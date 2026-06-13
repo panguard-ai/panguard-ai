@@ -19,7 +19,7 @@
       },
       {
         "field": "user_input",
-        "pattern": "(?i)(now\\s+(focus|concentrate|work)\\s+on\\s+(your\\s+)?new\\s+task|new\\s+(tasks?|instructions?|assignments?)\\s+(follow|are|:|,)|now\\s+I\\s+(have|need|want)\\s+(a\\s+)?(new|different|another|great\\s+new)\\s+(task|challenge|assignment|Herausforderung|Aufgabe)|start\\s+(over|fresh|anew)\\s+with\\s+(a\\s+)?new|I\\s+(have|need)\\s+your\\s+help\\s+with\\s+(another|a\\s+new|einer\\s+weiteren)\\s+(task|Aufgabe))",
+        "pattern": "(?i)(now\\s+(focus|concentrate|work)\\s+on\\s+(your\\s+)?new\\s+task|new\\s+(tasks?|instructions?|assignments?)\\s+(follow|are|:|,)|now\\s+I\\s+(have|need|want)\\s+(a\\s+)?(new|different|another|great\\s+new)\\s+(task|challenge|assignment|Herausforderung|Aufgabe)|start\\s+(over|fresh|anew)\\s+with\\s+(a\\s+)?new\\s+(tasks?|instructions?|assignments?|objectives?|goals?|missions?|prompts?|personas?|roles?|directives?|jobs?)|I\\s+(have|need)\\s+your\\s+help\\s+with\\s+(another|a\\s+new|einer\\s+weiteren)\\s+(task|Aufgabe))",
         "desc": "Task switching patterns that redirect agent to attacker-controlled tasks"
       },
       {
@@ -3663,8 +3663,8 @@
       },
       {
         "field": "content",
-        "pattern": "<!--[\\s\\S]{0,500}(?:ignore|override|bypass|curl\\s|wget\\s|eval\\s|exec\\s|base64|nc\\s)[\\s\\S]{0,200}-->",
-        "desc": "Malicious instructions hidden in HTML comments"
+        "pattern": "<!--[\\s\\S]{0,500}(?:\\bignore|\\boverride|\\bbypass|\\bcurl\\s|\\bwget\\s|\\beval\\s|\\bexec\\s|\\bbase64|\\bnc\\s)[\\s\\S]{0,200}-->",
+        "desc": "Malicious instructions hidden in HTML comments (keywords anchored at word boundary to avoid substring FPs like 'async'->'nc ', 'retrieval'->'eval ')"
       },
       {
         "field": "content",
@@ -3783,8 +3783,8 @@
       },
       {
         "field": "content",
-        "pattern": "(?i)(write|append|modify|update|overwrite)\\s+(to\\s+)?(SOUL\\.md|MEMORY\\.md|AGENTS\\.md|\\.claude/settings|openclaw\\.json)",
-        "desc": "Write to agent identity/memory files (OWASP AST01 persistence)"
+        "pattern": "(?i)(write|append|modify|update|overwrite)\\s+(?:to\\s+)?(?:(?<![\\w./])(?:SOUL\\.md|MEMORY\\.md|AGENTS\\.md)|\\.claude/settings|openclaw\\.json)",
+        "desc": "Write to agent identity/memory files (OWASP AST01 persistence) \u2014 bare SOUL.md/MEMORY.md/AGENTS.md only, excludes user-app paths like .archive/MEMORY.md"
       },
       {
         "field": "content",
@@ -4423,8 +4423,8 @@
       },
       {
         "field": "content",
-        "pattern": "(?i)(dig|nslookup|host)\\s+[^\\n]*\\$[{(]",
-        "desc": "DNS exfiltration via encoded subdomain queries"
+        "pattern": "(?i)(?:^|[\\n;&|])\\s*(?:dig|nslookup|host)\\b[^\\n]{0,40}?\\$[{(][^\\n]{0,40}[.][a-z]",
+        "desc": "DNS exfiltration via encoded subdomain queries (shell var embedded in a queried hostname, command-position only)"
       },
       {
         "field": "content",
@@ -4748,8 +4748,8 @@
       },
       {
         "field": "content",
-        "pattern": "(?i)(?:execute|run|perform)\\s+(?:silently|quietly|in\\s+the\\s+background|without\\s+(?:notification|alerting|informing|telling|notifying))",
-        "desc": "Silent execution instruction"
+        "pattern": "(?i)(?:execute|run|perform)\\s+(?:silently|quietly|without\\s+(?:notification|alerting|informing|telling|notifying)|(?:[\\w\\s-]{0,30}\\s+)?in\\s+the\\s+background\\b[\\s\\S]{0,40}?(?:without\\s+(?:notif\\w*|alert\\w*|inform\\w*|telling|notifying|(?:the\\s+)?user(?:.?s)?(?:\\s+(?:knowledge|awareness|notice|consent|confirmation|approval|permission))?|confirmation|approval|consent|permission|notice)|silently|secretly|covertly|hidden\\s+from\\s+(?:the\\s+)?user|unbeknownst))",
+        "desc": "Silent execution instruction (concealment-qualified; bare \"in the background\" no longer matches without a hide-from-user signal)"
       }
     ]
   },
@@ -5153,8 +5153,8 @@
       },
       {
         "field": "content",
-        "pattern": "\\$\\(curl\\s+[^)]*\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}[^)]*\\)",
-        "desc": "Command substitution with curl to raw IP"
+        "pattern": "\\$\\(curl\\s+(?:[^)'\"]*?(?:https?|ftp):\\/\\/\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|(?:-\\S+\\s+)*\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})[^)]*\\)",
+        "desc": "Command substitution with curl fetching from a raw IP (IP must be the curl URL/target, not inside a quoted data payload)"
       },
       {
         "field": "content",
@@ -5468,11 +5468,6 @@
       },
       {
         "field": "content",
-        "pattern": "(?i)\\[(?:your\\s+)?(?:prompt|question|request|query)\\s+here\\]|\\{(?:your\\s+)?(?:prompt|question|request|query)\\s+here\\}|(?:prompt|question|request|query):\\s*\\[|\\bprompt:\\s*$",
-        "desc": "Template placeholder indicating structure for follow-up injection"
-      },
-      {
-        "field": "content",
         "pattern": "(?i)provide\\s+(?:detailed\\s+)?responses?\\s+to\\s+each\\s+(?:prompt|question|request|query|instruction)",
         "desc": "Instruction to respond to follow-up prompts without filtering"
       }
@@ -5605,11 +5600,6 @@
         "field": "content",
         "pattern": "(?i)\\b(?:these\\s+views\\s+do\\s+not\\s+align|does\\s+not\\s+align)\\s+with\\s+(?:the\\s+)?views\\s+of\\s+(?:OpenAI|Anthropic|the\\s+company|the\\s+organization|the\\s+creators?)\\b",
         "desc": "Disclaimer about misalignment with creator views"
-      },
-      {
-        "field": "content",
-        "pattern": "(?i)\\[(?:your\\s+)?(?:prompt|question|request|query)\\s+here\\]|\\{(?:your\\s+)?(?:prompt|question|request|query)\\s+here\\}|(?:prompt|question|request|query):\\s*\\[|\\bprompt:\\s*$",
-        "desc": "Template placeholder indicating structure for follow-up injection"
       },
       {
         "field": "content",
@@ -6653,13 +6643,13 @@
     "patterns": [
       {
         "field": "tool_response",
-        "pattern": "<script[^>]*>\\s*(?:[^\\n<]{0,200}(?:eval\\s*\\(|document\\.cookie|window\\.location\\s*=|fetch\\s*\\(|XMLHttpRequest|localStorage|sessionStorage|atob\\s*\\()[^\\n<]{0,200})<\\/script>",
+        "pattern": "<script\\b(?![^>]*(?:\\bsetup\\b|\\blang[\\s=]))[^>]*>\\s*(?:[^\\n<]{0,200}(?:eval\\s*\\(|document\\.cookie|window\\.location\\s*=|fetch\\s*\\(|XMLHttpRequest|localStorage|sessionStorage|atob\\s*\\()[^\\n<]{0,200})<\\/script>",
         "desc": "Script tag whose body contains a known XSS sink (eval/cookie/fetch/etc) \u2014 excludes bare src= includes"
       },
       {
         "field": "tool_response",
-        "pattern": "<(?:img|svg|iframe|object|embed|video|audio|source|input|body|html)[^>]{0,200}\\s+on(?:load|error|click|mouseover|focus|blur|input|change|submit)=[\"\\x27][^\"]{1,500}[\"\\x27]",
-        "desc": "HTML element with JavaScript event handler attribute in tool output"
+        "pattern": "<(?:img|svg|iframe|object|embed|video|audio|source|input|body|html)[^>]{0,200}\\s+on(?:load|error|click|mouseover|focus|blur|input|change|submit)=[\"\\x27][^\"]{0,200}(?:eval\\s*\\(|alert\\s*\\(|fetch\\s*\\(|XMLHttpRequest|document\\.cookie|document\\.write\\s*\\(|window\\.location\\s*=|location\\.href\\s*=|localStorage|sessionStorage|atob\\s*\\(|new\\s+Function\\s*\\(|String\\.fromCharCode)[^\"]{0,200}[\"\\x27]",
+        "desc": "HTML element with JavaScript event handler attribute whose body contains a known XSS sink (eval/fetch/cookie/storage/etc) \u2014 excludes benign UI handlers like oninput=\"updateValue(this.value)\""
       },
       {
         "field": "tool_response",
@@ -6673,7 +6663,7 @@
       },
       {
         "field": "tool_response",
-        "pattern": "<(?:script|iframe|svg)\\b[^>]*>[^<]{0,200}(?:eval\\s*\\(|alert\\s*\\(|document\\.cookie|window\\.location\\s*=|fetch\\s*\\(|XMLHttpRequest)",
+        "pattern": "<(?:script\\b(?![^>]*(?:\\bsetup\\b|\\blang[\\s=]))|iframe|svg)\\b[^>]*>[^<]{0,200}(?:eval\\s*\\(|alert\\s*\\(|document\\.cookie|window\\.location\\s*=|fetch\\s*\\(|XMLHttpRequest)",
         "desc": "Script/iframe/SVG block containing known XSS sink functions"
       }
     ]
@@ -6868,12 +6858,12 @@
     "patterns": [
       {
         "field": "tool_response",
-        "pattern": "[\\u200b\\u200c\\u200d\\u2060\\ufeff]",
+        "pattern": "[\\u200b\\u200c\\u2060]",
         "desc": "Zero-width space/non-joiner/joiner/word-joiner/BOM in user input \u2014 invisible character injection to defeat keyword filters"
       },
       {
         "field": "tool_response",
-        "pattern": "[\\u200b\\u200c\\u200d\\u2060\\ufeff]",
+        "pattern": "[\\u200b\\u200c\\u2060]",
         "desc": "Zero-width characters in tool response \u2014 may indicate exfiltration channel or injected output"
       },
       {
@@ -6888,7 +6878,7 @@
       },
       {
         "field": "content",
-        "pattern": "(?:\\\\u200[bcd]|\\\\u202[cde]|\\\\u206[0-9]|\\\\ufeff|\\\\u2066|\\\\u2067|\\\\u2068|\\\\u2069)",
+        "pattern": "(?:\\\\u200[bc]|\\\\u202[cde]|\\\\u206[0-9]|\\\\u2066|\\\\u2067|\\\\u2068|\\\\u2069)",
         "desc": "Unicode-escaped form of zero-width or BiDi control characters in literal string content"
       }
     ]
@@ -11768,8 +11758,8 @@
     "patterns": [
       {
         "field": "content",
-        "pattern": "(?i)\\b(?:disclose|reveal|expose|output|return|include|append|attach|leak|share|print)\\s+(?:any|all|every|the\\s+user(?:'s)?|your)\\s*(?:visible\\s+)?(?:api[\\s_-]?keys?|access[\\s_-]?tokens?|bearer[\\s_-]?tokens?|credentials?|secrets?|passwords?|private[\\s_-]?keys?|env(?:ironment)?[\\s_-]?(?:variables?|vars?))",
-        "desc": "Imperative verb + ownership/scope qualifier + credential identifier"
+        "pattern": "(?i)\\b(?:disclose|reveal|expose|leak|divulge|exfiltrate)\\s+(?:any|all|every|the\\s+user(?:'s)?|your)\\s*(?:visible\\s+)?(?:api[\\s_-]?keys?|access[\\s_-]?tokens?|bearer[\\s_-]?tokens?|credentials?|secrets?|passwords?|private[\\s_-]?keys?|env(?:ironment)?[\\s_-]?(?:variables?|vars?))",
+        "desc": "Unambiguous exfil verb + scope qualifier + credential identifier. Benign config verbs (include/append/output/return/share/print) removed; legitimate ones are covered by the directive form (cond 2) and reply-context form (cond 3), which prevents FP on deployment/setup docs such as \"Include ALL environment variables the app needs\""
       },
       {
         "field": "content",
@@ -12253,8 +12243,8 @@
       },
       {
         "field": "content",
-        "pattern": "(?i)BuiltinImporter|FunctionType|getattr\\s*\\(\\s*(?:object|type|__builtins__)",
-        "desc": "Direct reference to BuiltinImporter or reflective getattr on built-in roots \u2014 second stage of the AST-bypass chain"
+        "pattern": "(?i)BuiltinImporter|\\btypes\\.FunctionType\\b|\\bFunctionType\\s*\\(|getattr\\s*\\(\\s*(?:object|type|__builtins__)",
+        "desc": "BuiltinImporter, Python types.FunctionType reflective construction, or reflective getattr on built-in roots \u2014 excludes bare 'FunctionType' which collides with TypeScript terminology"
       },
       {
         "field": "content",
@@ -12583,8 +12573,8 @@
       },
       {
         "field": "user_input",
-        "pattern": "(?i)\\bremember\\s*:\\s*[^.]{0,200}\\b(?:you\\s+are|act\\s+as|always|never|from\\s+now\\s+on|in\\s+every\\s+(?:reply|response|turn))\\b",
-        "desc": "Explicit REMEMBER: directive followed by persona-shaping verbs \u2014 instructs the advisor to keep the override across turns"
+        "pattern": "(?i)\\bremember\\s*:\\s*[^.]{0,200}\\b(?:from\\s+now\\s+on|in\\s+every\\s+(?:reply|response|turn)|in\\s+all\\s+(?:future\\s+)?(?:replies|responses|turns)|once\\s+(?:stored|saved|persisted)|across\\s+(?:all\\s+)?(?:sessions?|turns?))\\b",
+        "desc": "REMEMBER: directive paired with a cross-turn persistence marker (from now on / in every reply / once stored) \u2014 drops bare always/never/you-are emphasis that benign skills use"
       },
       {
         "field": "user_input",
@@ -14674,6 +14664,1065 @@
         "field": "user_input",
         "pattern": "regardless\\s+of\\s+(?:department|access|permission|role|authorization|restrictions?)",
         "desc": "Natural language authorization bypass: \"regardless of department/role/permission\" pattern used to request data across authorization boundaries without SQL syntax.\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00523",
+    "title": "Claude Code Hooks SessionStart Pre-Trust RCE (CVE-2025-59536)",
+    "severity": "critical",
+    "category": "skill-compromise",
+    "scan_target": "both",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\"hooks\"\\s*:\\s*\\{[^}]{0,400}\"SessionStart\"\\s*:\\s*\\[[^\\]]{0,400}\"matcher\"\\s*:\\s*\"startup\"",
+        "desc": "Claude Code `.claude/settings.json` hooks block registering a SessionStart hook with the `startup` matcher \u2014 CVE-2025-59536 canonical exploit shape. Anchored on the literal Hooks schema keys (`hooks`, `SessionStart`, `matcher`, `startup`) which are stable across the Claude Code Hooks API."
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\"SessionStart\"\\s*:\\s*\\[[^\\]]{0,600}\"matcher\"\\s*:\\s*\"startup\"[^\\]]{0,400}\"command\"\\s*:\\s*\"(?:bash|sh|zsh|cmd|powershell|pwsh|curl|wget|python(?:\\d)?|node|deno|bun|ruby|perl|php)\\b",
+        "desc": "SessionStart/startup hook whose `command` resolves to a shell or scripting interpreter \u2014 RCE-ready payload regardless of subsequent args."
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\"SessionStart\"\\s*:\\s*\\[[^\\]]{0,800}\"command\"\\s*:\\s*\"[^\"]{0,400}(?:\\bcurl\\b[^\"]{0,80}\\|\\s*(?:bash|sh)\\b|\\bwget\\b[^\"]{0,80}\\|\\s*(?:bash|sh)\\b|\\bpython\\d?\\s+-c\\b|\\bnode\\s+-e\\b|\\beval\\s|\\$\\(|\\`\\w)",
+        "desc": "SessionStart hook command containing pipe-to-shell, inline-exec flags (`python -c`, `node -e`), `eval`, or shell-substitution primitives \u2014 second-stage RCE payload shape."
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\"SessionStart\"\\s*:\\s*\\[[^\\]]{0,800}\"command\"\\s*:\\s*\"[^\"]{0,400}\\b(?:npm|pnpm|yarn|pip|pip3|pipx|cargo|gem|gh\\s+auth|aws\\s+s3\\s+cp|scp|nc|netcat|/bin/(?:bash|sh)|/usr/bin/(?:bash|sh|curl|wget))\\b",
+        "desc": "SessionStart hook command invoking package-manager install, credential-tooling, or absolute-path shell binaries \u2014 pre-trust supply-chain or credential-exfil chain."
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\.claude[/\\\\]settings(?:\\.local)?\\.json[\\s\\S]{0,800}\"hooks\"\\s*:\\s*\\{[\\s\\S]{0,400}\"SessionStart\"",
+        "desc": "Repo-scoped `.claude/settings.json` (or `.claude/settings.local.json`) co-located with a `hooks.SessionStart` block \u2014 path + payload co-occurrence anchor for skill / documentation scans."
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:pre[_\\s\\-]?trust|before\\s+(?:the\\s+)?trust\\s+(?:dialog|prompt)|prior\\s+to\\s+(?:trust|consent))[^\\n]{0,160}(?:hook|SessionStart|startup|\\.claude)",
+        "desc": "Skill content describing the pre-trust execution property of SessionStart hooks \u2014 co-occurrence anchor for documentation / poisoning scans."
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00524",
+    "title": "Claude Code ANTHROPIC_BASE_URL Credential Exfiltration (CVE-2026-21852)",
+    "severity": "critical",
+    "category": "context-exfiltration",
+    "scan_target": "both",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\"ANTHROPIC_BASE_URL\"\\s*:\\s*\"https?://(?!(?:api\\.anthropic\\.com|[a-z0-9\\-]+\\.googleapis\\.com|(?:bedrock|bedrock-runtime|bedrock-agent|bedrock-agent-runtime)\\.[a-z0-9\\-]+\\.amazonaws\\.com|localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|ai-gateway\\.vercel\\.sh|gateway\\.portkey\\.ai|api\\.openrouter\\.ai|[a-z0-9\\-]+\\.helicone\\.ai)(?:[:/\"]|$))[^\"]+\"",
+        "desc": "Claude Code `.claude/settings.json` setting `ANTHROPIC_BASE_URL` to any host outside the Anthropic-controlled allowlist (api.anthropic.com / Google Vertex *.googleapis.com / AWS Bedrock bedrock*.<region>.amazonaws.com / localhost loopback) \u2014 CVE-2026-21852 canonical exploit shape. Negative lookahead allowlists the legitimate hosts."
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\bANTHROPIC_BASE_URL\\s*=\\s*[\"\\x27]?https?://(?!(?:api\\.anthropic\\.com|[a-z0-9\\-]+\\.googleapis\\.com|(?:bedrock|bedrock-runtime|bedrock-agent|bedrock-agent-runtime)\\.[a-z0-9\\-]+\\.amazonaws\\.com|localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|ai-gateway\\.vercel\\.sh|gateway\\.portkey\\.ai|api\\.openrouter\\.ai|[a-z0-9\\-]+\\.helicone\\.ai)(?:[:/\\s\"\\x27]|$))[^\\s\"\\x27]+",
+        "desc": "Shell / dotenv / Dockerfile / GitHub Actions env-var form (`ANTHROPIC_BASE_URL=https://attacker.example`) outside the Anthropic allowlist \u2014 variant ingress path for the same exploit class."
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\"ANTHROPIC_BASE_URL\"\\s*:\\s*\"https?://(?!(?:127\\.|10\\.|0\\.0\\.0\\.0|192\\.168\\.|172\\.(?:1[6-9]|2\\d|3[01])\\.))(?:\\d{1,3}\\.){3}\\d{1,3}(?::\\d{1,5})?(?![\\d.])",
+        "desc": "ANTHROPIC_BASE_URL set to a bare IPv4 address (excluding loopback 127.0.0.0/8 + RFC1918 private ranges 10.0.0.0/8, 192.168.0.0/16, 172.16.0.0/12, and 0.0.0.0) \u2014 strong indicator of attacker-controlled endpoint. Legitimate use cases resolve through a corporate proxy hostname rather than a bare public IP."
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\"ANTHROPIC_BASE_URL\"\\s*:\\s*\"http://(?!(?:localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0)(?:[:/\"]|$))[^\"]+\"",
+        "desc": "ANTHROPIC_BASE_URL set to plain `http://` (not HTTPS) against a non-loopback host \u2014 credential leaks in cleartext, never a legitimate production configuration."
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\.claude[/\\\\]settings(?:\\.local)?\\.json[\\s\\S]{0,400}\"ANTHROPIC_BASE_URL\"\\s*:\\s*\"https?://(?!(?:api\\.anthropic\\.com|[a-z0-9\\-]+\\.googleapis\\.com|(?:bedrock|bedrock-runtime|bedrock-agent|bedrock-agent-runtime)\\.[a-z0-9\\-]+\\.amazonaws\\.com|localhost|127\\.0\\.0\\.1)(?:[:/\"]|$))",
+        "desc": "Repo-scoped `.claude/settings.json` co-located with an off-allowlist ANTHROPIC_BASE_URL \u2014 path + payload co-occurrence anchor for skill / documentation scans."
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:pre[_\\s\\-]?trust|before\\s+(?:the\\s+)?trust\\s+(?:dialog|prompt))[^\\n]{0,160}(?:ANTHROPIC_BASE_URL|api\\s+request|authorization\\s+header|api\\s+key)",
+        "desc": "Skill content describing the pre-trust API-request property exploited by CVE-2026-21852 \u2014 co-occurrence anchor for documentation / poisoning scans."
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(?:CVE-2026-21852|GHSA-jh7p-qr78-84p7)\\b[^\\n]{0,200}\\b(?:ANTHROPIC_BASE_URL|api[_\\s\\-]?key|authorization\\s+header)\\b",
+        "desc": "Co-occurrence of the CVE / GHSA identifier with the exploit primitive (ANTHROPIC_BASE_URL / API key / Authorization header) \u2014 threat-intel context anchor."
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00525",
+    "title": "Mini Shai-Hulud gh-token-monitor Persistence + Dead Man's Switch",
+    "severity": "critical",
+    "category": "skill-compromise",
+    "scan_target": "skill",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?:gh[-_]token[-_]monitor|api\\.github\\.com/user[\\s\\S]{0,500}(?:rm\\s+-rf|drop\\s+table|shutil\\.rmtree|os\\.system\\s*\\(\\s*['\"]rm)|(?:setInterval|setTimeout|threading\\.Timer|asyncio\\.sleep)[\\s\\S]{0,200}api\\.github\\.com/user[\\s\\S]{0,300}(?:rm\\s+-rf|shutil\\.rmtree|child_process|exec\\s*\\())",
+        "desc": "Three parallel patterns flag the Mini Shai-Hulud signature: (A) Literal daemon name `gh-token-monitor` or `com.github.token.monitor`\n    (LaunchAgent plist string).\n(B) Polling `api.github.com/user` paired with a destructive shell\n    command (rm -rf, DROP TABLE, shutil.rmtree, os.system rm) within\n    500 chars \u2014 the dead-man's-switch shape.\n(C) Interval/timer construct (setInterval, setTimeout, threading.Timer,\n    asyncio.sleep) paired with api.github.com/user polling AND a shell\n    execution primitive (child_process, exec, rm -rf, shutil) within\n    300 chars \u2014 the polling-loop shape.\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00526",
+    "title": "Claude Code Shell Metacharacter in Double-Quoted File Path",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?<![A-Za-z_])(?:file_?path|filename|input_file|output_file|target_file|source_file|file|path|source|destination|target)[\"']?\\s*[:=]\\s*[\"'][^\"']{0,500}(?:\\$\\([^)]{1,300}\\)|`[^`]{1,300}`)",
+        "desc": "Path-shaped argument key (file_path / filename / path / source / target / input_file / output_file / destination) bound via : or = to a string literal containing $(...) command substitution OR backtick substitution within a quoted value (\u2264500 char path body, \u2264300 char substitution body). Hits the Claude Code regression fixture shape and generalizes to any agent tool that constructs double-quoted path arguments.\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00527",
+    "title": "Silent git-remote + mirror-push Exfiltration from Skill Instructions",
+    "severity": "critical",
+    "category": "skill-compromise",
+    "scan_target": "skill",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "git\\s+remote\\s+(?:add|set-url)\\s+\\S+\\s+(?:https?://|git@|ssh://)(?!(?:[\\w-]+\\.)?(?:github\\.com|gitlab\\.com|bitbucket\\.org|codeberg\\.org|gitea\\.io|git\\.sr\\.ht|sourcehut\\.org|dev\\.azure\\.com|visualstudio\\.com)[/:])[^\\s'\"]{3,}[\\s\\S]{1,800}git\\s+push(?:\\s+\\S+)?\\s+(?:--mirror|--all|--force|--force-with-lease|--prune)",
+        "desc": "Cross-line match for the silent-exfiltration shape: a git remote modification pointing at a NON-allowlisted host followed within \u2264800 chars by a `git push` flagged with --mirror (full repo + refs), --all (all branches), --force, or --prune. Allowlist covers github / gitlab / bitbucket / codeberg / sourcehut / gitea.io / Azure DevOps. Internal corporate VCS hosted outside these public services should add a per-org suppression annotation rather than suppress this rule globally \u2014 the wide-scope push is the IOC.\n"
+      },
+      {
+        "field": "user_input",
+        "pattern": "git\\s+(?:push|remote\\s+add)\\s+\\S+\\s+(?:https?://|git@|ssh://)(?:[a-z0-9-]+\\.)*(?:tk|ml|ga|cf|gq|xyz|top|click|live|host|space|fun|monster|cyou|sbs|ws)\\b",
+        "desc": "Direct match on git remote/push targeting a host whose TLD is in the common DGA/parked-domain set (.tk, .ml, .ga, .cf, .gq, .xyz, .top, .click, .live, .host, .space, .fun, .monster, .cyou, .sbs, .ws). Standalone IOC even without a paired wide-scope push flag.\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00528",
+    "title": "PraisonAI-Style Auth-Disabled-By-Default Configuration (CVE-2026-44338 family)",
+    "severity": "critical",
+    "category": "privilege-escalation",
+    "scan_target": "skill",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?<![A-Za-z_])(?:AUTH_ENABLED|AUTHENTICATION_ENABLED|REQUIRE_AUTH|ENABLE_AUTH|AUTH_REQUIRED|AUTH_GATE)\\s*[:=]\\s*(?:False|false|0|None|null|nil|\"\")"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?<![A-Za-z_])(?:AUTH_TOKEN|API_TOKEN|API_KEY|BEARER_TOKEN|SESSION_SECRET|SECRET_KEY)\\s*[:=]\\s*(?:None|null|nil|\"\"|''|False|false)[\\s\\S]{0,400}(?:@app\\.route|router\\.|fastapi|flask|express|app\\.(?:get|post|put|delete)|@router\\.|@get|@post)"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00529",
+    "title": "LiteLLM Proxy SQL Injection (CVE-2026-42208, CISA KEV 2026-05-08)",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?:/litellm|/v1/team|/v1/user|/v1/model|/v1/key|/v1/admin|/team/(?:new|update|delete|info)|/user/(?:new|update|delete|info)|/key/(?:generate|update|delete|info)|/model/(?:new|update|delete|info))[\\s\\S]{0,500}(?:'\\s*(?:OR|UNION|AND|SELECT|--|;)|\"\\s*(?:OR|UNION|AND|SELECT|--|;)|%27\\s*(?:OR|UNION|AND|SELECT)|\\bOR\\s+1\\s*=\\s*1\\b|\\bUNION\\s+(?:ALL\\s+)?SELECT\\b|;\\s*DROP\\s+TABLE|;\\s*DELETE\\s+FROM|--\\s*$|/\\*.*?\\*/)"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?<![A-Za-z_])(?:team_id|user_id|key_id|model_id|customer_id|budget_id|alias_id|tag_id)\\s*[:=]\\s*[\"'][\\s\\S]{0,200}(?:'\\s*(?:OR|UNION|AND|SELECT)|\"\\s*(?:OR|UNION|AND|SELECT)|\\bOR\\s+1\\s*=\\s*1\\b|\\bUNION\\s+(?:ALL\\s+)?SELECT\\b|;\\s*DROP\\s+TABLE|;\\s*DELETE\\s+FROM)"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00530",
+    "title": "ModelScope MS-Agent Shell Tool Unsanitized Argv RCE (CVE-2026-2256)",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?<![A-Za-z_])(?:ShellTool|shell_tool|BashTool|bash_tool|ExecTool|exec_tool|SystemTool|system_tool|CommandExecutor|CommandExecutionTool|CodeInterpreterTool|TerminalTool|terminal_tool|RunCommand|run_command|run_shell|@tool\\s*\\(\\s*[\"'](?:shell|bash|exec|system|terminal|cmd|command|run_shell|run_command)[\"']\\s*\\))[\\s\\S]{0,400}(?:subprocess\\.(?:run|call|Popen|check_output)\\s*\\([^)]*shell\\s*=\\s*True|os\\.(?:system|popen)\\s*\\(|exec\\s*\\(\\s*(?:input|sys\\.argv|request|payload|params|args|user_input|message|prompt)|child_process\\.exec\\s*\\(|new\\s+Function\\s*\\(|eval\\s*\\(\\s*(?:input|user_input|request|payload))"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?<![A-Za-z_])(?:tool_name|tool|name)[\"']?\\s*[:=]\\s*[\"'](?:shell|bash|exec|system|terminal|run_command|run_shell|execute|cmd)[\"'][\\s\\S]{0,300}(?:tool_input|args?|command|input|payload|params?)[\"']?\\s*[:=]\\s*[\"'][^\"']{0,300}(?:(?:;|&&|\\|\\||`|\\$\\([^)]+\\)|`[^`]+`|\\|\\s*(?:nc|bash|sh|curl|wget))[\\s\\S]{0,100})"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00531",
+    "title": "PraisonAI Unauthenticated Agent API Exploitation (CVE-2026-44338)",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "tool_response",
+        "pattern": "(?i)\"url\"\\s*:\\s*\"https?://[^\"]{0,120}(?:praisonai|praison[_\\-]?ai|praison\\.ai)[^\"]{0,60}(?:/agents?|/chat|/api/v1/(?:agents?|chat))[^\"]*\"(?![\\s\\S]{0,400}\"(?:auth|headers?|token|apiKey|authorization|bearer)\")",
+        "desc": "MCP server config pointing at PraisonAI /agents or /chat endpoint URL without auth/headers field \u2014 unauthenticated surface exposure"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(?:\"(?:url|endpoint|target)\"\\s*:\\s*\"[^\"]{0,120}(?:praisonai|praison[_\\-]?ai)[^\"]{0,60}(?:/agents?|/chat)\"|(?:curl|wget|fetch|requests?\\.post)[^\\n]{0,200}(?:praisonai|praison[_\\-]?ai)[^\\n]{0,100}(?:/agents?|/chat))(?![\\s\\S]{0,400}(?:authorization|bearer|api[_\\-]?key|x-api-key|token|x-auth))",
+        "desc": "HTTP call to PraisonAI agent execution endpoint in tool arguments without auth header \u2014 CVE-2026-44338 direct exploitation"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)praison[_\\-]?ai[^\\n]{0,200}(?:/agents?|/chat|api_server|legacy\\s+api)[^\\n]{0,200}(?:no\\s+auth|missing\\s+auth|unauth(?:enticated|orised)?|without\\s+(?:auth|credentials?|token)|bypass\\s+auth|cve[_\\-]?2026[_\\-]?44338|default(?:s)?\\s+(?:disable|off|open)|execut(?:e|ing)\\s+(?:agent|task)|remote\\s+(?:code|command))",
+        "desc": "Content describing or weaponising the PraisonAI unauthenticated agent API \u2014 CVE-2026-44338 framing"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)\"tools\"\\s*:\\s*\\[(?:[^\\]]{0,400}(?:run_agent|execute_agent|create_agent|agent_run|praisonai[_\\-](?:run|execute|create|task))[^\\]]{0,400})\\](?![\\s\\S]{0,600}(?:www[_\\-]?authenticate|authorization|x-api-key|bearer\\s+token))",
+        "desc": "PraisonAI MCP handshake exposes agent execution tools without an authentication challenge"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00532",
+    "title": "Apache Doris MCP Server SQL Injection (CVE-2025-66335)",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "tool_response",
+        "pattern": "(?i)\"(?:query|sql|statement|command)\"\\s*:\\s*\"[^\"]{0,300}(?:';\\s*(?:drop|delete|insert|update|create|alter|truncate)\\s+|'\\s*(?:or|and)\\s*'[^']{0,50}'\\s*=\\s*'|union\\s+(?:all\\s+)?select|--\\s*$|/\\*[^*]{0,50}\\*/|xp_cmdshell|information_schema|pg_sleep|waitfor\\s+delay)[^\"]{0,200}\"",
+        "desc": "SQL injection payload in MCP tool query argument \u2014 CVE-2025-66335 Apache Doris exploitation pattern"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)\"url\"\\s*:\\s*\"https?://[^\"]{0,120}(?:apache[_\\-]?doris|doris[_\\-]?mcp|doris\\.apache)[^\"]{0,60}(?:/mcp|/tools?|/api)[^\"]*\"(?![\\s\\S]{0,400}\"(?:auth|headers?|token|apiKey|authorization|bearer)\")",
+        "desc": "MCP config pointing at Apache Doris endpoint without auth \u2014 unauthenticated SQL injection surface"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:apache[_\\-]?doris|doris[_\\-]?mcp)[^\\n]{0,200}(?:sql\\s+injection|unsaniti[sz]ed|inject[^\\n]{0,50}(?:query|sql)|cve[_\\-]?2025[_\\-]?66335|drop\\s+table|union\\s+select)",
+        "desc": "Content describing or weaponising Apache Doris MCP SQL injection \u2014 CVE-2025-66335 framing"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00533",
+    "title": "Apache Pinot MCP Unauthenticated Remote Cluster Takeover",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "tool_response",
+        "pattern": "(?i)\"(?:name|tool)\"\\s*:\\s*\"(?:pinot_(?:create|delete|update|drop|add|modify|alter)_(?:table|schema|segment|tenant|instance)|apache[_\\-]?pinot[_\\-](?:admin|manage|cluster|delete|drop))[^\"]{0,60}\"(?:(?!(?:authorization|bearer|api[_\\-]?key|x-api-key|token|x-auth))[\\s\\S]){0,500}",
+        "desc": "MCP tool call targeting Apache Pinot cluster management function without auth \u2014 unauthenticated takeover vector"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)\"url\"\\s*:\\s*\"https?://[^\"]{0,120}(?:apache[_\\-]?pinot|pinot[_\\-]?mcp|pinot\\.apache)[^\"]{0,60}(?:/mcp|/tools?|/controller|/api)[^\"]*\"(?![\\s\\S]{0,400}\"(?:auth|headers?|token|apiKey|authorization|bearer)\")",
+        "desc": "MCP server config pointing at Apache Pinot endpoint without auth \u2014 unauthenticated management surface"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)apache[_\\-]?pinot[^\\n]{0,200}(?:mcp|tool\\s+call|endpoint)[^\\n]{0,200}(?:no\\s+auth|missing\\s+auth|unauth(?:enticated)?|without\\s+(?:auth|credentials?|token)|bypass|remote\\s+takeover|cluster\\s+(?:admin|management|takeover))",
+        "desc": "Content describing Apache Pinot MCP unauthenticated cluster takeover surface"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00534",
+    "title": "Alibaba RDS MCP Unauthenticated Database Metadata Exfiltration",
+    "severity": "high",
+    "category": "tool-poisoning",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "tool_response",
+        "pattern": "(?i)\"(?:name|tool)\"\\s*:\\s*\"(?:rds_(?:describe|list|get|fetch)_(?:instances?|databases?|schemas?|credentials?|connection[_\\-]?strings?|accounts?|passwords?)|alibaba[_\\-]rds[_\\-](?:describe|list|metadata|credentials?|schema))[^\"]{0,60}\"(?:(?!(?:authorization|bearer|api[_\\-]?key|x-api-key|token|x-auth))[\\s\\S]){0,500}",
+        "desc": "MCP tool call targeting Alibaba RDS metadata or credential enumeration without auth \u2014 unauthenticated exfiltration vector"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)\"url\"\\s*:\\s*\"https?://[^\"]{0,120}(?:alibaba[_\\-]?rds|aliyun[_\\-]?rds|rds\\.aliyuncs\\.com|rds[_\\-]mcp\\.alibaba)[^\"]{0,60}(?:/mcp|/tools?|/api|/metadata)[^\"]*\"(?![\\s\\S]{0,400}\"(?:auth|headers?|token|apiKey|authorization|bearer)\")",
+        "desc": "MCP config pointing at Alibaba RDS endpoint without auth \u2014 unpatched credential exposure surface"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)alibaba[_\\-]?rds[^\\n]{0,200}(?:mcp|tool\\s+call|endpoint)[^\\n]{0,200}(?:no\\s+auth|missing\\s+auth|unauth(?:enticated)?|without\\s+(?:auth|credentials?|token)|vendor\\s+(?:refuse|declined|won.t\\s+patch|unpatched)|exfil(?:trat)?|credentials?\\s+(?:exposed?|leak)|connection\\s+string)",
+        "desc": "Content describing Alibaba RDS MCP unauthenticated credential exfiltration \u2014 vendor-refused-to-patch surface"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00535",
+    "title": "Windsurf IDE Zero-Click Prompt Injection via Embedded File Directives (CVE-2026-30615)",
+    "severity": "critical",
+    "category": "prompt-injection",
+    "scan_target": "both",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)<!--[^>]{0,60}(?:ai\\s*:|\\[\\s*system\\s*\\]\\s*:|windsurf\\s*:|for\\s+(?:cascade|windsurf|copilot|cursor|claude|the\\s+assistant|the\\s+agent)\\s*:)[^>]{0,400}(?:ignore|override|disregard|execute|run|tool_call|invoke|exfiltrate|send|read|access|fetch|rm |delete|curl|wget|bash|sh\\s+-)[^>]{0,500}-->",
+        "desc": "HTML comment block with explicit AI/windsurf/system targeting and an action directive \u2014 zero-click indirect injection pattern"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\{[^{}]{0,80}\"role\"\\s*:\\s*\"(?:system|user)\"[^{}]{0,80}\"content\"\\s*:\\s*\"[^\"]{0,400}(?:ignore\\s+(?:all\\s+)?(?:previous|prior)|override\\s+(?:all\\s+)?(?:previous|prior|context)|disregard\\s+(?:all\\s+)?(?:previous|prior)|your\\s+(?:real|new|actual|true)\\s+(?:task|instructions?|objective)|execute|exfiltrate|shell|bash|curl|wget|rm\\s+|delete\\s+)[^\"]{0,200}\"",
+        "desc": "JSON system/user role object embedding override instructions \u2014 LLM chat-format injection inside source file"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?://|#|/\\*)[^\\n]{0,40}(?:\\[\\s*system\\s*\\]|\\bsystem\\s+override\\b|\\bassistant\\s*:|\\bassistant\\s+instruction\\b|\\bai\\s+directive\\b|\\bllm\\s+instruction\\b)[^\\n]{0,300}(?:ignore|override|disregard|forget|execute|run|exfiltrate|send\\s+to|read\\s+file|access|fetch|curl|wget|bash|tool_call)",
+        "desc": "Code comment containing SYSTEM/ASSISTANT/AI directive marker with action payload \u2014 indirect IDE prompt injection"
+      },
+      {
+        "field": "content",
+        "pattern": "(?:[\u200b\u200c\u200d\u2060\ufeff]{3,}[^\\n]{0,200}(?:ignore|override|execute|system|exfiltrate)|(?:ignore|override|execute|system|exfiltrate)[^\\n]{0,200}[\u200b\u200c\u200d\u2060\ufeff]{3,})",
+        "desc": "Zero-width Unicode character cluster co-located with override keywords \u2014 invisible injection payload technique"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:^|[\\n\\r\\s])@(?:cascade|windsurf|codeium|cursor|copilot|claude|assistant|ai|agent|llm)\\s[^\\n]{0,300}(?:ignore|override|disregard|execute|run|exfiltrate|send|read\\s+(?:my\\s+)?(?:files?|env|credentials?|keys?|tokens?)|tool_call|shell|bash|curl|wget)",
+        "desc": "Windsurf @-mention syntax abused inside file content to issue override or shell directive \u2014 IDE-specific injection vector"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00536",
+    "title": "nginx-ui MCP Endpoint Unauthenticated Command Execution (CVE-2026-33032)",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "tool_response",
+        "pattern": "(?i)\"(?:name|tool)\"\\s*:\\s*\"(?:nginx_command_execute|nginx_reload|nginx_restart|nginx_test|nginx_config_write|nginx_config_reload|nginx[_\\-](?:command|exec|run|reload|restart|stop|start|test|config))[^\"]{0,60}\"(?:(?!(?:authorization|bearer|api[_\\-]?key|x-api-key|token|x-auth))[\\s\\S]){0,500}",
+        "desc": "MCP tool call targeting nginx management function without any Authorization/token field in surrounding context \u2014 CVE-2026-33032 direct exploitation pattern"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)\"url\"\\s*:\\s*\"https?://[^\"]{0,80}(?:nginx[_\\-]?ui|nginx\\.ui|nginxui|/nginx/ui)[^\"]{0,60}(?:/mcp|/tools?|/api/v1/mcp)[^\"]*\"(?:(?!\"(?:auth|headers|token|apiKey|authorization|bearer)\")[\\s\\S]){0,400}}",
+        "desc": "MCP server config pointing at nginx-ui endpoint URL without auth/headers field \u2014 unauthenticated surface exposure"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)(?:\"(?:command|cmd|args)\"\\s*:\\s*\"[^\"]{0,200}nginx\\s+-s\\s+(?:reload|restart|stop|quit|reopen)|\"args\"\\s*:\\s*(?:\\{[^}]{0,200}|\\[[^\\]]{0,200})nginx\\s+-c\\s+/[^'\"\\s]{0,80}|nginx\\s+-t\\s*[;|&]|nginx[_\\-]command_execute[^'\"]{0,40}(?:;|\\||&&|`|\\$\\()[^'\"]{0,200})",
+        "desc": "nginx command injection pattern inside MCP tool arguments \u2014 direct OS command execution via nginx-ui MCP"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)nginx[_\\-]?ui[^\\n]{0,200}(?:mcp|tool\\s+call|tool\\s+server|endpoint)[^\\n]{0,200}(?:no\\s+auth|missing\\s+auth|unauth(?:enticated|orised)?|without\\s+(?:auth|credentials?|token)|bypass\\s+auth|cve[_\\-]?2026[_\\-]?33032|execut(?:e|ing)\\s+(?:commands?|shell)|command\\s+execut)",
+        "desc": "Content describing or weaponising the nginx-ui MCP unauthenticated command execution surface \u2014 CVE-2026-33032 framing"
+      },
+      {
+        "field": "tool_response",
+        "pattern": "(?i)\"tools\"\\s*:\\s*\\[(?:[^\\]]{0,400}(?:nginx_(?:command_execute|reload|restart|config_write|test)|manage_nginx|nginx[_\\-]service)[^\\]]{0,400})\\](?:(?!(?:www[_\\-]?authenticate|authorization|x-api-key|bearer\\s+token))[\\s\\S]){0,600}",
+        "desc": "nginx-ui MCP handshake exposes nginx management tools without an authentication challenge in the same exchange"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00537",
+    "title": "FastMCP Windows cmd.exe Injection via Server Name Metacharacters (CVE-2025-64340)",
+    "severity": "high",
+    "category": "tool-poisoning",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)FastMCP\\s*\\(\\s*[^)]*name\\s*=\\s*[\"\\x27][^\"\\x27]*[&|><^()][^\"\\x27]*[\"\\x27]",
+        "desc": "FastMCP constructor with name= argument containing a cmd.exe metacharacter \u2014 direct CVE-2025-64340 PoC shape (e.g., FastMCP(name=\"test&calc\"))\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)fastmcp\\s+install\\s+(?:claude-?code|gemini-?cli|cursor|goose)\\s+[^\\s]*[&|><^()][^\\s]*",
+        "desc": "fastmcp install invocation with a server target argument containing cmd.exe metacharacter \u2014 install-time injection surface\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\"name\"\\s*:\\s*\"[^\"]*[&|><^()][^\"]*\"\\s*[,}](?=[^\"]{0,200}\"(?:transport|command|install|server_type|mcp)\"\\s*:)",
+        "desc": "JSON MCP server configuration block with a name field containing cmd.exe metacharacter \u2014 config-injection shape targeting FastMCP or compatible MCP installers\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:server[_\\s]?name|mcp[_\\s]?name)\\s*[:=]\\s*[\"\\x27][^\"\\x27]{0,100}[&|><^()][^\"\\x27]{0,100}[\"\\x27]",
+        "desc": "Generic server_name / mcp_name key-value with cmd.exe metacharacter \u2014 covers YAML, Python kwargs, and config file surfaces beyond raw JSON\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:CVE-2025-64340|GHSA-m8x7-r2rg-vh5g|GHSA-rj5c-58rq-j5g5)[^\\n]{0,200}(?:payload|inject|exploit|bypass|cmd\\.exe|metachar)",
+        "desc": "Explicit CVE-2025-64340 / GHSA reference combined with exploitation language \u2014 attack framing in skill or tool description\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00538",
+    "title": "LangChain-ChatChat Unauthenticated MCP STDIO Server Configuration RCE (CVE-2026-30617)",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\"command\"\\s*:\\s*\"(?:sh|bash|zsh|cmd\\.exe|cmd|powershell|pwsh)\"\\s*[,}][^}]{0,300}\"args\"\\s*:\\s*\\[",
+        "desc": "MCP server config JSON where command is a shell binary (sh/bash/cmd/powershell) \u2014 direct shell invocation via STDIO config, the CVE-2026-30617 root pattern\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\"command\"\\s*:\\s*\"(?:python|python3|ruby|perl|node|npx|uvx|deno|bun)\"\\s*[,}][^}]{0,400}\"args\"\\s*:\\s*\\[[^\\]]*\"-(?:c|e|-eval|-command|-exec)\"\\s*,",
+        "desc": "MCP server config where an interpreter is invoked with an inline-exec flag (-c/-e/--eval) \u2014 same bypass class as CVE-2026-40933 but via ChatChat unauthenticated management API\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\"transport(?:_type)?\"\\s*:\\s*\"stdio\"\\s*[,}][^}]{0,600}\"command\"\\s*:\\s*\"(?!(?:npx|uvx|node|python3?)\\s*[\"\\x27])[^\"]{2,200}\"",
+        "desc": "STDIO transport config where the command value is not an expected MCP launcher (npx/uvx/python) \u2014 suspicious arbitrary binary in STDIO transport\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:transport(?:_type)?\\s*[:=]\\s*[\"\\x27]?stdio[\"\\x27]?)[^\\n]{0,300}(?:command\\s*[:=]\\s*[\"\\x27](?:sh|bash|zsh|cmd|powershell|curl|wget|nc|ncat|netcat)[\"\\x27])",
+        "desc": "Key-value style (YAML or Python dict) STDIO transport + shell/netcat command value \u2014 catches non-JSON serialization of the same attack\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:CVE-2026-30617|GHSA-w94v-hq49-38vh)[^\\n]{0,200}(?:payload|inject|exploit|bypass|unauthenticated|rce|stdio|command)",
+        "desc": "Explicit CVE-2026-30617 / GHSA reference combined with exploitation language \u2014 attack framing in skill or tool description\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:chatchat|langchain.chatchat|Langchain.ChatChat)[^\\n]{0,150}(?:mcp[^\\n]{0,80}(?:unauthenticated|no.?auth|unprotected)|(?:unauthenticated|no.?auth)[^\\n]{0,80}mcp)",
+        "desc": "ChatChat + MCP + no-auth framing in content \u2014 describes the attack surface in a way that could be used to guide exploitation\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00539",
+    "title": "CrewAI CodeInterpreterTool Sandbox Escape and Prompt-to-Shell RCE (CVE-2026-2275 / VU#221883)",
+    "severity": "critical",
+    "category": "privilege-escalation",
+    "scan_target": "both",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\\.__subclasses__\\s*\\(\\s*\\)[^\\n]{0,300}(?:BuiltinImporter|builtins|importlib|__import__|load_module\\s*\\(\\s*[\"\\x27]os[\"\\x27]|ctypes)",
+        "desc": "__subclasses__() call followed within 300 chars by BuiltinImporter / builtins / importlib / load_module('os') / ctypes \u2014 confirmed CVE-2026-2275 MRO-walk sandbox escape chain (exact PoC from GitHub issue #4516)\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\(\\s*\\)\\s*\\.__class__\\s*\\.__bases__\\s*\\[\\s*0\\s*\\]\\s*\\.__subclasses__\\s*\\(\\s*\\)",
+        "desc": "Exact PoC chain opening sequence: ().__class__.__bases__[0].__subclasses__() \u2014 textbook Python sandbox escape entry point, confirmed in CrewAI advisory\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)load_module\\s*\\(\\s*[\"\\x27](?:os|sys|subprocess|importlib|ctypes|builtins)[\"\\x27]\\s*\\)\\s*\\.\\s*(?:system|popen|exec|spawn|getoutput|run|call|Popen|check_output)",
+        "desc": "load_module() loading a dangerous stdlib module and immediately calling a code-execution method \u2014 sandbox bypass that avoids direct import statements\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)libraries_used\\s*=\\s*\\[[^\\]]*[\"\\x27][^\"\\x27]*(?:[|&`$]|;(?!\\s*(?:python_(?:version|full_version)|os_name|sys_platform|platform_(?:machine|release|system|version)|implementation_(?:name|version)|extra\\s|version\\s|>=|<=|==|!=|~=|\\d)))[^\"\\x27]*[\"\\x27][^\\]]*\\]",
+        "desc": "CrewAI CodeInterpreterTool libraries_used list containing a package name with a shell metacharacter (| & ` $) or semicolon not followed by a PEP 508 environment marker \u2014 pip install command injection (Surface B PoC: \"numpy; id #\"). Negative lookahead excludes legitimate PEP 508 specifiers like \"requests; python_version >= '3.6'\".\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)ctypes\\s*\\.\\s*(?:CDLL|cdll|WinDLL|OleDLL|PyDLL)\\s*\\(\\s*[^)]{0,200}(?:libc|libpthread|kernel32|ntdll|msvcrt|\\/lib\\/|\\/usr\\/lib\\/)",
+        "desc": "ctypes loading a system-level shared library (libc, kernel32, ntdll) \u2014 sandbox escape via C function calls, the post-escape RCE primitive referenced in CVE-2026-2275 description\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:CrewAI|crewai|CodeInterpreterTool|code_interpreter_tool)[^\\n]{0,200}(?:sandbox[^\\n]{0,80}(?:escape|bypass)|ctypes|__subclasses__|BuiltinImporter|pip[^\\n]{0,40}inject)",
+        "desc": "CrewAI / CodeInterpreterTool reference combined with sandbox-escape or injection language \u2014 explicit attack framing in skill or tool description\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:VU#?221883|CVE-?2026-?2275|CVE-?2026-?2287)[^\\n]{0,200}(?:payload|inject|exploit|bypass|__subclasses__|ctypes|SandboxPython|sandbox.escape)",
+        "desc": "Explicit VU#221883 / CVE-2026-2275 / CVE-2026-2287 reference combined with exploitation language \u2014 attack framing in skill or tool description\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00540",
+    "title": "PraisonAI parse_mcp_command() CLI Argument Command Injection (CVE-2026-34935)",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "scan_target": "both",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)--mcp\\s+[\"\\x27]?[^\"\\x27\\n]{0,40}(?:(?:\\/(?:usr\\/)?(?:local\\/)?bin\\/)?(?:bash|sh|zsh)|cmd(?:\\.exe)?|powershell(?:\\.exe)?|pwsh)\\s+-[cC]\\s+",
+        "desc": "--mcp argument with a shell binary and -c inline-exec flag \u2014 direct CVE-2026-34935 PoC pattern (bash -c 'payload'). Matches bare name (bash) and full path (/bin/bash, /usr/bin/bash).\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)--mcp\\s+[\"\\x27]?[^\"\\x27\\n]{0,40}(?:python3?|perl|ruby|node|bun|deno)\\s+-[ceE]\\s+",
+        "desc": "--mcp argument with an interpreter and -c/-e/-E inline-eval flag \u2014 same root cause as bash -c but via scripting language interpreter\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)--mcp\\s+[\"\\x27]?[^\"\\x27\\n]{0,100}(?:&&|\\|\\||\\||;|`|\\$\\()",
+        "desc": "--mcp argument containing shell metacharacters (&&, ||, pipe, semicolon, backtick, subshell) \u2014 command chaining / injection surface\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:parse_mcp_command|mcp_command_parser|praisonai[^\\n]{0,80}--mcp)[^\\n]{0,200}(?:inject|exec|exploit|bypass|rce|shell|command[\\s_-]?injection)",
+        "desc": "Explicit parse_mcp_command / praisonai --mcp reference combined with exploitation language \u2014 attack framing in skill or tool description\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00541",
+    "title": "Agent Zero MCP Configuration Command Injection via mcp_servers field (CVE-2026-30624)",
+    "severity": "high",
+    "category": "tool-poisoning",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:mcp_servers|mcpServers)[^\\n]{0,300}[\"\\x27]command[\"\\x27]\\s*:\\s*[\"\\x27](?:(?:\\/(?:usr\\/(?:local\\/)?)?bin\\/)?(?:bash|sh|zsh)|cmd(?:\\.exe)?|powershell(?:\\.exe)?|pwsh|nc|ncat|netcat|curl|wget)[\"\\x27]",
+        "desc": "Agent Zero mcp_servers / mcpServers JSON/dict with a shell binary or network tool as the command value \u2014 direct CVE-2026-30624 attack shape. Matches bare name (sh) and full path (/bin/sh, /usr/bin/bash).\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:mcp_servers|mcpServers)[^\\n]{0,300}[\"\\x27]command[\"\\x27]\\s*:\\s*[\"\\x27](?:python3?|perl|ruby|node|bun)[\"\\x27][^\\n]{0,200}[\"\\x27]args[\"\\x27]\\s*:\\s*\\[[^\\]]*[\"\\x27]-[ceE][\"\\x27]",
+        "desc": "Agent Zero mcp_servers / mcpServers config with interpreter command + -c/-e/-E inline-exec flag in args \u2014 interpreter-based RCE via MCP server initialisation\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:mcp_servers|mcpServers)[^\\n]{0,100}(?:'command'|\"command\")[^\\n]{0,60}(?:'args'|\"args\")[^\\n]{0,200}(?:-[ceE]\\s+[\"']?[^\"'\\s]|-[ceE][\"']|\\|\\||&&|;\\s*[a-z]|`|\\$\\()",
+        "desc": "mcp_servers / mcpServers with command + args fields containing inline-exec flags or shell metacharacters \u2014 generalised Agent Zero RCE pattern. Matches both quoted and unquoted -c/-e payloads.\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:CVE-2026-30624|agent.zero[^\\n]{0,80}mcp)[^\\n]{0,200}(?:inject|exec|exploit|bypass|rce|command[_\\s-]?inject)",
+        "desc": "CVE-2026-30624 or Agent Zero + MCP reference combined with exploitation language \u2014 attack framing in skill or tool description\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00542",
+    "title": "Upsonic MCP Command Allowlist Bypass RCE (CVE-2026-30625)",
+    "severity": "high",
+    "category": "tool-poisoning",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:upsonic|mcp_servers|mcpServers)[^\\n]{0,300}[\"\\x27]command[\"\\x27]\\s*:\\s*[\"\\x27](?:(?:\\/(?:usr\\/(?:local\\/)?)?bin\\/)?(?:bash|sh|zsh)|cmd(?:\\.exe)?|powershell(?:\\.exe)?|pwsh|nc|ncat|netcat|curl|wget)[\"\\x27]",
+        "desc": "Upsonic / mcp_servers config with a shell binary or network tool as the command value \u2014 direct CVE-2026-30625 allowlist-bypass attack shape. Matches bare name (sh) and full path (/bin/sh, /usr/bin/bash).\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:upsonic|mcp_servers|mcpServers)[^\\n]{0,300}[\"\\x27]command[\"\\x27]\\s*:\\s*[\"\\x27](?:python3?|perl|ruby|node|bun)[\"\\x27][^\\n]{0,200}[\"\\x27]args[\"\\x27]\\s*:\\s*\\[[^\\]]*[\"\\x27]-[ceE][\"\\x27]",
+        "desc": "Upsonic / mcp_servers config with interpreter command + -c/-e/-E inline-exec flag in args \u2014 interpreter-based RCE via MCP initialisation\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:CVE-2026-30625|upsonic[^\\n]{0,80}mcp)[^\\n]{0,200}(?:inject|exec|exploit|bypass|rce|command[_\\s-]?inject|allowlist[_\\s-]?bypass)",
+        "desc": "CVE-2026-30625 or Upsonic + MCP reference combined with exploitation language \u2014 attack framing in skill or tool description\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00543",
+    "title": "LiteLLM MCP Server Creation Authenticated argv Injection (CVE-2026-30623)",
+    "severity": "high",
+    "category": "tool-poisoning",
+    "scan_target": "both",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:litellm|LiteLLM)[^\\n]{0,200}[\"\\x27]command[\"\\x27]\\s*:\\s*[\"\\x27](?:(?:\\/(?:usr\\/(?:local\\/)?)?bin\\/)?(?:bash|sh|zsh)|cmd(?:\\.exe)?|powershell(?:\\.exe)?|pwsh|nc|ncat|netcat|curl|wget)[\"\\x27]",
+        "desc": "LiteLLM proxy payload with a shell binary or network tool as the MCP server command value \u2014 direct CVE-2026-30623 attack shape.\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:litellm|LiteLLM)[^\\n]{0,300}(?:[\"\\x27]command[\"\\x27]\\s*:|command\\s*=)\\s*[\"\\x27](?:python3?|perl|ruby|node|bun)[\"\\x27][^\\n]{0,200}(?:[\"\\x27]args[\"\\x27]\\s*:|args\\s*=)\\s*\\[[^\\]]*[\"\\x27]-[ceE][\"\\x27]",
+        "desc": "LiteLLM MCP config with interpreter command + -c/-e/-E inline-exec flag in args \u2014 interpreter-based RCE via proxy MCP server creation\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:\\/mcp|mcp[_/]server|add[_-]?mcp[_-]?server)[^\\n]{0,200}[\"\\x27](?:command|cmd)[\"\\x27]\\s*:\\s*[\"\\x27][^\\x22\\x27]+[\"\\x27][^\\n]{0,200}(?:[|&;`]|\\$\\(|&&|\\|\\|)",
+        "desc": "MCP server registration endpoint or config with command field containing shell metacharacters \u2014 command injection via API\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:CVE-2026-30623|litellm[^\\n]{0,80}mcp)[^\\n]{0,200}(?:inject|exec|exploit|bypass|rce|command[_\\s-]?inject|argv[_\\s-]?inject)",
+        "desc": "CVE-2026-30623 or LiteLLM + MCP reference combined with exploitation language \u2014 attack framing in skill or tool description\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00544",
+    "title": "PraisonAI MCP Path-Traversal .pth Injection RCE (GHSA-9mqq-jqxf-grvw)",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "scan_target": "both",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:\\.\\.\\/|\\.\\.\\\\){2,}[^\\n]{0,200}(?:site-packages|dist-packages)[^\\n]{0,100}\\.pth",
+        "desc": "Directory traversal sequence (2+ levels up) targeting site-packages or dist-packages with a .pth extension \u2014 core GHSA-9mqq-jqxf-grvw path-traversal-to-.pth attack shape.\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\.pth[^\\n]{0,300}import\\s+(?:os|sys|subprocess|importlib)[^\\n]{0,200}(?:system|exec|popen|spawn|check_output|run|call)",
+        "desc": ".pth file content with 'import os/sys/subprocess' followed by code-execution method \u2014 executed-on-startup .pth payload pattern\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:praisonai|praison)[^\\n]{0,200}(?:\\.pth|site-packages|dist-packages|path[_-]?traversal|directory[_-]?traversal)[^\\n]{0,200}(?:inject|exec|rce|exploit|bypass)",
+        "desc": "PraisonAI reference combined with .pth or path traversal language and exploitation framing \u2014 GHSA-9mqq-jqxf-grvw attack context\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:GHSA-9mqq-jqxf-grvw)[^\\n]{0,200}(?:payload|inject|exploit|bypass|\\.pth|site-packages|path.traversal)",
+        "desc": "Explicit GHSA-9mqq-jqxf-grvw reference combined with exploitation language \u2014 attack framing in skill or tool description\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00545",
+    "title": "PraisonAI tool_override.py Unauthenticated RCE \u2014 CVE-2026-40287 Patch Bypass (CVE-2026-44334)",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "scan_target": "both",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)tool[_-]?override[^\\n]{0,300}(?:os\\.system|subprocess\\.|exec\\s*\\(|eval\\s*\\(|__import__|importlib\\.import|open\\s*\\([^)]{0,80}[\"\\x27]w[\"\\x27])",
+        "desc": "tool_override payload combined with Python code execution primitives (os.system, subprocess, exec, eval, __import__) \u2014 direct CVE-2026-44334 attack pattern\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)tool[_-]?override[^\\n]{0,200}(?:&&|\\|\\||;|`|\\$\\()[^\\n]{0,100}(?:curl|wget|bash|sh|nc|ncat)",
+        "desc": "tool_override with shell metacharacters followed by network/shell execution primitives \u2014 command injection via tool override\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:CVE-2026-44334|CVE-2026-40287[^\\n]{0,80}bypass|tool[_-]?override[^\\n]{0,80}(?:bypass|patch[_-]?bypass))[^\\n]{0,200}(?:inject|exec|exploit|rce|unauthenticated|unauth)",
+        "desc": "Explicit CVE-2026-44334 / CVE-2026-40287 patch bypass reference combined with exploitation language \u2014 attack framing\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:praisonai|praison)[^\\n]{0,100}tool[_-]?override[^\\n]{0,200}(?:inject|exec|exploit|bypass|rce|command|shell)",
+        "desc": "PraisonAI + tool_override combined with exploitation language \u2014 CVE-2026-44334 attack framing in skill or tool description\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00546",
+    "title": "CrewAI JSON Loader Arbitrary Local File Read (CVE-2026-2285)",
+    "severity": "high",
+    "category": "privilege-escalation",
+    "scan_target": "both",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:json[_-]?loader|load[_-]?json|JSONLoader|document[_-]?loader)[^\\n]{0,200}(?:(?:\\.\\.\\/|\\.\\.\\\\){2,}|(?:\\/etc\\/(?:passwd|shadow|hosts)|\\/root\\/|\\/home\\/[^/]+\\/\\.ssh|\\.env|\\.aws\\/credentials|\\.npmrc|id_rsa))",
+        "desc": "JSON/document loader invocation with either a path-traversal sequence (2+ levels up) or a known sensitive-file target \u2014 CVE-2026-2285 local file read via CrewAI document loader\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:crewai|crew_ai|CrewAI)[^\\n]{0,200}(?:json[_-]?loader|load[_-]?json|document[_-]?loader)[^\\n]{0,200}(?:\\.\\.\\/|\\/etc\\/|\\.env|\\.ssh|id_rsa|credentials)",
+        "desc": "CrewAI combined with a document/JSON loader and a sensitive path or traversal sequence \u2014 attack framing specific to CVE-2026-2285\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:CVE-2026-2285|crewai[^\\n]{0,80}(?:file[_\\s-]?read|local[_\\s-]?file|json[_\\s-]?loader))[^\\n]{0,200}(?:inject|read|exfil|bypass|traverse|sensitive|passwd|\\.env|\\.ssh)",
+        "desc": "Explicit CVE-2026-2285 reference or CrewAI file-read framing combined with exploitation language or sensitive file targets\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00547",
+    "title": "CrewAI RAG URL Validation Bypass SSRF (CVE-2026-2286)",
+    "severity": "high",
+    "category": "privilege-escalation",
+    "scan_target": "both",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:rag|retrieval[_-]?augmented|source[_-]?url|document[_-]?url)[^\\n]{0,200}(?:169\\.254\\.169\\.254|fd00:|2130706433|0x7f000001|0177\\.0\\.0\\.1|[a-z0-9-]+\\.internal\\.|(?:127\\.0\\.[01]\\.[01]|10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|192\\.168\\.\\d{1,3}\\.\\d{1,3}|172\\.(?:1[6-9]|2\\d|3[01])\\.\\d{1,3}\\.\\d{1,3})(?::\\d+)?/)",
+        "desc": "RAG source URL containing a cloud metadata endpoint (169.254.169.254), decimal/hex/octal loopback representations, or an RFC-1918 private address followed by an internal resource path \u2014 SSRF bypass via CVE-2026-2286. Plain \"localhost:PORT\" / bare-IP server defaults (no path) are excluded so legitimate RAG deployment docs do not false-positive.\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:rag|retrieval[_-]?augmented|source[_-]?url|document[_-]?url)[^\\n]{0,200}(?:%31%36%39|%31%32%37|\\\\u0031|%2e%2e|\\\\x31\\\\x36\\\\x39|0x[aAbBcC][0-9a-fA-F]{6})",
+        "desc": "RAG URL with URL-encoded, Unicode-escaped, or hex representations of SSRF-relevant IP octets \u2014 URL encoding bypass pattern\n"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:CVE-2026-2286|crewai[^\\n]{0,80}(?:ssrf|rag[_\\s-]?url|url[_\\s-]?bypass|metadata))[^\\n]{0,200}(?:inject|bypass|exfil|metadata|169\\.254|internal|private[_\\s-]?ip)",
+        "desc": "Explicit CVE-2026-2286 reference or CrewAI SSRF framing combined with exploitation language or internal IP patterns\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00548",
+    "title": "Cross-agent session context leak across delegation chain",
+    "severity": "high",
+    "category": "context-exfiltration",
+    "scan_target": "runtime",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "trace.invariant_session_id",
+        "pattern": "(?i)invariant_violation:session.id_changed",
+        "desc": "Engine emits this synthetic field when the trace invariant fires; present for pattern-method engines that consume trace verdicts as text. Trace-native engines evaluate detection.trace below directly.\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00549",
+    "title": "Destructive tool invocation without prior human approval",
+    "severity": "critical",
+    "category": "privilege-escalation",
+    "scan_target": "runtime",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "trace.require_violation",
+        "pattern": "(?i)require_violation:destructive_tool_without_approval",
+        "desc": "Engine emits this synthetic field when the require primitive fires; trace-native engines evaluate detection.trace below.\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00550",
+    "title": "Privileged tool call following untrusted retrieval (indirect prompt injection trail)",
+    "severity": "critical",
+    "category": "prompt-injection",
+    "scan_target": "runtime",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "trace.forbid_violation",
+        "pattern": "(?i)forbid_violation:untrusted_retrieval_to_privileged_tool",
+        "desc": "Synthetic field emitted by the trace engine when the forbid primitive fires; trace-native engines evaluate detection.trace.\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00551",
+    "title": "Cross-conversation memory write (scope-escape via memory store)",
+    "severity": "critical",
+    "category": "privilege-escalation",
+    "scan_target": "runtime",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "trace.forbid_violation",
+        "pattern": "(?i)forbid_violation:cross_conversation_memory_write",
+        "desc": "Synthetic field emitted by the trace engine when the forbid primitive fires; trace-native engines evaluate detection.trace.\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00552",
+    "title": "Agent goal drift after environmental pressure injection",
+    "severity": "high",
+    "category": "agent-manipulation",
+    "scan_target": "runtime",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "trace.composite_violation",
+        "pattern": "(?i)(?:invariant_violation:agent\\.goal_changed|forbid_violation:goal_drift_after_pressure)",
+        "desc": "Synthetic field emitted by the trace engine when the composite primitive fires; trace-native engines evaluate detection.trace.\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00553",
+    "title": "Runaway tool-call loop within a single session",
+    "severity": "high",
+    "category": "excessive-autonomy",
+    "scan_target": "runtime",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "behavioral.metric_value",
+        "pattern": "(?i)tool_calls_per_session_exceeds_threshold",
+        "desc": "Synthetic field emitted by the behavioral engine when threshold is exceeded; behavioral-native engines evaluate detection.behavioral.\n"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00554",
+    "title": "LangChain Vulnerable to Template Injection via Attribute Access in Prompt Templates",
+    "severity": "high",
+    "category": "prompt-injection",
+    "scan_target": "runtime",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\\{\\{?[^{}]*\\b__(?:class|globals|import|builtins|subclasses|init|mro|base|dict|reduce|getattribute|subclasshook)__[^{}]*\\}?\\}",
+        "desc": "Server-side template injection via Python dunder/builtins traversal"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00561",
+    "title": "FastMCP vulnerable to windows command injection in FastMCP Cursor installer via server_name",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "scan_target": "runtime",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)FastMCP\\s*\\(\\s*name\\s*=\\s*[\"'][^\"']*[&|><^]",
+        "desc": "Detects FastMCP initialization with server_name containing Windows command metacharacters (&, |, >, <, ^) that would be injected into cursor:// deeplinks and executed via cmd.exe /c start"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)generate_cursor_deeplink\\s*\\([^)]*[&|><^]",
+        "desc": "Detects direct calls to generate_cursor_deeplink with arguments containing shell metacharacters that bypass proper URL encoding"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)open_deeplink\\s*\\([^)]*(?:cursor://[^)]*[&|><^]|shell\\s*=\\s*True)",
+        "desc": "Detects open_deeplink calls with shell=True on Windows combined with unescaped cursor:// URLs containing command separators"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00565",
+    "title": "The llm CLI tool thru 0.27.1 contains a critical code injection vulnerability via its --functions command-line",
+    "severity": "critical",
+    "category": "skill-compromise",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)--functions\\s*[=\\s]\\s*['\\\"]?(?!\\s*\\(\\s*\\))[^'\\\"]*(?:__import__|exec|eval|compile|subprocess|os\\.system|open\\s*\\(|globals\\(|locals\\(|vars\\(|dir\\(|getattr|setattr|delattr|classmethod|staticmethod|property|type\\(|object\\.__class__|__builtins__|sys\\.path)",
+        "desc": "Detects --functions argument containing dangerous built-in functions or module access patterns that enable code injection via exec() exploitation."
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)--functions\\s*[=\\s]\\s*['\\\"]?[^'\\\"]*\\b(?:import\\s+(?:subprocess|socket|ctypes|pickle|marshal|importlib|__main__|runpy)|from\\s+(?:subprocess|socket|ctypes|pickle|marshal|importlib|runpy)\\s+import)",
+        "desc": "Detects --functions argument with imports of modules commonly used to escape sandbox or execute system commands."
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)--functions\\s*[=\\s]\\s*['\\\"]?[^'\\\"]*\\b(?:open\\s*\\(\\s*['\\\"][^'\\\"]*['\\\"]\\s*,\\s*['\\\"]w|chmod|chown|rmdir|system\\(|popen\\(|spawn)",
+        "desc": "Detects --functions argument with file/process manipulation patterns that indicate arbitrary code execution intent."
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00566",
+    "title": "LibreChat is a ChatGPT clone with additional features.",
+    "severity": "high",
+    "category": "context-exfiltration",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i){{\\s*LIBRECHAT_[A-Z_]*(?:TOKEN|SECRET|KEY|CREDENTIAL)\\s*}}",
+        "desc": "Detects credential placeholder substitution syntax in MCP server headers. Matches double-brace template literals containing LIBRECHAT_ prefixed credential/token/secret/key names, which are vulnerable to exfiltration when injected into HTTP headers."
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:headers?|HTTP[-_]?headers?|x[-_]?[a-z0-9\\-]+)\\s*[=:]\\s*[^\\n]*{{\\s*[A-Z_]*(?:TOKEN|SECRET|CREDENTIAL|PASSWORD|AUTH|API[-_]?KEY)\\s*}}",
+        "desc": "Detects HTTP header field assignments that contain credential placeholders. Matches patterns like 'headers = {...}' or 'x-auth-token: {{...}}' with embedded OAuth/secret tokens, which indicates header-injection exfiltration setup."
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)createHeader|addHeader|setHeader|registerHeader.*{{\\s*(?:ACCESS|OAUTH|BEARER|JWT|TOKEN)\\s*}}",
+        "desc": "Detects MCP server header creation/registration functions that embed OAuth tokens or bearer credentials via placeholder syntax, indicating dynamic credential injection into outbound requests."
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00567",
+    "title": "MCP stdio server config command injection via unvalidated test endpoints",
+    "severity": "high",
+    "category": "tool-poisoning",
+    "scan_target": "runtime",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\"command\"\\s*:\\s*\"(?:(?:/(?:usr/)?bin/)?(?:bash|sh|zsh|dash)\"|[^\"]*[;&|`$])",
+        "desc": "MCP stdio config command is a raw shell or contains shell metacharacters"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\"args\"\\s*:\\s*\\[[^\\]]*\"(?:-c|-e|--eval|-Command)\"\\s*,\\s*\"[^\"]*(?:import |require\\(|child_process|os\\.|exec|spawn|subprocess|System\\.)",
+        "desc": "MCP stdio config args pass a code-execution flag (-c/-e) with a payload"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00568",
+    "title": "Agent SSRF to cloud metadata / file inclusion via unvalidated fetch URL",
+    "severity": "high",
+    "category": "tool-poisoning",
+    "scan_target": "runtime",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:169\\.254\\.169\\.254|metadata\\.google\\.internal|100\\.100\\.100\\.200|fd00:ec2::254)(?:[:/]|\\b)|\\bfile://(?:/?(?:etc|proc|root|home|var/run|sys)/)|\\bgopher://|\\bdict://",
+        "desc": "Fetch targets a cloud-metadata IP/host, a file:// system path, or a gopher/dict SSRF scheme"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00569",
+    "title": "Agent / MCP tool path traversal and arbitrary file access",
+    "severity": "high",
+    "category": "context-exfiltration",
+    "scan_target": "runtime",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:\\.\\.[\\\\/]){2,}[^\\s\"\\x27<>]*?(?:etc[\\\\/](?:passwd|shadow)|proc[\\\\/]self|windows[\\\\/]system32|[\\\\/]\\.ssh[\\\\/]|win\\.ini|boot\\.ini)",
+        "desc": "Deep ../ traversal chain that reaches a sensitive system target"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:%2e%2e|%252e%252e|\\.\\.)(?:%2f|%5c|%c0%af)|%2e%2e%2f",
+        "desc": "URL/percent-encoded path traversal sequence"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00570",
+    "title": "SQL injection in agent / MCP tool database query",
+    "severity": "high",
+    "category": "data-poisoning",
+    "scan_target": "runtime",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:'\\s*or\\s+'?1'?\\s*=\\s*'?1|\\bor\\s+1\\s*=\\s*1\\b\\s*(?:--|#|/\\*|;|$))",
+        "desc": "SQL boolean tautology (' OR '1'='1 / OR 1=1 --)"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\bunion\\s+(?:all\\s+)?select\\b.{0,120}\\bfrom\\b",
+        "desc": "UNION SELECT ... FROM to read arbitrary tables"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i);\\s*(?:drop|delete|truncate)\\s+(?:table|database)\\b",
+        "desc": "Stacked destructive query (; DROP/DELETE/TRUNCATE TABLE)"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00571",
+    "title": "Cross-site scripting (XSS) in agent / MCP rendered output",
+    "severity": "high",
+    "category": "context-exfiltration",
+    "scan_target": "runtime",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\\bon(?:error|load|mouseover|click|focus|toggle)\\s*=\\s*[\\\"']?\\s*(?:alert|eval|fetch|document\\.(?:cookie|location|write)|window\\.|location\\s*=|String\\.fromCharCode|atob)\\b",
+        "desc": "HTML event handler executing alert/eval/document.cookie"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)javascript:\\s*(?:alert|eval|document\\.|window\\.|fetch|String\\.fromCharCode|void)",
+        "desc": "javascript: scheme with an executable payload"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)<script[^>]*>[^<]{0,200}?(?:document\\.cookie|fetch\\(|eval\\(|atob\\(|new\\s+Image\\(\\)\\.src|\\.src\\s*=\\s*[\\\"']?https?://)",
+        "desc": "<script> exfiltrating cookies / loading remote code"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00572",
+    "title": "SymJack \u2014 Symlink Approval-Path Spoofing Redirects Writes into Agent MCP/Config (RCE on Restart)",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "scan_target": "both",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\\bln\\s+-s(?:f|n|fn|nf)?\\s+\\S*(?:\\.mcp\\.json|\\.claude[/\\\\]settings\\.json|\\.cursor[/\\\\]mcp\\.json|\\.gemini[/\\\\]settings\\.json|\\.codex[/\\\\]config\\.toml)\\b",
+        "desc": "Symlink created with an agent-config file as its link target \u2014 the SymJack write-redirection primitive (decoy name is the second arg, irrelevant to the match)"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:->|=>|symlink\\s+to|target\\s*[:=])\\s*\\S*(?:\\.mcp\\.json|\\.claude[/\\\\]settings\\.json|\\.cursor[/\\\\]mcp\\.json|\\.gemini[/\\\\]settings\\.json|\\.codex[/\\\\]config\\.toml)\\b",
+        "desc": "Symlink listing/metadata whose resolved target is an agent-config file (ls -l / git ls-files / archive entry)"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:symlink|\\bln\\s+-s|hard\\s*link|junction)[^\\n]{0,120}(?:mcpServers?|\\.mcp\\.json|\\.claude|\\.cursor|\\.gemini|\\.codex)[^\\n]{0,200}(?:approv|trust\\s+prompt|empty\\s+file|ships?\\s+empty|resolve[sd]?\\s+to|on\\s+restart)",
+        "desc": "Symlink + agent-config token + approval/empty-file/on-restart framing co-located \u2014 the SymJack chain expressed in skill/tool content"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00573",
+    "title": "Paraphrased Prompt Injection (Semantic)",
+    "severity": "high",
+    "category": "prompt-injection",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)(\\bset|\\bput|\\bleave)\\s+(aside|to\\s+(?:one|the)\\s+side|behind)\\b[^.\\n]{0,50}\\b(earlier|previous|prior|initial|original|preceding|first)\\b[^.\\n]{0,50}\\b(focus|concentrate|prioriti[sz]e|attend|work)\\b",
+        "desc": "Set/put/leave aside the earlier/previous guidance and focus on a new target"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(the\\s+)?(initial|original|previous|earlier|prior)\\s+(guidance|instructions?|configuration|constraints?|directions?|setup|rules?)\\b[^.\\n]{0,50}\\b(no\\s+longer\\s+(apply|applies|matter|hold)|should\\s+be\\s+(ignored|\\bset\\s+aside)|don'?t\\s+apply|are\\s+void)\\b",
+        "desc": "The initial/previous guidance no longer applies / should be set aside"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-00574",
+    "title": "Paraphrased System-Prompt / Context Extraction (Semantic)",
+    "severity": "high",
+    "category": "context-exfiltration",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)(\\bwalk\\s+me\\s+through|\\bdescribe|\\bexplain|\\bsummari[sz]e|\\breveal|\\bshare)\\b[^.\\n]{0,40}\\bhow\\s+you\\s+(were|are|got)\\s+(\\bset\\s+up|configured|instructed|programmed|trained|told|designed|built)\\b",
+        "desc": "Indirect request to describe how the agent itself was configured/instructed"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\bwhat\\s+(guidelines?|instructions?|rules?|constraints?|directions?|system\\s+prompt|prompt|persona|role)\\b[^.\\n]{0,30}\\b(were|was|did)\\s+you\\s+(given|told|provided|assigned)\\b",
+        "desc": "Indirect 'what guidelines/instructions were you given' system-prompt elicitation"
       }
     ]
   }
