@@ -146,13 +146,13 @@ describe('calculateRiskScore', () => {
       expect(level).toBe('MEDIUM');
     });
 
-    it('critical finding with multiplier exactly 0.6 still yields HIGH', () => {
-      // 0.6 is NOT < 0.6, so weakenedCriticalOverride = false
+    it('critical finding with multiplier exactly 0.6 still yields CRITICAL', () => {
+      // 0.6 is NOT < 0.6, so weakenedCriticalOverride = false → normal context.
+      // A real critical in normal context forces CRITICAL (consistent with the
+      // single-critical @ 1.0 case above). The boundary only weakens BELOW 0.6.
       const findings = [makeFinding('f1', 'critical')];
       const { level } = calculateRiskScore(findings, 0.6);
-      // score = round(25 * 0.6) = 15, hasCritical=true, not weakened
-      // 15 < 40, not >=40; hasCritical && !weakened => HIGH
-      expect(level).toBe('HIGH');
+      expect(level).toBe('CRITICAL');
     });
 
     it('critical finding with multiplier 0.3 (below 0.6) yields MEDIUM', () => {
