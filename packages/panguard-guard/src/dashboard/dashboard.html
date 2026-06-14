@@ -902,7 +902,7 @@
       <!-- Protection status bar (always visible) -->
       <div class="pbar" id="pbar">
         <div class="pb-dot ok" id="pb-dot"></div>
-        <span class="pb-txt" id="pb-txt">PROTECTED</span>
+        <span class="pb-txt" id="pb-txt">CONNECTING…</span>
         <span id="pb-detail">| -- rules active | Uptime: --</span>
       </div>
 
@@ -914,16 +914,16 @@
         <div class="hero">
           <div class="hero-head">
             <div class="live-dot" id="hero-dot"></div>
-            <div class="hero-status" id="hero-status">PROTECTED</div>
+            <div class="hero-status" id="hero-status">CONNECTING…</div>
             <span class="badge badge-protected" id="hero-badge" data-i18n="active">Active</span>
           </div>
           <div
             style="font-size: 13px; color: var(--text-muted); line-height: 1.6"
             id="hero-desc"
-            data-i18n="hero_desc"
           >
-            All detection layers are operational. PanGuard is monitoring AI agent activity in real
-            time.
+            Every event runs through deterministic pattern matching and heuristic correlation —
+            on-device by default. An optional semantic layer (bring your own LLM) stays off until
+            you enable it.
           </div>
         </div>
 
@@ -941,10 +941,6 @@
             <div class="cl" data-i18n="k_tc">TC Rules Synced</div>
             <div class="cv sg" id="v-tcsync">0</div>
           </div>
-          <div class="cd">
-            <div class="cl" data-i18n="k_endpoints">Endpoints Connected</div>
-            <div class="cv sg" id="v-endpoints">1</div>
-          </div>
         </div>
 
         <!-- Detection layers status (renamed Tier → Layer A/B/C) -->
@@ -952,24 +948,25 @@
           <h3>
             <span class="dot dot-ok"></span> <span data-i18n="layer_title">Detection Layers</span>
           </h3>
-          <div class="desc" data-i18n="layer_desc">
-            Pattern matching and heuristic correlation run on every event. The optional semantic
-            layer adds LLM reasoning only when you connect one — it stays off until you opt in.
+          <div class="desc">
+            Layers A and B are deterministic and always on. Layer C is optional — bring your own
+            LLM (cloud API or local model). It is advisory (flags for review, never auto-blocks)
+            and stays off until you connect one.
           </div>
           <div class="layer-row">
-            <span class="layer-label">Layer A &mdash; Pattern match</span>
+            <span class="layer-label">Layer A &mdash; Pattern match (ATR rules)</span>
             <div class="layer-bar"><div class="layer-fill on" id="la-bar"></div></div>
-            <span class="layer-status on" id="la-st" data-i18n="active">Active</span>
+            <span class="layer-status on" id="la-st">Active</span>
           </div>
           <div class="layer-row">
             <span class="layer-label">Layer B &mdash; Heuristic correlation</span>
             <div class="layer-bar"><div class="layer-fill on" id="lb-bar"></div></div>
-            <span class="layer-status on" id="lb-st" data-i18n="active">Active</span>
+            <span class="layer-status on" id="lb-st">Active</span>
           </div>
           <div class="layer-row">
-            <span class="layer-label">Layer C &mdash; Semantic verdict (optional)</span>
+            <span class="layer-label">Layer C &mdash; Semantic verdict (optional &middot; advisory)</span>
             <div class="layer-bar"><div class="layer-fill" id="lc-bar"></div></div>
-            <span class="layer-status" id="lc-st" data-i18n="layer_optin">Opt-in</span>
+            <span class="layer-status" id="lc-st">Off &middot; bring your own</span>
           </div>
         </div>
 
@@ -987,10 +984,6 @@
             <div class="cl" data-i18n="k_mode">Mode</div>
             <div class="cv-sm sg" id="v-mode">--</div>
           </div>
-          <div class="cd">
-            <div class="cl" data-i18n="k_mem">Memory (MB)</div>
-            <div class="cv-sm sg" id="v-mem">0</div>
-          </div>
         </div>
 
         <!-- Recent events (last 20, auto-scroll) -->
@@ -1007,9 +1000,9 @@
       <!-- ===== PAGE 2: Threats ===== -->
       <div class="pg" id="p-threats">
         <div class="pt"><em data-i18n="t_th">Threats</em></div>
-        <div class="pd" data-i18n="d_th">
-          Every detected threat is logged here. Malicious events are auto-blocked. Use the severity
-          filter chips to narrow the view.
+        <div class="pd">
+          Every detected threat is logged here. In Protection mode, malicious events are blocked; in
+          Learning mode they are logged only. Use the severity filter chips to narrow the view.
         </div>
 
         <!-- Action bar: filters + tier-gated export buttons -->
@@ -1027,7 +1020,6 @@
             <button
               class="fb on"
               data-sev="all"
-              onclick="filterThreats('all', event)"
               data-i18n="all"
             >
               All
@@ -1035,7 +1027,6 @@
             <button
               class="fb"
               data-sev="critical"
-              onclick="filterThreats('critical', event)"
               data-i18n="critical"
             >
               Critical
@@ -1043,7 +1034,6 @@
             <button
               class="fb"
               data-sev="high"
-              onclick="filterThreats('high', event)"
               data-i18n="high"
             >
               High
@@ -1051,12 +1041,11 @@
             <button
               class="fb"
               data-sev="medium"
-              onclick="filterThreats('medium', event)"
               data-i18n="medium"
             >
               Medium
             </button>
-            <button class="fb" data-sev="low" onclick="filterThreats('low', event)" data-i18n="low">
+            <button class="fb" data-sev="low" data-i18n="low">
               Low
             </button>
           </div>
@@ -1065,7 +1054,6 @@
               class="btn btn-secondary btn-sm"
               data-tier-gate="pilot"
               id="btn-sarif"
-              onclick="exportSARIF()"
               style="display: none"
             >
               <span data-i18n="exp_sarif">Export SARIF</span>
@@ -1074,7 +1062,6 @@
               class="btn btn-primary btn-sm"
               data-tier-gate="pilot"
               id="btn-evidence"
-              onclick="exportEvidence()"
               style="display: none"
             >
               <span data-i18n="exp_evidence">Generate Evidence Pack</span>
@@ -1097,11 +1084,11 @@
         <table class="tb">
           <thead>
             <tr>
-              <th onclick="sortThreats('timestamp')" data-i18n="th_ts">Timestamp</th>
-              <th onclick="sortThreats('ruleId')" data-i18n="th_rid">Rule ID</th>
-              <th onclick="sortThreats('severity')" data-i18n="th_sev">Severity</th>
-              <th data-i18n="th_pat">Matched Pattern</th>
-              <th onclick="sortThreats('action')" data-i18n="th_act">Action</th>
+              <th data-sort="timestamp" class="sortable">Timestamp</th>
+              <th data-sort="ruleId" class="sortable">Rule ID</th>
+              <th data-sort="severity" class="sortable">Severity</th>
+              <th>Matched Pattern</th>
+              <th data-sort="action" class="sortable">Action</th>
             </tr>
           </thead>
           <tbody id="th-tb"></tbody>
@@ -1165,13 +1152,9 @@
               font-size: 13px;
               outline: none;
             "
-            oninput="filterRules()"
-            onfocus="this.style.borderColor = 'var(--sage)'"
-            onblur="this.style.borderColor = 'var(--border)'"
           />
           <select
             id="ru-cat"
-            onchange="filterRules()"
             style="
               background: var(--bg-raised);
               border: 1px solid var(--border);
@@ -1186,7 +1169,6 @@
           </select>
           <select
             id="ru-sev-flt"
-            onchange="filterRules()"
             style="
               background: var(--bg-raised);
               border: 1px solid var(--border);
@@ -1202,21 +1184,6 @@
             <option value="high">High</option>
             <option value="medium">Medium</option>
             <option value="low">Low</option>
-          </select>
-          <select
-            id="ru-target"
-            onchange="filterRules()"
-            style="
-              background: var(--bg-raised);
-              border: 1px solid var(--border);
-              color: var(--text-primary);
-              padding: 8px 12px;
-              border-radius: 8px;
-              font-size: 13px;
-              outline: none;
-            "
-          >
-            <option value="">All scan targets</option>
           </select>
           <span
             id="ru-search-count"
@@ -1235,8 +1202,6 @@
                 <th data-i18n="ru_title">Title</th>
                 <th data-i18n="ru_severity">Severity</th>
                 <th data-i18n="ru_category">Category</th>
-                <th data-i18n="ru_target">scan_target</th>
-                <th data-i18n="ru_status">Status</th>
               </tr>
             </thead>
             <tbody id="ru-tb"></tbody>
@@ -1265,10 +1230,6 @@
             <div class="cl" data-i18n="sk_unk">Tracked</div>
             <div class="cv w" id="sk-unk">--</div>
           </div>
-          <div class="cd">
-            <div class="cl" data-i18n="sk_blk">Blocked</div>
-            <div class="cv bad" id="sk-blk">0</div>
-          </div>
         </div>
 
         <div
@@ -1280,14 +1241,8 @@
           "
         >
           <div class="st" style="margin-bottom: 0" data-i18n="all_skills">All Installed Skills</div>
-          <button
-            class="btn btn-primary btn-sm"
-            onclick="
-              loadSkills();
-              toast('Refreshing skills...');
-            "
-          >
-            <span data-i18n="scan_now">Scan Now</span>
+          <button class="btn btn-primary btn-sm" id="btn-refresh-skills">
+            <span>Refresh</span>
           </button>
         </div>
         <div id="sk-loading" class="empty">
@@ -1299,9 +1254,7 @@
               <th>#</th>
               <th data-i18n="sk_name">Name</th>
               <th data-i18n="sk_platform">Platform</th>
-              <th data-i18n="sk_risk">Risk</th>
               <th data-i18n="sk_status">Status</th>
-              <th data-i18n="sk_audit">Last Audit</th>
             </tr>
           </thead>
           <tbody id="sk-tb"></tbody>
@@ -1363,10 +1316,9 @@
 
           <div class="st" data-i18n="tc_flywheel">Flywheel</div>
           <div class="flywheel" id="tc-flywheel">
-            +----------------+ +----------------+ +----------------+ | Your Endpoint | ---> | Threat
-            Cloud | ---> | Community | | threats in | | aggregation | | rules out |
-            +----------------+ +----------------+ +----------------+ ^ | | | +----------- rules
-            synced hourly ---------------+
+            <strong>Your endpoint</strong> detects threats &rarr;
+            <strong>Threat Cloud</strong> aggregates them anonymously &rarr;
+            <strong>Community</strong> rules sync back to every endpoint, hourly.
           </div>
 
           <div class="fs" style="margin-top: 20px">
@@ -1376,7 +1328,7 @@
               data, file contents, or source code is sent.
             </div>
             <div style="display: flex; align-items: center; gap: 12px">
-              <div class="toggle" id="tc-toggle" onclick="toggleUpload()"></div>
+              <div class="toggle" id="tc-toggle"></div>
               <span id="tc-toggle-label" style="font-size: 13px; font-weight: 600">--</span>
             </div>
           </div>
@@ -1389,13 +1341,13 @@
         <div class="pd" data-i18n="d_st">Configure how Guard runs on this endpoint.</div>
 
         <div class="fs">
-          <h3 data-i18n="st_mode">Guard Mode</h3>
-          <div class="desc" data-i18n="st_mode_desc">
-            Learning mode builds a baseline of normal activity. Protection mode actively blocks
-            detected threats.
+          <h3>Guard Mode</h3>
+          <div class="desc">
+            Learning mode builds a baseline of normal activity and only logs. Protection mode
+            actively blocks detected threats. Saving a change restarts detection with the new mode.
           </div>
           <div style="display: flex; align-items: center; gap: 12px">
-            <div class="toggle" id="st-mode-toggle" onclick="toggleMode()"></div>
+            <div class="toggle" id="st-mode-toggle"></div>
             <span id="st-mode-label" style="font-size: 13px; font-weight: 600">Learning</span>
           </div>
         </div>
@@ -1410,36 +1362,24 @@
             <label data-i18n="st_endpoint">Endpoint</label>
             <input id="st-tc-endpoint" type="text" placeholder="https://tc.panguard.ai/api" />
           </div>
-          <div class="fr">
-            <label data-i18n="st_upload">Upload</label>
-            <div class="toggle" id="st-tc-upload" onclick="toggleUploadSettings()"></div>
-            <span id="st-tc-upload-label" style="font-size: 13px; font-weight: 600">--</span>
-          </div>
         </div>
 
         <div class="fs">
-          <h3 data-i18n="st_port">Dashboard Port</h3>
-          <div class="desc" data-i18n="st_port_desc">
-            The TCP port this dashboard listens on (localhost-only).
+          <h3>Dashboard Port</h3>
+          <div class="desc">
+            The TCP port this dashboard listens on (localhost-only). Change it with
+            <code>pga config --dashboard-port &lt;port&gt;</code>, then restart Guard.
           </div>
           <div class="fr">
-            <label data-i18n="st_port_label">Port</label>
-            <input id="st-port" type="number" placeholder="9999" min="1024" max="65535" />
+            <label>Port</label>
+            <span id="st-port" class="mono" style="font-weight: 600">--</span>
           </div>
         </div>
 
-        <div class="fs">
-          <h3 data-i18n="st_lang">Language</h3>
-          <div class="desc" data-i18n="st_lang_desc">
-            Choose the display language. Setting is stored locally.
-          </div>
-          <!-- Language selector removed: the developer tool is English-only. -->
-
-        </div>
 
         <div style="display: flex; gap: 10px; margin-top: 8px">
-          <button class="btn btn-primary" onclick="saveSettings()" data-i18n="st_save">Save</button>
-          <button class="btn btn-secondary" onclick="loadSettings()" data-i18n="st_reload">
+          <button class="btn btn-primary" id="btn-save">Save</button>
+          <button class="btn btn-secondary" id="btn-reload">
             Reload
           </button>
         </div>
@@ -1470,221 +1410,7 @@
       /* ============================================================ */
       /*  i18n strings (EN / ZH)                                       */
       /* ============================================================ */
-      var T = {
-        en: {
-          n_ov: 'Overview',
-          n_th: 'Threats',
-          n_ru: 'Rules',
-          n_sk: 'Skills',
-          n_tc: 'Threat Cloud',
-          n_st: 'Settings',
-          t_ov: 'Overview',
-          t_th: 'Threats',
-          t_ru: 'Rules',
-          t_sk: 'Skills',
-          t_tc: 'Threat Cloud',
-          t_st: 'Settings',
-          active: 'Active',
-          layer_optin: 'Opt-in',
-          hero_desc:
-            'All detection layers are operational. PanGuard is watching your AI agents in real time — detection only, nothing is blocked unless you turn on enforcement.',
-          k_rules: 'Rules Active',
-          k_threats: 'Threats Detected',
-          k_tc: 'TC Rules Synced',
-          k_endpoints: 'Endpoints Connected',
-          k_uptime: 'Uptime',
-          k_events: 'Events Scanned',
-          k_mode: 'Mode',
-          k_mem: 'Memory (MB)',
-          layer_title: 'Detection Layers',
-          layer_desc:
-            'Pattern matching and heuristic correlation run on every event. The optional semantic layer adds LLM reasoning only when you connect one — it stays off until you opt in.',
-          recent_events: 'Recent Events',
-          ev_empty: 'All clear. No events yet.',
-          ev_empty_sub: 'Detected events will appear here as they happen.',
-          d_th: 'Every detected threat is logged here. Malicious events are auto-blocked. Use the severity filter chips to narrow the view.',
-          all: 'All',
-          critical: 'Critical',
-          high: 'High',
-          medium: 'Medium',
-          low: 'Low',
-          exp_sarif: 'Export SARIF',
-          exp_evidence: 'Generate Evidence Pack',
-          upsell_pilot: 'Upgrade to Pilot — unlock SARIF + Evidence Pack',
-          th_ts: 'Timestamp',
-          th_rid: 'Rule ID',
-          th_sev: 'Severity',
-          th_pat: 'Matched Pattern',
-          th_act: 'Action',
-          th_empty: 'All clear — no threats today.',
-          th_empty_sub: 'Your agents are protected. Threats will appear here if anything is caught.',
-          d_ru: 'All loaded ATR detection rules. Rules sync hourly from Threat Cloud.',
-          ru_total: 'Total Rules',
-          ru_critical: 'Critical',
-          ru_high: 'High',
-          ru_synced: 'Last Sync',
-          ru_loading: 'Loading rules...',
-          ru_id: 'ID',
-          ru_title: 'Title',
-          ru_severity: 'Severity',
-          ru_category: 'Category',
-          ru_target: 'scan_target',
-          ru_status: 'Status',
-          d_sk: 'All MCP skills detected across your platforms. Whitelisted skills are trusted; unknown skills are tracked for behavior drift.',
-          sk_total: 'Total Installed',
-          sk_wl: 'Whitelisted',
-          sk_unk: 'Tracked',
-          sk_blk: 'Blocked',
-          all_skills: 'All Installed Skills',
-          scan_now: 'Scan Now',
-          sk_loading: 'Loading skills...',
-          sk_name: 'Name',
-          sk_platform: 'Platform',
-          sk_risk: 'Risk',
-          sk_status: 'Status',
-          sk_audit: 'Last Audit',
-          d_tc: "Threat Cloud is PanGuard's anonymous threat intelligence sharing network.",
-          tc_loading: 'Loading Threat Cloud status...',
-          tc_conn: 'Connection Status',
-          tc_received: 'Rules Received',
-          tc_uploaded: 'Threats Uploaded',
-          tc_queue: 'Queue',
-          tc_last: 'Last Sync',
-          tc_flywheel: 'Flywheel',
-          tc_upload: 'Anonymous Upload',
-          tc_upload_desc:
-            'When enabled, anonymized threat patterns are uploaded to Threat Cloud. No personal data, file contents, or source code is sent.',
-          d_st: 'Configure how Guard runs on this endpoint.',
-          st_mode: 'Guard Mode',
-          st_mode_desc:
-            'Learning mode builds a baseline. Protection mode actively blocks detected threats.',
-          st_tc: 'Threat Cloud Endpoint',
-          st_tc_desc:
-            'URL of the Threat Cloud relay. Leave empty for the default panguard.ai endpoint.',
-          st_endpoint: 'Endpoint',
-          st_upload: 'Upload',
-          st_port: 'Dashboard Port',
-          st_port_desc: 'The TCP port this dashboard listens on (localhost-only).',
-          st_port_label: 'Port',
-          st_lang: 'Language',
-          st_lang_desc: 'Choose the display language.',
-          st_lang_label: 'Language',
-          st_save: 'Save',
-          st_reload: 'Reload',
-          st_license: 'License Tier:',
-          st_license_desc:
-            'Community is free and unlimited. Pilot unlocks SARIF + Evidence Pack export and priority Threat Cloud routing.',
-          st_license_link: 'View pricing →',
-        },
-        zh: {
-          n_ov: '總覽',
-          n_th: '威脅',
-          n_ru: '規則',
-          n_sk: '技能',
-          n_tc: '威脅雲',
-          n_st: '設定',
-          t_ov: '總覽',
-          t_th: '威脅',
-          t_ru: '規則',
-          t_sk: '技能',
-          t_tc: '威脅雲',
-          t_st: '設定',
-          active: '啟動中',
-          hero_desc:
-            '所有偵測層運作中,PanGuard 正在即時守護你的 AI agent — 僅偵測,除非你開啟強制模式,否則不會阻擋任何流量。',
-          k_rules: '啟用規則',
-          k_threats: '已偵測威脅',
-          k_tc: 'TC 同步規則',
-          k_endpoints: '已連線端點',
-          k_uptime: '運行時間',
-          k_events: '已掃描事件',
-          k_mode: '模式',
-          k_mem: '記憶體 (MB)',
-          layer_title: '偵測層',
-          layer_desc:
-            '三層串聯運作,Layer A 先進行模式比對,Layer B 進行啟發式關聯,Layer C 決定信心判決。',
-          recent_events: '最近事件',
-          ev_empty: '目前無事件。',
-          ev_empty_sub: '偵測到的事件將於此即時顯示。',
-          d_th: '所有偵測到的威脅都記錄於此。惡意事件會自動封鎖。可使用嚴重程度篩選。',
-          all: '全部',
-          critical: '嚴重',
-          high: '高',
-          medium: '中',
-          low: '低',
-          exp_sarif: '匯出 SARIF',
-          exp_evidence: '產生 Evidence Pack',
-          upsell_pilot: '升級至 Pilot — 解鎖 SARIF + Evidence Pack',
-          th_ts: '時間',
-          th_rid: '規則 ID',
-          th_sev: '嚴重程度',
-          th_pat: '匹配模式',
-          th_act: '採取動作',
-          th_empty: '一切正常 — 今日無威脅。',
-          th_empty_sub: '你的 agent 受到保護。偵測到威脅時會顯示在這裡。',
-          d_ru: '已載入的 ATR 偵測規則。規則每小時自動從 Threat Cloud 同步。',
-          ru_total: '總規則數',
-          ru_critical: '嚴重',
-          ru_high: '高',
-          ru_synced: '最後同步',
-          ru_loading: '載入規則中...',
-          ru_id: 'ID',
-          ru_title: '標題',
-          ru_severity: '嚴重程度',
-          ru_category: '分類',
-          ru_target: 'scan_target',
-          ru_status: '狀態',
-          d_sk: '所有平台已安裝的 MCP skill。Whitelist skill 為已信任,未知 skill 持續追蹤行為偏移。',
-          sk_total: '已安裝總數',
-          sk_wl: '白名單',
-          sk_unk: '追蹤中',
-          sk_blk: '已封鎖',
-          all_skills: '所有已安裝技能',
-          scan_now: '立即掃描',
-          sk_loading: '載入技能中...',
-          sk_name: '名稱',
-          sk_platform: '平台',
-          sk_risk: '風險',
-          sk_status: '狀態',
-          sk_audit: '上次稽核',
-          d_tc: 'Threat Cloud 是 PanGuard 的匿名威脅情資共享網路。',
-          tc_loading: '載入 Threat Cloud 狀態中...',
-          tc_conn: '連線狀態',
-          tc_received: '已接收規則',
-          tc_uploaded: '已上傳威脅',
-          tc_queue: '佇列',
-          tc_last: '最後同步',
-          tc_flywheel: '飛輪',
-          tc_upload: '匿名上傳',
-          tc_upload_desc:
-            '啟用時,匿名化威脅模式會上傳到 Threat Cloud。絕不傳送個人資料、檔案內容或原始碼。',
-          d_st: '設定 Guard 在此端點的運作方式。',
-          st_mode: 'Guard 模式',
-          st_mode_desc: '學習模式建立基線,保護模式主動封鎖偵測到的威脅。',
-          st_tc: 'Threat Cloud Endpoint',
-          st_tc_desc: 'Threat Cloud relay 的 URL。留空使用預設 panguard.ai endpoint。',
-          st_endpoint: 'Endpoint',
-          st_upload: '上傳',
-          st_port: 'Dashboard 連接埠',
-          st_port_desc: 'Dashboard 監聽的 TCP 連接埠 (僅 localhost)。',
-          st_port_label: '連接埠',
-          st_lang: '語言',
-          st_lang_desc: '選擇顯示語言。',
-          st_lang_label: '語言',
-          st_save: '儲存',
-          st_reload: '重新載入',
-          st_license: '授權等級:',
-          st_license_desc:
-            'Community 永久免費。Pilot 解鎖 SARIF + Evidence Pack 匯出與優先 Threat Cloud 路由。',
-          st_license_link: '查看價格 →',
-        },
-      };
 
-      // Product is English-only. The zh dictionary and the `lang === 'zh'`
-      // ternaries are retained as dead code (they always resolve to the English
-      // branch) and can be removed in a dedicated cleanup; the bilingual
-      // experience lives on the marketing site, not the developer tool.
-      var lang = 'en';
 
       var currentSevFilter = 'all';
       var currentSort = { col: 'timestamp', dir: 'desc' };
@@ -1727,7 +1453,7 @@
         return fetch(path, opts).then(function (r) {
           if (r.status === 401) {
             var wl = document.getElementById('wl');
-            if (wl) wl.textContent = lang === 'zh' ? 'Token 無效' : 'Invalid token';
+            if (wl) wl.textContent = 'Invalid token';
           }
           return r;
         });
@@ -1736,24 +1462,6 @@
       /* ============================================================ */
       /*  i18n + language toggle                                       */
       /* ============================================================ */
-      function applyLang() {
-        document.querySelectorAll('[data-i18n]').forEach(function (e) {
-          var k = e.getAttribute('data-i18n');
-          if (T[lang] && T[lang][k]) {
-            if (e.tagName === 'INPUT') e.placeholder = T[lang][k];
-            else e.textContent = T[lang][k];
-          }
-        });
-      }
-      function toggleLang() {
-        lang = lang === 'en' ? 'zh' : 'en';
-        try {
-          localStorage.setItem('panguard_lang', lang);
-        } catch (e) {
-          /* ignore */
-        }
-        applyLang();
-      }
 
       /* ============================================================ */
       /*  Navigation                                                   */
@@ -1821,11 +1529,11 @@
         var ws = new WebSocket('ws://' + location.host + '/ws');
         ws.onopen = function () {
           document.getElementById('wd').classList.add('on');
-          document.getElementById('wl').textContent = lang === 'zh' ? '已連線' : 'Connected';
+          document.getElementById('wl').textContent = 'Connected';
         };
         ws.onclose = function () {
           document.getElementById('wd').classList.remove('on');
-          document.getElementById('wl').textContent = lang === 'zh' ? '已斷線' : 'Disconnected';
+          document.getElementById('wl').textContent = 'Disconnected';
           setTimeout(connectWS, 3000);
         };
         ws.onmessage = function (e) {
@@ -1863,8 +1571,6 @@
         setKPI('v-uptime', fmtUptime(s.uptime || 0));
         setKPI('v-events', (s.eventsProcessed || 0).toLocaleString());
         setKPI('v-mode', s.mode || '--');
-        setKPI('v-mem', Math.round(s.memoryUsageMB || 0));
-        setKPI('v-endpoints', '1');
 
         var hs = document.getElementById('hero-status');
         var hd = document.getElementById('hero-dot');
@@ -1956,14 +1662,21 @@
                     : v.conclusion === 'suspicious'
                       ? 'medium'
                       : 'low',
-                pattern: (v.reasoning || '').slice(0, 50),
+                pattern: (v.reasoning || '').slice(0, 160),
                 action: v.recommendedAction || 'log_only',
               };
             });
             renderThreats();
           })
           .catch(function () {
-            renderThreats();
+            var emp = document.getElementById('th-empty');
+            var tb = document.getElementById('th-tb');
+            if (tb) tb.innerHTML = '';
+            if (emp) {
+              emp.style.display = '';
+              emp.innerHTML =
+                '<span style="color:var(--danger)">Could not load threats — is Guard running?</span>';
+            }
           });
       }
       function renderThreats() {
@@ -2102,12 +1815,10 @@
             document.getElementById('ru-wrap').style.display = '';
             // Build filter options
             var cats = {};
-            var targets = {};
             var critCount = 0,
               highCount = 0;
             allRules.forEach(function (r) {
               if (r.category) cats[r.category] = true;
-              if (r.scan_target) targets[r.scan_target] = true;
               if (r.severity === 'critical') critCount++;
               if (r.severity === 'high') highCount++;
             });
@@ -2122,15 +1833,6 @@
                 opt.textContent = c;
                 catSel.appendChild(opt);
               });
-            var tgtSel = document.getElementById('ru-target');
-            Object.keys(targets)
-              .sort()
-              .forEach(function (t) {
-                var opt = document.createElement('option');
-                opt.value = t;
-                opt.textContent = t;
-                tgtSel.appendChild(opt);
-              });
             renderRules(allRules);
           })
           .catch(function () {
@@ -2143,7 +1845,7 @@
         var table = document.getElementById('ru-table');
         tb.innerHTML = '';
         if (rules.length === 0) {
-          tb.innerHTML = '<tr><td colspan="6" class="empty">No rules match the filters.</td></tr>';
+          tb.innerHTML = '<tr><td colspan="4" class="empty">No rules match the filters.</td></tr>';
           table.style.display = '';
           return;
         }
@@ -2164,11 +1866,7 @@
             '</span></td>' +
             '<td>' +
             esc(r.category) +
-            '</td>' +
-            '<td class="mono">' +
-            esc(r.scan_target || '--') +
-            '</td>' +
-            '<td><span class="badge badge-ok">loaded</span></td>';
+            '</td>';
           tb.appendChild(tr);
         });
         document.getElementById('ru-search-count').textContent =
@@ -2178,11 +1876,9 @@
         var q = (document.getElementById('ru-search').value || '').toLowerCase();
         var cat = document.getElementById('ru-cat').value;
         var sev = document.getElementById('ru-sev-flt').value;
-        var tgt = document.getElementById('ru-target').value;
         var f = allRules.filter(function (r) {
           if (cat && r.category !== cat) return false;
           if (sev && r.severity !== sev) return false;
-          if (tgt && r.scan_target !== tgt) return false;
           if (q && (r.id + ' ' + r.title + ' ' + r.category).toLowerCase().indexOf(q) === -1)
             return false;
           return true;
@@ -2208,8 +1904,7 @@
             if (ld) ld.style.display = 'none';
             if (tbl) tbl.style.display = '';
             var wl = 0,
-              unk = 0,
-              blk = 0;
+              unk = 0;
             d.skills.forEach(function (s, i) {
               var status = s.whitelisted ? 'whitelisted' : 'tracked';
               if (status === 'whitelisted') wl++;
@@ -2222,7 +1917,6 @@
                   : status === 'blocked'
                     ? 'badge-critical'
                     : 'badge-w';
-              var risk = s.riskScore != null ? s.riskScore + '/100' : '--';
               var tr = document.createElement('tr');
               tr.innerHTML =
                 '<td>' +
@@ -2234,25 +1928,18 @@
                 '<td>' +
                 esc(s.platform || '--') +
                 '</td>' +
-                '<td>' +
-                esc(risk) +
-                '</td>' +
                 '<td><span class="dot ' +
                 dotCls +
                 '"></span> <span class="badge ' +
                 badgeCls +
                 '">' +
                 esc(status) +
-                '</span></td>' +
-                '<td class="mono" style="color:var(--text-muted);font-size:11px">' +
-                (s.lastAudit ? new Date(s.lastAudit).toLocaleDateString() : '--') +
-                '</td>';
+                '</span></td>';
               tb.appendChild(tr);
             });
             setKPI('sk-total', d.skills.length);
             setKPI('sk-wl', wl);
             setKPI('sk-unk', unk);
-            setKPI('sk-blk', blk);
           })
           .catch(function () {
             var ld = document.getElementById('sk-loading');
@@ -2273,13 +1960,7 @@
             if (dot) dot.className = 'dot ' + (isConnected ? 'dot-ok' : 'dot-bad');
             var ctext = document.getElementById('tc-conn-text');
             if (ctext) {
-              ctext.textContent = isConnected
-                ? lang === 'zh'
-                  ? '已連接'
-                  : 'Connected'
-                : lang === 'zh'
-                  ? '未連接'
-                  : 'Disconnected';
+              ctext.textContent = isConnected ? 'Connected' : 'Disconnected';
               ctext.style.color = isConnected ? 'var(--ok)' : 'var(--danger)';
             }
             document.getElementById('tc-endpoint').textContent = d.endpoint || '--';
@@ -2296,13 +1977,13 @@
             if (d.uploadEnabled) {
               if (tog) tog.classList.add('on');
               if (tlbl) {
-                tlbl.textContent = lang === 'zh' ? '已啟用' : 'Enabled';
+                tlbl.textContent = 'Enabled';
                 tlbl.style.color = 'var(--ok)';
               }
             } else {
               if (tog) tog.classList.remove('on');
               if (tlbl) {
-                tlbl.textContent = lang === 'zh' ? '已停用' : 'Disabled';
+                tlbl.textContent = 'Disabled';
                 tlbl.style.color = 'var(--text-muted)';
               }
             }
@@ -2325,7 +2006,7 @@
           })
           .then(function (d) {
             if (d.success) {
-              toast(lang === 'zh' ? '已儲存' : 'Saved');
+              toast('Saved');
               loadTCloud();
             } else {
               toast(d.error || 'Error');
@@ -2356,21 +2037,8 @@
             }
             var ep = document.getElementById('st-tc-endpoint');
             if (ep) ep.value = cfg.threatCloudEndpoint || '';
-            var ut = document.getElementById('st-tc-upload');
-            var ul = document.getElementById('st-tc-upload-label');
-            var uEnabled = cfg.threatCloudUploadEnabled !== false;
-            if (ut) {
-              if (uEnabled) ut.classList.add('on');
-              else ut.classList.remove('on');
-            }
-            if (ul) {
-              ul.textContent = uEnabled ? 'Enabled' : 'Disabled';
-              ul.style.color = uEnabled ? 'var(--ok)' : 'var(--text-muted)';
-            }
             var port = document.getElementById('st-port');
-            if (port) port.value = cfg.dashboardPort || 9999;
-            var langSel = document.getElementById('st-lang');
-            if (langSel) langSel.value = lang;
+            if (port) port.textContent = cfg.dashboardPort || 9999;
           })
           .catch(function () {
             /* ignore */
@@ -2386,31 +2054,10 @@
           l.style.color = isProt ? 'var(--ok)' : 'var(--warn)';
         }
       }
-      function toggleUploadSettings() {
-        var t = document.getElementById('st-tc-upload');
-        t.classList.toggle('on');
-        var l = document.getElementById('st-tc-upload-label');
-        var on = t.classList.contains('on');
-        if (l) {
-          l.textContent = on ? 'Enabled' : 'Disabled';
-          l.style.color = on ? 'var(--ok)' : 'var(--text-muted)';
-        }
-      }
-      function setLangFromSettings() {
-        var s = document.getElementById('st-lang').value;
-        if (s && s !== lang) {
-          lang = s;
-          try {
-            localStorage.setItem('panguard_lang', lang);
-          } catch (e) {
-            /* ignore */
-          }
-          applyLang();
-        }
-      }
       function saveSettings() {
+        var modeOn = document.getElementById('st-mode-toggle').classList.contains('on');
         var body = {
-          uploadEnabled: document.getElementById('st-tc-upload').classList.contains('on'),
+          mode: modeOn ? 'protection' : 'learning',
           endpoint: document.getElementById('st-tc-endpoint').value || undefined,
         };
         af('/api/threat-cloud', {
@@ -2423,7 +2070,8 @@
           })
           .then(function (d) {
             if (d.success) {
-              toast(lang === 'zh' ? '已儲存' : 'Saved');
+              toast('Settings saved — restart Guard to apply a mode change');
+              loadSettings();
             } else {
               toast(d.error || 'Save failed');
             }
@@ -2434,10 +2082,53 @@
       }
 
       /* ============================================================ */
+      /*  Event wiring (CSP-safe: no inline handlers)                  */
+      /* ============================================================ */
+      function on(id, ev, fn) {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener(ev, fn);
+      }
+      function wireEvents() {
+        document.querySelectorAll('.fb').forEach(function (b) {
+          b.addEventListener('click', function (e) {
+            filterThreats(b.getAttribute('data-sev'), e);
+          });
+        });
+        document.querySelectorAll('th[data-sort]').forEach(function (th) {
+          th.addEventListener('click', function () {
+            sortThreats(th.getAttribute('data-sort'));
+          });
+        });
+        on('btn-sarif', 'click', exportSARIF);
+        on('btn-evidence', 'click', exportEvidence);
+        var rs = document.getElementById('ru-search');
+        if (rs) {
+          rs.addEventListener('input', filterRules);
+          rs.addEventListener('focus', function () {
+            rs.style.borderColor = 'var(--sage)';
+          });
+          rs.addEventListener('blur', function () {
+            rs.style.borderColor = 'var(--border)';
+          });
+        }
+        ['ru-cat', 'ru-sev-flt'].forEach(function (id) {
+          on(id, 'change', filterRules);
+        });
+        on('btn-refresh-skills', 'click', function () {
+          loadSkills();
+          toast('Refreshing skills…');
+        });
+        on('tc-toggle', 'click', toggleUpload);
+        on('st-mode-toggle', 'click', toggleMode);
+        on('btn-save', 'click', saveSettings);
+        on('btn-reload', 'click', loadSettings);
+      }
+
+      /* ============================================================ */
       /*  Boot                                                         */
       /* ============================================================ */
       (function () {
-        applyLang();
+        wireEvents();
         connectWS();
         loadStatus();
         loadThreats();

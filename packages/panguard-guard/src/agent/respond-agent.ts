@@ -318,6 +318,9 @@ export class RespondAgent {
 
   private async respondWithPolicy(verdict: ThreatVerdict): Promise<ResponseResult> {
     const { confidence } = verdict;
+    // Advisory invariant: auto-execution (block/revoke/etc.) gates on deterministic confidence
+    // only. The bring-your-own LLM can raise `confidence` to notify/flag, never auto-block alone.
+    const enforcementConfidence = verdict.enforcementConfidence ?? confidence;
     const target = extractTarget(verdict);
     const isRepeatOffender = target
       ? this.escalation.isRepeatOffender(target, SAFETY_RULES.escalationThreshold)
@@ -327,7 +330,7 @@ export class RespondAgent {
       ? Math.max(50, this.actionPolicy.autoRespond - 10)
       : this.actionPolicy.autoRespond;
 
-    if (confidence >= effectiveAutoRespond) {
+    if (enforcementConfidence >= effectiveAutoRespond) {
       if (isRepeatOffender) {
         logger.warn(
           `Repeat offender ${target}: auto-responding at lower threshold ` +

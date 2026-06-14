@@ -47,7 +47,8 @@ import { PanguardAgentClient } from './agent-client/index.js';
 import type { AgentHeartbeat } from './agent-client/index.js';
 
 // Extracted modules
-import { autoDetectLLM, initEngines, loadAllRules, getRuleCounts } from './rule-loader.js';
+import { initEngines, loadAllRules, getRuleCounts } from './rule-loader.js';
+import { autoDetectLLM } from './llm-detect.js';
 import {
   syncThreatCloud,
   setupCloudSyncTimer,
@@ -131,6 +132,10 @@ export class GuardEngine {
    * Checks env vars for ANTHROPIC_API_KEY, OPENAI_API_KEY, or tries Ollama.
    */
   static async create(config: GuardConfig): Promise<GuardEngine> {
+    // Opt-in semantic layer: bring your own model (cloud API key or local Ollama). Returns null
+    // when nothing is configured, so detection defaults to deterministic-only. The model is
+    // ADVISORY — it can flag / explain / draft rules but never auto-blocks on its own
+    // (enforcement uses deterministicConfidence; see AnalyzeAgent + respondWithPolicy).
     const llm = await autoDetectLLM();
     const engine = new GuardEngine(config, llm);
     await engine.init();

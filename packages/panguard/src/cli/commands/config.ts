@@ -91,7 +91,9 @@ export function configCommand(): Command {
 
   cmd
     .command('llm')
-    .description('Configure LLM provider for AI analysis')
+    .description(
+      'Configure the optional advisory semantic layer (bring your own LLM, off by default)'
+    )
     .option('--provider <provider>', 'LLM provider: claude, openai, ollama')
     .option('--api-key <key>', 'API key (for claude/openai)')
     .option('--model <model>', 'Model override (e.g., claude-haiku-4-5-20251001, gpt-4o)')
@@ -108,6 +110,10 @@ export function configCommand(): Command {
         clear?: boolean;
       }) => {
         console.log(banner(PANGUARD_VERSION));
+        console.log(
+          `  ${c.dim('Note: detection is deterministic by default (ATR rules + heuristics). Configuring a provider adds an OPTIONAL, advisory semantic layer — it can flag findings for review but never auto-blocks. --show / --clear manage the stored config.')}`
+        );
+        console.log('');
 
         if (options.show) {
           const config = loadLlmConfig();

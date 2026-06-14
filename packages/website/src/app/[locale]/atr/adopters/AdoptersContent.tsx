@@ -137,13 +137,12 @@ const AWESOME_LISTS = [
 const STANDARDS_PIPELINE_OPEN = [
   {
     org: 'NIST AI RMF (OSCAL)',
-    status: 'Path 1 accepted 2026-05-11',
+    status: 'Collaborating with OSCAL lead',
     detail: 'Community OSCAL catalog covering all 4 AI RMF functions',
   },
   { org: 'NVIDIA garak', status: 'PR #1676 open' },
   { org: 'IBM mcp-context-forge', status: 'PR #4109 open' },
   { org: 'OWASP LLM Top 10', status: 'Issue #814 open' },
-  { org: 'safe-agentic-framework/safe-mcp', status: 'PR #187 open' },
   { org: 'meta-llama/PurpleLlama', status: 'PR #206 open' },
   { org: 'promptfoo/promptfoo', status: 'PR #8529 open' },
 ];

@@ -389,7 +389,7 @@ export default function PricingContent() {
                         '自訂 ATR rule pack 試做',
                         'SIEM webhook 整合樣板',
                         'LLM 額度全包(crystallization + 規則 enrichment ~$200/月,我們吃 token 成本)',
-                        '偵測 0% 依賴 LLM——336 條 deterministic rules @ 97.1% recall',
+                        '偵測 0% 依賴 LLM——336 條 deterministic rules @ 98% recall',
                         '90 天後升級 Enterprise 或乾淨結束',
                         '可 credit 全額 $25K 到 Y1 Enterprise 年約',
                       ]
@@ -400,7 +400,7 @@ export default function PricingContent() {
                         'Custom ATR rule pack trial',
                         'SIEM webhook integration template',
                         'LLM credits included (crystallization + rule enrichment ~$200/mo, we eat the token cost)',
-                        'Detection runs 0% on LLM — 336 deterministic rules @ 97.1% recall',
+                        'Detection runs 0% on LLM — 336 deterministic rules @ 98% recall',
                         'Clean exit or upgrade to Enterprise at day 90',
                         'Full $25K credit to Y1 Enterprise contract on upgrade',
                       ]
@@ -751,8 +751,8 @@ export default function PricingContent() {
               <div className="space-y-4 text-[14px] text-text-secondary leading-[1.85]">
                 <p>
                   {isZh
-                    ? '每筆偵測事件都對應到具體的 ATR 規則 ID，並串連六大框架的條文：EU AI Act、Colorado AI Act、NIST AI RMF、ISO/IEC 42001、OWASP Agentic Top 10、OWASP LLM Top 10。報告為 PDF 與 JSON 雙格式輸出，附 SHA-256 與 Merkle tree 簽章。'
-                    : 'Each detection event is mapped to a specific ATR rule ID and threaded across articles in six frameworks: EU AI Act, Colorado AI Act, NIST AI RMF, ISO/IEC 42001, OWASP Agentic Top 10, and OWASP LLM Top 10. Reports are delivered in PDF and JSON, signed with SHA-256 and Merkle tree.'}
+                    ? '每筆偵測事件都對應到具體的 ATR 規則 ID，並串連五大框架的條文：EU AI Act、NIST AI RMF、ISO/IEC 42001、OWASP Agentic Top 10、OWASP LLM Top 10。報告為 PDF 與 JSON 雙格式輸出，附 SHA-256 與 Merkle tree 簽章。'
+                    : 'Each detection event is mapped to a specific ATR rule ID and threaded across articles in five frameworks: EU AI Act, NIST AI RMF, ISO/IEC 42001, OWASP Agentic Top 10, and OWASP LLM Top 10. Reports are delivered in PDF and JSON, signed with SHA-256 and Merkle tree.'}
                 </p>
                 <p>
                   {isZh
@@ -770,13 +770,13 @@ export default function PricingContent() {
                     ? [
                         'NIST AI RMF 100% 規則覆蓋（1,566 個 mapping，於 ATR v2.1.0 上線）',
                         'EU AI Act Article 9、12、14、15、50 自動對照',
-                        '季度合規報告：每筆偵測 → ATR 規則 ID → 六大框架條文',
+                        '季度合規報告：每筆偵測 → ATR 規則 ID → 五大框架條文',
                         'PDF 與 JSON 雙格式，SHA-256 與 Merkle tree 不可竄改簽章',
                       ]
                     : [
                         'NIST AI RMF 100% rule coverage (1,566 mappings, shipped in ATR v2.1.0)',
                         'EU AI Act Articles 9, 12, 14, 15, and 50 auto-mapped',
-                        'Quarterly compliance reports threading detection event → ATR rule ID → 6-framework articles',
+                        'Quarterly compliance reports threading detection event → ATR rule ID → 5-framework articles',
                         'Tamper-evident PDF + JSON outputs signed with SHA-256 and Merkle tree',
                       ]
                   ).map((f) => (

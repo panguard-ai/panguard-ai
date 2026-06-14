@@ -57,6 +57,12 @@ for (const file of files) {
     console.warn(`  SKIP (no id): ${file}`);
     continue;
   }
+  // Production-only: the runtime ATREngine excludes draft/deprecated rules, so the
+  // bundled web scanner must too — otherwise the website runs rules the product does
+  // not actually ship, risking false positives on benign content.
+  if (doc.status === 'draft' || doc.status === 'deprecated') {
+    continue;
+  }
   const category = doc.tags?.category || '';
   const scanTarget = doc.tags?.scan_target || null; // mcp | skill | runtime | null (both)
   const ruleVersion = doc.rule_version || 1;

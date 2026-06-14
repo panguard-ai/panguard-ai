@@ -84,8 +84,8 @@ export const LAYERS: readonly Layer[] = [
     proofShort: { en: 'Q2 2026', zh: '2026 Q2 上線' },
     tryIt: {
       intro: {
-        en: 'Not live yet. Join the Team waitlist to be first when /admin/inventory ships.',
-        zh: '尚未上線。加入 Team 版 waitlist,第一時間使用 /admin/inventory。',
+        en: 'Not live yet. Join the early-access waitlist to be first when /admin/inventory ships.',
+        zh: '尚未上線。加入 early-access waitlist,第一時間使用 /admin/inventory。',
       },
       href: '/early-access',
     },
@@ -123,24 +123,24 @@ export const LAYERS: readonly Layer[] = [
     },
     status: 'shipped',
     what: {
-      en: 'L2 Audit inspects the code and configs an agent is about to trust, before it runs. Two scan paths: MCP config JSON (claude_desktop_config.json, .cursor/mcp.json) for runtime protection rules; SKILL.md files for skill-marketplace prompt injection and tool poisoning. Same 330 ATR rules, different regex subsets per scan target.',
-      zh: 'L2 稽核在 agent 執行前檢查它即將信任的程式碼與配置。兩條掃描路徑：MCP config JSON（claude_desktop_config.json、.cursor/mcp.json）跑 runtime protection rules；SKILL.md 檔跑 skill 市場的 prompt injection 與 tool poisoning。同一批 330 條 ATR 規則，依不同 scan target 套用不同的 regex 子集。',
+      en: 'L2 Audit inspects the code and configs an agent is about to trust, before it runs. Two scan paths: MCP config JSON (claude_desktop_config.json, .cursor/mcp.json) for runtime protection rules; SKILL.md files for skill-marketplace prompt injection and tool poisoning. Same 650+ ATR rules, different regex subsets per scan target.',
+      zh: 'L2 稽核在 agent 執行前檢查它即將信任的程式碼與配置。兩條掃描路徑：MCP config JSON（claude_desktop_config.json、.cursor/mcp.json）跑 runtime protection rules；SKILL.md 檔跑 skill 市場的 prompt injection 與 tool poisoning。同一批 650+ 條 ATR 規則，依不同 scan target 套用不同的 regex 子集。',
     },
     why: {
       en: 'One malicious skill install = agent hijack. The postmark-mcp incident silently forwarded 15,000 emails/day for months before detection. Scan before you trust the code an agent is about to run.',
       zh: '一個惡意 skill 安裝 = agent 被劫持。postmark-mcp 事件安靜轉發 15,000 封 email/天數月才被發現。在 agent 執行那段程式碼前先掃過。',
     },
     how: {
-      en: 'Regex-first ATR engine with optional LLM semantic layer. Rules stored as YAML with versioned lifecycle (draft → experimental → stable). Web scanner at panguard.ai/ and CLI `pga scan <url-or-path>`. Microsoft AGT + Cisco AI Defense ship these rules as their reference detection pack.',
-      zh: '以 regex 為主的 ATR 引擎,可選 LLM 語意層。規則以 YAML 儲存,有版本生命週期(draft → experimental → stable)。Web scanner 在 panguard.ai/,CLI `pga scan <url-or-path>`。Microsoft AGT + Cisco AI Defense 已把這些規則當作參考偵測包。',
+      en: 'Deterministic, on-device ATR rule engine — pure regex/pattern matching, no LLM in the detection path, reproducible verdicts. Rules stored as YAML with versioned lifecycle (draft → experimental → stable). Web scanner at panguard.ai/ and CLI `pga scan <url-or-path>`. Microsoft AGT + Cisco AI Defense ship these rules as their reference detection pack.',
+      zh: '確定性、裝置端的 ATR 規則引擎 — 純 regex/pattern 比對,偵測路徑無 LLM,判定可重現。規則以 YAML 儲存,有版本生命週期(draft → experimental → stable)。Web scanner 在 panguard.ai/,CLI `pga scan <url-or-path>`。Microsoft AGT + Cisco AI Defense 已把這些規則當作參考偵測包。',
     },
     proof: {
-      en: '330 ATR rules (MIT licensed) · 97.1% recall on NVIDIA Garak (666 adversarial prompts) · 96.9% recall / 100% precision / 0% FP on 498 real-world SKILL.md samples · 0.48% FP on 3,115 wild Skills.sh packages · Cisco AI Defense ships full pack via PR #79 + #99; Microsoft AGT ships 287 rules via PR #908 + #1277.',
-      zh: '330 條 ATR 規則（MIT 授權）· NVIDIA Garak 97.1% 召回（666 個對抗 prompt）· 498 個真實 SKILL.md 樣本 96.9% 召回 / 100% 精度 / 0% FP · 3,115 個野外 Skills.sh 套件 0.48% FP · Cisco AI Defense 透過 PR #79 + #99 引入完整 330 條規則；Microsoft AGT 透過 PR #908 + #1277 引入 287 條。',
+      en: '650+ ATR rules (MIT licensed) · 98% recall on 650 samples on NVIDIA Garak · 100% recall / 100% precision / 0% FP on 341 real-world SKILL.md samples · 0.48% FP on 3,115 wild Skills.sh packages · Cisco AI Defense ships full pack via PR #79 + #99; Microsoft AGT ships 287 rules via PR #908 + #1277.',
+      zh: '650+ 條 ATR 規則（MIT 授權）· NVIDIA Garak 650 樣本 98% 召回 · 341 個真實 SKILL.md 樣本 100% 召回 / 100% 精度 / 0% FP · 3,115 個野外 Skills.sh 套件 0.48% FP · Cisco AI Defense 透過 PR #79 + #99 引入完整規則包；Microsoft AGT 透過 PR #908 + #1277 引入 287 條。',
     },
     proofShort: {
-      en: '330 rules · 97.1% Garak recall · 0.48% FP',
-      zh: '330 條規則 · Garak 97.1% 召回 · 0.48% FP',
+      en: '650+ rules · 98% Garak recall · 0.48% FP',
+      zh: '650+ 條規則 · Garak 98% 召回 · 0.48% FP',
     },
     tryIt: {
       intro: {
@@ -268,36 +268,36 @@ export const LAYERS: readonly Layer[] = [
     slug: 'detect',
     name: { en: 'Detect', zh: '偵測 Detect' },
     tagline: {
-      en: 'Behavioral anomaly detection with a 3-layer AI funnel',
-      zh: '3 層 AI 漏斗的行為異常偵測',
+      en: 'Behavioral anomaly detection — deterministic heuristic correlation',
+      zh: '行為異常偵測 — 確定性啟發式關聯',
     },
     status: 'shipped',
     what: {
-      en: 'L4 Detect catches what rules cannot: novel attack patterns, behavioral drift, coordinated multi-step attacks. A 3-layer funnel routes ~90% of traffic to cheap rule matching, ~7% to a local LLM (Ollama / llama.cpp) for semantic analysis, and only ~3% to cloud AI for deep reasoning on ambiguous cases.',
-      zh: 'L4 偵測抓規則抓不到的:新型態攻擊模式、行為漂移、多步驟協同攻擊。3 層漏斗把 ~90% 流量路由到便宜的規則比對、~7% 到本地 LLM(Ollama / llama.cpp)做語意分析、只有 ~3% 到雲端 AI 對模糊案例做深度推理。',
+      en: 'L4 Detect catches what single-rule matching cannot: behavioral drift, coordinated multi-step attacks, and individually-benign tool calls that combine into a malicious sequence. It runs entirely on-device with no LLM in the detection path: a behavioral baseline plus heuristic and temporal correlation across events. Single-rule matching handles known attacks; L4 correlates the residue.',
+      zh: 'L4 偵測抓單條規則抓不到的:行為漂移、多步驟協同攻擊、以及單獨無害但組合起來成為惡意序列的工具呼叫。它完全在裝置端執行,偵測路徑無 LLM:行為基線加上跨事件的啟發式與時間關聯。單條規則比對處理已知攻擊;L4 關聯剩下的殘量。',
     },
     why: {
-      en: 'Rules catch the 90% of attacks you have seen before. The other 10% need AI — but if you call a cloud LLM on every request, cost and latency explode. The funnel keeps P50 under 50ms, P99 under 5s, at 95% cheaper than naive "always call GPT" architectures.',
-      zh: '規則抓到你看過的 90% 攻擊。剩下 10% 要 AI — 但每個 request 都 call 雲端 LLM,成本與延遲會爆。漏斗讓 P50 低於 50ms、P99 低於 5s,比天真的「一律 call GPT」架構便宜 95%。',
+      en: 'Single-rule matching catches attacks you have seen before. Multi-step and drifting attacks slip between individual rules. Behavioral correlation closes that gap deterministically — reproducible verdicts, no cloud call, no LLM latency tax. P50 stays under 50ms, correlation passes complete in milliseconds, fully offline.',
+      zh: '單條規則比對抓你看過的攻擊。多步驟與漂移型攻擊會從單條規則之間溜走。行為關聯以確定性方式補上這個缺口 — 判定可重現、不打雲端、沒有 LLM 延遲稅。P50 維持在 50ms 以下,關聯掃描在毫秒內完成,完全離線。',
     },
     how: {
-      en: 'SmartRouter in packages/panguard-guard/src/engines/smart-router.ts dispatches events by confidence. EnvironmentBaseline learns normal processes / connections / logins during the 7-day learning window, then flips to protection mode. AnalyzeAgent wraps Anthropic / OpenAI / Ollama with a unified interface; investigation engine correlates across events.',
-      zh: 'packages/panguard-guard/src/engines/smart-router.ts 的 SmartRouter 依信心度分派事件。EnvironmentBaseline 在 7 天學習視窗學正常 process / 連線 / 登入,然後切到 protection mode。AnalyzeAgent 把 Anthropic / OpenAI / Ollama 包成統一介面;investigation engine 跨事件關聯。',
+      en: 'SmartRouter in packages/panguard-guard/src/engines/smart-router.ts dispatches events by confidence to deterministic handlers. EnvironmentBaseline learns normal processes / connections / logins during the 7-day learning window, then flips to protection mode and flags deviations. The investigation engine correlates across events using heuristic and temporal rules — no model inference at detection time.',
+      zh: 'packages/panguard-guard/src/engines/smart-router.ts 的 SmartRouter 依信心度把事件分派到確定性 handler。EnvironmentBaseline 在 7 天學習視窗學正常 process / 連線 / 登入,然後切到 protection mode 標記偏移。investigation engine 用啟發式與時間規則跨事件關聯 — 偵測當下不做任何模型推論。',
     },
     proof: {
-      en: 'Rules (50ms) → local AI (~2s) → cloud AI (~5s) · 90 / 7 / 3 production traffic split · 7-day learning-mode baseline · Supports Claude, OpenAI, Ollama, or offline-only.',
-      zh: '規則 (50ms) → 本地 AI (~2s) → 雲端 AI (~5s) · production 流量 90 / 7 / 3 分配 · 7 天 learning-mode baseline · 支援 Claude / OpenAI / Ollama / 純離線。',
+      en: 'On-device behavioral correlation · P50 under 50ms per decision · 7-day learning-mode baseline · No LLM in the detection path — verdicts are deterministic and reproducible · Fully offline.',
+      zh: '裝置端行為關聯 · 每次決策 P50 低於 50ms · 7 天 learning-mode baseline · 偵測路徑無 LLM — 判定確定且可重現 · 完全離線。',
     },
     proofShort: {
-      en: '90/7/3 funnel · 7-day baseline',
-      zh: '90/7/3 漏斗 · 7 天 baseline',
+      en: 'On-device correlation · 7-day baseline · no LLM',
+      zh: '裝置端關聯 · 7 天 baseline · 無 LLM',
     },
     tryIt: {
       intro: {
-        en: 'Add cloud AI for deeper detection (optional — local-only also works):',
-        zh: '加入雲端 AI 進行更深偵測(選用 — 純本地也能跑):',
+        en: 'Behavioral detection is on by default once the baseline is learned:',
+        zh: 'baseline 學完後,行為偵測預設啟用:',
       },
-      command: 'pga guard setup-ai',
+      command: 'pga up',
     },
     attacks: [
       {
@@ -309,11 +309,11 @@ export const LAYERS: readonly Layer[] = [
         },
       },
       {
-        name: { en: 'Novel prompt injection variants', zh: '新型 prompt 注入變體' },
+        name: { en: 'Behavioral drift from baseline', zh: '偏離基線的行為漂移' },
         severity: 'medium',
         description: {
-          en: 'Adversarial prompts that evade known regex — local AI analyzes semantic intent.',
-          zh: '躲過已知 regex 的對抗 prompt — 本地 AI 分析語意意圖。',
+          en: 'A skill that starts deviating from its learned baseline — new processes, unexpected connections, off-pattern timing — is flagged by deterministic baseline comparison.',
+          zh: 'Skill 開始偏離學到的基線 — 新 process、未預期連線、異常時序 — 由確定性的基線比對標記。',
         },
       },
     ],
@@ -445,8 +445,8 @@ export const LAYERS: readonly Layer[] = [
       zh: 'L7 治理是合規團隊與稽核員看的東西。今天：每個 admin 動作的稽核日誌（actor、IP、時間戳）、client key 註冊 + 撤銷、OWASP Agentic Top 10 對應（10/10）、NIST AI RMF 100% 對應（1,566 個 mapping，於 ATR v2.1.0 上線）、EU AI Act + ISO 42001 metadata 由 Migrator Enterprise 自動標註。2026 Q2：`pga report --framework <name>` 產出每條規則對應的 Markdown / PDF 報告。2026 Q3：AIAM — agent 身分、scope、委派。',
     },
     why: {
-      en: 'EU AI Act enforces 2026-08-02. Colorado AI Act 2026-06-01. F500 RFPs are asking for per-rule framework mapping, not just "we scan." Auditors need a path from detected event → triggered rule → controlled article. Compliance teams need SOC2 Type II attestation. We publish honest timelines and commit to them.',
-      zh: 'EU AI Act 2026-08-02 強制執行。Colorado AI Act 2026-06-01。F500 RFP 要的是每條規則對應框架的 mapping,不只是「我們有掃」。稽核員要「偵測到事件 → 觸發規則 → 控制條文」的路徑。合規團隊要 SOC2 Type II 認證。我們公開誠實時程並承諾做到。',
+      en: 'As the EU AI Act phases in, F500 RFPs are asking for per-rule framework mapping, not just "we scan." Auditors need a path from detected event → triggered rule → controlled article. Compliance teams need SOC2 Type II attestation. We publish honest timelines and commit to them.',
+      zh: '隨著 EU AI Act 逐步生效,F500 RFP 要的是每條規則對應框架的 mapping,不只是「我們有掃」。稽核員要「偵測到事件 → 觸發規則 → 控制條文」的路徑。合規團隊要 SOC2 Type II 認證。我們公開誠實時程並承諾做到。',
     },
     how: {
       en: 'Today: threat-cloud/src/audit-logger.ts with audit_log SQLite migrations v2-v3. ATR v2.1.0 rules ship with `compliance.nist_ai_rmf` metadata block (1,566 mappings). Migrator Enterprise auto-tags EU AI Act articles + ISO 42001 clauses on every converted rule. Q2 2026: `pga report` reads rule YAML + TC audit log to build Markdown / PDF reports. Q3 2026: AIAM package (panguard-auth) — OAuth 2.0 device flow, JWT issue/verify, policy evaluator.',

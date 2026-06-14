@@ -205,6 +205,11 @@ export class AnalyzeAgent {
     // Step 6: Calculate final confidence (weighted average)
     const hasAI = this.llm !== null && aiAnalysis !== null;
     let finalConfidence = calculateFinalConfidence(evidenceList, hasAI);
+    // Advisory invariant: enforcement confidence uses DETERMINISTIC evidence only (excludes the
+    // AI layer). Auto-blocking keys off this, so a bring-your-own LLM can raise the displayed
+    // confidence (-> notify / flag-for-review) but can never trigger a block on its own.
+    const deterministicEvidence = evidenceList.filter((e) => e.source !== 'ai_analysis');
+    let enforcementConfidence = calculateFinalConfidence(deterministicEvidence, false);
 
     // Contradiction detection: if rule says high but baseline says normal, slight reduce
     const hasHighRule = evidenceList.some(
@@ -216,6 +221,7 @@ export class AnalyzeAgent {
     const noDeviation = !deviation.isDeviation;
     if (hasHighRule && noDeviation && baseline.learningComplete) {
       finalConfidence = Math.max(0, finalConfidence - 10);
+      enforcementConfidence = Math.max(0, enforcementConfidence - 10);
       logger.info(
         `Contradiction: high rule match but no baseline deviation. Confidence reduced by 10.`
       );
@@ -228,6 +234,7 @@ export class AnalyzeAgent {
     const verdict: ThreatVerdict = {
       conclusion,
       confidence: finalConfidence,
+      enforcementConfidence,
       reasoning: buildReasoning(evidenceList, deviation, aiAnalysis),
       evidence: evidenceList,
       recommendedAction,

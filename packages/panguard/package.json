@@ -39,6 +39,7 @@
     "build": "tsc --build && cp ../../CHANGELOG.md ./CHANGELOG.md 2>/dev/null || true",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "dev": "tsc --build --watch",
     "prepublishOnly": "pnpm run build",
     "postinstall": "node -e \"console.log('\\n  Panguard AI v' + require('./package.json').version + ' installed.\\n\\n  Quick start:\\n    pga              Open interactive menu\\n    pga up           Start protection + dashboard\\n    pga scan         Scan your skills\\n    pga audit <dir>  Audit a skill before installing\\n\\n  First time? Just run: pga\\n')\""
@@ -62,7 +63,7 @@
   "optionalDependencies": {
     "@panguard-ai/threat-cloud": "workspace:*",
     "@panguard-ai/panguard-trap": "workspace:*",
-    "agent-threat-rules": "^3.2.0"
+    "agent-threat-rules": "^3.4.0"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",

@@ -53,11 +53,11 @@ export const COMPARE: ComparisonEntry[] = [
     framing: {
       en: [
         'Sigma is the open detection standard for SIEM (Security Information and Event Management). Rules describe log patterns — Windows Event ID 4625 with logon type 3 and source IP outside the allowlist — and SIEM engines (Splunk, ELK, Microsoft Sentinel) load and evaluate them. Sigma is a decade old, has thousands of community rules, and is the de-facto language for detection engineering.',
-        'ATR is the open detection standard for AI agents. Rules describe agent-context patterns — `tool_call.arguments` containing a base64-encoded reverse shell, `model_output` containing markdown image references with credential parameters, `agent_event.event_type` of unauthorized_file_read — and ATR engines (PanGuard Guard, Microsoft AGT, Cisco AI Defense skill-scanner) load and evaluate them. ATR is two years old, has 419 rules, and is becoming the de-facto language for AI agent detection.',
+        'ATR is the open detection standard for AI agents. Rules describe agent-context patterns — `tool_call.arguments` containing a base64-encoded reverse shell, `model_output` containing markdown image references with credential parameters, `agent_event.event_type` of unauthorized_file_read — and ATR engines (PanGuard Guard, Microsoft AGT, Cisco AI Defense skill-scanner) load and evaluate them. ATR is two years old, has 650+ rules, and is becoming the de-facto language for AI agent detection.',
       ],
       zh: [
         'Sigma 是 SIEM（Security Information and Event Management）的開放偵測標準。規則描述 log 模式——Windows Event ID 4625 加上 logon type 3 加上來源 IP 在 allowlist 之外——SIEM 引擎（Splunk、ELK、Microsoft Sentinel）載入並執行。Sigma 已經十年,有數千條社群規則,是偵測工程的事實標準語言。',
-        'ATR 是 AI agent 的開放偵測標準。規則描述 agent-context 模式——`tool_call.arguments` 包含 base64 編碼的 reverse shell、`model_output` 包含夾帶憑證參數的 markdown 圖片參照、`agent_event.event_type` 為 unauthorized_file_read——ATR 引擎（PanGuard Guard、Microsoft AGT、Cisco AI Defense skill-scanner）載入並執行。ATR 兩年歷史,419 條規則,正在成為 AI agent 偵測的事實標準語言。',
+        'ATR 是 AI agent 的開放偵測標準。規則描述 agent-context 模式——`tool_call.arguments` 包含 base64 編碼的 reverse shell、`model_output` 包含夾帶憑證參數的 markdown 圖片參照、`agent_event.event_type` 為 unauthorized_file_read——ATR 引擎（PanGuard Guard、Microsoft AGT、Cisco AI Defense skill-scanner）載入並執行。ATR 兩年歷史,650+ 條規則,正在成為 AI agent 偵測的事實標準語言。',
       ],
     },
     rows: [
@@ -69,7 +69,7 @@ export const COMPARE: ComparisonEntry[] = [
       },
       {
         feature: 'Maturity',
-        atr: '2 years, 419 rules',
+        atr: '2 years, 650+ rules',
         other: '10+ years, thousands of community rules',
         winner: 'other',
       },
@@ -141,8 +141,8 @@ export const COMPARE: ComparisonEntry[] = [
       zh: 'ATR vs garak — 偵測規則 vs 對抗式測試',
     },
     oneLiner: {
-      en: "garak generates adversarial prompts to probe LLM weaknesses pre-deployment. ATR detects malicious patterns in agent runtime traffic. garak finds vulnerabilities in models; ATR catches exploits against agents. Both are needed. ATR rules pass garak's test corpus at 97.1% recall.",
-      zh: 'garak 產生對抗式 prompt,在部署前探測 LLM 弱點。ATR 在 agent runtime 偵測流量中的惡意模式。garak 找模型漏洞;ATR 抓針對 agent 的 exploit。兩者都需要。ATR 規則在 garak 的測試語料庫上召回率 97.1%。',
+      en: "garak generates adversarial prompts to probe LLM weaknesses pre-deployment. ATR detects malicious patterns in agent runtime traffic. garak finds vulnerabilities in models; ATR catches exploits against agents. Both are needed. ATR rules pass garak's test corpus at 98% recall.",
+      zh: 'garak 產生對抗式 prompt,在部署前探測 LLM 弱點。ATR 在 agent runtime 偵測流量中的惡意模式。garak 找模型漏洞;ATR 抓針對 agent 的 exploit。兩者都需要。ATR 規則在 garak 的測試語料庫上召回率 98%。',
     },
     framing: {
       en: [
@@ -169,13 +169,13 @@ export const COMPARE: ComparisonEntry[] = [
       },
       {
         feature: 'Sample size',
-        atr: '419 detection rules',
+        atr: '650+ detection rules',
         other: 'Hundreds of probe types',
         winner: 'tie',
       },
       {
         feature: 'Garak benchmark recall',
-        atr: '97.1% on 666-sample corpus',
+        atr: '98% recall on 650 samples',
         other: '—',
         winner: 'atr',
       },
@@ -197,8 +197,8 @@ export const COMPARE: ComparisonEntry[] = [
       zh: '你在部署前評估 LLM。你想知道哪些攻擊對你的模型有效,好讓你 patch、retrain、或強化 system prompt。你想要研究級的測試套件,有可重現的 probe。',
     },
     bottomLine: {
-      en: "Use both. Run garak in CI before any model change ships. Run ATR in production against every request. garak finds what to fix; ATR catches what was missed. ATR's public benchmark against garak's corpus (97.1% recall on 666 samples) measures that overlap honestly.",
-      zh: '兩個都用。Model 變更要 ship 之前,在 CI 跑 garak。生產環境對每個 request 跑 ATR。garak 找出該修什麼;ATR 抓住漏掉的。ATR 對 garak 語料庫的公開 benchmark（666 個樣本 97.1% 召回率）誠實地量化這個重疊。',
+      en: "Use both. Run garak in CI before any model change ships. Run ATR in production against every request. garak finds what to fix; ATR catches what was missed. ATR's public benchmark against garak's corpus (98% recall on 650 samples) measures that overlap honestly.",
+      zh: '兩個都用。Model 變更要 ship 之前,在 CI 跑 garak。生產環境對每個 request 跑 ATR。garak 找出該修什麼;ATR 抓住漏掉的。ATR 對 garak 語料庫的公開 benchmark（650 個樣本 98% 召回率）誠實地量化這個重疊。',
     },
     references: [
       { label: 'NVIDIA garak on GitHub', url: 'https://github.com/NVIDIA/garak' },

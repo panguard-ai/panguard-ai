@@ -124,7 +124,7 @@ const collectiveConfigs = [
 const resilienceConfigs = [
   { key: 'optimal' as const, color: 'bg-[#22c55e]', icon: CheckIcon },
   { key: 'cloudUnavailable' as const, color: 'bg-[#f59e0b]', icon: AlertIcon },
-  { key: 'llmOffline' as const, color: 'bg-[#f59e0b]', icon: AlertIcon },
+  { key: 'engineOnly' as const, color: 'bg-[#f59e0b]', icon: AlertIcon },
   { key: 'emergency' as const, color: 'bg-[#ef4444]', icon: AlertIcon },
 ];
 
@@ -153,8 +153,8 @@ export default function TechnologyContent() {
     <>
       <p id="definition" className="sr-only">
         Panguard&apos;s detection engine uses ATR (Agent Threat Rules) -- the first open standard
-        for AI agent threat detection -- across multiple detection stages with graceful degradation
-        from cloud to fully offline operation.
+        for AI agent threat detection -- across multiple deterministic detection stages that run
+        entirely on-device, with no LLM in the detection path.
       </p>
 
       {/* -- Hero -- */}
@@ -180,7 +180,7 @@ export default function TechnologyContent() {
         </div>
       </section>
 
-      {/* -- Three-Layer Funnel -- */}
+      {/* -- Deterministic Detection Stages -- */}
       <SectionWrapper>
         <SectionTitle
           overline={t('defenseFunnel.overline')}
