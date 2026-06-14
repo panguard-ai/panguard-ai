@@ -74,17 +74,17 @@ export default function AdvancedSetupContent() {
         </div>
       </SectionWrapper>
 
-      {/* Ollama */}
+      {/* Custom rules & Threat Cloud */}
       <SectionWrapper dark>
         <div className="max-w-3xl mx-auto">
           <FadeInUp>
-            <h2 className="text-xl font-bold text-text-primary mb-2">{t('ollamaTitle')}</h2>
-            <p className="text-text-secondary mb-6">{t('ollamaDesc')}</p>
+            <h2 className="text-xl font-bold text-text-primary mb-2">{t('customRulesTitle')}</h2>
+            <p className="text-text-secondary mb-6">{t('customRulesDesc')}</p>
             <CodeBlock
-              code={`# Install Ollama\ncurl -fsSL https://ollama.ai/install.sh | sh\n\n# Pull a model\nollama pull llama3\n\n# Verify it's running\ncurl http://localhost:11434/api/tags`}
+              code={`# Point the engine at your own ATR rules directory\nexport PANGUARD_ATR_RULES_DIR=/etc/panguard/rules\n\n# Auto-reload rules when files change (no restart)\nexport PANGUARD_WATCH_RULES=true\n\n# Run fully air-gapped (skip Threat Cloud sync)\nexport TC_ENDPOINT=`}
               label="Terminal"
             />
-            <p className="text-xs text-text-muted mt-3">{t('ollamaNote')}</p>
+            <p className="text-xs text-text-muted mt-3">{t('customRulesNote')}</p>
           </FadeInUp>
         </div>
       </SectionWrapper>

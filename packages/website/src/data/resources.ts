@@ -28,7 +28,7 @@ export const resources: Resource[] = [
     title: 'Setting Up Real-Time Protection',
     type: 'Guide',
     description:
-      'Deploy Panguard Guard for continuous endpoint monitoring with 3-layer AI detection and automated response.',
+      'Deploy Panguard Guard for continuous endpoint monitoring with deterministic on-device detection and automated response.',
     date: '2026-03',
     docsUrl: `${DOCS}/guides/real-time-protection`,
   },
@@ -55,7 +55,7 @@ export const resources: Resource[] = [
     title: 'MCP Integration for Claude & Cursor',
     type: 'Tutorial',
     description:
-      'Connect Panguard to Claude Desktop or Cursor via Model Context Protocol for AI-powered security workflows.',
+      'Connect Panguard to Claude Desktop or Cursor via Model Context Protocol for agent-driven security workflows.',
     date: '2026-02',
     docsUrl: `${DOCS}/guides/mcp-integration`,
   },

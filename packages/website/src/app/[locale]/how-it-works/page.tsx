@@ -25,19 +25,19 @@ const howToJsonLd = {
   '@type': 'HowTo',
   name: 'How Panguard AI Protects Your Servers',
   description:
-    'Panguard uses a three-stage security pipeline with a three-tier AI funnel to detect, analyze, and respond to threats in real time.',
+    'Panguard uses a three-stage security pipeline with deterministic, on-device detection to detect, analyze, and respond to threats in real time.',
   step: [
     {
       '@type': 'HowToStep',
       position: 1,
       name: 'Detect',
-      text: 'Rule-based scanning with 330 ATR (Agent Threat Rules) catches known AI agent threats locally -- prompt injection, tool poisoning, credential exfiltration.',
+      text: 'Rule-based scanning with 650+ ATR (Agent Threat Rules) catches known AI agent threats locally -- prompt injection, tool poisoning, credential exfiltration.',
     },
     {
       '@type': 'HowToStep',
       position: 2,
       name: 'Analyze',
-      text: 'Behavioral AI analyzes suspicious patterns using local models (Ollama) or cloud AI for advanced correlation.',
+      text: 'Behavioral baselines and on-device correlation analyze suspicious patterns deterministically -- AST static analysis plus temporal correlation, with no LLM in the detection path.',
     },
     {
       '@type': 'HowToStep',

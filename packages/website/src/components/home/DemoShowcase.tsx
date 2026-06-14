@@ -9,7 +9,7 @@ const DEMOS: readonly { key: string; image: string; alt: string; width: number; 
     {
       key: 'dashboard',
       image: '/demo/guard-dashboard.png',
-      alt: 'PanGuard Guard Dashboard — live ATR rules active, real-time protection status, 3-layer detection',
+      alt: 'PanGuard Guard Dashboard — live ATR rules active, real-time protection status, deterministic on-device detection',
       width: 1440,
       height: 900,
     },
