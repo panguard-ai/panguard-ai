@@ -28,7 +28,7 @@ export default function ProductGuardPage() {
         data={softwareApplicationSchema({
           name: 'PanGuard Guard',
           description:
-            'Runtime enforcement engine. 4-agent pipeline (Detect, Analyze, Respond, Report) loads 419 ATR rules and enforces them on every MCP and skill event in real time. 11 configurable response actions including block, quarantine, kill, notify.',
+            'Runtime enforcement engine. 4-agent pipeline (Detect, Analyze, Respond, Report) loads 650+ ATR rules and enforces them on every MCP and skill event in real time. 11 configurable response actions including block, quarantine, kill, notify.',
           url: 'https://panguard.ai/product/guard',
           category: 'SecurityApplication',
           applicationSubCategory: 'Runtime Security',

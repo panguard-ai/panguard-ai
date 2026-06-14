@@ -57,8 +57,8 @@ export const changelogEntries: ChangelogEntry[] = [
       },
       {
         type: 'improvement',
-        text: 'NVIDIA garak in-the-wild benchmark: 97.1% recall (646/666) maintained · 0.20% FP on 498-sample SKILL.md corpus',
-        textZh: 'NVIDIA garak 實測基準:97.1% recall(646/666) · 498 SKILL.md 樣本上 0.20% 誤報率',
+        text: 'NVIDIA garak in-the-wild benchmark: 98% recall on 650 samples maintained · 100% precision / 0% FP on 341-sample SKILL.md corpus',
+        textZh: 'NVIDIA garak 實測基準:650 樣本 98% recall · 341 SKILL.md 樣本上 100% 精度 / 0% 誤報率',
       },
       {
         type: 'fix',
@@ -151,9 +151,9 @@ export const changelogEntries: ChangelogEntry[] = [
     title: 'ATR v2.0.x · 113 Detection Rules · 9 Categories',
     titleZh: 'ATR v2.0.x · 113 條偵測規則 · 9 大類別',
     description:
-      'ATR upgraded to v2.0.x with 113 detection rules across 9 threat categories. MCP benchmark: 62.7% recall / 99.7% precision on PINT 850-sample adversarial corpus. SKILL.md benchmark: 96.9% recall / 100% precision / 0% FP on real-world skill corpus.',
+      'ATR upgraded to v2.0.x with 113 detection rules across 9 threat categories. MCP benchmark: 62.7% recall / 99.7% precision on PINT 850-sample adversarial corpus. SKILL.md benchmark: 100% recall / 100% precision / 0% FP on 341-sample real-world skill corpus.',
     descriptionZh:
-      'ATR 升級至 v2.0.x,共 113 條偵測規則涵蓋 9 大威脅類別。MCP 基準測試:PINT 850 樣本對抗語料庫上 62.7% recall / 99.7% precision。SKILL.md 基準測試:真實技能語料庫上 96.9% recall / 100% precision / 0% 誤報率。',
+      'ATR 升級至 v2.0.x,共 113 條偵測規則涵蓋 9 大威脅類別。MCP 基準測試:PINT 850 樣本對抗語料庫上 62.7% recall / 99.7% precision。SKILL.md 基準測試:341 樣本真實技能語料庫上 100% recall / 100% precision / 0% 誤報率。',
     changes: [
       {
         type: 'feature',

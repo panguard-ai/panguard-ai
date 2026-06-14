@@ -57,11 +57,11 @@ const CROSSWALKS: readonly Crosswalk[] = [
     framework: 'NIST AI RMF (AI 100-1 + GenAI Profile 600-1)',
     ownerEn: 'NIST',
     ownerZh: 'NIST',
-    coverage: 'OSCAL Path 1 accepted',
+    coverage: 'Collaborating on OSCAL',
     noteEn:
-      'Community OSCAL catalog v0.3 published 2026-05-10, covering all four AI RMF functions (Govern/Map/Measure/Manage). Acceptance email received 2026-05-11.',
+      'Community OSCAL catalog v0.3 covers all four AI RMF functions (Govern/Map/Measure/Manage). Collaborating with the OSCAL lead on a community catalog branch.',
     noteZh:
-      '社群 OSCAL catalog v0.3 於 2026-05-10 釋出，涵蓋 AI RMF 四大功能 (Govern/Map/Measure/Manage)。2026-05-11 收到 acceptance email。',
+      '社群 OSCAL catalog v0.3 涵蓋 AI RMF 四大功能 (Govern/Map/Measure/Manage)。正與 OSCAL lead 在社群 catalog branch 上協作。',
     doc: 'https://github.com/Agent-Threat-Rule/ai-rmf-oscal-catalog',
   },
   {
@@ -81,9 +81,9 @@ const CROSSWALKS: readonly Crosswalk[] = [
     ownerZh: '歐盟執委會',
     coverage: 'Art. 15 (Accuracy/Robustness/Cybersecurity)',
     noteEn:
-      'Detections aligned with Art. 15 obligations for high-risk AI systems. Submission filed to EU AI Office Have-Your-Say (deadline 2026-06-03).',
+      'Detections aligned with Art. 15 obligations for high-risk AI systems as the EU AI Act phases in. Submission filed to the EU AI Office Have-Your-Say consultation.',
     noteZh:
-      '對應高風險 AI 系統的第 15 條 (準確性／穩健性／資安) 義務。已向 EU AI Office Have-Your-Say 提交 (截止 2026-06-03)。',
+      '對應高風險 AI 系統的第 15 條 (準確性／穩健性／資安) 義務，隨 EU AI Act 逐步生效。已向 EU AI Office Have-Your-Say 諮詢提交。',
   },
   {
     id: 'safe-mcp',
@@ -107,6 +107,17 @@ const CROSSWALKS: readonly Crosswalk[] = [
     noteZh:
       '2026-05-01 發佈的聯合指導要求對已知攻擊模式做執行期偵測；ATR 是該指導所需的開放 MIT 授權偵測層。',
     doc: `${REPO_BLOB}/docs/FIVE-EYES-MAPPING.md`,
+  },
+  {
+    id: 'cwe',
+    framework: 'CWE (Common Weakness Enumeration)',
+    ownerEn: 'MITRE Corporation',
+    ownerZh: 'MITRE Corporation',
+    coverage: '24 CWEs / 43 rules',
+    noteEn:
+      'Each rule’s compliance.cwe field ties an agent-layer detection back to the underlying software weakness — CWE-78 (OS command injection), CWE-94 (code injection), CWE-22 (path traversal), CWE-89 (SQL injection) and CWE-918 (SSRF) lead. Connects new agent threats to the weakness taxonomy security teams already triage against.',
+    noteZh:
+      '每條規則的 compliance.cwe 欄位把 agent 層的偵測接回底層的軟體弱點——以 CWE-78（OS 指令注入）、CWE-94（程式碼注入）、CWE-22（路徑穿越）、CWE-89（SQL 注入）、CWE-918（SSRF）為主。把全新的 agent 威脅接回資安團隊本來就在分類的弱點體系。',
   },
   {
     id: 'cve-cisa-kev',
@@ -137,6 +148,11 @@ export default function CrosswalksContent() {
         <h1 className="mb-4 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
           {isZh ? 'ATR 對應其他框架' : 'ATR Framework Crosswalks'}
         </h1>
+        <p className="mb-4 text-base font-medium text-emerald-700">
+          {isZh
+            ? `ATR 對應 ${CROSSWALKS.length} 套標準與框架 — 它們底下會跑的那一層。`
+            : `ATR crosswalks to ${CROSSWALKS.length} standards and frameworks — the executable layer beneath all of them.`}
+        </p>
         <p className="text-lg leading-relaxed text-slate-600">
           {isZh
             ? 'ATR 不取代任何政策框架。ATR 是把這些框架在掃描時可執行的偵測規則層 — Sigma 之於 ATT&CK、YARA 之於 malware。下方為已發佈對應表。'
@@ -156,8 +172,8 @@ export default function CrosswalksContent() {
         <CalloutCard
           headEn="ATR says how to detect"
           headZh="ATR 說怎麼偵測"
-          bodyEn="421 rules with deterministic YAML detectors and reproducible test cases."
-          bodyZh="421 條具備確定性 YAML 偵測器與可重現測試案例的規則。"
+          bodyEn="650+ rules with deterministic YAML detectors and reproducible test cases."
+          bodyZh="650+ 條具備確定性 YAML 偵測器與可重現測試案例的規則。"
           isZh={isZh}
           accent
         />

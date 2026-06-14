@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'CLI Reference — Panguard AI',
     description:
-      'Complete command reference for the Panguard CLI. Scanning, real-time protection, honeypots, compliance reports, and system utilities.',
+      'Complete command reference for the Panguard CLI. Scanning, inline detection, honeypots, compliance reports, and system utilities.',
   },
 };
 

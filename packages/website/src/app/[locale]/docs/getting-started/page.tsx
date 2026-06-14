@@ -9,7 +9,7 @@ import GettingStartedContent from './GettingStartedContent';
 export const metadata: Metadata = {
   title: 'Getting Started — Panguard AI',
   description:
-    'Install Panguard AI in under 2 minutes. Quick-start guide for CLI setup, first scan, and 24/7 monitoring.',
+    'Install Panguard AI in under 2 minutes. Quick-start guide for CLI setup, first scan, and inline detection.',
   openGraph: {
     title: 'Getting Started — Panguard AI',
     description: 'Install and configure Panguard AI endpoint security in minutes.',
@@ -38,8 +38,8 @@ const howToJsonLd = {
     },
     {
       '@type': 'HowToStep',
-      name: 'Enable 24/7 monitoring',
-      text: 'Run panguard guard to activate the real-time AI protection agent.',
+      name: 'Enable inline detection',
+      text: 'Run panguard guard to activate the inline AI protection agent that detects and blocks threats at runtime.',
       url: 'https://panguard.ai/docs/getting-started',
     },
   ],
@@ -59,7 +59,7 @@ export default async function GettingStartedPage() {
         data={techArticleSchema({
           headline: 'Getting Started with PanGuard AI',
           description:
-            'Install PanGuard AI in under 2 minutes. CLI setup, first scan, 24/7 monitoring, and Threat Cloud opt-in walkthrough.',
+            'Install PanGuard AI in under 2 minutes. CLI setup, first scan, inline detection, and Threat Cloud opt-in walkthrough.',
           url: 'https://panguard.ai/docs/getting-started',
           datePublished: '2026-01-01',
           dateModified: '2026-05-12',

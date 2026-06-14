@@ -86,6 +86,9 @@ export default function SkillAuditorContent() {
             {t('title')}
           </h1>
           <p className="text-lg text-text-secondary mt-4 max-w-2xl">{t('subtitle')}</p>
+          <p className="text-sm text-text-muted mt-3 max-w-2xl">
+            Free and open source under the MIT license. No account required.
+          </p>
         </FadeInUp>
 
         {/* Quick Start */}

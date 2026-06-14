@@ -97,15 +97,19 @@ function FAQCategory({
 
 const categories: CategoryDef[] = [
   {
+    key: 'general',
+    icon: <SupportIcon size={20} className="text-brand-sage" />,
+    count: 3,
+    highlightFirst: true,
+  },
+  {
     key: 'security',
     icon: <ShieldIcon size={20} className="text-brand-sage" />,
     count: 4,
-    highlightFirst: true,
   },
   { key: 'detection', icon: <ScanIcon size={20} className="text-brand-sage" />, count: 4 },
   { key: 'privacy', icon: <LockIcon size={20} className="text-brand-sage" />, count: 3 },
   { key: 'deployment', icon: <DeployIcon size={20} className="text-brand-sage" />, count: 3 },
-  { key: 'general', icon: <SupportIcon size={20} className="text-brand-sage" />, count: 3 },
 ];
 
 export default function FAQContent() {
