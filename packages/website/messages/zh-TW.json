@@ -746,11 +746,11 @@
       "trustNote": "掃描在伺服器端執行。不會儲存代碼。僅快取內容 hash 用於去重。",
       "submitATR": "提交 ATR 規則提案"
     },
-    "srDefinition": "Panguard AI 是 ATR（Agent Threat Rules）的商業參考實作。ATR 是偵測 AI agent 攻擊的開放標準——agent 世界的 CVE 與 Sigma：MIT 授權、機器可讀，已被 Microsoft、Cisco、NVIDIA 與 MISP 採用。PanGuard 把這個免費標準轉成簽章、可送審的合規證據。",
+    "srDefinition": "Panguard AI 是 ATR（Agent Threat Rules）的商業參考實作。ATR 是偵測 AI agent 攻擊的開放標準——agent 世界的 CVE 與 Sigma：MIT 授權、機器可讀，已被 Microsoft、Cisco 與 MISP 採用。PanGuard 把這個免費標準轉成簽章、可送審的合規證據。",
     "scannerHero": {
       "titleLine1": "AI agent 時代的",
       "titleLine2": "開放資安標準。",
-      "subtitle": "偵測 AI agent 攻擊的開放規則，MIT 授權——agent 世界的 CVE 與 Sigma。涵蓋 10 大類、650+ 條規則，已被 Microsoft、Cisco、NVIDIA、MISP 採用。",
+      "subtitle": "偵測 AI agent 攻擊的開放規則，MIT 授權——agent 世界的 CVE 與 Sigma。涵蓋 10 大類、650+ 條規則，已被 Microsoft、Cisco、MISP 採用。",
       "scanLabel": "安裝前，先檢查你的 MCP Skill 安不安全",
       "tabUrl": "GitHub 連結",
       "tabPaste": "貼上內容",
