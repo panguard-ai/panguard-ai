@@ -58,7 +58,8 @@ export const changelogEntries: ChangelogEntry[] = [
       {
         type: 'improvement',
         text: 'NVIDIA garak in-the-wild benchmark: 98% recall on 650 samples maintained · 100% precision / 0% FP on 341-sample SKILL.md corpus',
-        textZh: 'NVIDIA garak 實測基準:650 樣本 98% recall · 341 SKILL.md 樣本上 100% 精度 / 0% 誤報率',
+        textZh:
+          'NVIDIA garak 實測基準:650 樣本 98% recall · 341 SKILL.md 樣本上 100% 精度 / 0% 誤報率',
       },
       {
         type: 'fix',

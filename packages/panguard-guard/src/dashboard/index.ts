@@ -1052,7 +1052,11 @@ export class DashboardServer {
           this.jsonResponse(res, { error: 'Invalid endpoint URL' }, 400);
           return;
         }
-        if (update.mode !== undefined && update.mode !== 'learning' && update.mode !== 'protection') {
+        if (
+          update.mode !== undefined &&
+          update.mode !== 'learning' &&
+          update.mode !== 'protection'
+        ) {
           this.jsonResponse(res, { error: 'Invalid mode' }, 400);
           return;
         }

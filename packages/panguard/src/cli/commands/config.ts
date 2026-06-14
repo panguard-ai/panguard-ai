@@ -91,7 +91,9 @@ export function configCommand(): Command {
 
   cmd
     .command('llm')
-    .description('Configure the optional advisory semantic layer (bring your own LLM, off by default)')
+    .description(
+      'Configure the optional advisory semantic layer (bring your own LLM, off by default)'
+    )
     .option('--provider <provider>', 'LLM provider: claude, openai, ollama')
     .option('--api-key <key>', 'API key (for claude/openai)')
     .option('--model <model>', 'Model override (e.g., claude-haiku-4-5-20251001, gpt-4o)')

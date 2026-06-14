@@ -59,11 +59,11 @@ export default async function TermsOfServicePage(props: { params: Promise<{ loca
             2. Description of Service
           </h2>
           <p>
-            Panguard provides a security platform for AI agents that includes, but is
-            not limited to: pre-install skill auditing (Skill Auditor), automated vulnerability
-            scanning (Panguard Scan), continuous runtime protection (Panguard Guard), collective
-            threat intelligence (Threat Cloud), and MCP server integration. All features are
-            available to all users under the MIT License at no cost.
+            Panguard provides a security platform for AI agents that includes, but is not limited
+            to: pre-install skill auditing (Skill Auditor), automated vulnerability scanning
+            (Panguard Scan), continuous runtime protection (Panguard Guard), collective threat
+            intelligence (Threat Cloud), and MCP server integration. All features are available to
+            all users under the MIT License at no cost.
           </p>
         </section>
 

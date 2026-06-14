@@ -89,6 +89,4 @@ const trailingNewline = original.endsWith('\n') ? '\n' : '';
 writeFileSync(PKG_PATH, JSON.stringify(pkg, null, 2) + trailingNewline);
 
 // eslint-disable-next-line no-console
-console.log(
-  `[fix-next-cjs-launcher] rewrote ${PKG_PATH}: type "${before}" → "commonjs"`
-);
+console.log(`[fix-next-cjs-launcher] rewrote ${PKG_PATH}: type "${before}" → "commonjs"`);

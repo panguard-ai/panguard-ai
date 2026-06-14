@@ -120,8 +120,7 @@ function ScannerHeroInner() {
         {/* Title */}
         <div className="mb-5 animate-[fadeUp_0.6s_0.1s_ease_both]">
           <h1 className="text-[clamp(22px,5vw,48px)] font-bold leading-[1.2] tracking-tight text-text-primary break-words">
-            {t('titleLine1')}{' '}
-            <span className="text-panguard-green">{t('titleLine2')}</span>
+            {t('titleLine1')} <span className="text-panguard-green">{t('titleLine2')}</span>
           </h1>
           <p className="mt-4 text-base sm:text-lg text-text-secondary leading-relaxed max-w-xl mx-auto">
             {t('subtitle')}
@@ -148,7 +147,9 @@ function ScannerHeroInner() {
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
                 <Terminal className="w-4 h-4 text-text-muted flex-shrink-0" />
-                <code className="text-sm text-brand-sage select-all truncate">{INSTALL_COMMAND}</code>
+                <code className="text-sm text-brand-sage select-all truncate">
+                  {INSTALL_COMMAND}
+                </code>
               </div>
               <button
                 onClick={copyInstall}
@@ -188,14 +189,16 @@ function ScannerHeroInner() {
         {/* Trust badges — 4 strongest signals only */}
         <div className="mt-8 animate-[fadeUp_0.5s_0.5s_ease_both]">
           <div className="flex flex-wrap justify-center gap-2">
-            {[t('badgeRules'), t('badgeRecall'), t('badgeCisco'), t('badgeLicense')].map((badge) => (
-              <span
-                key={badge}
-                className="text-[11px] text-text-muted border border-border/40 rounded-full px-3 py-1 bg-surface-1/20"
-              >
-                {badge}
-              </span>
-            ))}
+            {[t('badgeRules'), t('badgeRecall'), t('badgeCisco'), t('badgeLicense')].map(
+              (badge) => (
+                <span
+                  key={badge}
+                  className="text-[11px] text-text-muted border border-border/40 rounded-full px-3 py-1 bg-surface-1/20"
+                >
+                  {badge}
+                </span>
+              )
+            )}
           </div>
         </div>
 
@@ -228,8 +231,9 @@ function ScannerHeroSkeleton() {
           <span className="text-panguard-green">for the age of AI agents.</span>
         </h1>
         <p className="text-base sm:text-lg text-text-secondary max-w-2xl mx-auto leading-relaxed">
-          Open, MIT-licensed detection rules for attacks on AI agents — the CVE and Sigma of the agent
-          world. 650+ rules across 10 categories, already adopted by Microsoft, Cisco and MISP.
+          Open, MIT-licensed detection rules for attacks on AI agents — the CVE and Sigma of the
+          agent world. 650+ rules across 10 categories, already adopted by Microsoft, Cisco and
+          MISP.
         </p>
         <p className="text-sm font-medium text-panguard-green">
           Free forever · MIT-licensed · no account · runs as your own Threat Cloud sensor
