@@ -194,6 +194,13 @@ export default function GuardDocsContent() {
             Every stage is deterministic and runs entirely on-device. No LLM sits in the detection
             path, so the same input always produces the same verdict — online or fully air-gapped.
           </p>
+          <p className="text-text-secondary mb-6">
+            Optionally, you can connect your own model — a cloud API (Anthropic, OpenAI,
+            OpenAI-compatible) or a local Ollama — to add an <em>advisory</em> semantic layer. It is
+            off by default and runs alongside the detection path, not inside it: it can explain a
+            verdict or flag a novel pattern for your review, but it never auto-blocks. Deterministic
+            detection stays the only thing that acts.
+          </p>
           <div className="space-y-4">
             {[
               {
