@@ -82,7 +82,11 @@ const nextConfig = {
       // "Team Tier"; /docs/api's Swagger/OpenAPI links 404 in prod. Hide both and
       // point inbound traffic at the real free-install path until rebuilt.
       { source: '/early-access', destination: '/docs/getting-started', permanent: false },
-      { source: '/zh-TW/early-access', destination: '/zh-TW/docs/getting-started', permanent: false },
+      {
+        source: '/zh-TW/early-access',
+        destination: '/zh-TW/docs/getting-started',
+        permanent: false,
+      },
       { source: '/docs/api', destination: '/docs/getting-started', permanent: false },
       { source: '/zh-TW/docs/api', destination: '/zh-TW/docs/getting-started', permanent: false },
     ];

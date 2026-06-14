@@ -346,15 +346,17 @@ async function commandStart(
     console.log('');
 
     // Free tier: show what's enabled/disabled
-    console.log(`  ${c.safe('\u2713')} Pattern matching + heuristic correlation on every event (Layer A + B)`);
+    console.log(
+      `  ${c.safe('\u2713')} Pattern matching + heuristic correlation on every event (Layer A + B)`
+    );
 
     console.log('');
     const semanticOn = Boolean(
       config.ai?.provider ||
-        process.env['PANGUARD_AI_KEY'] ||
-        process.env['ANTHROPIC_API_KEY'] ||
-        process.env['OPENAI_API_KEY'] ||
-        process.env['PANGUARD_LLM_ENDPOINT']
+      process.env['PANGUARD_AI_KEY'] ||
+      process.env['ANTHROPIC_API_KEY'] ||
+      process.env['OPENAI_API_KEY'] ||
+      process.env['PANGUARD_LLM_ENDPOINT']
     );
     if (semanticOn) {
       const provider = config.ai?.provider ?? 'configured LLM';
@@ -737,8 +739,6 @@ async function showFirstRunWelcome(dashboardPort: number): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-
-
 
 /** Stop the guard engine / 停止守護引擎 */
 function commandStop(dataDir: string): void {

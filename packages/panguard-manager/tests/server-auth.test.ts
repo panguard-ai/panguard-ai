@@ -48,9 +48,9 @@ describe('ManagerServer auth', () => {
   it('refuses to bind a non-loopback host without an auth token (fail closed)', () => {
     const registry = new AgentsRegistry({ filePath: join(tmpdir(), 'a.json') });
     const aggregator = new FleetAggregator();
-    expect(
-      () => new ManagerServer({ port: 8099, host: '0.0.0.0', registry, aggregator })
-    ).toThrow(/non-loopback/);
+    expect(() => new ManagerServer({ port: 8099, host: '0.0.0.0', registry, aggregator })).toThrow(
+      /non-loopback/
+    );
   });
 
   it('rejects a too-short auth token', () => {
@@ -83,7 +83,13 @@ describe('ManagerServer auth', () => {
       base = `http://127.0.0.1:${port}`;
       const registry = new AgentsRegistry({ filePath: join(tmp, 'agents.json') });
       const aggregator = new FleetAggregator();
-      server = new ManagerServer({ port, host: '127.0.0.1', registry, aggregator, authToken: TOKEN });
+      server = new ManagerServer({
+        port,
+        host: '127.0.0.1',
+        registry,
+        aggregator,
+        authToken: TOKEN,
+      });
       await server.start();
     });
 

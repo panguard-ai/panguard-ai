@@ -36,7 +36,6 @@ import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 
-
 const logger = createLogger('panguard-guard:rule-loader');
 
 /** Result of initializing all engines and agents */
