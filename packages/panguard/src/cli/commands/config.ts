@@ -91,7 +91,7 @@ export function configCommand(): Command {
 
   cmd
     .command('llm')
-    .description('Configure LLM provider for AI analysis')
+    .description('Deprecated — LLM analysis was removed; detection is deterministic')
     .option('--provider <provider>', 'LLM provider: claude, openai, ollama')
     .option('--api-key <key>', 'API key (for claude/openai)')
     .option('--model <model>', 'Model override (e.g., claude-haiku-4-5-20251001, gpt-4o)')
@@ -108,6 +108,10 @@ export function configCommand(): Command {
         clear?: boolean;
       }) => {
         console.log(banner(PANGUARD_VERSION));
+        console.log(
+          `  ${c.dim('Note: detection is deterministic (ATR rules + heuristics). The LLM analysis layer was removed, so a configured provider has no effect on detection. --show / --clear still work for any legacy config.')}`
+        );
+        console.log('');
 
         if (options.show) {
           const config = loadLlmConfig();
