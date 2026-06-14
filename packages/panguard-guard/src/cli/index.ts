@@ -349,7 +349,7 @@ async function commandStart(
     console.log('');
 
     // Free tier: show what's enabled/disabled
-    console.log(`  ${c.safe('\u2713')} Auto-blocking: known attack patterns (Layer 1 rules)`);
+    console.log(`  ${c.safe('\u2713')} Pattern matching + heuristic correlation on every event (Layer A + B)`);
 
     // Show AI layer status and setup guide if not configured
     const hasLocalAi = config.ai?.provider === 'ollama';
@@ -363,19 +363,19 @@ async function commandStart(
 
     if (hasLocalAi) {
       console.log(
-        `  ${c.safe('\u2713')} Layer 2 Local AI: ${c.sage(config.ai?.provider + ' / ' + (config.ai?.model ?? 'default'))}`
+        `  ${c.safe('\u2713')} Layer C Semantic (local AI): ${c.sage(config.ai?.provider + ' / ' + (config.ai?.model ?? 'default'))} \u2014 opt-in`
       );
     }
     if (hasCloudAi || hasEnvKey) {
       const provider =
         config.ai?.provider ?? (process.env['ANTHROPIC_API_KEY'] ? 'anthropic' : 'openai');
-      console.log(`  ${c.safe('\u2713')} Layer 3 Cloud AI: ${c.sage(provider + ' connected')}`);
+      console.log(`  ${c.safe('\u2713')} Layer C Semantic (cloud AI): ${c.sage(provider + ' key detected')} \u2014 opt-in`);
     }
 
     if (!hasAnyAi && !hasEnvKey) {
       console.log('');
       console.log(
-        `  ${symbols.info} Guard started with ${c.sage('Layer 1 (Pattern Detection)')} active.`
+        `  ${symbols.info} Guard started with ${c.sage('Layer A (pattern) + Layer B (heuristics)')} active.`
       );
       console.log('');
       printAiSetupGuide();
@@ -759,7 +759,7 @@ function printAiSetupGuide(): void {
 
   console.log(`  To enable AI-powered detection layers:`);
   console.log('');
-  console.log(`  ${c.sage('Layer 2')} -- Local AI (Free, Private)`);
+  console.log(`  ${c.sage('Layer C \u2014 option 1')} -- Local AI (free, private)`);
   console.log(`    1. Install Ollama: ${c.dim('curl -fsSL https://ollama.com/install.sh | sh')}`);
   console.log(`    2. Pull a model:   ${c.dim('ollama pull llama3.2')}`);
   console.log(`    3. Set in config:`);
@@ -767,7 +767,7 @@ function printAiSetupGuide(): void {
     `       ${c.dim(`echo '{"ai":{"provider":"ollama","model":"llama3.2"}}' > ${configDir}/guard-ai.json`)}`
   );
   console.log('');
-  console.log(`  ${c.sage('Layer 3')} -- Cloud AI (Fastest, Most Accurate)`);
+  console.log(`  ${c.sage('Layer C \u2014 option 2')} -- Cloud AI (fastest, most accurate)`);
   console.log(`    1. Get API key: ${c.dim('https://console.anthropic.com/')}`);
   console.log(`    2. Set in config:`);
   console.log(`       ${c.dim('export PANGUARD_AI_KEY=sk-ant-your-key-here')}`);
@@ -835,7 +835,7 @@ async function commandSetupAI(_dataDir: string): Promise<void> {
   });
 
   if (!provider || provider === 'skip') {
-    console.log(`\n  ${symbols.info} Skipped. Guard will use regex-only detection (Layer 1).`);
+    console.log(`\n  ${symbols.info} Skipped. Guard will use pattern + heuristic detection (Layer A + B).`);
     console.log(`  ${c.dim('Re-run "panguard-guard setup-ai" anytime to enable AI.')}`);
     return;
   }
