@@ -47,7 +47,7 @@ import { PanguardAgentClient } from './agent-client/index.js';
 import type { AgentHeartbeat } from './agent-client/index.js';
 
 // Extracted modules
-import { autoDetectLLM, initEngines, loadAllRules, getRuleCounts } from './rule-loader.js';
+import { initEngines, loadAllRules, getRuleCounts } from './rule-loader.js';
 import {
   syncThreatCloud,
   setupCloudSyncTimer,
@@ -131,7 +131,9 @@ export class GuardEngine {
    * Checks env vars for ANTHROPIC_API_KEY, OPENAI_API_KEY, or tries Ollama.
    */
   static async create(config: GuardConfig): Promise<GuardEngine> {
-    const llm = await autoDetectLLM();
+    // Semantic LLM verdict layer is intentionally disabled for GA: the judge is not mature
+    // enough to ship in a security tool. Detection is deterministic (pattern + heuristic) only.
+    const llm = null;
     const engine = new GuardEngine(config, llm);
     await engine.init();
     return engine;
