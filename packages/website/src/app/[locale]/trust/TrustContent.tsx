@@ -63,7 +63,6 @@ const dataHandlingConfigs = [
 const subprocessorKeys = [
   'aws',
   'anthropic',
-  'openai',
   'supabase',
   'stripe',
   'vercel',

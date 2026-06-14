@@ -6,11 +6,11 @@ import AdvancedSetupContent from './AdvancedSetupContent';
 export const metadata: Metadata = {
   title: 'Advanced Setup — Panguard AI',
   description:
-    'Enhance Panguard with Ollama (local LLM) and advanced configuration. Environment variables reference.',
+    'Customize Panguard with your own ATR rules, air-gapped operation, and advanced configuration. Environment variables reference.',
   openGraph: {
     title: 'Advanced Setup — Panguard AI',
     description:
-      'Enhance Panguard with optional integrations: Ollama local LLM, environment variables.',
+      'Customize Panguard: custom ATR rule directories, air-gapped operation, environment variables.',
   },
 };
 
