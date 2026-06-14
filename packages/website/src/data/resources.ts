@@ -46,7 +46,7 @@ export const resources: Resource[] = [
     title: 'Generating Compliance Reports',
     type: 'Guide',
     description:
-      'Automate ISO 27001, SOC 2, and Taiwan Cyber Security Act compliance evidence collection and report generation.',
+      'Automate EU AI Act, NIST AI RMF, and ISO/IEC 42001 compliance evidence collection and report generation.',
     date: '2026-02',
     docsUrl: `${DOCS}/guides/compliance-reports`,
   },

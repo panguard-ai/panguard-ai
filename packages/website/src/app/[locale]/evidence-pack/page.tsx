@@ -3,7 +3,7 @@
  *
  * Direct link sent to CISO / compliance buyer prospects (Birdman, Tang,
  * HUMAIN, Sage, NEXUS). They can open this on a phone and see:
- *  - 3 framework-mapped compliance PDFs (ISO 27001 / SOC 2 / Taiwan CSA)
+ *  - 3 framework-mapped compliance PDFs (EU AI Act / NIST AI RMF / ISO/IEC 42001)
  *  - JSON + HTML variants
  *  - manifest.json with SHA-256 + HMAC for tamper detection
  *  - The "0% LLM in detection path" claim made auditable
@@ -23,7 +23,7 @@ import manifest from '../../../../public/samples/evidence-pack-2026-05/manifest.
 export const metadata: Metadata = {
   title: 'Sample Compliance Evidence Pack | PanGuard AI',
   description:
-    'Open a real PanGuard compliance evidence pack — ISO 27001, SOC 2, Taiwan CSA — with SHA-256 + HMAC integrity proofs. Synthetic data, real format.',
+    'Open a real PanGuard compliance evidence pack — EU AI Act, NIST AI RMF, ISO/IEC 42001 — with SHA-256 + HMAC integrity proofs. Synthetic data, real format.',
   robots: { index: false, follow: true },
 };
 

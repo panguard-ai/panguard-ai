@@ -89,8 +89,13 @@ function StepCard({ step, index }: { readonly step: Step; readonly index: number
         {t(step.timingKey)}
       </span>
 
-      {/* Hover detail overlay */}
-      <div className="absolute inset-0 rounded-xl bg-surface-2/95 backdrop-blur-sm p-6 flex items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
+      {/* Detail — always visible on mobile (touch has no hover) */}
+      <p className="mt-3 text-sm text-text-secondary leading-relaxed md:hidden">
+        {t(step.detailKey)}
+      </p>
+
+      {/* Hover detail overlay — desktop only */}
+      <div className="absolute inset-0 rounded-xl bg-surface-2/95 backdrop-blur-sm p-6 hidden md:flex items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
         <p className="text-sm text-text-secondary leading-relaxed">{t(step.detailKey)}</p>
       </div>
     </motion.div>

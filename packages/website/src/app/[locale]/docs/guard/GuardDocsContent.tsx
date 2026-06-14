@@ -59,9 +59,12 @@ export default function GuardDocsContent() {
             Panguard Guard
           </h1>
           <p className="text-lg text-text-secondary mt-4 max-w-2xl">
-            Real-time endpoint protection powered by a 5-agent AI pipeline. Guard monitors AI agent
-            tool calls, prompt flows, and skill behavior 24/7 using ATR (Agent Threat Rules) backed
-            by a three-layer AI analysis funnel.
+            Inline detection powered by a 5-agent AI pipeline. Guard watches AI agent tool calls,
+            prompt flows, and skill behavior using ATR (Agent Threat Rules) backed by a three-layer
+            AI analysis funnel — detecting and blocking threats at runtime.
+          </p>
+          <p className="text-sm text-text-muted mt-3 max-w-2xl">
+            Free and open source under the MIT license. No account required.
           </p>
         </FadeInUp>
 
@@ -525,8 +528,8 @@ panguard guard config set auto_response true`}
           <div className="bg-surface-1/50 border border-border rounded-2xl p-8 text-center">
             <h3 className="text-xl font-bold text-text-primary mb-3">Start Protecting</h3>
             <p className="text-text-secondary mb-6 max-w-lg mx-auto">
-              Install Panguard and activate Guard in under a minute. Community plan includes full
-              scan and Layer 1 rule-based protection at no cost.
+              Install Panguard and activate Guard in under a minute. Everything here — full scan and
+              all rule-based protection layers — is free and open source today.
             </p>
             <CodeBlock code="panguard guard start" />
             <div className="flex flex-wrap justify-center gap-3 mt-6">

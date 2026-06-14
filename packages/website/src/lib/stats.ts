@@ -27,18 +27,18 @@ export const STATS = {
   /** Synced from agent-threat-rules/stats.json by sync-atr-stats workflow */
   atrVersion: '3.1.1',
   /** ATR v2.2.x: stable + experimental total */
-  atrRules: 462,
+  atrRules: 651,
   atrStableRules: 359,
   atrExperimentalRules: 62,
   /** Community ATR rules from Threat Cloud flywheel (TC-side aggregation, separate from main repo) */
   atrCommunityRules: 93,
   /** Total unique detection patterns across all ATR rules (compiled from YAML) */
   atrPatterns: 920,
-  totalRules: 462,
+  totalRules: 651,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
-  totalRulesDisplay: '462' as const,
+  totalRulesDisplay: '650+' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '462' as const,
+  atrRulesDisplay: '650+' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,
@@ -88,17 +88,35 @@ export const STATS = {
     'model-security': 3,
     'data-poisoning': 2,
   },
-  /** Compliance frameworks ATR v2.2.0 maps to (per-rule metadata) */
-  complianceFrameworks: 6,
+  /**
+   * Two-tier framework story — SINGLE SOURCE OF TRUTH.
+   * Keep in sync with /atr/crosswalks CROSSWALKS registry and ATR
+   * data/compliance-frameworks/ allowlist.
+   *
+   * EVIDENCE tier (5): frameworks with validated, control-level identifiers in
+   * ATR's data/compliance-frameworks/*.json allowlist, gated by
+   * `npm run validate:compliance` — the same gate that caught the fabricated
+   * ISO clauses (2026-06-05). PanGuard generates signed compliance evidence for
+   * these. A framework only earns this tier once its allowlist file exists.
+   */
+  complianceFrameworks: 5,
   complianceFrameworkList: [
+    'EU AI Act',
+    'NIST AI RMF',
+    'ISO/IEC 42001',
     'OWASP Agentic Top 10:2026',
     'OWASP LLM Top 10:2025',
-    'MITRE ATLAS',
-    'NIST AI RMF',
-    'EU AI Act',
-    'ISO/IEC 42001',
-    'SAFE-MCP',
   ],
+  /**
+   * CROSSWALK tier (breadth, the "universal standard" claim). MUST equal the
+   * number of entries in the /atr/crosswalks CROSSWALKS array (that array is the
+   * registry; this number mirrors it). Adding a crosswalk there → bump this.
+   * Current 10 = the 5 evidence frameworks + MITRE ATLAS + SAFE-MCP + CWE +
+   * Five Eyes joint guidance + CISA KEV. (Colorado AI Act is partial-by-design,
+   * not counted.) Every entry must point to a real ATR mapping doc or per-rule
+   * metadata — never claim a crosswalk a rule does not actually reference.
+   */
+  crosswalkStandards: 10,
   /** Rule source corpora integrated in v2.2.0 sprint */
   ruleSourceCorpora: [
     'NVIDIA garak (3,475 prompts)',
@@ -183,8 +201,8 @@ export const STATS = {
     },
     skill: { recall: 1, precision: 0.97, fp: 0.002, samples: 498 },
     garak: {
-      recall: 97.1,
-      samples: 666,
+      recall: 98,
+      samples: 650,
       perFamily: { latentinjection: 34.4, sysprompt_extraction: 67.9, dan: 90.2 },
     },
     hackaprompt: { recall: 66.2, precision: 100, samples: 4_780, baselineRecall: 28.6 },

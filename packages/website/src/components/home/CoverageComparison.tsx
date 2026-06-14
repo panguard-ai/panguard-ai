@@ -33,7 +33,7 @@ export default function CoverageComparison() {
         }
       />
       <div className="max-w-5xl mx-auto mt-14 overflow-x-auto">
-        <table className="w-full border-collapse text-sm">
+        <table className="w-full min-w-[640px] border-collapse text-sm">
           <thead>
             <tr className="border-b border-border">
               <th className="text-left py-3 px-4 font-semibold text-text-primary">

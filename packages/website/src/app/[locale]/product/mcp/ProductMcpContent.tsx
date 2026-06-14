@@ -49,7 +49,7 @@ const mcpTools = [
   {
     icon: AnalyticsIcon,
     name: 'panguard_generate_report',
-    desc: 'Generate ISO 27001, SOC 2, or TCSA compliance report',
+    desc: 'Generate EU AI Act, NIST AI RMF, or ISO/IEC 42001 compliance report',
   },
   {
     icon: SettingsIcon,

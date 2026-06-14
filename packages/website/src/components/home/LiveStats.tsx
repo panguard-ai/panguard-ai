@@ -11,15 +11,15 @@ export default function LiveStats() {
   const stats = [
     {
       label: isZh ? 'ATR 規則數' : 'ATR rules',
-      value: STATS.atrRules.toString(),
+      value: STATS.totalRulesDisplay,
     },
     {
       label: isZh ? 'Garak 對抗樣本' : 'Garak prompts',
-      value: '666',
+      value: STATS.benchmark.garak.samples.toString(),
     },
     {
       label: isZh ? 'Garak recall' : 'Garak recall',
-      value: '97.1%',
+      value: `${STATS.benchmark.garak.recall}%`,
     },
     {
       label: isZh ? '已掃描技能' : 'Skills scanned',
