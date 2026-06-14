@@ -97,7 +97,10 @@ async function cmdServe(flags: Readonly<Record<string, string | boolean>>): Prom
   const aggregator = new FleetAggregator();
   aggregator.hydrateFromRegistry(registry.list());
 
-  const server = new ManagerServer({ port, host, registry, aggregator });
+  // MANAGER_AUTH_TOKEN gates register/revoke; required when binding to a non-loopback host.
+  // MANAGER_AUTH_TOKEN 守住 register/revoke;綁定非 loopback 主機時為必填。
+  const authToken = process.env['MANAGER_AUTH_TOKEN'];
+  const server = new ManagerServer({ port, host, registry, aggregator, authToken });
   await server.start();
 
   const shutdown = async (signal: string): Promise<void> => {

@@ -11,7 +11,7 @@
  */
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import { randomBytes } from 'node:crypto';
+import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -49,6 +49,19 @@ export interface ManagerServerOptions {
   readonly registry: AgentsRegistry;
   /** Pre-built FleetAggregator / 預先建立的 FleetAggregator */
   readonly aggregator: FleetAggregator;
+  /**
+   * Pre-shared admin/enrollment token. When set, mutating endpoints
+   * (register, revoke) require `Authorization: Bearer <token>`.
+   * REQUIRED whenever host is non-loopback — the server refuses to start otherwise.
+   * 預共享的 admin/enrollment token。設定後,變更類端點(register、revoke)需帶 Bearer。
+   * 綁定非 loopback 時為必填 — 否則伺服器拒絕啟動。
+   */
+  readonly authToken?: string;
+}
+
+/** True if a bind host only accepts local connections / 綁定主機是否僅接受本機連線 */
+function isLoopbackHost(host: string): boolean {
+  return host === '127.0.0.1' || host === 'localhost' || host === '::1';
 }
 
 interface RateLimitEntry {
@@ -65,6 +78,7 @@ export class ManagerServer {
   private readonly dashboardHtmlPath: string;
   private readonly registry: AgentsRegistry;
   private readonly aggregator: FleetAggregator;
+  private readonly authToken?: string;
   private readonly wsClients: Set<WSClient> = new Set();
   private readonly rateLimits: Map<string, RateLimitEntry> = new Map();
   private server: ReturnType<typeof createServer> | null = null;
@@ -77,6 +91,20 @@ export class ManagerServer {
     }
     this.port = options.port;
     this.host = options.host ?? '0.0.0.0';
+    // Fail closed: refuse to expose a remotely-reachable manager without an auth token,
+    // otherwise anyone who can reach the port can register fake agents or revoke real ones.
+    // 失敗即關閉:沒有 auth token 不准對外開放,否則任何能連到該埠的人都能註冊假代理或撤銷真代理。
+    if (options.authToken && options.authToken.length < 16) {
+      throw new Error('authToken must be at least 16 chars / authToken 至少 16 字元');
+    }
+    if (!isLoopbackHost(this.host) && !options.authToken) {
+      throw new Error(
+        `refusing to bind manager to non-loopback host "${this.host}" without an auth token. ` +
+          'Set MANAGER_AUTH_TOKEN (openssl rand -hex 32), or bind to 127.0.0.1. ' +
+          `拒絕在沒有 auth token 的情況下將 manager 綁定到非 loopback 主機 "${this.host}"。`
+      );
+    }
+    this.authToken = options.authToken;
     this.registry = options.registry;
     this.aggregator = options.aggregator;
     this.dashboardHtmlPath = options.dashboardHtmlPath ?? this.resolveBundledDashboard();
@@ -227,6 +255,27 @@ export class ManagerServer {
     return entry.count <= RATE_LIMIT_MAX;
   }
 
+  /**
+   * Gate mutating/admin endpoints behind the pre-shared token.
+   * Returns true (request may proceed) when no token is configured — only reachable
+   * on loopback because the constructor fails closed for non-loopback binds.
+   * 用預共享 token 守住變更/管理類端點。未設 token 時放行(僅可能在 loopback,因建構子已對非 loopback 失敗即關閉)。
+   */
+  private requireAuth(req: IncomingMessage, res: ServerResponse): boolean {
+    if (!this.authToken) return true;
+    const header = req.headers.authorization ?? '';
+    const provided = header.startsWith('Bearer ') ? header.slice('Bearer '.length).trim() : '';
+    const expected = this.authToken;
+    const a = Buffer.from(provided);
+    const b = Buffer.from(expected);
+    const okToken = a.length === b.length && timingSafeEqual(a, b);
+    if (!okToken) {
+      fail(res, 401, 'missing or invalid admin token', newRequestId());
+      return false;
+    }
+    return true;
+  }
+
   private async handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const nonce = randomBytes(16).toString('base64');
     res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -265,6 +314,7 @@ export class ManagerServer {
         return;
       }
       if (pathname === '/api/agents/register' && method === 'POST') {
+        if (!this.requireAuth(req, res)) return;
         await handleRegister(req, res, {
           registry: this.registry,
           aggregator: this.aggregator,
@@ -279,6 +329,7 @@ export class ManagerServer {
       }
       const agentRevoke = pathname.match(/^\/api\/agents\/([A-Za-z0-9_]+)\/revoke$/);
       if (agentRevoke && method === 'POST') {
+        if (!this.requireAuth(req, res)) return;
         const id = agentRevoke[1] ?? '';
         handleRevoke(res, id, { registry: this.registry, aggregator: this.aggregator });
         return;

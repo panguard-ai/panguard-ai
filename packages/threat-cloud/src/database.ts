@@ -1859,7 +1859,16 @@ export class ThreatCloudDB {
       }
     }
 
-    const hashSecret = process.env['TC_HASH_SECRET'] ?? 'panguard-default-hash-key';
+    // Fail closed: a known default key would let anyone recompute contributorHash
+    // and reverse-engineer client_ids, defeating the anonymisation. Require a real secret.
+    // 失敗即關閉:已知的預設金鑰會讓任何人重算 contributorHash 還原 client_id,破壞匿名化。必須提供真實 secret。
+    const hashSecret = process.env['TC_HASH_SECRET'];
+    if (!hashSecret) {
+      throw new Error(
+        'TC_HASH_SECRET is not set — refusing to hash contributor ids with a known default key. ' +
+          'Generate one with `openssl rand -hex 32` and set TC_HASH_SECRET before serving contributor data.'
+      );
+    }
 
     return rows.map((r) => ({
       // HMAC hash client_id — prevents PII reconstruction without server secret
