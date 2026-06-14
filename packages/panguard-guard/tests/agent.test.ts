@@ -180,6 +180,31 @@ describe('RespondAgent', () => {
     expect(result.action).toBe('notify');
   });
 
+  it('advisory cap: AI-inflated confidence cannot auto-block (enforcementConfidence gates execution)', async () => {
+    const agent = new RespondAgent(
+      DEFAULT_ACTION_POLICY,
+      'protection',
+      [],
+      undefined,
+      PERMISSIVE_ENFORCEMENT_POLICY
+    );
+    // The bring-your-own LLM is "sure" (confidence 99) but the deterministic layers are weak
+    // (enforcementConfidence 20). The advisory layer must surface it (notify/flag) but never
+    // auto-execute an enforcing action on its own.
+    const verdict: ThreatVerdict = {
+      conclusion: 'malicious',
+      confidence: 99,
+      enforcementConfidence: 20,
+      reasoning: 'AI-only suspicion',
+      evidence: [{ source: 'ai_analysis', description: 'llm thinks malicious', confidence: 99 }],
+      recommendedAction: 'block_ip',
+    };
+
+    const result = await agent.respond(verdict);
+    expect(result.action).not.toBe('block_ip');
+    expect(result.action).toBe('notify');
+  });
+
   it('should log only when confidence is low', async () => {
     const agent = new RespondAgent(
       DEFAULT_ACTION_POLICY,

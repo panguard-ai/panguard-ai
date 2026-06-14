@@ -26,7 +26,7 @@ import { DetectAgent, AnalyzeAgent, RespondAgent, ReportAgent } from './agent/in
 import { loadBaseline } from './memory/index.js';
 import { InvestigationEngine } from './investigation/index.js';
 import { ThreatCloudClient } from './threat-cloud/index.js';
-import { validateLicense, hasFeature } from './license/index.js';
+import { validateLicense } from './license/index.js';
 // Detection handled by ATR Engine
 import { GuardATREngine } from './engines/atr-engine.js';
 import { ATRDrafter } from './engines/atr-drafter.js';
@@ -136,7 +136,9 @@ export async function initEngines(
   });
 
   const detectAgent = new DetectAgent();
-  const analyzeLLM = hasFeature(license, 'ai_analysis') ? llm : null;
+  // Bring-your-own: the semantic layer is available on any tier once the operator configures a
+  // model (cloud or local). It is advisory only — never auto-blocks (see AnalyzeAgent).
+  const analyzeLLM = llm;
   const analyzeAgent = new AnalyzeAgent(analyzeLLM);
 
   let smartRouter: SmartRouter | null = null;

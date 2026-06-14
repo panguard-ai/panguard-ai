@@ -158,12 +158,12 @@ describe('DashboardServer — tier gating', () => {
       expect(html).not.toContain('Tier 1-3');
       expect(html).not.toContain('Tier 1-2');
 
-      // Detection layers were renamed Tier→Layer. The semantic verdict layer
-      // (Layer C / LLM judge) was removed for GA — detection is deterministic only.
+      // Layers A/B are deterministic + always on. Layer C is the optional, advisory,
+      // bring-your-own semantic layer — off by default, never auto-blocks.
       expect(html).toContain('Layer A');
       expect(html).toContain('Layer B');
-      expect(html).not.toContain('Layer C');
-      expect(html).not.toContain('Semantic verdict');
+      expect(html).toContain('Layer C');
+      expect(html).toContain('advisory');
     });
   });
 

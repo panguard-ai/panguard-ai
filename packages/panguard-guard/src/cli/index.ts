@@ -349,9 +349,23 @@ async function commandStart(
     console.log(`  ${c.safe('\u2713')} Pattern matching + heuristic correlation on every event (Layer A + B)`);
 
     console.log('');
-    console.log(
-      `  ${symbols.info} Detection is deterministic \u2014 pattern matching + heuristic correlation only, no LLM, nothing leaves your machine.`
+    const semanticOn = Boolean(
+      config.ai?.provider ||
+        process.env['PANGUARD_AI_KEY'] ||
+        process.env['ANTHROPIC_API_KEY'] ||
+        process.env['OPENAI_API_KEY'] ||
+        process.env['PANGUARD_LLM_ENDPOINT']
     );
+    if (semanticOn) {
+      const provider = config.ai?.provider ?? 'configured LLM';
+      console.log(
+        `  ${c.safe('\u2713')} Layer C Semantic (advisory): ${c.sage(provider)} \u2014 flags for review, never auto-blocks`
+      );
+    } else {
+      console.log(
+        `  ${symbols.info} Layer C Semantic is off. Optional: connect your own LLM (cloud API or local Ollama) for advisory analysis \u2014 it never auto-blocks.`
+      );
+    }
   } // end of PANGUARD_QUIET_GUARD else block
 
   // ── First-run welcome / 首次啟動歡迎 ──────────────────────────────

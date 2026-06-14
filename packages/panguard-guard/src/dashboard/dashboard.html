@@ -921,8 +921,9 @@
             style="font-size: 13px; color: var(--text-muted); line-height: 1.6"
             id="hero-desc"
           >
-            Every event runs through deterministic pattern matching and heuristic correlation.
-            No LLM, no cloud calls — nothing leaves your machine.
+            Every event runs through deterministic pattern matching and heuristic correlation —
+            on-device by default. An optional semantic layer (bring your own LLM) stays off until
+            you enable it.
           </div>
         </div>
 
@@ -948,8 +949,9 @@
             <span class="dot dot-ok"></span> <span data-i18n="layer_title">Detection Layers</span>
           </h3>
           <div class="desc">
-            Two deterministic layers run on every event. No LLM, no cloud calls — detection stays
-            fully on-device and reproducible.
+            Layers A and B are deterministic and always on. Layer C is optional — bring your own
+            LLM (cloud API or local model). It is advisory (flags for review, never auto-blocks)
+            and stays off until you connect one.
           </div>
           <div class="layer-row">
             <span class="layer-label">Layer A &mdash; Pattern match (ATR rules)</span>
@@ -960,6 +962,11 @@
             <span class="layer-label">Layer B &mdash; Heuristic correlation</span>
             <div class="layer-bar"><div class="layer-fill on" id="lb-bar"></div></div>
             <span class="layer-status on" id="lb-st">Active</span>
+          </div>
+          <div class="layer-row">
+            <span class="layer-label">Layer C &mdash; Semantic verdict (optional &middot; advisory)</span>
+            <div class="layer-bar"><div class="layer-fill" id="lc-bar"></div></div>
+            <span class="layer-status" id="lc-st">Off &middot; bring your own</span>
           </div>
         </div>
 
