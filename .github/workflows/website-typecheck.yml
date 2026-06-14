@@ -28,5 +28,7 @@ jobs:
         run: pnpm run build
       - name: TypeScript check
         run: pnpm --filter website exec tsc --noEmit
-      - name: ESLint
-        run: pnpm --filter website exec eslint .
+      # ESLint for the website is covered by the root "Lint & Format" job
+      # (pnpm run lint lints all packages). The standalone `eslint .` here was
+      # pre-existing-broken (Next uses `next lint`; bare eslint reports all files
+      # ignored), so this redundant step is removed rather than double-linted.
