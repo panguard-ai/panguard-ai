@@ -746,11 +746,11 @@
       "trustNote": "Scans run server-side. No code is stored. Only content hash is cached for deduplication.",
       "submitATR": "Submit ATR Rule Proposal"
     },
-    "srDefinition": "Panguard AI is the commercial reference implementation of ATR (Agent Threat Rules), the open standard for detecting attacks on AI agents — the CVE and Sigma of the agent world. ATR is MIT-licensed, machine-readable, and already adopted by Microsoft, Cisco, NVIDIA and MISP. PanGuard turns the free standard into signed, audit-ready compliance evidence.",
+    "srDefinition": "Panguard AI is the commercial reference implementation of ATR (Agent Threat Rules), the open standard for detecting attacks on AI agents — the CVE and Sigma of the agent world. ATR is MIT-licensed, machine-readable, and already adopted by Microsoft, Cisco and MISP. PanGuard turns the free standard into signed, audit-ready compliance evidence.",
     "scannerHero": {
       "titleLine1": "The open security standard",
       "titleLine2": "for the age of AI agents.",
-      "subtitle": "Open, MIT-licensed detection rules for attacks on AI agents — the CVE and Sigma of the agent world. 650+ rules across 10 categories, already adopted by Microsoft, Cisco, NVIDIA and MISP.",
+      "subtitle": "Open, MIT-licensed detection rules for attacks on AI agents — the CVE and Sigma of the agent world. 650+ rules across 10 categories, already adopted by Microsoft, Cisco and MISP.",
       "scanLabel": "Check any MCP skill before you install",
       "tabUrl": "GitHub URL",
       "tabPaste": "Paste Content",
