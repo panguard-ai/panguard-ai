@@ -28,7 +28,7 @@ export default function ProductScanPage() {
         data={softwareApplicationSchema({
           name: 'PanGuard Scan',
           description:
-            '60-second security audit for AI agent skills and MCP packages. Sigma + YARA + 419 ATR rules. SARIF 2.1.0 export. Static plus optional LLM second opinion.',
+            '60-second security audit for AI agent skills and MCP packages. Sigma + YARA + 650+ ATR rules. SARIF 2.1.0 export. Static plus optional LLM second opinion.',
           url: 'https://panguard.ai/product/scan',
           category: 'SecurityApplication',
           applicationSubCategory: 'AI Skill Auditor',

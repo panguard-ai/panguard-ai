@@ -4,7 +4,7 @@
  * Regulated Industries Positioning section
  * Day 55 (2026-05-05) — adds 4 sub-sections aligning with strategic vision:
  *   1. Built on ATR (open standard upstream)
- *   2. Two-Track Solution (Real-time Protection + Audit-Ready Compliance)
+ *   2. Two-Track Solution (Inline detection + Audit-Ready Compliance)
  *   3. ATR Migrator Pro (commercial differentiator)
  *   4. 5-Framework Compliance (auto-mapping evidence)
  *
@@ -37,8 +37,8 @@ export default function RegulatedIndustriesPositioning() {
             </h2>
             <p className="text-base sm:text-lg text-text-secondary max-w-3xl leading-relaxed">
               {isZh
-                ? 'PanGuard 是 ATR 開放標準的商業實作版本。ATR 是 MIT 永久免費的偵測標準,由 ATR 社群維護;PanGuard 把它包成受監管產業會買的整套平台——即時防護 + 可稽核合規證據 + 地端部署 + SLA。'
-                : 'PanGuard is the commercial reference implementation of the ATR open standard. ATR is the MIT-licensed detection standard maintained by the ATR Community; PanGuard wraps it into the platform regulated industries need — real-time protection + audit-ready compliance evidence + on-prem + SLA.'}
+                ? 'PanGuard 是 ATR 開放標準的商業實作版本。ATR 是 MIT 永久免費的偵測標準,由 ATR 社群維護;PanGuard 把它包成受監管產業會買的整套平台——即時偵測攔截 + 可稽核合規證據 + 地端部署 + SLA。'
+                : 'PanGuard is the commercial reference implementation of the ATR open standard. ATR is the MIT-licensed detection standard maintained by the ATR Community; PanGuard wraps it into the platform regulated industries need — inline detection + audit-ready compliance evidence + on-prem + SLA.'}
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm">
               <a
@@ -81,7 +81,7 @@ export default function RegulatedIndustriesPositioning() {
               <div className="bg-surface-2 rounded-xl border border-border p-7 h-full">
                 <Shield className="w-7 h-7 text-panguard-green mb-4" />
                 <h3 className="text-xl font-bold text-text-primary mb-3">
-                  {isZh ? '即時防護' : 'Real-time Protection'}
+                  {isZh ? '即時偵測攔截' : 'Inline detection'}
                 </h3>
                 <p className="text-sm text-text-secondary leading-relaxed mb-4">
                   {isZh
@@ -130,8 +130,8 @@ export default function RegulatedIndustriesPositioning() {
               </h2>
               <p className="text-base text-text-secondary leading-relaxed mb-6">
                 {isZh
-                  ? '銀行、保險、醫療這幾年累積了上千條 Sigma 跟 YARA 規則。EU AI Act 8/2 開罰那天,這些規則完全管不到 AI Agent 的行為。手寫遷移要 6-12 個月,Migrator 一週搞定,還自動對照 5 個合規框架。'
-                  : 'F500 banks, insurance, and healthcare have accumulated thousands of Sigma and YARA detection rules. When EU AI Act enforcement begins August 2, those rules cannot cover AI agent behavior. Manual migration: 6-12 months. Migrator: under a week, with 5-framework compliance auto-mapping.'}
+                  ? '銀行、保險、醫療這幾年累積了上千條 Sigma 跟 YARA 規則。隨著 EU AI Act 逐步生效,這些規則完全管不到 AI Agent 的行為。手寫遷移要 6-12 個月,Migrator 一週搞定,還自動對照 5 個合規框架。'
+                  : 'F500 banks, insurance, and healthcare have accumulated thousands of Sigma and YARA detection rules. As the EU AI Act phases in, those rules cannot cover AI agent behavior. Manual migration: 6-12 months. Migrator: under a week, with 5-framework compliance auto-mapping.'}
               </p>
               <div className="bg-surface-3 rounded-lg p-4 mb-6 font-mono text-xs sm:text-sm border border-border">
                 <span className="text-text-muted">$ </span>
@@ -240,7 +240,7 @@ export default function RegulatedIndustriesPositioning() {
           </FadeInUp>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 max-w-5xl mx-auto">
             {[
-              { name: 'EU AI Act', sub: isZh ? '2026/8/2 強制' : 'Aug 2 enforcement' },
+              { name: 'EU AI Act', sub: isZh ? '逐步生效中' : 'Phasing in' },
               { name: 'NIST AI RMF', sub: isZh ? '美國聯邦' : 'US federal' },
               { name: 'ISO/IEC 42001', sub: isZh ? '國際 AIMS' : 'International AIMS' },
               {

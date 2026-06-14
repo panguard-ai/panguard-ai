@@ -70,7 +70,7 @@ const NOTIFICATION_TYPES = [
     type: 'Threat Alerts',
     timing: 'Immediate',
     description:
-      'Real-time notifications when threats are detected. Includes severity, source IP, and recommended action.',
+      'Inline notifications when threats are detected. Includes severity, source IP, and recommended action.',
   },
   {
     type: 'Daily Summaries',
@@ -115,8 +115,11 @@ export default function ChatDocsContent() {
               Panguard Chat
             </h1>
             <p className="text-text-secondary mt-4 text-lg leading-relaxed">
-              AI-powered security notifications delivered to your preferred channels. Get threat
-              alerts in plain language via Telegram, Slack, LINE, Email, or custom Webhook.
+              Plain-language security notifications delivered to your preferred channels. Get threat
+              alerts you can actually read via Telegram, Slack, LINE, Email, or custom Webhook.
+            </p>
+            <p className="text-sm text-text-muted mt-3">
+              Free and open source under the MIT license. No account required.
             </p>
           </FadeInUp>
         </div>

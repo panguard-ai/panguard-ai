@@ -97,15 +97,19 @@ function FAQCategory({
 
 const categories: CategoryDef[] = [
   {
+    key: 'general',
+    icon: <SupportIcon size={20} className="text-brand-sage" />,
+    count: 3,
+    highlightFirst: true,
+  },
+  {
     key: 'security',
     icon: <ShieldIcon size={20} className="text-brand-sage" />,
     count: 4,
-    highlightFirst: true,
   },
   { key: 'detection', icon: <ScanIcon size={20} className="text-brand-sage" />, count: 4 },
   { key: 'privacy', icon: <LockIcon size={20} className="text-brand-sage" />, count: 3 },
   { key: 'deployment', icon: <DeployIcon size={20} className="text-brand-sage" />, count: 3 },
-  { key: 'general', icon: <SupportIcon size={20} className="text-brand-sage" />, count: 3 },
 ];
 
 export default function FAQContent() {
@@ -149,7 +153,7 @@ export default function FAQContent() {
         <FadeInUp>
           <div className="flex justify-center mt-8 gap-4">
             <a
-              href="https://github.com/panguard-ai/panguard"
+              href="https://github.com/panguard-ai/panguard-ai"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 px-6 py-3 rounded-full text-sm font-semibold hover:bg-sage-light transition-colors"

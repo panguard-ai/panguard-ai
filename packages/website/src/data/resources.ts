@@ -28,7 +28,7 @@ export const resources: Resource[] = [
     title: 'Setting Up Real-Time Protection',
     type: 'Guide',
     description:
-      'Deploy Panguard Guard for continuous endpoint monitoring with 3-layer AI detection and automated response.',
+      'Deploy Panguard Guard for continuous endpoint monitoring with deterministic on-device detection and automated response.',
     date: '2026-03',
     docsUrl: `${DOCS}/guides/real-time-protection`,
   },
@@ -46,7 +46,7 @@ export const resources: Resource[] = [
     title: 'Generating Compliance Reports',
     type: 'Guide',
     description:
-      'Automate ISO 27001, SOC 2, and Taiwan Cyber Security Act compliance evidence collection and report generation.',
+      'Automate EU AI Act, NIST AI RMF, and ISO/IEC 42001 compliance evidence collection and report generation.',
     date: '2026-02',
     docsUrl: `${DOCS}/guides/compliance-reports`,
   },
@@ -55,7 +55,7 @@ export const resources: Resource[] = [
     title: 'MCP Integration for Claude & Cursor',
     type: 'Tutorial',
     description:
-      'Connect Panguard to Claude Desktop or Cursor via Model Context Protocol for AI-powered security workflows.',
+      'Connect Panguard to Claude Desktop or Cursor via Model Context Protocol for agent-driven security workflows.',
     date: '2026-02',
     docsUrl: `${DOCS}/guides/mcp-integration`,
   },

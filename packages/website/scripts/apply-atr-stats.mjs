@@ -133,7 +133,7 @@ const candidates = [
     val: () => {
       const list = get(upstream, 'adoption.production') ?? [];
       const ms = list.find(
-        (p) => p && typeof p.org === 'string' && p.org.startsWith('Microsoft Agent'),
+        (p) => p && typeof p.org === 'string' && p.org.startsWith('Microsoft Agent')
       );
       return `microsoftRulesMerged: ${ms?.rulesShipped ?? 0}`;
     },
@@ -213,11 +213,11 @@ writeFileSync(statsTsPath, src);
 console.log(`apply-atr-stats: applied ${touched} replacements to ${statsTsPath}`);
 if (skipped.length > 0) {
   console.warn(
-    `apply-atr-stats: skipped ${skipped.length} field(s) not present in upstream stats.json:`,
+    `apply-atr-stats: skipped ${skipped.length} field(s) not present in upstream stats.json:`
   );
   for (const s of skipped) console.warn(`  - ${s}`);
   console.warn(
     'These stats.ts values were left as-is. To re-enable auto-sync for them, ' +
-      'either extend ATR data/stats.json upstream or compute them locally in this script.',
+      'either extend ATR data/stats.json upstream or compute them locally in this script.'
   );
 }

@@ -1045,10 +1045,19 @@ export class DashboardServer {
         const update = JSON.parse(body) as {
           uploadEnabled?: boolean;
           endpoint?: string;
+          mode?: string;
         };
 
         if (update.endpoint !== undefined && !DashboardServer.isValidEndpointUrl(update.endpoint)) {
           this.jsonResponse(res, { error: 'Invalid endpoint URL' }, 400);
+          return;
+        }
+        if (
+          update.mode !== undefined &&
+          update.mode !== 'learning' &&
+          update.mode !== 'protection'
+        ) {
+          this.jsonResponse(res, { error: 'Invalid mode' }, 400);
           return;
         }
 
@@ -1057,6 +1066,7 @@ export class DashboardServer {
           ...config,
           threatCloudUploadEnabled: update.uploadEnabled ?? config.threatCloudUploadEnabled,
           threatCloudEndpoint: update.endpoint ?? config.threatCloudEndpoint,
+          mode: (update.mode as GuardConfig['mode']) ?? config.mode,
         };
 
         saveConfig(updatedConfig);

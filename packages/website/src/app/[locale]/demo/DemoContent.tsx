@@ -132,8 +132,9 @@ export default function DemoContent() {
                     Sample Compliance Evidence Pack
                   </h3>
                   <p className="mt-2 text-sm text-text-secondary leading-relaxed">
-                    3 framework PDFs (ISO 27001 / SOC 2 / Taiwan CSA) + JSON + HTML + manifest with
-                    SHA-256 + HMAC. Same pipeline that runs against a real customer workspace.
+                    3 framework PDFs (EU AI Act / NIST AI RMF / ISO/IEC 42001) + JSON + HTML +
+                    manifest with SHA-256 + HMAC. Same pipeline that runs against a real customer
+                    workspace.
                   </p>
                   <p className="mt-4 text-sm font-semibold text-brand-sage group-hover:text-brand-sage-light">
                     Open the pack →

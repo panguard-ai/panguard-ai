@@ -2,6 +2,36 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [Unreleased] - GA prep (2026-06-14)
+
+### Security
+
+- **Installed-footprint hardening.** Removed command-injection vectors in the
+  scanner and notifications (`execSync` → `execFileSync` with validated args),
+  hardened the Guard dashboard write surface (removed the `ai-config` POST,
+  added CSRF Origin checks, token-gated the WebSocket), tightened on-disk file
+  permissions (`0o600`/`0o700`), and constrained cloud-rule YAML parsing to a
+  safe schema. systemd services now run as the installing user, never root.
+- **Threat Cloud contributor hashing fails closed.** `TC_HASH_SECRET` no longer
+  falls back to a known default; the server refuses to hash without a real
+  secret (documented in `.env.example`).
+- **Manager API auth.** `register`/`revoke` now require a pre-shared
+  `MANAGER_AUTH_TOKEN`, and the server refuses to bind a non-loopback host
+  without one (fail closed).
+
+### Changed
+
+- **ATR rules 3.2.0 → 3.4.0 (462 → 651 rules).** Every component — CLI, Guard,
+  scanner, and the website scanner bundle — now runs the current published ATR
+  ruleset instead of a four-month-old snapshot.
+- **Website honesty pass.** Single-sourced the rule count, unified Garak recall
+  to 98%, removed NVIDIA from "adopted by" claims (its garak PR is still open),
+  fixed dead GitHub links, reconciled the FAQ with the Pricing page (every
+  product feature free; paid = optional services for regulated orgs), and made
+  the live rule-stats endpoint return real counts from the deployed bundle.
+- **Docker/remote deploys.** `OllamaProvider` now reads `OLLAMA_ENDPOINT` /
+  `OLLAMA_HOST`, so a containerised Guard can reach a non-localhost Ollama.
+
 ## [1.4.15] - 2026-03-28
 
 ### Added

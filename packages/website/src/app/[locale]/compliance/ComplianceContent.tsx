@@ -46,7 +46,7 @@ export default function ComplianceContent() {
                 <span className="text-sm text-text-secondary">{t('hero.badge')}</span>
               </div>
               <div className="inline-flex items-center gap-2 bg-surface-2 border border-border rounded-full px-6 py-2.5">
-                <span className="text-sm font-bold text-text-primary">{STATS.atrRules}</span>
+                <span className="text-sm font-bold text-text-primary">{STATS.atrRulesDisplay}</span>
                 <span className="text-sm text-text-secondary">{t('hero.rulesBadge')}</span>
               </div>
             </div>
@@ -187,8 +187,8 @@ export default function ComplianceContent() {
       <SectionWrapper>
         <SectionTitle
           overline="COMPLIANCE ROADMAP · LAYER 7 GOVERN"
-          title="6-framework mapping shipped · reporting + AIAM next"
-          subtitle="Per-rule mapping across 6 frameworks ships today (ATR v3.2.0, 100% coverage, CI-validated). Auditor-grade reports + AIAM land Q2/Q3 2026 on the public timeline. No fake checkmarks."
+          title="5-framework mapping shipped · reporting + AIAM next"
+          subtitle="Per-rule mapping across 5 frameworks ships today (ATR v3.2.0, 100% coverage, CI-validated). Auditor-grade reports + AIAM land Q2/Q3 2026 on the public timeline. No fake checkmarks."
         />
 
         {/* Today vs Coming Soon honest split */}
@@ -286,7 +286,7 @@ export default function ComplianceContent() {
             {
               name: 'EU AI Act',
               scope: 'Articles 9, 10, 12, 13, 14, 15 (high-risk)',
-              date: 'High-risk obligations 2026-08-02',
+              date: 'High-risk obligations as the EU AI Act phases in',
               status: 'shipped' as const,
               statusLabel: '100% mapped · v3.2.0',
             },
@@ -300,7 +300,7 @@ export default function ComplianceContent() {
             {
               name: 'Colorado AI Act',
               scope: 'SB24-205 algorithmic discrimination',
-              date: 'Enforcement 2026-06-01',
+              date: 'Enforcement phasing in',
               status: 'planned' as const,
               statusLabel: 'Mapping Q2 2026',
             },

@@ -23,7 +23,7 @@ const ADOPTERS: readonly { name: string; detail: string; highlight?: boolean }[]
     detail: `${STATS.adoption.microsoftRulesMerged} ATR rules merged (PR #908 + #1277)`,
     highlight: true,
   },
-  { name: 'NVIDIA Garak', detail: '97.1% recall · PR open' },
+  { name: 'NVIDIA Garak', detail: '98% recall · PR open' },
 ];
 
 export default function SocialProof() {

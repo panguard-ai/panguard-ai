@@ -255,6 +255,9 @@ export default function GettingStartedContent() {
               {t('title')}
             </h1>
             <p className="text-text-secondary mt-4 text-lg leading-relaxed">{t('subtitle')}</p>
+            <p className="text-sm text-text-muted mt-3">
+              Free and open source under the MIT license. No account required.
+            </p>
           </FadeInUp>
         </div>
       </SectionWrapper>
@@ -324,7 +327,7 @@ export default function GettingStartedContent() {
               <TerminalOutput
                 lines={[
                   `[OK] Panguard v${STATS.cliVersion} installed`,
-                  `[OK] Rule engine loaded (${STATS.atrRules} ATR + ${STATS.totalRulesDisplay} total rules)`,
+                  `[OK] Rule engine loaded (${STATS.atrRulesDisplay} ATR rules)`,
                   '[OK] Scan complete.',
                 ]}
               />
@@ -377,12 +380,12 @@ export default function GettingStartedContent() {
                     label="Claude Code"
                   />
                   <p>
-                    <strong className="text-text-primary">Step 4:</strong> Start 24/7 protection
+                    <strong className="text-text-primary">Step 4:</strong> Start inline protection
                   </p>
                   <CodeBlock code="pga guard start --dashboard" label="Terminal" />
                   <p className="text-xs text-panguard-green">
-                    Done! Claude Code now has 11 security tools via MCP. Guard monitors everything
-                    24/7.
+                    Done! Claude Code now has 11 security tools via MCP. Guard detects and blocks
+                    threats at runtime.
                   </p>
                 </div>
               </div>
@@ -485,8 +488,8 @@ jobs:
               <div className="mt-4 space-y-2 text-sm text-text-secondary">
                 <p>
                   <strong className="text-text-primary">What it does:</strong> Scans your repo for
-                  MCP config files and SKILL.md files using {STATS.atrRules} ATR detection rules.
-                  Outputs SARIF to the GitHub Security tab.
+                  MCP config files and SKILL.md files using {STATS.atrRulesDisplay} ATR detection
+                  rules. Outputs SARIF to the GitHub Security tab.
                 </p>
                 <p>
                   <strong className="text-text-primary">Options:</strong>
@@ -565,7 +568,7 @@ jobs:
                   <TerminalOutput
                     lines={[
                       '{"riskScore": 72, "findings": 8, "critical": 1, "high": 2, "medium": 3, "low": 2,',
-                      ' "scanDuration": "47s", "framework": "ISO 27001",',
+                      ' "scanDuration": "47s", "framework": "EU AI Act",',
                       ' "topFinding": "SSH root login enabled (critical)"}',
                     ]}
                   />
@@ -611,7 +614,7 @@ jobs:
                 <p className="text-sm font-semibold text-text-primary mb-2">{t('step8Title')}</p>
                 <p className="text-text-secondary text-sm mb-3">{t('step8Desc')}</p>
                 <CodeBlock
-                  code={`panguard report generate --framework iso27001\npanguard report generate --framework soc2\npanguard report generate --framework tcsa`}
+                  code={`panguard report generate --framework eu-ai-act\npanguard report generate --framework nist-ai-rmf\npanguard report generate --framework iso-42001`}
                   label="Terminal"
                 />
               </div>
@@ -639,7 +642,7 @@ jobs:
                   { cmd: 'pga scan', desc: 'Run security scan' },
                   { cmd: 'pga scan --deep', desc: 'Deep scan with all engines' },
                   { cmd: 'pga audit skill <dir>', desc: 'Audit a skill before installing' },
-                  { cmd: 'pga guard start', desc: 'Start real-time protection' },
+                  { cmd: 'pga guard start', desc: 'Start inline detection' },
                   { cmd: 'pga status', desc: 'Check protection status' },
                   { cmd: 'pga doctor', desc: 'Diagnose installation' },
                   { cmd: 'pga --help', desc: 'Show all commands' },
@@ -686,7 +689,7 @@ jobs:
             <p className="text-text-secondary mb-6">{t('advancedHintDesc')}</p>
 
             <div className="space-y-3">
-              {[t('advancedHintOllama')].map((hint) => (
+              {[t('advancedHintRules')].map((hint) => (
                 <div key={hint} className="flex items-start gap-3">
                   <Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" />
                   <p className="text-sm text-text-secondary leading-relaxed">{hint}</p>

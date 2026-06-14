@@ -6,11 +6,11 @@ import GuardDocsContent from './GuardDocsContent';
 export const metadata: Metadata = {
   title: 'Panguard Guard — Documentation',
   description:
-    'Real-time skill behavior monitoring with AI pipeline. Configure detection rules, response actions, and threat monitoring.',
+    'Inline skill behavior detection with deterministic, on-device analysis. Configure detection rules, response actions, and threat monitoring.',
   openGraph: {
     title: 'Panguard Guard — Panguard AI Docs',
     description:
-      '24/7 skill behavior monitoring: 330 ATR detection rules, AI analysis, automated response.',
+      'Inline skill behavior detection: 650+ ATR detection rules, deterministic on-device analysis, automated response.',
   },
 };
 
