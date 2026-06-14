@@ -64,7 +64,15 @@ export class OllamaProvider extends LLMProviderBase {
    */
   constructor(config: LLMConfig) {
     super(config);
-    this.endpoint = (config.endpoint ?? DEFAULT_ENDPOINT).replace(/\/+$/, '');
+    // Resolution order: explicit config > OLLAMA_ENDPOINT (docker-compose) >
+    // OLLAMA_HOST (doctor convention) > localhost default. Without the env reads,
+    // a containerised guard always hit localhost:11434 and silently lost AI analysis.
+    this.endpoint = (
+      config.endpoint ??
+      process.env['OLLAMA_ENDPOINT'] ??
+      process.env['OLLAMA_HOST'] ??
+      DEFAULT_ENDPOINT
+    ).replace(/\/+$/, '');
     this.logger.info('Ollama provider initialized', {
       endpoint: this.endpoint,
       model: this.model,
