@@ -3319,11 +3319,11 @@
       },
       "ai": {
         "layer": "Layer 5",
-        "name": "AI Correlation",
-        "engine": "LLM Reasoning",
-        "desc": "Events that pass through layers 1-4 are cross-correlated by AI. The model weighs behavioral baselines, threat intelligence feeds, and temporal patterns to produce a confidence-scored verdict with full attack narrative.",
-        "detects": "Zero-day attacks, APT campaigns, novel attack chains, false positive reduction",
-        "tech": "Local Ollama + Cloud LLM fallback, RAG over baseline memory, threat intel enrichment, 0-100 scoring"
+        "name": "Confidence Scoring",
+        "engine": "Deterministic Correlation",
+        "desc": "Events that pass through layers 1-4 are cross-correlated on-device with no LLM in the detection path. The engine weighs behavioral baselines, rule confidence, and temporal patterns to produce a reproducible confidence-scored verdict with a full attack narrative.",
+        "detects": "Multi-step attack chains, behavioral drift, policy violations, false positive reduction",
+        "tech": "Deterministic heuristic + temporal correlation, baseline-deviation scoring, 0-100 confidence, fully reproducible"
       }
     },
     "dataFlow": {
@@ -6258,7 +6258,7 @@
       },
       "q2": {
         "q": "What if a skill passes audit but turns malicious later?",
-        "a": "Guard monitors every whitelisted skill continuously using multiple detection layers -- and when it detects drift, it doesn't just alert. It auto-responds.\n\n1. ATR rule matching (sub-millisecond) -- 650+ ATR detection rules for AI agent threats. If the skill's behavior matches any rule, it's flagged instantly.\n\n2. Fingerprint drift -- Skill Auditor records what the skill is supposed to do. Guard compares live behavior against that fingerprint. A code-review tool that suddenly starts making network calls to unknown endpoints? Caught the moment it deviates.\n\n3. LLM deep analysis -- For novel patterns that rules and fingerprinting miss, the AI analyzer examines behavior semantically. Its verdict is automatically distilled into a new ATR rule so the same attack is caught by rules alone next time.\n\nWhen a threat is confirmed, Guard's confidence-based response kicks in:\n- Confidence >= 85%: automatic response -- revoke skill from whitelist, block tool invocation, quarantine session. No human delay.\n- Confidence 50-84%: alert with full evidence, suggest specific action (e.g., revoke_skill or kill_agent), wait for human confirmation.\n- Below 50%: log for investigation with all context preserved.\n\nEven a patient attacker who waits 50 invocations before acting gets caught the moment they do something outside their fingerprint -- and Guard responds in proportion to its certainty."
+        "a": "Guard monitors every whitelisted skill continuously using layered deterministic detection -- and when it detects drift, it doesn't just alert. It auto-responds.\n\n1. ATR rule matching (sub-millisecond) -- 650+ ATR detection rules for AI agent threats. If the skill's behavior matches any rule, it's flagged instantly.\n\n2. Fingerprint drift -- Skill Auditor records what the skill is supposed to do. Guard compares live behavior against that fingerprint. A code-review tool that suddenly starts making network calls to unknown endpoints? Caught the moment it deviates.\n\nBoth run entirely on-device with no LLM in the detection path -- verdicts are deterministic and reproducible.\n\nWhen a threat is confirmed, Guard's confidence-based response kicks in:\n- Confidence >= 85%: automatic response -- revoke skill from whitelist, block tool invocation, quarantine session. No human delay.\n- Confidence 50-84%: alert with full evidence, suggest specific action (e.g., revoke_skill or kill_agent), wait for human confirmation.\n- Below 50%: log for investigation with all context preserved.\n\nEven a patient attacker who waits 50 invocations before acting gets caught the moment they do something outside their fingerprint -- and Guard responds in proportion to its certainty."
       },
       "q3": {
         "q": "What are ATR rules?",

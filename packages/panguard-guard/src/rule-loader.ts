@@ -36,8 +36,6 @@ import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 
-// Re-export autoDetectLLM from its own module
-export { autoDetectLLM } from './llm-detect.js';
 
 const logger = createLogger('panguard-guard:rule-loader');
 
