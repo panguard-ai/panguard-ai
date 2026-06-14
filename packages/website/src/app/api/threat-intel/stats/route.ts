@@ -1,27 +1,21 @@
 import { NextResponse } from 'next/server';
-import { ATR_RULES_COMPILED } from '@/lib/atr-rules-compiled';
 import { STATS } from '@/lib/stats';
 
 /**
  * GET /api/threat-intel/stats
  *
- * Returns current rule + threat-intel stats. The rule and pattern counts are
- * computed from the ATR rules actually bundled with this deployment, so the
- * "live" numbers reflect exactly what the in-browser scanner runs (no stale
- * filesystem reads, no zero-fallback). Ecosystem / threat-intel figures come
- * from the verified STATS source of truth.
+ * Returns the canonical ATR standard counts (STATS, the single source of truth
+ * synced from agent-threat-rules), so every "live" rule-count widget shows the
+ * same standard size as the rest of the site. The in-browser scanner runs the
+ * production subset (draft/deprecated excluded at bundle-compile time); that
+ * subset size is an implementation detail, not the headline number.
  */
 export async function GET() {
   try {
-    const rules = ATR_RULES_COMPILED as ReadonlyArray<{ patterns?: ReadonlyArray<unknown> }>;
-    const total = rules.length;
-    let patterns = 0;
-    for (const r of rules) patterns += Array.isArray(r.patterns) ? r.patterns.length : 0;
-
     return NextResponse.json({
       atr: {
-        total,
-        patterns,
+        total: STATS.atrRules,
+        patterns: STATS.atrPatterns,
         promoted: STATS.threatIntel.promotedRules,
         draft: STATS.threatIntel.draftRules,
       },
