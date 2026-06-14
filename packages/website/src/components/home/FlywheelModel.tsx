@@ -8,7 +8,8 @@ import SectionTitle from '@/components/ui/SectionTitle';
 // Business-model section. Copy locked 2026-06-14 (recast for present-continuous, industry-scale,
 // non-self-congratulatory tone per founder critique). The company appears as the implementation the
 // market reaches for, not the hero of an origin story. Inline EN/ZH (matches PricingPreview pattern).
-// NVIDIA framed as "adopted" (docs + plugin), not "merged" — verified against ecosystem ground truth.
+// Adopter list = verified MERGED only (Microsoft, Cisco, MISP). NVIDIA garak PR is still open, so it
+// is NOT claimed as an adopter here — shown elsewhere as "PR open" to respect self-publication != adoption.
 
 type FlywheelCopy = {
   readonly overline: string;
@@ -27,7 +28,7 @@ const EN: FlywheelCopy = {
     {
       n: '01',
       title: 'The standard is spreading',
-      body: 'New agent attacks surface in the wild and become open ATR rules — MIT-licensed, growing roughly twice a day. Already adopted by Microsoft, Cisco, NVIDIA and MISP. The wider the agent world adopts it, the more it becomes the default way to describe an agent threat.',
+      body: 'New agent attacks surface in the wild and become open ATR rules — MIT-licensed, growing roughly twice a day. Already adopted by Microsoft, Cisco and MISP. The wider the agent world adopts it, the more it becomes the default way to describe an agent threat.',
     },
     {
       n: '02',

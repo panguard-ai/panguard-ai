@@ -389,7 +389,7 @@ export default function PricingContent() {
                         '自訂 ATR rule pack 試做',
                         'SIEM webhook 整合樣板',
                         'LLM 額度全包(crystallization + 規則 enrichment ~$200/月,我們吃 token 成本)',
-                        '偵測 0% 依賴 LLM——336 條 deterministic rules @ 97.1% recall',
+                        '偵測 0% 依賴 LLM——336 條 deterministic rules @ 98% recall',
                         '90 天後升級 Enterprise 或乾淨結束',
                         '可 credit 全額 $25K 到 Y1 Enterprise 年約',
                       ]
@@ -400,7 +400,7 @@ export default function PricingContent() {
                         'Custom ATR rule pack trial',
                         'SIEM webhook integration template',
                         'LLM credits included (crystallization + rule enrichment ~$200/mo, we eat the token cost)',
-                        'Detection runs 0% on LLM — 336 deterministic rules @ 97.1% recall',
+                        'Detection runs 0% on LLM — 336 deterministic rules @ 98% recall',
                         'Clean exit or upgrade to Enterprise at day 90',
                         'Full $25K credit to Y1 Enterprise contract on upgrade',
                       ]

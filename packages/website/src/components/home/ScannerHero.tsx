@@ -229,7 +229,7 @@ function ScannerHeroSkeleton() {
         </h1>
         <p className="text-base sm:text-lg text-text-secondary max-w-2xl mx-auto leading-relaxed">
           Open, MIT-licensed detection rules for attacks on AI agents — the CVE and Sigma of the agent
-          world. 650+ rules across 10 categories, already adopted by Microsoft, Cisco, NVIDIA and MISP.
+          world. 650+ rules across 10 categories, already adopted by Microsoft, Cisco and MISP.
         </p>
         <p className="text-sm font-medium text-panguard-green">
           Free forever · MIT-licensed · no account · runs as your own Threat Cloud sensor
