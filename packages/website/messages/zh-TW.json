@@ -995,7 +995,7 @@
   "pricing": {
     "overline": "開源",
     "title": "100% 免費。100% 開源。",
-    "subtitle": "MIT 授權。沒有付費牆、沒有分級、沒有限制。全功能免費。",
+    "subtitle": "MIT 授權。沒有付費牆、沒有功能限制、沒有用量上限。全功能免費。",
     "guarantee": "MIT 授權。完整原始碼公開於 GitHub。"
   },
   "earlyAccess": {
@@ -1389,7 +1389,7 @@
     },
     "tierNote": {
       "title": "100% 開源",
-      "desc": "Threat Cloud 隨每個 Panguard 安裝自動啟用。所有功能皆以 MIT 授權免費開源。沒有付費版，沒有功能限制。",
+      "desc": "Threat Cloud 隨每個 Panguard 安裝自動啟用。所有功能皆以 MIT 授權免費開源，沒有功能限制。（給受監管組織的選用付費服務列在定價頁。）",
       "freeLabel": "每次安裝",
       "freeDesc": "完整威脅情報、多端點管理、完整 API 存取",
       "paidLabel": "社群貢獻",
@@ -1564,12 +1564,6 @@
           "desc": "650+ ATR 偵測規則(開放標準)",
           "lang": "YAML / ATR",
           "stars": "社群"
-        },
-        {
-          "name": "panguard-docs",
-          "desc": "文件、API 參考、入門指南",
-          "lang": "MDX",
-          "stars": "文件"
         }
       ]
     },
@@ -1823,7 +1817,7 @@
     "hero": {
       "overline": "開源",
       "title": "100% 免費。100% 開源。",
-      "subtitle": "MIT 授權。沒有付費牆、沒有分級、沒有限制。所有功能。所有規則。所有工具。"
+      "subtitle": "MIT 授權。沒有付費牆、沒有功能限制、沒有用量上限。所有功能。所有規則。所有工具。"
     },
     "badge": "MIT 授權",
     "planName": "Panguard AI",
@@ -1839,7 +1833,7 @@
     "guarantee": "MIT 授權。完整原始碼公開於 GitHub。",
     "faq": {
       "faq1q": "Panguard 真的免費嗎？",
-      "faq1a": "是的，100% 免費。Panguard 是 MIT 開源軟體。所有功能 -- Guard、Threat Cloud、ATR 規則、Scan、Chat、MCP、Skill Auditor -- 完全免費，無機器數、掃描次數或功能限制。所有功能完全免費，無限制。沒有付費版，沒有付費牆。",
+      "faq1a": "是的，100% 免費。Panguard 是 MIT 開源軟體。所有功能 -- Guard、Threat Cloud、ATR 規則、Scan、Chat、MCP、Skill Auditor -- 完全免費，無機器數、掃描次數或功能限制，也沒有任何功能付費牆。（給受監管組織的選用代管服務列在定價頁，但永遠不會限制任何功能。）",
       "faq2q": "Panguard 如何維持運作？",
       "faq2a": "我們相信 AI Agent 安全應該是公共財，不是進階功能。Panguard 由社群驅動，透過贊助、補助和企業顧問合作維持運作。",
       "faq3q": "什麼算一台機器？",
@@ -6352,7 +6346,7 @@
       "title": "一般問題",
       "q1": {
         "q": "真的免費嗎？",
-        "a": "是的。100% 免費、開源、MIT 授權。沒有付費方案、沒有功能限制、沒有用量上限。\n\nScan、Guard、Skill Auditor、Threat Cloud、全部 650+ ATR 偵測規則-- 全部免費、全部開源。\n\n合規報告和蜜罐陷阱已內建，同樣免費。\n\n不需信用卡、不需註冊、不會看到「聯繫業務詢價」。"
+        "a": "是的——每一項 Panguard 產品功能都以 MIT 授權免費開源，沒有功能限制、沒有用量上限。\n\nScan、Guard、Skill Auditor、Threat Cloud、合規報告、蜜罐陷阱、全部 650+ ATR 偵測規則——全部免費、全部開源。安裝不需信用卡、不需註冊。\n\n付費的只有給受監管組織的選用服務：含 SLA 的代管支援、on-prem／離線部署協助，以及可供稽核的簽章合規證據（規模化）。這些是服務，永遠不會限制任何產品功能，開源產品永久免費。服務級距見定價頁。"
       },
       "q2": {
         "q": "誰在做這個？",

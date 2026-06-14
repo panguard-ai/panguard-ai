@@ -19,8 +19,8 @@ export async function generateMetadata(props: {
       ? 'ATR Benchmark 結果 — Garak, SKILL.md, PINT, Wild Scan'
       : 'ATR Benchmark Results — Garak, SKILL.md, PINT, Wild Scan',
     description: isZh
-      ? '419 條 ATR 規則在公開對抗式語料庫上的實測結果。Garak 97.1% recall, SKILL.md 100% recall + 97% precision, PINT 62.5% recall, Wild Scan 67,799 個 skill 中 1,096 個確認惡意。可重現方法、原始資料、Zenodo DOI。'
-      : 'Public benchmark results for 419 ATR rules against adversarial corpora. Garak 97.1% recall, SKILL.md 100% recall + 97% precision, PINT 62.5% recall, Wild Scan 1,096 confirmed malicious of 67,799 skills. Reproducible methodology, raw data, Zenodo DOI.',
+      ? '419 條 ATR 規則在公開對抗式語料庫上的實測結果。Garak 98% recall, SKILL.md 100% recall + 97% precision, PINT 62.5% recall, Wild Scan 67,799 個 skill 中 1,096 個確認惡意。可重現方法、原始資料、Zenodo DOI。'
+      : 'Public benchmark results for 419 ATR rules against adversarial corpora. Garak 98% recall, SKILL.md 100% recall + 97% precision, PINT 62.5% recall, Wild Scan 1,096 confirmed malicious of 67,799 skills. Reproducible methodology, raw data, Zenodo DOI.',
     alternates: buildAlternates('/research/benchmarks', params.locale),
   };
 }

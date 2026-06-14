@@ -153,7 +153,7 @@ export default function FAQContent() {
         <FadeInUp>
           <div className="flex justify-center mt-8 gap-4">
             <a
-              href="https://github.com/panguard-ai/panguard"
+              href="https://github.com/panguard-ai/panguard-ai"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 px-6 py-3 rounded-full text-sm font-semibold hover:bg-sage-light transition-colors"

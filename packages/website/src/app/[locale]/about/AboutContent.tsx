@@ -167,7 +167,7 @@ export default function AboutContent() {
           <FadeInUp delay={0.1}>
             <div className="flex flex-wrap justify-center gap-3">
               <a
-                href="https://github.com/panguard-ai/panguard"
+                href="https://github.com/panguard-ai/panguard-ai"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold rounded-full px-8 py-3.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"

@@ -995,14 +995,14 @@
   "pricing": {
     "overline": "Open Source",
     "title": "100% free. 100% open source.",
-    "subtitle": "MIT License. No paywalls, no tiers, no limits. Every feature included.",
+    "subtitle": "MIT License. No paywalls, no feature gates, no usage limits. Every feature included.",
     "guarantee": "MIT License. Full source code available on GitHub."
   },
   "pricingPage": {
     "hero": {
       "overline": "Open Source",
       "title": "100% free. 100% open source.",
-      "subtitle": "MIT License. No paywalls, no tiers, no limits. Every feature. Every rule. Every tool."
+      "subtitle": "MIT License. No paywalls, no feature gates, no usage limits. Every feature. Every rule. Every tool."
     },
     "badge": "MIT Licensed",
     "planName": "Panguard AI",
@@ -1018,7 +1018,7 @@
     "guarantee": "MIT License. Full source code available on GitHub.",
     "faq": {
       "faq1q": "Is Panguard really free?",
-      "faq1a": "Yes, 100%. Panguard is MIT open source. Every feature -- Guard, Threat Cloud, ATR rules, Scan, Chat, MCP, Skill Auditor -- is free with no limits on machines, scans, or features. Every feature is free with no limits. No paid tiers, no paywalls.",
+      "faq1a": "Yes, 100%. Panguard is MIT open source. Every feature -- Guard, Threat Cloud, ATR rules, Scan, Chat, MCP, Skill Auditor -- is free with no limits on machines, scans, or features, and no feature gating or paywall. (Optional managed services exist for regulated organizations -- see Pricing -- but they never gate a feature.)",
       "faq2q": "How does Panguard sustain itself?",
       "faq2a": "We believe AI agent security should be a public good, not a premium feature. Panguard is community-driven. We sustain through sponsorships, grants, and enterprise consulting partnerships.",
       "faq3q": "What counts as a machine?",
@@ -4890,7 +4890,7 @@
     },
     "tierNote": {
       "title": "100% Open Source",
-      "desc": "Threat Cloud activates automatically with every Panguard installation. Every feature is free and open source under MIT license. No paid tiers, no feature gates.",
+      "desc": "Threat Cloud activates automatically with every Panguard installation. Every feature is free and open source under the MIT license, with no feature gates. (Optional paid services for regulated organizations are listed on Pricing.)",
       "freeLabel": "Every Installation",
       "freeDesc": "Full threat intel feed, multi-endpoint management, complete API access",
       "paidLabel": "Community Contribution",
@@ -5065,12 +5065,6 @@
           "desc": "650+ ATR detection rules for AI agent security (the open standard)",
           "lang": "YAML / ATR",
           "stars": "Community"
-        },
-        {
-          "name": "panguard-docs",
-          "desc": "Documentation, API reference, and getting started guides",
-          "lang": "MDX",
-          "stars": "Docs"
         }
       ]
     },
@@ -6328,7 +6322,7 @@
       "title": "General",
       "q1": {
         "q": "Is it really free?",
-        "a": "Yes. 100% free, open source, MIT license. No paid tiers, no feature gating, no usage limits.\n\nScan, Guard, Skill Auditor, Threat Cloud, all 650+ ATR detection rules -- all free, all open source.\n\nCompliance Report and Honeypot Trap are included and free.\n\nNo credit card, no signup, no \"contact sales for pricing.\""
+        "a": "Yes -- every Panguard product feature is free and open source under the MIT license, with no feature gating and no usage limits.\n\nScan, Guard, Skill Auditor, Threat Cloud, the Compliance Report, the Honeypot Trap, and all 650+ ATR detection rules -- all free, all open source. No credit card or signup to install.\n\nWhat is paid is optional, and only for regulated organizations: managed support with an SLA, on-prem / airgap deployment help, and signed, auditor-ready compliance evidence at scale. These are services -- they never gate a product feature, and the open-source product stays free forever. See Pricing for the service tiers."
       },
       "q2": {
         "q": "Who builds this?",
