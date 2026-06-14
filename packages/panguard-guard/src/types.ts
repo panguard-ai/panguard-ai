@@ -80,6 +80,13 @@ export interface ThreatVerdict {
   conclusion: 'benign' | 'suspicious' | 'malicious';
   /** Confidence score 0-100 / 信心分數 */
   confidence: number;
+  /**
+   * Confidence from deterministic evidence only (excludes the advisory AI layer). Auto-enforcement
+   * uses this, so a bring-your-own LLM can never trigger a block on its own — it can only raise
+   * `confidence` to notify / flag-for-review. Falls back to `confidence` when unset.
+   * 僅由確定性證據計算;自動處置以此為準,自帶 LLM 永遠無法單獨觸發 block。
+   */
+  enforcementConfidence?: number;
   /** AI reasoning chain / AI 推理鏈 */
   reasoning: string;
   /** Supporting evidence / 支持判斷的證據 */
