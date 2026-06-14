@@ -21,8 +21,6 @@ import {
   spinner,
   setLogLevel,
   promptConfirm,
-  promptSelect,
-  promptText,
 } from '@panguard-ai/core';
 import type { StatusItem } from '@panguard-ai/core';
 import { GuardEngine } from '../guard-engine.js';
