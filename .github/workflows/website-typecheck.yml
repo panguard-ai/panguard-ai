@@ -22,6 +22,10 @@ jobs:
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+      - name: Build workspace packages
+        # website tsc resolves @panguard-ai/* via their built .d.ts; without this
+        # step tsc fails with TS2307 "Cannot find module" on workspace deps.
+        run: pnpm run build
       - name: TypeScript check
         run: pnpm --filter website exec tsc --noEmit
       - name: ESLint
