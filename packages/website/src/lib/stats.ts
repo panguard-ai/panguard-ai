@@ -27,18 +27,18 @@ export const STATS = {
   /** Synced from agent-threat-rules/stats.json by sync-atr-stats workflow */
   atrVersion: '3.1.1',
   /** ATR v2.2.x: stable + experimental total */
-  atrRules: 651,
+  atrRules: 652,
   atrStableRules: 359,
   atrExperimentalRules: 62,
   /** Community ATR rules from Threat Cloud flywheel (TC-side aggregation, separate from main repo) */
   atrCommunityRules: 93,
   /** Total unique detection patterns across all ATR rules (compiled from YAML) */
   atrPatterns: 920,
-  totalRules: 651,
+  totalRules: 652,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
-  totalRulesDisplay: '650+' as const,
+  totalRulesDisplay: '652' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '650+' as const,
+  atrRulesDisplay: '652' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,
@@ -267,7 +267,7 @@ export const STATS = {
    * Website components should always prefer fetchLiveMetrics() for real-time data.
    * Update these periodically to keep fallbacks reasonable.
    */
-  lastUpdated: '2026-06-14T00:00:00.000Z',
+  lastUpdated: '2026-06-01T05:01:56.657Z',
 } as const;
 
 export type Stats = typeof STATS;
