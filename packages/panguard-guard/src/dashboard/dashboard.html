@@ -921,8 +921,8 @@
             style="font-size: 13px; color: var(--text-muted); line-height: 1.6"
             id="hero-desc"
           >
-            Pattern matching and heuristic correlation run on every event. The semantic layer is
-            optional and stays off until you connect one.
+            Every event runs through deterministic pattern matching and heuristic correlation.
+            No LLM, no cloud calls — nothing leaves your machine.
           </div>
         </div>
 
@@ -947,24 +947,19 @@
           <h3>
             <span class="dot dot-ok"></span> <span data-i18n="layer_title">Detection Layers</span>
           </h3>
-          <div class="desc" data-i18n="layer_desc">
-            Pattern matching and heuristic correlation run on every event. The optional semantic
-            layer adds LLM reasoning only when you connect one — it stays off until you opt in.
+          <div class="desc">
+            Two deterministic layers run on every event. No LLM, no cloud calls — detection stays
+            fully on-device and reproducible.
           </div>
           <div class="layer-row">
-            <span class="layer-label">Layer A &mdash; Pattern match</span>
+            <span class="layer-label">Layer A &mdash; Pattern match (ATR rules)</span>
             <div class="layer-bar"><div class="layer-fill on" id="la-bar"></div></div>
-            <span class="layer-status on" id="la-st" data-i18n="active">Active</span>
+            <span class="layer-status on" id="la-st">Active</span>
           </div>
           <div class="layer-row">
             <span class="layer-label">Layer B &mdash; Heuristic correlation</span>
             <div class="layer-bar"><div class="layer-fill on" id="lb-bar"></div></div>
-            <span class="layer-status on" id="lb-st" data-i18n="active">Active</span>
-          </div>
-          <div class="layer-row">
-            <span class="layer-label">Layer C &mdash; Semantic verdict (optional)</span>
-            <div class="layer-bar"><div class="layer-fill" id="lc-bar"></div></div>
-            <span class="layer-status" id="lc-st" data-i18n="layer_optin">Opt-in</span>
+            <span class="layer-status on" id="lb-st">Active</span>
           </div>
         </div>
 
