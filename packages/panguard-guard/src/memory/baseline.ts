@@ -74,9 +74,7 @@ export function checkDeviation(
           isDeviation: true,
           deviationType: 'new_process',
           confidence,
-          description:
-            `New process detected: ${processName} (not in baseline) / ` +
-            `偵測到新程序: ${processName} (不在基線中)`,
+          description: `New process detected: ${processName} (not in baseline)`,
         };
       }
     }
@@ -98,9 +96,7 @@ export function checkDeviation(
           isDeviation: true,
           deviationType: 'new_network_dest',
           confidence,
-          description:
-            `New network destination: ${remoteAddr} (not in baseline) / ` +
-            `偵測到新網路目的地: ${remoteAddr} (不在基線中)`,
+          description: `New network destination: ${remoteAddr} (not in baseline)`,
         };
       }
     }
@@ -121,9 +117,7 @@ export function checkDeviation(
         isDeviation: true,
         deviationType: 'new_user',
         confidence,
-        description:
-          `New user activity: ${username} (not in baseline) / ` +
-          `偵測到新使用者活動: ${username} (不在基線中)`,
+        description: `New user activity: ${username} (not in baseline)`,
       };
     }
   }
@@ -133,7 +127,7 @@ export function checkDeviation(
     isDeviation: false,
     deviationType: 'none',
     confidence: 0,
-    description: 'Event within normal baseline parameters / 事件在正常基線參數範圍內',
+    description: 'Event within normal baseline parameters',
   };
 }
 

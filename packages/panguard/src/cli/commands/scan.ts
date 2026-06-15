@@ -42,6 +42,48 @@ function remoteSystem(openPorts: number): ScanOutputSystem {
   };
 }
 
+/**
+ * Resolve the ATR scanner CLI that PanGuard bundles as a dependency
+ * (agent-threat-rules). `pga scan` must run the ruleset PanGuard actually
+ * ships — never a stale global `atr` on $PATH nor a network `npx ...@latest`,
+ * which silently scan with a different (often older) rule count.
+ *
+ * Returns the absolute cli.js path, or null if it cannot be resolved (the
+ * caller then falls back to PATH/npx as a last resort).
+ */
+async function resolveBundledAtrCli(): Promise<string | null> {
+  try {
+    const { fileURLToPath } = await import('node:url');
+    const { dirname, join } = await import('node:path');
+    const { existsSync, readFileSync } = await import('node:fs');
+    // agent-threat-rules is ESM-only with an `exports` map that blocks
+    // require.resolve('agent-threat-rules/package.json'), so walk the directory
+    // tree from this module and find node_modules/agent-threat-rules on disk —
+    // exports-immune, and finds the bundled copy whether nested or hoisted.
+    let dir = dirname(fileURLToPath(import.meta.url));
+    for (let i = 0; i < 12; i++) {
+      const cand = join(dir, 'node_modules', 'agent-threat-rules');
+      const pkgPath = join(cand, 'package.json');
+      if (existsSync(pkgPath)) {
+        const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8')) as {
+          bin?: string | Record<string, string>;
+        };
+        const binRel =
+          typeof pkg.bin === 'string'
+            ? pkg.bin
+            : (pkg.bin?.['atr'] ?? pkg.bin?.['agent-threat-rules']);
+        if (binRel && existsSync(join(cand, binRel))) return join(cand, binRel);
+      }
+      const parent = dirname(dir);
+      if (parent === dir) break;
+      dir = parent;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export function scanCommand(): Command {
   return new Command('scan')
     .description('Scan skills for threats, or run a system security scan')
@@ -98,12 +140,16 @@ export function scanCommand(): Command {
 
           console.log(`\n  Scanning ${skills.length} installed skill(s)...\n`);
 
-          // Detect ATR binary once before the loop
+          // Resolve the BUNDLED ATR scanner once (the ruleset PanGuard ships),
+          // not a stale global `atr` on $PATH or npx@latest.
+          const bundledAtr = await resolveBundledAtrCli();
           let useNpx = false;
-          try {
-            execFileSync('atr', ['--version'], { stdio: 'pipe', timeout: 5000 });
-          } catch {
-            useNpx = true;
+          if (!bundledAtr) {
+            try {
+              execFileSync('atr', ['--version'], { stdio: 'pipe', timeout: 5000 });
+            } catch {
+              useNpx = true;
+            }
           }
 
           let threats = 0;
@@ -112,22 +158,17 @@ export function scanCommand(): Command {
           for (const skill of skills) {
             const skillPath = join(skillsDir, skill.name);
             try {
-              const atrBin = useNpx ? 'npx' : 'atr';
-              const atrArgs = useNpx
-                ? [
-                    '-y',
-                    'agent-threat-rules@latest',
-                    'scan',
-                    skillPath,
-                    '--severity',
-                    options.severity,
-                    '--json',
-                  ]
-                : ['scan', skillPath, '--severity', options.severity, '--json'];
+              const atrBin = bundledAtr ? process.execPath : useNpx ? 'npx' : 'atr';
+              const baseArgs = ['scan', skillPath, '--severity', options.severity, '--json'];
+              const atrArgs = bundledAtr
+                ? [bundledAtr, ...baseArgs]
+                : useNpx
+                  ? ['-y', 'agent-threat-rules@latest', ...baseArgs]
+                  : baseArgs;
 
               const result = execFileSync(atrBin, atrArgs, {
                 stdio: ['inherit', 'pipe', 'pipe'],
-                timeout: useNpx ? 90_000 : 30_000,
+                timeout: bundledAtr || !useNpx ? 30_000 : 90_000,
               });
               const parsed = JSON.parse(result.toString()) as { findings?: unknown[] };
               if (parsed.findings && parsed.findings.length > 0) {
@@ -187,22 +228,29 @@ export function scanCommand(): Command {
             if (options.sarif) atrArgs.push('--sarif');
             else if (options.json) atrArgs.push('--json');
 
-            // Find ATR binary: check if `atr` is on PATH, else use npx
+            // Run the BUNDLED ATR scanner (the ruleset PanGuard actually ships),
+            // not a stale global `atr` on $PATH or a network npx@latest.
             let atrBin: string;
-            const { execFileSync: efs } = await import('node:child_process');
-            let atrOnPath = false;
-            try {
-              efs('atr', ['--version'], { stdio: 'pipe', timeout: 5000 });
-              atrOnPath = true;
-            } catch {
-              /* not installed */
-            }
-
-            if (atrOnPath) {
-              atrBin = 'atr';
+            const bundledAtr = await resolveBundledAtrCli();
+            if (bundledAtr) {
+              atrBin = process.execPath;
+              atrArgs.unshift(bundledAtr);
             } else {
-              atrBin = 'npx';
-              atrArgs.unshift('-y', 'agent-threat-rules@latest');
+              // Last resort only if the bundled dependency cannot be resolved.
+              const { execFileSync: efs } = await import('node:child_process');
+              let atrOnPath = false;
+              try {
+                efs('atr', ['--version'], { stdio: 'pipe', timeout: 5000 });
+                atrOnPath = true;
+              } catch {
+                /* not installed */
+              }
+              if (atrOnPath) {
+                atrBin = 'atr';
+              } else {
+                atrBin = 'npx';
+                atrArgs.unshift('-y', 'agent-threat-rules@latest');
+              }
             }
 
             // Pass TC client key (provisioned by `pga up`) to ATR via env var.

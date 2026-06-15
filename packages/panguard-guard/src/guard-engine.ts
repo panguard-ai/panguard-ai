@@ -233,7 +233,8 @@ export class GuardEngine {
       this.config
     );
 
-    // Periodic Threat Cloud sync (every hour) + initial sync (await on startup)
+    // Periodic Threat Cloud rule sync (every 5 minutes) + initial sync (awaited
+    // on startup) — pulls new ATR rules from Threat Cloud and applies them live.
     const syncDeps = {
       atrEngine: this.engines.atrEngine,
       threatCloud: this.engines.threatCloud,
