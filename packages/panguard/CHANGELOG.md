@@ -2,7 +2,7 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
-## [Unreleased] - GA prep (2026-06-14)
+## [1.6.0] - 2026-06-15
 
 ### Security
 

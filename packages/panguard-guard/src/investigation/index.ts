@@ -189,8 +189,8 @@ export class InvestigationEngine {
    */
   async createPlanWithLLM(event: SecurityEvent): Promise<InvestigationPlan> {
     if (!this.llm) {
-      logger.warn('No LLM provider configured, returning empty plan / 未配置 LLM 供應商');
-      return { steps: [], reasoning: 'No LLM provider available / 無 LLM 供應商可用' };
+      logger.warn('No LLM provider configured, returning empty plan');
+      return { steps: [], reasoning: 'No LLM provider available' };
     }
 
     // Lazy-initialize the LLM planner / 延遲初始化 LLM 規劃器
@@ -204,7 +204,7 @@ export class InvestigationEngine {
       if (steps.length === 0) {
         return {
           steps: [],
-          reasoning: 'LLM returned no investigation steps / LLM 未回傳調查步驟',
+          reasoning: 'LLM returned no investigation steps',
         };
       }
 
