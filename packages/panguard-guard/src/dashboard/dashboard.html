@@ -1433,6 +1433,36 @@
           </div>
         </div>
 
+        <div class="fs">
+          <h3>Alert Channels</h3>
+          <div class="desc">
+            Where Guard sends an alert when a threat fires. Configured with
+            <code>pga config</code> / <code>~/.panguard-guard/config.json</code> — secrets are never
+            shown or set from this dashboard.
+          </div>
+          <div
+            id="st-notify-list"
+            style="display: flex; flex-direction: column; gap: 6px; font-size: 13px"
+          ></div>
+        </div>
+
+        <div class="fs">
+          <h3>
+            Enforcement Policy
+            <span style="font-weight: 400; color: var(--text-muted); font-size: 12px"
+              >&mdash; what Protection mode is allowed to do</span
+            >
+          </h3>
+          <div class="desc">
+            In Protection mode, only the responses armed below run automatically. Configure under
+            <code>enforcementPolicy</code> in <code>~/.panguard-guard/config.json</code>.
+          </div>
+          <div
+            id="st-enforce-list"
+            style="display: flex; flex-direction: column; gap: 6px; font-size: 13px"
+          ></div>
+        </div>
+
         <div style="display: flex; gap: 10px; margin-top: 8px">
           <button class="btn btn-primary" id="btn-save">Save</button>
           <button class="btn btn-secondary" id="btn-reload">Reload</button>
@@ -2260,6 +2290,74 @@
         selectedMode = m;
         renderModeSeg();
       }
+      /* Read-only alert-channel status. The dashboard never sets channel secrets
+         over HTTP (that was removed as an exfil surface); it only shows whether
+         each channel is configured + points to the CLI/config path. */
+      function renderNotifyChannels(n) {
+        var el = document.getElementById('st-notify-list');
+        if (!el) return;
+        var chans = [
+          ['email', 'Email'],
+          ['slack', 'Slack'],
+          ['telegram', 'Telegram'],
+          ['line', 'LINE'],
+          ['webhook', 'Webhook'],
+        ];
+        var anyOn = false;
+        el.innerHTML = chans
+          .map(function (c) {
+            var on = !!n[c[0]];
+            if (on) anyOn = true;
+            return (
+              '<div>' +
+              esc(c[1]) +
+              ': ' +
+              (on
+                ? '<span style="color:var(--ok)">configured</span>'
+                : '<span style="color:var(--text-muted)">not configured</span>') +
+              '</div>'
+            );
+          })
+          .join('');
+        if (!anyOn) {
+          el.innerHTML +=
+            '<div style="color:var(--text-muted);margin-top:4px">No alert channel set — ' +
+            'a fired threat is recorded in this dashboard but not pushed anywhere.</div>';
+        }
+      }
+      /* Read-only enforcement-policy (Protection-mode blast radius). Shows which
+         automatic destructive responses are armed, so enabling Protection is not
+         a black box. Configured in config.json, not here. */
+      function renderEnforcement(p) {
+        var el = document.getElementById('st-enforce-list');
+        if (!el) return;
+        if (!p) {
+          el.innerHTML =
+            '<div style="color:var(--text-muted)">Default — detections are logged and you are ' +
+            'notified; no automatic destructive action is taken.</div>';
+          return;
+        }
+        var acts = [
+          ['blockIPs', 'Block attacker IPs'],
+          ['killProcesses', 'Kill malicious processes'],
+          ['isolateFiles', 'Isolate / quarantine files'],
+          ['disableAccounts', 'Disable accounts'],
+        ];
+        el.innerHTML = acts
+          .map(function (a) {
+            var on = p[a[0]] && p[a[0]].enabled;
+            return (
+              '<div>' +
+              (on
+                ? '<span style="color:var(--danger)">● armed</span>'
+                : '<span style="color:var(--text-muted)">○ off</span>') +
+              ' &mdash; ' +
+              esc(a[1]) +
+              '</div>'
+            );
+          })
+          .join('');
+      }
       function loadSettings() {
         af('/api/config')
           .then(function (r) {
@@ -2281,6 +2379,8 @@
             // a hard-coded fallback that can be flat wrong.
             var port = document.getElementById('st-port');
             if (port) port.textContent = cfg.dashboardPort || location.port || '3100';
+            renderNotifyChannels(cfg.notifications || {});
+            renderEnforcement(cfg.enforcementPolicy);
           })
           .catch(function () {
             /* ignore */
