@@ -4,8 +4,9 @@
  * Flow: scan installed skills → warn about threats → start Guard → open dashboard
  */
 
-import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { homedir, platform } from 'node:os';
 import { execFile } from 'node:child_process';
 import { Command } from 'commander';
@@ -50,11 +51,16 @@ function isGuardRunning(): boolean {
 }
 
 /**
- * Read the real rule count loaded by Guard from its TC cache.
- * Falls back to 311 (the @panguard-ai/agent-threat-rules@2.0.12 bundled count)
- * if the cache hasn't synced yet or is malformed.
+ * Read the real rule count loaded by Guard from its TC cache, falling back to
+ * the count actually bundled with THIS install (never a hardcoded guess — the
+ * ATR rule count changes daily, so we read it from the shipped package).
  */
 function readRuleCountFromCache(): number {
+  // The Guard always loads the rules BUNDLED with this install; Threat Cloud
+  // sync can only ADD more on top. So the honest "active" count is at least the
+  // bundled count — never the (often smaller) TC cache figure alone, which would
+  // understate what the engine is really running and disagree with the dashboard.
+  const bundled = readBundledRuleCount();
   try {
     const cachePath = join(homedir(), '.panguard-guard', 'threat-cloud-cache.json');
     if (existsSync(cachePath)) {
@@ -62,13 +68,70 @@ function readRuleCountFromCache(): number {
         uniqueRulesCount?: number;
       };
       if (typeof cache.uniqueRulesCount === 'number' && cache.uniqueRulesCount > 0) {
-        return cache.uniqueRulesCount;
+        return Math.max(bundled, cache.uniqueRulesCount);
       }
     }
   } catch {
-    /* fallback */
+    /* fall through to the bundled count */
   }
-  return 311;
+  return bundled;
+}
+
+/**
+ * Count the detection rules actually bundled with this install by reading the
+ * shipped agent-threat-rules package (stats.json if present, else counting the
+ * rule YAML files). Returns 0 if it cannot be determined so the caller can omit
+ * the line rather than print a wrong number.
+ */
+function readBundledRuleCount(): number {
+  try {
+    const pkgDir = resolveBundledAtrDir();
+    if (!pkgDir) return 0;
+    const statsPath = join(pkgDir, 'data', 'stats.json');
+    if (existsSync(statsPath)) {
+      const stats = JSON.parse(readFileSync(statsPath, 'utf-8')) as {
+        rules?: { total?: number };
+      };
+      if (typeof stats.rules?.total === 'number' && stats.rules.total > 0) {
+        return stats.rules.total;
+      }
+    }
+    // Fallback: count rule YAML files on disk
+    const rulesDir = join(pkgDir, 'rules');
+    let count = 0;
+    const walk = (dir: string): void => {
+      for (const entry of readdirSync(dir)) {
+        const full = join(dir, entry);
+        if (statSync(full).isDirectory()) walk(full);
+        else if (entry.endsWith('.yaml') || entry.endsWith('.yml')) count++;
+      }
+    };
+    if (existsSync(rulesDir)) walk(rulesDir);
+    return count;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * Locate the bundled agent-threat-rules package directory by walking up the
+ * module tree (filesystem lookup, immune to the package's ESM `exports` map
+ * which blocks require.resolve of its package.json).
+ */
+function resolveBundledAtrDir(): string | null {
+  try {
+    let dir = dirname(fileURLToPath(import.meta.url));
+    for (let i = 0; i < 12; i++) {
+      const cand = join(dir, 'node_modules', 'agent-threat-rules');
+      if (existsSync(join(cand, 'package.json'))) return cand;
+      const parent = dirname(dir);
+      if (parent === dir) break;
+      dir = parent;
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -155,20 +218,21 @@ export function upCommand(): Command {
           }
         }
 
-        // ── Step 1: Detect platforms + inject proxy ─────────────
+        // ── Step 1: Detect AI platforms (we SCAN before deploying) ──
         let platformCount = 0;
         let serverCount = 0;
         let threatCount = 0;
+        type DetectFn = () => Promise<Array<{ id: string; name: string; detected: boolean }>>;
+        type InjectFn = (ids: readonly string[]) => {
+          totalPlatforms: number;
+          totalServersProxied: number;
+          results: ReadonlyArray<{ platformId: string; serversProxied: number; error?: string }>;
+        };
+        // Captured during detection, used to inject AFTER the scan completes.
+        let detectedPlatforms: Array<{ id: string; name: string; detected: boolean }> = [];
+        let injectProxyFn: InjectFn | null = null;
         try {
-          type DetectFn = () => Promise<Array<{ id: string; name: string; detected: boolean }>>;
-          type InjectFn = (ids: readonly string[]) => {
-            totalPlatforms: number;
-            totalServersProxied: number;
-            results: ReadonlyArray<{ platformId: string; serversProxied: number; error?: string }>;
-          };
           let detectPlatforms: DetectFn;
-          let injectProxyFn: InjectFn;
-
           try {
             // Published package: import from /config subpath
             const mcp = (await import('@panguard-ai/panguard-mcp/config' as string)) as {
@@ -194,62 +258,13 @@ export function upCommand(): Command {
             `  ${shield()} ${c.bold(t(lang, 'Looking at your setup...', '看看你的環境...'))}\n`
           );
           const platforms = await detectPlatforms();
-          const detected = platforms.filter((p) => p.detected);
+          detectedPlatforms = platforms.filter((p) => p.detected);
 
-          for (const p of detected) {
+          for (const p of detectedPlatforms) {
             console.log(`    ${ok()} ${c.safe(p.name)}  ${c.dim(t(lang, 'found', '已找到'))}`);
           }
-          if (detected.length === 0) {
+          if (detectedPlatforms.length === 0) {
             console.log(`    ${c.dim(t(lang, 'No AI tools found yet.', '尚未找到 AI 工具。'))}`);
-          }
-
-          // Build runtime protection by DEFAULT. `pga up` should stand up
-          // protection out of the box; --no-proxy opts out (scan only). In an
-          // interactive TTY we still confirm, but the prompt defaults to YES so
-          // the common path (just run `pga up`) actually protects. Non-TTY
-          // (CI / unattended) injects by default too — configs are backed up.
-          if (detected.length > 0) {
-            let shouldInject = opts.proxy !== false;
-            if (shouldInject && !opts.yes && process.stdin.isTTY) {
-              const { createInterface } = await import('node:readline');
-              const rl = createInterface({ input: process.stdin, output: process.stdout });
-              const answer = await new Promise<string>((resolve) => {
-                rl.question(
-                  `\n  Inject runtime protection into ${detected.length} platform(s)? ` +
-                    `${c.dim('(configs backed up to *.bak)')} [Y/n] `,
-                  resolve
-                );
-              });
-              rl.close();
-              shouldInject = answer.trim().toLowerCase() !== 'n';
-            }
-
-            if (!shouldInject) {
-              console.log(
-                `\n    ${c.dim('Scan only — runtime protection not injected (--no-proxy).')}`
-              );
-            } else {
-              console.log(`\n  ${shield()} ${c.bold('Watching your agents...')}\n`);
-              const proxySummary = injectProxyFn(detected.map((p) => p.id));
-              platformCount = proxySummary.totalPlatforms;
-              serverCount = proxySummary.totalServersProxied;
-
-              if (serverCount > 0) {
-                console.log(
-                  `    ${c.safe(`${serverCount} MCP server(s)`)} proxied across ${c.sage(`${platformCount} platform(s)`)}`
-                );
-                console.log(`    ${c.dim('Config backed up to *.bak files')}`);
-              } else {
-                console.log(`    ${c.dim('All detected tools are already protected.')}`);
-              }
-
-              // Show errors if any
-              for (const r of proxySummary.results) {
-                if (r.error) {
-                  console.log(`    ${c.critical(`${r.platformId}: ${r.error}`)}`);
-                }
-              }
-            }
           }
           console.log();
         } catch {
@@ -258,13 +273,7 @@ export function upCommand(): Command {
           );
         }
 
-        // ── Step 2: Open dashboard ──────────────────────────────
-        if (opts.dashboard) {
-          console.log(`  ${c.sage(`Opening dashboard: ${DASHBOARD_URL}`)}\n`);
-          openBrowser(DASHBOARD_URL);
-        }
-
-        // ── Step 3: Scan installed skills ────────────────────────
+        // ── Step 2: Scan installed skills (BEFORE deploying protection) ──
         if (!opts.skipScan) {
           console.log(
             `\n  ${arrow()} ${c.bold(t(lang, 'Scanning installed skills...', '掃描已安裝技能...'))}\n`
@@ -439,6 +448,56 @@ export function upCommand(): Command {
           }
         }
 
+        // ── Step 3: Deploy runtime protection (AFTER the scan) ──
+        // Build runtime protection by DEFAULT. `pga up` should stand up
+        // protection out of the box; --no-proxy opts out (scan only). In an
+        // interactive TTY we confirm, but the prompt defaults to YES so the
+        // common path (just run `pga up`) actually protects. Non-TTY
+        // (CI / unattended) injects by default too — configs are backed up.
+        if (detectedPlatforms.length > 0 && injectProxyFn) {
+          let shouldInject = opts.proxy !== false;
+          if (shouldInject && !opts.yes && process.stdin.isTTY) {
+            const { createInterface } = await import('node:readline');
+            const rl = createInterface({ input: process.stdin, output: process.stdout });
+            const answer = await new Promise<string>((resolve) => {
+              rl.question(
+                `\n  Inject runtime protection into ${detectedPlatforms.length} platform(s)? ` +
+                  `${c.dim('(configs backed up to *.bak)')} [Y/n] `,
+                resolve
+              );
+            });
+            rl.close();
+            shouldInject = answer.trim().toLowerCase() !== 'n';
+          }
+
+          if (!shouldInject) {
+            console.log(
+              `\n    ${c.dim('Scan only — runtime protection not injected (--no-proxy).')}`
+            );
+          } else {
+            console.log(`\n  ${shield()} ${c.bold('Watching your agents...')}\n`);
+            const proxySummary = injectProxyFn(detectedPlatforms.map((p) => p.id));
+            platformCount = proxySummary.totalPlatforms;
+            serverCount = proxySummary.totalServersProxied;
+
+            if (serverCount > 0) {
+              console.log(
+                `    ${c.safe(`${serverCount} MCP server(s)`)} proxied across ${c.sage(`${platformCount} platform(s)`)}`
+              );
+              console.log(`    ${c.dim('Config backed up to *.bak files')}`);
+            } else {
+              console.log(`    ${c.dim('All detected tools are already protected.')}`);
+            }
+
+            for (const r of proxySummary.results) {
+              if (r.error) {
+                console.log(`    ${c.critical(`${r.platformId}: ${r.error}`)}`);
+              }
+            }
+          }
+          console.log();
+        }
+
         // ── Activation tracking (one-time, respects telemetry opt-out) ──
         const telemetryDisabled = (() => {
           try {
@@ -475,6 +534,12 @@ export function upCommand(): Command {
               `  ${c.caution('Guard start failed:')} ${err instanceof Error ? err.message : String(err)}\n`
             );
           }
+        }
+
+        // ── Open dashboard (after Guard is up so the server is listening) ──
+        if (opts.dashboard) {
+          console.log(`\n  ${c.sage(`Opening dashboard: ${DASHBOARD_URL}`)}\n`);
+          openBrowser(DASHBOARD_URL);
         }
 
         // ── Read rule count + TC status ──────────

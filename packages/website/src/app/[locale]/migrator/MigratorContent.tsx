@@ -404,11 +404,11 @@ export default function MigratorContent() {
         </div>
         <FadeInUp>
           <p className="text-center text-text-muted text-sm mt-10 max-w-3xl mx-auto leading-relaxed">
-            Pricing reflects scope: this is a{' '}
-            <strong className="text-text-primary">$50&ndash;150K detection-evidence module</strong>,
-            not a turnkey EU AI Act compliance package. The pack&rsquo;s value is collapsing 6
-            months of detection-engineering consulting into 1 week of setup &mdash; not replacing
-            the legal/compliance dossier itself.
+            Pricing reflects scope: this is a focused{' '}
+            <strong className="text-text-primary">detection-evidence module</strong> (sales-led
+            pricing &mdash; contact us), not a turnkey EU AI Act compliance package. The
+            pack&rsquo;s value is collapsing 6 months of detection-engineering consulting into 1
+            week of setup &mdash; not replacing the legal/compliance dossier itself.
           </p>
         </FadeInUp>
       </SectionWrapper>
@@ -537,10 +537,12 @@ export default function MigratorContent() {
                 {isZh ? 'Standalone · 年約' : 'Standalone · annual'}
               </p>
               <div className="flex items-baseline gap-2 mb-1">
-                <span className="text-3xl font-extrabold text-text-primary">$500K&ndash;2M</span>
+                <span className="text-3xl font-extrabold text-text-primary">
+                  {isZh ? '洽詢定價' : 'Contact us'}
+                </span>
               </div>
               <p className="text-[10px] text-text-muted mb-3">
-                {isZh ? '目標區間 $750K – $1.5M' : 'target $750K–$1.5M'}
+                {isZh ? '業務洽談定價' : 'sales-led pricing'}
               </p>
               <p className="text-[13px] text-text-secondary leading-[1.85] mb-3 flex-1">
                 {isZh
@@ -563,7 +565,9 @@ export default function MigratorContent() {
                 {isZh ? 'Sovereign · 多年合約' : 'Sovereign · multi-year'}
               </p>
               <div className="flex items-baseline gap-2 mb-1">
-                <span className="text-3xl font-extrabold text-text-primary">$3&ndash;10M</span>
+                <span className="text-3xl font-extrabold text-text-primary">
+                  {isZh ? '洽詢定價' : 'Contact us'}
+                </span>
               </div>
               <p className="text-[10px] text-text-muted mb-3">
                 {isZh ? '多年期國家合約' : 'multi-year national contract'}
@@ -593,8 +597,8 @@ export default function MigratorContent() {
             </p>
             <p className="text-sm text-text-secondary leading-[1.85]">
               {isZh
-                ? 'Migrator Pro 已內建於 PanGuard Enterprise 方案（年費 $150K 起，目標 $250K – $1M，上限 $3M+）。Standalone 與 Sovereign 兩種 tier 是為「只想採用 Migrator、暫不導入完整 runtime」的客戶所設。'
-                : 'Migrator Pro is bundled inside PanGuard Enterprise ($150K floor · target $250K–$1M · up to $3M+). The Standalone and Sovereign tiers are for customers who want Migrator without the full runtime.'}
+                ? 'Migrator Pro 已內建於 PanGuard Enterprise 方案（業務洽談定價）。Standalone 與 Sovereign 兩種 tier 是為「只想採用 Migrator、暫不導入完整 runtime」的客戶所設。'
+                : 'Migrator Pro is bundled inside PanGuard Enterprise (sales-led pricing). The Standalone and Sovereign tiers are for customers who want Migrator without the full runtime.'}
             </p>
             <Link
               href="/pricing"
