@@ -1240,8 +1240,11 @@
       <div class="pg" id="p-tcloud">
         <div class="pt"><em data-i18n="t_tc">Threat Cloud</em></div>
         <div class="pd" data-i18n="d_tc">
-          Threat Cloud is PanGuard's anonymous threat intelligence sharing network. Your endpoint
-          can upload anonymized threat patterns and receive updated detection rules in return.
+          Threat Cloud is PanGuard's anonymous threat-intelligence network. Your endpoint uploads
+          anonymized threat patterns (no code, no file contents). New detection rules ship in the
+          open ATR package — Guard checks once a day and tells you when an upgrade is available. It
+          never auto-pulls rule logic from the network, so a compromised relay can't change what
+          your engine enforces.
         </div>
 
         <div id="tc-loading" class="empty">
@@ -1291,9 +1294,11 @@
 
           <div class="st" data-i18n="tc_flywheel">Flywheel</div>
           <div class="flywheel" id="tc-flywheel">
-            <strong>Your endpoint</strong> detects threats &rarr;
-            <strong>Threat Cloud</strong> aggregates them anonymously &rarr;
-            <strong>Community</strong> rules sync back to every endpoint, hourly.
+            <strong>Your endpoint</strong> detects a threat &rarr;
+            <strong>Threat Cloud</strong> aggregates it anonymously &rarr;
+            it strengthens the open <strong>ATR</strong> ruleset &rarr;
+            you get the improvements through <strong>pga upgrade</strong> (a daily check flags when
+            new rules are out).
           </div>
 
           <div class="fs" style="margin-top: 20px">
