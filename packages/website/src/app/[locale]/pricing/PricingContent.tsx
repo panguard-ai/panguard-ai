@@ -375,8 +375,8 @@ export default function PricingContent() {
               </p>
               <p className="text-sm text-text-secondary leading-[1.85]">
                 {isZh
-                  ? 'F500 採購流程前的試水合約。IT Director 層級可審核通過，不需要進到 CFO 議程。試點結束後可全額抵入 Y1 Enterprise 年約。$25K 僅前 3 個 Founding Customer 適用,第 4 個起 Enterprise $250K 起跳 (sales-led)。'
-                  : 'A pre-procurement pilot contract for F500. IT Director can approve without reaching CFO. The full $25K credits toward Y1 Enterprise. $25K applies to the first 3 Founding Customers only — after that, all engagements move to Enterprise $250K base (sales-led).'}
+                  ? 'F500 採購流程前的試水合約。IT Director 層級可審核通過，不需要進到 CFO 議程。試點結束後可全額抵入 Y1 Enterprise 年約。$25K 僅前 3 個 Founding Customer 適用,第 4 個起轉 Enterprise(業務洽談定價)。'
+                  : 'A pre-procurement pilot contract for F500. IT Director can approve without reaching CFO. The full $25K credits toward Y1 Enterprise. $25K applies to the first 3 Founding Customers only — after that, all engagements move to Enterprise (sales-led pricing).'}
               </p>
 
               <div className="my-7 flex-1">
@@ -625,8 +625,8 @@ export default function PricingContent() {
             </p>
             <p className="text-sm text-text-secondary leading-[1.85]">
               {isZh
-                ? '首 5 家 F500 Enterprise 客戶可鎖定 $100K × 2 年的創始價（標準定價區間為 $250K–$350K），交換條件為公開 logo 與 case study 授權。第 6 家起恢復標準定價。'
-                : 'The first 5 F500 Enterprise customers can lock the founding rate of $100K × 2 years (versus the standard $250K–$350K range), in exchange for public logo and case study rights. Standard pricing resumes from customer six onwards.'}
+                ? '首 5 家 F500 Enterprise 客戶可鎖定創始價（業務洽談定價），交換條件為公開 logo 與 case study 授權。第 6 家起恢復標準定價。'
+                : 'The first 5 F500 Enterprise customers can lock a founding rate (contact us for pricing), in exchange for public logo and case study rights. Standard pricing resumes from customer six onwards.'}
             </p>
           </div>
         </FadeInUp>
@@ -949,7 +949,9 @@ export default function PricingContent() {
                   {isZh ? 'Path 3 · 商業合約落地' : 'Path 3 · Commercial Reference Deployment'}
                 </p>
                 <div className="flex items-baseline gap-2 mb-3">
-                  <span className="text-3xl font-extrabold text-text-primary">$5–20M</span>
+                  <span className="text-3xl font-extrabold text-text-primary">
+                    {isZh ? '洽詢定價' : 'Contact us'}
+                  </span>
                   <span className="text-xs text-text-muted">
                     {isZh ? '/ 多年合約' : '/ multi-year'}
                   </span>
@@ -1041,7 +1043,9 @@ export default function PricingContent() {
                   <span className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage">
                     {isZh ? 'Path 3 · 商業合約' : 'Path 3 · Commercial'}
                   </span>
-                  <span className="text-sm font-semibold text-text-primary">$5–20M</span>
+                  <span className="text-sm font-semibold text-text-primary">
+                    {isZh ? '洽詢定價' : 'Contact us'}
+                  </span>
                   <span className="text-[11px] text-text-muted">
                     {isZh ? '多年期 reference' : 'Multi-year reference'}
                   </span>
@@ -1076,7 +1080,9 @@ export default function PricingContent() {
                   {isZh ? 'OEM Use License' : 'OEM Use License'}
                 </p>
                 <div className="flex items-baseline gap-2 mb-3">
-                  <span className="text-3xl font-extrabold text-text-primary">$2–10M</span>
+                  <span className="text-3xl font-extrabold text-text-primary">
+                    {isZh ? '洽詢定價' : 'Contact us'}
+                  </span>
                   <span className="text-xs text-text-muted">/ {isZh ? '年' : 'year'}</span>
                 </div>
                 <p className="text-[13px] text-text-secondary leading-[1.85] mb-4">
@@ -1247,7 +1253,9 @@ Auditor-ready artefacts
                   {isZh ? '年會員費' : 'annual membership'}
                 </p>
                 <div className="mt-4 flex items-baseline gap-2">
-                  <span className="text-3xl font-extrabold text-text-primary">$10K</span>
+                  <span className="text-3xl font-extrabold text-text-primary">
+                    {isZh ? '洽詢定價' : 'Contact us'}
+                  </span>
                   <span className="text-xs text-text-muted">/ {isZh ? '年' : 'year'}</span>
                 </div>
                 <p className="text-[13px] text-text-secondary mt-4 leading-relaxed">

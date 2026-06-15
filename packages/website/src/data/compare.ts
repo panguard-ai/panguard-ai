@@ -404,7 +404,7 @@ export const COMPARE: ComparisonEntry[] = [
       },
       {
         feature: 'Pricing',
-        atr: 'Community $0, Pilot $25K, Enterprise $150-500K, Sovereign $5-20M',
+        atr: 'Community $0, Pilot $25K, Enterprise & Sovereign (sales-led pricing — contact us)',
         other: 'Enterprise contracts, custom pricing',
         winner: 'context',
       },
@@ -416,7 +416,7 @@ export const COMPARE: ComparisonEntry[] = [
       },
       {
         feature: 'Sovereign deployment',
-        atr: 'Sovereign tier explicit ($5-20M/nation, airgap, Cisco/AMD/NVIDIA JV pre-integrated)',
+        atr: 'Sovereign tier explicit (sales-led pricing, airgap, Cisco/AMD/NVIDIA JV pre-integrated)',
         other: 'Custom enterprise engagements',
         winner: 'context',
       },
@@ -430,8 +430,8 @@ export const COMPARE: ComparisonEntry[] = [
       zh: '你是 Cisco 用戶。Cisco 在你的 DR、SD-WAN、XDR。DefenseClaw 接到既有的 Cisco 基礎設施,你的採購、支援、SLA 關係已經在 Cisco。企業整合成本近乎零。',
     },
     bottomLine: {
-      en: "These are not actually competitors at the layer that matters. Both organizations are shipping the same ATR rule set in production. The choice is between Cisco's commercial bundle (heavyweight, integrated, expensive) and PanGuard's open-plus-commercial model (lightweight, vendor-neutral, scales from $0 to $20M). If you are already a Cisco customer, the integration advantage probably wins. Everyone else benefits more from PanGuard's open posture.",
-      zh: '在關鍵的那一層,這兩家其實不算對手。兩家組織都在生產環境跑同一套 ATR 規則。選擇在於 Cisco 的商業 bundle（重量級、整合、貴）vs PanGuard 的開放+商業模式（輕量、廠商中立、從 $0 規模到 $20M）。如果你已經是 Cisco 客戶,整合優勢大概會贏。其他人從 PanGuard 的開放姿態獲益更多。',
+      en: "These are not actually competitors at the layer that matters. Both organizations are shipping the same ATR rule set in production. The choice is between Cisco's commercial bundle (heavyweight, integrated, expensive) and PanGuard's open-plus-commercial model (lightweight, vendor-neutral, scaling from a free Community tier up to sales-led enterprise and sovereign engagements). If you are already a Cisco customer, the integration advantage probably wins. Everyone else benefits more from PanGuard's open posture.",
+      zh: '在關鍵的那一層,這兩家其實不算對手。兩家組織都在生產環境跑同一套 ATR 規則。選擇在於 Cisco 的商業 bundle（重量級、整合、貴）vs PanGuard 的開放+商業模式（輕量、廠商中立、從免費的 Community tier 一路到業務洽談的企業與主權級方案）。如果你已經是 Cisco 客戶,整合優勢大概會贏。其他人從 PanGuard 的開放姿態獲益更多。',
     },
     references: [
       {
