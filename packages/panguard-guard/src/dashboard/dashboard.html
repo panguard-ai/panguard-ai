@@ -1224,6 +1224,24 @@
           </thead>
           <tbody id="sk-tb"></tbody>
         </table>
+
+        <!-- Quarantined files — see what's quarantined and restore it. The
+             quarantine confirm dialog promises restorability; this honors it.
+             Hidden when nothing is quarantined. -->
+        <div id="qz-section" style="display: none; margin-top: 28px">
+          <div class="st" style="margin-bottom: 12px">Quarantined Files</div>
+          <table class="tb">
+            <thead>
+              <tr>
+                <th>Original path</th>
+                <th>Reason</th>
+                <th>Quarantined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="qz-tb"></tbody>
+          </table>
+        </div>
       </div>
 
       <!-- ===== PAGE 5: Threat Cloud ===== -->
@@ -2044,6 +2062,7 @@
       }
 
       function loadSkills() {
+        loadQuarantined();
         af('/api/installed-skills')
           .then(function (r) {
             return r.json();
@@ -2078,7 +2097,14 @@
               var actBtn =
                 'padding:3px 9px;font-size:11px;border-radius:6px;cursor:pointer;background:transparent;';
               var actionsCell = s.whitelisted
-                ? '<td><span style="color:var(--text-muted);font-size:12px">trusted</span></td>'
+                ? '<td style="white-space:nowrap">' +
+                  '<span style="color:var(--text-muted);font-size:12px;margin-right:8px">trusted</span>' +
+                  '<button type="button" class="act" data-act="unwhitelist" data-idx="' +
+                  i +
+                  '" style="' +
+                  actBtn +
+                  'border:0.5px solid var(--border);color:var(--text-secondary)">Un-trust</button>' +
+                  '</td>'
                 : '<td style="white-space:nowrap">' +
                   '<button type="button" class="act" data-act="quarantine" data-idx="' +
                   i +
@@ -2305,7 +2331,13 @@
         ) {
           return;
         }
-        var ep = act === 'quarantine' ? '/api/skills/quarantine' : '/api/skills/whitelist';
+        var EPMAP = {
+          quarantine: '/api/skills/quarantine',
+          whitelist: '/api/skills/whitelist',
+          unwhitelist: '/api/skills/unwhitelist',
+        };
+        var ep = EPMAP[act];
+        if (!ep) return;
         af(ep, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -2318,14 +2350,92 @@
           })
           .then(function (res) {
             if (res.ok && res.d && res.d.success) {
-              toast(act === 'quarantine' ? 'Quarantined: ' + name : 'Marked safe: ' + name);
+              var msg =
+                act === 'quarantine'
+                  ? 'Quarantined: ' + name
+                  : act === 'unwhitelist'
+                    ? 'Removed from whitelist: ' + name
+                    : 'Marked safe: ' + name;
+              toast(msg);
               loadSkills();
+              loadQuarantined();
             } else {
               toast((res.d && res.d.error) || 'Action failed');
             }
           })
           .catch(function () {
             toast('Action failed');
+          });
+      }
+      /* Quarantined-files list + restore — honors the 'can be restored' promise
+         the quarantine dialog makes. Reads /api/skills/quarantined; Restore POSTs
+         /api/skills/restore. Hidden when nothing is quarantined. */
+      function loadQuarantined() {
+        var sec = document.getElementById('qz-section');
+        var tb = document.getElementById('qz-tb');
+        if (!sec || !tb) return;
+        af('/api/skills/quarantined')
+          .then(function (r) {
+            return r.json();
+          })
+          .then(function (d) {
+            var recs = (d && d.records) || [];
+            if (!recs.length) {
+              sec.style.display = 'none';
+              tb.innerHTML = '';
+              return;
+            }
+            sec.style.display = '';
+            tb.innerHTML = '';
+            recs.forEach(function (rec) {
+              var when = rec.quarantinedAt ? new Date(rec.quarantinedAt).toLocaleString() : '--';
+              var tr = document.createElement('tr');
+              tr.innerHTML =
+                '<td class="mono" style="font-size:12px">' +
+                esc(rec.originalPath || '') +
+                '</td>' +
+                '<td style="font-size:12px">' +
+                esc(rec.reason || '') +
+                '</td>' +
+                '<td style="font-size:12px">' +
+                esc(when) +
+                '</td>' +
+                '<td style="white-space:nowrap">' +
+                '<button type="button" class="act" data-restore-id="' +
+                esc(rec.id || '') +
+                '" style="padding:3px 9px;font-size:11px;border-radius:6px;cursor:pointer;' +
+                'background:transparent;border:0.5px solid var(--emerald,#34d399);' +
+                'color:var(--emerald,#34d399)">Restore</button></td>';
+              tb.appendChild(tr);
+            });
+          })
+          .catch(function () {
+            sec.style.display = 'none';
+          });
+      }
+      function restoreQuarantined(id) {
+        if (!id) return;
+        af('/api/skills/restore', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: id }),
+        })
+          .then(function (r) {
+            return r.json().then(function (d) {
+              return { ok: r.ok, d: d };
+            });
+          })
+          .then(function (res) {
+            if (res.ok && res.d && res.d.success) {
+              toast('Restored');
+              loadQuarantined();
+              loadSkills();
+            } else {
+              toast((res.d && res.d.error) || 'Restore failed');
+            }
+          })
+          .catch(function () {
+            toast('Restore failed');
           });
       }
       function wireEvents() {
@@ -2340,6 +2450,14 @@
             var btn = e.target && e.target.closest ? e.target.closest('button.act') : null;
             if (!btn) return;
             skillAction(btn.getAttribute('data-act'), parseInt(btn.getAttribute('data-idx'), 10));
+          });
+        }
+        var qzTb = document.getElementById('qz-tb');
+        if (qzTb) {
+          qzTb.addEventListener('click', function (e) {
+            var btn =
+              e.target && e.target.closest ? e.target.closest('button[data-restore-id]') : null;
+            if (btn) restoreQuarantined(btn.getAttribute('data-restore-id'));
           });
         }
         document.querySelectorAll('th[data-sort]').forEach(function (th) {
