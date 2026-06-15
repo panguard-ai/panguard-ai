@@ -14,6 +14,7 @@ import { runCLI } from '@panguard-ai/panguard-guard';
 import { c, setLogLevel } from '@panguard-ai/core';
 import { ok, warn, arrow, shield, brandTagline } from '../theme.js';
 import { detectLang } from '../interactive/lang.js';
+import { ensureTelemetryConsent } from '../consent.js';
 
 type Lang = 'en' | 'zh-TW';
 
@@ -240,6 +241,14 @@ export function upCommand(): Command {
             );
           }
         }
+
+        // ── Threat Cloud policy + consent (BEFORE we scan or deploy anything) ──
+        // Discloses exactly what is shared — anonymized threat signatures + one-way
+        // hashes, never code/prompts/PII — and asks once. Default ON (opt-out); a
+        // single keystroke declines and nothing leaves the machine. This gates all
+        // TC upload, and is changeable anytime (pga config set telemetry false / the
+        // dashboard Settings + Threat Cloud toggle). Non-interactive (CI) stays OFF.
+        await ensureTelemetryConsent();
 
         // ── Step 1: Detect AI platforms (we SCAN before deploying) ──
         let platformCount = 0;
