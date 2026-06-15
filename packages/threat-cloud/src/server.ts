@@ -1380,23 +1380,54 @@ export class ThreatCloudServer {
       validated.push(mutable as unknown as AnonymizedThreatData);
     }
 
+    // Resilient insert: a single bad row (or a transient DB error) must not
+    // crash the whole upload with an unhandled 500 — that silently breaks the
+    // community flywheel. Insert per-event, capture the real error to Sentry so
+    // it is diagnosable server-side, and degrade to 503 only if NOTHING landed.
+    let inserted = 0;
+    let lastError: unknown = null;
     for (const data of validated) {
-      this.db.insertThreat(data);
+      try {
+        this.db.insertThreat(data);
+        inserted++;
+      } catch (err) {
+        lastError = err;
+        Sentry.captureException(err, { tags: { endpoint: 'POST /api/threats' } });
+      }
+    }
+
+    if (inserted === 0 && validated.length > 0) {
+      log.error(
+        `insertThreat failed for all ${validated.length} event(s): ${
+          lastError instanceof Error ? lastError.message : String(lastError)
+        }`
+      );
+      this.sendJson(res, 503, {
+        ok: false,
+        error: 'Threat store temporarily unavailable — not recorded, please retry',
+      });
+      return;
     }
 
     const clientIP = req.socket.remoteAddress ?? 'unknown';
-    this.db.audit.logAction(
-      'client',
-      'threat.submit',
-      'threat',
-      undefined,
-      { count: validated.length },
-      clientIP
-    );
+    try {
+      this.db.audit.logAction(
+        'client',
+        'threat.submit',
+        'threat',
+        undefined,
+        { count: inserted },
+        clientIP
+      );
+    } catch (err) {
+      // Audit logging is best-effort — never fail the upload because the audit
+      // write threw. Capture it so it is visible, but the threat data is recorded.
+      Sentry.captureException(err, { tags: { endpoint: 'POST /api/threats', stage: 'audit' } });
+    }
 
     this.sendJson(res, 201, {
       ok: true,
-      data: { message: 'Threat data received', count: validated.length },
+      data: { message: 'Threat data received', count: inserted },
     });
   }
 
