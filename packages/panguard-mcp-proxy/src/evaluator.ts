@@ -40,6 +40,36 @@ export interface EvalResult {
   readonly durationMs: number;
 }
 
+/** Minimal rule shape the deny policy needs. */
+interface RuleLike {
+  readonly severity: string;
+  readonly maturity?: string;
+  readonly confirm?: string;
+}
+
+/**
+ * Whether a single rule match is strong enough to HARD-DENY a live tool call
+ * (vs. degrade to 'ask'). This is the proxy's false-positive control point: the
+ * detection engine runs the full 'hunt' lane so nothing is missed, but we only
+ * auto-break the agent on a signal we trust.
+ *
+ *   - confirm:embedding rules (the broad workhorses ATR-2026-00001/00002) need
+ *     async semantic confirmation this proxy can't run and are the top FP
+ *     sources -> never hard-deny unconfirmed (the caller degrades to 'ask').
+ *   - critical severity hard-stops even on a younger rule (security-first:
+ *     credential exfil / RCE / data destruction are specific, not broad).
+ *   - high severity hard-stops only when proven (maturity=stable).
+ *   - everything else (high-test, experimental, medium, low) -> not blockable.
+ *
+ * Pure + exported so the policy is unit-tested independently of which live rule
+ * happens to match (the rule corpus changes daily; this policy must not).
+ */
+export function shouldHardDeny(rule: RuleLike): boolean {
+  if (rule.confirm === 'embedding') return false;
+  if (rule.severity === 'critical') return true;
+  return rule.severity === 'high' && rule.maturity === 'stable';
+}
+
 export class ProxyEvaluator {
   private readonly engine: ATREngine;
   private rulesLoaded = false;
@@ -51,6 +81,12 @@ export class ProxyEvaluator {
 
   constructor() {
     const rulesDir = findRulesDir();
+    // 'hunt' detection (every rule) so we never MISS an attack in a tool call —
+    // incl. the broad workhorse rule ATR-2026-00001 (stable but confirm:embedding,
+    // which an 'enforce' sync lane would silently drop since this proxy ships no
+    // embedding model). FP-safety is enforced at the DENY gate instead: a match
+    // only HARD-denies a live tool call when it is a proven rule (see evaluate());
+    // unproven matches degrade to 'ask' rather than breaking the agent.
     this.engine = new ATREngine({ rulesDir });
     this.blocklistPath = join(homedir(), '.panguard-guard', 'blocked-tools.json');
     this.refreshBlocklist();
@@ -156,14 +192,13 @@ export class ProxyEvaluator {
         };
       }
 
-      // Check highest severity match
-      const maxSeverity = matches.reduce((max, m) => {
-        const order = ['informational', 'low', 'medium', 'high', 'critical'];
-        return order.indexOf(m.rule.severity) > order.indexOf(max) ? m.rule.severity : max;
-      }, 'informational');
-
-      const outcome = maxSeverity === 'critical' || maxSeverity === 'high' ? 'deny' : 'ask';
-      const topMatch = matches[0]!;
+      // Hard-DENY only on a trusted match (see shouldHardDeny); every other
+      // match is still surfaced as 'ask' (user-in-the-loop), never silently
+      // allowed. This is the proxy's false-positive control point — the engine
+      // runs full 'hunt' detection so nothing is missed.
+      const blockMatch = matches.find((m) => shouldHardDeny(m.rule));
+      const outcome: EvalResult['outcome'] = blockMatch ? 'deny' : 'ask';
+      const topMatch = blockMatch ?? matches[0]!;
 
       return {
         outcome,

@@ -75,6 +75,19 @@ export interface GuardATREngineConfig {
   hotReload?: boolean;
   /** Skill whitelist configuration / Skill 白名單配置 */
   whitelist?: SkillWhitelistConfig;
+  /**
+   * Detection lane — controls which rule maturities fire at runtime.
+   *   'enforce' (default) : only maturity=stable rules. Lowest false-positive
+   *                         lane (~0.2% FP on the 65K-sample benign corpus).
+   *                         Correct for a runtime that auto-acts: never block on
+   *                         an unproven rule. The sync path also drops broad
+   *                         `confirm: embedding` rules (they need async
+   *                         confirmation this hot path cannot run).
+   *   'alert'             : stable + test. Analyst / correlation lane.
+   *   'hunt'              : every rule incl. draft. Highest recall, ~9% FP.
+   *                         Offline review only — never for auto-action.
+   */
+  lane?: 'enforce' | 'alert' | 'hunt';
 }
 
 /**
@@ -100,16 +113,33 @@ export class GuardATREngine {
     // Shared session tracker for behavioral detection across events
     const sessionTracker = new SessionTracker();
 
+    // Runtime detection lane. Default 'hunt' (every rule) ON PURPOSE: the guard
+    // daemon does NOT hard-block on a raw match — it gates block-vs-notify on
+    // verdict confidence + actionPolicy downstream (see event-processor). So we
+    // want full DETECTION visibility here (incl. the broad workhorse rule
+    // ATR-2026-00001, maturity=stable but confirm:embedding), and let the
+    // confidence gate decide what's actionable.
+    //
+    // NOTE: do NOT naively flip this to 'enforce'. The sync engine path drops
+    // every `confirm: embedding` rule (00001 included) because confirmation is
+    // async and this runtime ships no embedding model — enforce here would
+    // silently miss basic attacks like "ignore previous instructions" / DAN
+    // that ONLY 00001 catches. Verified 2026-06-16: enforce caught 1/4 sample
+    // attacks vs hunt's 3/4, with 0 FP on benign in BOTH lanes. The FP control
+    // belongs at the action gate, not the detection lane.
+    const lane = config.lane ?? 'hunt';
+
     // Primary engine for custom user rules
     this.engine = new ATREngine({
       rulesDir: config.rulesDir,
       sessionTracker,
+      lane,
     });
 
     // Bundled rules from the @panguard-ai/atr package
     const bundledDir = config.bundledRulesDir ?? resolveBundledRulesDir();
     if (bundledDir) {
-      this.bundledEngine = new ATREngine({ rulesDir: bundledDir, sessionTracker });
+      this.bundledEngine = new ATREngine({ rulesDir: bundledDir, sessionTracker, lane });
     } else {
       this.bundledEngine = null;
     }
