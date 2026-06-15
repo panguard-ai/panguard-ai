@@ -16,12 +16,20 @@
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { randomBytes, timingSafeEqual, createHash } from 'node:crypto';
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import {
+  existsSync,
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+  mkdirSync,
+  renameSync,
+} from 'node:fs';
+import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 import { WebSocketServer, type WebSocket as WS } from 'ws';
 import { createLogger } from '@panguard-ai/core';
+import { FileQuarantine } from '../response/file-quarantine.js';
 import type {
   DashboardStatus,
   DashboardEvent,
@@ -504,6 +512,25 @@ export class DashboardServer {
           );
           if (!res.headersSent) this.jsonResponse(res, { error: 'Internal error' }, 500);
         });
+        break;
+      case '/api/skills/quarantine':
+        if (req.method === 'POST') {
+          this.handleQuarantinePost(req, res).catch((err: unknown) => {
+            logger.error(
+              `handleQuarantinePost error: ${err instanceof Error ? err.message : String(err)}`
+            );
+            if (!res.headersSent) this.jsonResponse(res, { error: 'Internal error' }, 500);
+          });
+        } else {
+          this.jsonResponse(res, { error: 'Method not allowed' }, 405);
+        }
+        break;
+      case '/api/skills/whitelist':
+        if (req.method === 'POST') {
+          this.handleWhitelistPost(req, res);
+        } else {
+          this.jsonResponse(res, { error: 'Method not allowed' }, 405);
+        }
         break;
       case '/api/agents':
         this.handleAgentsApi(res).catch((err: unknown) => {
@@ -1203,6 +1230,134 @@ export class DashboardServer {
       whitelisted: allSkills.filter((s) => s.whitelisted).length,
       tracked: allSkills.filter((s) => !s.whitelisted).length,
     });
+  }
+
+  /**
+   * Read a JSON request body (≤10KB) for the action POST endpoints. Resolves to
+   * the parsed object, or null after having already written the error response
+   * (payload too large / invalid JSON / stream error) — callers just return on null.
+   */
+  private readJsonBody(
+    req: IncomingMessage,
+    res: ServerResponse
+  ): Promise<Record<string, unknown> | null> {
+    return new Promise((resolveBody) => {
+      let body = '';
+      let aborted = false;
+      req.on('data', (chunk: Buffer) => {
+        body += chunk.toString();
+        if (body.length > 10_000) {
+          aborted = true;
+          res.writeHead(413, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Payload too large' }));
+          req.destroy();
+          resolveBody(null);
+        }
+      });
+      req.on('end', () => {
+        if (aborted) return;
+        try {
+          resolveBody(JSON.parse(body || '{}') as Record<string, unknown>);
+        } catch {
+          this.jsonResponse(res, { error: 'Invalid JSON' }, 400);
+          resolveBody(null);
+        }
+      });
+      req.on('error', () => resolveBody(null));
+    });
+  }
+
+  /**
+   * POST /api/skills/quarantine — move a flagged file-based skill into quarantine.
+   * Resolves the skill name under ~/.claude/skills/, contains it against path
+   * traversal, confirms it exists, then uses the existing FileQuarantine (atomic
+   * move + 0o700 perms + restorable manifest). MCP-server config entries are not
+   * file-based and cannot be quarantined this way.
+   */
+  private async handleQuarantinePost(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readJsonBody(req, res);
+    if (body === null) return;
+    const name = typeof body['name'] === 'string' ? (body['name'] as string).trim() : '';
+    if (!name) {
+      this.jsonResponse(res, { error: 'Missing skill name' }, 400);
+      return;
+    }
+    const skillsRoot = join(homedir(), '.claude', 'skills');
+    const target = resolve(skillsRoot, name);
+    // Containment: the resolved path must stay strictly inside the skills dir.
+    if (target === skillsRoot || !target.startsWith(skillsRoot + sep)) {
+      this.jsonResponse(res, { error: 'Invalid skill name' }, 400);
+      return;
+    }
+    if (!existsSync(target)) {
+      this.jsonResponse(
+        res,
+        {
+          error:
+            'Not a file-based skill (no folder under ~/.claude/skills) — remove its config entry instead',
+        },
+        404
+      );
+      return;
+    }
+    try {
+      const fq = new FileQuarantine();
+      await fq.initialize();
+      const record = await fq.quarantine(target, `Quarantined from dashboard: ${name}`);
+      logger.warn(`Skill quarantined via dashboard: ${name}`);
+      this.jsonResponse(res, { success: true, quarantinePath: record.quarantinePath });
+    } catch (err: unknown) {
+      this.jsonResponse(
+        res,
+        { error: `Quarantine failed: ${err instanceof Error ? err.message : String(err)}` },
+        500
+      );
+    }
+  }
+
+  /**
+   * POST /api/skills/whitelist — mark a skill safe (false positive) by adding it
+   * to the local skill-whitelist.json the installed-skills view reads. Atomic
+   * write (tmp + rename), owner-only perms.
+   */
+  private async handleWhitelistPost(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readJsonBody(req, res);
+    if (body === null) return;
+    const name = typeof body['name'] === 'string' ? (body['name'] as string).trim() : '';
+    if (!name) {
+      this.jsonResponse(res, { error: 'Missing skill name' }, 400);
+      return;
+    }
+    try {
+      const dataDir = this.getConfig?.()?.dataDir ?? join(homedir(), '.panguard-guard');
+      const whitelistPath = join(dataDir, 'skill-whitelist.json');
+      let entries: Array<{ name: string; source?: string; addedAt?: string }> = [];
+      if (existsSync(whitelistPath)) {
+        try {
+          const raw = JSON.parse(readFileSync(whitelistPath, 'utf-8')) as {
+            whitelist?: Array<{ name: string; source?: string }>;
+            skills?: Array<{ name: string; source?: string }>;
+          };
+          entries = raw.whitelist ?? raw.skills ?? [];
+        } catch {
+          /* corrupt file — start fresh */
+        }
+      }
+      if (!entries.some((s) => s.name === name)) {
+        entries.push({ name, source: 'manual-dashboard', addedAt: new Date().toISOString() });
+      }
+      mkdirSync(dataDir, { recursive: true });
+      const tmp = `${whitelistPath}.tmp.${process.pid}`;
+      writeFileSync(tmp, JSON.stringify({ whitelist: entries }, null, 2), { mode: 0o600 });
+      renameSync(tmp, whitelistPath);
+      this.jsonResponse(res, { success: true });
+    } catch (err: unknown) {
+      this.jsonResponse(
+        res,
+        { error: `Whitelist failed: ${err instanceof Error ? err.message : String(err)}` },
+        500
+      );
+    }
   }
 
   private async handleAgentsApi(res: ServerResponse): Promise<void> {

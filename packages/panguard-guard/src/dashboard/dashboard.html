@@ -1217,6 +1217,7 @@
               <th data-i18n="sk_name">Name</th>
               <th data-i18n="sk_platform">Platform</th>
               <th data-i18n="sk_status">Status</th>
+              <th data-i18n="sk_actions">Actions</th>
             </tr>
           </thead>
           <tbody id="sk-tb"></tbody>
@@ -1377,6 +1378,7 @@
       var currentSort = { col: 'timestamp', dir: 'desc' };
       var allThreats = [];
       var allRules = [];
+      var skillsData = [];
       var licenseTier = 'community';
 
       /* ============================================================ */
@@ -1850,6 +1852,7 @@
             var tbl = document.getElementById('sk-table');
             var tb = document.getElementById('sk-tb');
             tb.innerHTML = '';
+            skillsData = d.skills || [];
             if (!d.skills || d.skills.length === 0) {
               if (ld)
                 ld.innerHTML = '<span style="color:var(--text-muted)">No skills detected.</span>';
@@ -1871,6 +1874,22 @@
                   : status === 'blocked'
                     ? 'badge-critical'
                     : 'badge-w';
+              var actBtn =
+                'padding:3px 9px;font-size:11px;border-radius:6px;cursor:pointer;background:transparent;';
+              var actionsCell = s.whitelisted
+                ? '<td><span style="color:var(--text-muted);font-size:12px">trusted</span></td>'
+                : '<td style="white-space:nowrap">' +
+                  '<button type="button" class="act" data-act="quarantine" data-idx="' +
+                  i +
+                  '" style="' +
+                  actBtn +
+                  'border:0.5px solid var(--bad,#c0504d);color:var(--bad,#c0504d)">Quarantine</button> ' +
+                  '<button type="button" class="act" data-act="whitelist" data-idx="' +
+                  i +
+                  '" style="' +
+                  actBtn +
+                  'border:0.5px solid var(--border);color:var(--text-secondary)">Mark safe</button>' +
+                  '</td>';
               var tr = document.createElement('tr');
               tr.innerHTML =
                 '<td>' +
@@ -1888,7 +1907,8 @@
                 badgeCls +
                 '">' +
                 esc(status) +
-                '</span></td>';
+                '</span></td>' +
+                actionsCell;
               tb.appendChild(tr);
             });
             setKPI('sk-total', d.skills.length);
@@ -2042,12 +2062,55 @@
         var el = document.getElementById(id);
         if (el) el.addEventListener(ev, fn);
       }
+      function skillAction(act, idx) {
+        var s = skillsData[idx];
+        if (!s || !s.name) return;
+        var name = s.name;
+        if (
+          act === 'quarantine' &&
+          !window.confirm(
+            'Quarantine "' + name + '"?\nIt moves to ~/.panguard/quarantine and can be restored.'
+          )
+        ) {
+          return;
+        }
+        var ep = act === 'quarantine' ? '/api/skills/quarantine' : '/api/skills/whitelist';
+        af(ep, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: name }),
+        })
+          .then(function (r) {
+            return r.json().then(function (d) {
+              return { ok: r.ok, d: d };
+            });
+          })
+          .then(function (res) {
+            if (res.ok && res.d && res.d.success) {
+              toast(act === 'quarantine' ? 'Quarantined: ' + name : 'Marked safe: ' + name);
+              loadSkills();
+            } else {
+              toast((res.d && res.d.error) || 'Action failed');
+            }
+          })
+          .catch(function () {
+            toast('Action failed');
+          });
+      }
       function wireEvents() {
         document.querySelectorAll('.fb').forEach(function (b) {
           b.addEventListener('click', function (e) {
             filterThreats(b.getAttribute('data-sev'), e);
           });
         });
+        var skTb = document.getElementById('sk-tb');
+        if (skTb) {
+          skTb.addEventListener('click', function (e) {
+            var btn = e.target && e.target.closest ? e.target.closest('button.act') : null;
+            if (!btn) return;
+            skillAction(btn.getAttribute('data-act'), parseInt(btn.getAttribute('data-idx'), 10));
+          });
+        }
         document.querySelectorAll('th[data-sort]').forEach(function (th) {
           th.addEventListener('click', function () {
             sortThreats(th.getAttribute('data-sort'));
