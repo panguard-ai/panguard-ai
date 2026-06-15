@@ -404,11 +404,11 @@ export default function MigratorContent() {
         </div>
         <FadeInUp>
           <p className="text-center text-text-muted text-sm mt-10 max-w-3xl mx-auto leading-relaxed">
-            Pricing reflects scope: this is a{' '}
-            <strong className="text-text-primary">$50&ndash;150K detection-evidence module</strong>,
-            not a turnkey EU AI Act compliance package. The pack&rsquo;s value is collapsing 6
-            months of detection-engineering consulting into 1 week of setup &mdash; not replacing
-            the legal/compliance dossier itself.
+            Pricing reflects scope: this is a focused{' '}
+            <strong className="text-text-primary">detection-evidence module</strong> (sales-led
+            pricing &mdash; contact us), not a turnkey EU AI Act compliance package. The
+            pack&rsquo;s value is collapsing 6 months of detection-engineering consulting into 1
+            week of setup &mdash; not replacing the legal/compliance dossier itself.
           </p>
         </FadeInUp>
       </SectionWrapper>
@@ -537,10 +537,12 @@ export default function MigratorContent() {
                 {isZh ? 'Standalone · 年約' : 'Standalone · annual'}
               </p>
               <div className="flex items-baseline gap-2 mb-1">
-                <span className="text-3xl font-extrabold text-text-primary">$500K&ndash;2M</span>
+                <span className="text-3xl font-extrabold text-text-primary">
+                  {isZh ? '洽詢定價' : 'Contact us'}
+                </span>
               </div>
               <p className="text-[10px] text-text-muted mb-3">
-                {isZh ? '目標區間 $750K – $1.5M' : 'target $750K–$1.5M'}
+                {isZh ? '業務洽談定價' : 'sales-led pricing'}
               </p>
               <p className="text-[13px] text-text-secondary leading-[1.85] mb-3 flex-1">
                 {isZh
