@@ -1042,6 +1042,17 @@
           </div>
         </div>
 
+        <!-- Suppression summary (anti alert-fatigue: only high-confidence shown by default) -->
+        <div
+          id="th-summary"
+          style="
+            display: none;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin: 4px 0 10px;
+          "
+        ></div>
+
         <!-- Sortable threat table -->
         <table class="tb">
           <thead>
@@ -1049,6 +1060,7 @@
               <th data-sort="timestamp" class="sortable">Timestamp</th>
               <th data-sort="ruleId" class="sortable">Rule ID</th>
               <th data-sort="severity" class="sortable">Severity</th>
+              <th data-sort="confidence" class="sortable">Confidence</th>
               <th>Matched Pattern</th>
               <th data-sort="action" class="sortable">Action</th>
             </tr>
@@ -1380,6 +1392,8 @@
       var allRules = [];
       var skillsData = [];
       var licenseTier = 'community';
+      var SUPPRESS_THRESHOLD = 50;
+      var showSuppressed = false;
 
       /* ============================================================ */
       /*  Utilities                                                    */
@@ -1609,15 +1623,32 @@
           })
           .then(function (verdicts) {
             allThreats = (verdicts || []).map(function (v, i) {
+              // Real ATR rule id lives in a rule_match evidence's data.ruleId —
+              // evidence[0].source is the evidence TYPE (e.g. "rule_match"), not an id.
+              var ruleMatch = (v.evidence || []).filter(function (e) {
+                return e && e.source === 'rule_match' && e.data && e.data.ruleId;
+              })[0];
+              var ruleId = ruleMatch
+                ? ruleMatch.data.ruleId
+                : v.mitreTechnique || v.evidence?.[0]?.source || 'heuristic-' + i;
+              // Enforcement confidence (deterministic-only) drives the displayed
+              // confidence; falls back to overall confidence.
+              var conf =
+                typeof v.enforcementConfidence === 'number'
+                  ? v.enforcementConfidence
+                  : typeof v.confidence === 'number'
+                    ? v.confidence
+                    : 0;
               return {
                 timestamp: v.timestamp || new Date().toISOString(),
-                ruleId: (v.evidence && v.evidence[0] && v.evidence[0].source) || 'rule-' + i,
+                ruleId: ruleId,
                 severity:
                   v.conclusion === 'malicious'
                     ? 'critical'
                     : v.conclusion === 'suspicious'
                       ? 'medium'
                       : 'low',
+                confidence: Math.round(conf),
                 pattern: (v.reasoning || '').slice(0, 160),
                 action: v.recommendedAction || 'log_only',
               };
@@ -1638,10 +1669,43 @@
       function renderThreats() {
         var tb = document.getElementById('th-tb');
         var emp = document.getElementById('th-empty');
+        var sum = document.getElementById('th-summary');
         tb.innerHTML = '';
-        var list = allThreats.filter(function (t) {
+        var bySev = allThreats.filter(function (t) {
           return currentSevFilter === 'all' || t.severity === currentSevFilter;
         });
+        // Anti alert-fatigue: low-confidence detections are suppressed from the
+        // default view (the #1 reason solo devs mute a security tool). The count
+        // stays visible and one click reveals them.
+        var high = bySev.filter(function (t) {
+          return t.confidence >= SUPPRESS_THRESHOLD;
+        });
+        var low = bySev.filter(function (t) {
+          return t.confidence < SUPPRESS_THRESHOLD;
+        });
+        if (sum) {
+          if (low.length > 0) {
+            sum.style.display = '';
+            sum.innerHTML =
+              'Showing ' +
+              high.length +
+              ' high-confidence · ' +
+              '<span id="th-supp-toggle" style="text-decoration:underline;cursor:pointer">' +
+              low.length +
+              ' low-confidence ' +
+              (showSuppressed ? '(hide)' : 'suppressed') +
+              '</span>';
+            var tg = document.getElementById('th-supp-toggle');
+            if (tg)
+              tg.addEventListener('click', function () {
+                showSuppressed = !showSuppressed;
+                renderThreats();
+              });
+          } else {
+            sum.style.display = 'none';
+          }
+        }
+        var list = (showSuppressed ? bySev : high).slice();
         list.sort(function (a, b) {
           var av = a[currentSort.col],
             bv = b[currentSort.col];
@@ -1655,6 +1719,7 @@
         if (emp) emp.style.display = 'none';
         list.forEach(function (t) {
           var tr = document.createElement('tr');
+          if (t.confidence < SUPPRESS_THRESHOLD) tr.style.opacity = '0.6';
           var ts = t.timestamp.split('T')[1]
             ? t.timestamp.split('T')[1].split('.')[0]
             : t.timestamp;
@@ -1670,6 +1735,9 @@
             '">' +
             esc(t.severity) +
             '</span></td>' +
+            '<td class="mono">' +
+            t.confidence +
+            '%</td>' +
             '<td class="mono">' +
             esc(t.pattern) +
             '</td>' +
