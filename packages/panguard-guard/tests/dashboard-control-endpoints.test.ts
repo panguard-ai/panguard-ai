@@ -244,5 +244,12 @@ describe('DashboardServer — 1.7 control endpoints', () => {
       // the append-only whitelist now has an in-product undo
       expect(html).toContain('data-act="unwhitelist"');
     });
+
+    it('settings surfaces alert channels + enforcement-policy blast radius (read-only)', () => {
+      expect(html).toContain('id="st-notify-list"');
+      expect(html).toContain('renderNotifyChannels');
+      expect(html).toContain('id="st-enforce-list"');
+      expect(html).toContain('renderEnforcement');
+    });
   });
 });
