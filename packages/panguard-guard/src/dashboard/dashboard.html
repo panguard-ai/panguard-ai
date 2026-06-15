@@ -791,7 +791,6 @@
         color: var(--ok);
       }
 
-
       /* Threat Cloud flywheel */
       .flywheel {
         font-family: 'JetBrains Mono', 'SF Mono', monospace;
@@ -900,10 +899,7 @@
             <div class="hero-status" id="hero-status">CONNECTING…</div>
             <span class="badge badge-protected" id="hero-badge" data-i18n="active">Active</span>
           </div>
-          <div
-            style="font-size: 13px; color: var(--text-muted); line-height: 1.6"
-            id="hero-desc"
-          >
+          <div style="font-size: 13px; color: var(--text-muted); line-height: 1.6" id="hero-desc">
             Every event runs through deterministic pattern matching and heuristic correlation —
             on-device by default. An optional semantic layer (bring your own LLM) stays off until
             you enable it.
@@ -932,9 +928,9 @@
             <span class="dot dot-ok"></span> <span data-i18n="layer_title">Detection Layers</span>
           </h3>
           <div class="desc">
-            Layers A and B are deterministic and always on. Layer C is optional — bring your own
-            LLM (cloud API or local model). It is advisory (flags for review, never auto-blocks)
-            and stays off until you connect one.
+            Layers A and B are deterministic and always on. Layer C is optional — bring your own LLM
+            (cloud API or local model). It is advisory (flags for review, never auto-blocks) and
+            stays off until you connect one.
           </div>
           <div class="layer-row">
             <span class="layer-label">Layer A &mdash; Pattern match (ATR rules)</span>
@@ -947,10 +943,17 @@
             <span class="layer-status on" id="lb-st">Active</span>
           </div>
           <div class="layer-row">
-            <span class="layer-label">Layer C &mdash; Semantic verdict (optional &middot; advisory)</span>
+            <span class="layer-label"
+              >Layer C &mdash; Semantic verdict (optional &middot; advisory)</span
+            >
             <div class="layer-bar"><div class="layer-fill" id="lc-bar"></div></div>
             <span class="layer-status" id="lc-st">Off &middot; bring your own</span>
           </div>
+          <div
+            class="layer-hint"
+            id="lc-hint"
+            style="margin-top: 8px; font-size: 12px; color: var(--text-muted); line-height: 1.6"
+          ></div>
         </div>
 
         <!-- Uptime counter -->
@@ -1000,37 +1003,11 @@
           "
         >
           <div class="flt">
-            <button
-              class="fb on"
-              data-sev="all"
-              data-i18n="all"
-            >
-              All
-            </button>
-            <button
-              class="fb"
-              data-sev="critical"
-              data-i18n="critical"
-            >
-              Critical
-            </button>
-            <button
-              class="fb"
-              data-sev="high"
-              data-i18n="high"
-            >
-              High
-            </button>
-            <button
-              class="fb"
-              data-sev="medium"
-              data-i18n="medium"
-            >
-              Medium
-            </button>
-            <button class="fb" data-sev="low" data-i18n="low">
-              Low
-            </button>
+            <button class="fb on" data-sev="all" data-i18n="all">All</button>
+            <button class="fb" data-sev="critical" data-i18n="critical">Critical</button>
+            <button class="fb" data-sev="high" data-i18n="high">High</button>
+            <button class="fb" data-sev="medium" data-i18n="medium">Medium</button>
+            <button class="fb" data-sev="low" data-i18n="low">Low</button>
           </div>
           <div style="display: flex; gap: 8px; align-items: center">
             <button class="btn btn-secondary btn-sm" id="btn-sarif">
@@ -1045,12 +1022,7 @@
         <!-- Suppression summary (anti alert-fatigue: only high-confidence shown by default) -->
         <div
           id="th-summary"
-          style="
-            display: none;
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin: 4px 0 10px;
-          "
+          style="display: none; font-size: 12px; color: var(--text-secondary); margin: 4px 0 10px"
         ></div>
 
         <!-- Sortable threat table -->
@@ -1079,9 +1051,27 @@
       <div class="pg" id="p-rules">
         <div class="pt"><em data-i18n="t_ru">Rules</em></div>
         <div class="pd" data-i18n="d_ru">
-          All loaded ATR detection rules. Rules sync hourly from Threat Cloud. Use search and
-          filters to find specific rules.
+          All loaded ATR detection rules. The bundled rule set is checked daily against npm; updates
+          are surfaced below and applied only when you run <code>pga upgrade</code> — rules are the
+          engine's trust root and are never auto-pulled. Use search and filters to find specific
+          rules.
         </div>
+
+        <!-- Rule-update banner: surfaces rule-sync's daily notify-only check.
+             Hidden unless a newer published rule set is available. -->
+        <div
+          id="rule-update-banner"
+          style="
+            display: none;
+            margin: 0 0 16px;
+            padding: 12px 16px;
+            border: 1px solid var(--emerald, #34d399);
+            border-radius: 10px;
+            background: rgba(52, 211, 153, 0.08);
+            font-size: 13px;
+            line-height: 1.6;
+          "
+        ></div>
 
         <div class="cg">
           <div class="cd">
@@ -1295,10 +1285,9 @@
           <div class="st" data-i18n="tc_flywheel">Flywheel</div>
           <div class="flywheel" id="tc-flywheel">
             <strong>Your endpoint</strong> detects a threat &rarr;
-            <strong>Threat Cloud</strong> aggregates it anonymously &rarr;
-            it strengthens the open <strong>ATR</strong> ruleset &rarr;
-            you get the improvements through <strong>pga upgrade</strong> (a daily check flags when
-            new rules are out).
+            <strong>Threat Cloud</strong> aggregates it anonymously &rarr; it strengthens the open
+            <strong>ATR</strong> ruleset &rarr; you get the improvements through
+            <strong>pga upgrade</strong> (a daily check flags when new rules are out).
           </div>
 
           <div class="fs" style="margin-top: 20px">
@@ -1323,13 +1312,83 @@
         <div class="fs">
           <h3>Guard Mode</h3>
           <div class="desc">
-            Learning mode builds a baseline of normal activity and only logs. Protection mode
-            actively blocks detected threats. Saving a change restarts detection with the new mode.
+            Three modes. <strong>Learning</strong> builds a baseline and only logs.
+            <strong>Report-only</strong> detects and records everything but never acts (recommended
+            for new deployments). <strong>Protection</strong> actively blocks per your enforcement
+            policy. Saving a change restarts detection with the new mode.
           </div>
-          <div style="display: flex; align-items: center; gap: 12px">
-            <div class="toggle" id="st-mode-toggle"></div>
-            <span id="st-mode-label" style="font-size: 13px; font-weight: 600">Learning</span>
+          <div
+            id="st-mode-seg"
+            role="radiogroup"
+            aria-label="Guard mode"
+            style="
+              display: inline-flex;
+              border: 1px solid var(--border, #2e2a27);
+              border-radius: 8px;
+              overflow: hidden;
+            "
+          >
+            <button
+              type="button"
+              class="seg-btn"
+              data-mode="learning"
+              role="radio"
+              aria-checked="false"
+              style="
+                padding: 8px 16px;
+                background: transparent;
+                color: var(--text-muted);
+                border: 0;
+                cursor: pointer;
+                font-size: 13px;
+                font-weight: 600;
+              "
+            >
+              Learning
+            </button>
+            <button
+              type="button"
+              class="seg-btn"
+              data-mode="report-only"
+              role="radio"
+              aria-checked="false"
+              style="
+                padding: 8px 16px;
+                background: transparent;
+                color: var(--text-muted);
+                border: 0;
+                border-left: 1px solid var(--border, #2e2a27);
+                cursor: pointer;
+                font-size: 13px;
+                font-weight: 600;
+              "
+            >
+              Report-only
+            </button>
+            <button
+              type="button"
+              class="seg-btn"
+              data-mode="protection"
+              role="radio"
+              aria-checked="false"
+              style="
+                padding: 8px 16px;
+                background: transparent;
+                color: var(--text-muted);
+                border: 0;
+                border-left: 1px solid var(--border, #2e2a27);
+                cursor: pointer;
+                font-size: 13px;
+                font-weight: 600;
+              "
+            >
+              Protection
+            </button>
           </div>
+          <div
+            id="st-mode-desc"
+            style="margin-top: 8px; font-size: 12px; color: var(--text-muted); line-height: 1.6"
+          ></div>
         </div>
 
         <div class="fs">
@@ -1356,12 +1415,9 @@
           </div>
         </div>
 
-
         <div style="display: flex; gap: 10px; margin-top: 8px">
           <button class="btn btn-primary" id="btn-save">Save</button>
-          <button class="btn btn-secondary" id="btn-reload">
-            Reload
-          </button>
+          <button class="btn btn-secondary" id="btn-reload">Reload</button>
         </div>
 
         <div class="info-box" style="margin-top: 20px">
@@ -1389,7 +1445,6 @@
       /* ============================================================ */
       /*  i18n strings (EN / ZH)                                       */
       /* ============================================================ */
-
 
       var currentSevFilter = 'all';
       var currentSort = { col: 'timestamp', dir: 'desc' };
@@ -1561,7 +1616,50 @@
             'badge ' + (s.mode === 'protection' ? 'badge-protected' : 'badge-learning');
         }
         updatePBar(s);
+        renderLayers(s.layers);
         applyTierGates(s);
+      }
+      /* Real per-layer health from the server (never hard-coded green). The
+         server reports state per layer; Layer A goes red 'Degraded' if zero
+         rules are loaded, and Layer C shows the BYO-LLM guidance inline. */
+      function renderLayers(L) {
+        if (!L) return;
+        var map = { a: 'la', b: 'lb', c: 'lc' };
+        Object.keys(map).forEach(function (k) {
+          var ly = L[k];
+          if (!ly) return;
+          var active = ly.state === 'active';
+          var color =
+            ly.state === 'active'
+              ? 'var(--ok)'
+              : ly.state === 'degraded'
+                ? 'var(--danger)'
+                : ly.state === 'idle'
+                  ? 'var(--warn)'
+                  : 'var(--text-muted)';
+          var label = active
+            ? 'Active'
+            : ly.state === 'degraded'
+              ? 'Degraded'
+              : ly.state === 'idle'
+                ? 'Idle'
+                : ly.optional
+                  ? 'Off · bring your own'
+                  : 'Off';
+          var st = document.getElementById(map[k] + '-st');
+          var bar = document.getElementById(map[k] + '-bar');
+          if (st) {
+            st.textContent = label;
+            st.style.color = color;
+            if (ly.detail) st.title = ly.detail;
+          }
+          if (bar) bar.className = 'layer-fill' + (active ? ' on' : '');
+        });
+        // Surface Layer C's BYO-LLM guidance inline (how to actually connect it),
+        // not just a hover title — the original UI said "until you connect one"
+        // with no path. Cleared once a semantic LLM is configured.
+        var hint = document.getElementById('lc-hint');
+        if (hint) hint.textContent = L.c && L.c.state !== 'active' && L.c.detail ? L.c.detail : '';
       }
       function updatePBar(s) {
         var dot = document.getElementById('pb-dot');
@@ -1821,7 +1919,37 @@
           });
       }
 
+      /* Surface the daily notify-only rule-update check (rule-sync writes it to
+         rule-update.json). The server computed this 'newer rules published'
+         signal but nothing read it. Notify-only — never auto-applies. */
+      function loadRuleUpdate() {
+        var b = document.getElementById('rule-update-banner');
+        if (!b) return;
+        af('/api/rule-update')
+          .then(function (r) {
+            return r.json();
+          })
+          .then(function (d) {
+            if (d && d.updateAvailable && d.latestVersion) {
+              b.innerHTML =
+                '<strong>New detection rules available</strong> &mdash; agent-threat-rules ' +
+                esc(d.currentVersion || '?') +
+                ' &rarr; ' +
+                esc(d.latestVersion) +
+                '. Run <code>pga upgrade</code> to update. Rules are verified by npm and never ' +
+                'auto-applied.';
+              b.style.display = '';
+            } else {
+              b.style.display = 'none';
+            }
+          })
+          .catch(function () {
+            b.style.display = 'none';
+          });
+      }
+
       function loadRules() {
+        loadRuleUpdate();
         af('/api/rules')
           .then(function (r) {
             return r.json();
@@ -2064,6 +2192,48 @@
           });
       }
 
+      /* Guard mode is THREE states (learning / report-only / protection). The
+         old binary toggle could not represent report-only and silently rewrote
+         it to 'learning' on save — quietly downgrading enforcement. This 3-state
+         segmented control preserves whatever the config actually is. */
+      var selectedMode = 'learning';
+      var MODE_INFO = {
+        learning: {
+          desc: 'builds a baseline of normal activity and only logs — no blocking.',
+          color: 'var(--warn)',
+        },
+        'report-only': {
+          desc: 'detects and records everything but never acts (recommended for new deployments).',
+          color: 'var(--sage, #8b9a8e)',
+        },
+        protection: {
+          desc: 'actively blocks detected threats per your enforcement policy.',
+          color: 'var(--ok)',
+        },
+      };
+      function renderModeSeg() {
+        var seg = document.getElementById('st-mode-seg');
+        if (!seg) return;
+        Array.prototype.forEach.call(seg.querySelectorAll('.seg-btn'), function (b) {
+          var on = b.getAttribute('data-mode') === selectedMode;
+          b.style.background = on ? 'var(--surface-3, #302b27)' : 'transparent';
+          b.style.color = on
+            ? MODE_INFO[selectedMode]
+              ? MODE_INFO[selectedMode].color
+              : 'var(--text)'
+            : 'var(--text-muted)';
+          b.setAttribute('aria-checked', on ? 'true' : 'false');
+        });
+        var d = document.getElementById('st-mode-desc');
+        if (d && MODE_INFO[selectedMode]) {
+          d.textContent = 'This mode ' + MODE_INFO[selectedMode].desc;
+        }
+      }
+      function selectMode(m) {
+        if (!MODE_INFO[m]) return;
+        selectedMode = m;
+        renderModeSeg();
+      }
       function loadSettings() {
         af('/api/config')
           .then(function (r) {
@@ -2071,40 +2241,28 @@
           })
           .then(function (cfg) {
             if (!cfg) return;
-            var mt = document.getElementById('st-mode-toggle');
-            var ml = document.getElementById('st-mode-label');
-            var isProt = cfg.mode === 'protection';
-            if (mt) {
-              if (isProt) mt.classList.add('on');
-              else mt.classList.remove('on');
-            }
-            if (ml) {
-              ml.textContent = isProt ? 'Protection' : 'Learning';
-              ml.style.color = isProt ? 'var(--ok)' : 'var(--warn)';
-            }
+            // Preserve the real mode — including report-only — instead of
+            // collapsing it to a binary on/off.
+            selectedMode =
+              cfg.mode === 'protection' || cfg.mode === 'report-only' || cfg.mode === 'learning'
+                ? cfg.mode
+                : 'learning';
+            renderModeSeg();
             var ep = document.getElementById('st-tc-endpoint');
             if (ep) ep.value = cfg.threatCloudEndpoint || '';
+            // Show the REAL port: the one this dashboard is actually served on
+            // (location.port) is the ground truth a user needs to reconnect, not
+            // a hard-coded fallback that can be flat wrong.
             var port = document.getElementById('st-port');
-            if (port) port.textContent = cfg.dashboardPort || 9999;
+            if (port) port.textContent = cfg.dashboardPort || location.port || '3100';
           })
           .catch(function () {
             /* ignore */
           });
       }
-      function toggleMode() {
-        var t = document.getElementById('st-mode-toggle');
-        t.classList.toggle('on');
-        var l = document.getElementById('st-mode-label');
-        var isProt = t.classList.contains('on');
-        if (l) {
-          l.textContent = isProt ? 'Protection' : 'Learning';
-          l.style.color = isProt ? 'var(--ok)' : 'var(--warn)';
-        }
-      }
       function saveSettings() {
-        var modeOn = document.getElementById('st-mode-toggle').classList.contains('on');
         var body = {
-          mode: modeOn ? 'protection' : 'learning',
+          mode: selectedMode,
           endpoint: document.getElementById('st-tc-endpoint').value || undefined,
         };
         af('/api/threat-cloud', {
@@ -2209,7 +2367,13 @@
           toast('Refreshing skills…');
         });
         on('tc-toggle', 'click', toggleUpload);
-        on('st-mode-toggle', 'click', toggleMode);
+        var modeSeg = document.getElementById('st-mode-seg');
+        if (modeSeg) {
+          modeSeg.addEventListener('click', function (e) {
+            var btn = e.target && e.target.closest ? e.target.closest('button.seg-btn') : null;
+            if (btn) selectMode(btn.getAttribute('data-mode'));
+          });
+        }
         on('btn-save', 'click', saveSettings);
         on('btn-reload', 'click', loadSettings);
       }

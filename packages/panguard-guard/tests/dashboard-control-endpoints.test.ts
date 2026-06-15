@@ -206,4 +206,33 @@ describe('DashboardServer — 1.7 control endpoints', () => {
       expect((await post('/api/threat-cloud', { mode: 'yolo' })).status).toBe(400);
     });
   });
+
+  describe('Dashboard HTML — 1.7 controls are wired (CSP-safe)', () => {
+    let html = '';
+    beforeEach(async () => {
+      html = await (await fetch(`${baseUrl}/`)).text();
+    });
+
+    it('has the rule-update banner + the notify-only fetch', () => {
+      expect(html).toContain('id="rule-update-banner"');
+      expect(html).toContain('loadRuleUpdate');
+      expect(html).toContain('/api/rule-update');
+    });
+
+    it('renders real layer health (renderLayers) + Layer C inline guidance hint', () => {
+      expect(html).toContain('renderLayers');
+      expect(html).toContain('id="lc-hint"');
+    });
+
+    it('mode is a 3-state segmented control incl. report-only — no binary toggle', () => {
+      expect(html).toContain('id="st-mode-seg"');
+      expect(html).toContain('data-mode="report-only"');
+      expect(html).toContain('data-mode="protection"');
+      expect(html).toContain('data-mode="learning"');
+      // the old binary toggle + its handler are gone (it caused the clobber)
+      expect(html).not.toContain('st-mode-toggle');
+      // CSP-safe: no inline onclick handlers anywhere
+      expect(html).not.toMatch(/onclick=/);
+    });
+  });
 });
