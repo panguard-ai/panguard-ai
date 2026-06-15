@@ -52,6 +52,8 @@ import { autoDetectLLM } from './llm-detect.js';
 import {
   syncThreatCloud,
   setupCloudSyncTimer,
+  checkForRuleUpdates,
+  setupRuleUpdateCheckTimer,
   getSkillThreatSubmitter as _getSkillThreatSubmitter,
   getATRProposalSubmitter as _getATRProposalSubmitter,
   getSkillBlacklistChecker as _getSkillBlacklistChecker,
@@ -101,6 +103,7 @@ export class GuardEngine {
   private statusTimer: ReturnType<typeof setInterval> | null = null;
   private learningCheckTimer: ReturnType<typeof setInterval> | null = null;
   private cloudSyncTimer: ReturnType<typeof setInterval> | null = null;
+  private ruleUpdateTimer: ReturnType<typeof setInterval> | null = null;
   private eventCallback?: (type: string, data: Record<string, unknown>) => void;
   private consecutiveCriticalChecks = 0;
   private proxyVerdictWatcher: ReturnType<typeof setInterval> | null = null;
@@ -233,7 +236,9 @@ export class GuardEngine {
       this.config
     );
 
-    // Periodic Threat Cloud sync (every hour) + initial sync (await on startup)
+    // Periodic Threat Cloud INDICATOR sync (IP/domain blocklists + community
+    // skill lists + heartbeat). This no longer pulls detection rules — those are
+    // bundled and updated only via `pga upgrade` (see rule-sync.ts).
     const syncDeps = {
       atrEngine: this.engines.atrEngine,
       threatCloud: this.engines.threatCloud,
@@ -241,8 +246,14 @@ export class GuardEngine {
       config: this.config,
     };
     this.cloudSyncTimer = setupCloudSyncTimer(syncDeps);
-    // Await initial sync so guard starts with latest rules from TC
+    // Await initial indicator sync so the blocklists are fresh on startup.
     await syncThreatCloud(syncDeps);
+
+    // Daily rule-update CHECK (notify-only): compares the bundled ruleset against
+    // the latest published npm version and surfaces "update available" — it never
+    // downloads or live-applies rules (that is the supply-chain hole we avoid).
+    this.ruleUpdateTimer = setupRuleUpdateCheckTimer(syncDeps);
+    void checkForRuleUpdates(syncDeps); // fire-and-forget initial check (no network block on startup)
 
     // Start monitor engine
     this.monitorEngine = new MonitorEngine({
@@ -459,6 +470,10 @@ export class GuardEngine {
     if (this.cloudSyncTimer) {
       clearInterval(this.cloudSyncTimer);
       this.cloudSyncTimer = null;
+    }
+    if (this.ruleUpdateTimer) {
+      clearInterval(this.ruleUpdateTimer);
+      this.ruleUpdateTimer = null;
     }
     if (this.proxyVerdictWatcher) {
       clearInterval(this.proxyVerdictWatcher);

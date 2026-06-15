@@ -144,8 +144,8 @@ export default function LayersIndexContent() {
           <FadeInUp delay={0.1}>
             <p className="text-text-secondary mt-5 leading-relaxed">
               {isZh
-                ? 'F500 CISO 今天為單層廠商付 $400-600K/年(Lakera + Apono + Straiker + Cisco bundle)。PanGuard 7 層整合 $250K/年。節省費用的同時,拿掉 vendor fatigue 與整合成本。'
-                : "F500 CISOs today pay $400-600K/yr across single-layer vendors (Lakera + Apono + Straiker + Cisco bundle). PanGuard's 7-layer consolidation lands at $250K/yr — cheaper plus no vendor fatigue plus one SOC to train."}
+                ? 'F500 CISO 今天為單層廠商付 $400-600K/年(Lakera + Apono + Straiker + Cisco bundle)。PanGuard 7 層整合只要其中一小部分(洽詢定價)。節省費用的同時,拿掉 vendor fatigue 與整合成本。'
+                : "F500 CISOs today pay $400-600K/yr across single-layer vendors (Lakera + Apono + Straiker + Cisco bundle). PanGuard's 7-layer consolidation lands at a fraction of that (contact us for pricing) — cheaper plus no vendor fatigue plus one SOC to train."}
             </p>
           </FadeInUp>
           <FadeInUp delay={0.2}>

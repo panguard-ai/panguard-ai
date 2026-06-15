@@ -2,7 +2,27 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
-## [Unreleased] - GA prep (2026-06-14)
+## [1.6.1] - 2026-06-15
+
+### Fixed
+
+- **`pga scan` now runs the bundled ruleset.** The scanner used to shell out to
+  whatever `atr` binary happened to be on `$PATH` (or `npx agent-threat-rules@latest`),
+  so a user with an older global `atr` silently scanned with a stale, smaller rule
+  set (e.g. 462 rules from a 3.2.0 global install instead of the 651 PanGuard ships).
+  It now resolves and runs the agent-threat-rules CLI bundled with this install.
+- **`pga up` scans before it deploys.** The flow injected runtime protection into
+  agent configs first and scanned skills afterwards — the opposite of what the
+  command described. It now detects platforms, scans installed skills, surfaces
+  threats, and only then injects protection and starts Guard.
+- **Honest active-rule count.** `pga up` no longer prints a hardcoded `311`
+  fallback (referencing a two-year-old bundled version). It reads the real count
+  bundled with the install and never reports fewer rules than are actually loaded.
+- **English-only Guard dashboard data.** Anomaly-baseline deviation descriptions
+  and investigation reasoning were bilingual (English + Chinese) and surfaced into
+  the dashboard via verdict evidence. They are now English-only.
+
+## [1.6.0] - 2026-06-15
 
 ### Security
 

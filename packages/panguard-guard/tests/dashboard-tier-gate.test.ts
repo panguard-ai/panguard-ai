@@ -2,9 +2,9 @@
  * Dashboard tier-gate tests
  *
  * Covers:
- *  - /api/status now carries `license.tier` so the SPA can gate Pilot-only UI
- *  - the served HTML contains `data-tier-gate="pilot"` attributes on the
- *    SARIF + Evidence buttons (so the JS gate code has something to find)
+ *  - /api/status carries `license.tier` so the SPA can show a tier badge
+ *  - the served HTML exposes the SARIF + Evidence buttons with NO tier-gate
+ *    and NO upsell — both exports are free in the community dashboard
  *  - POST /api/export/sarif and /api/export/evidence return realistic-shape
  *    JSON downloads
  *  - regression: the served HTML no longer contains stale UI strings
@@ -129,23 +129,22 @@ describe('DashboardServer — tier gating', () => {
     });
   });
 
-  describe('Dashboard HTML — tier-gate attributes', () => {
-    it('exposes data-tier-gate="pilot" on the SARIF and Evidence buttons', async () => {
+  describe('Dashboard HTML — export buttons are free (no paywall)', () => {
+    it('exposes the SARIF + Evidence buttons with no tier-gate and no upsell', async () => {
       const res = await fetch(`${baseUrl}/`);
       expect(res.status).toBe(200);
       const html = await res.text();
 
-      // Both buttons must carry the gate attribute so applyTierGates can
-      // find them. Use a regex tolerant of attribute order.
-      expect(html).toMatch(
-        /id="btn-sarif"[^>]*data-tier-gate="pilot"|data-tier-gate="pilot"[^>]*id="btn-sarif"/
-      );
-      expect(html).toMatch(
-        /id="btn-evidence"[^>]*data-tier-gate="pilot"|data-tier-gate="pilot"[^>]*id="btn-evidence"/
-      );
+      // Both export buttons are present and available to everyone — SARIF and
+      // Evidence Pack export are free in the community dashboard.
+      expect(html).toMatch(/id="btn-sarif"/);
+      expect(html).toMatch(/id="btn-evidence"/);
 
-      // The upsell link must also be present so non-paid tiers see it.
-      expect(html).toContain('data-tier-upsell="pilot"');
+      // The paywall is gone: no tier-gating attributes, no upsell link, no
+      // "Upgrade to Pilot" cross-sell in the free local app.
+      expect(html).not.toContain('data-tier-gate="pilot"');
+      expect(html).not.toContain('data-tier-upsell="pilot"');
+      expect(html).not.toContain('Upgrade to Pilot');
     });
 
     it('does NOT contain stale "Connect LLM" / "Groq" / "Tier 1-3" UI strings', async () => {

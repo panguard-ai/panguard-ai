@@ -39,45 +39,18 @@ export interface CloudSyncDeps {
  * skill whitelist and blacklist.
  */
 export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
-  const { atrEngine, threatCloud, feedManager, config } = deps;
+  const { atrEngine, threatCloud, feedManager } = deps;
 
   try {
-    // Sync ATR rules from Threat Cloud
-    let newATRRules = 0;
-    try {
-      // Rule reception is ON by default but can be disabled (offline / pinned
-      // rules) via config threatCloudRuleSyncEnabled=false — independently of
-      // the IP/domain blocklist feeds synced below, which keep working.
-      const atrRules =
-        config.threatCloudRuleSyncEnabled === false ? [] : await threatCloud.fetchATRRules();
-      const yaml = await import('js-yaml');
-      for (const rule of atrRules) {
-        try {
-          // TC stores rules as YAML strings, not JSON. JSON_SCHEMA: remote rule
-          // content is parsed as pure data only (no custom YAML types), so a
-          // malicious or MITM'd Threat Cloud response cannot smuggle executable
-          // or type-confused objects into the engine.
-          const parsed = yaml.load(rule.ruleContent, {
-            schema: yaml.JSON_SCHEMA,
-          }) as import('@panguard-ai/atr').ATRRule;
-          if (parsed.id && parsed.title && parsed.detection && parsed.agent_source?.type) {
-            atrEngine.addCloudRule(parsed);
-            newATRRules++;
-          }
-        } catch (parseErr: unknown) {
-          logger.warn(
-            `Skipping invalid ATR rule from cloud: ${rule.ruleId ?? 'unknown'} — ${parseErr instanceof Error ? parseErr.message : String(parseErr)}`
-          );
-        }
-      }
-      if (newATRRules > 0) {
-        logger.info(
-          `ATR cloud sync: ${newATRRules} rules updated / ATR 雲端同步: ${newATRRules} 條規則更新`
-        );
-      }
-    } catch (err: unknown) {
-      logger.warn(`ATR cloud sync failed: ${err instanceof Error ? err.message : String(err)}`);
-    }
+    // NOTE: Detection RULES are intentionally NOT pulled from Threat Cloud here.
+    // Live-applying arbitrary rule content from a network relay into the engine
+    // is a supply-chain attack surface — a compromised or MITM'd relay could push
+    // ReDoS patterns or auto-blocking rules to every client every few minutes with
+    // no review. Rules ship bundled with the npm package (integrity-verified,
+    // immutable, publicly auditable) and change only via `pga upgrade`; a daily
+    // npm version check (checkForRuleUpdates) NOTIFIES when a newer published
+    // ruleset is available. The feeds below are threat INDICATORS (IP/domain
+    // blocklists, community skill lists), not executable detection logic.
 
     // Refresh IP blocklist
     const ips = await threatCloud.fetchBlocklist();
@@ -146,10 +119,7 @@ export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
         if (wasRevoked) revokedSkills++;
       }
       if (revokedSkills > 0) {
-        logger.warn(
-          `Community blacklist: ${revokedSkills} skill(s) revoked / ` +
-            `社群黑名單: ${revokedSkills} 個技能已撤銷`
-        );
+        logger.warn(`Community blacklist: ${revokedSkills} skill(s) revoked`);
       }
       lastBlacklistSync = new Date().toISOString();
     } catch (err: unknown) {
@@ -177,10 +147,8 @@ export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
     }
 
     logger.info(
-      `Threat Cloud sync: ${newATRRules} ATR, ` +
-        `${addedIPs} IPs, ${addedDomains} domains, ${importedSkills} whitelist, ${revokedSkills} blacklist / ` +
-        `Threat Cloud 同步: ${newATRRules} ATR, ` +
-        `${addedIPs} IP, ${addedDomains} 網域, ${importedSkills} 白名單, ${revokedSkills} 黑名單`
+      `Threat Cloud indicator sync: ${addedIPs} IPs, ${addedDomains} domains, ` +
+        `${importedSkills} whitelist, ${revokedSkills} blacklist`
     );
   } catch (err: unknown) {
     logger.warn(`Threat Cloud sync failed: ${err instanceof Error ? err.message : String(err)}`);
@@ -254,4 +222,112 @@ export function getSkillBlacklistChecker(
       (entry) => entry.skillName.toLowerCase().trim().replace(/\s+/g, '-') === normalized
     );
   };
+}
+
+/** Read the bundled agent-threat-rules version (filesystem walk-up, immune to
+ * the package's ESM `exports` map which blocks require.resolve of package.json). */
+async function readBundledAtrVersion(): Promise<string | null> {
+  try {
+    const { fileURLToPath } = await import('node:url');
+    const { dirname, join } = await import('node:path');
+    const { existsSync, readFileSync } = await import('node:fs');
+    let dir = dirname(fileURLToPath(import.meta.url));
+    for (let i = 0; i < 12; i++) {
+      const pkgPath = join(dir, 'node_modules', 'agent-threat-rules', 'package.json');
+      if (existsSync(pkgPath)) {
+        const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8')) as { version?: string };
+        return pkg.version ?? null;
+      }
+      const parent = dirname(dir);
+      if (parent === dir) break;
+      dir = parent;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/** Compare dotted version strings; true iff `a` is strictly newer than `b`. */
+function isNewerVersion(a: string, b: string): boolean {
+  const pa = a.split('.').map((n) => parseInt(n, 10) || 0);
+  const pb = b.split('.').map((n) => parseInt(n, 10) || 0);
+  for (let i = 0; i < 3; i++) {
+    const x = pa[i] ?? 0;
+    const y = pb[i] ?? 0;
+    if (x !== y) return x > y;
+  }
+  return false;
+}
+
+export interface RuleUpdateStatus {
+  readonly updateAvailable: boolean;
+  readonly currentVersion: string | null;
+  readonly latestVersion: string | null;
+  readonly checkedAt: string;
+}
+
+/**
+ * Daily rule-update CHECK — notify-only. Queries the public npm registry for the
+ * latest published agent-threat-rules version and compares it to the version
+ * bundled with this install. It does NOT download or apply anything: detection
+ * rules are the engine's trust root and change only via an explicit,
+ * npm-integrity-verified `pga upgrade`. The result is logged and written to
+ * <dataDir>/rule-update.json so the dashboard and CLI can surface it.
+ */
+export async function checkForRuleUpdates(deps: CloudSyncDeps): Promise<RuleUpdateStatus> {
+  const checkedAt = new Date().toISOString();
+  const currentVersion = await readBundledAtrVersion();
+  let latestVersion: string | null = null;
+  try {
+    const res = await fetch('https://registry.npmjs.org/agent-threat-rules/latest', {
+      headers: { Accept: 'application/json' },
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (res.ok) {
+      const body = (await res.json()) as { version?: string };
+      latestVersion = body.version ?? null;
+    }
+  } catch (err: unknown) {
+    logger.warn(`Rule update check failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
+
+  const updateAvailable =
+    !!currentVersion && !!latestVersion && isNewerVersion(latestVersion, currentVersion);
+
+  if (updateAvailable) {
+    logger.info(
+      `New detection rules available: agent-threat-rules ${currentVersion} -> ${latestVersion}. ` +
+        `Run "pga upgrade" to update — rules are verified by npm and never auto-applied.`
+    );
+  }
+
+  // Persist for the dashboard / CLI to surface (best-effort, owner-only perms).
+  try {
+    const { writeFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const status: RuleUpdateStatus = { updateAvailable, currentVersion, latestVersion, checkedAt };
+    writeFileSync(join(deps.config.dataDir, 'rule-update.json'), JSON.stringify(status, null, 2), {
+      mode: 0o600,
+    });
+  } catch {
+    /* best-effort surface; the log line above is the primary signal */
+  }
+
+  return { updateAvailable, currentVersion, latestVersion, checkedAt };
+}
+
+/**
+ * Create a DAILY rule-update-check timer (notify-only). Rules are not a
+ * real-time feed; the integrity-checked npm registry is the source of truth, so
+ * checking once a day is both sufficient and far smaller an attack surface than
+ * a high-frequency live pull. Returns the timer handle (caller clears it).
+ */
+export function setupRuleUpdateCheckTimer(deps: CloudSyncDeps): ReturnType<typeof setInterval> {
+  return setInterval(
+    () => {
+      void checkForRuleUpdates(deps);
+    },
+    24 * 60 * 60 * 1000
+  );
 }
