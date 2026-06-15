@@ -51,6 +51,29 @@ function isGuardRunning(): boolean {
 }
 
 /**
+ * Whether Guard is installed as a persistent OS service (launchd/systemd). `pga up`
+ * starts a background daemon but does NOT install the service — so monitoring stops
+ * at the next reboot unless the user ran `pga guard install`. Used to keep the
+ * summary panel honest about persistence (a security tool must not overclaim it).
+ */
+function isServiceInstalled(): boolean {
+  try {
+    const os = platform();
+    if (os === 'darwin') {
+      const dir = join(homedir(), 'Library', 'LaunchAgents');
+      return existsSync(dir) && readdirSync(dir).some((f) => /panguard.*guard.*\.plist$/i.test(f));
+    }
+    if (os === 'linux') {
+      const dir = join(homedir(), '.config', 'systemd', 'user');
+      return existsSync(dir) && readdirSync(dir).some((f) => /panguard.*guard/i.test(f));
+    }
+  } catch {
+    /* best-effort */
+  }
+  return false;
+}
+
+/**
  * Read the real rule count loaded by Guard from its TC cache, falling back to
  * the count actually bundled with THIS install (never a hardcoded guess — the
  * ATR rule count changes daily, so we read it from the shipped package).
@@ -575,6 +598,14 @@ export function upCommand(): Command {
         console.log(`\n  ${c.dim('\u2500'.repeat(50))}`);
         console.log(`  ${statusLabel} ${c.dim(`\u2014 ${elapsed}s`)}`);
         console.log(`  ${c.dim('\u2500'.repeat(50))}`);
+        // Honest persistence framing: `pga up` runs a background daemon but does
+        // not install the OS service, so monitoring stops at reboot. Say so plainly
+        // rather than implying always-on protection a security tool must not fake.
+        if (guardRunning && !isServiceInstalled()) {
+          console.log(
+            `  ${c.dim(t(lang, 'Runs until reboot. For always-on monitoring: pga guard install', '\u6301\u7e8c\u5230\u91cd\u958b\u6a5f\u70ba\u6b62\u3002\u8981\u958b\u6a5f\u5f8c\u4ecd\u6301\u7e8c\u76e3\u63a7:pga guard install'))}`
+          );
+        }
         console.log('');
         if (opts.dashboard) {
           console.log(`  ${c.sage('Dashboard')}     ${DASHBOARD_URL}`);
