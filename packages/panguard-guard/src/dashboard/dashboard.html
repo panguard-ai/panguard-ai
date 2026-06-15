@@ -791,23 +791,6 @@
         color: var(--ok);
       }
 
-      /* Tier-upsell link (shown when license tier is community for paid features) */
-      .upsell {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 12px;
-        color: var(--text-muted);
-        text-decoration: none;
-        padding: 6px 10px;
-        border-radius: 8px;
-        border: 1px dashed var(--border);
-        transition: all 0.15s;
-      }
-      .upsell:hover {
-        color: var(--sage);
-        border-color: var(--sage);
-      }
 
       /* Threat Cloud flywheel */
       .flywheel {
@@ -1050,33 +1033,12 @@
             </button>
           </div>
           <div style="display: flex; gap: 8px; align-items: center">
-            <button
-              class="btn btn-secondary btn-sm"
-              data-tier-gate="pilot"
-              id="btn-sarif"
-              style="display: none"
-            >
+            <button class="btn btn-secondary btn-sm" id="btn-sarif">
               <span data-i18n="exp_sarif">Export SARIF</span>
             </button>
-            <button
-              class="btn btn-primary btn-sm"
-              data-tier-gate="pilot"
-              id="btn-evidence"
-              style="display: none"
-            >
+            <button class="btn btn-primary btn-sm" id="btn-evidence">
               <span data-i18n="exp_evidence">Generate Evidence Pack</span>
             </button>
-            <a
-              class="upsell"
-              data-tier-upsell="pilot"
-              href="https://panguard.ai/pricing"
-              target="_blank"
-              rel="noopener"
-              style="display: none"
-              data-i18n="upsell_pilot"
-            >
-              Upgrade to Pilot &mdash; unlock SARIF + Evidence Pack
-            </a>
           </div>
         </div>
 
@@ -1388,8 +1350,7 @@
           <strong data-i18n="st_license">License Tier:</strong> <span id="st-tier-display">--</span
           ><br />
           <span data-i18n="st_license_desc"
-            >Community is free and unlimited. Pilot unlocks SARIF + Evidence Pack export and
-            priority Threat Cloud routing.</span
+            >Community is free and unlimited — including SARIF and Evidence Pack export.</span
           >
           <br /><br />
           <a
@@ -1504,18 +1465,11 @@
       });
 
       /* ============================================================ */
-      /*  License tier gating                                          */
+      /*  License tier label (no feature gating — everything is free)  */
       /* ============================================================ */
       function applyTierGates(status) {
         var tier = (status && status.license && status.license.tier) || 'community';
         licenseTier = tier;
-        var isPaid = tier === 'pilot' || tier === 'enterprise' || tier === 'pro';
-        document.querySelectorAll('[data-tier-gate="pilot"]').forEach(function (el) {
-          el.style.display = isPaid ? 'inline-flex' : 'none';
-        });
-        document.querySelectorAll('[data-tier-upsell="pilot"]').forEach(function (el) {
-          el.style.display = isPaid ? 'none' : 'inline-flex';
-        });
         var badge = document.getElementById('lic-badge');
         if (badge) badge.textContent = tier.toUpperCase();
         var dispTier = document.getElementById('st-tier-display');

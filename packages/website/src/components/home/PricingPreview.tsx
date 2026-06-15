@@ -33,8 +33,8 @@ const TIERS_EN = [
   {
     id: 'enterprise',
     name: 'Enterprise',
-    price: '$150-500K',
-    period: ' / yr',
+    price: "Let's talk",
+    period: '',
     desc: 'Migrator Pro · 5-framework signed evidence · airgap · SLA · CSM',
     cta: 'Contact Sales',
     href: '/contact?tier=enterprise',
@@ -42,8 +42,8 @@ const TIERS_EN = [
   {
     id: 'sovereign',
     name: 'Sovereign',
-    price: '$5-20M',
-    period: ' / nation',
+    price: "Let's talk",
+    period: '',
     desc: 'Nation-state airgap · multi-tenant · custom compliance · Cisco/AMD/NVIDIA JV pre-integrated',
     cta: 'Sovereign Desk',
     href: '/contact?tier=sovereign',
@@ -73,8 +73,8 @@ const TIERS_ZH = [
   {
     id: 'enterprise',
     name: 'Enterprise 企業版',
-    price: '$150-500K',
-    period: ' / 年',
+    price: '洽談定價',
+    period: '',
     desc: 'Migrator Pro · 5 框架 signed evidence · 離網 · SLA · 專屬 CSM',
     cta: '洽詢業務',
     href: '/contact?tier=enterprise',
@@ -82,8 +82,8 @@ const TIERS_ZH = [
   {
     id: 'sovereign',
     name: 'Sovereign 主權級',
-    price: '$5-20M',
-    period: ' / 國家',
+    price: '洽談定價',
+    period: '',
     desc: '主權國家 airgap · 多 tenant · 客製化合規 · Cisco/AMD/NVIDIA JV 預整合',
     cta: '主權團隊洽詢',
     href: '/contact?tier=sovereign',

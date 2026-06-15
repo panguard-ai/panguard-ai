@@ -455,13 +455,12 @@ export default function PricingContent() {
               </div>
 
               <div className="mt-5 flex items-baseline gap-1.5">
-                <span className="text-3xl font-extrabold text-text-primary">$150K</span>
-                <span className="text-xs text-text-muted">
-                  {isZh ? '起 · 客製年約' : 'floor · custom annual'}
+                <span className="text-3xl font-extrabold text-text-primary">
+                  {isZh ? '洽談定價' : "Let's talk"}
                 </span>
               </div>
               <p className="text-[11px] text-text-muted mt-1">
-                {isZh ? '目標 $250-350K · 上限 $500K+' : 'Target $250-350K · up to $500K+'}
+                {isZh ? '客製年約 · 私訊我們' : 'Custom annual contract · contact us'}
               </p>
 
               <p className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage mt-4 mb-1">
@@ -558,13 +557,12 @@ export default function PricingContent() {
               </div>
 
               <div className="mt-5 flex items-baseline gap-1.5">
-                <span className="text-3xl font-extrabold text-text-primary">$5-20M</span>
-                <span className="text-xs text-text-muted">
-                  {isZh ? '/ 國家 · 年約' : '/ nation · annual'}
+                <span className="text-3xl font-extrabold text-text-primary">
+                  {isZh ? '洽談定價' : "Let's talk"}
                 </span>
               </div>
               <p className="text-[11px] text-text-muted mt-1">
-                {isZh ? '對話進行中 · 1 個 Saudi PIF 線索' : 'Active dialogue · 1 Saudi PIF lead'}
+                {isZh ? '國家級部署 · 私訊我們' : 'Nation-scale deployment · contact us'}
               </p>
 
               <p className="text-[11px] uppercase tracking-wider font-semibold text-indigo-300 mt-4 mb-1">
