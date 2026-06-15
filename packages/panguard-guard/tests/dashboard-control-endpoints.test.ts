@@ -234,5 +234,15 @@ describe('DashboardServer — 1.7 control endpoints', () => {
       // CSP-safe: no inline onclick handlers anywhere
       expect(html).not.toMatch(/onclick=/);
     });
+
+    it('skills tab exposes quarantine list + restore and whitelist removal', () => {
+      expect(html).toContain('id="qz-section"');
+      expect(html).toContain('loadQuarantined');
+      expect(html).toContain('restoreQuarantined');
+      expect(html).toContain('data-restore-id');
+      expect(html).toContain('/api/skills/restore');
+      // the append-only whitelist now has an in-product undo
+      expect(html).toContain('data-act="unwhitelist"');
+    });
   });
 });
