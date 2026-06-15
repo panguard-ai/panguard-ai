@@ -83,6 +83,18 @@ export interface DashboardRelayOptions {
   readonly token: string;
 }
 
+/** Per-layer runtime health, computed from live engine state (never hard-coded). */
+interface LayerState {
+  readonly state: 'active' | 'idle' | 'degraded' | 'off';
+  readonly detail: string;
+  readonly optional?: boolean;
+}
+interface LayerHealth {
+  readonly a: LayerState;
+  readonly b: LayerState;
+  readonly c: LayerState;
+}
+
 /**
  * Dashboard Server manages the HTTP + WebSocket real-time dashboard
  */
@@ -230,7 +242,7 @@ export class DashboardServer {
 
         this.sendToClient(client, {
           type: 'status_update',
-          data: this.status,
+          data: { ...this.status, layers: this.computeLayers() },
           timestamp: new Date().toISOString(),
         });
 
@@ -303,7 +315,7 @@ export class DashboardServer {
     this.status = { ...this.status, ...update };
     this.broadcast({
       type: 'status_update',
-      data: this.status,
+      data: { ...this.status, layers: this.computeLayers() },
       timestamp: new Date().toISOString(),
     });
   }
@@ -532,6 +544,36 @@ export class DashboardServer {
           this.jsonResponse(res, { error: 'Method not allowed' }, 405);
         }
         break;
+      case '/api/skills/unwhitelist':
+        if (req.method === 'POST') {
+          this.handleUnwhitelistPost(req, res);
+        } else {
+          this.jsonResponse(res, { error: 'Method not allowed' }, 405);
+        }
+        break;
+      case '/api/skills/quarantined':
+        this.handleQuarantinedListApi(res).catch((err: unknown) => {
+          logger.error(
+            `handleQuarantinedListApi error: ${err instanceof Error ? err.message : String(err)}`
+          );
+          if (!res.headersSent) this.jsonResponse(res, { error: 'Internal error' }, 500);
+        });
+        break;
+      case '/api/skills/restore':
+        if (req.method === 'POST') {
+          this.handleRestorePost(req, res).catch((err: unknown) => {
+            logger.error(
+              `handleRestorePost error: ${err instanceof Error ? err.message : String(err)}`
+            );
+            if (!res.headersSent) this.jsonResponse(res, { error: 'Internal error' }, 500);
+          });
+        } else {
+          this.jsonResponse(res, { error: 'Method not allowed' }, 405);
+        }
+        break;
+      case '/api/rule-update':
+        this.handleRuleUpdateApi(res);
+        break;
       case '/api/agents':
         this.handleAgentsApi(res).catch((err: unknown) => {
           logger.error(
@@ -584,6 +626,7 @@ export class DashboardServer {
    */
   private buildStatusResponse(): DashboardStatus & {
     license: { tier: 'community' | 'pilot' | 'enterprise' | 'free' | 'pro' };
+    layers: LayerHealth;
   } {
     const cfg = this.getConfig?.();
     const rawTier = cfg?.cliTier ?? this.status.licenseTier ?? 'community';
@@ -592,6 +635,41 @@ export class DashboardServer {
       ...this.status,
       licenseTier: tier,
       license: { tier },
+      layers: this.computeLayers(),
+    };
+  }
+
+  /**
+   * Real per-layer health, derived from live engine state — NOT hard-coded.
+   * The dashboard's "Layer A/B Active" used to be static green in the HTML, so it
+   * stayed green even with zero rules loaded or the engine stopped. This computes
+   * the truth: Layer A (deterministic pattern) is active only when rules are
+   * actually loaded AND the engine is running; Layer B (deterministic heuristic +
+   * baseline) tracks the running state; Layer C (optional semantic) reflects
+   * whether the user has configured a BYO LLM (config.ai) — it is advisory and
+   * off-by-default, so "off" is a healthy state, not a fault.
+   */
+  private computeLayers(): LayerHealth {
+    const cfg = this.getConfig?.();
+    const ruleCount = this.status.atrRuleCount ?? 0;
+    const running = this.status.mode === 'learning' || this.status.mode === 'protection';
+    const aiConfigured = !!cfg?.ai;
+    return {
+      a: {
+        state: ruleCount > 0 && running ? 'active' : ruleCount > 0 ? 'idle' : 'degraded',
+        detail: ruleCount > 0 ? `${ruleCount} pattern rules loaded` : 'no rules loaded',
+      },
+      b: {
+        state: running ? 'active' : 'idle',
+        detail: 'heuristic + behavioral baseline',
+      },
+      c: {
+        state: aiConfigured ? 'active' : 'off',
+        optional: true,
+        detail: aiConfigured
+          ? 'semantic verdict configured (advisory)'
+          : 'off · bring your own LLM — set PANGUARD_LLM_ENDPOINT or run `pga config llm`',
+      },
     };
   }
 
@@ -1079,9 +1157,14 @@ export class DashboardServer {
           this.jsonResponse(res, { error: 'Invalid endpoint URL' }, 400);
           return;
         }
+        // Accept all THREE real modes. Omitting 'report-only' here used to both
+        // reject a legitimate report-only save (400) and let the binary UI toggle
+        // silently overwrite a user's report-only config with 'learning' on the
+        // next save — quietly downgrading their enforcement posture.
         if (
           update.mode !== undefined &&
           update.mode !== 'learning' &&
+          update.mode !== 'report-only' &&
           update.mode !== 'protection'
         ) {
           this.jsonResponse(res, { error: 'Invalid mode' }, 400);
@@ -1357,6 +1440,139 @@ export class DashboardServer {
         { error: `Whitelist failed: ${err instanceof Error ? err.message : String(err)}` },
         500
       );
+    }
+  }
+
+  /**
+   * POST /api/skills/unwhitelist — remove a skill from the local whitelist, so a
+   * mistaken "Mark safe" is reversible from the dashboard (the whitelist used to
+   * be append-only with no in-product undo). Atomic write, owner-only perms.
+   */
+  private async handleUnwhitelistPost(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readJsonBody(req, res);
+    if (body === null) return;
+    const name = typeof body['name'] === 'string' ? (body['name'] as string).trim() : '';
+    if (!name) {
+      this.jsonResponse(res, { error: 'Missing skill name' }, 400);
+      return;
+    }
+    try {
+      const dataDir = this.getConfig?.()?.dataDir ?? join(homedir(), '.panguard-guard');
+      const whitelistPath = join(dataDir, 'skill-whitelist.json');
+      if (!existsSync(whitelistPath)) {
+        this.jsonResponse(res, { success: true, removed: false });
+        return;
+      }
+      let entries: Array<{ name: string; source?: string; addedAt?: string }> = [];
+      try {
+        const raw = JSON.parse(readFileSync(whitelistPath, 'utf-8')) as {
+          whitelist?: Array<{ name: string; source?: string }>;
+          skills?: Array<{ name: string; source?: string }>;
+        };
+        entries = raw.whitelist ?? raw.skills ?? [];
+      } catch {
+        this.jsonResponse(res, { success: true, removed: false });
+        return;
+      }
+      const next = entries.filter((s) => s.name !== name);
+      const removed = next.length !== entries.length;
+      mkdirSync(dataDir, { recursive: true });
+      const tmp = `${whitelistPath}.tmp.${process.pid}`;
+      writeFileSync(tmp, JSON.stringify({ whitelist: next }, null, 2), { mode: 0o600 });
+      renameSync(tmp, whitelistPath);
+      this.jsonResponse(res, { success: true, removed });
+    } catch (err: unknown) {
+      this.jsonResponse(
+        res,
+        { error: `Un-whitelist failed: ${err instanceof Error ? err.message : String(err)}` },
+        500
+      );
+    }
+  }
+
+  /**
+   * GET /api/skills/quarantined — the list of currently quarantined files, so the
+   * user can SEE what's quarantined and restore it. The quarantine confirm dialog
+   * promises restorability; this + /api/skills/restore make that promise real.
+   */
+  private async handleQuarantinedListApi(res: ServerResponse): Promise<void> {
+    try {
+      const fq = new FileQuarantine();
+      await fq.initialize();
+      const records = fq.getActiveRecords().map((r) => ({
+        id: r.id,
+        originalPath: r.originalPath,
+        reason: r.reason,
+        quarantinedAt: r.quarantinedAt,
+      }));
+      this.jsonResponse(res, { records, total: records.length });
+    } catch (err: unknown) {
+      logger.error(`quarantined list failed: ${err instanceof Error ? err.message : String(err)}`);
+      this.jsonResponse(res, { records: [], total: 0 });
+    }
+  }
+
+  /**
+   * POST /api/skills/restore — restore a quarantined file to its original path,
+   * honoring the reversibility the UI promises. Body: { id }.
+   */
+  private async handleRestorePost(req: IncomingMessage, res: ServerResponse): Promise<void> {
+    const body = await this.readJsonBody(req, res);
+    if (body === null) return;
+    const id = typeof body['id'] === 'string' ? (body['id'] as string).trim() : '';
+    if (!id) {
+      this.jsonResponse(res, { error: 'Missing quarantine id' }, 400);
+      return;
+    }
+    try {
+      const fq = new FileQuarantine();
+      await fq.initialize();
+      const result = await fq.restore(id);
+      if (result.success) {
+        logger.warn(`Quarantined file restored via dashboard: ${id}`);
+        this.jsonResponse(res, { success: true, message: result.message });
+      } else {
+        this.jsonResponse(res, { success: false, error: result.message }, 400);
+      }
+    } catch (err: unknown) {
+      this.jsonResponse(
+        res,
+        { error: `Restore failed: ${err instanceof Error ? err.message : String(err)}` },
+        500
+      );
+    }
+  }
+
+  /**
+   * GET /api/rule-update — surface the daily notify-only rule-update check that
+   * rule-sync writes to <dataDir>/rule-update.json. The backend computed this
+   * signal ("newer detection rules published") but nothing read it, so the most
+   * actionable security update was invisible. Notify-only: never auto-applies.
+   */
+  private handleRuleUpdateApi(res: ServerResponse): void {
+    const dataDir = this.getConfig?.()?.dataDir ?? join(homedir(), '.panguard-guard');
+    const updatePath = join(dataDir, 'rule-update.json');
+    if (!existsSync(updatePath)) {
+      this.jsonResponse(res, {
+        updateAvailable: false,
+        currentVersion: null,
+        latestVersion: null,
+        checkedAt: null,
+        neverChecked: true,
+      });
+      return;
+    }
+    try {
+      const status = JSON.parse(readFileSync(updatePath, 'utf-8'));
+      this.jsonResponse(res, status);
+    } catch {
+      this.jsonResponse(res, {
+        updateAvailable: false,
+        currentVersion: null,
+        latestVersion: null,
+        checkedAt: null,
+        neverChecked: true,
+      });
     }
   }
 
