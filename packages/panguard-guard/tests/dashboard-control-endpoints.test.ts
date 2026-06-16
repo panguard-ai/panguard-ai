@@ -207,6 +207,40 @@ describe('DashboardServer — 1.7 control endpoints', () => {
     });
   });
 
+  describe('enforcement posture — PROTECTED only when it will actually act', () => {
+    it('protection mode with NO armed response = monitoring, not protected', async () => {
+      dashboard.updateStatus({ mode: 'protection' });
+      const d = await (await get('/api/status')).json();
+      expect(d.enforcement.posture).toBe('monitoring');
+      expect(d.enforcement.osActionsArmed).toBe(false);
+    });
+
+    it('protection mode WITH an armed response = protected', async () => {
+      dashboard.setConfigGetter(
+        () =>
+          ({
+            ...baseConfig(dataDir),
+            enforcementPolicy: {
+              blockIPs: { enabled: true },
+              killProcesses: { enabled: false, allowedProcessNames: [] },
+              isolateFiles: { enabled: false, allowedPaths: [] },
+              disableAccounts: { enabled: false },
+            },
+          }) as unknown as GuardConfig
+      );
+      dashboard.updateStatus({ mode: 'protection' });
+      const d = await (await get('/api/status')).json();
+      expect(d.enforcement.posture).toBe('protected');
+      expect(d.enforcement.armedActions).toContain('block IPs');
+    });
+
+    it('report-only mode reports report-only', async () => {
+      dashboard.updateStatus({ mode: 'report-only' });
+      const d = await (await get('/api/status')).json();
+      expect(d.enforcement.posture).toBe('report-only');
+    });
+  });
+
   describe('Dashboard HTML — 1.7 controls are wired (CSP-safe)', () => {
     let html = '';
     beforeEach(async () => {
@@ -261,6 +295,13 @@ describe('DashboardServer — 1.7 control endpoints', () => {
       expect(html).toContain('loadRuntime');
       expect(html).toContain('/api/agents');
       expect(html).toContain('/api/proxy-verdicts');
+    });
+
+    it('derives the hero badge from honest enforcement posture, not a hardcoded mode string', () => {
+      expect(html).toContain('postureView');
+      expect(html).toContain('MONITORING');
+      // the old overclaiming ternary is gone
+      expect(html).not.toContain("s.mode === 'protection' ? 'PROTECTED' : 'LEARNING'");
     });
 
     it('leads the Overview with a posture score + actionable deductions', () => {

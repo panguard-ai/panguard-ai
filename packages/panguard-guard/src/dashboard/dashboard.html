@@ -1812,18 +1812,23 @@
         setKPI('v-events', (s.eventsProcessed || 0).toLocaleString());
         setKPI('v-mode', s.mode || '--');
 
+        // Honest posture label: PROTECTED only when the daemon will actually ACT
+        // (protection mode + an armed response). 'protection' mode with no armed
+        // OS response is MONITORING (detect + notify), not green PROTECTED.
+        var p = postureView(s);
         var hs = document.getElementById('hero-status');
         var hd = document.getElementById('hero-dot');
         var hb = document.getElementById('hero-badge');
         if (hs) {
-          hs.textContent = s.mode === 'protection' ? 'PROTECTED' : 'LEARNING';
-          hs.style.color = s.mode === 'protection' ? 'var(--ok)' : 'var(--warn)';
+          hs.textContent = p.label;
+          hs.style.color = p.color;
+          hs.title = p.detail;
         }
-        if (hd) hd.style.background = s.mode === 'protection' ? 'var(--ok)' : 'var(--warn)';
+        if (hd) hd.style.background = p.color;
         if (hb) {
-          hb.textContent = s.mode === 'protection' ? 'PROTECTED' : 'LEARNING';
-          hb.className =
-            'badge ' + (s.mode === 'protection' ? 'badge-protected' : 'badge-learning');
+          hb.textContent = p.label;
+          hb.className = 'badge ' + p.badge;
+          hb.title = p.detail;
         }
         updatePBar(s);
         renderLayers(s.layers);
@@ -1876,6 +1881,18 @@
             pts: pa,
             goto: 'coverage',
             btn: 'Connect',
+          });
+        }
+        // Honesty: 'protection' mode that arms NO automatic response is detect-and-
+        // notify, not prevention. Don't let the score read 'Strong' while the daemon
+        // would take no action. (report-only / learning make no such claim → no penalty.)
+        if (s.enforcement && s.enforcement.mode === 'protection' && !s.enforcement.osActionsArmed) {
+          score -= 10;
+          ded.push({
+            label: 'Protection mode on, but no automatic response is armed',
+            pts: 10,
+            goto: 'settings',
+            btn: 'Configure',
           });
         }
         score = Math.max(0, score);
@@ -1982,18 +1999,59 @@
         var hint = document.getElementById('lc-hint');
         if (hint) hint.textContent = L.c && L.c.state !== 'active' && L.c.detail ? L.c.detail : '';
       }
+      /* Map the server's honest enforcement posture to a label/color. PROTECTED
+         (emerald) ONLY when the daemon will actually act; 'protection' mode with
+         no armed response → MONITORING (amber), not a green over-claim. */
+      function postureView(s) {
+        var enf = s.enforcement || {
+          posture: s.mode === 'protection' ? 'protected' : s.mode || 'learning',
+          armedActions: [],
+        };
+        var MAP = {
+          protected: {
+            label: 'PROTECTED',
+            color: 'var(--emerald)',
+            badge: 'badge-protected',
+            detail: 'Detecting and auto-responding (' + (enf.armedActions || []).join(', ') + ')',
+          },
+          monitoring: {
+            label: 'MONITORING',
+            color: 'var(--warn)',
+            badge: 'badge-learning',
+            detail:
+              'Detecting + notifying. No automatic OS response is armed — arm it under ' +
+              'enforcementPolicy in config to auto-act.',
+          },
+          'report-only': {
+            label: 'REPORT-ONLY',
+            color: 'var(--sage)',
+            badge: 'badge-learning',
+            detail: 'Recording detections only; takes no action by design.',
+          },
+          learning: {
+            label: 'LEARNING',
+            color: 'var(--warn)',
+            badge: 'badge-learning',
+            detail: 'Building a baseline of normal activity; logging only.',
+          },
+          off: {
+            label: 'OFFLINE',
+            color: 'var(--danger)',
+            badge: 'badge-learning',
+            detail: 'Guard is not running.',
+          },
+        };
+        return MAP[enf.posture] || MAP.learning;
+      }
       function updatePBar(s) {
         var dot = document.getElementById('pb-dot');
         var txt = document.getElementById('pb-txt');
         var det = document.getElementById('pb-detail');
         if (!dot || !txt || !det) return;
-        var running = s.mode === 'protection' || s.mode === 'learning';
+        var running = s.mode === 'protection' || s.mode === 'learning' || s.mode === 'report-only';
+        var p = postureView(s);
         dot.className = 'pb-dot ' + (running ? 'ok' : 'bad');
-        txt.textContent = running
-          ? s.mode === 'protection'
-            ? 'PROTECTED'
-            : 'LEARNING'
-          : 'OFFLINE';
+        txt.textContent = running ? p.label : 'OFFLINE';
         var rules = s.atrRuleCount || 0;
         det.textContent =
           '| ' +

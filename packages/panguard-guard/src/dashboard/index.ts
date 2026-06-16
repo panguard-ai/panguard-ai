@@ -96,6 +96,18 @@ interface LayerHealth {
 }
 
 /**
+ * Honest enforcement posture — what the daemon will ACTUALLY do on a detection,
+ * not just the mode label. 'protection' mode with no armed response policy is
+ * detect-and-notify, NOT prevention, and must not read as a green PROTECTED.
+ */
+interface EnforcementStatus {
+  readonly mode: string;
+  readonly posture: 'protected' | 'monitoring' | 'report-only' | 'learning' | 'off';
+  readonly osActionsArmed: boolean;
+  readonly armedActions: string[];
+}
+
+/**
  * Dashboard Server manages the HTTP + WebSocket real-time dashboard
  */
 export class DashboardServer {
@@ -242,7 +254,11 @@ export class DashboardServer {
 
         this.sendToClient(client, {
           type: 'status_update',
-          data: { ...this.status, layers: this.computeLayers() },
+          data: {
+            ...this.status,
+            layers: this.computeLayers(),
+            enforcement: this.computeEnforcement(),
+          },
           timestamp: new Date().toISOString(),
         });
 
@@ -315,7 +331,11 @@ export class DashboardServer {
     this.status = { ...this.status, ...update };
     this.broadcast({
       type: 'status_update',
-      data: { ...this.status, layers: this.computeLayers() },
+      data: {
+        ...this.status,
+        layers: this.computeLayers(),
+        enforcement: this.computeEnforcement(),
+      },
       timestamp: new Date().toISOString(),
     });
   }
@@ -627,6 +647,7 @@ export class DashboardServer {
   private buildStatusResponse(): DashboardStatus & {
     license: { tier: 'community' | 'pilot' | 'enterprise' | 'free' | 'pro' };
     layers: LayerHealth;
+    enforcement: EnforcementStatus;
   } {
     const cfg = this.getConfig?.();
     const rawTier = cfg?.cliTier ?? this.status.licenseTier ?? 'community';
@@ -636,6 +657,7 @@ export class DashboardServer {
       licenseTier: tier,
       license: { tier },
       layers: this.computeLayers(),
+      enforcement: this.computeEnforcement(),
     };
   }
 
@@ -671,6 +693,32 @@ export class DashboardServer {
           : 'off · bring your own LLM — set PANGUARD_LLM_ENDPOINT or run `pga config llm`',
       },
     };
+  }
+
+  /**
+   * Honest enforcement posture. The dashboard used to print PROTECTED whenever
+   * mode === 'protection', even with an all-off enforcement policy that takes no
+   * action — the exact "says PROTECTED, prevents nothing" overclaim the audit
+   * flagged. This reports what the daemon will ACTUALLY do: 'protected' only when
+   * protection mode is on AND at least one response action is armed; otherwise
+   * 'monitoring' (detect + notify, no automatic OS response).
+   */
+  private computeEnforcement(): EnforcementStatus {
+    const cfg = this.getConfig?.();
+    const mode = this.status.mode ?? 'learning';
+    const ep = cfg?.enforcementPolicy;
+    const armed: string[] = [];
+    if (ep?.blockIPs?.enabled) armed.push('block IPs');
+    if (ep?.killProcesses?.enabled) armed.push('kill processes');
+    if (ep?.isolateFiles?.enabled) armed.push('isolate files');
+    if (ep?.disableAccounts?.enabled) armed.push('disable accounts');
+    const osActionsArmed = mode === 'protection' && armed.length > 0;
+    let posture: EnforcementStatus['posture'];
+    if (mode === 'protection') posture = osActionsArmed ? 'protected' : 'monitoring';
+    else if (mode === 'report-only') posture = 'report-only';
+    else if (mode === 'learning') posture = 'learning';
+    else posture = 'off';
+    return { mode, posture, osActionsArmed, armedActions: armed };
   }
 
   private normalizeLicenseTier(t: string): 'community' | 'pilot' | 'enterprise' | 'free' | 'pro' {
