@@ -22,6 +22,18 @@ All notable changes to Panguard AI will be documented in this file.
   and investigation reasoning were bilingual (English + Chinese) and surfaced into
   the dashboard via verdict evidence. They are now English-only.
 
+### Security
+
+- **Detection rules no longer live-apply from a network relay.** The Guard daemon
+  used to pull ATR rule content from Threat Cloud every 5 minutes and apply it to
+  the engine with no review — a supply-chain attack surface (a compromised or
+  MITM'd relay could push ReDoS or auto-blocking rules to every client). Rules now
+  ship bundled with the npm package (integrity-verified, immutable, publicly
+  auditable) and change only via an explicit `pga upgrade`. A once-a-day check
+  against the npm registry NOTIFIES when a newer published ruleset is available;
+  it never downloads or applies rules automatically. Threat-indicator feeds
+  (IP/domain blocklists, community skill lists) are unaffected.
+
 ## [1.6.0] - 2026-06-15
 
 ### Security

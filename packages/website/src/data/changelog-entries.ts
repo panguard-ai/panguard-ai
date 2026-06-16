@@ -222,8 +222,8 @@ export const changelogEntries: ChangelogEntry[] = [
       },
       {
         type: 'feature',
-        text: 'OpenClaw, WorkBuddy, NemoClaw, ArkClaw native integration',
-        textZh: 'OpenClaw、WorkBuddy、NemoClaw、ArkClaw 原生整合',
+        text: 'OpenClaw and WorkBuddy native integration',
+        textZh: 'OpenClaw、WorkBuddy 原生整合',
       },
       {
         type: 'improvement',

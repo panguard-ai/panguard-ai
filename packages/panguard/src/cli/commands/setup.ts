@@ -94,8 +94,6 @@ const PLATFORM_RESTART_HINTS: Record<string, string> = {
   openclaw: 'Close and reopen OpenClaw',
   codex: 'Restart the Codex CLI session',
   workbuddy: 'Close and reopen WorkBuddy',
-  nemoclaw: 'Close and reopen NemoClaw',
-  arkclaw: 'Close and reopen ArkClaw',
 };
 
 export function setupCommand(): Command {
@@ -103,7 +101,7 @@ export function setupCommand(): Command {
     .description('Auto-detect AI agent platforms and configure Panguard MCP')
     .option(
       '--platform <name>',
-      'Target a specific platform (claude-code, cursor, openclaw, codex, workbuddy, nemoclaw, claude-desktop)'
+      'Target a specific platform (claude-code, cursor, openclaw, codex, workbuddy, claude-desktop)'
     )
     .option('--remove', 'Remove Panguard MCP config from platforms', false)
     .option('--json', 'Output as JSON', false)
@@ -183,8 +181,6 @@ export function setupCommand(): Command {
           'openclaw',
           'codex',
           'workbuddy',
-          'nemoclaw',
-          'arkclaw',
         ];
         let targets = allPlatforms;
         if (options.platform) {

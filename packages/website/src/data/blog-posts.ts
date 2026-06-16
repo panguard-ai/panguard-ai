@@ -1493,7 +1493,7 @@ export const blogPosts: BlogPost[] = [
       '沒有實作的標準只是清單。沒有標準的實作只是亂槍打鳥。產業兩者都需要。',
       '## 目前已有的工具',
       '在標準化流程進行的同時，已經有可執行的工具可以使用：',
-      '- 110 條 ATR 偵測規則，覆蓋全部 10 個 OWASP Agentic Top 10 類別——77 個規則映射\n- 53,577 個 Skills 已掃描，有史以來最大規模的 AI Agent Skill 安全審計\n- 17 個平台支援：Claude Code、Claude Desktop、Cursor、Hermes Agent、OpenClaw、Codex CLI、WorkBuddy、NemoClaw、ArkClaw、Windsurf、QClaw、Cline、VS Code Copilot、Zed、Gemini CLI、Continue、Roo Code\n- Threat Cloud：集體情報網路，每次掃描都讓所有用戶更安全\n- 61.4% recall、99.6% precision，基於 PINT benchmark——完整方法論公開',
+      '- 110 條 ATR 偵測規則，覆蓋全部 10 個 OWASP Agentic Top 10 類別——77 個規則映射\n- 53,577 個 Skills 已掃描，有史以來最大規模的 AI Agent Skill 安全審計\n- 13 個平台支援：Claude Code、Claude Desktop、Cursor、OpenClaw、Codex CLI、WorkBuddy、Windsurf、Cline、VS Code Copilot、Zed、Gemini CLI、Continue、Roo Code\n- Threat Cloud：集體情報網路，每次掃描都讓所有用戶更安全\n- 61.4% recall、99.6% precision，基於 PINT benchmark——完整方法論公開',
       '## 接下來會怎樣',
       '市場驗證。 六家最大的科技公司確認了 AI Agent 工具呼叫安全是真實且緊迫的問題。這驗證了整個領域的方向。',
       '標準對齊。 當 SAFE-MCP 發布威脅分類時，我們會把每條 ATR 規則映射上去。',
