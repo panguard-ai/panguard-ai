@@ -11,6 +11,7 @@
  */
 
 import { join } from 'node:path';
+import { createPublicKey, verify as edVerify } from 'node:crypto';
 import {
   createLogger,
   ThreatIntelFeedManager,
@@ -255,11 +256,39 @@ export async function initEngines(
  * Load all rules from bundled directories and cloud.
  * Called during GuardEngine.start().
  */
+/**
+ * Verify an ed25519 signature on a network-delivered detection rule BEFORE it is
+ * loaded into the engine. Detection rules are executable trust (regex → ReDoS,
+ * auto-block rules → destructive response), so a rule pulled from Threat Cloud
+ * must be cryptographically attributable to the ATR publisher, not just shaped
+ * like JSON. Fail CLOSED: no provisioned public key, or no/invalid signature →
+ * reject. The publisher key is supplied out-of-band via PANGUARD_RULE_PUBKEY
+ * (PEM, ed25519); until it is provisioned, opt-in cloud rule sync loads nothing.
+ */
+export function verifyCloudRuleSignature(rule: {
+  ruleContent?: string;
+  signature?: string;
+}): boolean {
+  const pem = process.env['PANGUARD_RULE_PUBKEY'];
+  if (!pem || !rule.signature || !rule.ruleContent) return false;
+  try {
+    const key = createPublicKey(pem);
+    return edVerify(
+      null,
+      Buffer.from(rule.ruleContent, 'utf-8'),
+      key,
+      Buffer.from(rule.signature, 'base64')
+    );
+  } catch {
+    return false;
+  }
+}
+
 export async function loadAllRules(
   atrEngine: GuardATREngine,
   threatCloud: ThreatCloudClient,
   feedManager: ThreatIntelFeedManager,
-  _config: GuardConfig
+  config: GuardConfig
 ): Promise<void> {
   feedManager
     .start()
@@ -284,13 +313,33 @@ export async function loadAllRules(
       }
       atrEngine.startSessionCleanup();
 
-      // Now safe to fetch cloud rules — bundledRuleIds is populated
+      // TRUST ROOT: detection rules are the engine's executable trust. By default
+      // they come ONLY from the signed npm package (updated via `pga upgrade`,
+      // npm-integrity-verified) and are NEVER auto-pulled from the network — a
+      // compromised or MITM'd relay must not be able to inject detection logic.
+      // Cloud rule sync is strictly opt-in AND every rule must carry a valid
+      // publisher signature; we fail closed otherwise.
+      if (config.threatCloudRuleSyncEnabled !== true) {
+        logger.info(
+          'Cloud rule sync disabled (default) — detection rules loaded from the signed package only; nothing auto-pulled.'
+        );
+        return [] as Awaited<ReturnType<typeof threatCloud.fetchATRRules>>;
+      }
+      logger.warn(
+        'Cloud rule sync ENABLED — fetching from Threat Cloud; each rule must pass publisher signature verification.'
+      );
       return threatCloud.fetchATRRules();
     })
     .then((atrCloudRules) => {
       let added = 0;
+      let rejected = 0;
       for (const rule of atrCloudRules) {
         try {
+          // Reject any network rule that is not signed by the ATR publisher key.
+          if (!verifyCloudRuleSignature(rule)) {
+            rejected++;
+            continue;
+          }
           const parsed = JSON.parse(rule.ruleContent) as import('@panguard-ai/atr').ATRRule;
           if (parsed.id && parsed.title && parsed.detection && parsed.agent_source?.type) {
             atrEngine.addCloudRule(parsed);
@@ -301,7 +350,12 @@ export async function loadAllRules(
         }
       }
       if (added > 0) {
-        logger.info(`ATR cloud rules loaded: ${added} rules / ATR 雲端規則已載入: ${added} 條`);
+        logger.info(`ATR cloud rules loaded: ${added} signature-verified rules`);
+      }
+      if (rejected > 0) {
+        logger.warn(
+          `ATR cloud rules rejected: ${rejected} rule(s) failed signature verification (fail-closed; not loaded).`
+        );
       }
     })
     .catch((err: unknown) => {
