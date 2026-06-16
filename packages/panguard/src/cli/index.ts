@@ -86,6 +86,7 @@ const migrateProCommand = lazyCommand(
 import { upgradeCommand } from './commands/upgrade.js';
 import { configCommand } from './commands/config.js';
 import { doctorCommand } from './commands/doctor.js';
+import { hookCommand } from './commands/hook.js';
 import { auditCommand } from './commands/audit.js';
 import { skillsCommand } from './commands/skills.js';
 import { hacktivityCommand } from './commands/hacktivity.js';
@@ -120,6 +121,7 @@ program.addCommand(whoamiCommand());
 program.addCommand(chatCommand());
 program.addCommand(configCommand());
 program.addCommand(doctorCommand());
+program.addCommand(hookCommand());
 // report (AI Compliance Audit Evidence generator) is the enterprise tier's
 // core differentiator and is NOT released in the free community plan. It stays
 // hidden until the paid tier launches behind a license gate. Do not register it
@@ -144,6 +146,10 @@ const userArgs = process.argv.slice(2);
 const helpFlags = new Set(['-h', '--help', '-V', '--version']);
 const hasSubcommand = userArgs.some((a) => !a.startsWith('-'));
 const hasHelpOrVersion = userArgs.some((a) => helpFlags.has(a));
+// The `hook` command is invoked by Claude Code per tool call and its stdout is
+// parsed as JSON — it must emit NOTHING else (no update banner, no update check,
+// no first-run wizard). Detect it early and stay silent + fast.
+const isHookCommand = userArgs[0] === 'hook';
 
 /**
  * Show "What's new" message once after upgrade.
@@ -300,15 +306,15 @@ async function checkForUpdates(): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  // Show "what's new" on interactive use (not --json, not --help)
+  // Show "what's new" on interactive use (not --json, not --help, not the hook)
   const isJsonMode = userArgs.includes('--json');
-  if (!hasHelpOrVersion && !isJsonMode) {
+  if (!hasHelpOrVersion && !isJsonMode && !isHookCommand) {
     await showWhatsNewIfUpgraded();
     // Non-blocking update check (fire and forget on non-JSON interactive use)
     void checkForUpdates();
   }
 
-  if (!hasSubcommand && !hasHelpOrVersion) {
+  if (!hasSubcommand && !hasHelpOrVersion && !isHookCommand) {
     // First-run detection: if no config exists, auto-run setup wizard
     const { existsSync } = await import('node:fs');
     const { join } = await import('node:path');

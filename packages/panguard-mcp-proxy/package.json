@@ -5,6 +5,16 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./evaluator": {
+      "import": "./dist/evaluator.js",
+      "types": "./dist/evaluator.d.ts"
+    }
+  },
   "bin": {
     "panguard-mcp-proxy": "./dist/index.js"
   },

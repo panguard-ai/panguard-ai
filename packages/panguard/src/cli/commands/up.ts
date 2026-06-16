@@ -15,6 +15,7 @@ import { c, setLogLevel } from '@panguard-ai/core';
 import { ok, warn, arrow, shield, brandTagline } from '../theme.js';
 import { detectLang } from '../interactive/lang.js';
 import { ensureTelemetryConsent } from '../consent.js';
+import { installHook } from './hook.js';
 
 type Lang = 'en' | 'zh-TW';
 
@@ -524,6 +525,24 @@ export function upCommand(): Command {
             for (const r of proxySummary.results) {
               if (r.error) {
                 console.log(`    ${c.critical(`${r.platformId}: ${r.error}`)}`);
+              }
+            }
+
+            // The MCP proxy only covers MCP tool servers. Claude Code's BUILT-IN
+            // tools (Bash/Edit/Write/WebFetch) bypass it — the most dangerous
+            // surface. Register the PreToolUse hook so they're evaluated too.
+            if (detectedPlatforms.some((p) => p.id === 'claude-code')) {
+              try {
+                const r = installHook();
+                console.log(
+                  r === 'installed'
+                    ? `    ${c.safe('Built-in tools guarded')} ${c.dim('(Bash/Edit/Write/WebFetch via PreToolUse hook — restart Claude Code)')}`
+                    : `    ${c.dim('Built-in-tool hook already installed.')}`
+                );
+              } catch {
+                console.log(
+                  `    ${c.dim('Could not install the built-in-tool hook — run `pga hook install` manually.')}`
+                );
               }
             }
           }
