@@ -8,10 +8,18 @@
  * spawn e2e proving the real `pga hook run` emits clean JSON.
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import { execFileSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import {
   normalizeInput,
@@ -20,6 +28,9 @@ import {
   withHookInstalled,
   withHookRemoved,
   toHookPlatform,
+  installFor,
+  lastHookInstallError,
+  readHookProtectionStatus,
 } from '../src/cli/commands/hook.js';
 
 describe('normalizeInput — per-platform stdin, evaluate command not tool name', () => {
@@ -131,6 +142,156 @@ describe('Claude settings install/uninstall — idempotent, non-clobbering', () 
     const removed = withHookRemoved(once);
     expect(isHookInstalled(removed)).toBe(false);
     expect(removed.hooks?.PreToolUse?.length).toBe(1); // user hook kept
+  });
+});
+
+describe('installFor — data-loss safety (corrupt config is NEVER overwritten)', () => {
+  // installFor writes under os.homedir(); os.homedir() honors $HOME on
+  // macOS/Linux, so we sandbox each test in a throwaway HOME.
+  let home: string | undefined;
+  const origHome = process.env['HOME'];
+
+  afterEach(() => {
+    if (origHome === undefined) delete process.env['HOME'];
+    else process.env['HOME'] = origHome;
+    if (home) {
+      rmSync(home, { recursive: true, force: true });
+      home = undefined;
+    }
+  });
+
+  const sandbox = (): string => {
+    home = mkdtempSync(join(tmpdir(), 'pg-hook-home-'));
+    process.env['HOME'] = home;
+    return home;
+  };
+
+  it('REGRESSION: invalid-JSON ~/.claude/settings.json is left byte-for-byte intact', () => {
+    const h = sandbox();
+    const settings = join(h, '.claude', 'settings.json');
+    mkdirSync(join(h, '.claude'), { recursive: true });
+    // A real user config with permissions/env/model + a trailing-comma typo.
+    const corrupt =
+      '{\n  "permissions": { "allow": ["Bash(ls:*)"] },\n  "env": { "FOO": "bar" },\n  "model": "opus",\n}\n';
+    writeFileSync(settings, corrupt);
+
+    const result = installFor('claude-code');
+
+    expect(result).toBe('error');
+    // The file content must be UNCHANGED — never clobbered.
+    expect(readFileSync(settings, 'utf-8')).toBe(corrupt);
+    // And the user is told why (clear, actionable message), not silently skipped.
+    expect(lastHookInstallError()).toMatch(/not valid JSON/i);
+    expect(lastHookInstallError()).toMatch(/did NOT modify/i);
+  });
+
+  it('merge-writes into a VALID settings.json, preserving all top-level keys', () => {
+    const h = sandbox();
+    const settings = join(h, '.claude', 'settings.json');
+    mkdirSync(join(h, '.claude'), { recursive: true });
+    writeFileSync(
+      settings,
+      JSON.stringify({
+        permissions: { allow: ['Bash(ls:*)'] },
+        env: { FOO: 'bar' },
+        model: 'opus',
+        mcpServers: { x: { command: 'y' } },
+      })
+    );
+
+    const result = installFor('claude-code');
+    expect(result).toBe('installed');
+
+    const after = JSON.parse(readFileSync(settings, 'utf-8')) as Record<string, unknown>;
+    // Existing keys survive…
+    expect(after['permissions']).toEqual({ allow: ['Bash(ls:*)'] });
+    expect(after['env']).toEqual({ FOO: 'bar' });
+    expect(after['model']).toBe('opus');
+    expect(after['mcpServers']).toEqual({ x: { command: 'y' } });
+    // …and our hook is now present.
+    expect(isHookInstalled(after as never)).toBe(true);
+  });
+
+  it('writes a fresh config when the target is genuinely ABSENT', () => {
+    const h = sandbox();
+    const settings = join(h, '.claude', 'settings.json');
+    expect(existsSync(settings)).toBe(false);
+
+    expect(installFor('claude-code')).toBe('installed');
+    expect(isHookInstalled(JSON.parse(readFileSync(settings, 'utf-8')) as never)).toBe(true);
+  });
+
+  it('is idempotent on a valid config (second install = already)', () => {
+    sandbox();
+    expect(installFor('claude-code')).toBe('installed');
+    expect(installFor('claude-code')).toBe('already');
+  });
+
+  it('aborts a corrupt config for every JSON round-trip platform', () => {
+    const cases: Array<[Parameters<typeof installFor>[0], string[]]> = [
+      ['codex', ['.codex', 'hooks.json']],
+      ['gemini', ['.gemini', 'settings.json']],
+      ['cursor', ['.cursor', 'hooks.json']],
+      ['windsurf', ['.codeium', 'windsurf', 'hooks.json']],
+    ];
+    for (const [platform, segs] of cases) {
+      const h = sandbox();
+      const file = join(h, ...segs);
+      mkdirSync(join(file, '..'), { recursive: true });
+      writeFileSync(file, '{ not json at all');
+      expect(installFor(platform)).toBe('error');
+      expect(readFileSync(file, 'utf-8')).toBe('{ not json at all');
+      // tidy up before the next iteration's sandbox()
+      rmSync(h, { recursive: true, force: true });
+      home = undefined;
+    }
+  });
+});
+
+describe('readHookProtectionStatus — 0-rules fail-open is surfaced, not silent', () => {
+  let home: string | undefined;
+  const origHome = process.env['HOME'];
+
+  afterEach(() => {
+    if (origHome === undefined) delete process.env['HOME'];
+    else process.env['HOME'] = origHome;
+    if (home) {
+      rmSync(home, { recursive: true, force: true });
+      home = undefined;
+    }
+  });
+
+  const markerPath = (h: string): string =>
+    join(h, '.panguard-guard', 'hook-protection-status.json');
+
+  it('returns null when no hook run has recorded a status', () => {
+    home = mkdtempSync(join(tmpdir(), 'pg-hook-status-'));
+    process.env['HOME'] = home;
+    expect(readHookProtectionStatus()).toBeNull();
+  });
+
+  it('reports degraded=true when the marker says the hook loaded 0 rules', () => {
+    home = mkdtempSync(join(tmpdir(), 'pg-hook-status-'));
+    process.env['HOME'] = home;
+    const p = markerPath(home);
+    mkdirSync(join(p, '..'), { recursive: true });
+    writeFileSync(
+      p,
+      JSON.stringify({ degraded: true, ruleCount: 0, at: '2026-06-16T00:00:00.000Z' })
+    );
+    const s = readHookProtectionStatus();
+    expect(s).not.toBeNull();
+    expect(s!.degraded).toBe(true);
+    expect(s!.ruleCount).toBe(0);
+  });
+
+  it('reports degraded=false once a run loads rules again (cleared marker)', () => {
+    home = mkdtempSync(join(tmpdir(), 'pg-hook-status-'));
+    process.env['HOME'] = home;
+    const p = markerPath(home);
+    mkdirSync(join(p, '..'), { recursive: true });
+    writeFileSync(p, JSON.stringify({ degraded: false, ruleCount: 652, at: 'x' }));
+    expect(readHookProtectionStatus()?.degraded).toBe(false);
   });
 });
 

@@ -17,6 +17,11 @@ import { detectLang } from '../interactive/lang.js';
 import { ensureTelemetryConsent } from '../consent.js';
 import { installFor, toHookPlatform } from './hook.js';
 import { ensurePersistentService, type PersistResult } from './persist.js';
+import { isFirstRun, markInitialized } from '../first-run.js';
+import {
+  readAuthenticatedDashboardUrl,
+  dashboardBaseUrl,
+} from '../dashboard-url.js';
 
 type Lang = 'en' | 'zh-TW';
 
@@ -24,61 +29,6 @@ type Lang = 'en' | 'zh-TW';
 const t = (lang: Lang, en: string, zh: string): string => (lang === 'zh-TW' ? zh : en);
 
 const TC_ENDPOINT = 'https://tc.panguard.ai';
-
-/** Default dashboard port — matches packages/panguard-guard config default. */
-const DEFAULT_DASHBOARD_PORT = 3100;
-
-/** Where the daemon persists its per-launch dashboard auth token (0o600). */
-const DASHBOARD_TOKEN_PATH = join(homedir(), '.panguard-guard', 'dashboard-token');
-
-/**
- * Read the dashboard port the daemon is actually configured to use, so the
- * launch URL points at the right place even on a non-default port. Falls back
- * to the shared default when config is absent or unreadable.
- */
-function readDashboardPort(): number {
-  try {
-    const cfgPath = join(homedir(), '.panguard-guard', 'config.json');
-    if (existsSync(cfgPath)) {
-      const cfg = JSON.parse(readFileSync(cfgPath, 'utf-8')) as { dashboardPort?: number };
-      if (typeof cfg.dashboardPort === 'number' && cfg.dashboardPort > 0) {
-        return cfg.dashboardPort;
-      }
-    }
-  } catch {
-    /* fall through to default */
-  }
-  return DEFAULT_DASHBOARD_PORT;
-}
-
-/** Base (unauthenticated) dashboard URL — only for human-readable hints. */
-function dashboardBaseUrl(): string {
-  return `http://127.0.0.1:${readDashboardPort()}`;
-}
-
-/**
- * Build the AUTHENTICATED dashboard launch URL, or null if the daemon has not
- * (yet) persisted its launch token.
- *
- * The daemon's dashboard auth token lives in DashboardServer memory and mints
- * the auth cookie ONLY for a request carrying it as `/?token=<token>`. A bare
- * http://127.0.0.1:PORT therefore 401s on a rerun / already-running daemon /
- * headless host. The daemon persists that token to ~/.panguard-guard/dashboard-token
- * (0o600) once its dashboard is listening; we read it here to construct the URL
- * the user can actually open. Returns null when the token is absent so callers
- * print guidance instead of a dead bare URL. The token is treated like the
- * cookie: read from an owner-only file and never logged on its own.
- */
-function readAuthenticatedDashboardUrl(): string | null {
-  try {
-    if (!existsSync(DASHBOARD_TOKEN_PATH)) return null;
-    const token = readFileSync(DASHBOARD_TOKEN_PATH, 'utf-8').trim();
-    if (!token) return null;
-    return `${dashboardBaseUrl()}/?token=${token}`;
-  } catch {
-    return null;
-  }
-}
 
 function openBrowser(url: string): void {
   const os = platform();
@@ -263,10 +213,14 @@ export function upCommand(): Command {
         console.log(`  ${c.dim(brandTagline(lang))}\n`);
         console.log(`  ${c.dim('─'.repeat(50))}\n`);
 
-        const activatedMarker = join(homedir(), '.panguard', 'activated');
-        const isFirstRun = !existsSync(activatedMarker);
+        // First-run detection uses a durable, telemetry-independent marker
+        // (~/.panguard/.initialized) so the welcome + interactive setup run ONCE.
+        // The old ~/.panguard/activated marker was written only by the opt-in
+        // Threat Cloud ping, so an opt-out user (the default) saw the welcome +
+        // setup on every single `pga up`.
+        const firstRun = isFirstRun();
 
-        if (isFirstRun) {
+        if (firstRun) {
           console.log('');
           console.log(
             `  ${c.sage(c.bold(t(lang, 'Welcome to PanGuard AI!', '歡迎使用 PanGuard AI！')))}`
@@ -866,6 +820,12 @@ export function upCommand(): Command {
           );
         }
         console.log('');
+
+        // The full first run completed: record the durable marker so the next
+        // `pga up` (and bare `pga`) skip the welcome + interactive setup and go
+        // straight to scan -> protect -> summary. Independent of telemetry
+        // consent, so opt-out users are no longer nagged every run.
+        markInitialized();
       }
     );
 }
@@ -1003,13 +963,18 @@ async function reportActivation(): Promise<void> {
   if (fe(marker)) return;
 
   const { randomUUID } = await import('node:crypto');
-  const idPath = join(homedir(), '.panguard', 'client-id');
+  const idDir = join(homedir(), '.panguard');
+  const idPath = join(idDir, 'client-id');
   let clientId: string;
   try {
     clientId = rf(idPath, 'utf-8').trim();
   } catch {
     clientId = randomUUID();
     try {
+      // On a true first run ~/.panguard may not exist yet; create it (0o700)
+      // before writing the client-id, otherwise the write ENOENTs and
+      // readSensorId() keeps returning null forever.
+      if (!fe(idDir)) md(idDir, { recursive: true, mode: 0o700 });
       wf(idPath, clientId, 'utf-8');
     } catch {
       /* best effort */

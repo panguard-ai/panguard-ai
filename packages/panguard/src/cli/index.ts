@@ -315,21 +315,20 @@ async function main(): Promise<void> {
   }
 
   if (!hasSubcommand && !hasHelpOrVersion && !isHookCommand) {
-    // First-run detection: if no config exists, auto-run setup wizard
-    const { existsSync } = await import('node:fs');
-    const { join } = await import('node:path');
-    const configPath = join(
-      process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.',
-      '.panguard',
-      'config.json'
-    );
-    const isFirstRun = !existsSync(configPath);
+    // First-run detection uses the shared durable marker
+    // (~/.panguard/.initialized), the SAME marker `pga up` and `pga setup`
+    // write on first success. The old check looked at ~/.panguard/config.json,
+    // a file that is never written (setup saves to ~/.panguard-guard/config.json),
+    // so the setup wizard re-triggered on every bare `pga` even after setup.
+    const { isFirstRun, markInitialized } = await import('./first-run.js');
 
-    if (isFirstRun) {
-      // First time user — run setup wizard directly
+    if (isFirstRun()) {
+      // First time user — run setup wizard directly, then mark initialized so
+      // subsequent bare `pga` goes straight to the interactive menu.
       console.log('\n  Welcome to Panguard AI! / Panguard AI!\n');
       console.log('  First time detected. Starting setup wizard...\n');
       await program.parseAsync(['node', 'panguard', 'setup']);
+      markInitialized();
       return;
     }
 

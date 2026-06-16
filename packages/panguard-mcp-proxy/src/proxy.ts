@@ -157,9 +157,18 @@ export class MCPProxy {
     );
     this.registerHandlers();
     await this.server.connect(agentTransport);
-    process.stderr.write(
-      `[panguard-proxy] Proxy active. ${ruleCount} rules protecting all tool calls.\n`
-    );
+    // With 0 rules, Layer A catches nothing — say so plainly instead of the
+    // misleading "0 rules protecting all tool calls" (the loud warning was
+    // already emitted by evaluator.loadRules()).
+    if (ruleCount === 0) {
+      process.stderr.write(
+        '[panguard-proxy] Proxy active in DEGRADED mode — 0 ATR rules loaded; only the Guard blocklist is enforced.\n'
+      );
+    } else {
+      process.stderr.write(
+        `[panguard-proxy] Proxy active. ${ruleCount} rules protecting all tool calls.\n`
+      );
+    }
   }
 
   /**

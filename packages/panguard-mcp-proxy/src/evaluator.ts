@@ -113,6 +113,20 @@ export class ProxyEvaluator {
     if (this.rulesLoaded) return this.ruleCount;
     this.ruleCount = await this.engine.loadRules();
     this.rulesLoaded = true;
+    // 0 rules => the detection engine matches nothing, so every tool call gets
+    // an 'allow' verdict (evaluate() returns allow when matches.length === 0).
+    // That is protection silently OFF — never let it pass unannounced. We do NOT
+    // hard-fail (a blocklist-only proxy with no ATR rules is still a degraded but
+    // usable mode, and proxy fail-CLOSED on evaluation *crashes* is unchanged in
+    // evaluate()); we surface it loudly so the operator and the dashboard can see
+    // Layer A is degraded. See computeLayers() Layer A: ruleCount === 0 => 'degraded'.
+    if (this.ruleCount === 0) {
+      process.stderr.write(
+        '[panguard-proxy] WARNING: 0 ATR rules loaded — pattern detection (Layer A) is DEGRADED. ' +
+          'Tool calls will only be checked against the Guard blocklist; no rule-based threats will be caught. ' +
+          'Verify the agent-threat-rules package is installed and the rules directory is populated.\n'
+      );
+    }
     return this.ruleCount;
   }
 
