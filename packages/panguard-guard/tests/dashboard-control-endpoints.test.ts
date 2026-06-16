@@ -251,5 +251,23 @@ describe('DashboardServer — 1.7 control endpoints', () => {
       expect(html).toContain('id="st-enforce-list"');
       expect(html).toContain('renderEnforcement');
     });
+
+    it('surfaces the latent endpoints as Coverage + Runtime tabs', () => {
+      expect(html).toContain('data-tab="coverage"');
+      expect(html).toContain('data-tab="runtime"');
+      expect(html).toContain('id="p-coverage"');
+      expect(html).toContain('id="p-runtime"');
+      expect(html).toContain('loadCoverage');
+      expect(html).toContain('loadRuntime');
+      expect(html).toContain('/api/agents');
+      expect(html).toContain('/api/proxy-verdicts');
+    });
+
+    it('uses the full 5-path brand mark (not the 1-path blob)', () => {
+      const start = html.indexOf('class="sb-brand"');
+      const sidebar = html.slice(start, html.indexOf('class="sb-nav"', start));
+      const paths = (sidebar.match(/<path/g) || []).length;
+      expect(paths).toBe(5);
+    });
   });
 });

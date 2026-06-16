@@ -864,6 +864,20 @@
             /></svg
           ><span data-i18n="n_sk">Skills</span>
         </div>
+        <div class="ni" data-tab="coverage">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"
+            /></svg
+          ><span>Coverage</span>
+        </div>
+        <div class="ni" data-tab="runtime">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M13 3l-2 0 0 10 2 0 0-10zm4.83 2.17l-1.42 1.42A6.92 6.92 0 0119 12a7 7 0 11-11.41-5.42L6.17 5.17A9 9 0 1021 12a8.94 8.94 0 00-3.17-6.83z"
+            /></svg
+          ><span>Runtime</span>
+        </div>
         <div class="ni" data-tab="tcloud">
           <svg viewBox="0 0 24 24">
             <path
@@ -1265,6 +1279,70 @@
         </div>
       </div>
 
+      <!-- ===== Coverage ===== -->
+      <div class="pg" id="p-coverage">
+        <div class="pt"><em>Coverage</em></div>
+        <div class="pd">
+          Which AI agent platforms Guard can see on this machine, and whether each is wired up. A
+          detected-but-not-connected platform is running <strong>unprotected</strong> — connect it
+          with <code>pga init</code>.
+        </div>
+        <div class="cg">
+          <div class="cd">
+            <div class="cl">Detected</div>
+            <div class="cv sg" id="cov-detected">--</div>
+          </div>
+          <div class="cd">
+            <div class="cl">Protected</div>
+            <div class="cv" id="cov-configured" style="color: var(--emerald)">--</div>
+          </div>
+          <div class="cd">
+            <div class="cl">Unprotected</div>
+            <div class="cv" id="cov-unprotected">--</div>
+          </div>
+        </div>
+        <div id="cov-loading" class="empty">
+          <span class="spin"></span> <span>Detecting platforms…</span>
+        </div>
+        <table class="tb" id="cov-table" style="display: none">
+          <thead>
+            <tr>
+              <th>Platform</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="cov-tb"></tbody>
+        </table>
+      </div>
+
+      <!-- ===== Runtime ===== -->
+      <div class="pg" id="p-runtime">
+        <div class="pt"><em>Runtime</em></div>
+        <div class="pd">
+          Live decisions from the MCP proxy as your agents call tools. Quiet when healthy — a row
+          appears only on a real evaluation. <strong>allow</strong> = passed,
+          <strong>deny</strong> = blocked on a proven rule, <strong>ask</strong> = flagged for you
+          to decide.
+        </div>
+        <div id="rt-loading" class="empty">
+          <span class="spin"></span> <span>Loading runtime verdicts…</span>
+        </div>
+        <div id="rt-empty" class="empty" style="display: none">
+          No proxy activity yet. Verdicts appear here when the MCP proxy evaluates a tool call.
+        </div>
+        <table class="tb" id="rt-table" style="display: none">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Outcome</th>
+              <th>Tool / reason</th>
+              <th>Confidence</th>
+            </tr>
+          </thead>
+          <tbody id="rt-tb"></tbody>
+        </table>
+      </div>
+
       <!-- ===== PAGE 5: Threat Cloud ===== -->
       <div class="pg" id="p-tcloud">
         <div class="pt"><em data-i18n="t_tc">Threat Cloud</em></div>
@@ -1601,6 +1679,12 @@
         }
         if (tab === 'settings') {
           loadSettings();
+        }
+        if (tab === 'coverage') {
+          loadCoverage();
+        }
+        if (tab === 'runtime') {
+          loadRuntime();
         }
       }
       document.querySelectorAll('.ni').forEach(function (n) {
@@ -2112,6 +2196,108 @@
         renderRules(f);
       }
 
+      /* Coverage — surfaces /api/agents (which platforms are detected + whether
+         each is wired to the proxy). This data drove zero UI before; a detected
+         but un-connected platform is running unprotected. */
+      function loadCoverage() {
+        var ld = document.getElementById('cov-loading');
+        var tbl = document.getElementById('cov-table');
+        var tb = document.getElementById('cov-tb');
+        if (!tb) return;
+        af('/api/agents')
+          .then(function (r) {
+            return r.json();
+          })
+          .then(function (d) {
+            var agents = (d && d.agents) || [];
+            var det = d.detected || 0;
+            var cfg = d.configured || 0;
+            setKPI('cov-detected', det);
+            setKPI('cov-configured', cfg);
+            var unprot = Math.max(0, det - cfg);
+            setKPI('cov-unprotected', unprot);
+            var ue = document.getElementById('cov-unprotected');
+            if (ue) ue.style.color = unprot > 0 ? 'var(--warn)' : 'var(--text-muted)';
+            if (!agents.length) {
+              if (ld)
+                ld.innerHTML =
+                  '<span style="color:var(--text-muted)">No agent platforms detected. Install ' +
+                  'one (Claude Code, Cursor, Cline…), then run <code>pga init</code>.</span>';
+              if (tbl) tbl.style.display = 'none';
+              return;
+            }
+            if (ld) ld.style.display = 'none';
+            if (tbl) tbl.style.display = '';
+            tb.innerHTML = '';
+            agents.forEach(function (a) {
+              var status = !a.detected
+                ? '<span style="color:var(--text-muted)">not installed</span>'
+                : a.alreadyConfigured
+                  ? '<span style="color:var(--emerald)">● protected</span>'
+                  : '<span style="color:var(--warn)">○ unprotected — run <code>pga init</code></span>';
+              var tr = document.createElement('tr');
+              tr.innerHTML = '<td>' + esc(a.name || a.id || '') + '</td><td>' + status + '</td>';
+              tb.appendChild(tr);
+            });
+          })
+          .catch(function () {
+            if (ld)
+              ld.innerHTML =
+                '<span style="color:var(--text-muted)">Platform detection unavailable.</span>';
+          });
+      }
+      /* Runtime — surfaces /api/proxy-verdicts (live MCP proxy decisions). Quiet
+         when healthy; a row only appears on a real allow/deny/ask evaluation. */
+      function loadRuntime() {
+        var ld = document.getElementById('rt-loading');
+        var emp = document.getElementById('rt-empty');
+        var tbl = document.getElementById('rt-table');
+        var tb = document.getElementById('rt-tb');
+        if (!tb) return;
+        af('/api/proxy-verdicts')
+          .then(function (r) {
+            return r.json();
+          })
+          .then(function (d) {
+            var vs = (d && d.verdicts) || [];
+            if (ld) ld.style.display = 'none';
+            if (!vs.length) {
+              if (emp) emp.style.display = '';
+              if (tbl) tbl.style.display = 'none';
+              return;
+            }
+            if (emp) emp.style.display = 'none';
+            if (tbl) tbl.style.display = '';
+            tb.innerHTML = '';
+            vs.forEach(function (v) {
+              var oc = (v.outcome || '').toLowerCase();
+              var color =
+                oc === 'deny' ? 'var(--danger)' : oc === 'ask' ? 'var(--warn)' : 'var(--emerald)';
+              var t = v.timestamp ? (String(v.timestamp).split('T')[1] || '').split('.')[0] : '--';
+              var reason =
+                v.reason || (v.matchedRules && v.matchedRules.join(', ')) || v.tool || '';
+              var conf = typeof v.confidence === 'number' ? v.confidence + '%' : '--';
+              var tr = document.createElement('tr');
+              tr.innerHTML =
+                '<td style="font-size:12px">' +
+                esc(t) +
+                '</td><td><span style="color:' +
+                color +
+                ';text-transform:uppercase;font-weight:600;font-size:12px">' +
+                esc(oc || '?') +
+                '</span></td><td style="font-size:12px">' +
+                esc(String(reason).slice(0, 80)) +
+                '</td><td style="font-size:12px">' +
+                esc(conf) +
+                '</td>';
+              tb.appendChild(tr);
+            });
+          })
+          .catch(function () {
+            if (ld) ld.style.display = 'none';
+            if (emp) emp.style.display = '';
+          });
+      }
       function loadSkills() {
         loadQuarantined();
         af('/api/installed-skills')
