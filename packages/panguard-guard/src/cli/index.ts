@@ -32,6 +32,7 @@ import { generateTestLicenseKey } from '../license/index.js';
 import { generateInstallScript } from '../install/index.js';
 import { DashboardRenderer } from './dashboard-renderer.js';
 import type { DashboardState } from './dashboard-renderer.js';
+import { removeDashboardToken } from '../dashboard/index.js';
 import { SkillWatcher } from '../engines/skill-watcher.js';
 import { commandScan } from './scan-command.js';
 import {
@@ -761,12 +762,18 @@ function commandStop(dataDir: string): void {
   if (!pidFile.isRunning()) {
     console.log(`  ${symbols.warn} Process not found, cleaning up PID file`);
     pidFile.remove();
+    // The dead daemon never ran its graceful dashboard.stop(), so its launch
+    // token may be orphaned on disk — remove it so it cannot outlive the daemon.
+    removeDashboardToken();
     return;
   }
 
   try {
     process.kill(pid, 'SIGTERM');
     console.log(`  ${symbols.pass} PanguardGuard stopped ${c.dim(`(PID: ${pid})`)}`);
+    // The daemon removes its own token in dashboard.stop() on SIGTERM, but that
+    // is async; clean up here too so the secret is gone the moment stop returns.
+    removeDashboardToken();
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error(`  ${symbols.fail} Failed to stop: ${msg}`);
@@ -885,6 +892,9 @@ async function commandUninstall(): Promise<void> {
     const msg = err instanceof Error ? err.message : String(err);
     sp.fail(`Uninstall failed: ${msg}`);
   }
+  // Remove the persisted dashboard launch token so the secret never lingers
+  // after the service is gone.
+  removeDashboardToken();
 }
 
 /** Show current configuration / 顯示當前配置 */

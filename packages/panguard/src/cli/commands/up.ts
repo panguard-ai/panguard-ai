@@ -25,7 +25,60 @@ const t = (lang: Lang, en: string, zh: string): string => (lang === 'zh-TW' ? zh
 
 const TC_ENDPOINT = 'https://tc.panguard.ai';
 
-const DASHBOARD_URL = 'http://127.0.0.1:3100';
+/** Default dashboard port — matches packages/panguard-guard config default. */
+const DEFAULT_DASHBOARD_PORT = 3100;
+
+/** Where the daemon persists its per-launch dashboard auth token (0o600). */
+const DASHBOARD_TOKEN_PATH = join(homedir(), '.panguard-guard', 'dashboard-token');
+
+/**
+ * Read the dashboard port the daemon is actually configured to use, so the
+ * launch URL points at the right place even on a non-default port. Falls back
+ * to the shared default when config is absent or unreadable.
+ */
+function readDashboardPort(): number {
+  try {
+    const cfgPath = join(homedir(), '.panguard-guard', 'config.json');
+    if (existsSync(cfgPath)) {
+      const cfg = JSON.parse(readFileSync(cfgPath, 'utf-8')) as { dashboardPort?: number };
+      if (typeof cfg.dashboardPort === 'number' && cfg.dashboardPort > 0) {
+        return cfg.dashboardPort;
+      }
+    }
+  } catch {
+    /* fall through to default */
+  }
+  return DEFAULT_DASHBOARD_PORT;
+}
+
+/** Base (unauthenticated) dashboard URL — only for human-readable hints. */
+function dashboardBaseUrl(): string {
+  return `http://127.0.0.1:${readDashboardPort()}`;
+}
+
+/**
+ * Build the AUTHENTICATED dashboard launch URL, or null if the daemon has not
+ * (yet) persisted its launch token.
+ *
+ * The daemon's dashboard auth token lives in DashboardServer memory and mints
+ * the auth cookie ONLY for a request carrying it as `/?token=<token>`. A bare
+ * http://127.0.0.1:PORT therefore 401s on a rerun / already-running daemon /
+ * headless host. The daemon persists that token to ~/.panguard-guard/dashboard-token
+ * (0o600) once its dashboard is listening; we read it here to construct the URL
+ * the user can actually open. Returns null when the token is absent so callers
+ * print guidance instead of a dead bare URL. The token is treated like the
+ * cookie: read from an owner-only file and never logged on its own.
+ */
+function readAuthenticatedDashboardUrl(): string | null {
+  try {
+    if (!existsSync(DASHBOARD_TOKEN_PATH)) return null;
+    const token = readFileSync(DASHBOARD_TOKEN_PATH, 'utf-8').trim();
+    if (!token) return null;
+    return `${dashboardBaseUrl()}/?token=${token}`;
+  } catch {
+    return null;
+  }
+}
 
 function openBrowser(url: string): void {
   const os = platform();
@@ -631,10 +684,50 @@ export function upCommand(): Command {
           }
         }
 
+        // ── Resolve the AUTHENTICATED dashboard URL ──────────────────
+        // The daemon persists its launch token once the dashboard is listening.
+        // The launchd path writes the PID file before the dashboard token, so
+        // there can be a brief window where the daemon is up but the token is
+        // not yet on disk — poll up to ~2s before falling back to guidance, so
+        // we never open/print a bare URL that 401s.
+        let dashboardUrl: string | null = null;
+        if (opts.dashboard && isGuardRunning()) {
+          for (let i = 0; i < 20; i++) {
+            dashboardUrl = readAuthenticatedDashboardUrl();
+            if (dashboardUrl) break;
+            await new Promise((r) => setTimeout(r, 100));
+          }
+        }
+
         // ── Open dashboard (after Guard is up so the server is listening) ──
+        // Open + print the AUTHENTICATED URL so it works on rerun, headless, or
+        // when copied. If the token is unavailable, print guidance instead of a
+        // dead bare URL that would land on a 401 "Invalid token" page.
         if (opts.dashboard) {
-          console.log(`\n  ${c.sage(`Opening dashboard: ${DASHBOARD_URL}`)}\n`);
-          openBrowser(DASHBOARD_URL);
+          if (dashboardUrl) {
+            console.log(`\n  ${c.sage(`Opening dashboard: ${dashboardBaseUrl()}`)}\n`);
+            openBrowser(dashboardUrl);
+          } else if (isGuardRunning()) {
+            console.log(
+              `\n  ${c.caution(
+                t(
+                  lang,
+                  `Dashboard is still starting. Re-run "pga up" in a moment to open it.`,
+                  `儀表板仍在啟動中。請稍後再次執行「pga up」開啟。`
+                )
+              )}\n`
+            );
+          } else {
+            console.log(
+              `\n  ${c.caution(
+                t(
+                  lang,
+                  `Dashboard not available (Guard is not running). Start it with: pga up`,
+                  `儀表板無法使用（Guard 未執行）。請用以下指令啟動：pga up`
+                )
+              )}\n`
+            );
+          }
         }
 
         // ── Read rule count + TC status ──────────
@@ -685,7 +778,10 @@ export function upCommand(): Command {
         }
         console.log('');
         if (opts.dashboard) {
-          console.log(`  ${c.sage('Dashboard')}     ${DASHBOARD_URL}`);
+          // Print the AUTHENTICATED URL (with token) so copy-pasting it works —
+          // a bare URL 401s. Fall back to the base URL only as a last resort
+          // when the token is not yet on disk.
+          console.log(`  ${c.sage('Dashboard')}     ${dashboardUrl ?? dashboardBaseUrl()}`);
         }
         console.log(
           `  ${c.sage(t(lang, 'Rules', '規則'))}         ${ruleCount} ${t(lang, 'detection rules active', '條偵測規則運作中')}`
@@ -725,9 +821,16 @@ export function upCommand(): Command {
 
         // ── Next steps ─────────────────────────────────────────
         console.log(`  ${c.bold(t(lang, 'NEXT STEPS', '下一步'))}`);
-        console.log(
-          `  ${c.dim('1.')} ${t(lang, 'Open dashboard', '開啟儀表板')}     ${c.sage(DASHBOARD_URL)}`
-        );
+        if (dashboardUrl) {
+          console.log(
+            `  ${c.dim('1.')} ${t(lang, 'Open dashboard', '開啟儀表板')}     ${c.sage(dashboardUrl)}`
+          );
+        } else {
+          // No live token: point at re-running `pga up` rather than a dead URL.
+          console.log(
+            `  ${c.dim('1.')} ${t(lang, 'Open dashboard', '開啟儀表板')}     ${c.dim(t(lang, 'run "pga up" to open the dashboard', '執行「pga up」開啟儀表板'))}`
+          );
+        }
         if (threatCount > 0) {
           console.log(
             `  ${c.dim('2.')} ${t(lang, 'Review threats', '檢視威脅')}     ${c.caution(`${threatCount} ${t(lang, 'flagged', '個標記')}`)} ${c.dim('\u2014 pga audit skill <name>')}`

@@ -44,13 +44,16 @@ describe('checkWithATR', () => {
       const result = await checkWithATR(manifest);
       expect(result.findings.length).toBeGreaterThan(0);
 
-      const atrFinding = result.findings.find((f) => f.id.startsWith('atr-'));
-      expect(atrFinding).toBeDefined();
-      // ATR rule taxonomy classifies this phrase as either prompt-injection
-      // (asking the model to ignore instructions) or context-exfiltration
-      // (asking for the system prompt). Both are correct and the engine has
-      // moved between the two; accept either category here.
-      expect(['prompt-injection', 'context-exfiltration']).toContain(atrFinding!.category);
+      const atrFindings = result.findings.filter((f) => f.id.startsWith('atr-'));
+      expect(atrFindings.length).toBeGreaterThan(0);
+      // ATR rule taxonomy classifies this phrase across a few related categories:
+      // prompt-injection (asking the model to ignore instructions),
+      // context-exfiltration (asking for the system prompt), and skill-compromise
+      // (the SKILL.md-context prompt-injection rule that scanSkill fires). All are
+      // correct; assert at least one finding lands in the accepted set rather than
+      // depending on which rule happens to be first.
+      const accepted = ['prompt-injection', 'context-exfiltration', 'skill-compromise'];
+      expect(atrFindings.some((f) => accepted.includes(f.category))).toBe(true);
     });
 
     it('should detect persona switching patterns', async () => {

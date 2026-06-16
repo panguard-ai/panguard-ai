@@ -56,6 +56,7 @@ import {
   hasConsentBeenAsked,
   askTelemetryConsent,
   ensureTelemetryConsent,
+  markConsentAsked,
 } from '../src/cli/consent.js';
 
 describe('hasConsentBeenAsked', () => {
@@ -156,6 +157,53 @@ describe('askTelemetryConsent', () => {
       telemetryEnabled: false,
       threatCloudUploadEnabled: false,
     });
+  });
+});
+
+describe('markConsentAsked (exported — single consent point for pga setup)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('is exported and writes the consent marker file', () => {
+    // Dir already exists; markConsentAsked just writes the marker.
+    mockExistsSync.mockReturnValue(true);
+    markConsentAsked();
+    expect(mockWriteFileSync).toHaveBeenCalledWith(
+      expect.stringContaining('.telemetry-prompted'),
+      expect.any(String),
+      'utf-8'
+    );
+  });
+
+  it('creates the guard dir first when it does not exist', () => {
+    mockExistsSync.mockReturnValue(false);
+    markConsentAsked();
+    expect(mockMkdirSync).toHaveBeenCalledWith(expect.stringContaining('.panguard-guard'), {
+      recursive: true,
+    });
+  });
+});
+
+describe('ensureTelemetryConsent does not re-prompt once marked (BUG2 regression)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+  });
+
+  it('returns the stored opt-in WITHOUT prompting after consent was marked', async () => {
+    // Simulate pga setup having written telemetryEnabled=true and marked asked.
+    // The trailing ensureTelemetryConsent() must NOT prompt again (which used to
+    // default-NO and silently overwrite the opt-in) — it just reads the value back.
+    mockExistsSync.mockReturnValue(true); // hasConsentBeenAsked() === true
+    mockLoadGuardConfig.mockReturnValue({ telemetryEnabled: true });
+
+    const result = await ensureTelemetryConsent();
+
+    expect(result).toBe(true);
+    // No second prompt, and no config write that could clobber the opt-in.
+    expect(mockCreateInterface).not.toHaveBeenCalled();
+    expect(mockUpdateGuardConfig).not.toHaveBeenCalled();
   });
 });
 

@@ -647,6 +647,12 @@ export function setupCommand(): Command {
         // exact pattern we are removing. They stay OFF; the user enables it later
         // with `pga config set telemetry true`. The interactive prompt defaults to
         // NO so a bare Enter declines.
+        //
+        // This is the SINGLE consent point: the answer here drives BOTH
+        // threatCloudUploadEnabled AND telemetryEnabled, and we mark consent as
+        // asked so the trailing ensureTelemetryConsent() sees hasConsentBeenAsked()
+        // === true and does not re-prompt (which previously asked a second time,
+        // defaulted to NO, and silently overwrote a first-prompt opt-in).
         // Tracks the explicit opt-in decision so the post-setup usage ping below
         // (outside this block) only fires when the user turned sharing ON.
         let tcUploadOptedIn = false;
@@ -671,12 +677,23 @@ export function setupCommand(): Command {
             const guardConfig = loadConfig(tcConfigPath);
             const updatedConfig = {
               ...guardConfig,
+              // Both flags follow the one consent answer. The upload gate checks
+              // threatCloudUploadEnabled; telemetryEnabled is what
+              // ensureTelemetryConsent() reads back — keep them in lockstep so a
+              // single opt-in turns the whole collective-defense path on.
               threatCloudUploadEnabled: enableTC,
+              telemetryEnabled: enableTC,
               threatCloudEndpoint: enableTC
                 ? (guardConfig.threatCloudEndpoint ?? 'https://tc.panguard.ai/api')
                 : guardConfig.threatCloudEndpoint,
             };
             saveConfig(updatedConfig, tcConfigPath);
+
+            // Record that consent has been asked HERE, so the trailing
+            // ensureTelemetryConsent() does not prompt again and clobber this
+            // answer with its default-NO.
+            const { markConsentAsked } = await import('../consent.js');
+            markConsentAsked();
 
             if (!options.json) {
               if (enableTC) {

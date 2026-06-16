@@ -23,6 +23,8 @@ import {
   writeFileSync,
   mkdirSync,
   renameSync,
+  rmSync,
+  chmodSync,
 } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -76,6 +78,34 @@ const RATE_LIMIT_MAX = 120;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const MAX_WS_CLIENTS = 20;
 const MAX_WS_PER_IP = 5;
+
+/**
+ * The dashboard's per-launch auth token is persisted here (0o600) while the
+ * daemon runs, so a *separate* process — `pga up` on a rerun, an
+ * already-running daemon, a headless host — can build the authenticated launch
+ * URL (http://127.0.0.1:PORT/?token=<token>) instead of opening a bare URL that
+ * 401s. The token is the launch secret that mints the dashboard auth cookie, so
+ * it is treated exactly like the cookie: owner-only file mode, never logged, and
+ * removed when the dashboard stops so a stale token cannot linger after exit.
+ */
+const DASHBOARD_TOKEN_DIR = join(homedir(), '.panguard-guard');
+const DASHBOARD_TOKEN_PATH = join(DASHBOARD_TOKEN_DIR, 'dashboard-token');
+
+/**
+ * Remove the persisted dashboard launch token. Exported so `pga guard stop` /
+ * `pga guard uninstall` can guarantee the secret never outlives the daemon even
+ * when the process is killed without a graceful `stop()` (e.g. SIGTERM mid-run).
+ * Best-effort: a missing file or permission error is not fatal.
+ */
+export function removeDashboardToken(): void {
+  try {
+    if (existsSync(DASHBOARD_TOKEN_PATH)) {
+      rmSync(DASHBOARD_TOKEN_PATH, { force: true });
+    }
+  } catch {
+    /* best effort — never block shutdown on token cleanup */
+  }
+}
 
 /** Relay configuration for connecting to a remote Manager */
 export interface DashboardRelayOptions {
@@ -294,6 +324,12 @@ export class DashboardServer {
         // /?token=<authToken>; that one-time token mints the HttpOnly auth
         // cookie used for all subsequent /api/* and /ws traffic.
 
+        // Persist the launch token (0o600) so a separate `pga up` invocation can
+        // build the authenticated URL for an already-running daemon instead of
+        // opening a bare URL that 401s. Written only once the dashboard is truly
+        // listening, so a present token file implies a reachable dashboard.
+        this.persistAuthToken();
+
         if (this.relayConfig) {
           this.startRelayClient(this.relayConfig);
         }
@@ -304,6 +340,10 @@ export class DashboardServer {
   }
 
   async stop(): Promise<void> {
+    // Remove the persisted launch token so the secret never outlives the
+    // dashboard — a stale token would point `pga up` at a dead port.
+    removeDashboardToken();
+
     if (this.relayClient) {
       this.relayClient.disconnect();
       this.relayClient = null;
@@ -381,6 +421,39 @@ export class DashboardServer {
 
   getAuthToken(): string {
     return this.authToken;
+  }
+
+  /**
+   * Persist the launch token to ~/.panguard-guard/dashboard-token with 0o600 so
+   * a separate `pga up` invocation (rerun, already-running daemon, headless,
+   * copied URL) can construct the authenticated launch URL. The token is the
+   * launch secret that mints the auth cookie, so it is written owner-only and
+   * never logged — same handling as the cookie. Best-effort: a write failure
+   * just means the CLI falls back to printing guidance instead of a live URL.
+   */
+  private persistAuthToken(): void {
+    try {
+      if (!existsSync(DASHBOARD_TOKEN_DIR)) {
+        mkdirSync(DASHBOARD_TOKEN_DIR, { recursive: true, mode: 0o700 });
+      }
+      // Atomic write via a temp file + rename so a concurrent reader never sees
+      // a half-written token. The temp file is created owner-only from the start.
+      const tmpPath = `${DASHBOARD_TOKEN_PATH}.tmp.${process.pid}`;
+      writeFileSync(tmpPath, this.authToken, { encoding: 'utf-8', mode: 0o600 });
+      renameSync(tmpPath, DASHBOARD_TOKEN_PATH);
+      // chmod even if the file pre-existed, to tighten a loosely-created file.
+      try {
+        chmodSync(DASHBOARD_TOKEN_PATH, 0o600);
+      } catch {
+        /* platforms without POSIX permissions */
+      }
+    } catch (err) {
+      // Never block dashboard startup on token persistence — log without the
+      // token value, then continue. The CLI degrades to guidance text.
+      logger.warn(
+        `Could not persist dashboard launch token: ${err instanceof Error ? err.message : String(err)}`
+      );
+    }
   }
 
   private handleRequest(req: IncomingMessage, res: ServerResponse): void {

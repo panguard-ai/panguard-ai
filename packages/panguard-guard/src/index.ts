@@ -114,7 +114,7 @@ export {
 export { ThreatCloudClient } from './threat-cloud/index.js';
 
 // Dashboard / 儀表板
-export { DashboardServer } from './dashboard/index.js';
+export { DashboardServer, removeDashboardToken } from './dashboard/index.js';
 export { DashboardRelayClient } from './dashboard/relay-client.js';
 export type { RelayClientConfig } from './dashboard/relay-client.js';
 export type { DashboardRelayOptions } from './dashboard/index.js';
