@@ -263,6 +263,13 @@ describe('DashboardServer — 1.7 control endpoints', () => {
       expect(html).toContain('/api/proxy-verdicts');
     });
 
+    it('leads the Overview with a posture score + actionable deductions', () => {
+      expect(html).toContain('id="posture-score"');
+      expect(html).toContain('id="posture-deductions"');
+      expect(html).toContain('renderPosture');
+      expect(html).toContain('data-goto');
+    });
+
     it('uses the full 5-path brand mark (not the 1-path blob)', () => {
       const start = html.indexOf('class="sb-brand"');
       const sidebar = html.slice(start, html.indexOf('class="sb-nav"', start));

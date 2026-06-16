@@ -927,6 +927,63 @@
       <div class="pg on" id="p-overview">
         <div class="pt"><em data-i18n="t_ov">Overview</em></div>
 
+        <!-- Posture score: one number + the things dragging it down, each with a
+             one-click fix. Lead the screen with a single decision (DESIGN.md §2.1). -->
+        <div
+          class="hero"
+          id="posture-card"
+          style="display: flex; gap: 28px; align-items: center; flex-wrap: wrap"
+        >
+          <div style="display: flex; flex-direction: column; align-items: center; min-width: 120px">
+            <div
+              id="posture-score"
+              style="
+                font-family: 'Space Grotesk', sans-serif;
+                font-size: 56px;
+                font-weight: 700;
+                line-height: 1;
+                color: var(--emerald);
+              "
+            >
+              --
+            </div>
+            <div
+              style="
+                font-size: 11px;
+                letter-spacing: 1px;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                margin-top: 4px;
+              "
+            >
+              Posture
+            </div>
+          </div>
+          <div style="flex: 1; min-width: 240px">
+            <div
+              style="
+                height: 8px;
+                border-radius: 6px;
+                background: var(--bg-raised);
+                overflow: hidden;
+                margin-bottom: 6px;
+              "
+            >
+              <div
+                id="posture-bar"
+                style="height: 100%; width: 0; background: var(--emerald); transition: width 0.4s"
+              ></div>
+            </div>
+            <div id="posture-label" style="font-size: 13px; color: var(--text-muted)">
+              Calculating…
+            </div>
+            <div
+              id="posture-deductions"
+              style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px"
+            ></div>
+          </div>
+        </div>
+
         <!-- Status hero -->
         <div class="hero">
           <div class="hero-head">
@@ -1770,7 +1827,118 @@
         }
         updatePBar(s);
         renderLayers(s.layers);
+        _lastStatus = s;
+        renderPosture(s);
         applyTierGates(s);
+      }
+      /* Posture score — one honest number from real local state, with each
+         deduction offering a one-click jump to fix it. Formula (founder-set
+         default): start 100; −min(threats*8,40) unresolved threats; −30 if the
+         deterministic engine isn't actually running rules; −min(unprotected*5,20)
+         detected-but-unconnected agent platforms. The optional semantic layer
+         being off is NOT penalized — it is opt-in by design. */
+      var _lastStatus = null;
+      var _agentUnprotected = 0;
+      function renderPosture(s) {
+        if (!s) return;
+        var score = 100;
+        var ded = [];
+        var threats = s.threatsDetected || 0;
+        if (threats > 0) {
+          var pt = Math.min(threats * 8, 40);
+          score -= pt;
+          ded.push({
+            label: threats + ' unresolved threat' + (threats > 1 ? 's' : ''),
+            pts: pt,
+            goto: 'threats',
+            btn: 'Review',
+          });
+        }
+        var la = s.layers && s.layers.a;
+        if (la && la.state !== 'active') {
+          score -= 30;
+          ded.push({
+            label: 'Detection engine: ' + (la.detail || 'not running'),
+            pts: 30,
+            goto: 'rules',
+            btn: 'Inspect',
+          });
+        }
+        if (_agentUnprotected > 0) {
+          var pa = Math.min(_agentUnprotected * 5, 20);
+          score -= pa;
+          ded.push({
+            label:
+              _agentUnprotected +
+              ' agent platform' +
+              (_agentUnprotected > 1 ? 's' : '') +
+              ' unprotected',
+            pts: pa,
+            goto: 'coverage',
+            btn: 'Connect',
+          });
+        }
+        score = Math.max(0, score);
+        var color = score >= 85 ? 'var(--emerald)' : score >= 60 ? 'var(--warn)' : 'var(--danger)';
+        var label =
+          score >= 85
+            ? 'Strong — your agents are well protected'
+            : score >= 60
+              ? 'Fair — a few things to address'
+              : 'At risk — action needed';
+        var sc = document.getElementById('posture-score');
+        if (sc) {
+          sc.textContent = score;
+          sc.style.color = color;
+        }
+        var bar = document.getElementById('posture-bar');
+        if (bar) {
+          bar.style.width = score + '%';
+          bar.style.background = color;
+        }
+        var lb = document.getElementById('posture-label');
+        if (lb) lb.textContent = label;
+        var dd = document.getElementById('posture-deductions');
+        if (dd) {
+          if (!ded.length) {
+            dd.innerHTML =
+              '<div style="font-size:12px;color:var(--text-muted)">Nothing needs your ' +
+              'attention right now.</div>';
+          } else {
+            dd.innerHTML = '';
+            ded.forEach(function (d) {
+              var row = document.createElement('div');
+              row.style.cssText =
+                'display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px';
+              row.innerHTML =
+                '<span>' +
+                esc(d.label) +
+                ' <span style="color:var(--danger)">&minus;' +
+                d.pts +
+                '</span></span>' +
+                '<button type="button" class="btn btn-secondary btn-sm" data-goto="' +
+                d.goto +
+                '">' +
+                esc(d.btn) +
+                '</button>';
+              dd.appendChild(row);
+            });
+          }
+        }
+      }
+      /* Pull the unprotected-platform count for the posture score (Coverage data). */
+      function refreshPostureAgents() {
+        af('/api/agents')
+          .then(function (r) {
+            return r.json();
+          })
+          .then(function (d) {
+            _agentUnprotected = Math.max(0, (d.detected || 0) - (d.configured || 0));
+            if (_lastStatus) renderPosture(_lastStatus);
+          })
+          .catch(function () {
+            /* leave at 0 */
+          });
       }
       /* Real per-layer health from the server (never hard-coded green). The
          server reports state per layer; Layer A goes red 'Degraded' if zero
@@ -1870,6 +2038,7 @@
           .catch(function () {
             /* ignore */
           });
+        refreshPostureAgents();
       }
 
       function loadThreats() {
@@ -2797,6 +2966,13 @@
           modeSeg.addEventListener('click', function (e) {
             var btn = e.target && e.target.closest ? e.target.closest('button.seg-btn') : null;
             if (btn) selectMode(btn.getAttribute('data-mode'));
+          });
+        }
+        var postureDed = document.getElementById('posture-deductions');
+        if (postureDed) {
+          postureDed.addEventListener('click', function (e) {
+            var btn = e.target && e.target.closest ? e.target.closest('button[data-goto]') : null;
+            if (btn) nav(btn.getAttribute('data-goto'));
           });
         }
         on('btn-save', 'click', saveSettings);
