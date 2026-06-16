@@ -510,7 +510,7 @@
           "title": "AI Agent as Security Analyst",
           "description": "After panguard setup, your AI agent (Claude Code, Cursor, etc.) gains 12 security tools via MCP. Ask naturally: 'scan my system', 'audit this skill', 'show me alerts', 'block that IP'.",
           "snippetLabel": "Works with",
-          "snippet": "Claude Code, Claude Desktop, Cursor,\nOpenClaw, Codex, Workbuddy, NemoClaw"
+          "snippet": "Claude Code, Claude Desktop, Cursor,\nOpenClaw, Codex, Workbuddy, Gemini CLI"
         }
       }
     },
@@ -5901,7 +5901,6 @@
           "items": [
             "Threat Cloud crystallization pipeline",
             "GitHub Action for CI/CD scanning",
-            "Hermes Agent integration (76K stars)",
             "RFC-002: Behavioral detection types",
             "RFC-003: Collective defense protocol"
           ]
@@ -5966,7 +5965,7 @@
       "viewATR": "ATR Standard on GitHub",
       "install": "Get Started",
       "copied": "Copied!",
-      "platforms": "Works with Claude Code, Cursor, QClaw, OpenClaw, Codex, WorkBuddy, Claude Desktop",
+      "platforms": "Works with Claude Code, Cursor, OpenClaw, Codex, WorkBuddy, Claude Desktop, Gemini CLI",
       "badges": {
         "mit": "MIT Licensed",
         "rules": "650+ ATR Rules",

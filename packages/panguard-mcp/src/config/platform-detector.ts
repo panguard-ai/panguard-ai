@@ -2,9 +2,9 @@
  * Platform Detector - Detect installed AI agent runtimes
  * 平台偵測器 - 偵測已安裝的 AI Agent 執行環境
  *
- * Detects 17 platforms: Claude Code, Claude Desktop, Cursor, Hermes Agent,
- * OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline,
- * VS Code Copilot, Zed, Gemini CLI, Continue, Roo Code.
+ * Detects 13 platforms: Claude Code, Claude Desktop, Cursor, OpenClaw,
+ * Codex, WorkBuddy, Windsurf, Cline, VS Code Copilot, Zed, Gemini CLI,
+ * Continue, Roo Code.
  *
  * @module @panguard-ai/panguard-mcp/config/platform-detector
  */
@@ -21,14 +21,10 @@ export type PlatformId =
   | 'claude-code'
   | 'claude-desktop'
   | 'cursor'
-  | 'hermes'
   | 'openclaw'
   | 'codex'
   | 'workbuddy'
-  | 'nemoclaw'
-  | 'arkclaw'
   | 'windsurf'
-  | 'qclaw'
   | 'cline'
   | 'vscode-copilot'
   | 'zed'
@@ -121,11 +117,6 @@ function getOpenClawSkillPath(): string {
   return join(homedir(), '.openclaw', 'skills', 'panguard', 'SKILL.md');
 }
 
-/** Get the Hermes Agent MCP config path. */
-function getHermesConfigPath(): string {
-  return join(homedir(), '.hermes', 'config.yaml');
-}
-
 /** Get the OpenClaw skills directory for Panguard. */
 function getOpenClawSkillDir(): string {
   return join(homedir(), '.openclaw', 'skills', 'panguard');
@@ -141,24 +132,9 @@ function getWorkbuddyConfigPath(): string {
   return join(homedir(), '.workbuddy', '.mcp.json');
 }
 
-/** Get the MCP config path for NemoClaw. */
-function getNemoClawConfigPath(): string {
-  return join(homedir(), '.nemoclaw', 'mcp.json');
-}
-
-/** Get the MCP config path for ArkClaw (ByteDance). */
-function getArkClawConfigPath(): string {
-  return join(homedir(), '.arkclaw', 'mcp.json');
-}
-
 /** Get the MCP config path for Windsurf (Codeium). */
 function getWindsurfConfigPath(): string {
   return join(homedir(), '.codeium', 'windsurf', 'mcp_config.json');
-}
-
-/** Get the MCP config path for QClaw (Tencent). */
-function getQClawConfigPath(): string {
-  return join(homedir(), '.qclaw', 'mcp.json');
 }
 
 /** Get the MCP settings path for Cline (VS Code extension). */
@@ -332,17 +308,6 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
     alreadyConfigured: hasPanguardMCPEntry(cursorPath),
   });
 
-  // Hermes Agent (OpenClaw successor, uses SKILL.md + MCP via config.yaml)
-  const hermesConfigPath = getHermesConfigPath();
-  const hermesDetected = (await commandExists('hermes')) || existsSync(join(homedir(), '.hermes'));
-  platforms.push({
-    id: 'hermes',
-    name: 'Hermes Agent',
-    configPath: hermesConfigPath,
-    detected: hermesDetected,
-    alreadyConfigured: hasPanguardMCPEntry(hermesConfigPath),
-  });
-
   // OpenClaw (uses native skill system, not MCP)
   const openclawSkillDir = getOpenClawSkillDir();
   const openclawDetected =
@@ -378,35 +343,6 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
     alreadyConfigured: hasPanguardMCPEntry(wbPath),
   });
 
-  // NemoClaw
-  const ncPath = getNemoClawConfigPath();
-  const ncDetected = (await commandExists('nemoclaw')) || existsSync(join(homedir(), '.nemoclaw'));
-  platforms.push({
-    id: 'nemoclaw',
-    name: 'NemoClaw',
-    configPath: ncPath,
-    detected: ncDetected,
-    alreadyConfigured: hasPanguardMCPEntry(ncPath),
-  });
-
-  // ArkClaw (ByteDance)
-  try {
-    const acCmd = await commandExists('arkclaw');
-    const acDir = existsSync(join(homedir(), '.arkclaw'));
-    if (acCmd || acDir) {
-      const cfgPath = getArkClawConfigPath();
-      platforms.push({
-        id: 'arkclaw',
-        name: 'ArkClaw',
-        configPath: cfgPath,
-        detected: true,
-        alreadyConfigured: hasPanguardMCPEntry(cfgPath),
-      });
-    }
-  } catch {
-    /* not installed */
-  }
-
   // Windsurf (Codeium)
   const wsPath = getWindsurfConfigPath();
   const wsDetected =
@@ -417,17 +353,6 @@ export async function detectPlatforms(): Promise<DetectedPlatform[]> {
     configPath: wsPath,
     detected: wsDetected,
     alreadyConfigured: hasPanguardMCPEntry(wsPath),
-  });
-
-  // QClaw (Tencent)
-  const qcPath = getQClawConfigPath();
-  const qcDetected = (await commandExists('qclaw')) || existsSync(join(homedir(), '.qclaw'));
-  platforms.push({
-    id: 'qclaw',
-    name: 'QClaw',
-    configPath: qcPath,
-    detected: qcDetected,
-    alreadyConfigured: hasPanguardMCPEntry(qcPath),
   });
 
   // Cline (VS Code extension)
@@ -544,22 +469,14 @@ export function getConfigPath(platformId: PlatformId): string {
       return getClaudeDesktopConfigPath();
     case 'cursor':
       return getCursorConfigPath();
-    case 'hermes':
-      return getHermesConfigPath();
     case 'openclaw':
       return getOpenClawSkillDir();
     case 'codex':
       return getCodexConfigPath();
     case 'workbuddy':
       return getWorkbuddyConfigPath();
-    case 'nemoclaw':
-      return getNemoClawConfigPath();
-    case 'arkclaw':
-      return getArkClawConfigPath();
     case 'windsurf':
       return getWindsurfConfigPath();
-    case 'qclaw':
-      return getQClawConfigPath();
     case 'cline':
       return getClineConfigPath();
     case 'vscode-copilot':

@@ -377,7 +377,7 @@ dGFycmQzdHh3KSI=' | base64 -D | bash`}</code>
             </h2>
             <p className="text-text-secondary mb-8 max-w-lg mx-auto">
               One command. Under 5 seconds per skill. Works with Claude Code, Cursor, OpenClaw,
-              Hermes, and 12 more platforms.
+              and 10 more platforms.
             </p>
           </FadeInUp>
           <FadeInUp delay={0.1}>

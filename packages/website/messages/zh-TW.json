@@ -510,7 +510,7 @@
           "title": "AI 代理化身資安分析師",
           "description": "執行 panguard setup 後，你的 AI 代理（Claude Code、Cursor 等）透過 MCP 獲得 12 個安全工具。自然語言提問：「掃描我的系統」、「審計這個技能」、「顯示警報」、「封鎖那個 IP」。",
           "snippetLabel": "支援平台",
-          "snippet": "Claude Code, Claude Desktop, Cursor,\nOpenClaw, Codex, Workbuddy, NemoClaw"
+          "snippet": "Claude Code, Claude Desktop, Cursor,\nOpenClaw, Codex, Workbuddy, Gemini CLI"
         }
       }
     },
@@ -5927,7 +5927,6 @@
           "items": [
             "Threat Cloud 結晶管線",
             "GitHub Action 上架 CI/CD 掃描",
-            "Hermes Agent 整合（76K stars）",
             "RFC-002：行為序列偵測類型",
             "RFC-003：集體防護協定"
           ]
@@ -5992,7 +5991,7 @@
       "viewATR": "GitHub 上的 ATR 標準",
       "install": "開始使用",
       "copied": "已複製!",
-      "platforms": "支援 Claude Code、Cursor、QClaw、OpenClaw、Codex、WorkBuddy、Claude Desktop",
+      "platforms": "支援 Claude Code、Cursor、OpenClaw、Codex、WorkBuddy、Claude Desktop、Gemini CLI",
       "badges": {
         "mit": "MIT 開源",
         "rules": "650+ ATR 規則",

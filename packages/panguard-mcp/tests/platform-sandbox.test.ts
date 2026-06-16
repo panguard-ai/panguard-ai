@@ -2,7 +2,7 @@
  * Platform Sandbox Tests
  * 平台沙盒測試
  *
- * Tests platform detection and config path resolution for all 16 platforms
+ * Tests platform detection and config path resolution for all 13 platforms
  * using isolated temp directories as sandboxed home environments.
  *
  * @module @panguard-ai/panguard-mcp/tests/platform-sandbox
@@ -57,7 +57,7 @@ afterAll(() => {
   rmSync(SANDBOX_ROOT, { recursive: true, force: true });
 });
 
-// ─── All 16 Platform IDs ────────────────────────────────────────────────────
+// ─── All 13 Platform IDs ────────────────────────────────────────────────────
 
 const ALL_PLATFORM_IDS: PlatformId[] = [
   'claude-code',
@@ -66,10 +66,7 @@ const ALL_PLATFORM_IDS: PlatformId[] = [
   'openclaw',
   'codex',
   'workbuddy',
-  'nemoclaw',
-  // arkclaw is conditional — only added when detected
   'windsurf',
-  'qclaw',
   'cline',
   'vscode-copilot',
   'zed',
@@ -83,10 +80,9 @@ const ALL_PLATFORM_IDS: PlatformId[] = [
 // ═══════════════════════════════════════════════════════════════════════════
 
 describe('All supported platforms registered', () => {
-  it('detectPlatforms returns 15 always-on platforms (arkclaw conditional)', async () => {
+  it('detectPlatforms returns all 13 platforms', async () => {
     const platforms = await detectPlatforms();
-    // 15 always-on + arkclaw only if detected
-    expect(platforms.length).toBeGreaterThanOrEqual(15);
+    expect(platforms.length).toBeGreaterThanOrEqual(13);
   });
 
   it('includes all expected platform IDs', async () => {
@@ -99,9 +95,7 @@ describe('All supported platforms registered', () => {
   });
 
   it('getConfigPath returns valid path for all platforms', () => {
-    const allIds: PlatformId[] = [...ALL_PLATFORM_IDS, 'arkclaw'];
-
-    for (const id of allIds) {
+    for (const id of ALL_PLATFORM_IDS) {
       const configPath = getConfigPath(id);
       expect(configPath, `getConfigPath('${id}') returned falsy`).toBeTruthy();
       expect(typeof configPath).toBe('string');
@@ -110,8 +104,7 @@ describe('All supported platforms registered', () => {
   });
 
   it('no two platforms share the same config path', () => {
-    const allIds: PlatformId[] = [...ALL_PLATFORM_IDS, 'arkclaw'];
-    const paths = allIds.map((id) => getConfigPath(id));
+    const paths = ALL_PLATFORM_IDS.map((id) => getConfigPath(id));
     const unique = new Set(paths);
     // vscode-copilot and cline/roo-code are in the same VS Code dir but different files
     // Just check no exact duplicates
@@ -130,8 +123,6 @@ describe('Platform detection via directory', () => {
     { id: 'openclaw', name: 'OpenClaw', dir: '.openclaw' },
     { id: 'codex', name: 'Codex CLI', dir: '.codex' },
     { id: 'workbuddy', name: 'WorkBuddy', dir: '.workbuddy' },
-    { id: 'nemoclaw', name: 'NemoClaw', dir: '.nemoclaw' },
-    { id: 'qclaw', name: 'QClaw', dir: '.qclaw' },
     { id: 'gemini-cli', name: 'Gemini CLI', dir: '.gemini' },
     { id: 'continue', name: 'Continue', dir: '.continue' },
   ];

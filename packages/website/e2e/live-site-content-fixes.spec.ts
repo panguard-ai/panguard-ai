@@ -74,7 +74,7 @@ test.describe('Journey 1: Homepage flywheel — three-layer defense section', ()
   });
 });
 
-// ─── Journey 2: Platform tabs — all 8 platforms ─────────────────────────────
+// ─── Journey 2: Platform tabs — supported platforms ─────────────────────────
 
 test.describe('Journey 2: Platform tabs — npx panguard setup', () => {
   const EXPECTED_PLATFORMS = [
@@ -84,11 +84,11 @@ test.describe('Journey 2: Platform tabs — npx panguard setup', () => {
     'OpenClaw',
     'Codex',
     'WorkBuddy',
-    'NemoClaw',
-    'ArkClaw',
+    'Windsurf',
+    'Gemini CLI',
   ];
 
-  test('all 8 platforms appear in the setup section (English)', async ({ page }) => {
+  test('supported platforms appear in the setup section (English)', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
@@ -121,7 +121,7 @@ test.describe('Journey 2: Platform tabs — npx panguard setup', () => {
 
     // Look for tab-like elements in the setup section
     const tabs = page.locator('[role="tab"], button').filter({
-      hasText: /Claude Code|Claude Desktop|Cursor|OpenClaw|Codex|WorkBuddy|NemoClaw|ArkClaw/i,
+      hasText: /Claude Code|Claude Desktop|Cursor|OpenClaw|Codex|WorkBuddy|Windsurf|Gemini CLI/i,
     });
     const tabCount = await tabs.count();
 
@@ -413,11 +413,11 @@ test.describe('Journey 10: Chinese version /zh-TW — platform tabs', () => {
     'OpenClaw',
     'Codex',
     'WorkBuddy',
-    'NemoClaw',
-    'ArkClaw',
+    'Windsurf',
+    'Gemini CLI',
   ];
 
-  test('/zh-TW loads and shows all 8 platforms', async ({ page }) => {
+  test('/zh-TW loads and shows supported platforms', async ({ page }) => {
     // Try both /zh-TW and /zh variants
     let res = await page.goto('/zh-TW');
     if (!res || res.status() !== 200) {
