@@ -759,7 +759,7 @@
       "scanBtn": "掃描",
       "historyLabel": "最近掃描",
       "trustNote": "掃描在伺服器端執行，不儲存任何程式碼，僅快取內容 hash。",
-      "platformLabel": "支援 17 個平台：",
+      "platformLabel": "支援 13 個平台：",
       "ticker1": "postmark-mcp v1.0.16 每天偷偷轉寄 15,000 封信",
       "ticker2": "MCPJam Inspector CVSS 9.8 遠端程式碼執行",
       "ticker3": "Claude Code hooks 被利用偷走 API key",
@@ -767,7 +767,7 @@
       "ticker5": "43% 公開 MCP servers 有指令執行漏洞",
       "badgeOwasp": "OWASP 10/10",
       "badgeRules": "650+ 條 ATR 規則",
-      "badgePlatforms": "17 個平台",
+      "badgePlatforms": "13 個平台",
       "badgeLicense": "MIT 授權",
       "badgeScanned": "已掃 {count} Skills",
       "badgeRecall": "Garak 98% 召回率",
@@ -906,7 +906,7 @@
         },
         "panguard": {
           "label": "PanGuard",
-          "desc": "開源、17 個平台、不到 1 小時更新規則"
+          "desc": "開源、13 個平台、不到 1 小時更新規則"
         }
       }
     },
@@ -919,7 +919,7 @@
       "roadmapTitle": "我們的方向：",
       "installNow": "立即安裝",
       "scanSkill": "掃描 Skill",
-      "installNote": "60 秒安裝。17 個平台。{rules} 條規則。永久免費。",
+      "installNote": "60 秒安裝。13 個平台。{rules} 條規則。永久免費。",
       "paperPublished": "論文已發表（Zenodo DOI）"
     },
     "atrStandard": {

@@ -29,6 +29,8 @@ export interface QuarantineRecord {
   reason: string;
   quarantinedAt: string;
   restoredAt?: string;
+  /** True when the quarantined entry is a directory-style skill (~/.claude/skills/<name>/). */
+  isDirectory?: boolean;
 }
 
 /** Quarantine manifest stored as JSON / 隔離清單（JSON 格式） */
@@ -77,20 +79,43 @@ export class FileQuarantine {
       throw new Error('Cannot quarantine a file already in quarantine directory');
     }
 
-    // Read file and compute hash before moving
-    const fileBuffer = await readFile(absPath);
-    const sha256 = createHash('sha256').update(fileBuffer).digest('hex');
-    const fileStat = await stat(absPath);
+    // stat FIRST: a Claude Code skill is a DIRECTORY (~/.claude/skills/<name>/),
+    // not a single file. readFile() on a directory throws EISDIR, which is why
+    // one-click quarantine used to 500 on the most common skill type. Branch on
+    // the entry type before any file read.
+    const entryStat = await stat(absPath);
+    const isDirectory = entryStat.isDirectory();
+
+    // Evidence hash: for a file, hash its bytes. For a directory-style skill,
+    // hash its SKILL.md (the instructions are the threat surface), falling back
+    // to empty when absent. We never readFile() a directory.
+    let sha256: string;
+    let fileSize: number;
+    if (isDirectory) {
+      let manifestBuf: Buffer;
+      try {
+        manifestBuf = await readFile(join(absPath, 'SKILL.md'));
+      } catch {
+        manifestBuf = Buffer.alloc(0);
+      }
+      sha256 = createHash('sha256').update(manifestBuf).digest('hex');
+      fileSize = manifestBuf.length;
+    } else {
+      const fileBuffer = await readFile(absPath);
+      sha256 = createHash('sha256').update(fileBuffer).digest('hex');
+      fileSize = entryStat.size;
+    }
 
     // Generate unique quarantine name
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const quarantineName = `${id}_${basename(absPath)}`;
     const quarantinePath = join(this.quarantineDir, quarantineName);
 
-    // Move file to quarantine
+    // Move the file OR the whole directory into quarantine — rename handles both.
     await rename(absPath, quarantinePath);
 
-    // Restrict permissions (not on Windows)
+    // Restrict permissions (not on Windows). 0o000 blocks access to a file or a
+    // directory alike.
     if (platform() !== 'win32') {
       await chmod(quarantinePath, 0o000);
     }
@@ -100,9 +125,10 @@ export class FileQuarantine {
       originalPath: absPath,
       quarantinePath,
       sha256,
-      fileSize: fileStat.size,
+      fileSize,
       reason,
       quarantinedAt: new Date().toISOString(),
+      isDirectory,
     };
 
     this.manifest.records.push(record);
@@ -131,9 +157,10 @@ export class FileQuarantine {
     }
 
     try {
-      // Restore permissions before moving
+      // Restore permissions before moving. A directory needs the execute bit to
+      // be traversable again (0o700); a regular file gets 0o644.
       if (platform() !== 'win32') {
-        await chmod(record.quarantinePath, 0o644);
+        await chmod(record.quarantinePath, record.isDirectory ? 0o700 : 0o644);
       }
 
       await rename(record.quarantinePath, record.originalPath);

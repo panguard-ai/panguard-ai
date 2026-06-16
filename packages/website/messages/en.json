@@ -759,7 +759,7 @@
       "scanBtn": "Scan",
       "historyLabel": "Recent scans",
       "trustNote": "Scans run server-side. No code is stored. Only content hash is cached.",
-      "platformLabel": "Works with 17 platforms:",
+      "platformLabel": "Works with 13 platforms:",
       "ticker1": "postmark-mcp v1.0.16 silently forwarded 15,000 emails/day",
       "ticker2": "MCPJam Inspector CVSS 9.8 remote code execution",
       "ticker3": "Claude Code hooks exploited for API key theft",
@@ -906,7 +906,7 @@
         },
         "panguard": {
           "label": "PanGuard",
-          "desc": "Open source, 17 platforms, < 1 hour rule updates"
+          "desc": "Open source, 13 platforms, < 1 hour rule updates"
         }
       }
     },
@@ -919,7 +919,7 @@
       "roadmapTitle": "Where we're going:",
       "installNow": "Install Now",
       "scanSkill": "Scan a Skill",
-      "installNote": "60 seconds. 17 platforms. {rules} rules. Free forever.",
+      "installNote": "60 seconds. 13 platforms. {rules} rules. Free forever.",
       "paperPublished": "Paper published (Zenodo DOI)"
     },
     "atrStandard": {
