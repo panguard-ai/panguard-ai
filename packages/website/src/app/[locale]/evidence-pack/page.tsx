@@ -178,8 +178,8 @@ export default async function EvidencePackPage({
             <ul className="space-y-2.5 text-sm text-text-secondary leading-relaxed">
               <Bullet>
                 {isZh
-                  ? '偵測:336 條 ATR 規則 + Garak 98% recall · 0.20% FP——LLM 0 個 token'
-                  : 'Detection: 336 ATR rules with 98% Garak recall / 0.20% FP — zero LLM tokens'}
+                  ? '偵測:純 deterministic ATR 規則 + Garak ~97.2% recall · SKILL.md 語料庫 0.20% FP——LLM 0 個 token'
+                  : 'Detection: deterministic ATR rules with ~97.2% Garak recall / 0.20% FP on the SKILL.md corpus — zero LLM tokens'}
               </Bullet>
               <Bullet>
                 {isZh

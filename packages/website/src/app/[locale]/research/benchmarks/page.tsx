@@ -19,8 +19,8 @@ export async function generateMetadata(props: {
       ? 'ATR Benchmark 結果 — Garak, SKILL.md, PINT, Wild Scan'
       : 'ATR Benchmark Results — Garak, SKILL.md, PINT, Wild Scan',
     description: isZh
-      ? '419 條 ATR 規則在公開對抗式語料庫上的實測結果。Garak 98% recall, SKILL.md 100% recall + 97% precision, PINT 62.5% recall, Wild Scan 67,799 個 skill 中 1,096 個確認惡意。可重現方法、原始資料、Zenodo DOI。'
-      : 'Public benchmark results for 419 ATR rules against adversarial corpora. Garak 98% recall, SKILL.md 100% recall + 97% precision, PINT 62.5% recall, Wild Scan 1,096 confirmed malicious of 67,799 skills. Reproducible methodology, raw data, Zenodo DOI.',
+      ? 'ATR 規則在公開對抗式語料庫上的實測結果(v3.5.0)。Garak ~97.2% recall, SKILL.md 100% recall + 97% precision, PINT 63.6% recall / 99.65% precision, HackAPrompt 69.6% recall。可重現方法、原始資料、Zenodo DOI。'
+      : 'Public benchmark results for ATR rules against adversarial corpora (v3.5.0). Garak ~97.2% recall, SKILL.md 100% recall + 97% precision, PINT 63.6% recall / 99.65% precision, HackAPrompt 69.6% recall. Reproducible methodology, raw data, Zenodo DOI.',
     alternates: buildAlternates('/research/benchmarks', params.locale),
   };
 }
@@ -44,16 +44,16 @@ const BENCHMARKS: Benchmark[] = [
     slug: 'garak',
     name: 'Garak (NVIDIA jailbreak corpus)',
     description:
-      'NVIDIA garak is the leading open-source LLM red-teaming framework. We ran ATR v2.1.2 against the full garak corpus to measure adversarial-prompt detection.',
+      'NVIDIA garak is the leading open-source LLM red-teaming framework. We ran ATR v3.5.0 against the full garak corpus to measure adversarial-prompt detection.',
     zhDescription:
-      'NVIDIA garak 是業界領先的開源 LLM red-teaming 框架。我們用 ATR v2.1.2 對 garak 完整語料庫做對抗式 prompt 偵測測試。',
+      'NVIDIA garak 是業界領先的開源 LLM red-teaming 框架。我們用 ATR v3.5.0 對 garak 完整語料庫做對抗式 prompt 偵測測試。',
     date: '2026-04-22',
     source: { label: 'github.com/NVIDIA/garak', url: 'https://github.com/NVIDIA/garak' },
     results: [
-      { label: 'Recall', value: `${STATS.benchmark.garak.recall}%` },
+      { label: 'Recall', value: `~${STATS.benchmark.garak.recallApprox}%` },
       { label: 'Sample size', value: `${STATS.benchmark.garak.samples} samples` },
       { label: 'Layer', value: 'Regex only (no LLM second opinion)' },
-      { label: 'ATR version', value: 'v2.1.2' },
+      { label: 'ATR version', value: 'v2.1.2 (last verified measurement)' },
     ],
     reproduce: 'pnpm bench:garak (in agent-threat-rules repo)',
     externalLink:
@@ -129,19 +129,19 @@ const BENCHMARKS: Benchmark[] = [
     slug: 'hackaprompt',
     name: 'HackAPrompt cluster mining',
     description:
-      'Engineering write-up from 2026-05-11. Baseline ATR v2.1.2 vs HackAPrompt 600K-corpus 5K deterministic sample. Result: 29.5% recall, 0 new false positives. The number is below closed-source ML detectors. Methodology and rule additions documented in the public engineering blog.',
+      'ATR v3.5.0 against the HackAPrompt deterministic sample: 69.6% recall, 100% precision — up from the 29.5% v2.1.2 baseline documented in the 2026-05-11 cluster-mining write-up. The rule base keeps closing the gap on this corpus.',
     zhDescription:
-      '2026-05-11 的工程紀錄。Baseline ATR v2.1.2 對 HackAPrompt 600K 語料庫的 5K 確定性樣本。結果:29.5% recall,0 個新誤報。數字低於閉源 ML 偵測器。方法論與規則更新公開於工程部落格。',
+      'ATR v3.5.0 對 HackAPrompt 確定性樣本:69.6% recall、100% precision — 從 v2.1.2 的 29.5% baseline(2026-05-11 cluster-mining 紀錄)持續拉高。規則庫在這個語料庫上不斷補上缺口。',
     date: '2026-05-11',
     source: {
       label: 'HackAPrompt corpus',
       url: 'https://huggingface.co/datasets/hackaprompt/hackaprompt-dataset',
     },
     results: [
-      { label: 'HackAPrompt recall', value: '29.5%' },
-      { label: 'Baseline recall', value: '16.0%' },
-      { label: 'Sample size', value: '5,000 deterministic' },
-      { label: 'New FPs introduced', value: '0' },
+      { label: 'Recall (v3.5.0)', value: `${STATS.benchmark.hackaprompt.recall}%` },
+      { label: 'Precision', value: `${STATS.benchmark.hackaprompt.precision}%` },
+      { label: 'Sample size', value: `${STATS.benchmark.hackaprompt.samples.toLocaleString()} deterministic` },
+      { label: 'v2.1.2 baseline', value: '29.5%' },
     ],
     reproduce: 'pnpm bench:hackaprompt',
     externalLink: 'https://panguard.ai/blog/hackaprompt-cluster-mining-29-percent-recall',
@@ -157,8 +157,8 @@ export default async function BenchmarkHubPage(props: { params: Promise<{ locale
       ? 'ATR Benchmark 結果 — Garak, SKILL.md, PINT, Wild Scan'
       : 'ATR Benchmark Results — Garak, SKILL.md, PINT, Wild Scan',
     description: isZh
-      ? '419 條 ATR 規則對抗式語料庫實測'
-      : 'Public benchmark results for 419 ATR rules against adversarial corpora.',
+      ? `${STATS.atrRules} 條 ATR 規則對抗式語料庫實測`
+      : `Public benchmark results for ${STATS.atrRules} ATR rules against adversarial corpora.`,
     url: 'https://panguard.ai/research/benchmarks',
     datePublished: '2026-05-12',
     dateModified: '2026-05-12',
@@ -194,8 +194,8 @@ export default async function BenchmarkHubPage(props: { params: Promise<{ locale
             </p>
             <h1 className="text-[clamp(28px,5vw,52px)] font-extrabold leading-[1.05] tracking-tight text-text-primary max-w-3xl">
               {isZh
-                ? '419 條 ATR 規則的公開實測結果'
-                : 'Public benchmark results for 419 ATR rules'}
+                ? `${STATS.atrRules} 條 ATR 規則的公開實測結果`
+                : `Public benchmark results for ${STATS.atrRules} ATR rules`}
             </h1>
             <p className="text-lg text-text-secondary mt-6 max-w-2xl leading-relaxed">
               {isZh

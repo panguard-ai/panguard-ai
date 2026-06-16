@@ -396,7 +396,7 @@ export default function PricingContent() {
                         '自訂 ATR rule pack 試做',
                         'SIEM webhook 整合樣板',
                         'LLM 額度全包(crystallization + 規則 enrichment ~$200/月,我們吃 token 成本)',
-                        '偵測 0% 依賴 LLM——336 條 deterministic rules @ 98% recall',
+                        `偵測 0% 依賴 LLM——deterministic ATR 規則,Garak ~${STATS.benchmark.garak.recallApprox}% recall`,
                         '90 天後升級 Enterprise 或乾淨結束',
                         '可 credit 全額 $25K 到 Y1 Enterprise 年約',
                       ]
@@ -407,7 +407,7 @@ export default function PricingContent() {
                         'Custom ATR rule pack trial',
                         'SIEM webhook integration template',
                         'LLM credits included (crystallization + rule enrichment ~$200/mo, we eat the token cost)',
-                        'Detection runs 0% on LLM — 336 deterministic rules @ 98% recall',
+                        `Detection runs 0% on LLM — deterministic ATR rules, ~${STATS.benchmark.garak.recallApprox}% Garak recall`,
                         'Clean exit or upgrade to Enterprise at day 90',
                         'Full $25K credit to Y1 Enterprise contract on upgrade',
                       ]
@@ -940,8 +940,8 @@ export default function PricingContent() {
                 </div>
                 <p className="text-sm text-text-secondary leading-[1.85] flex-1">
                   {isZh
-                    ? '由國家紅隊以自有對抗樣本，對 ATR 全 419 條規則進行完整測試。我們提供偵測引擎、Migrator 工具與完整的失敗案例揭露。'
-                    : "The national red team runs its own adversarial corpus against ATR's full 330-rule library. We provide the detection engine, Migrator tooling, and full failure-case disclosure."}
+                    ? '由國家紅隊以自有對抗樣本，對 ATR 全部規則進行完整測試。我們提供偵測引擎、Migrator 工具與完整的失敗案例揭露。'
+                    : "The national red team runs its own adversarial corpus against the full ATR rule set. We provide the detection engine, Migrator tooling, and full failure-case disclosure."}
                 </p>
                 <p className="text-xs text-text-muted leading-[1.85] mt-3">
                   {isZh
@@ -1075,8 +1075,8 @@ export default function PricingContent() {
             }
             subtitle={
               isZh
-                ? 'Cisco AI Defense 已採用全部 419 條 ATR 規則；Microsoft AGT 採用 287 條並啟用每週自動同步；NVIDIA garak、Gen Digital Sage、IBM mcp-context-forge 的整合正在進行中。若貴公司的產品需要精修到 Cisco 已合併 PR 品質的版本——包含 draft 規則的早期存取、五大框架合規 metadata，以及白標部署——OEM tier 是為這個情境設計的方案。'
-                : 'Cisco AI Defense ships all 330 ATR rules. Microsoft AGT ships 287 rules with weekly auto-sync. NVIDIA garak, Gen Digital Sage, and IBM mcp-context-forge integrations are in flight. For vendors who need the Cisco-merge-PR-quality enriched version — early access to draft rules, five-framework compliance metadata, white-label deployment — the OEM tier is purpose-built for that scenario.'
+                ? 'Cisco AI Defense 已採用完整 ATR 規則包（自動同步至最新版本）；Microsoft AGT 透過每週自動同步引入 ATR 規則；NVIDIA garak、Gen Digital Sage、IBM mcp-context-forge 的整合正在進行中。若貴公司的產品需要精修到 Cisco 已合併 PR 品質的版本——包含 draft 規則的早期存取、五大框架合規 metadata，以及白標部署——OEM tier 是為這個情境設計的方案。'
+                : 'Cisco AI Defense ships the full ATR rule pack (auto-synced to latest). Microsoft AGT ships ATR rules with weekly auto-sync. NVIDIA garak, Gen Digital Sage, and IBM mcp-context-forge integrations are in flight. For vendors who need the Cisco-merge-PR-quality enriched version — early access to draft rules, five-framework compliance metadata, white-label deployment — the OEM tier is purpose-built for that scenario.'
             }
           />
 

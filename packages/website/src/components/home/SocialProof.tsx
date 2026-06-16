@@ -15,15 +15,15 @@ import { STATS } from '@/lib/stats';
 const ADOPTERS: readonly { name: string; detail: string; highlight?: boolean }[] = [
   {
     name: 'Cisco AI Defense',
-    detail: `${STATS.adoption.ciscoRulesMerged} ATR rules merged (PR #79 + #99)`,
+    detail: 'Full ATR rule pack merged (PR #79 + #99)',
     highlight: true,
   },
   {
     name: 'Microsoft AGT',
-    detail: `${STATS.adoption.microsoftRulesMerged} ATR rules merged (PR #908 + #1277)`,
+    detail: 'ATR rules merged + weekly auto-sync (PR #908 + #1277)',
     highlight: true,
   },
-  { name: 'NVIDIA Garak', detail: '98% recall · PR open' },
+  { name: 'NVIDIA Garak', detail: `${STATS.benchmark.garak.recallApprox}% recall · PR open` },
 ];
 
 export default function SocialProof() {

@@ -6,6 +6,7 @@ import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import { Link } from '@/navigation';
 import { ArrowRight, Check } from 'lucide-react';
+import { STATS } from '@/lib/stats';
 
 type Lang = 'en' | 'zh';
 
@@ -41,7 +42,7 @@ const COPY = {
     successHint: 'Questions? Reply to our email or contact enterprise@panguard.ai',
     alreadyShipping: 'Already shipping today · Community tier',
     todayList: [
-      { en: '330 ATR detection rules (MIT licensed)', zh: '' },
+      { en: `${STATS.atrRules} ATR detection rules (MIT licensed)`, zh: '' },
       { en: 'pga CLI + Guard daemon (11 response actions)', zh: '' },
       { en: 'Honeypot integrated in Guard (trap-bridge.ts)', zh: '' },
       { en: 'Threat Cloud sensor registration on pga up', zh: '' },
@@ -78,7 +79,7 @@ const COPY = {
     successHint: '有問題?回覆我們的 email,或寫 enterprise@panguard.ai',
     alreadyShipping: '今天已可用 · Community 版',
     todayList: [
-      { en: '', zh: '419 條 ATR 偵測規則（MIT 授權）' },
+      { en: '', zh: `${STATS.atrRules} 條 ATR 偵測規則（MIT 授權）` },
       { en: '', zh: 'pga CLI + Guard daemon(11 種反應動作)' },
       { en: '', zh: '整合在 Guard 內的蜜罐(trap-bridge.ts)' },
       { en: '', zh: 'pga up 時自動註冊為 Threat Cloud 感測器' },

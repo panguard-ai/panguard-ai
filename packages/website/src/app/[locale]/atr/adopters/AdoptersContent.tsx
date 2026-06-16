@@ -22,9 +22,9 @@ const ADOPTERS: readonly Adopter[] = [
     org: 'Microsoft Agent Governance Toolkit',
     category: 'big-tech',
     noteEn:
-      '287-rule expansion in production with weekly auto-sync workflow. Microsoft Copilot SWE Agent opened AGT#1981 with regression-test fixtures presuming ATR detection (2026-05-11).',
+      'ATR rule pack in production with a weekly auto-sync workflow. Microsoft Copilot SWE Agent opened AGT#1981 with regression-test fixtures presuming ATR detection (2026-05-11).',
     noteZh:
-      '287 條規則進入 production，並設定每週自動同步。Microsoft Copilot SWE Agent 在 2026-05-11 開了 AGT#1981 並提交 regression-test fixtures 預設使用 ATR 偵測。',
+      'ATR 規則包進入 production，並設定每週自動同步。Microsoft Copilot SWE Agent 在 2026-05-11 開了 AGT#1981 並提交 regression-test fixtures 預設使用 ATR 偵測。',
     prs: [
       {
         number: 908,
@@ -34,8 +34,8 @@ const ADOPTERS: readonly Adopter[] = [
       },
       {
         number: 1277,
-        titleEn: '287-rule expansion + weekly auto-sync',
-        titleZh: '287 條擴張 + 每週自動同步',
+        titleEn: 'ATR rule pack + weekly auto-sync',
+        titleZh: 'ATR 規則包 + 每週自動同步',
         date: '2026-04-26',
       },
     ],
@@ -43,8 +43,8 @@ const ADOPTERS: readonly Adopter[] = [
   {
     org: 'Cisco AI Defense',
     category: 'big-tech',
-    noteEn: 'Full 419-rule pack in skill-scanner production. Auto-syncs to latest ATR release.',
-    noteZh: '完整 419 條規則進入 skill-scanner production，並自動同步至最新 ATR 發行。',
+    noteEn: 'The full ATR rule pack in skill-scanner production, auto-synced to the latest ATR release.',
+    noteZh: '完整 ATR 規則包進入 skill-scanner production，並自動同步至最新 ATR 發行。',
     prs: [
       {
         number: 79,
@@ -56,8 +56,8 @@ const ADOPTERS: readonly Adopter[] = [
       {
         number: 99,
         repo: 'cisco-ai-defense/skill-scanner',
-        titleEn: 'Full 344-rule pack (auto-syncs to 419)',
-        titleZh: '完整 344 條規則',
+        titleEn: 'Full rule pack (auto-synced to latest)',
+        titleZh: '完整規則包（自動同步至最新版本）',
         date: '2026-04-22',
       },
     ],

@@ -19,7 +19,7 @@ export default function LiveStats() {
     },
     {
       label: isZh ? 'Garak recall' : 'Garak recall',
-      value: `${STATS.benchmark.garak.recall}%`,
+      value: `~${STATS.benchmark.garak.recallApprox}%`,
     },
     {
       label: isZh ? '已掃描技能' : 'Skills scanned',

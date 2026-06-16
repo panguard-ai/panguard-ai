@@ -10,7 +10,6 @@
  * @module @panguard-ai/panguard-guard/rule-sync
  */
 
-import { hostname, platform } from 'node:os';
 import { createLogger } from '@panguard-ai/core';
 import type { ThreatIntelFeedManager } from '@panguard-ai/core';
 import type { GuardConfig } from './types.js';
@@ -39,7 +38,14 @@ export interface CloudSyncDeps {
  * skill whitelist and blacklist.
  */
 export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
-  const { atrEngine, threatCloud, feedManager } = deps;
+  const { atrEngine, threatCloud, feedManager, config } = deps;
+
+  // Outbound collective-defense sharing is opt-in: it is allowed ONLY when the
+  // user has explicitly enabled it. Absent/unset config is treated as OFF (the
+  // gate is `=== true`, never `!== false`). This governs every OUTBOUND post in
+  // this function; the INBOUND indicator pulls below run regardless because they
+  // download community blocklists/lists and never reveal anything about this host.
+  const sharingOptedIn = config.threatCloudUploadEnabled === true;
 
   try {
     // NOTE: Detection RULES are intentionally NOT pulled from Threat Cloud here.
@@ -71,21 +77,24 @@ export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
       );
     }
 
-    // Report locally whitelisted skills to Threat Cloud (batch)
-    try {
-      const localSkills = atrEngine
-        .getWhitelistManager()
-        .getAll()
-        .filter((s) => s.source === 'fingerprint' || s.source === 'manual');
-      if (localSkills.length > 0) {
-        await threatCloud.reportSafeSkillsBatch(
-          localSkills.map((s) => ({ skillName: s.name, fingerprintHash: s.fingerprintHash }))
+    // Report locally whitelisted skills to Threat Cloud (batch) — OUTBOUND
+    // collective-defense sharing, so only when the user has opted in.
+    if (sharingOptedIn) {
+      try {
+        const localSkills = atrEngine
+          .getWhitelistManager()
+          .getAll()
+          .filter((s) => s.source === 'fingerprint' || s.source === 'manual');
+        if (localSkills.length > 0) {
+          await threatCloud.reportSafeSkillsBatch(
+            localSkills.map((s) => ({ skillName: s.name, fingerprintHash: s.fingerprintHash }))
+          );
+        }
+      } catch (err: unknown) {
+        logger.warn(
+          `Skill whitelist upload failed: ${err instanceof Error ? err.message : String(err)}`
         );
       }
-    } catch (err: unknown) {
-      logger.warn(
-        `Skill whitelist upload failed: ${err instanceof Error ? err.message : String(err)}`
-      );
     }
 
     // Sync community skill whitelist (incremental after first sync)
@@ -131,20 +140,13 @@ export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
     // After first full sync, switch to incremental
     isFirstSync = false;
 
-    // Send device heartbeat to TC for fleet tracking
-    try {
-      const deviceId = threatCloud.getClientId();
-      await threatCloud.sendHeartbeat({
-        deviceId,
-        orgId: deviceId, // Single-user: org = device until orgs are configured
-        hostname: hostname(),
-        osType: platform(),
-        agentCount: atrEngine.getRuleCount(),
-        guardVersion: 'guard',
-      });
-    } catch (err: unknown) {
-      logger.warn(`Heartbeat failed: ${err instanceof Error ? err.message : String(err)}`);
-    }
+    // NOTE: There is intentionally NO periodic device heartbeat / phone-home.
+    // A privacy-respecting tool must not beacon hostname (or any device identity)
+    // to the cloud on a timer. The ONLY outbound Threat Cloud traffic is the
+    // event-driven, anonymized threat upload that fires when a real threat is
+    // caught (see event-processor.reportAndNotify), plus the opt-in skill
+    // whitelist batch above — both gated on explicit consent. Everything in this
+    // sync is otherwise an INBOUND pull of community indicators.
 
     logger.info(
       `Threat Cloud indicator sync: ${addedIPs} IPs, ${addedDomains} domains, ` +

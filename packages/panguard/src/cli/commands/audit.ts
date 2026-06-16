@@ -177,6 +177,29 @@ export function auditCommand(): Command {
           setLogLevel('silent');
         }
 
+        // Collective-defense upload is OPT-IN, default OFF. `--no-cloud` is a hard
+        // off-switch, but even with cloud not disabled we only upload when the user
+        // has EXPLICITLY opted in (threatCloudUploadEnabled === true in the guard
+        // config). Absent/unset config or any read error => OFF (no upload).
+        const cloudUploadAllowed = await (async (): Promise<boolean> => {
+          if (!options.cloud) return false;
+          try {
+            const { existsSync, readFileSync } = await import('node:fs');
+            const cfgPath = path.join(
+              process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.',
+              '.panguard-guard',
+              'config.json'
+            );
+            if (!existsSync(cfgPath)) return false;
+            const cfg = JSON.parse(readFileSync(cfgPath, 'utf-8')) as {
+              threatCloudUploadEnabled?: boolean;
+            };
+            return cfg.threatCloudUploadEnabled === true;
+          } catch {
+            return false;
+          }
+        })();
+
         // ── Detect URL vs local path ──
         let resolvedPath: string;
         let tempDir: string | null = null;
@@ -414,8 +437,8 @@ export function auditCommand(): Command {
           }
         }
 
-        // ── Report to Threat Cloud (flywheel) ──
-        if (options.cloud && report.riskScore > 0) {
+        // ── Report to Threat Cloud (flywheel) — OPT-IN upload only ──
+        if (cloudUploadAllowed && report.riskScore > 0) {
           const skillHash = computeSkillHash(resolvedPath);
           const skillName = report.manifest?.name ?? path.basename(resolvedPath);
 
@@ -465,9 +488,9 @@ export function auditCommand(): Command {
           }
         }
 
-        // ── Flywheel: submit ATR proposal for HIGH/CRITICAL findings ──
+        // ── Flywheel: submit ATR proposal for HIGH/CRITICAL findings — OPT-IN ──
         if (
-          options.cloud &&
+          cloudUploadAllowed &&
           (report.riskLevel === 'HIGH' || report.riskLevel === 'CRITICAL') &&
           report.findings.length > 0
         ) {
@@ -552,8 +575,8 @@ response:
           }
         }
 
-        // Report scan event to TC for metrics (always, regardless of findings)
-        if (options.cloud) {
+        // Report scan event to TC for metrics — OPT-IN upload only.
+        if (cloudUploadAllowed) {
           try {
             const { ThreatCloudClient } = await import('@panguard-ai/panguard-guard');
             const dataDir = path.join(

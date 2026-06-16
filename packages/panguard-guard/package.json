@@ -30,7 +30,8 @@
     "dist",
     "bundled-rules",
     "package.json",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc --build && node -e \"require('node:fs').mkdirSync('dist/dashboard',{recursive:true});require('node:fs').copyFileSync('src/dashboard/dashboard.html','dist/dashboard/dashboard.html')\"",

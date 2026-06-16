@@ -248,17 +248,18 @@ export function upCommand(): Command {
 
         // ── Threat Cloud policy + consent (BEFORE we scan or deploy anything) ──
         // Discloses exactly what is shared — anonymized threat signatures + one-way
-        // hashes, never code/prompts/PII — and asks once. Default ON (opt-out); a
-        // single keystroke declines and nothing leaves the machine. This gates all
-        // TC upload, and is changeable anytime (pga config set telemetry false / the
+        // hashes, never code/prompts/PII — and asks once. OPT-IN, default OFF: a
+        // bare Enter declines and nothing leaves the machine. This gates all TC
+        // upload, and is changeable anytime (pga config set telemetry true / the
         // dashboard Settings + Threat Cloud toggle). Non-interactive (CI) stays OFF.
         const telemetryConsented = await ensureTelemetryConsent();
 
-        // Whether the scan flywheel may upload to Threat Cloud. Requires BOTH an
-        // affirmative consent (telemetryEnabled) AND that TC upload has not been
-        // turned off (threatCloudUploadEnabled !== false). Mirrors the activation
-        // opt-out read below; nothing leaves the machine when the user declined or
-        // opted out via `pga config set telemetry false` / the dashboard toggle.
+        // Whether the scan flywheel may upload to Threat Cloud. OPT-IN, default
+        // OFF: requires an affirmative consent (telemetryConsented) AND that TC
+        // upload is EXPLICITLY enabled in config (threatCloudUploadEnabled ===
+        // true). Absent/unset config => OFF (gate is `=== true`, never `!== false`).
+        // Nothing leaves the machine unless the user opted in via the first-run
+        // prompt / `pga config set telemetry true` / the dashboard toggle.
         const tcUploadAllowed = (() => {
           if (!telemetryConsented) return false;
           try {
@@ -268,13 +269,14 @@ export function upCommand(): Command {
                 telemetryEnabled?: boolean;
                 threatCloudUploadEnabled?: boolean;
               };
-              if (cfg.telemetryEnabled === false) return false;
-              if (cfg.threatCloudUploadEnabled === false) return false;
+              return cfg.threatCloudUploadEnabled === true;
             }
           } catch {
-            // On any read error, fall back to the consent result we already have.
+            // On any read error, fail closed — do not upload.
+            return false;
           }
-          return true;
+          // No config on disk yet => not opted in => OFF.
+          return false;
         })();
 
         // ── Step 1: Detect AI platforms (we SCAN before deploying) ──
@@ -583,22 +585,12 @@ export function upCommand(): Command {
           console.log();
         }
 
-        // ── Activation tracking (one-time, respects telemetry opt-out) ──
-        const telemetryDisabled = (() => {
-          try {
-            const cfgPath = join(homedir(), '.panguard-guard', 'config.json');
-            if (existsSync(cfgPath)) {
-              const cfg = JSON.parse(readFileSync(cfgPath, 'utf-8')) as {
-                telemetryEnabled?: boolean;
-              };
-              return cfg.telemetryEnabled === false;
-            }
-          } catch {
-            /* default to enabled */
-          }
-          return false;
-        })();
-        if (!telemetryDisabled) {
+        // ── Activation tracking (one-time, OPT-IN) ──
+        // The activation ping is non-essential collective telemetry, so it only
+        // fires when the user has EXPLICITLY opted in (threatCloudUploadEnabled
+        // === true). Default OFF: absent/unset config or any read error => no ping.
+        const telemetryDisabled = !tcUploadAllowed;
+        if (tcUploadAllowed) {
           reportActivation().catch(() => {});
         }
 
@@ -755,12 +747,19 @@ export function upCommand(): Command {
         console.log(
           `  ${c.dim(t(lang, 'Add Layer 2 (local AI) or 3 (cloud AI) for deeper detection.', '加入 Layer 2 (本地 AI) 或 Layer 3 (雲端 AI) 提升偵測深度。'))}`
         );
-        if (!telemetryDisabled) {
+        if (tcUploadAllowed) {
           console.log(
-            `  ${c.dim(t(lang, 'Telemetry: anonymous usage stats sent to tc.panguard.ai', '遙測：匿名使用統計會傳送至 tc.panguard.ai'))}`
+            `  ${c.dim(t(lang, 'Collective defense ON: anonymized threat signatures shared (no hostname, no data).', '集體防禦已開啟：分享匿名威脅特徵（無主機名、無資料）。'))}`
           );
           console.log(
-            `  ${c.dim(t(lang, 'Opt out: pga config set telemetry false', '關閉：pga config set telemetry false'))}`
+            `  ${c.dim(t(lang, 'Turn off: pga config set telemetry false', '關閉：pga config set telemetry false'))}`
+          );
+        } else {
+          console.log(
+            `  ${c.dim(t(lang, 'Collective defense OFF: nothing leaves this machine.', '集體防禦已關閉：沒有任何資料離開這台機器。'))}`
+          );
+          console.log(
+            `  ${c.dim(t(lang, 'Help the community (optional): pga config set telemetry true', '協助社群（選用）：pga config set telemetry true'))}`
           );
         }
         console.log('');

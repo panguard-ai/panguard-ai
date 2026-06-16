@@ -84,11 +84,12 @@ export default function SecurityWhitepaperPage() {
         <section>
           <h2 className="text-lg font-semibold text-text-primary mb-3">4. Logging &amp; Audit</h2>
           <p>
-            Threat Cloud writes an immutable audit log of all admin actions, configuration changes,
-            and rule promotions. The schema is at <code>migrations.ts</code> in the open-source{' '}
-            <code>threat-cloud</code> package; rows include actor, action, resource, and timestamp.
-            Audit log retention is 365 days. We do not yet operate a dedicated SIEM with correlation
-            rules; the audit log is the system of record.
+            Threat Cloud writes an append-only audit log of all admin actions, configuration changes,
+            and rule promotions, with SHA-256 content hashing for tamper-evidence on each row. A full
+            tamper-evident hash chain is on the roadmap. The schema is at <code>migrations.ts</code> in
+            the open-source <code>threat-cloud</code> package; rows include actor, action, resource, and
+            timestamp. Audit log retention is 365 days. We do not yet operate a dedicated SIEM with
+            correlation rules; the audit log is the system of record.
           </p>
         </section>
 

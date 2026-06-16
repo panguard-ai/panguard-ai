@@ -16,7 +16,7 @@ ATR 開放偵測標準的商業實作層。
 [![ATR](https://img.shields.io/badge/ATR-444%20rules-8b5cf6.svg?style=flat-square)](https://github.com/Agent-Threat-Rule/agent-threat-rules)
 [![OWASP](https://img.shields.io/badge/OWASP%20Agentic%20Top%2010-10%2F10-green?style=flat-square)](docs/OWASP-MAPPING.md)
 [![SAFE-MCP](https://img.shields.io/badge/SAFE--MCP-91.8%25-blue?style=flat-square)](https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/SAFE-MCP-MAPPING.md)
-[![garak](https://img.shields.io/badge/garak%20recall-97.1%25-2ea043?style=flat-square)](https://panguard.ai/research/benchmarks)
+[![garak](https://img.shields.io/badge/garak%20recall-~98%25-2ea043?style=flat-square)](https://panguard.ai/research/benchmarks)
 [![Made in Taiwan](https://img.shields.io/badge/Made%20in-Taiwan-e11d48.svg?style=flat-square)](https://panguard.ai)
 
 [Quick Start](#quick-start) · [Why PanGuard](#why-panguard-layer-0--layer-1) · [Products](#products) · [Ecosystem](#ecosystem-adoption) · [Benchmarks](#benchmarks) · [Pricing](https://panguard.ai/pricing) · [Sovereign AI](https://sovereign-ai-defense.vercel.app)
@@ -154,16 +154,16 @@ Every ATR rule maps to 6 compliance frameworks. Enterprise compliance evidence i
 
 Public benchmarks, deterministic samples, fixed seeds. Full methodology at [panguard.ai/research/benchmarks](https://panguard.ai/research/benchmarks).
 
-| Corpus                       | Recall    | Precision | False positives | Sample size |
-| ---------------------------- | --------- | --------- | --------------- | ----------- |
-| garak (ATR-core families)    | **97.1%** | -         | -               | 666         |
-| SKILL.md real-world (v2.2.0) | **100%**  | **100%**  | **0%**          | 341         |
-| PINT (prompt-injection)      | 62.5%     | 99.6%     | 0.25%           | 850         |
-| HackAPrompt                  | 66.2%     | -         | -               | 4,780       |
+| Corpus                    | Recall    | Precision | False positives | Sample size |
+| ------------------------- | --------- | --------- | --------------- | ----------- |
+| garak (ATR-core families) | **~98%**  | -         | -               | 650         |
+| SKILL.md real-world       | **100%**  | **97%**   | **0.20%**       | 498         |
+| PINT (prompt-injection)   | 63.2%     | 99.7%     | 0.25%           | 850         |
+| HackAPrompt               | see below | -         | -               | 4,780       |
 
-HackAPrompt is a +37.6 percentage point lift over the v2.1.x baseline of 28.6%. Numbers are precise. We do not round up.
+These are the last verified measurements (PINT and SKILL.md against published external corpora; garak reported as an approximate figure that drifts across rule versions). They are not re-pinned to the currently shipped ATR build. HackAPrompt recall is reported per rule version in the engineering blog rather than as a single headline number, because it moves with each rule batch. Numbers are precise. We do not round up.
 
-HackAPrompt 相對 v2.1.x 基準 28.6% 提升 37.6 個百分點。數字是精確的，不四捨五入往上灌水。
+以上為最近一次已驗證的量測（PINT 與 SKILL.md 對照公開外部語料庫；garak 為會隨規則版本浮動的近似值）。這些數字未重新對齊到當前出貨的 ATR build。HackAPrompt recall 隨每批規則變動，因此在工程部落格中逐版本呈現，而非以單一頭條數字宣稱。數字是精確的，不四捨五入往上灌水。
 
 ---
 

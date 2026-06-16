@@ -236,9 +236,12 @@ export class GuardEngine {
       this.config
     );
 
-    // Periodic Threat Cloud INDICATOR sync (IP/domain blocklists + community
-    // skill lists + heartbeat). This no longer pulls detection rules — those are
-    // bundled and updated only via `pga upgrade` (see rule-sync.ts).
+    // Periodic Threat Cloud INDICATOR sync — INBOUND pull only: IP/domain
+    // blocklists + community skill whitelist/blacklist. It does NOT pull
+    // detection rules (those are bundled, updated only via `pga upgrade`) and it
+    // does NOT phone home — there is no device heartbeat / hostname beacon. The
+    // only outbound traffic is the opt-in, event-driven anonymized threat upload
+    // (see event-processor.reportAndNotify) and the opt-in whitelist batch.
     const syncDeps = {
       atrEngine: this.engines.atrEngine,
       threatCloud: this.engines.threatCloud,
@@ -678,8 +681,10 @@ export class GuardEngine {
           }
         }
 
-        // Report proxy scan events to Threat Cloud for flywheel
-        if (newLines.length > 0) {
+        // Report proxy scan events to Threat Cloud for flywheel. This is an
+        // OUTBOUND post (aggregate counts) so it is gated on explicit opt-in
+        // (=== true, never !== false). Opted out => no phone-home.
+        if (newLines.length > 0 && this.config.threatCloudUploadEnabled === true) {
           this.engines.threatCloud
             .reportScanEvent({
               source: 'cli-user',

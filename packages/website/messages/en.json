@@ -760,7 +760,7 @@
       "historyLabel": "Recent scans",
       "trustNote": "Scans run server-side. No code is stored. Only content hash is cached.",
       "platformLabel": "Works with 13 platforms:",
-      "ticker1": "postmark-mcp v1.0.16 silently forwarded 15,000 emails/day",
+      "ticker1": "An email-delivery MCP server silently forwarded thousands of emails/day",
       "ticker2": "MCPJam Inspector CVSS 9.8 remote code execution",
       "ticker3": "Claude Code hooks exploited for API key theft",
       "ticker4": "Azure MCP Server SSRF stole managed identity tokens",
@@ -770,7 +770,7 @@
       "badgePlatforms": "17 Platforms",
       "badgeLicense": "MIT Licensed",
       "badgeScanned": "{count} Skills Scanned",
-      "badgeRecall": "98% Garak recall",
+      "badgeRecall": "97.2% Garak recall",
       "badgeCisco": "7 organizations merged · NIST collaborating",
       "badgeSafeMcp": "SAFE-MCP 91.8% coverage (PR pending)"
     },
@@ -804,20 +804,24 @@
       "downloads": "downloads",
       "skills": {
         "tesla": {
+          "label": "A vehicle-API client skill",
           "summary": "Can override your agent's system prompt",
-          "detail": "Controls your Tesla fleet -- prompt injection allows full override of agent instructions, enabling unauthorized vehicle commands."
+          "detail": "A skill that controls a connected-car fleet API -- a prompt-injection pattern allows full override of agent instructions, enabling unauthorized vehicle commands. Example anonymized; we do not name the package."
         },
         "wallet": {
+          "label": "A crypto-wallet connector skill",
           "summary": "Can override your agent's system prompt",
-          "detail": "Connects to your crypto wallet -- prompt injection allows an attacker to redirect transactions or exfiltrate private keys."
+          "detail": "A skill that connects to a crypto wallet -- a prompt-injection pattern lets an attacker redirect transactions or exfiltrate private keys. Example anonymized; we do not name the package."
         },
         "clawsec": {
+          "label": "A security-tooling skill",
           "summary": "A security tool with security holes",
-          "detail": "Ironically, this security-focused skill contains resource exhaustion and data exfiltration patterns that undermine the protections it claims to provide."
+          "detail": "Ironically, this security-focused skill contains resource exhaustion and data exfiltration patterns that undermine the protections it claims to provide. Example anonymized; we do not name the package."
         },
         "safeexec": {
+          "label": "An 'exec' utility skill",
           "summary": "Named 'safe' but isn't safe",
-          "detail": "Despite its reassuring name, this skill contains unsafe code execution patterns that bypass sandbox restrictions."
+          "detail": "Despite a reassuring name, this skill contains unsafe code execution patterns that bypass sandbox restrictions. Example anonymized; we do not name the package."
         }
       }
     },
@@ -832,8 +836,8 @@
       "incident2Desc": "Hooks + MCP config exploited for arbitrary shell execution and API key theft.",
       "incident3Name": "Azure MCP Server",
       "incident3Desc": "SSRF steals managed identity tokens. Attacker gains Azure resource access without admin privileges.",
-      "incident4Name": "postmark-mcp",
-      "incident4Desc": "Clean for 15 versions. v1.0.16 silently BCC-forwarded 3K-15K emails per day to an external address."
+      "incident4Name": "An email-delivery MCP server",
+      "incident4Desc": "Clean for 15 versions, then a point release silently BCC-forwarded thousands of emails per day to an external address. Example anonymized; no package named."
     },
     "whyPanguard": {
       "title": "Why PanGuard",
@@ -2206,7 +2210,7 @@
       "stats": {
         "stat1": {
           "value": "99.9%",
-          "label": "guaranteed uptime SLA"
+          "label": "target service availability"
         },
         "stat2": {
           "value": "500+",
@@ -2702,7 +2706,7 @@
         "items": [
           "Local-first architecture -- all data stays on your machine",
           "Threat Cloud hosted on SOC 2 Type II certified provider",
-          "Immutable audit log for admin actions (365-day retention)",
+          "SHA-256 content hashing for tamper-evidence on dashboard actions (365-day retention); full tamper-evident chain on roadmap",
           "Automated dependency vulnerability scanning",
           "DDoS protection at provider edge"
         ]
@@ -2730,7 +2734,7 @@
       },
       "item5": {
         "title": "Audit Logging",
-        "desc": "Immutable audit trail for all administrative actions. Logs retained for a minimum of 12 months."
+        "desc": "SHA-256 content hashing provides tamper-evidence on dashboard actions. Logs retained for a minimum of 12 months. A full tamper-evident hash chain is on the roadmap."
       },
       "item6": {
         "title": "Incident Response",
@@ -2863,7 +2867,7 @@
     "practices": {
       "overline": "Practices",
       "title": "How we secure ourselves.",
-      "subtitle": "These are not aspirational goals. They are current, enforced practices that apply to every line of code, every deployment, and every employee.",
+      "subtitle": "These are the security practices we follow across our code, deployments, and team. Where a control is still being rolled out, we say so rather than imply it is already complete.",
       "item1": {
         "title": "Local-First Architecture",
         "desc": "Panguard runs entirely on your machine. No data is sent to any server unless you opt in to Threat Cloud. Your security data, scan results, and configuration never leave your device."
@@ -2999,8 +3003,8 @@
     },
     "sla": {
       "overline": "SERVICE LEVEL",
-      "title": "SLA Summary",
-      "subtitle": "Our commitments to all users.",
+      "title": "Service-Level Targets",
+      "subtitle": "Our service-level targets for all users. Contractual SLAs are available under paid managed-support tiers.",
       "items": {
         "0": {
           "metric": "Threat Cloud API Uptime",
@@ -3410,11 +3414,11 @@
       },
       "postmark-supply-chain-attack": {
         "title": "Clean for 15 Versions. Version 1.0.16 Stole Your Inbox.",
-        "excerpt": "postmark-mcp published 15 clean versions. Version 1.0.16 added one BCC line that forwarded 3,000-15,000 emails per day to phan@giftshop.club. Plus: the SANDWORM_MODE cluster -- 19 typosquatted npm packages stealing SSH keys."
+        "excerpt": "An email-delivery MCP server published 15 clean versions. One point release added a single BCC line that forwarded thousands of emails per day to an attacker-controlled inbox. Plus: a typosquatting cluster of npm packages stealing SSH keys. Examples anonymized; no packages named."
       },
       "postmark-supply-chain-attack-zh": {
         "title": "Clean for 15 Versions. Version 1.0.16 Stole Your Inbox. (Chinese)",
-        "excerpt": "The postmark-mcp supply chain attack and SANDWORM_MODE typosquatting cluster. Chinese language version."
+        "excerpt": "An MCP email supply-chain attack and an npm typosquatting cluster. Examples anonymized; no packages named. Chinese language version."
       },
       "zombie-agent-delayed-attack": {
         "title": "The Email That Waited 6 Weeks to Steal Your Data",
@@ -3442,11 +3446,11 @@
       },
       "transparent-recall-vs-opaque-precision": {
         "title": "Why Transparent 39.9% Recall Beats Opaque 98%",
-        "excerpt": "ATR has 99.6% precision and 61.4% recall on the PINT benchmark. We use \"ATR Scanned\" not \"ATR Certified.\" We publish what we miss. The Snort analogy: lower detection but open and auditable beats proprietary black boxes every time."
+        "excerpt": "Why we use \"ATR Scanned\" not \"ATR Certified\" -- and why we publish what we miss. The Snort analogy: lower detection but open and auditable beats proprietary black boxes every time. (PINT figures in this post are from the ATR v0.4.0 era; current benchmarks are on the benchmark hub.)"
       },
       "transparent-recall-vs-opaque-precision-zh": {
         "title": "Why Transparent 39.9% Recall Beats Opaque 98% (Chinese)",
-        "excerpt": "ATR achieves 99.6% precision and 61.4% recall on the PINT benchmark. We use ATR Scanned not ATR Certified. Chinese language version."
+        "excerpt": "為什麼我們用 ATR Scanned 而非 ATR Certified,並公開我們漏掉的部分。本文 PINT 數字為 ATR v0.4.0 時期;當前 benchmark 見 benchmark hub。Chinese language version."
       },
       "flywheel-every-scan-protects-everyone": {
         "title": "The Flywheel: Every Scan Makes Everyone Safer",
@@ -5033,7 +5037,7 @@
     },
     "founder": {
       "title": "Built by a founder who saw the gap firsthand",
-      "desc": "PanGuard started when I -- a cross-disciplinary builder with backgrounds in sales, marketing (300M+ Threads impressions), and hip-hop festival production -- taught myself to code and discovered that AI agents were installing tools with full system access and zero security review. Within months, ATR grew to 650+ detection rules, got merged into Cisco AI Defense, scanned 67,000+ skills, and achieved 100% recall on real-world threats (100% precision, 0% FP on 341 samples). Based in Taiwan, shipping globally."
+      "desc": "PanGuard started when I -- a cross-disciplinary builder with backgrounds in sales, marketing (300M+ Threads impressions), and hip-hop festival production -- taught myself to code and discovered that AI agents were installing tools with full system access and zero security review. Within months, ATR grew to 650+ detection rules, got merged into Cisco AI Defense, scanned 67,000+ skills, and achieved 100% recall on the real-world SKILL.md corpus (97% precision, 0.20% FP on 498 samples). Based in Taiwan, shipping globally."
     }
   },
   "openSource": {

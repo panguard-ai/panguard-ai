@@ -141,8 +141,8 @@ export const COMPARE: ComparisonEntry[] = [
       zh: 'ATR vs garak — 偵測規則 vs 對抗式測試',
     },
     oneLiner: {
-      en: "garak generates adversarial prompts to probe LLM weaknesses pre-deployment. ATR detects malicious patterns in agent runtime traffic. garak finds vulnerabilities in models; ATR catches exploits against agents. Both are needed. ATR rules pass garak's test corpus at 98% recall.",
-      zh: 'garak 產生對抗式 prompt,在部署前探測 LLM 弱點。ATR 在 agent runtime 偵測流量中的惡意模式。garak 找模型漏洞;ATR 抓針對 agent 的 exploit。兩者都需要。ATR 規則在 garak 的測試語料庫上召回率 98%。',
+      en: "garak generates adversarial prompts to probe LLM weaknesses pre-deployment. ATR detects malicious patterns in agent runtime traffic. garak finds vulnerabilities in models; ATR catches exploits against agents. Both are needed. ATR rules pass garak's test corpus at ~97.2% recall.",
+      zh: 'garak 產生對抗式 prompt,在部署前探測 LLM 弱點。ATR 在 agent runtime 偵測流量中的惡意模式。garak 找模型漏洞;ATR 抓針對 agent 的 exploit。兩者都需要。ATR 規則在 garak 的測試語料庫上召回率約 97.2%。',
     },
     framing: {
       en: [
@@ -175,7 +175,7 @@ export const COMPARE: ComparisonEntry[] = [
       },
       {
         feature: 'Garak benchmark recall',
-        atr: '98% recall on 650 samples',
+        atr: '~97.2% recall on 650 samples',
         other: '—',
         winner: 'atr',
       },
@@ -197,8 +197,8 @@ export const COMPARE: ComparisonEntry[] = [
       zh: '你在部署前評估 LLM。你想知道哪些攻擊對你的模型有效,好讓你 patch、retrain、或強化 system prompt。你想要研究級的測試套件,有可重現的 probe。',
     },
     bottomLine: {
-      en: "Use both. Run garak in CI before any model change ships. Run ATR in production against every request. garak finds what to fix; ATR catches what was missed. ATR's public benchmark against garak's corpus (98% recall on 650 samples) measures that overlap honestly.",
-      zh: '兩個都用。Model 變更要 ship 之前,在 CI 跑 garak。生產環境對每個 request 跑 ATR。garak 找出該修什麼;ATR 抓住漏掉的。ATR 對 garak 語料庫的公開 benchmark（650 個樣本 98% 召回率）誠實地量化這個重疊。',
+      en: "Use both. Run garak in CI before any model change ships. Run ATR in production against every request. garak finds what to fix; ATR catches what was missed. ATR's public benchmark against garak's corpus (~97.2% recall on 650 samples) measures that overlap honestly.",
+      zh: '兩個都用。Model 變更要 ship 之前,在 CI 跑 garak。生產環境對每個 request 跑 ATR。garak 找出該修什麼;ATR 抓住漏掉的。ATR 對 garak 語料庫的公開 benchmark（650 個樣本約 97.2% 召回率）誠實地量化這個重疊。',
     },
     references: [
       { label: 'NVIDIA garak on GitHub', url: 'https://github.com/NVIDIA/garak' },
@@ -358,23 +358,23 @@ export const COMPARE: ComparisonEntry[] = [
       zh: 'PanGuard AI vs Cisco DefenseClaw — 開放標準 vs 企業平台',
     },
     oneLiner: {
-      en: 'Cisco DefenseClaw is a full enterprise AI security platform. PanGuard AI is the open standard plus commercial platform — same scope, different starting point. Cisco AI Defense actually ships ATR rules in production (PR #99, 419 rules merged into skill-scanner) so there is no peer competition at the rule layer.',
-      zh: 'Cisco DefenseClaw 是完整企業 AI 安全平台。PanGuard AI 是開放標準加商業平台——範圍相同,起點不同。Cisco AI Defense 在生產環境實際使用 ATR 規則（PR #99,419 條規則合併進 skill-scanner）,所以規則層沒有 peer 競爭。',
+      en: 'Cisco DefenseClaw is a full enterprise AI security platform. PanGuard AI is the open standard plus commercial platform — same scope, different starting point. Cisco AI Defense actually ships the full ATR rule pack in production (PR #99, auto-synced to the latest ATR release in skill-scanner) so there is no peer competition at the rule layer.',
+      zh: 'Cisco DefenseClaw 是完整企業 AI 安全平台。PanGuard AI 是開放標準加商業平台——範圍相同,起點不同。Cisco AI Defense 在生產環境實際使用完整 ATR 規則包（PR #99,於 skill-scanner 自動同步至最新 ATR 發行）,所以規則層沒有 peer 競爭。',
     },
     framing: {
       en: [
         "Cisco DefenseClaw (positioned at RSA 2026) is a packaged enterprise AI security platform — runtime, dashboard, integrations, SLA, the works. It is sold to F500-grade buyers as a single product with Cisco's sales motion behind it. The differentiator is enterprise infrastructure integration and Cisco's existing customer relationships.",
-        "PanGuard AI takes a different approach: ship the open rule standard (ATR) first, build the commercial platform on top. ATR is MIT-licensed and adopted by Cisco itself — Cisco AI Defense's skill-scanner runs all 419 ATR rules in production via PR #99 (merged 2026-04-22). So this is not really a competition at the rule layer. The competition is at the platform layer: who has the better runtime, compliance evidence, and migration tooling.",
+        "PanGuard AI takes a different approach: ship the open rule standard (ATR) first, build the commercial platform on top. ATR is MIT-licensed and adopted by Cisco itself — Cisco AI Defense's skill-scanner runs the full ATR rule pack in production via PR #99 (merged 2026-04-22), auto-synced to the latest release. So this is not really a competition at the rule layer. The competition is at the platform layer: who has the better runtime, compliance evidence, and migration tooling.",
       ],
       zh: [
         'Cisco DefenseClaw (RSA 2026 推出) 是打包好的企業 AI 安全平台——runtime、dashboard、整合、SLA,一應俱全。賣給 F500 級買家的單一產品,背後有 Cisco 的銷售動能。差異化點是企業基礎設施整合與 Cisco 既有客戶關係。',
-        'PanGuard AI 採不同路徑:先 ship 開放規則標準（ATR）,再在上面建商業平台。ATR 是 MIT 授權,Cisco 自己也採用——Cisco AI Defense 的 skill-scanner 透過 PR #99（2026-04-22 合併）在生產環境跑全部 419 條 ATR 規則。所以這在規則層其實不算競爭。競爭在平台層:誰有更好的 runtime、合規 evidence、migration 工具。',
+        'PanGuard AI 採不同路徑:先 ship 開放規則標準（ATR）,再在上面建商業平台。ATR 是 MIT 授權,Cisco 自己也採用——Cisco AI Defense 的 skill-scanner 透過 PR #99（2026-04-22 合併）在生產環境跑完整 ATR 規則包,並自動同步至最新發行。所以這在規則層其實不算競爭。競爭在平台層:誰有更好的 runtime、合規 evidence、migration 工具。',
       ],
     },
     rows: [
       {
         feature: 'Rule standard',
-        atr: 'ATR (open, MIT, 419 rules) — Cisco runs these too',
+        atr: 'ATR (open, MIT, full rule pack) — Cisco runs these too',
         other: 'Same — Cisco ships ATR',
         winner: 'tie',
       },

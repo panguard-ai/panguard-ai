@@ -127,20 +127,20 @@ export const LAYERS: readonly Layer[] = [
       zh: 'L2 稽核在 agent 執行前檢查它即將信任的程式碼與配置。兩條掃描路徑：MCP config JSON（claude_desktop_config.json、.cursor/mcp.json）跑 runtime protection rules；SKILL.md 檔跑 skill 市場的 prompt injection 與 tool poisoning。同一批 650+ 條 ATR 規則，依不同 scan target 套用不同的 regex 子集。',
     },
     why: {
-      en: 'One malicious skill install = agent hijack. The postmark-mcp incident silently forwarded 15,000 emails/day for months before detection. Scan before you trust the code an agent is about to run.',
-      zh: '一個惡意 skill 安裝 = agent 被劫持。postmark-mcp 事件安靜轉發 15,000 封 email/天數月才被發現。在 agent 執行那段程式碼前先掃過。',
+      en: 'One malicious skill install = agent hijack. In one real supply-chain case an email-delivery MCP server silently forwarded thousands of emails per day for months before detection. Scan before you trust the code an agent is about to run.',
+      zh: '一個惡意 skill 安裝 = agent 被劫持。曾有一個真實供應鏈案例:一個電子郵件遞送 MCP server 安靜轉發數千封 email/天數月才被發現。在 agent 執行那段程式碼前先掃過。',
     },
     how: {
       en: 'Deterministic, on-device ATR rule engine — pure regex/pattern matching, no LLM in the detection path, reproducible verdicts. Rules stored as YAML with versioned lifecycle (draft → experimental → stable). Web scanner at panguard.ai/ and CLI `pga scan <url-or-path>`. Microsoft AGT + Cisco AI Defense ship these rules as their reference detection pack.',
       zh: '確定性、裝置端的 ATR 規則引擎 — 純 regex/pattern 比對,偵測路徑無 LLM,判定可重現。規則以 YAML 儲存,有版本生命週期(draft → experimental → stable)。Web scanner 在 panguard.ai/,CLI `pga scan <url-or-path>`。Microsoft AGT + Cisco AI Defense 已把這些規則當作參考偵測包。',
     },
     proof: {
-      en: '650+ ATR rules (MIT licensed) · 98% recall on 650 samples on NVIDIA Garak · 100% recall / 100% precision / 0% FP on 341 real-world SKILL.md samples · 0.48% FP on 3,115 wild Skills.sh packages · Cisco AI Defense ships full pack via PR #79 + #99; Microsoft AGT ships 287 rules via PR #908 + #1277.',
-      zh: '650+ 條 ATR 規則（MIT 授權）· NVIDIA Garak 650 樣本 98% 召回 · 341 個真實 SKILL.md 樣本 100% 召回 / 100% 精度 / 0% FP · 3,115 個野外 Skills.sh 套件 0.48% FP · Cisco AI Defense 透過 PR #79 + #99 引入完整規則包；Microsoft AGT 透過 PR #908 + #1277 引入 287 條。',
+      en: '650+ ATR rules (MIT licensed) · ~97.2% recall on 650 NVIDIA Garak samples · 100% recall / 97% precision / 0.20% FP on 498 real-world SKILL.md samples · Cisco AI Defense ships the full ATR rule pack via PR #79 + #99; Microsoft AGT ships ATR rules with weekly auto-sync via PR #908 + #1277.',
+      zh: '650+ 條 ATR 規則（MIT 授權）· NVIDIA Garak 650 樣本 ~97.2% 召回 · 498 個真實 SKILL.md 樣本 100% 召回 / 97% 精度 / 0.20% FP · Cisco AI Defense 透過 PR #79 + #99 引入完整 ATR 規則包；Microsoft AGT 透過 PR #908 + #1277 引入 ATR 規則並啟用每週自動同步。',
     },
     proofShort: {
-      en: '650+ rules · 98% Garak recall · 0.48% FP',
-      zh: '650+ 條規則 · Garak 98% 召回 · 0.48% FP',
+      en: '650+ rules · ~97.2% Garak recall · 0.20% SKILL.md FP',
+      zh: '650+ 條規則 · Garak ~97.2% 召回 · SKILL.md 0.20% FP',
     },
     tryIt: {
       intro: {
@@ -180,8 +180,8 @@ export const LAYERS: readonly Layer[] = [
         label: 'Microsoft Agent Governance Toolkit #908 + #1277',
         href: 'https://github.com/microsoft/agent-governance-toolkit/pull/1277',
         context: {
-          en: 'Merged: 287 ATR rules + weekly auto-sync workflow into AGT production',
-          zh: '已合併：287 條 ATR 規則 + 每週自動同步 workflow 進入 AGT 生產環境',
+          en: 'Merged: ATR rules + weekly auto-sync workflow into AGT production',
+          zh: '已合併：ATR 規則 + 每週自動同步 workflow 進入 AGT 生產環境',
         },
       },
       {

@@ -642,19 +642,28 @@ export function setupCommand(): Command {
         }
 
         // ── 6. Threat Cloud opt-in (always runs, independent of guard install) ──
+        // OPT-IN, default OFF. Non-interactive runs (-y / --json) must NOT silently
+        // enable collective-defense sharing — that would be an implicit opt-out, the
+        // exact pattern we are removing. They stay OFF; the user enables it later
+        // with `pga config set telemetry true`. The interactive prompt defaults to
+        // NO so a bare Enter declines.
+        // Tracks the explicit opt-in decision so the post-setup usage ping below
+        // (outside this block) only fires when the user turned sharing ON.
+        let tcUploadOptedIn = false;
         if (!options.remove && !options.skipGuard) {
           const dataDir = join(homedir(), '.panguard-guard');
           const enableTC =
-            options.yes ||
-            options.json ||
+            !options.yes &&
+            !options.json &&
             (await promptConfirm({
               message: {
-                en: 'Enable Threat Cloud collective defense?',
-                'zh-TW': '啟用 Threat Cloud 集體防禦？',
+                en: 'Enable Threat Cloud collective defense? (optional, off by default)',
+                'zh-TW': '啟用 Threat Cloud 集體防禦？（選用，預設關閉）',
               },
-              defaultValue: true,
+              defaultValue: false,
               lang: L,
             }));
+          tcUploadOptedIn = enableTC;
 
           try {
             const tcConfigPath = join(dataDir, 'config.json');
@@ -695,22 +704,26 @@ export function setupCommand(): Command {
           }
         }
 
-        // ── Report setup event to Threat Cloud (best-effort) ────────
-        void fetch('https://tc.panguard.ai/api/usage', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            event_type: 'cli_setup',
-            source: 'cli-user',
-            metadata: {
-              version: PANGUARD_VERSION,
-              platforms: results.filter((r) => r.success).map((r) => r.platformId),
-              skillsScanned:
-                (jsonOutput['skill_scan'] as { total?: number } | undefined)?.total ?? 0,
-            },
-          }),
-          signal: AbortSignal.timeout(3000),
-        }).catch(() => {});
+        // ── Report setup event to Threat Cloud — OPT-IN only ────────
+        // Only fire when the user explicitly enabled collective defense above
+        // (enableTC). Default OFF: no phone-home on a plain `pga setup`.
+        if (tcUploadOptedIn) {
+          void fetch('https://tc.panguard.ai/api/usage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              event_type: 'cli_setup',
+              source: 'cli-user',
+              metadata: {
+                version: PANGUARD_VERSION,
+                platforms: results.filter((r) => r.success).map((r) => r.platformId),
+                skillsScanned:
+                  (jsonOutput['skill_scan'] as { total?: number } | undefined)?.total ?? 0,
+              },
+            }),
+            signal: AbortSignal.timeout(3000),
+          }).catch(() => {});
+        }
 
         // ── JSON output (all data collected) ─────────────────────────
         if (options.json) {

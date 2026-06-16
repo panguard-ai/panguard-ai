@@ -220,8 +220,12 @@ export async function initEngines(
   });
   setFeedManager(feedManager);
 
+  // ATRDrafter's sole output is an OUTBOUND submission of drafted rule proposals
+  // to Threat Cloud. That is collective-defense sharing, so it only runs when the
+  // user has explicitly opted in (=== true, never !== false). No opt-in => no
+  // drafter is created, so nothing is drafted and nothing is uploaded.
   let atrDrafter: ATRDrafter | null = null;
-  if (analyzeLLM) {
+  if (analyzeLLM && config.threatCloudUploadEnabled === true) {
     atrDrafter = new ATRDrafter(analyzeLLM, threatCloud, {
       llmProvider: process.env['ANTHROPIC_API_KEY']
         ? 'claude'
