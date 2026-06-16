@@ -5,12 +5,13 @@
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { homedir } from 'node:os';
+import { homedir, platform } from 'node:os';
 import { request as httpNodeRequest } from 'node:http';
 import { execFileSync as nodeExecFileSync } from 'node:child_process';
 import { Command } from 'commander';
 import { runCLI } from '@panguard-ai/panguard-guard';
 import { c, box, header, symbols, divider } from '@panguard-ai/core';
+import { ensurePersistentService } from './persist.js';
 
 export function guardCommand(): Command {
   const cmd = new Command('guard')
@@ -113,9 +114,28 @@ export function guardCommand(): Command {
 
   cmd
     .command('install')
-    .description('Install as system service')
+    .description('Install as a reboot-surviving service')
     .option('--data-dir <path>', 'Data directory')
     .action(async (opts: { dataDir?: string }) => {
+      // macOS: install the user-level LaunchAgent via the proven command
+      // (`pga guard --watch`) — the same path `pga up` uses, one source of truth.
+      // The legacy panguard-guard installer builds a `<bin> start` plist, which is
+      // wrong from the pga binary (pga has no top-level `start` command) and would
+      // silently fail to protect after reboot.
+      if (platform() === 'darwin') {
+        const r = ensurePersistentService();
+        if (r === 'installed') {
+          console.log(
+            `  ${symbols.pass} ${c.safe('Always-on service installed')} — protection restarts after reboot.`
+          );
+        } else if (r === 'already') {
+          console.log(`  ${symbols.info} ${c.dim('Always-on service already installed.')}`);
+        } else {
+          console.log(`  ${symbols.fail} ${c.caution('Could not install the service.')}`);
+        }
+        return;
+      }
+      // Linux/Windows: system-service path (may require sudo/admin).
       const args = ['install'];
       if (opts.dataDir) args.push('--data-dir', opts.dataDir);
       await runCLI(args);

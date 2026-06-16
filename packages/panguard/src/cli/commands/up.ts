@@ -16,6 +16,7 @@ import { ok, warn, arrow, shield, brandTagline } from '../theme.js';
 import { detectLang } from '../interactive/lang.js';
 import { ensureTelemetryConsent } from '../consent.js';
 import { installFor, toHookPlatform } from './hook.js';
+import { ensurePersistentService, type PersistResult } from './persist.js';
 
 type Lang = 'en' | 'zh-TW';
 
@@ -183,6 +184,7 @@ export function upCommand(): Command {
     .option('--no-proxy', 'Scan only — do not inject runtime protection into agent configs')
     .option('--verbose', 'Verbose output', false)
     .option('--skip-scan', 'Skip initial skill scan', false)
+    .option('--no-persist', 'Do not install the reboot-surviving service (run only until reboot)')
     .option('-y, --yes', 'Skip confirmation prompts', false)
     .action(
       async (opts: {
@@ -190,6 +192,7 @@ export function upCommand(): Command {
         proxy: boolean;
         verbose: boolean;
         skipScan: boolean;
+        persist: boolean;
         yes: boolean;
       }) => {
         // Suppress JSON logs for clean output — set env var BEFORE any dynamic imports
@@ -578,18 +581,36 @@ export function upCommand(): Command {
         const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
         const guardAlreadyRunning = isGuardRunning();
 
+        // Persistence: on macOS install a user-level LaunchAgent (no sudo) so
+        // protection survives reboot like an antivirus. The service IS the daemon
+        // (RunAtLoad), so when we install it we do NOT also spawn an ephemeral one
+        // — two daemons would fight over the dashboard port. Linux/Windows keep
+        // the ephemeral daemon plus the honest "pga guard install" hint.
+        let persistResult: PersistResult = isServiceInstalled() ? 'already' : 'unsupported';
         if (!guardAlreadyRunning) {
-          // Suppress guard's own banner/status — pga up has its own summary
-          process.env['PANGUARD_QUIET_GUARD'] = '1';
-          const args = ['start'];
-          if (opts.dashboard) args.push('--dashboard');
-          if (opts.verbose) args.push('--verbose');
-          try {
-            await runCLI(args);
-          } catch (err) {
-            process.stderr.write(
-              `  ${c.caution('Guard start failed:')} ${err instanceof Error ? err.message : String(err)}\n`
-            );
+          if (opts.persist !== false && platform() === 'darwin' && persistResult !== 'already') {
+            persistResult = ensurePersistentService();
+          }
+          const serviceManages = persistResult === 'installed' || persistResult === 'already';
+          if (serviceManages) {
+            // launchctl starts the daemon asynchronously — wait briefly (up to
+            // ~3s for the PID file) so the summary reflects reality.
+            for (let i = 0; i < 30 && !isGuardRunning(); i++) {
+              await new Promise((r) => setTimeout(r, 100));
+            }
+          } else {
+            // Ephemeral fallback: a background daemon that stops at reboot.
+            process.env['PANGUARD_QUIET_GUARD'] = '1';
+            const args = ['start'];
+            if (opts.dashboard) args.push('--dashboard');
+            if (opts.verbose) args.push('--verbose');
+            try {
+              await runCLI(args);
+            } catch (err) {
+              process.stderr.write(
+                `  ${c.caution('Guard start failed:')} ${err instanceof Error ? err.message : String(err)}\n`
+              );
+            }
           }
         }
 
@@ -632,10 +653,15 @@ export function upCommand(): Command {
         console.log(`\n  ${c.dim('\u2500'.repeat(50))}`);
         console.log(`  ${statusLabel} ${c.dim(`\u2014 ${elapsed}s`)}`);
         console.log(`  ${c.dim('\u2500'.repeat(50))}`);
-        // Honest persistence framing: `pga up` runs a background daemon but does
-        // not install the OS service, so monitoring stops at reboot. Say so plainly
-        // rather than implying always-on protection a security tool must not fake.
-        if (guardRunning && !isServiceInstalled()) {
+        // Honest persistence framing: say plainly whether protection survives a
+        // reboot \u2014 never imply always-on when it's only a until-reboot daemon.
+        const persisted =
+          persistResult === 'installed' || persistResult === 'already' || isServiceInstalled();
+        if (guardRunning && persisted) {
+          console.log(
+            `  ${c.dim(t(lang, 'Always-on: protection restarts after reboot (launchd).', '\u5e38\u99d0:\u91cd\u958b\u6a5f\u5f8c\u81ea\u52d5\u6062\u5fa9\u9632\u8b77(launchd)\u3002'))}`
+          );
+        } else if (guardRunning) {
           console.log(
             `  ${c.dim(t(lang, 'Runs until reboot. For always-on monitoring: pga guard install', '\u6301\u7e8c\u5230\u91cd\u958b\u6a5f\u70ba\u6b62\u3002\u8981\u958b\u6a5f\u5f8c\u4ecd\u6301\u7e8c\u76e3\u63a7:pga guard install'))}`
           );

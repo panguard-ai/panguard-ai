@@ -11,9 +11,26 @@ vi.mock('@panguard-ai/panguard-guard', () => ({
   runCLI: vi.fn().mockResolvedValue(undefined),
 }));
 
+// Mock the reboot-persistence installer so `guard install` has no side effects
+// (it would otherwise write a launchd plist + run launchctl on the test machine).
+vi.mock('../src/cli/commands/persist.js', () => ({
+  ensurePersistentService: vi.fn(() => 'installed'),
+}));
+
+// Mock os.platform so the platform-dependent `guard install` branch is testable
+// regardless of the host the suite runs on. Keep everything else (homedir, etc.) real.
+vi.mock('node:os', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('node:os')>();
+  return { ...actual, platform: vi.fn(() => 'darwin') };
+});
+
 import { runCLI } from '@panguard-ai/panguard-guard';
+import { ensurePersistentService } from '../src/cli/commands/persist.js';
+import { platform } from 'node:os';
 
 const mockedRunCLI = vi.mocked(runCLI);
+const mockedEnsure = vi.mocked(ensurePersistentService);
+const mockedPlatform = vi.mocked(platform);
 
 describe('guardCommand', () => {
   beforeEach(() => {
@@ -161,16 +178,22 @@ describe('guardCommand', () => {
   });
 
   describe('guard install', () => {
-    it('should forward "install" to runCLI', async () => {
+    it('on macOS installs the reboot-surviving service (proven launchd path, not the broken legacy installer)', async () => {
+      mockedPlatform.mockReturnValue('darwin');
       const cmd = guardCommand();
       await cmd.parseAsync(['install'], { from: 'user' });
-      expect(mockedRunCLI).toHaveBeenCalledWith(['install']);
+      expect(mockedEnsure).toHaveBeenCalled();
+      // Must NOT route to the legacy panguard-guard installer (it builds a
+      // `<bin> start` plist that is wrong from the pga binary).
+      expect(mockedRunCLI).not.toHaveBeenCalledWith(['install']);
     });
 
-    it('should forward --data-dir option', async () => {
+    it('on Linux/Windows forwards to the system-service installer', async () => {
+      mockedPlatform.mockReturnValue('linux');
       const cmd = guardCommand();
       await cmd.parseAsync(['install', '--data-dir', '/srv/panguard'], { from: 'user' });
       expect(mockedRunCLI).toHaveBeenCalledWith(['install', '--data-dir', '/srv/panguard']);
+      expect(mockedEnsure).not.toHaveBeenCalled();
     });
   });
 
