@@ -24,8 +24,13 @@ export function hasConsentBeenAsked(): boolean {
   return existsSync(CONSENT_MARKER);
 }
 
-/** Mark consent as asked (regardless of answer) */
-function markConsentAsked(): void {
+/**
+ * Mark consent as asked (regardless of answer). Exported so a command that owns
+ * its own consent prompt (e.g. `pga setup`'s Threat Cloud question) can record
+ * that the user has already been asked — preventing the trailing
+ * `ensureTelemetryConsent()` from re-prompting and overwriting the first answer.
+ */
+export function markConsentAsked(): void {
   try {
     if (!existsSync(GUARD_CONFIG_DIR)) {
       mkdirSync(GUARD_CONFIG_DIR, { recursive: true });

