@@ -352,9 +352,16 @@ export class GuardEngine {
       this.updateDashboardStatus();
 
       const dashPort = Number(this.config.dashboardPort);
-      // Auth via HttpOnly cookie — no token in URL (prevents leakage in browser history / ps)
-      const dashUrl = `http://127.0.0.1:${dashPort}`;
-      logger.info(`Dashboard: ${dashUrl}`);
+      // The auth token is a launch secret. The dashboard mints the HttpOnly
+      // auth cookie ONLY for a request carrying this one-time token in the query
+      // string — an unauthenticated GET / never receives a token. So the
+      // launch URL must include it; opening this URL is what authenticates the
+      // operator's browser. The token is not logged (only the bare URL is) to
+      // avoid leaking it into log files; it is passed to the OS opener via argv
+      // for this local-only process.
+      const baseUrl = `http://127.0.0.1:${dashPort}`;
+      const launchUrl = `${baseUrl}/?token=${this.dashboard.getAuthToken()}`;
+      logger.info(`Dashboard: ${baseUrl} (open via the printed launch URL to authenticate)`);
       try {
         const { execFile } = await import('node:child_process');
         const openCmd =
@@ -363,7 +370,7 @@ export class GuardEngine {
             : process.platform === 'win32'
               ? 'start'
               : 'xdg-open';
-        execFile(openCmd, [dashUrl]);
+        execFile(openCmd, [launchUrl]);
       } catch {
         logger.debug('Could not auto-open browser');
       }

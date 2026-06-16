@@ -2,10 +2,15 @@
  * panguard config - Manage local configuration
  *
  * Subcommands:
- *   pga config llm --provider claude --api-key sk-xxx
+ *   pga config llm --provider claude
  *   pga config llm --provider ollama --endpoint http://localhost:11434
  *   pga config llm --show
  *   pga config llm --clear
+ *
+ * Security: there is no --api-key flag. A secret passed on the command line is
+ * exposed to `ps`, shell history, and process listings. Cloud keys are read
+ * only from the ANTHROPIC_API_KEY / OPENAI_API_KEY environment variables (see
+ * panguard-guard llm-detect.ts); this build never persists a cloud key to disk.
  */
 
 import { Command } from 'commander';
@@ -14,6 +19,18 @@ import { PANGUARD_VERSION } from '../../index.js';
 import { saveLlmConfig, loadLlmConfig, deleteLlmConfig } from '../credentials.js';
 import { loadGuardConfig, updateGuardConfig } from '../guard-config.js';
 import { saveLang } from '../interactive/lang.js';
+
+/**
+ * Print how to provide a cloud key without persisting it: via the environment
+ * variable the semantic layer actually reads, or via local Ollama (no key).
+ */
+function printCloudKeyGuidance(): void {
+  console.log('');
+  console.log(`  ${c.dim('Set the key in your environment (never stored on disk):')}`);
+  console.log(`    ${c.sage('export ANTHROPIC_API_KEY=sk-ant-...')}   ${c.dim('# Anthropic')}`);
+  console.log(`    ${c.sage('export OPENAI_API_KEY=sk-...')}          ${c.dim('# OpenAI')}`);
+  console.log(`  ${c.dim('Or use local Ollama (no key):')} pga config llm --provider ollama`);
+}
 
 export function configCommand(): Command {
   const cmd = new Command('config').description('Manage local configuration');
@@ -95,7 +112,6 @@ export function configCommand(): Command {
       'Configure the optional advisory semantic layer (bring your own LLM, off by default)'
     )
     .option('--provider <provider>', 'LLM provider: claude, openai, ollama')
-    .option('--api-key <key>', 'API key (for claude/openai)')
     .option('--model <model>', 'Model override (e.g., claude-haiku-4-5-20251001, gpt-4o)')
     .option('--endpoint <url>', 'Endpoint URL (for ollama, default: http://localhost:11434)')
     .option('--show', 'Show current LLM configuration')
@@ -103,7 +119,6 @@ export function configCommand(): Command {
     .action(
       (options: {
         provider?: string;
-        apiKey?: string;
         model?: string;
         endpoint?: string;
         show?: boolean;
@@ -111,7 +126,7 @@ export function configCommand(): Command {
       }) => {
         console.log(banner(PANGUARD_VERSION));
         console.log(
-          `  ${c.dim('Note: detection is deterministic by default (ATR rules + heuristics). Configuring a provider adds an OPTIONAL, advisory semantic layer — it can flag findings for review but never auto-blocks. --show / --clear manage the stored config.')}`
+          `  ${c.dim('Note: detection is deterministic by default (ATR rules + heuristics). The OPTIONAL advisory semantic layer can flag findings for review but never auto-blocks. This build never stores a cloud API key on disk.')}`
         );
         console.log('');
 
@@ -119,23 +134,17 @@ export function configCommand(): Command {
           const config = loadLlmConfig();
           if (!config) {
             console.log(`  ${c.dim('No LLM configuration found.')}`);
-            console.log(
-              `  ${c.dim('Set one with:')} pga config llm --provider claude --api-key sk-...`
-            );
+            printCloudKeyGuidance();
             return;
           }
           console.log(`  ${c.sage('LLM Configuration')}`);
           console.log(`  Provider:  ${c.bold(config.provider)}`);
-          console.log(
-            `  API Key:   ${config.apiKey ? c.safe(config.apiKey.slice(0, 8) + '...' + config.apiKey.slice(-4)) : c.dim('none')}`
-          );
           console.log(`  Model:     ${config.model ? c.bold(config.model) : c.dim('default')}`);
           console.log(
             `  Endpoint:  ${config.endpoint ? c.bold(config.endpoint) : c.dim('default')}`
           );
           console.log(`  Saved:     ${c.dim(config.savedAt)}`);
           console.log('');
-          console.log(`  ${c.dim('Stored encrypted at ~/.panguard/llm.enc')}`);
           return;
         }
 
@@ -153,20 +162,10 @@ export function configCommand(): Command {
           console.log(`  ${c.caution('--provider is required.')}`);
           console.log('');
           console.log('  Examples:');
-          console.log(`    ${c.dim('$')} pga config llm --provider claude --api-key sk-ant-xxx`);
-          console.log(`    ${c.dim('$')} pga config llm --provider openai --api-key sk-xxx`);
+          console.log(`    ${c.dim('$')} pga config llm --provider claude`);
+          console.log(`    ${c.dim('$')} pga config llm --provider openai`);
           console.log(`    ${c.dim('$')} pga config llm --provider ollama`);
-          console.log('');
-          console.log('  OpenAI-compatible APIs (Gemini, Groq, Qwen, DeepSeek, etc.):');
-          console.log(
-            `    ${c.dim('$')} pga config llm --provider openai --endpoint https://api.groq.com/openai/v1 --api-key gsk-xxx`
-          );
-          console.log(
-            `    ${c.dim('$')} pga config llm --provider openai --endpoint https://generativelanguage.googleapis.com/v1beta/openai/ --api-key AIza-xxx`
-          );
-          console.log(
-            `    ${c.dim('$')} pga config llm --provider openai --endpoint https://dashscope.aliyuncs.com/compatible-mode/v1 --api-key sk-xxx  ${c.dim('# Qwen')}`
-          );
+          console.log(`    ${c.dim('$')} pga config llm --provider ollama --endpoint http://gpu:11434`);
           console.log('');
           console.log(`    ${c.dim('$')} pga config llm --show`);
           console.log(`    ${c.dim('$')} pga config llm --clear`);
@@ -181,34 +180,43 @@ export function configCommand(): Command {
           return;
         }
 
-        if (options.provider !== 'ollama' && !options.apiKey) {
+        // Cloud providers: never collect or persist a key. The semantic layer
+        // reads the key only from the environment (see llm-detect.ts). Tell the
+        // user which env var to set instead of writing a plaintext secret.
+        if (options.provider !== 'ollama') {
           console.log(
-            `  ${c.caution(`--api-key is required for provider '${options.provider}'.`)}`
+            `  ${c.dim(`Panguard does not store a cloud API key. Provider '${options.provider}' reads its key from the environment:`)}`
           );
+          printCloudKeyGuidance();
           return;
         }
 
+        // Ollama: no secret involved. This community build does not persist the
+        // selection (the engine resolves the semantic layer from the
+        // environment / local-runtime probe at startup — see llm-detect.ts), so
+        // be honest rather than claim an encrypted save that never happens.
         saveLlmConfig({
           provider: options.provider,
-          apiKey: options.apiKey,
           model: options.model,
           endpoint: options.endpoint,
           savedAt: new Date().toISOString(),
         });
 
-        console.log(`  ${c.safe('LLM configuration saved.')}`);
+        console.log(`  ${c.sage('Local AI (Ollama) selected.')}`);
         console.log(`  Provider:  ${c.bold(options.provider)}`);
-        if (options.apiKey) {
-          console.log(
-            `  API Key:   ${c.safe(options.apiKey.slice(0, 8) + '...' + options.apiKey.slice(-4))}`
-          );
-        }
         if (options.model) {
           console.log(`  Model:     ${c.bold(options.model)}`);
         }
+        if (options.endpoint) {
+          console.log(`  Endpoint:  ${c.bold(options.endpoint)}`);
+        }
         console.log('');
-        console.log(`  ${c.dim('Encrypted and stored at ~/.panguard/llm.enc')}`);
-        console.log(`  ${c.dim('The Guard engine will use this configuration automatically.')}`);
+        console.log(
+          `  ${c.dim('Start the semantic layer against a local runtime with:')} PANGUARD_SEMANTIC=1`
+        );
+        console.log(
+          `  ${c.dim('or point at any OpenAI-compatible endpoint with:')} PANGUARD_LLM_ENDPOINT=...`
+        );
       }
     );
 
