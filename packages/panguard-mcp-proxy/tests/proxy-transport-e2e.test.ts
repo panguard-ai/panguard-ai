@@ -79,6 +79,51 @@ function textOf(result: unknown): string {
   return content?.map((c) => c.text ?? '').join('\n') ?? '';
 }
 
+/** An evaluator that always throws — simulates a crashed/timed-out async brain. */
+const throwingEvaluator: ProxyEvaluatorLike = {
+  loadRules: async () => 0,
+  evaluateToolCall: async () => {
+    throw new Error('evaluator unavailable');
+  },
+  evaluateToolResponse: async () => {
+    throw new Error('evaluator unavailable');
+  },
+};
+
+/** Wire the stack with a chosen evaluator (for fail-mode tests). */
+async function wireWith(evaluator: ProxyEvaluatorLike): Promise<Client> {
+  const upstream = makeUpstream();
+  const [upSrv, proxyCli] = InMemoryTransport.createLinkedPair();
+  await upstream.connect(upSrv);
+  const proxy = new MCPProxy({ upstreamCommand: 'noop', upstreamArgs: [] }, { evaluator });
+  const [proxySrv, agentCli] = InMemoryTransport.createLinkedPair();
+  await proxy.connect(proxyCli, proxySrv);
+  const agent = new Client({ name: 'test-agent', version: '0.0.1' }, { capabilities: {} });
+  await agent.connect(agentCli);
+  return agent;
+}
+
+describe('MCPProxy fail-mode (security-first default)', () => {
+  it('fails CLOSED by default — a benign call is DENIED when the evaluator errors', async () => {
+    delete process.env['PANGUARD_PROXY_FAIL_MODE'];
+    const agent = await wireWith(throwingEvaluator);
+    const r = await agent.callTool({ name: 'echo', arguments: { text: 'hello world' } });
+    // Evaluator threw → fail-closed → the call is blocked, never forwarded.
+    expect(textOf(r)).toContain('BLOCKED');
+  });
+
+  it('honors PANGUARD_PROXY_FAIL_MODE=open — forwards when the evaluator errors', async () => {
+    process.env['PANGUARD_PROXY_FAIL_MODE'] = 'open';
+    try {
+      const agent = await wireWith(throwingEvaluator);
+      const r = await agent.callTool({ name: 'echo', arguments: { text: 'hello world' } });
+      expect(textOf(r)).toBe('hello world');
+    } finally {
+      delete process.env['PANGUARD_PROXY_FAIL_MODE'];
+    }
+  });
+});
+
 describe('MCPProxy transport e2e (full forward/block flow)', () => {
   it('forwards a benign tool call to upstream and returns its result', async () => {
     const agent = await wireStack();
