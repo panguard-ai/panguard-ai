@@ -806,17 +806,35 @@ export function upCommand(): Command {
         );
         if (tcUploadAllowed) {
           console.log(
-            `  ${c.dim(t(lang, 'Collective defense ON: anonymized threat signatures shared (no hostname, no data).', '集體防禦已開啟：分享匿名威脅特徵（無主機名、無資料）。'))}`
+            `  ${c.dim(t(lang, 'Collective defense ON: when an attack is blocked, only the matched rule ID,', '集體防禦已開啟：擋下攻擊時，只分享命中的規則 ID、'))}`
           );
           console.log(
-            `  ${c.dim(t(lang, 'Turn off: pga config set telemetry false', '關閉：pga config set telemetry false'))}`
+            `  ${c.dim(t(lang, 'a one-way payload hash, and the source type are shared — never your prompts,', 'payload 的單向雜湊、來源類型 — 絕不含你的 prompt、'))}`
+          );
+          console.log(
+            `  ${c.dim(t(lang, 'code, file contents, keys, hostname, or IP. Thank you for defending the commons.', '程式碼、檔案內容、金鑰、主機名或 IP。謝謝你一起守護社群。'))}`
+          );
+          console.log(
+            `  ${c.dim(t(lang, 'Turn off anytime: pga config set telemetry false', '隨時可關閉：pga config set telemetry false'))}`
           );
         } else {
+          // OPT-IN guidance (NOT a default, NOT a nag): explain the value + the
+          // privacy guarantee + the one command, so the user can make an
+          // informed choice. Collective defense stays OFF until they opt in.
           console.log(
-            `  ${c.dim(t(lang, 'Collective defense OFF: nothing leaves this machine.', '集體防禦已關閉：沒有任何資料離開這台機器。'))}`
+            `  ${c.dim(t(lang, 'Collective defense is OFF — nothing leaves this machine.', '集體防禦目前關閉 — 沒有任何資料離開這台機器。'))}`
           );
           console.log(
-            `  ${c.dim(t(lang, 'Help the community (optional): pga config set telemetry true', '協助社群（選用）：pga config set telemetry true'))}`
+            `  ${c.dim(t(lang, 'Want to help? Each attack you block can become a new ATR rule that protects', '想幫忙嗎？你擋下的每次攻擊，都能變成一條保護所有人的新 ATR 規則，'))}`
+          );
+          console.log(
+            `  ${c.dim(t(lang, 'everyone — and you get community rules back faster. Shared: only the matched', '而你也能更快收到社群回流的規則。分享的只有命中的規則 ID、'))}`
+          );
+          console.log(
+            `  ${c.dim(t(lang, 'rule ID, a one-way hash, and the source type. Never your prompts, code,', 'payload 的單向雜湊、來源類型。絕不含你的 prompt、程式碼、'))}`
+          );
+          console.log(
+            `  ${c.dim(t(lang, 'file contents, keys, hostname, or IP. Opt in: pga config set telemetry true', '檔案內容、金鑰、主機名或 IP。開啟：pga config set telemetry true'))}`
           );
         }
         console.log('');

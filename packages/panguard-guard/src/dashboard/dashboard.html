@@ -607,6 +607,145 @@
         font-weight: 600;
       }
 
+      /* Collective-defense value/privacy explainer */
+      .cd-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin: 14px 0;
+      }
+      @media (max-width: 720px) {
+        .cd-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .cd-box {
+        background: var(--bg-raised);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+      }
+      .cd-box-title {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+      }
+      .cd-box-title.cd-good {
+        color: var(--ok);
+      }
+      .cd-list {
+        margin: 0;
+        padding-left: 18px;
+        font-size: 13px;
+        line-height: 1.65;
+        color: var(--text-muted);
+      }
+      .cd-list li {
+        margin-bottom: 4px;
+      }
+      .cd-control {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 0 4px;
+      }
+      .cd-cli {
+        margin-top: 12px;
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+      /* Copy-paste command line */
+      .cmd-box {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 6px;
+        background: var(--bg-raised);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 8px 10px;
+      }
+      .cmd-box code {
+        flex: 1;
+        font-family: 'JetBrains Mono', 'SF Mono', monospace;
+        font-size: 12px;
+        color: var(--text-primary);
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+      .cmd-copy {
+        flex-shrink: 0;
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--sage);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          color 0.15s;
+      }
+      .cmd-copy:hover {
+        border-color: var(--sage);
+      }
+      .cmd-copy.copied {
+        color: var(--ok);
+        border-color: var(--ok);
+      }
+
+      /* Optional alert-channel disclosure */
+      .notify-summary {
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--sage);
+        list-style: none;
+        user-select: none;
+        padding: 4px 0;
+      }
+      .notify-summary::-webkit-details-marker {
+        display: none;
+      }
+      .notify-summary::before {
+        content: '▸ ';
+        color: var(--text-muted);
+      }
+      details[open] .notify-summary::before {
+        content: '▾ ';
+      }
+      .nc {
+        background: var(--bg-raised);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 12px 14px;
+      }
+      .nc-head {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 4px;
+      }
+      .nc-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+      .nc-state {
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .nc-what {
+        font-size: 12px;
+        color: var(--text-muted);
+        line-height: 1.55;
+        margin-bottom: 8px;
+      }
+
       /* Spinner */
       .spin {
         display: inline-block;
@@ -1022,7 +1161,9 @@
           <div class="desc">
             Layers A and B are deterministic and always on. Layer C is optional — bring your own LLM
             (cloud API or local model). It is advisory (flags for review, never auto-blocks) and
-            stays off until you connect one.
+            stays off until you connect one. It runs only on events A and B already flagged, not on
+            every action, so cloud use is typically a few cents a month — and a local model (Ollama)
+            is free and keeps everything on your machine.
           </div>
           <div class="layer-row">
             <span class="layer-label">Layer A &mdash; Pattern match (ATR rules)</span>
@@ -1465,14 +1606,47 @@
           </div>
 
           <div class="fs" style="margin-top: 20px">
-            <h3 data-i18n="tc_upload">Anonymous Upload</h3>
-            <div class="desc" data-i18n="tc_upload_desc">
-              When enabled, anonymized threat patterns are uploaded to Threat Cloud. No personal
-              data, file contents, or source code is sent.
+            <h3>Collective defense</h3>
+            <div class="desc">
+              Off by default. When you turn it on, every attack Guard blocks on this machine can
+              become a new ATR rule that protects everyone — and you get the community's new rules
+              back faster. More sensors means quicker detection for all of us.
             </div>
-            <div style="display: flex; align-items: center; gap: 12px">
-              <div class="toggle" id="tc-toggle"></div>
-              <span id="tc-toggle-label" style="font-size: 13px; font-weight: 600">--</span>
+
+            <div class="cd-grid">
+              <div class="cd-box">
+                <div class="cd-box-title cd-good">What turning it on does for you</div>
+                <ul class="cd-list">
+                  <li>Your blocked patterns help draft new open ATR rules.</li>
+                  <li>You receive community rule updates sooner.</li>
+                  <li>You can turn it off again at any time.</li>
+                </ul>
+              </div>
+              <div class="cd-box">
+                <div class="cd-box-title">What is shared (and what is never shared)</div>
+                <ul class="cd-list">
+                  <li>Shared: the matched rule ID, a one-way hash of the payload, and the source type.</li>
+                  <li>Never shared: your prompts, code, file contents, keys, IP address, or hostname.</li>
+                  <li>A random install ID only — raw samples never leave this machine.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="cd-control">
+              <div class="toggle" id="tc-toggle" role="switch" aria-checked="false" tabindex="0"
+                aria-label="Collective defense"></div>
+              <div>
+                <div id="tc-toggle-label" style="font-size: 14px; font-weight: 600">--</div>
+                <div id="tc-toggle-sub" style="font-size: 12px; color: var(--text-muted)"></div>
+              </div>
+            </div>
+
+            <div class="cd-cli">
+              Prefer the command line? This does the same thing:
+              <div class="cmd-box">
+                <code id="tc-cli-cmd">pga config set telemetry true</code>
+                <button class="cmd-copy" data-copy-target="tc-cli-cmd" type="button">Copy</button>
+              </div>
             </div>
           </div>
         </div>
@@ -1590,16 +1764,22 @@
         </div>
 
         <div class="fs">
-          <h3>Alert Channels</h3>
-          <div class="desc">
-            Where Guard sends an alert when a threat fires. Configured with
-            <code>pga config</code> / <code>~/.panguard-guard/config.json</code> — secrets are never
-            shown or set from this dashboard.
+          <h3>Alerts</h3>
+          <div class="info-box" style="border-left: 3px solid var(--ok); margin-bottom: 14px">
+            <strong>You are already set up.</strong> Every threat Guard detects shows up right here
+            in this dashboard — on the Overview and Threats tabs. No configuration needed.
           </div>
-          <div
-            id="st-notify-list"
-            style="display: flex; flex-direction: column; gap: 6px; font-size: 13px"
-          ></div>
+
+          <details id="notify-details">
+            <summary class="notify-summary">Send alerts somewhere else too? (optional)</summary>
+            <div class="desc" style="margin-top: 10px">
+              You can also push each alert to a chat or inbox you already watch. Pick one below,
+              paste its line into <code>~/.panguard-guard/config.json</code> (or run
+              <code>pga setup</code> for a guided walk-through), then restart Guard. Secrets are
+              typed into that file, never into this dashboard.
+            </div>
+            <div id="st-notify-list" style="display: flex; flex-direction: column; gap: 10px"></div>
+          </details>
         </div>
 
         <div class="fs">
@@ -1669,6 +1849,28 @@
           .replace(/>/g, '&gt;')
           .replace(/"/g, '&quot;')
           .replace(/'/g, '&#039;');
+      }
+      /* Copy a command to the clipboard. Falls back to a manual-select prompt
+         when the async clipboard API is unavailable (older browsers / non-secure
+         contexts). The button briefly confirms so the user knows it worked. */
+      function copyText(text, btn) {
+        function ok() {
+          if (!btn) return;
+          var prev = btn.textContent;
+          btn.textContent = 'Copied';
+          btn.classList.add('copied');
+          setTimeout(function () {
+            btn.textContent = prev;
+            btn.classList.remove('copied');
+          }, 1500);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(ok, function () {
+            window.prompt('Copy this command:', text);
+          });
+        } else {
+          window.prompt('Copy this command:', text);
+        }
       }
       function fmtUptime(ms) {
         var s = Math.floor(ms / 1000);
@@ -2639,19 +2841,35 @@
 
             var tog = document.getElementById('tc-toggle');
             var tlbl = document.getElementById('tc-toggle-label');
+            var tsub = document.getElementById('tc-toggle-sub');
             if (d.uploadEnabled) {
-              if (tog) tog.classList.add('on');
+              if (tog) {
+                tog.classList.add('on');
+                tog.setAttribute('aria-checked', 'true');
+              }
               if (tlbl) {
-                tlbl.textContent = 'Enabled';
+                tlbl.textContent = 'Collective defense is ON';
                 tlbl.style.color = 'var(--ok)';
               }
+              if (tsub)
+                tsub.textContent =
+                  'You are helping defend the commons. Click to turn off — sharing stops immediately.';
             } else {
-              if (tog) tog.classList.remove('on');
+              if (tog) {
+                tog.classList.remove('on');
+                tog.setAttribute('aria-checked', 'false');
+              }
               if (tlbl) {
-                tlbl.textContent = 'Disabled';
+                tlbl.textContent = 'Collective defense is OFF';
                 tlbl.style.color = 'var(--text-muted)';
               }
+              if (tsub)
+                tsub.textContent =
+                  'Nothing leaves your machine. Click to turn on and share anonymized signatures.';
             }
+            // Keep the CLI command in sync with the action the toggle will take.
+            var cli = document.getElementById('tc-cli-cmd');
+            if (cli) cli.textContent = 'pga config set telemetry ' + (d.uploadEnabled ? 'false' : 'true');
           })
           .catch(function () {
             document.getElementById('tc-loading').innerHTML =
@@ -2661,10 +2879,14 @@
       function toggleUpload() {
         var tog = document.getElementById('tc-toggle');
         var isOn = tog.classList.contains('on');
+        // consentGiven is the single collective-defense answer: the backend flips
+        // BOTH telemetryEnabled and threatCloudUploadEnabled together and records
+        // the consent marker, exactly like the CLI first-run prompt. Opt-in: this
+        // only turns sharing ON when the user clicks it from the OFF state.
         af('/api/threat-cloud', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ uploadEnabled: !isOn }),
+          body: JSON.stringify({ consentGiven: !isOn }),
         })
           .then(function (r) {
             return r.json();
@@ -2724,40 +2946,91 @@
         selectedMode = m;
         renderModeSeg();
       }
-      /* Read-only alert-channel status. The dashboard never sets channel secrets
-         over HTTP (that was removed as an exfil surface); it only shows whether
-         each channel is configured + points to the CLI/config path. */
+      /* Optional alert channels. The dashboard NEVER sets channel secrets over
+         HTTP (that was removed as an exfil surface). For each channel that Guard
+         actually supports (NotificationConfig in types.ts: email / slack /
+         telegram / line / webhook) it shows what the channel is, whether it is
+         configured, and the exact JSON to paste into config.json. Placeholders
+         only — the user fills in their own secret in the file, not here. */
+      var NOTIFY_CHANNELS = [
+        {
+          key: 'slack',
+          name: 'Slack',
+          what: 'Post each alert into a Slack channel using an Incoming Webhook URL from Slack.',
+          snippet: '"slack": { "webhookUrl": "https://hooks.slack.com/services/XXX/YYY/ZZZ" }',
+        },
+        {
+          key: 'telegram',
+          name: 'Telegram',
+          what: 'Message you (or a group) through a Telegram bot. Needs the bot token and chat ID.',
+          snippet: '"telegram": { "botToken": "YOUR_BOT_TOKEN", "chatId": "YOUR_CHAT_ID" }',
+        },
+        {
+          key: 'email',
+          name: 'Email',
+          what: 'Email each alert through your own SMTP server.',
+          snippet:
+            '"email": { "host": "smtp.example.com", "port": 587, "secure": false, "auth": { "user": "YOU", "pass": "YOUR_SMTP_PASSWORD" }, "from": "guard@example.com", "to": ["you@example.com"] }',
+        },
+        {
+          key: 'line',
+          name: 'LINE',
+          what: 'Send each alert to LINE using a LINE Notify access token.',
+          snippet: '"line": { "accessToken": "YOUR_LINE_NOTIFY_TOKEN" }',
+        },
+        {
+          key: 'webhook',
+          name: 'Webhook',
+          what: 'POST each alert as JSON to any URL you own (wire it into your own tooling).',
+          snippet: '"webhook": { "url": "https://example.com/guard-hook", "secret": "OPTIONAL_SHARED_SECRET" }',
+        },
+      ];
+      var notifySnippetSeq = 0;
       function renderNotifyChannels(n) {
+        n = n || {};
         var el = document.getElementById('st-notify-list');
         if (!el) return;
-        var chans = [
-          ['email', 'Email'],
-          ['slack', 'Slack'],
-          ['telegram', 'Telegram'],
-          ['line', 'LINE'],
-          ['webhook', 'Webhook'],
-        ];
-        var anyOn = false;
-        el.innerHTML = chans
-          .map(function (c) {
-            var on = !!n[c[0]];
-            if (on) anyOn = true;
-            return (
-              '<div>' +
-              esc(c[1]) +
-              ': ' +
-              (on
-                ? '<span style="color:var(--ok)">configured</span>'
-                : '<span style="color:var(--text-muted)">not configured</span>') +
-              '</div>'
-            );
-          })
-          .join('');
-        if (!anyOn) {
-          el.innerHTML +=
-            '<div style="color:var(--text-muted);margin-top:4px">No alert channel set — ' +
-            'a fired threat is recorded in this dashboard but not pushed anywhere.</div>';
-        }
+        // If the user already configured a channel, open the optional section so
+        // they can see/manage it; otherwise keep it collapsed (zero-config default).
+        var anyOn = NOTIFY_CHANNELS.some(function (c) {
+          return !!n[c.key];
+        });
+        var details = document.getElementById('notify-details');
+        if (details && anyOn) details.setAttribute('open', '');
+        el.innerHTML = NOTIFY_CHANNELS.map(function (c) {
+          var on = !!n[c.key];
+          var stateHtml = on
+            ? '<span class="nc-state" style="color:var(--ok)">configured</span>'
+            : '<span class="nc-state" style="color:var(--text-muted)">not set up</span>';
+          var cmdId = 'nc-cmd-' + ++notifySnippetSeq;
+          return (
+            '<div class="nc">' +
+            '<div class="nc-head"><span class="nc-name">' +
+            esc(c.name) +
+            '</span>' +
+            stateHtml +
+            '</div>' +
+            '<div class="nc-what">' +
+            esc(c.what) +
+            '</div>' +
+            '<div class="cmd-box">' +
+            '<code id="' +
+            cmdId +
+            '">' +
+            esc(c.snippet) +
+            '</code>' +
+            '<button class="cmd-copy" type="button" data-copy-target="' +
+            cmdId +
+            '">Copy</button>' +
+            '</div>' +
+            '</div>'
+          );
+        }).join('');
+        el.innerHTML +=
+          '<div style="font-size:12px;color:var(--text-muted);margin-top:2px">' +
+          'Add the line inside the <code>"notifications"</code> object in ' +
+          '<code>~/.panguard-guard/config.json</code>, then restart Guard. ' +
+          'Without any channel, alerts still appear in this dashboard.</div>';
       }
       /* Read-only enforcement-policy (Protection-mode blast radius). Shows which
          automatic destructive responses are armed, so enabling Protection is not
@@ -3019,6 +3292,21 @@
           toast('Refreshing skills…');
         });
         on('tc-toggle', 'click', toggleUpload);
+        // The toggle is a role=switch — make it keyboard-operable (Space/Enter).
+        on('tc-toggle', 'keydown', function (e) {
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            toggleUpload();
+          }
+        });
+        // Delegated copy-to-clipboard for every [data-copy-target] command box.
+        document.addEventListener('click', function (e) {
+          var btn = e.target && e.target.closest ? e.target.closest('[data-copy-target]') : null;
+          if (!btn) return;
+          var src = document.getElementById(btn.getAttribute('data-copy-target'));
+          if (!src) return;
+          copyText(src.textContent || '', btn);
+        });
         var modeSeg = document.getElementById('st-mode-seg');
         if (modeSeg) {
           modeSeg.addEventListener('click', function (e) {

@@ -107,6 +107,37 @@ export function removeDashboardToken(): void {
   }
 }
 
+/**
+ * Path of the collective-defense consent marker. Mirrors the CLI consent module
+ * (packages/panguard/src/cli/consent.ts:CONSENT_MARKER) so that turning
+ * collective defense ON or OFF from the dashboard counts as "the user has been
+ * asked and answered" — otherwise the next `pga up` / `pga scan` first-run
+ * prompt would overwrite the dashboard choice. The marker is purely a "consent
+ * has been recorded" signal; it never enables anything on its own. The upload
+ * gate is still `threatCloudUploadEnabled === true`, default OFF. Resolved at
+ * call time (not module load) so it always follows the live home directory.
+ */
+function consentMarkerPath(): string {
+  return join(homedir(), '.panguard-guard', '.telemetry-prompted');
+}
+
+/**
+ * Record that the user has answered the collective-defense question (from the
+ * dashboard toggle). Best-effort: a missing dir is created; any failure is
+ * swallowed so a read-only home directory never blocks saving the config.
+ */
+function markConsentAnswered(): void {
+  try {
+    const dir = join(homedir(), '.panguard-guard');
+    if (!existsSync(dir)) {
+      mkdirSync(dir, { recursive: true, mode: 0o700 });
+    }
+    writeFileSync(consentMarkerPath(), new Date().toISOString(), { encoding: 'utf-8', mode: 0o600 });
+  } catch {
+    /* best effort — if we can't write the marker, the CLI re-asks next run */
+  }
+}
+
 /** Relay configuration for connecting to a remote Manager */
 export interface DashboardRelayOptions {
   readonly managerUrl: string;
@@ -811,8 +842,8 @@ export class DashboardServer {
         state: aiConfigured ? 'active' : 'off',
         optional: true,
         detail: aiConfigured
-          ? 'semantic verdict configured (advisory) · runs only on flagged events'
-          : 'off · bring your own LLM to catch novel attacks A/B miss and draft new ATR rules — runs only on flagged events, not every call (low token). Local & private: set PANGUARD_SEMANTIC=1 with Ollama (no API key, data stays on your machine). Cloud: set ANTHROPIC_API_KEY or OPENAI_API_KEY (read from the environment, never stored).',
+          ? 'semantic verdict configured (advisory) · runs only on flagged events, not every action — typically a few cents/month, or free with local Ollama'
+          : 'off · bring your own LLM to catch novel attacks A/B miss and draft new ATR rules — runs only on flagged events, not every action, so a typical machine costs a few cents per month. Local & private: set PANGUARD_SEMANTIC=1 with Ollama (free, no API key, data stays on your machine). Cloud: set ANTHROPIC_API_KEY or OPENAI_API_KEY (read from the environment, never stored).',
       },
     };
   }
@@ -1297,12 +1328,17 @@ export class DashboardServer {
     // Opt-in, default OFF: only "enabled" when explicitly turned on (=== true).
     const uploadEnabled = config?.threatCloudUploadEnabled === true;
     const endpoint = config?.threatCloudEndpoint ?? 'https://tc.panguard.ai/api';
+    // Whether the collective-defense question has been answered at least once
+    // (first-run prompt OR a dashboard toggle). Lets the UI distinguish
+    // "never asked" from "deliberately off". Never affects the upload gate.
+    const consentAsked = existsSync(consentMarkerPath());
 
     this.jsonResponse(res, {
       enabled: config?.threatCloudEndpoint !== undefined,
       connected: lastSync !== null,
       endpoint,
       uploadEnabled,
+      consentAsked,
       ...stats,
       clientId,
       lastSync,
@@ -1331,9 +1367,26 @@ export class DashboardServer {
       try {
         const update = JSON.parse(body) as {
           uploadEnabled?: boolean;
+          // Collective-defense single answer. When present it is the source of
+          // truth for BOTH telemetryEnabled and threatCloudUploadEnabled (they
+          // move together, exactly like the CLI first-run consent prompt) and it
+          // records the consent marker. Opt-in: only `true` turns sharing on.
+          consentGiven?: boolean;
           endpoint?: string;
           mode?: string;
         };
+
+        if (
+          update.consentGiven !== undefined &&
+          typeof update.consentGiven !== 'boolean'
+        ) {
+          this.jsonResponse(res, { error: 'consentGiven must be a boolean' }, 400);
+          return;
+        }
+        if (update.uploadEnabled !== undefined && typeof update.uploadEnabled !== 'boolean') {
+          this.jsonResponse(res, { error: 'uploadEnabled must be a boolean' }, 400);
+          return;
+        }
 
         if (update.endpoint !== undefined && !DashboardServer.isValidEndpointUrl(update.endpoint)) {
           this.jsonResponse(res, { error: 'Invalid endpoint URL' }, 400);
@@ -1354,14 +1407,29 @@ export class DashboardServer {
         }
 
         const config = this.getConfig!();
+        // consentGiven is the single collective-defense answer: it drives BOTH
+        // flags so they can never drift apart (the CLI gate reads both). A plain
+        // `uploadEnabled` is still honoured for the legacy upload toggle, but
+        // consentGiven wins when both are sent.
+        const sharingEnabled =
+          update.consentGiven ?? update.uploadEnabled ?? config.threatCloudUploadEnabled;
         const updatedConfig: GuardConfig = {
           ...config,
-          threatCloudUploadEnabled: update.uploadEnabled ?? config.threatCloudUploadEnabled,
+          threatCloudUploadEnabled: sharingEnabled,
+          // Keep the deprecated telemetryEnabled flag in lockstep — the CLI
+          // upload gate and consent module both read it.
+          telemetryEnabled:
+            update.consentGiven ?? update.uploadEnabled ?? config.telemetryEnabled,
           threatCloudEndpoint: update.endpoint ?? config.threatCloudEndpoint,
           mode: (update.mode as GuardConfig['mode']) ?? config.mode,
         };
 
         saveConfig(updatedConfig);
+        // The user has now answered the collective-defense question from the
+        // dashboard, so the CLI first-run prompt must not re-ask and clobber it.
+        if (update.consentGiven !== undefined) {
+          markConsentAnswered();
+        }
         this.jsonResponse(res, { success: true });
       } catch {
         this.jsonResponse(res, { error: 'Invalid JSON' }, 400);

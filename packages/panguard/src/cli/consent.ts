@@ -2,11 +2,14 @@
  * Telemetry consent — first-run collective-defense disclosure.
  *
  * Collective-defense sharing is OPT-IN and defaults to OFF. On first interactive
- * run we disclose what would be shared (matched rule ID, a one-way payload hash,
- * source type — never prompts/code/data, no IP, no hostname, a random install ID)
- * and ask the user to turn it ON; pressing Enter declines. Raw samples are never
- * sent. Non-interactive (CI) stays OFF until explicitly enabled. Nothing leaves
- * the machine unless the user explicitly opts in (gates are `=== true`).
+ * run we explain BOTH the value (your blocked attacks become ATR rules that
+ * protect everyone, and you get community rules back faster) and the privacy
+ * guarantee (matched rule ID, a one-way payload hash, source type — never
+ * prompts/code/file contents/keys, no IP, no hostname, a random install ID),
+ * then ask the user to turn it ON; pressing Enter declines. This is an informed
+ * invitation, not a nag or a pre-checked default. Raw samples are never sent.
+ * Non-interactive (CI) stays OFF until explicitly enabled. Nothing leaves the
+ * machine unless the user explicitly opts in (gates are `=== true`).
  */
 
 import { existsSync, writeFileSync, mkdirSync } from 'node:fs';
@@ -60,21 +63,37 @@ export async function askTelemetryConsent(): Promise<boolean> {
 
   console.log('');
   console.log(`  ${symbols.info} ${c.bold('Collective defense (optional, off by default)')}`);
+  console.log(`  ${c.dim('集體防禦（選用，預設關閉）')}`);
   console.log('');
-  console.log(`  ${c.dim('If you turn this on, then when PanGuard catches an attack it shares an')}`);
-  console.log(`  ${c.dim('anonymized signature — the matched rule ID, a one-way hash of the')}`);
-  console.log(`  ${c.dim('payload, and the source type — so new attacks become rules that')}`);
-  console.log(`  ${c.dim('protect everyone.')}`);
-  console.log('');
+  console.log(`  ${c.dim('Why turn it on: every attack PanGuard blocks on your machine can become')}`);
+  console.log(`  ${c.dim('a new ATR rule that protects everyone — and you get those community')}`);
+  console.log(`  ${c.dim('rules back faster. More sensors means faster detection for all of us.')}`);
   console.log(
-    `  ${c.dim('Never your prompts, code, or data. No IP address. No hostname. A random')}`
+    `  ${c.dim('開啟的理由：你這台機器擋下的每一次攻擊，都能變成一條新的 ATR 規則保護所有人，')}`
   );
-  console.log(`  ${c.dim('install ID only. Raw samples are never sent.')}`);
-  console.log(`  ${c.dim('Stays off unless you opt in. Turn on later: pga config set telemetry true')}`);
+  console.log(
+    `  ${c.dim('而你也能更快收到社群回流的規則。感測器越多，大家的偵測都越快。')}`
+  );
+  console.log('');
+  console.log(`  ${c.dim('What is shared: only the matched rule ID, a one-way hash of the payload,')}`);
+  console.log(`  ${c.dim('and the source type. Never your prompts, code, file contents, keys, IP')}`);
+  console.log(`  ${c.dim('address, or hostname. A random install ID only. Raw samples are never sent.')}`);
+  console.log(
+    `  ${c.dim('分享的內容：只有命中的規則 ID、payload 的單向雜湊、來源類型。絕不含你的')}`
+  );
+  console.log(
+    `  ${c.dim('prompt、程式碼、檔案內容、金鑰、IP 或主機名。只有一組隨機安裝 ID，從不上傳原始樣本。')}`
+  );
+  console.log('');
+  console.log(`  ${c.dim('Stays off unless you opt in. Change anytime: pga config set telemetry true/false')}`);
+  console.log(`  ${c.dim('不開就維持關閉。隨時可改：pga config set telemetry true/false')}`);
   console.log('');
 
   // Opt-in: default is NO. Pressing Enter declines (default OFF).
-  const answer = await promptYesNo('  Share anonymized threat signatures? [y/N] ', false);
+  const answer = await promptYesNo(
+    '  Join collective defense and share anonymized threat signatures? [y/N] ',
+    false
+  );
 
   const config = loadGuardConfig();
   updateGuardConfig({ ...config, telemetryEnabled: answer, threatCloudUploadEnabled: answer });
@@ -82,8 +101,10 @@ export async function askTelemetryConsent(): Promise<boolean> {
 
   if (answer) {
     console.log(`  ${c.safe('Thank you — you are helping defend the commons.')}`);
+    console.log(`  ${c.dim('謝謝你 — 你正在幫忙守護整個社群。')}`);
   } else {
     console.log(`  ${c.dim('No problem. Nothing leaves your machine.')}`);
+    console.log(`  ${c.dim('沒問題，不會有任何資料離開這台機器。')}`);
   }
   console.log('');
 

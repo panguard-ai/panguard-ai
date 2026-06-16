@@ -208,11 +208,26 @@ async function commandSetupAi(): Promise<void> {
   console.log(`    ${c.sage('Layer 1')} - Pattern Detection (regex rules, always active)`);
   console.log(`    ${c.dim('第一層')}   ${c.dim('模式偵測（正則規則，始終啟用）')}`);
   console.log('');
-  console.log(`    ${c.sage('Layer 2')} - Local AI (Ollama - free, private, on-device)`);
-  console.log(`    ${c.dim('第二層')}   ${c.dim('本地 AI（Ollama - 免費、私密、裝置端）')}`);
+  console.log(`    ${c.sage('Layer 2')} - Local AI (Ollama - $0, fully private, on-device)`);
+  console.log(`    ${c.dim('第二層')}   ${c.dim('本地 AI（Ollama - $0、完全私密、裝置端執行）')}`);
   console.log('');
   console.log(`    ${c.sage('Layer 3')} - Cloud AI (Anthropic/OpenAI - fastest, most accurate)`);
   console.log(`    ${c.dim('第三層')}   ${c.dim('雲端 AI（Anthropic/OpenAI - 最快、最準確）')}`);
+  console.log('');
+  // Cost reality up front, so the choice is informed before anyone picks Layer 3.
+  // The semantic judge runs ONLY on events the deterministic layers already
+  // flagged — not on every action — so real-world usage is a handful of calls
+  // a day, not thousands.
+  console.log(
+    `  ${c.dim('Layers 2 and 3 only run on events Layer 1 already flagged — not on every')}`
+  );
+  console.log(
+    `  ${c.dim('action — so a typical developer triggers them just a handful of times a day.')}`
+  );
+  console.log(
+    `  ${c.dim('第二、三層只在第一層已標記的事件上執行 — 不是每個動作都跑 — 所以一般開發者')}`
+  );
+  console.log(`  ${c.dim('一天只會觸發幾次。')}`);
   console.log('');
   console.log(divider());
   console.log('');
@@ -268,6 +283,10 @@ async function commandSetupAi(): Promise<void> {
   // Step 2a: Local AI (Ollama)
   if (setupLocal) {
     console.log(divider('Layer 2: Local AI'));
+    console.log('');
+    // Honest cost framing: local inference never calls a paid API.
+    console.log(`  ${c.dim('Cost: $0 and fully private — runs on your machine, nothing leaves it.')}`);
+    console.log(`  ${c.dim('費用：$0 且完全私密 — 在你的機器上執行，不會有任何資料離開。')}`);
     console.log('');
 
     const ollamaInstalled = isOllamaInstalled();
@@ -350,9 +369,28 @@ async function commandSetupAi(): Promise<void> {
       `  ${c.dim('Panguard never stores your cloud key on disk. Provide it via the')}`
     );
     console.log(`  ${c.dim('environment variable the semantic layer reads at startup:')}`);
+    console.log(
+      `  ${c.dim('PanGuard 從不把雲端金鑰寫到硬碟。請用語意層啟動時讀取的環境變數提供：')}`
+    );
     console.log(`    ${c.sage('export ANTHROPIC_API_KEY=sk-ant-...')}   ${c.dim('# Anthropic')}`);
     console.log(`    ${c.sage('export OPENAI_API_KEY=sk-...')}          ${c.dim('# OpenAI')}`);
-    console.log(`  ${c.dim('或改用本地 Ollama（無需金鑰）。')}`);
+    console.log(
+      `  ${c.dim('Prefer no key and full privacy? Pick Local AI (Ollama) instead — $0, on-device.')}`
+    );
+    console.log(`  ${c.dim('想完全不用金鑰、保有完整隱私？改選本地 AI（Ollama）— $0、裝置端執行。')}`);
+    console.log('');
+    // Honest cost framing (verified): the semantic judge runs ONLY on events the
+    // deterministic layers already flagged, so it fires a handful of times a day
+    // for a typical developer — roughly a few cents per month, not a precise $.
+    console.log(`  ${c.dim('Cost: the cloud judge runs only on already-flagged events — a handful of')}`);
+    console.log(`  ${c.dim('times a day for typical use, so roughly a few cents per month. You pay')}`);
+    console.log(`  ${c.dim('your AI provider directly; PanGuard adds no markup and no subscription.')}`);
+    console.log(
+      `  ${c.dim('費用：雲端判斷層只在已標記的事件上執行 — 一般使用一天幾次，')}`
+    );
+    console.log(
+      `  ${c.dim('大約每月幾美分。費用直接付給你的 AI 供應商；PanGuard 不加價、不收訂閱費。')}`
+    );
     console.log('');
 
     const provider = await readLine(`  Preferred cloud provider [claude/openai] (default claude): `);
