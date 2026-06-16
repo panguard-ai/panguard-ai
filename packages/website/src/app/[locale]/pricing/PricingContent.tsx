@@ -309,6 +309,11 @@ export default function PricingContent() {
                   ? '個人開發者、小團隊,以及任何想自架完整防護產品的組織。Community 不是殘廢試用版——它是功能完整的免費防護。Enterprise 另加規則遷移、合規證據、SSO 與治理(不是閹割 vs 付費,而是自架 vs 業務洽談)。'
                   : 'Individual developers, small teams, and any organisation that wants the complete, free protection product, self-hosted. Community is not a crippled trial — it is the full protection product. Enterprise adds rule migration, compliance evidence, SSO, and governance (not crippled-vs-paid, just self-hosted vs sales-led).'}
               </p>
+              <p className="text-[13px] text-brand-sage/90 leading-[1.85] mt-3">
+                {isZh
+                  ? '你在前線擋下的攻擊會變成新的 ATR 規則,保護所有人——跑的人越多,每個人被保護得越快。'
+                  : 'Your frontline catches become new ATR rules that protect everyone — the more people run it, the faster everyone is protected.'}
+              </p>
 
               <div className="my-7 flex-1">
                 <ul className="space-y-2.5">

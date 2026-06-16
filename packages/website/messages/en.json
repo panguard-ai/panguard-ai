@@ -4526,6 +4526,35 @@
         "label": "To learn your normal"
       }
     },
+    "ruleEngine": {
+      "overline": "WHERE THE RULES COME FROM",
+      "title": "Models keep getting faster. The rules have to keep up.",
+      "subtitle": "Every model release opens new ways to jailbreak, exfiltrate, and hijack an agent. The old path -- a committee drafts a rule, debates it for weeks, ships it -- can't match that pace. ATR mass-produces high-quality rules through four fast paths into one open, MIT-licensed base.",
+      "slow": {
+        "label": "The slow way",
+        "desc": "One rule, hand-authored and argued over a committee table for weeks. By the time it ships, the attack has three new variants."
+      },
+      "fastLabel": "The ATR way -- four fast paths into one open rule base",
+      "paths": [
+        {
+          "name": "From CVEs",
+          "desc": "New agent and MCP vulnerabilities are pulled in and turned into detection rules as they're disclosed."
+        },
+        {
+          "name": "From red-team PoCs",
+          "desc": "A working exploit becomes a generalizing rule -- the detection catches the technique, not just the one payload."
+        },
+        {
+          "name": "Through the converter",
+          "desc": "The bridge from the PC era to the AI era: 20 years of Sigma / YARA / Snort detection IP converts into ATR rules and lays the foundation. Free under MIT."
+        },
+        {
+          "name": "Through the community flywheel",
+          "desc": "A first sighting on one machine is drafted into a rule, reaches community consensus, and protects the whole network."
+        }
+      ],
+      "wall": "Old detection knowledge is the foundation. The new wall against agent attacks gets rebuilt on top -- and the more people run Panguard, the faster that wall grows. Every install is a sensor; every sighting raises the cost of attack for everyone."
+    },
     "layers": {
       "overline": "FIVE DETECTION STAGES",
       "title": "Five stages that catch what others miss",
@@ -4539,7 +4568,7 @@
       "layer2": {
         "badge": "Layer 2",
         "name": "Rules Engine",
-        "desc": "650+ ATR detection rules for AI agent security.",
+        "desc": "Hundreds of ATR detection rules for AI agent security -- and the base grows every day.",
         "detail": "Catches 90% of known threats in under 50ms. No AI needed."
       },
       "layer3": {
@@ -4568,7 +4597,7 @@
       "tier1": {
         "name": "Rules Engine",
         "pct": "Stage 1",
-        "items": "650+ ATR detection rules|10 threat categories|Pure regex -- fully deterministic|Community-driven rule updates",
+        "items": "Hundreds of ATR detection rules, growing daily|10 threat categories|Pure regex -- fully deterministic|Community-driven rule updates",
         "speed": "<50ms per event"
       },
       "tier2": {

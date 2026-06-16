@@ -4,14 +4,29 @@ import { useLocale } from 'next-intl';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import SectionTitle from '@/components/ui/SectionTitle';
+import { STATS } from '@/lib/stats';
 
 // Business-model section. Copy locked 2026-06-14 (recast for present-continuous, industry-scale,
 // non-self-congratulatory tone per founder critique). The company appears as the implementation the
 // market reaches for, not the hero of an origin story. Inline EN/ZH (matches PricingPreview pattern).
 // Adopter list = verified MERGED only (Microsoft, Cisco, MISP). NVIDIA garak PR is still open, so it
 // is NOT claimed as an adopter here — shown elsewhere as "PR open" to respect self-publication != adoption.
+//
+// "Why now" timeline added 2026-06-16 (narrative doctrine: panguard-narrative-doctrine.md). The speed
+// gap is the load-bearing argument: LLMs upgrade faster than defenses can; old rule-writing is slow;
+// ATR mass-produces rules through several fast paths; the install base is the engine that closes the
+// gap. Numbers stay dynamic via STATS — never hardcode a rule count (it drifts across sources).
+
+type WhyNowBeat = {
+  readonly k: string;
+  readonly head: string;
+  readonly body: string;
+};
 
 type FlywheelCopy = {
+  readonly whyNowOverline: string;
+  readonly whyNowTitle: string;
+  readonly whyNowBeats: readonly WhyNowBeat[];
   readonly overline: string;
   readonly title: string;
   readonly intro: string;
@@ -20,6 +35,30 @@ type FlywheelCopy = {
 };
 
 const EN: FlywheelCopy = {
+  whyNowOverline: 'WHY NOW',
+  whyNowTitle: 'Models keep getting faster. Detection has to keep up.',
+  whyNowBeats: [
+    {
+      k: 'gap',
+      head: 'LLMs upgrade faster than defenses can',
+      body: 'Every model release opens new ways to jailbreak, exfiltrate, and hijack an agent. The attack surface moves on the model vendors’ release cadence, not yours.',
+    },
+    {
+      k: 'slow',
+      head: 'Hand-written rules are too slow',
+      body: 'The old path — a committee drafts a rule, debates it for weeks, ships it — cannot match that pace. By the time a rule lands, the attack has three new variants.',
+    },
+    {
+      k: 'fast',
+      head: 'ATR mass-produces rules through fast paths',
+      body: `New CVEs, red-team PoCs, the Sigma/YARA converter, and the community flywheel all feed the same open rule base. A new rule promotes roughly every ${STATS.promotionIntervalMinutes} minutes, and the base grows daily.`,
+    },
+    {
+      k: 'flywheel',
+      head: 'More installs close the gap faster',
+      body: 'Every install is a sensor. A first sighting on one machine becomes a drafted rule, reaches community consensus, and protects the whole network. The more people run it, the faster detection catches up to model speed.',
+    },
+  ],
   overline: 'BUSINESS MODEL',
   title: 'The shape the agent-security market is taking',
   intro:
@@ -45,6 +84,30 @@ const EN: FlywheelCopy = {
 };
 
 const ZH: FlywheelCopy = {
+  whyNowOverline: '為什麼是現在',
+  whyNowTitle: '模型一直變快，偵測就得跟上。',
+  whyNowBeats: [
+    {
+      k: 'gap',
+      head: 'LLM 升級的速度，比防禦能補的速度快',
+      body: '每一次模型改版，都多出新的越獄、外洩、劫持 agent 的路。攻擊面跟著模型廠商的發版節奏走，不是跟著你走。',
+    },
+    {
+      k: 'slow',
+      head: '手寫規則太慢',
+      body: '舊做法——委員會起草一條規則、爭論幾週、才上線——追不上這個節奏。等規則上線，攻擊已經多出三個變體。',
+    },
+    {
+      k: 'fast',
+      head: 'ATR 用多條快路量產規則',
+      body: `新 CVE、紅隊 PoC、Sigma/YARA 轉換器、社群飛輪——全都流進同一套開放規則庫。大約每 ${STATS.promotionIntervalMinutes} 分鐘晉升一條新規則，規則庫每天增長。`,
+    },
+    {
+      k: 'flywheel',
+      head: '裝的人越多，缺口補得越快',
+      body: '每一次安裝都是一個 sensor。某一台機器上的第一次捕獲，會被草擬成規則、取得社群共識、保護整個網路。用的人越多，偵測追上模型速度的速度就越快。',
+    },
+  ],
   overline: '商業模式',
   title: 'agent 資安市場正在長成的形狀',
   intro:
@@ -75,7 +138,38 @@ export default function FlywheelModel() {
 
   return (
     <SectionWrapper dark>
-      <SectionTitle overline={c.overline} title={c.title} subtitle={c.intro} />
+      {/* Why now: the speed gap and how the flywheel closes it */}
+      <SectionTitle overline={c.whyNowOverline} title={c.whyNowTitle} />
+
+      <div className="max-w-6xl mx-auto mt-12">
+        <ol className="grid gap-px overflow-hidden rounded-xl border border-border bg-border md:grid-cols-2 lg:grid-cols-4">
+          {c.whyNowBeats.map((beat, i) => (
+            <FadeInUp key={beat.k} delay={i * 0.08}>
+              <li className="relative h-full bg-surface-2 p-6">
+                <span className="text-xs font-bold uppercase tracking-[0.18em] text-brand-sage/80 tabular-nums">
+                  {`0${i + 1}`}
+                </span>
+                <h3 className="mt-3 text-base font-bold leading-snug text-text-primary">
+                  {beat.head}
+                </h3>
+                <p className="mt-2.5 text-sm leading-relaxed text-text-secondary">{beat.body}</p>
+                {i < c.whyNowBeats.length - 1 ? (
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute right-0 top-1/2 hidden -translate-y-1/2 translate-x-1/2 text-brand-sage/70 lg:block"
+                  >
+                    &rarr;
+                  </span>
+                ) : null}
+              </li>
+            </FadeInUp>
+          ))}
+        </ol>
+      </div>
+
+      <div className="mt-20 sm:mt-28">
+        <SectionTitle overline={c.overline} title={c.title} subtitle={c.intro} />
+      </div>
 
       <div className="max-w-6xl mx-auto mt-14 grid gap-6 lg:grid-cols-3">
         {c.steps.map((step, i) => (

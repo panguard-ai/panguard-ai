@@ -169,11 +169,14 @@ export default function MigratorContent() {
               </span>
             </div>
             <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight mb-6 text-text-primary">
-              The Enterprise pipeline behind the converter
+              {isZh
+                ? '把 20 年 SOC 偵測 IP 搬過河'
+                : 'Carry 20 years of SOC detection IP across the bridge'}
             </h2>
             <p className="text-xl md:text-2xl text-text-secondary leading-relaxed">
-              Convert legacy detection rules into AI-agent-context ATR YAML in one command.
-              Auto-mapped to EU AI Act articles, OWASP Agentic Top 10, NIST AI RMF, ISO/IEC 42001.
+              {isZh
+                ? '轉換器是 PC→AI 的橋。Sigma、YARA、Snort 裡累積二十年的偵測知識搬進 AI agent 的世界，當新防線的地基。Community 轉換器免費把規則搬過去；enrichment、合規證據、治理是後續疊在地基上的 Enterprise 層。'
+                : 'The converter is the PC-to-AI bridge. Twenty years of detection knowledge — locked in Sigma, YARA, and Snort — carries into the AI agent world and lays the foundation for the new wall. The Community converter moves the rules across for free; enrichment, compliance evidence, and governance are the Enterprise layers built on top.'}
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-text-muted">
               <span className="inline-flex items-center gap-1.5">
@@ -251,7 +254,7 @@ export default function MigratorContent() {
         <FadeInUp>
           <SectionTitle
             title="How it works"
-            subtitle="Sigma/YARA in. ATR YAML + audit pack + activation report out."
+            subtitle="Sigma/YARA in, ATR YAML out — the old detection IP becomes the foundation, the audit pack and activation report layer on top."
           />
         </FadeInUp>
         <div className="max-w-5xl mx-auto mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -316,8 +319,8 @@ export default function MigratorContent() {
         <FadeInUp>
           <div className="text-center mt-8 text-sm text-text-muted">
             <ArrowDown className="w-4 h-4 inline-block mr-2" />
-            The migrator reauthors detection fields from endpoint Sysmon to AI-agent telemetry. Same
-            threat, language the runtime engine actually sees.
+            The bridge reauthors detection fields from endpoint Sysmon to AI-agent telemetry. Same
+            threat, carried into the language the runtime engine actually sees.
           </div>
         </FadeInUp>
       </SectionWrapper>
@@ -616,7 +619,7 @@ export default function MigratorContent() {
         <FadeInUp>
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="font-display text-3xl md:text-4xl font-bold mb-4 text-text-primary">
-              Ready to migrate your detection coverage?
+              Bring your detection coverage across the bridge
             </h2>
             <p className="text-text-secondary mb-8 leading-relaxed">
               Migrator Community v0.1.0 is live on npm under MIT — Sigma / YARA parsers, IR,

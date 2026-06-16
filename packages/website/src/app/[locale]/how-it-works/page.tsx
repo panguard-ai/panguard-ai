@@ -31,7 +31,7 @@ const howToJsonLd = {
       '@type': 'HowToStep',
       position: 1,
       name: 'Detect',
-      text: 'Rule-based scanning with 650+ ATR (Agent Threat Rules) catches known AI agent threats locally -- prompt injection, tool poisoning, credential exfiltration.',
+      text: 'Rule-based scanning with hundreds of ATR (Agent Threat Rules), a base that grows daily, catches known AI agent threats locally -- prompt injection, tool poisoning, credential exfiltration.',
     },
     {
       '@type': 'HowToStep',
