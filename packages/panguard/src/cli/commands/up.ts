@@ -15,7 +15,7 @@ import { c, setLogLevel } from '@panguard-ai/core';
 import { ok, warn, arrow, shield, brandTagline } from '../theme.js';
 import { detectLang } from '../interactive/lang.js';
 import { ensureTelemetryConsent } from '../consent.js';
-import { installHook } from './hook.js';
+import { installFor, toHookPlatform } from './hook.js';
 
 type Lang = 'en' | 'zh-TW';
 
@@ -528,20 +528,26 @@ export function upCommand(): Command {
               }
             }
 
-            // The MCP proxy only covers MCP tool servers. Claude Code's BUILT-IN
+            // The MCP proxy only covers MCP tool servers. An agent's BUILT-IN
             // tools (Bash/Edit/Write/WebFetch) bypass it — the most dangerous
-            // surface. Register the PreToolUse hook so they're evaluated too.
-            if (detectedPlatforms.some((p) => p.id === 'claude-code')) {
-              try {
-                const r = installHook();
+            // surface. Register the per-platform tool-call hook on EVERY detected
+            // platform that exposes one, so built-in tools are evaluated too.
+            const hookable = detectedPlatforms
+              .map((p) => toHookPlatform(p.id))
+              .filter((p): p is NonNullable<typeof p> => p !== null);
+            if (hookable.length) {
+              const done: string[] = [];
+              for (const hp of hookable) {
+                try {
+                  if (installFor(hp) !== 'error') done.push(hp);
+                } catch {
+                  /* best-effort; pga hook install can retry */
+                }
+              }
+              if (done.length) {
                 console.log(
-                  r === 'installed'
-                    ? `    ${c.safe('Built-in tools guarded')} ${c.dim('(Bash/Edit/Write/WebFetch via PreToolUse hook — restart Claude Code)')}`
-                    : `    ${c.dim('Built-in-tool hook already installed.')}`
-                );
-              } catch {
-                console.log(
-                  `    ${c.dim('Could not install the built-in-tool hook — run `pga hook install` manually.')}`
+                  `    ${c.safe(`Built-in tools guarded on ${done.length} platform(s)`)} ` +
+                    `${c.dim(`(${done.join(', ')} — restart the agent to activate)`)}`
                 );
               }
             }
