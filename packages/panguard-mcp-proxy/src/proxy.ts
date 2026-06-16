@@ -104,8 +104,8 @@ export class MCPProxy {
       (envFailMode === 'open' || envFailMode === 'closed' ? envFailMode : 'closed');
     this.evalTimeout = config.evalTimeout ?? 5000;
     // Sync sub-ms pre-check. Runs in front of the async evaluator so the worst
-    // payloads (and any session the brain flags) are blocked instantly — even
-    // if the async evaluator times out fail-open.
+    // payloads (and any session the brain flags) are blocked instantly — and,
+    // with fail-closed as the default, an unavailable async evaluator denies.
     this.riskStore = new InMemoryRiskStore();
     this.guard = new GuardGate({
       gate: new InlineGate(),
