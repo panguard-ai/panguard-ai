@@ -798,7 +798,10 @@ export class DashboardServer {
     return {
       a: {
         state: ruleCount > 0 && running ? 'active' : ruleCount > 0 ? 'idle' : 'degraded',
-        detail: ruleCount > 0 ? `${ruleCount} pattern rules loaded` : 'no rules loaded',
+        detail:
+          ruleCount > 0
+            ? `${ruleCount} pattern rules loaded`
+            : 'no rules loaded — pattern detection off; reinstall ATR rules',
       },
       b: {
         state: running ? 'active' : 'idle',

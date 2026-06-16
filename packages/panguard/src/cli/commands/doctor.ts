@@ -15,6 +15,7 @@ import { homedir } from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { c, symbols, box, header } from '@panguard-ai/core';
 import { PANGUARD_VERSION } from '../../index.js';
+import { readHookProtectionStatus } from './hook.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -382,6 +383,35 @@ function checkSystemService(): CheckResult {
   }
 }
 
+function checkHookProtection(): CheckResult {
+  // The built-in-tool PreToolUse hook fails OPEN when it loads 0 rules (correct:
+  // it must never brick the agent). But silent permanent no-protection is not
+  // acceptable — the hook records a degraded marker we surface here.
+  const status = readHookProtectionStatus();
+  if (!status) {
+    return {
+      status: 'pass',
+      label: 'Built-in-tool hook',
+      detail: 'No degraded protection recorded',
+    };
+  }
+  if (status.degraded) {
+    return {
+      status: 'fail',
+      label: 'Built-in-tool hook',
+      detail: `Hook loaded 0 rules — protection DEGRADED (allowing all tool calls)${
+        status.at ? ` since ${status.at}` : ''
+      }`,
+      fix: 'Run "pga guard sync-rules" (or reinstall) to restore detection rules, then restart the host agent',
+    };
+  }
+  return {
+    status: 'pass',
+    label: 'Built-in-tool hook',
+    detail: `Active (${status.ruleCount} rules at last run)`,
+  };
+}
+
 function checkShellCompletions(): CheckResult {
   if (existsSync(ZSH_COMPLETIONS_PATH)) {
     return {
@@ -524,6 +554,7 @@ function runAllChecks(): CheckResult[] {
     checkAiLayerLocal(),
     checkAiLayerCloud(),
     checkGuardEngine(),
+    checkHookProtection(),
     checkNotificationChannels(),
     checkLastScan(),
     checkThreatCloud(),

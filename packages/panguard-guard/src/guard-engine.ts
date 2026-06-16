@@ -66,6 +66,31 @@ import type { PolicyUpdate } from './response-engine.js';
 const logger = createLogger('panguard-guard:engine');
 
 /**
+ * Whether the daemon should auto-open the dashboard in a browser on start.
+ *
+ * A background service must NEVER spawn a browser tab: when launchd / systemd /
+ * sc.exe (re)start the daemon on every login, reboot, or KeepAlive restart,
+ * an unconditional open would pop a tab each time — the round-2 GA bug. The
+ * only context where the daemon itself should open a tab is a human running
+ * `panguard-guard start` directly in a foreground terminal. The interactive
+ * `pga up` launcher opens the dashboard itself (it reads the persisted token),
+ * so it sets PANGUARD_QUIET_GUARD on the ephemeral fallback path it spawns —
+ * we honour that too, to avoid a double-open.
+ *
+ * Detection (most robust across all service managers): every service manager
+ * redirects the daemon's stdout to a log file or journal, so stdout is never a
+ * TTY under a service; a foreground terminal always has a TTY. PANGUARD_NO_AUTO_OPEN
+ * is an explicit opt-out (headless hosts / tests); PANGUARD_QUIET_GUARD (set by
+ * `pga up`) also suppresses it. Pure + exported so the policy is unit-tested
+ * without spawning a real browser.
+ */
+export function shouldAutoOpenDashboard(env: NodeJS.ProcessEnv, stdoutIsTTY: boolean): boolean {
+  if (env['PANGUARD_NO_AUTO_OPEN']) return false;
+  if (env['PANGUARD_QUIET_GUARD']) return false;
+  return stdoutIsTTY === true;
+}
+
+/**
  * GuardEngine is the central orchestrator for all PanguardGuard functionality
  * GuardEngine 是所有 PanguardGuard 功能的中央協調器
  */
@@ -365,17 +390,26 @@ export class GuardEngine {
       const baseUrl = `http://127.0.0.1:${dashPort}`;
       const launchUrl = `${baseUrl}/?token=${this.dashboard.getAuthToken()}`;
       logger.info(`Dashboard: ${baseUrl} (open via the printed launch URL to authenticate)`);
-      try {
-        const { execFile } = await import('node:child_process');
-        const openCmd =
-          process.platform === 'darwin'
-            ? 'open'
-            : process.platform === 'win32'
-              ? 'start'
-              : 'xdg-open';
-        execFile(openCmd, [launchUrl]);
-      } catch {
-        logger.debug('Could not auto-open browser');
+      // Only auto-open in an interactive foreground start — never when launched
+      // by the persistence service (launchd/systemd/sc.exe), which would pop a
+      // browser tab on every login/reboot/restart. See shouldAutoOpenDashboard().
+      if (shouldAutoOpenDashboard(process.env, !!process.stdout.isTTY)) {
+        try {
+          const { execFile } = await import('node:child_process');
+          const openCmd =
+            process.platform === 'darwin'
+              ? 'open'
+              : process.platform === 'win32'
+                ? 'start'
+                : 'xdg-open';
+          execFile(openCmd, [launchUrl]);
+        } catch {
+          logger.debug('Could not auto-open browser');
+        }
+      } else {
+        logger.debug(
+          'Dashboard auto-open suppressed (non-interactive / service start). Open the printed launch URL manually.'
+        );
       }
     }
 

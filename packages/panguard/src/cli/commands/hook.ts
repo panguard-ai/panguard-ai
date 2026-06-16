@@ -182,6 +182,101 @@ export function emitFor(platform: HookPlatform, verdict: Verdict, reason: string
   }
 }
 
+// ── 0-rules fail-open detection (degraded-protection signal) ─────────────────
+
+/**
+ * Where the hook records that it loaded 0 rules on its last run. Lives in the
+ * shared guard state dir (~/.panguard-guard) so `pga doctor` and the dashboard
+ * can surface "protection degraded" — fail-OPEN is the correct safety choice
+ * (a hook with no rules must not brick the agent), but SILENT permanent
+ * no-protection is not acceptable. The marker is JSON: { degraded, ruleCount,
+ * at } and is cleared the moment a run loads rules again.
+ */
+const hookStatusPath = (): string =>
+  join(homedir(), '.panguard-guard', 'hook-protection-status.json');
+
+/**
+ * Has this process already emitted the stderr fail-open warning? The hook is a
+ * short-lived per-tool-call process, but a host may reuse it; emit the loud
+ * stderr line at most ONCE per process so we are noisy enough to be noticed
+ * without spamming every tool call within a single invocation.
+ */
+let warnedZeroRules = false;
+
+/**
+ * Record the degraded (0-rules) protection state for doctor/dashboard, and emit
+ * a one-time stderr warning. Best-effort: a failure to write the marker (e.g.
+ * read-only HOME) must never break the hook — we still allow the tool call.
+ */
+function signalZeroRulesFailOpen(): void {
+  if (!warnedZeroRules) {
+    warnedZeroRules = true;
+    process.stderr.write(
+      '[panguard-hook] WARNING: 0 detection rules loaded — built-in-tool protection is ' +
+        'DEGRADED (allowing all tool calls). Run "pga doctor" / "pga guard sync-rules" to ' +
+        'restore protection.\n'
+    );
+  }
+  try {
+    const path = hookStatusPath();
+    mkdirSync(dirname(path), { recursive: true });
+    writeFileSync(
+      path,
+      JSON.stringify({ degraded: true, ruleCount: 0, at: new Date().toISOString() }, null, 2),
+      { mode: 0o600 }
+    );
+  } catch {
+    /* best-effort marker; never block the agent on a write failure */
+  }
+}
+
+/**
+ * Clear the degraded marker once rules load again (healthy run). Best-effort —
+ * we overwrite with a healthy record rather than deleting, so the file stays a
+ * stable readable signal of "last hook run was OK". Only writes when a stale
+ * degraded marker exists, to avoid touching disk on every healthy tool call.
+ */
+function clearZeroRulesFailOpen(ruleCount: number): void {
+  try {
+    const path = hookStatusPath();
+    if (!existsSync(path)) return;
+    const prev = JSON.parse(readFileSync(path, 'utf-8')) as { degraded?: boolean };
+    if (prev.degraded !== true) return; // already healthy; nothing to clear
+    writeFileSync(
+      path,
+      JSON.stringify({ degraded: false, ruleCount, at: new Date().toISOString() }, null, 2),
+      { mode: 0o600 }
+    );
+  } catch {
+    /* best-effort */
+  }
+}
+
+/**
+ * Read the last-recorded hook protection status, for `pga doctor` / dashboard.
+ * Returns null when no hook has run yet (no marker) or the marker is unreadable.
+ * `degraded: true` means the most recent hook run loaded 0 rules and therefore
+ * allowed every built-in-tool call (no enforcement).
+ */
+export function readHookProtectionStatus(): { degraded: boolean; ruleCount: number; at: string } | null {
+  try {
+    const path = hookStatusPath();
+    if (!existsSync(path)) return null;
+    const parsed = JSON.parse(readFileSync(path, 'utf-8')) as {
+      degraded?: boolean;
+      ruleCount?: number;
+      at?: string;
+    };
+    return {
+      degraded: parsed.degraded === true,
+      ruleCount: typeof parsed.ruleCount === 'number' ? parsed.ruleCount : 0,
+      at: typeof parsed.at === 'string' ? parsed.at : '',
+    };
+  } catch {
+    return null;
+  }
+}
+
 function readStdin(): Promise<string> {
   return new Promise((resolve) => {
     let data = '';
@@ -218,7 +313,16 @@ export async function runHook(platform: HookPlatform): Promise<void> {
     if (!norm || !norm.content.trim()) process.exit(0);
 
     const evaluator = new ProxyEvaluator();
-    await evaluator.loadRules();
+    const ruleCount = await evaluator.loadRules();
+    if (ruleCount <= 0) {
+      // Fail-OPEN (correct: never brick the agent) but NOT silent — record the
+      // degraded state + warn once on stderr so doctor/dashboard/user can see
+      // that protection is currently a no-op, then allow the tool call.
+      signalZeroRulesFailOpen();
+      process.exit(0);
+    }
+    // Rules loaded → ensure any prior degraded marker is cleared.
+    clearZeroRulesFailOpen(ruleCount);
     // Neutral tool name so tool_name-existence rules never fire on a built-in
     // tool name; only the command content is judged.
     const result = await evaluator.evaluateToolCall('command', { input: norm.content });
@@ -242,13 +346,74 @@ export async function runHook(platform: HookPlatform): Promise<void> {
 const HOOK_CMD = (p: HookPlatform): string => `pga hook run --platform ${p}`;
 const TOOL_MATCHER = EVALUATED_TOOLS.join('|');
 
-function readJson(path: string): Record<string, unknown> {
-  if (!existsSync(path)) return {};
+/**
+ * Read an existing JSON config we are about to ROUND-TRIP (read → merge → write
+ * back). The verdict MUST distinguish three cases, because conflating them
+ * destroys user data:
+ *   - 'absent': file does not exist → safe to start from {} and write a fresh one.
+ *   - 'ok':     file exists and parsed → safe to merge into and write back.
+ *   - 'corrupt':file exists but is NOT valid JSON → DANGER. We must NOT write,
+ *               or we silently wipe the user's permissions/env/model/MCP servers
+ *               that we simply failed to parse. Caller aborts this platform.
+ *
+ * The previous readJson() returned {} on BOTH absent and corrupt, so a single
+ * stray byte in ~/.claude/settings.json caused installFor to overwrite the file
+ * with an object containing only our hooks key.
+ */
+type JsonRead =
+  | { kind: 'absent' }
+  | { kind: 'ok'; data: Record<string, unknown> }
+  | { kind: 'corrupt'; error: string };
+
+function readJsonForRoundTrip(path: string): JsonRead {
+  if (!existsSync(path)) return { kind: 'absent' };
+  let raw: string;
   try {
-    return JSON.parse(readFileSync(path, 'utf-8')) as Record<string, unknown>;
-  } catch {
-    return {};
+    raw = readFileSync(path, 'utf-8');
+  } catch (err) {
+    // File exists but is unreadable (permissions/IO) — treat as corrupt: do not
+    // overwrite something we could not even read.
+    return { kind: 'corrupt', error: err instanceof Error ? err.message : String(err) };
   }
+  // A genuinely empty file is treated as absent-equivalent (safe to start fresh).
+  if (raw.trim() === '') return { kind: 'absent' };
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return { kind: 'ok', data: parsed as Record<string, unknown> };
+    }
+    return { kind: 'corrupt', error: 'top-level JSON value is not an object' };
+  } catch (err) {
+    return { kind: 'corrupt', error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+/**
+ * Resolve an existing config for a round-trip write, or signal abort. Returns
+ * the object to merge into ({} when the file was genuinely absent), or null when
+ * the file exists but could not be parsed — in which case the caller records a
+ * clear error and NEVER writes over the file. The corruption reason is captured
+ * in `lastInstallError` for the install command to surface.
+ */
+function configOrAbort(path: string, label: string): Record<string, unknown> | null {
+  const r = readJsonForRoundTrip(path);
+  if (r.kind === 'absent') return {};
+  if (r.kind === 'ok') return r.data;
+  lastInstallError = `${label} (${path}) exists but is not valid JSON (${r.error}). PanGuard did NOT modify it — fix or back up the file, then re-run "pga hook install".`;
+  return null;
+}
+
+/**
+ * Last human-readable reason a platform install returned 'error'. Written by
+ * configOrAbort / installFor and read by the install command to tell the user
+ * exactly which config could not be parsed (so they can fix it before we ever
+ * touch it). Reset at the top of each installFor call.
+ */
+let lastInstallError: string | null = null;
+
+/** The reason the most recent installFor() returned 'error', if any. */
+export function lastHookInstallError(): string | null {
+  return lastInstallError;
 }
 function writeJson(path: string, data: unknown): void {
   mkdirSync(dirname(path), { recursive: true });
@@ -270,7 +435,13 @@ interface ClaudeSettings {
   [k: string]: unknown;
 }
 
-const CLAUDE_SETTINGS = join(homedir(), '.claude', 'settings.json');
+/**
+ * Path to Claude's settings file, resolved lazily so it always reflects the
+ * current homedir() (consistent with every other platform writer, which all
+ * compute their path inside installFor). A module-level const would freeze the
+ * path at import time.
+ */
+const claudeSettingsPath = (): string => join(homedir(), '.claude', 'settings.json');
 
 /** Is our PreToolUse hook present in a Claude-style settings object? (pure) */
 export function isHookInstalled(settings: ClaudeSettings): boolean {
@@ -301,21 +472,39 @@ export function withHookRemoved(settings: ClaudeSettings): ClaudeSettings {
   return { ...settings, hooks: { ...settings.hooks, PreToolUse: filtered } };
 }
 
-/** Register the hook for one platform, writing its exact config. Returns a status. */
+/**
+ * Register the hook for one platform, writing its exact config. Returns a status.
+ *
+ * DATA-LOSS SAFETY: every writer that round-trips an EXISTING user config reads
+ * it through configOrAbort, which returns null when the file exists but cannot
+ * be parsed. On null we abort that platform with 'error' (and a clear message in
+ * lastInstallError) and NEVER write — overwriting an unparseable settings.json
+ * would wipe the user's permissions/env/model/MCP servers. We only merge-write
+ * when the file was successfully parsed (kind 'ok') or genuinely absent
+ * (configOrAbort returns {}). Every writer spreads the parsed object first, so
+ * all existing top-level keys are preserved.
+ */
 export function installFor(platform: HookPlatform): 'installed' | 'already' | 'error' {
+  lastInstallError = null;
   try {
     switch (platform) {
       case 'claude-code':
       case 'continue': {
         // Continue reads ~/.claude/settings.json too, so the Claude entry covers both.
-        const s = readJson(CLAUDE_SETTINGS) as ClaudeSettings;
+        const settingsPath = claudeSettingsPath();
+        const base = configOrAbort(settingsPath, 'Claude settings');
+        if (base === null) return 'error';
+        const s = base as ClaudeSettings;
         if (isHookInstalled(s)) return 'already';
-        writeJson(CLAUDE_SETTINGS, withHookInstalled(s, HOOK_CMD('claude-code')));
+        // withHookInstalled spreads `s`, preserving permissions/env/model/MCP keys.
+        writeJson(settingsPath, withHookInstalled(s, HOOK_CMD('claude-code')));
         return 'installed';
       }
       case 'codex': {
         const path = join(homedir(), '.codex', 'hooks.json');
-        const s = readJson(path) as ClaudeSettings;
+        const base = configOrAbort(path, 'Codex hooks');
+        if (base === null) return 'error';
+        const s = base as ClaudeSettings;
         if (isHookInstalled(s)) return 'already';
         const hooks = { ...(s.hooks ?? {}) };
         const pre = Array.isArray(hooks.PreToolUse) ? [...hooks.PreToolUse] : [];
@@ -328,7 +517,9 @@ export function installFor(platform: HookPlatform): 'installed' | 'already' | 'e
       }
       case 'gemini': {
         const path = join(homedir(), '.gemini', 'settings.json');
-        const s = readJson(path) as { hooks?: { BeforeTool?: unknown[] }; [k: string]: unknown };
+        const base = configOrAbort(path, 'Gemini settings');
+        if (base === null) return 'error';
+        const s = base as { hooks?: { BeforeTool?: unknown[] }; [k: string]: unknown };
         const before = Array.isArray(s.hooks?.BeforeTool)
           ? [...(s.hooks!.BeforeTool as unknown[])]
           : [];
@@ -344,7 +535,9 @@ export function installFor(platform: HookPlatform): 'installed' | 'already' | 'e
       }
       case 'cursor': {
         const path = join(homedir(), '.cursor', 'hooks.json');
-        const s = readJson(path) as { version?: number; hooks?: Record<string, unknown[]> };
+        const base = configOrAbort(path, 'Cursor hooks');
+        if (base === null) return 'error';
+        const s = base as { version?: number; hooks?: Record<string, unknown[]> };
         const hooks = { ...(s.hooks ?? {}) };
         if (JSON.stringify(hooks).includes('pga hook run')) return 'already';
         for (const ev of ['beforeShellExecution', 'beforeMCPExecution']) {
@@ -357,7 +550,9 @@ export function installFor(platform: HookPlatform): 'installed' | 'already' | 'e
       }
       case 'windsurf': {
         const path = join(homedir(), '.codeium', 'windsurf', 'hooks.json');
-        const s = readJson(path) as { hooks?: Record<string, unknown[]> };
+        const base = configOrAbort(path, 'Windsurf hooks');
+        if (base === null) return 'error';
+        const s = base as { hooks?: Record<string, unknown[]> };
         const hooks = { ...(s.hooks ?? {}) };
         if (JSON.stringify(hooks).includes('pga hook run')) return 'already';
         for (const ev of ['pre_run_command', 'pre_write_code', 'pre_mcp_tool_use']) {
@@ -370,6 +565,8 @@ export function installFor(platform: HookPlatform): 'installed' | 'already' | 'e
       }
       case 'cline': {
         // Filename-based: an executable named after the event. macOS/Linux only.
+        // Not a JSON round-trip — the file is our own script, so there is no user
+        // config to clobber; we only skip if it already references our hook.
         const dir = join(homedir(), 'Documents', 'Cline', 'Rules', 'Hooks');
         const file = join(dir, 'PreToolUse');
         if (existsSync(file) && readFileSync(file, 'utf-8').includes('pga hook run'))
@@ -382,7 +579,8 @@ export function installFor(platform: HookPlatform): 'installed' | 'already' | 'e
         return 'installed';
       }
     }
-  } catch {
+  } catch (err) {
+    lastInstallError = err instanceof Error ? err.message : String(err);
     return 'error';
   }
 }
@@ -453,6 +651,11 @@ export function hookCommand(): Command {
               ? c.dim('already')
               : c.caution('error');
         console.log(`  ${p.padEnd(12)} ${tag}`);
+        // On error, surface WHY (e.g. corrupt config we refused to overwrite)
+        // so the user can fix it — never silently skip a data-loss abort.
+        if (r === 'error' && lastHookInstallError()) {
+          console.log(`  ${''.padEnd(12)} ${c.dim(lastHookInstallError()!)}`);
+        }
       }
       console.log(`  ${c.dim('Restart the host agent for the hook to take effect.')}`);
     });
@@ -461,12 +664,24 @@ export function hookCommand(): Command {
     .command('uninstall')
     .description('Remove the PanGuard hook from Claude-style settings')
     .action(() => {
-      const s = readJson(CLAUDE_SETTINGS) as ClaudeSettings;
+      const settingsPath = claudeSettingsPath();
+      const read = readJsonForRoundTrip(settingsPath);
+      if (read.kind === 'corrupt') {
+        // Same data-loss rule as install: never write over a config we cannot
+        // parse. The hook entry may or may not be in there — refuse to guess.
+        console.log(
+          `  ${c.caution('Cannot uninstall:')} ${c.dim(
+            `${settingsPath} is not valid JSON (${read.error}). Fix or back up the file first.`
+          )}`
+        );
+        return;
+      }
+      const s = (read.kind === 'ok' ? read.data : {}) as ClaudeSettings;
       if (!isHookInstalled(s)) {
         console.log(`  ${c.dim('Hook not installed.')}`);
         return;
       }
-      writeJson(CLAUDE_SETTINGS, withHookRemoved(s));
+      writeJson(settingsPath, withHookRemoved(s));
       console.log(`  ${c.safe('PreToolUse hook removed.')}`);
     });
 
@@ -474,7 +689,19 @@ export function hookCommand(): Command {
     .command('status')
     .description('Show whether the built-in-tool hook is registered (Claude)')
     .action(() => {
-      const installed = isHookInstalled(readJson(CLAUDE_SETTINGS) as ClaudeSettings);
+      const settingsPath = claudeSettingsPath();
+      const read = readJsonForRoundTrip(settingsPath);
+      if (read.kind === 'corrupt') {
+        console.log(
+          `  ${c.caution('Cannot read settings:')} ${c.dim(
+            `${settingsPath} is not valid JSON (${read.error}).`
+          )}`
+        );
+        return;
+      }
+      const installed = isHookInstalled(
+        (read.kind === 'ok' ? read.data : {}) as ClaudeSettings
+      );
       console.log(
         installed
           ? `  ${c.safe('Built-in-tool hook ACTIVE')} (Claude). Hookable platforms: ${HOOKABLE_PLATFORMS.join(', ')}.`

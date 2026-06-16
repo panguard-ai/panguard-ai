@@ -20,6 +20,8 @@ import {
   renderSkillScanResults,
   reviewFlaggedSkills,
 } from './setup-skill-scan.js';
+import { markInitialized } from '../first-run.js';
+import { readAuthenticatedDashboardUrl, dashboardBaseUrl } from '../dashboard-url.js';
 
 /** Open URL in the default browser (cross-platform) */
 function openBrowser(url: string): void {
@@ -131,6 +133,37 @@ export function setupCommand(): Command {
                 ? 'zh-TW'
                 : 'en';
         const L = detectedLang;
+
+        /**
+         * Open + print the Guard dashboard once it is reachable. The daemon mints
+         * the dashboard auth cookie ONLY for a URL carrying its launch token
+         * (/?token=…); a bare http://127.0.0.1:PORT lands on a 401 "Invalid token"
+         * page. The daemon persists that token to ~/.panguard-guard/dashboard-token
+         * shortly after its dashboard starts listening, so we poll briefly (~3s)
+         * for it. If it never appears (daemon still starting / headless), we print
+         * actionable guidance instead of opening a dead bare URL.
+         */
+        const openDashboard = async (): Promise<void> => {
+          let url: string | null = null;
+          for (let i = 0; i < 30; i++) {
+            url = readAuthenticatedDashboardUrl();
+            if (url) break;
+            await new Promise((r) => setTimeout(r, 100));
+          }
+          console.log();
+          if (url) {
+            console.log(c.green(`  ${symbols.pass} Opening Guard Dashboard...`));
+            console.log(c.dim(`    ${url}`));
+            openBrowser(url);
+          } else {
+            console.log(
+              c.yellow(
+                `  ${symbols.warn} Dashboard is still starting. Open it with: pga up`
+              )
+            );
+            console.log(c.dim(`    It will be served at ${dashboardBaseUrl()}`));
+          }
+        };
 
         const mcpConfig = await (import('@panguard-ai/panguard-mcp/config' as string) as Promise<{
           detectPlatforms: () => Promise<
@@ -524,7 +557,10 @@ export function setupCommand(): Command {
               }
             }
 
-            const dashUrl = 'http://127.0.0.1:3100';
+            // Human-readable base URL for JSON metadata / last-resort hints only.
+            // The page the user actually opens must carry the daemon's auth token
+            // (resolved at open time via openDashboard) — a bare URL 401s.
+            const dashUrl = dashboardBaseUrl();
 
             if (!guardBin) {
               if (!options.json) {
@@ -579,10 +615,7 @@ export function setupCommand(): Command {
 
                 // Open Dashboard in browser (skip in JSON mode — AI agent will show URL)
                 if (!options.json) {
-                  console.log();
-                  console.log(c.green(`  ${symbols.pass} Opening Guard Dashboard...`));
-                  console.log(c.dim(`    ${dashUrl}`));
-                  openBrowser(dashUrl);
+                  await openDashboard();
                 }
               } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
@@ -625,10 +658,7 @@ export function setupCommand(): Command {
                         `  ${symbols.pass} Guard started (PID: ${child.pid}). Will stop when system restarts.`
                       )
                     );
-                    console.log();
-                    console.log(c.green(`  ${symbols.pass} Opening Guard Dashboard...`));
-                    console.log(c.dim(`    ${dashUrl}`));
-                    openBrowser(dashUrl);
+                    await openDashboard();
                   }
                 } catch {
                   jsonOutput['guard'] = { installed: false, running: false, error: msg };
@@ -776,6 +806,12 @@ export function setupCommand(): Command {
           }
           console.log();
         }
+
+        // Setup finished interactively: record the durable first-run marker so a
+        // later `pga up` / bare `pga` skips the welcome + this wizard. Writing it
+        // here (not only in the bare-`pga` path) makes a direct `pga setup` also
+        // count as completing first-run.
+        markInitialized();
       }
     );
 
