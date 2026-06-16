@@ -689,8 +689,8 @@ export class DashboardServer {
         state: aiConfigured ? 'active' : 'off',
         optional: true,
         detail: aiConfigured
-          ? 'semantic verdict configured (advisory)'
-          : 'off · bring your own LLM — set PANGUARD_LLM_ENDPOINT or run `pga config llm`',
+          ? 'semantic verdict configured (advisory) · runs only on flagged events'
+          : 'off · bring your own LLM to catch novel attacks A/B miss and draft new ATR rules — runs only on flagged events, not every call (low token). Local & private: PANGUARD_SEMANTIC=1 with Ollama (data stays on your machine). Cloud: ANTHROPIC_API_KEY, or `pga config llm` (key stored encrypted).',
       },
     };
   }
