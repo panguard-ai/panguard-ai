@@ -82,7 +82,7 @@ export function configCommand(): Command {
         `  Telemetry:     ${guardConfig.telemetryEnabled === true ? c.safe('enabled') : c.dim('disabled')}`
       );
       console.log(
-        `  Threat Cloud:  ${guardConfig.threatCloudUploadEnabled === false ? c.dim('disabled') : c.safe('enabled')}`
+        `  Threat Cloud:  ${guardConfig.threatCloudUploadEnabled === true ? c.safe('enabled') : c.dim('disabled')}`
       );
       console.log(
         `  Mode:          ${guardConfig.mode ? c.bold(guardConfig.mode) : c.dim('default')}`

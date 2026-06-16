@@ -229,12 +229,12 @@ async function reportAndNotify(
       });
   }
 
-  // Upload to threat cloud
-  if (
-    anonymizedData &&
-    state.config.threatCloudUploadEnabled !== false &&
-    state.config.telemetryEnabled !== false
-  ) {
+  // Upload to threat cloud — OPT-IN, default OFF. Only when the user has
+  // EXPLICITLY enabled collective-defense sharing. Absent/unset config => OFF
+  // (gate is `=== true`, never `!== false`). This is the event-driven
+  // "catch then upload" path: it fires only on a non-benign verdict and sends
+  // the anonymized signature (no hostname, no path, no raw content, no username).
+  if (anonymizedData && state.config.threatCloudUploadEnabled === true) {
     if (state.config.showUploadData) {
       logger.info(`[upload-preview] Anonymized data: ${JSON.stringify(anonymizedData, null, 2)}`);
     }

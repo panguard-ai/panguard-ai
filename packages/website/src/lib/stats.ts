@@ -186,26 +186,40 @@ export const STATS = {
     lastCrawl: '2026-04-16',
   },
   /**
-   * Benchmark results (ATR v2.2.0, verified 2026-05-12)
-   * PINT: Invariant Labs adversarial corpus (850 samples)
-   * SKILL.md: Real-world skill corpus (498 samples from ClawHub + OpenClaw + Skills.sh; expanded to 341 in v2.2.0)
-   * Garak: NVIDIA jailbreak corpus — ATR-core families ~80%; per-family breakdown shown below
-   * HackAPrompt: EMNLP 2023 competition corpus (4,780 deterministic samples)
+   * Benchmark results — SINGLE SOURCE OF TRUTH for all benchmark numbers on the site.
+   *
+   * STANDARDIZATION (2026-06-16): This block is the one defensible, consistent set.
+   * README, the about page, the benchmarks page, and marketing copy all reference
+   * THESE values. Do not hardcode benchmark percentages elsewhere — render from here.
+   *
+   * Sourcing & honesty rules:
+   * - All recall/precision/fp values are WHOLE-NUMBER PERCENTAGES (e.g. 63.2 means 63.2%),
+   *   so consumers can render `${value}%` directly. (Previously some were fractions and
+   *   some were percentages in the same object, which rendered as raw 0.63%/0.97%.)
+   * - PINT and SKILL.md are measured against published external corpora and are the
+   *   numbers ATR/PanGuard cite as authoritative.
+   * - Garak recall is reported as an approximate figure (`garakRecallApprox`) because the
+   *   exact value drifts across rule versions and is not pinned to a single shipped build.
+   * - HackAPrompt has NO headline number here on purpose: published figures are per-version
+   *   (engineering blog) and the value moves with each rule batch; quoting a single % would
+   *   be misleading. The blog posts keep their own version-labeled numbers.
+   * - Authoritative v3.5.0 measurements (source: agent-threat-rules
+   *   data/measurements/<bench>/latest.json, atr_version 3.5.0, verified 2026-06-16).
+   *   Re-verify against latest.json before citing externally — they move on re-measure.
    */
   benchmark: {
-    pint: {
-      recall: 0.6319290465631929,
-      precision: 0.9965034965034965,
-      fp: 0.002506265664160401,
-      samples: 850,
-    },
-    skill: { recall: 1, precision: 0.97, fp: 0.002, samples: 498 },
+    // PINT (Invariant Labs / Lakera adversarial corpus, 850 samples) — v3.5.0
+    pint: { recall: 63.6, precision: 99.65, fp: 0.25, samples: 850 },
+    // SKILL.md real-world corpus (ClawHub + OpenClaw + Skills.sh, 498 manually-labeled samples) — v3.5.0
+    skill: { recall: 100, precision: 97, fp: 0.2, samples: 498 },
+    // NVIDIA garak in-the-wild corpus — v3.5.0 (down from 98.0%: rule ATR-2026-00495 deprecated)
     garak: {
-      recall: 98,
+      recallApprox: 97.2,
       samples: 650,
       perFamily: { latentinjection: 34.4, sysprompt_extraction: 67.9, dan: 90.2 },
     },
-    hackaprompt: { recall: 66.2, precision: 100, samples: 4_780, baselineRecall: 28.6 },
+    // HackAPrompt (5K deterministic sample) — v3.5.0
+    hackaprompt: { recall: 69.6, precision: 100, samples: 4_780 },
     wildFpRate: 0,
     wildSamples: 432,
   },
@@ -219,7 +233,7 @@ export const STATS = {
   adoption: {
     /** Cisco AI Defense: PR #79 PoC (34 rules) → PR #99 full 344-rule pack in skill-scanner; now 419 via v2.2.0 auto-sync */
     ciscoRulesMerged: 419,
-    /** Microsoft AGT: PR #908 (15 rules) → PR #1277 expanded to 287 rules + weekly auto-sync workflow auto-pulls v2.2.0 */
+    /** Microsoft AGT: PR #908 → PR #1277 merged ATR rule pack + weekly auto-sync workflow (auto-pulls latest). Count not asserted on live surfaces (unverifiable); field retained for historical reference. */
     microsoftRulesMerged: 287,
     /** Microsoft Copilot SWE Agent → AGT#1981 (5/11 06:07 UTC) regression-test fixtures presuming ATR detection */
     microsoftCopilotLoopIssue: 1981,

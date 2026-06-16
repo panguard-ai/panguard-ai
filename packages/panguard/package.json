@@ -33,7 +33,8 @@
     "bin",
     "CHANGELOG.md",
     "package.json",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc --build && cp ../../CHANGELOG.md ./CHANGELOG.md 2>/dev/null || true",

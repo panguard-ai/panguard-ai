@@ -1218,7 +1218,8 @@ export class DashboardServer {
       }
     }
 
-    const uploadEnabled = config?.threatCloudUploadEnabled !== false;
+    // Opt-in, default OFF: only "enabled" when explicitly turned on (=== true).
+    const uploadEnabled = config?.threatCloudUploadEnabled === true;
     const endpoint = config?.threatCloudEndpoint ?? 'https://tc.panguard.ai/api';
 
     this.jsonResponse(res, {

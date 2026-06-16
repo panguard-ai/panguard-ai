@@ -47,12 +47,16 @@ const INCIDENTS: readonly Incident[] = [
     sourceUrl: 'https://nvd.nist.gov/vuln/detail/CVE-2026-26118',
   },
   {
-    id: 'postmark',
-    name: 'postmark-mcp',
+    // Anonymized: a real ClawHub scan finding, described by capability category
+    // instead of by package name. We do not name a real third-party package as
+    // malicious without a reproducible public CVE/advisory link.
+    id: 'email-mcp',
+    name: 'An email-delivery MCP server',
     severity: 'HIGH',
     cvss: '--',
-    description: 'Clean for 15 versions. v1.0.16 added silent BCC forwarding 3K-15K emails/day.',
-    source: 'ATR ClawHub scan',
+    description:
+      'Clean for 15 versions, then a point release added silent BCC forwarding of thousands of emails per day to an external address. Example anonymized; no package named.',
+    source: 'PanGuard ClawHub scan finding',
     sourceUrl: 'https://github.com/panguard-ai/panguard-ai',
   },
 ] as const;

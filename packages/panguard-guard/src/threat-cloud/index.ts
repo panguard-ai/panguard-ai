@@ -655,32 +655,13 @@ export class ThreatCloudClient {
   }
 
   // ---------------------------------------------------------------------------
-  // Device Heartbeat / 裝置心跳
+  // Device heartbeat removed (privacy)
+  //
+  // There is deliberately NO sendHeartbeat / device beacon. A privacy-respecting
+  // tool must not phone home hostname or device identity on a timer. Outbound
+  // Threat Cloud traffic is limited to the opt-in, event-driven anonymized threat
+  // upload (upload/flushBuffer) that fires only when a real threat is caught.
   // ---------------------------------------------------------------------------
-
-  /**
-   * Send a heartbeat to Threat Cloud with device metadata.
-   * Called periodically by Guard daemon for fleet tracking.
-   * 向 Threat Cloud 發送裝置心跳用於 fleet 追蹤。
-   */
-  async sendHeartbeat(device: {
-    deviceId: string;
-    orgId: string;
-    hostname?: string;
-    osType?: string;
-    agentCount?: number;
-    guardVersion?: string;
-  }): Promise<void> {
-    if (this.status === 'offline' || !this.endpoint) return;
-
-    try {
-      const url = `${this.endpoint}/api/devices/heartbeat`;
-      await this.httpPost(url, device);
-      logger.info(`Heartbeat sent for device ${device.deviceId}`);
-    } catch {
-      // Best effort — Guard continues running even if TC is unreachable
-    }
-  }
 
   // ---------------------------------------------------------------------------
   // HTTP helpers / HTTP 輔助函數

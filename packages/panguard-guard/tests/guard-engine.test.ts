@@ -534,38 +534,67 @@ describe('GuardEngine', () => {
       await eng.stop();
     });
 
-    it('should upload anonymized data to threat cloud when available', async () => {
+    // Shared anonymized-data report stub for the upload opt-in/opt-out tests.
+    const reportWithAnonymizedData = {
+      updatedBaseline: {
+        normalProcesses: [],
+        normalConnections: [],
+        normalLoginPatterns: [],
+        normalServicePorts: [],
+        learningStarted: new Date().toISOString(),
+        learningComplete: false,
+        confidenceLevel: 0,
+        lastUpdated: new Date().toISOString(),
+        eventCount: 1,
+      },
+      anonymizedData: {
+        attackSourceIP: '203.0.0.0',
+        attackType: 'brute_force',
+        mitreTechnique: 'T1110',
+        sigmaRuleMatched: 'r1',
+        timestamp: new Date().toISOString(),
+        region: 'US',
+      },
+    };
+
+    it('should upload anonymized data to threat cloud when the user has opted in', async () => {
       const detection: DetectionResult = {
         event: makeEvent(),
         ruleMatches: [{ ruleId: 'r1', ruleName: 'Test', severity: 'high' }],
         timestamp: new Date().toISOString(),
       };
       mockDetect.mockReturnValue(detection);
-      mockReport.mockReturnValue({
-        updatedBaseline: {
-          normalProcesses: [],
-          normalConnections: [],
-          normalLoginPatterns: [],
-          normalServicePorts: [],
-          learningStarted: new Date().toISOString(),
-          learningComplete: false,
-          confidenceLevel: 0,
-          lastUpdated: new Date().toISOString(),
-          eventCount: 1,
-        },
-        anonymizedData: {
-          attackSourceIP: '203.0.0.0',
-          attackType: 'brute_force',
-          mitreTechnique: 'T1110',
-          sigmaRuleMatched: 'r1',
-          timestamp: new Date().toISOString(),
-          region: 'US',
-        },
-      });
+      mockReport.mockReturnValue(reportWithAnonymizedData);
+
+      // Collective-defense sharing is opt-in: only an engine with
+      // threatCloudUploadEnabled === true may upload.
+      const optedInEngine = await GuardEngine.create(
+        makeConfig({ threatCloudUploadEnabled: true })
+      );
+      mockUpload.mockClear();
+
+      await optedInEngine.processEvent(makeEvent());
+
+      expect(mockUpload).toHaveBeenCalled();
+      await optedInEngine.stop();
+    });
+
+    it('should NOT upload to threat cloud by default (opt-in, default OFF)', async () => {
+      const detection: DetectionResult = {
+        event: makeEvent(),
+        ruleMatches: [{ ruleId: 'r1', ruleName: 'Test', severity: 'high' }],
+        timestamp: new Date().toISOString(),
+      };
+      mockDetect.mockReturnValue(detection);
+      mockReport.mockReturnValue(reportWithAnonymizedData);
+
+      // Default engine (makeConfig without threatCloudUploadEnabled): nothing
+      // leaves the machine until the user explicitly opts in.
+      mockUpload.mockClear();
 
       await engine.processEvent(makeEvent());
 
-      expect(mockUpload).toHaveBeenCalled();
+      expect(mockUpload).not.toHaveBeenCalled();
     });
 
     it('should NOT upload to threat cloud when anonymizedData is null', async () => {

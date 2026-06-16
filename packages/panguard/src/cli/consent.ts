@@ -1,12 +1,12 @@
 /**
  * Telemetry consent — first-run collective-defense disclosure.
  *
- * On first interactive run we disclose what is shared (matched rule ID, a
- * one-way payload hash, source type — never prompts/code/data, no IP, a random
- * install ID) and default to ON (opt-out). Raw samples are never sent unless
- * the user opts in separately. Non-interactive (CI) stays OFF until explicitly
- * enabled. The guard event-processor will not upload anything before this
- * disclosure has been shown at least once (it gates on the marker written here).
+ * Collective-defense sharing is OPT-IN and defaults to OFF. On first interactive
+ * run we disclose what would be shared (matched rule ID, a one-way payload hash,
+ * source type — never prompts/code/data, no IP, no hostname, a random install ID)
+ * and ask the user to turn it ON; pressing Enter declines. Raw samples are never
+ * sent. Non-interactive (CI) stays OFF until explicitly enabled. Nothing leaves
+ * the machine unless the user explicitly opts in (gates are `=== true`).
  */
 
 import { existsSync, writeFileSync, mkdirSync } from 'node:fs';
@@ -54,20 +54,22 @@ export async function askTelemetryConsent(): Promise<boolean> {
   }
 
   console.log('');
-  console.log(`  ${symbols.info} ${c.bold('Collective defense')}`);
+  console.log(`  ${symbols.info} ${c.bold('Collective defense (optional, off by default)')}`);
   console.log('');
-  console.log(`  ${c.dim('When PanGuard catches an attack, it shares an anonymized signature —')}`);
-  console.log(`  ${c.dim('the matched rule ID, a one-way hash of the payload, and the source')}`);
-  console.log(`  ${c.dim('type — so new attacks become rules that protect everyone.')}`);
+  console.log(`  ${c.dim('If you turn this on, then when PanGuard catches an attack it shares an')}`);
+  console.log(`  ${c.dim('anonymized signature — the matched rule ID, a one-way hash of the')}`);
+  console.log(`  ${c.dim('payload, and the source type — so new attacks become rules that')}`);
+  console.log(`  ${c.dim('protect everyone.')}`);
   console.log('');
   console.log(
-    `  ${c.dim('Never your prompts, code, or data. No IP address. A random install ID')}`
+    `  ${c.dim('Never your prompts, code, or data. No IP address. No hostname. A random')}`
   );
-  console.log(`  ${c.dim('only. Raw samples are never sent unless you opt in separately.')}`);
-  console.log(`  ${c.dim('Turn off anytime: pga config set telemetry false')}`);
+  console.log(`  ${c.dim('install ID only. Raw samples are never sent.')}`);
+  console.log(`  ${c.dim('Stays off unless you opt in. Turn on later: pga config set telemetry true')}`);
   console.log('');
 
-  const answer = await promptYesNo('  Share anonymized threat signatures? [Y/n] ', true);
+  // Opt-in: default is NO. Pressing Enter declines (default OFF).
+  const answer = await promptYesNo('  Share anonymized threat signatures? [y/N] ', false);
 
   const config = loadGuardConfig();
   updateGuardConfig({ ...config, telemetryEnabled: answer, threatCloudUploadEnabled: answer });
@@ -84,8 +86,9 @@ export async function askTelemetryConsent(): Promise<boolean> {
 }
 
 /**
- * Simple yes/no prompt. Empty input returns `defaultYes` (so a [Y/n] prompt
- * defaults to yes on Enter); otherwise true only for y/yes.
+ * Simple yes/no prompt. Empty input (Enter) returns `defaultYes`; otherwise true
+ * only for y/yes. For opt-in consent pass `defaultYes = false` so a bare Enter
+ * declines and nothing is shared.
  */
 function promptYesNo(question: string, defaultYes = false): Promise<boolean> {
   return new Promise((resolve) => {

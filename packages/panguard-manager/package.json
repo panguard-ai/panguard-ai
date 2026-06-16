@@ -9,6 +9,12 @@
   "bin": {
     "panguard-manager": "./dist/cli.js"
   },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc && node -e \"require('node:fs').copyFileSync('src/dashboard.html','dist/dashboard.html')\"",
     "clean": "rm -rf dist tsconfig.tsbuildinfo",

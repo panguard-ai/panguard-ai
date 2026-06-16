@@ -28,7 +28,8 @@
     "dist",
     "openclaw-skill",
     "package.json",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc --build",

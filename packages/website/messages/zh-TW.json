@@ -760,7 +760,7 @@
       "historyLabel": "最近掃描",
       "trustNote": "掃描在伺服器端執行，不儲存任何程式碼，僅快取內容 hash。",
       "platformLabel": "支援 13 個平台：",
-      "ticker1": "postmark-mcp v1.0.16 每天偷偷轉寄 15,000 封信",
+      "ticker1": "一個電子郵件遞送 MCP server 每天偷偷轉寄數千封信",
       "ticker2": "MCPJam Inspector CVSS 9.8 遠端程式碼執行",
       "ticker3": "Claude Code hooks 被利用偷走 API key",
       "ticker4": "Azure MCP Server SSRF 偷走 managed identity token",
@@ -770,7 +770,7 @@
       "badgePlatforms": "13 個平台",
       "badgeLicense": "MIT 授權",
       "badgeScanned": "已掃 {count} Skills",
-      "badgeRecall": "Garak 98% 召回率",
+      "badgeRecall": "Garak 97.2% 召回率",
       "badgeCisco": "7 個組織已 merge · NIST 協作中",
       "badgeSafeMcp": "SAFE-MCP 91.8% 覆蓋率(PR 審查中)"
     },
@@ -804,20 +804,24 @@
       "downloads": "次下載",
       "skills": {
         "tesla": {
+          "label": "一個車輛 API 用戶端 Skill",
           "summary": "可以覆寫你 Agent 的 system prompt",
-          "detail": "控制你的 Tesla 車隊 -- prompt injection 可完全覆寫 Agent 指令，發出未授權的車輛命令。"
+          "detail": "一個控制連網車隊 API 的 Skill -- prompt injection 模式可完全覆寫 Agent 指令，發出未授權的車輛命令。範例已匿名，我們不點名套件。"
         },
         "wallet": {
+          "label": "一個加密錢包連接 Skill",
           "summary": "可以覆寫你 Agent 的 system prompt",
-          "detail": "連接你的加密錢包 -- prompt injection 讓攻擊者可以重導交易或竊取私鑰。"
+          "detail": "一個連接加密錢包的 Skill -- prompt injection 模式讓攻擊者可以重導交易或竊取私鑰。範例已匿名，我們不點名套件。"
         },
         "clawsec": {
+          "label": "一個資安工具 Skill",
           "summary": "一個有安全漏洞的安全工具",
-          "detail": "諷刺的是，這個以安全為賣點的 Skill 本身包含資源耗盡和資料外洩模式，反而破壞了它聲稱提供的保護。"
+          "detail": "諷刺的是，這個以安全為賣點的 Skill 本身包含資源耗盡和資料外洩模式，反而破壞了它聲稱提供的保護。範例已匿名，我們不點名套件。"
         },
         "safeexec": {
+          "label": "一個 'exec' 工具 Skill",
           "summary": "名叫 'safe' 但不 safe",
-          "detail": "儘管名字讓人安心，這個 Skill 包含繞過 sandbox 限制的不安全程式碼執行模式。"
+          "detail": "儘管名字讓人安心，這個 Skill 包含繞過 sandbox 限制的不安全程式碼執行模式。範例已匿名，我們不點名套件。"
         }
       }
     },
@@ -832,8 +836,8 @@
       "incident2Desc": "Hooks 和 MCP 設定檔被利用，可以跑任意 shell 指令、偷走你的 API key。",
       "incident3Name": "Azure MCP Server",
       "incident3Desc": "透過 SSRF 偷走 managed identity token。攻擊者不需要管理員權限就能存取你的 Azure 資源。",
-      "incident4Name": "postmark-mcp",
-      "incident4Desc": "前 15 個版本都正常。v1.0.16 偷偷加了一行 BCC，每天把 3,000 到 15,000 封信轉寄到外部信箱。"
+      "incident4Name": "一個電子郵件遞送 MCP server",
+      "incident4Desc": "前 15 個版本都正常，之後某個小改版偷偷加了一行 BCC，每天把數千封信轉寄到外部信箱。範例已匿名，我們不點名套件。"
     },
     "whyPanguard": {
       "title": "為什麼選 PanGuard",
@@ -1551,7 +1555,7 @@
     },
     "founder": {
       "title": "一個看到缺口的創辦人，從零開始建造",
-      "desc": "PanGuard 的起點是我——一個跨領域背景的 builder（業務、行銷、嘻哈音樂節製作人）——自學寫程式後發現：AI Agent 正在安裝有完整系統存取權的工具，卻零安全審查。幾個月內，ATR 成長到 650+ 條偵測規則、被 Cisco AI Defense 採用、掃描了 67,000+ 個 Skills、在真實威脅上達到 100% 召回率（100% 精確率、0% 誤報率，341 筆樣本）。立足台灣，服務全球。"
+      "desc": "PanGuard 的起點是我——一個跨領域背景的 builder（業務、行銷、嘻哈音樂節製作人）——自學寫程式後發現：AI Agent 正在安裝有完整系統存取權的工具，卻零安全審查。幾個月內，ATR 成長到 650+ 條偵測規則、被 Cisco AI Defense 採用、掃描了 67,000+ 個 Skills、在真實世界 SKILL.md 語料庫上達到 100% 召回率（97% 精確率、0.20% 誤報率，498 筆樣本）。立足台灣，服務全球。"
     }
   },
   "openSource": {
@@ -3050,7 +3054,7 @@
       "stats": {
         "stat1": {
           "value": "99.9%",
-          "label": "保證正常運行 SLA"
+          "label": "目標服務可用率"
         },
         "stat2": {
           "value": "500+",
@@ -3542,7 +3546,7 @@
         "items": [
           "本地優先架構 -- 所有資料留在你的機器上",
           "Threat Cloud 部署在 SOC 2 Type II 認證的雲端供應商",
-          "管理操作不可變稽核日誌(保留 365 天)",
+          "對 dashboard 操作以 SHA-256 內容雜湊提供防竄改證據(保留 365 天);完整防竄改鏈為 roadmap",
           "自動依賴弱點掃描",
           "供應商邊緣 DDoS 防護"
         ]
@@ -3570,7 +3574,7 @@
       },
       "item5": {
         "title": "稽核日誌",
-        "desc": "所有管理操作的不可變稽核軌跡。日誌至少保留 12 個月。"
+        "desc": "以 SHA-256 內容雜湊對 dashboard 操作提供防竄改證據。日誌至少保留 12 個月。完整防竄改雜湊鏈為 roadmap。"
       },
       "item6": {
         "title": "事件回應",
@@ -3708,7 +3712,7 @@
     "practices": {
       "overline": "實踐",
       "title": "我們如何保護自己。",
-      "subtitle": "這些不是願景目標。它們是當前強制執行的實踐，適用於每一行程式碼、每一次部署和每一位員工。",
+      "subtitle": "這些是我們在程式碼、部署與團隊上遵循的安全實踐。對於仍在逐步落地的控制項，我們會如實說明，而不會暗示它已完成。",
       "item1": {
         "title": "本地優先架構",
         "desc": "Panguard 完全在你的機器上運行。除非你選擇加入威脅雲，否則不會將資料發送到任何伺服器。你的安全資料、掃描結果和組態永遠不會離開你的裝置。"
@@ -3844,8 +3848,8 @@
     },
     "sla": {
       "overline": "服務等級",
-      "title": "SLA 摘要",
-      "subtitle": "我們對企業客戶的承諾。",
+      "title": "服務等級目標",
+      "subtitle": "我們對所有使用者的服務等級目標。具合約效力的 SLA 提供於付費的代管支援方案。",
       "items": {
         "0": {
           "metric": "威脅雲 API 可用性",
@@ -4255,11 +4259,11 @@
       },
       "postmark-supply-chain-attack": {
         "title": "乾淨了 15 個版本。1.0.16 版偷走了你的信箱。",
-        "excerpt": "postmark-mcp 發布了 15 個乾淨版本。1.0.16 版加了一行 BCC，每天將 3,000-15,000 封郵件轉寄到 phan@giftshop.club。另外：SANDWORM_MODE 集群——19 個仿冒 npm 套件竊取 SSH 金鑰。"
+        "excerpt": "一個電子郵件遞送 MCP server 發布了 15 個乾淨版本。某個小改版加了一行 BCC，每天將數千封郵件轉寄到攻擊者控制的信箱。另外還有一個 npm 仿冒套件群在竊取 SSH 金鑰。範例已匿名，我們不點名套件。"
       },
       "postmark-supply-chain-attack-zh": {
         "title": "乾淨了 15 個版本。1.0.16 版偷走了你的信箱。",
-        "excerpt": "postmark-mcp 發布了 15 個乾淨版本。1.0.16 版加了一行 BCC，每天將 3,000-15,000 封郵件轉寄到 phan@giftshop.club。另外還有 SANDWORM_MODE -- 19 個仿冒 npm 套件竊取 SSH keys。"
+        "excerpt": "一個 MCP 郵件供應鏈攻擊，以及一個 npm 仿冒套件群。範例已匿名，我們不點名套件。"
       },
       "zombie-agent-delayed-attack": {
         "title": "那封等了 6 週才竊取你資料的郵件",
@@ -4287,11 +4291,11 @@
       },
       "transparent-recall-vs-opaque-precision": {
         "title": "為什麼透明的 39.9% 召回率勝過不透明的 98%",
-        "excerpt": "ATR 在 PINT 基準測試上達到 99.6% 精確率和 61.4% 召回率。我們使用「ATR Scanned」而非「ATR Certified」。我們公開未偵測到的部分。Snort 的類比：較低的偵測率但開放可稽核，每次都勝過專有黑箱。"
+        "excerpt": "為什麼我們使用「ATR Scanned」而非「ATR Certified」，並公開我們未偵測到的部分。Snort 的類比：較低的偵測率但開放可稽核，每次都勝過專有黑箱。（本文 PINT 數字為 ATR v0.4.0 時期；當前 benchmark 見 benchmark hub。）"
       },
       "transparent-recall-vs-opaque-precision-zh": {
         "title": "透明的 39.9% 召回率為什麼打敗不透明的 98%",
-        "excerpt": "ATR 在 PINT 基準測試上達到 99.6% 精確率和 61.4% 召回率。我們使用「ATR Scanned」而非「ATR Certified」。我們公開未偵測到的部分。較低的偵測率但開放可稽核，每次都勝過專有黑箱。"
+        "excerpt": "我們使用「ATR Scanned」而非「ATR Certified」，並公開未偵測到的部分。較低的偵測率但開放可稽核，每次都勝過專有黑箱。（本文 PINT 數字為 ATR v0.4.0 時期；當前 benchmark 見 benchmark hub。）"
       },
       "flywheel-every-scan-protects-everyone": {
         "title": "飛輪效應：每次掃描都讓所有人更安全",

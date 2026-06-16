@@ -328,16 +328,17 @@ async function commandStart(
       ])
     );
 
-    // Threat intelligence sharing transparency message
-    if (config.threatCloudUploadEnabled === false || config.telemetryEnabled === false) {
-      console.log(`  ${symbols.info} Threat intelligence sharing: ${c.dim('disabled')}`);
-      console.log(`  ${c.dim('  No data will be uploaded to Panguard Threat Cloud')}`);
-    } else {
+    // Threat intelligence sharing transparency message — OPT-IN, default OFF.
+    // Only "enabled" when the user explicitly turned it on (=== true).
+    if (config.threatCloudUploadEnabled === true) {
       console.log(`  ${symbols.info} Threat intelligence sharing: ${c.safe('enabled')}`);
       console.log(
         `  ${c.dim('  Detected threats are anonymously uploaded to Panguard Threat Cloud')}`
       );
       console.log(`  ${c.dim('  Disable: panguard-guard start --no-telemetry')}`);
+    } else {
+      console.log(`  ${symbols.info} Threat intelligence sharing: ${c.dim('disabled')}`);
+      console.log(`  ${c.dim('  No data will be uploaded to Panguard Threat Cloud')}`);
     }
     if (config.showUploadData) {
       console.log(`  ${symbols.info} Upload data preview: ${c.safe('enabled')}`);
@@ -421,7 +422,8 @@ async function commandStart(
   }
 
   function pushTelemetryEvent(event: string, findingCount: number, severity: string): void {
-    if (config.telemetryEnabled === false) return;
+    // Opt-in, default OFF: only queue telemetry when explicitly enabled.
+    if (config.threatCloudUploadEnabled !== true) return;
     telemetryBatch.push({
       event,
       platform: `${process.platform}-${process.arch}`,
@@ -462,10 +464,17 @@ async function commandStart(
   }
 
   // ── Skill Install Watcher ────────────────────────────────────────────
+  // Local detection always runs (dashboard alerts, blacklist checks). The
+  // OUTBOUND flywheel submitters (skill threat + ATR proposal) carry a skill
+  // name and findings to Threat Cloud, so they are collective-defense sharing:
+  // wire them ONLY when the user has explicitly opted in (=== true, never
+  // !== false). Opted out => submitters stay undefined => SkillWatcher uploads
+  // nothing.
+  const sharingOptedIn = config.threatCloudUploadEnabled === true;
   const skillWatcher = new SkillWatcher({
     pollInterval: 10_000,
-    submitThreat: engine.getSkillThreatSubmitter(),
-    submitATRProposal: engine.getATRProposalSubmitter(),
+    submitThreat: sharingOptedIn ? engine.getSkillThreatSubmitter() : undefined,
+    submitATRProposal: sharingOptedIn ? engine.getATRProposalSubmitter() : undefined,
   });
 
   skillWatcher.on('skill-added', (change: { name: string; platformId: string }) => {
@@ -827,10 +836,11 @@ async function commandInstall(dataDir: string): Promise<void> {
 
   const enableTC = await promptConfirm({
     message: {
-      en: 'Enable Threat Cloud collective defense?',
-      'zh-TW': '啟用 Threat Cloud 集體防禦？',
+      en: 'Enable Threat Cloud collective defense? (optional, off by default)',
+      'zh-TW': '啟用 Threat Cloud 集體防禦？（選用，預設關閉）',
     },
-    defaultValue: true,
+    // Opt-in: default OFF so a bare Enter declines and nothing is shared.
+    defaultValue: false,
     lang: uiLang,
   });
 

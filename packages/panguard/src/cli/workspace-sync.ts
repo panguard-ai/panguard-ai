@@ -114,7 +114,6 @@ export interface WorkspaceEvent {
 
 export interface EndpointInfo {
   machine_id: string;
-  hostname?: string;
   os_type?: string;
   panguard_version?: string;
 }
@@ -135,9 +134,11 @@ export function getEndpointInfo(
     const seed = `${hostname()}::${userEmail}::${process.arch}`;
     cachedMachineId = 'm_' + createHash('sha256').update(seed).digest('hex').slice(0, 48);
   }
+  // Send ONLY the one-way hashed machine_id — never the raw hostname. The hash
+  // gives the dashboard a stable per-machine "endpoint" without the server ever
+  // seeing the actual hostname (matching the promise in the comment above).
   return {
     machine_id: cachedMachineId,
-    hostname: hostname(),
     os_type: platform(),
     ...(panguardVersion ? { panguard_version: panguardVersion } : {}),
   };
