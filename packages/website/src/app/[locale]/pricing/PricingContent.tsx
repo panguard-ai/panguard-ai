@@ -306,8 +306,8 @@ export default function PricingContent() {
               </p>
               <p className="text-sm text-text-secondary leading-[1.85]">
                 {isZh
-                  ? '個人開發者、小團隊，以及任何想自架完整 7 層 PanGuard 堆疊的組織。功能與 Enterprise 完全相同——差別在自架部署與社群支援。'
-                  : 'Individual developers, small teams, and any organisation that wants to self-host the full 7-layer PanGuard stack. Feature parity with Enterprise — only difference is self-hosted deployment and community support.'}
+                  ? '個人開發者、小團隊,以及任何想自架完整防護產品的組織。Community 不是殘廢試用版——它是功能完整的免費防護。Enterprise 另加規則遷移、合規證據、SSO 與治理(不是閹割 vs 付費,而是自架 vs 業務洽談)。'
+                  : 'Individual developers, small teams, and any organisation that wants the complete, free protection product, self-hosted. Community is not a crippled trial — it is the full protection product. Enterprise adds rule migration, compliance evidence, SSO, and governance (not crippled-vs-paid, just self-hosted vs sales-led).'}
               </p>
 
               <div className="my-7 flex-1">
@@ -315,23 +315,25 @@ export default function PricingContent() {
                   {(isZh
                     ? [
                         `${STATS.atrRules} 條 ATR 偵測規則(MIT 授權)`,
+                        '防護 13 個 AI agent 平台(Claude Code、Cursor、Gemini CLI、Codex、Cline、Windsurf、Continue 等)',
+                        '內建工具防護(PreToolUse hook)+ MCP proxy——攔截惡意 shell / 檔案寫入 / web-fetch,不只 MCP 呼叫',
+                        '常駐 Guard daemon——重開機後自動恢復(launchd / systemd)、預設 fail-closed',
+                        '本地 Web dashboard——誠實 posture + 一鍵隔離 / 還原 / 白名單',
+                        'SARIF + Evidence Pack 匯出——免費,無付費牆',
                         '無 agent / endpoint / tenant 數量上限',
-                        '5 層今天已上線:L2 稽核 · L3 防護 · L4 偵測 · L5 誘捕 · L6 反應',
-                        '2 層 2026 Q2/Q3 補:L1 探索 · L7 治理',
-                        'Threat Cloud 感測器自動註冊 · 匿名遙測(可隨時停用)',
-                        'Threat Cloud 規則更新(< 24 小時)',
-                        'GitHub Issues + Discord 社群支援',
-                        'pga CLI:scan · audit · up · guard · status · sensor',
+                        'Threat Cloud 感測器 + 簽章規則更新(< 24 小時,可隨時停用)',
+                        '一行安裝:pga up · GitHub + Discord 社群支援',
                       ]
                     : [
                         `${STATS.atrRules} ATR detection rules (MIT licensed)`,
+                        'Protects 13 AI agent platforms (Claude Code, Cursor, Gemini CLI, Codex, Cline, Windsurf, Continue + more)',
+                        'Built-in-tool protection (PreToolUse hook) + MCP proxy — blocks malicious shell / file writes / web-fetch, not just MCP calls',
+                        'Always-on Guard daemon — survives reboot (launchd / systemd), fail-closed by default',
+                        'Local web dashboard — honest posture + one-click quarantine / restore / whitelist',
+                        'SARIF + Evidence Pack export — free, no paywall',
                         'Unlimited agents / endpoints / tenants',
-                        '5 layers shipped today: L2 Audit · L3 Protect · L4 Detect · L5 Deceive · L6 Respond',
-                        '2 layers coming Q2/Q3 2026: L1 Discover · L7 Govern',
-                        'Auto-registers as Threat Cloud sensor · anonymous telemetry (opt-out anytime)',
-                        'Threat Cloud rule updates (< 24h)',
-                        'Community support via GitHub Issues + Discord',
-                        'pga CLI: scan · audit · up · guard · status · sensor',
+                        'Threat Cloud sensor + signed rule updates (< 24h, opt-out anytime)',
+                        'One-command install: pga up · community support via GitHub + Discord',
                       ]
                   ).map((f) => (
                     <li key={f} className="flex items-start gap-2.5">
