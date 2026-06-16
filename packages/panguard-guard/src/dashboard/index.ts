@@ -38,6 +38,7 @@ import type {
   ThreatVerdict,
 } from '../types.js';
 import { saveConfig } from '../config.js';
+import { redactSecrets } from '../redact.js';
 import { DashboardRelayClient, type RelayClientConfig } from './relay-client.js';
 
 // ESM-compatible __dirname resolution. import.meta.dirname is Node 20.11+
@@ -289,7 +290,9 @@ export class DashboardServer {
 
       this.server.listen(this.port, '127.0.0.1', () => {
         logger.info(`Dashboard started on http://127.0.0.1:${this.port}`);
-        // Token never logged — auth via HttpOnly cookie only
+        // Token never logged. The launcher (guard-engine) opens the browser at
+        // /?token=<authToken>; that one-time token mints the HttpOnly auth
+        // cookie used for all subsequent /api/* and /ws traffic.
 
         if (this.relayConfig) {
           this.startRelayClient(this.relayConfig);
@@ -411,23 +414,26 @@ export class DashboardServer {
 
     const url = req.url ?? '/';
 
-    if (url === '/') {
-      this.serveIndex(res, nonce);
+    if (url === '/' || url.split('?')[0] === '/') {
+      this.serveIndex(req, res, nonce);
       return;
     }
 
     if (url.startsWith('/api/')) {
       const authHeader = req.headers.authorization ?? '';
       // Parse auth token from: 1) Authorization header, 2) HttpOnly cookie.
-      // Query-param tokens (?token=) were removed — they leak into server logs,
-      // browser history, and Referer headers.
+      // Query-param tokens (?token=) are NOT accepted on /api/* — they leak into
+      // server logs, browser history, and Referer headers. (The launch token in
+      // GET /?token= only mints the cookie; it never authenticates an API call.)
+      const headerToken = authHeader.replace('Bearer ', '');
       const cookieToken =
         (req.headers.cookie ?? '')
           .split(';')
           .map((c) => c.trim())
           .find((c) => c.startsWith('panguard_auth='))
           ?.split('=')[1] ?? '';
-      const providedToken = authHeader.replace('Bearer ', '') || cookieToken;
+      const usedHeaderToken = headerToken.length > 0;
+      const providedToken = headerToken || cookieToken;
 
       if (
         !providedToken ||
@@ -439,18 +445,31 @@ export class DashboardServer {
         return;
       }
 
-      // CSRF defense-in-depth on top of the SameSite=Strict cookie. A browser
-      // always attaches Origin on a state-changing request, so a *mismatched*
-      // Origin is a cross-site (CSRF) attempt and is rejected. An *absent*
-      // Origin means a non-browser client (CLI / script / test) that had to
-      // supply the auth token explicitly — not a CSRF vector — so it is allowed.
+      // CSRF defense for state-changing requests. The CSRF-exploitable path is a
+      // browser that auto-attaches the SameSite cookie; for it the Origin header
+      // MUST be present and match a loopback origin. An ABSENT Origin is NOT
+      // treated as same-origin — it is rejected — because a same-origin browser
+      // fetch always sends Origin on POST/PUT/DELETE. The only legitimate caller
+      // with no Origin is a non-browser client (CLI / script / test), which
+      // cannot ride a victim's cookie and instead supplies the token explicitly
+      // in the Authorization header — that path is exempt (an attacker's
+      // cross-site page cannot set a custom Authorization header).
       if (req.method && req.method !== 'GET' && req.method !== 'HEAD') {
-        const origin = req.headers.origin;
-        const allowedOrigins = [`http://127.0.0.1:${this.port}`, `http://localhost:${this.port}`];
-        if (origin && !allowedOrigins.includes(origin)) {
-          res.writeHead(403, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ error: 'Forbidden: cross-origin request rejected' }));
-          return;
+        if (!usedHeaderToken) {
+          const origin = req.headers.origin;
+          const allowedOrigins = [
+            `http://127.0.0.1:${this.port}`,
+            `http://localhost:${this.port}`,
+          ];
+          if (!origin || !allowedOrigins.includes(origin)) {
+            res.writeHead(403, { 'Content-Type': 'application/json' });
+            res.end(
+              JSON.stringify({
+                error: 'Forbidden: missing or cross-origin Origin on cookie-authenticated request',
+              })
+            );
+            return;
+          }
         }
       }
     }
@@ -490,14 +509,8 @@ export class DashboardServer {
           // the browser. The dashboard only needs to know a channel is
           // configured — never the secret value. Key-name matching survives
           // config-shape drift (new secret fields are caught automatically).
-          const SECRET_KEY_RE =
-            /(api[-_]?key|license[-_]?key|signing[-_]?key|private[-_]?key|token|secret|password|passphrase|credential|\bpass\b)/i;
-          const safe = JSON.parse(
-            JSON.stringify(this.getConfig(), (k, v) =>
-              SECRET_KEY_RE.test(k) && typeof v === 'string' && v ? '[redacted]' : v
-            )
-          );
-          this.jsonResponse(res, safe);
+          // Shared with the CLI `config` dump — see ../redact.ts.
+          this.jsonResponse(res, redactSecrets(this.getConfig()));
         } else {
           this.jsonResponse(res, { error: 'Config not available' }, 503);
         }
@@ -507,14 +520,18 @@ export class DashboardServer {
         this.handleSkillsApi(res);
         break;
       case '/api/ai-config':
-        // Read-only. The semantic-layer LLM is configured via env vars / CLI
-        // only (PANGUARD_LLM_ENDPOINT, NVIDIA_API_KEY, `pga config llm`) — never
-        // written through HTTP. A dashboard POST that persisted an API key and
-        // an arbitrary endpoint was a credential-write + data-exfil surface.
+        // Read-only. The semantic-layer LLM is configured via env vars only
+        // (ANTHROPIC_API_KEY / OPENAI_API_KEY for cloud, or PANGUARD_SEMANTIC=1
+        // with a local Ollama) — never written through HTTP. A dashboard POST
+        // that persisted an API key and an arbitrary endpoint was a
+        // credential-write + data-exfil surface.
         if (req.method === 'POST') {
           this.jsonResponse(
             res,
-            { error: 'Read-only: configure the LLM via env vars or `pga config llm`' },
+            {
+              error:
+                'Read-only: configure the LLM via env vars (ANTHROPIC_API_KEY / OPENAI_API_KEY, or PANGUARD_SEMANTIC=1 with local Ollama)',
+            },
             405
           );
         } else {
@@ -627,15 +644,44 @@ export class DashboardServer {
     return entry.count <= RATE_LIMIT_MAX;
   }
 
-  private serveIndex(res: ServerResponse, nonce: string): void {
-    // Set auth token as HttpOnly cookie — never exposed in HTML source or JS
-    // Inject nonce into <script> tag for CSP compliance
+  private serveIndex(req: IncomingMessage, res: ServerResponse, nonce: string): void {
+    // The auth cookie is a LAUNCH SECRET — it is minted only for a request that
+    // carries the correct one-time token in the query string (the URL the `pga`
+    // CLI prints and opens: http://127.0.0.1:PORT/?token=<authToken>). An
+    // UNAUTHENTICATED GET / (no token, or a wrong token — e.g. a malicious local
+    // page probing the port) still receives the HTML shell, but NO Set-Cookie,
+    // so it cannot reach any /api/* endpoint or the /ws stream. This closes the
+    // "GET / hands a valid auth token to any caller" hole: the token comes from
+    // the CLI that started the dashboard, never from serving the index.
+    const queryToken = this.extractLaunchToken(req.url ?? '/');
+    const launched =
+      !!queryToken &&
+      queryToken.length === this.authToken.length &&
+      timingSafeEqual(Buffer.from(queryToken), Buffer.from(this.authToken));
+
+    // Inject nonce into <script> tag for CSP compliance.
     const html = DASHBOARD_HTML.replace('<script>', `<script nonce="${nonce}">`);
-    res.writeHead(200, {
+    const headers: Record<string, string> = {
       'Content-Type': 'text/html; charset=utf-8',
-      'Set-Cookie': `panguard_auth=${this.authToken}; HttpOnly; SameSite=Strict; Path=/`,
-    });
+    };
+    if (launched) {
+      // HttpOnly + SameSite=Strict: not readable by JS and not attached to
+      // cross-site requests. Issued only once the launch token is verified.
+      headers['Set-Cookie'] = `panguard_auth=${this.authToken}; HttpOnly; SameSite=Strict; Path=/`;
+    }
+    res.writeHead(200, headers);
     res.end(html);
+  }
+
+  /** Parse the one-time launch token from a `GET /?token=...` request URL. */
+  private extractLaunchToken(url: string): string {
+    const qIndex = url.indexOf('?');
+    if (qIndex === -1) return '';
+    try {
+      return new URLSearchParams(url.slice(qIndex + 1)).get('token') ?? '';
+    } catch {
+      return '';
+    }
   }
 
   /**
@@ -690,7 +736,7 @@ export class DashboardServer {
         optional: true,
         detail: aiConfigured
           ? 'semantic verdict configured (advisory) · runs only on flagged events'
-          : 'off · bring your own LLM to catch novel attacks A/B miss and draft new ATR rules — runs only on flagged events, not every call (low token). Local & private: PANGUARD_SEMANTIC=1 with Ollama (data stays on your machine). Cloud: ANTHROPIC_API_KEY, or `pga config llm` (key stored encrypted).',
+          : 'off · bring your own LLM to catch novel attacks A/B miss and draft new ATR rules — runs only on flagged events, not every call (low token). Local & private: set PANGUARD_SEMANTIC=1 with Ollama (no API key, data stays on your machine). Cloud: set ANTHROPIC_API_KEY or OPENAI_API_KEY (read from the environment, never stored).',
       },
     };
   }
@@ -1046,8 +1092,18 @@ export class DashboardServer {
       return;
     }
     const config = this.getConfig();
+    // Never return raw config.ai — it carries plaintext apiKey / byokApiKey.
+    // Expose only the non-secret shape the SPA needs; presence of a key is a
+    // boolean, never the value.
     this.jsonResponse(res, {
-      ai: config.ai ?? null,
+      ai: config.ai
+        ? {
+            provider: config.ai.provider,
+            model: config.ai.model,
+            endpoint: config.ai.endpoint,
+            hasApiKey: !!config.ai.apiKey,
+          }
+        : null,
       mode: config.mode,
       dashboardEnabled: config.dashboardEnabled,
     });
@@ -1055,7 +1111,8 @@ export class DashboardServer {
 
   // handleAiConfigPost was removed: the dashboard no longer writes LLM
   // credentials or endpoints over HTTP (that was a credential-write + exfil
-  // surface). The LLM is configured via env vars / `pga config llm` only.
+  // surface). The LLM is configured via env vars only (ANTHROPIC_API_KEY /
+  // OPENAI_API_KEY for cloud, or PANGUARD_SEMANTIC=1 with local Ollama).
   // /api/ai-config is now read-only (handleAiConfigGet).
 
   // ---------------------------------------------------------------------------

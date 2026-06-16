@@ -21,6 +21,11 @@ export interface StoredCredentials {
 
 export interface LlmConfig {
   provider: string;
+  /**
+   * Deprecated and never persisted. Cloud keys are read only from the
+   * ANTHROPIC_API_KEY / OPENAI_API_KEY environment variables (see
+   * panguard-guard llm-detect.ts). Kept optional for type back-compat only.
+   */
   apiKey?: string;
   model?: string;
   endpoint?: string;
@@ -43,7 +48,12 @@ export function loadLlmConfig(): LlmConfig | null {
   return null;
 }
 
-/** No-op in community edition. */
+/**
+ * No-op in community edition — this build does NOT persist an LLM config (and
+ * never a cloud key). The semantic layer resolves a provider at startup from
+ * the environment / local-runtime probe (see panguard-guard llm-detect.ts).
+ * Callers must not rely on a later loadLlmConfig() returning what they passed.
+ */
 export function saveLlmConfig(_config: LlmConfig): void {}
 
 /** Always returns false in community edition. */

@@ -25,6 +25,7 @@ import {
 import type { StatusItem } from '@panguard-ai/core';
 import { GuardEngine } from '../guard-engine.js';
 import { loadConfig, saveConfig, DEFAULT_DATA_DIR } from '../config.js';
+import { redactSecrets } from '../redact.js';
 import { PidFile } from '../daemon/index.js';
 import { installService, uninstallService } from '../daemon/index.js';
 import { generateTestLicenseKey } from '../license/index.js';
@@ -881,7 +882,11 @@ function commandConfig(dataDir: string): void {
   console.log(header('Configuration'));
   try {
     const config = loadConfig(join(dataDir, 'config.json'));
-    console.log(JSON.stringify(config, null, 2));
+    // Redact secret-bearing fields (ai.apiKey, threatCloudApiKey, license key,
+    // notification botToken / webhook secret / smtp pass) before printing —
+    // a plaintext config dump must never expose a stored secret to the terminal
+    // or scrollback. Shared redactor — see ../redact.ts.
+    console.log(JSON.stringify(redactSecrets(config), null, 2));
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error(`  ${symbols.fail} Failed to load config: ${msg}`);

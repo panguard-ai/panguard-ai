@@ -3,7 +3,7 @@
  * panguard guard - 守護引擎管理
  */
 
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync, chmodSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir, platform } from 'node:os';
 import { request as httpNodeRequest } from 'node:http';
@@ -173,17 +173,6 @@ function isOllamaInstalled(): boolean {
   }
 }
 
-/** Validate API key format */
-function validateApiKeyFormat(key: string): { valid: boolean; provider: string } {
-  if (key.startsWith('sk-ant-')) {
-    return { valid: true, provider: 'anthropic' };
-  }
-  if (key.startsWith('sk-') && !key.startsWith('sk-ant-')) {
-    return { valid: true, provider: 'openai' };
-  }
-  return { valid: false, provider: 'unknown' };
-}
-
 /** Read a single line from stdin */
 function readLine(prompt: string): Promise<string> {
   return new Promise((resolve) => {
@@ -270,9 +259,10 @@ async function commandSetupAi(): Promise<void> {
   const setupLocal = choice === '1' || choice === '3';
   const setupCloud = choice === '2' || choice === '3';
 
-  // Ensure config directory exists
+  // Ensure config directory exists. 0o700: ~/.panguard can hold secret-bearing
+  // config — never world/group-traversable on shared machines.
   if (!existsSync(configDir)) {
-    mkdirSync(configDir, { recursive: true });
+    mkdirSync(configDir, { recursive: true, mode: 0o700 });
   }
 
   // Step 2a: Local AI (Ollama)
@@ -330,86 +320,99 @@ async function commandSetupAi(): Promise<void> {
   }
 
   // Step 2b: Cloud AI
+  //
+  // Security: the wizard NEVER persists a raw cloud API key. The semantic layer
+  // reads the key only from the ANTHROPIC_API_KEY / OPENAI_API_KEY environment
+  // variables (see llm-detect.ts) — a persisted `ai.apiKey` in config.json is
+  // never read and would only sit on disk as a plaintext-leak liability. We
+  // store the chosen provider/model (no secret) so status/dashboard can show
+  // the intended provider, and tell the user which env var to set.
   if (setupCloud) {
     console.log(divider('Layer 3: Cloud AI'));
     console.log('');
 
-    const envKey =
-      process.env['PANGUARD_AI_KEY'] ||
-      process.env['ANTHROPIC_API_KEY'] ||
-      process.env['OPENAI_API_KEY'];
-    if (envKey) {
-      const { provider } = validateApiKeyFormat(envKey);
-      console.log(`  ${symbols.pass} API key found in environment: ${c.sage(provider)}`);
-      console.log(`  ${c.dim('已在環境變數中找到 API 金鑰')}: ${provider}`);
-      console.log('');
+    const envProvider = process.env['ANTHROPIC_API_KEY']
+      ? 'claude'
+      : process.env['OPENAI_API_KEY']
+        ? 'openai'
+        : null;
+    if (envProvider) {
+      console.log(
+        `  ${symbols.pass} Cloud key detected in environment: ${c.sage(envProvider === 'claude' ? 'ANTHROPIC_API_KEY' : 'OPENAI_API_KEY')}`
+      );
+      console.log(`  ${c.dim('已在環境變數中偵測到雲端金鑰')}`);
+    } else {
+      console.log(`  ${symbols.info} No cloud key in the environment yet.`);
+      console.log(`  ${c.dim('環境變數中尚未設定雲端金鑰。')}`);
+    }
+    console.log('');
+    console.log(
+      `  ${c.dim('Panguard never stores your cloud key on disk. Provide it via the')}`
+    );
+    console.log(`  ${c.dim('environment variable the semantic layer reads at startup:')}`);
+    console.log(`    ${c.sage('export ANTHROPIC_API_KEY=sk-ant-...')}   ${c.dim('# Anthropic')}`);
+    console.log(`    ${c.sage('export OPENAI_API_KEY=sk-...')}          ${c.dim('# OpenAI')}`);
+    console.log(`  ${c.dim('或改用本地 Ollama（無需金鑰）。')}`);
+    console.log('');
+
+    const provider = await readLine(`  Preferred cloud provider [claude/openai] (default claude): `);
+    const cloudProvider = provider === 'openai' ? 'openai' : 'claude';
+    const defaultModel = cloudProvider === 'claude' ? 'claude-sonnet-4-20250514' : 'gpt-4o';
+
+    const model = await readLine(`  Model [${defaultModel}]: `);
+    const cloudModel = model || defaultModel;
+
+    // Store provider + model ONLY — never a secret. If local AI was just
+    // configured, demote it to fallback metadata under aiLocal.
+    const currentAi = (existingConfig['ai'] ?? {}) as Record<string, unknown>;
+    if (setupLocal && currentAi['provider'] === 'ollama') {
+      existingConfig = {
+        ...existingConfig,
+        ai: {
+          provider: cloudProvider,
+          model: cloudModel,
+        },
+        aiLocal: {
+          provider: currentAi['provider'],
+          model: currentAi['model'],
+          endpoint: currentAi['endpoint'],
+        },
+      };
+    } else {
+      existingConfig = {
+        ...existingConfig,
+        ai: {
+          provider: cloudProvider,
+          model: cloudModel,
+        },
+      };
     }
 
-    console.log(`  Enter your API key (Anthropic or OpenAI):`);
-    console.log(`  ${c.dim('輸入您的 API 金鑰（Anthropic 或 OpenAI）：')}`);
-    console.log(`  ${c.dim('  Anthropic: https://console.anthropic.com/')}`);
-    console.log(`  ${c.dim('  OpenAI:    https://platform.openai.com/api-keys')}`);
     console.log('');
-
-    const apiKey = await readLine(`  API Key: `);
-    console.log('');
-
-    if (apiKey) {
-      const { valid, provider } = validateApiKeyFormat(apiKey);
-      if (!valid) {
-        console.log(
-          `  ${symbols.warn} Unrecognized key format, saving as-is / 無法識別的金鑰格式，直接儲存`
-        );
-      }
-
-      const cloudProvider =
-        provider === 'anthropic' ? 'claude' : provider === 'openai' ? 'openai' : 'claude';
-      const defaultModel = cloudProvider === 'claude' ? 'claude-sonnet-4-20250514' : 'gpt-4o';
-
-      const model = await readLine(`  Model [${defaultModel}]: `);
-      const cloudModel = model || defaultModel;
-
-      // If we already set local AI, merge into a combined config
-      const currentAi = (existingConfig['ai'] ?? {}) as Record<string, unknown>;
-      if (setupLocal && currentAi['provider'] === 'ollama') {
-        // Store cloud as the primary with local as fallback info
-        existingConfig = {
-          ...existingConfig,
-          ai: {
-            provider: cloudProvider,
-            model: cloudModel,
-            apiKey: apiKey,
-          },
-          aiLocal: {
-            provider: currentAi['provider'],
-            model: currentAi['model'],
-            endpoint: currentAi['endpoint'],
-          },
-        };
-      } else {
-        existingConfig = {
-          ...existingConfig,
-          ai: {
-            provider: cloudProvider,
-            model: cloudModel,
-            apiKey: apiKey,
-          },
-        };
-      }
-
-      console.log('');
+    console.log(
+      `  ${symbols.pass} Cloud AI provider set: ${c.sage(`${cloudProvider} / ${cloudModel}`)}`
+    );
+    if (!envProvider) {
       console.log(
-        `  ${symbols.pass} Cloud AI configured: ${c.sage(`${cloudProvider} / ${cloudModel}`)}`
+        `  ${symbols.warn} Set ${c.sage(cloudProvider === 'claude' ? 'ANTHROPIC_API_KEY' : 'OPENAI_API_KEY')} in your environment before restarting guard, or the semantic layer stays off.`
       );
-    } else {
-      console.log(`  ${symbols.info} Skipped cloud AI setup`);
     }
     console.log('');
   }
 
-  // Save config
+  // Save config. 0o600 file + chmod (even if the file already existed, to
+  // tighten a loosely-created one): config.json can carry other secret-bearing
+  // fields (threatCloudApiKey, notification secrets) — never world/group-readable.
   try {
-    writeFileSync(configPath, JSON.stringify(existingConfig, null, 2), 'utf-8');
+    writeFileSync(configPath, JSON.stringify(existingConfig, null, 2), {
+      encoding: 'utf-8',
+      mode: 0o600,
+    });
+    try {
+      chmodSync(configPath, 0o600);
+    } catch {
+      /* best effort — platforms without POSIX permissions */
+    }
     console.log(`  ${symbols.pass} Configuration saved to ${c.sage(configPath)}`);
     console.log(`  ${c.dim('設定已儲存至')} ${configPath}`);
   } catch (err: unknown) {

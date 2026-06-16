@@ -252,7 +252,30 @@ export function upCommand(): Command {
         // single keystroke declines and nothing leaves the machine. This gates all
         // TC upload, and is changeable anytime (pga config set telemetry false / the
         // dashboard Settings + Threat Cloud toggle). Non-interactive (CI) stays OFF.
-        await ensureTelemetryConsent();
+        const telemetryConsented = await ensureTelemetryConsent();
+
+        // Whether the scan flywheel may upload to Threat Cloud. Requires BOTH an
+        // affirmative consent (telemetryEnabled) AND that TC upload has not been
+        // turned off (threatCloudUploadEnabled !== false). Mirrors the activation
+        // opt-out read below; nothing leaves the machine when the user declined or
+        // opted out via `pga config set telemetry false` / the dashboard toggle.
+        const tcUploadAllowed = (() => {
+          if (!telemetryConsented) return false;
+          try {
+            const cfgPath = join(homedir(), '.panguard-guard', 'config.json');
+            if (existsSync(cfgPath)) {
+              const cfg = JSON.parse(readFileSync(cfgPath, 'utf-8')) as {
+                telemetryEnabled?: boolean;
+                threatCloudUploadEnabled?: boolean;
+              };
+              if (cfg.telemetryEnabled === false) return false;
+              if (cfg.threatCloudUploadEnabled === false) return false;
+            }
+          } catch {
+            // On any read error, fall back to the consent result we already have.
+          }
+          return true;
+        })();
 
         // ── Step 1: Detect AI platforms (we SCAN before deploying) ──
         let platformCount = 0;
@@ -405,8 +428,10 @@ export function upCommand(): Command {
                         });
                       }
 
-                      // ── Flywheel: submit scan results to TC ──
-                      if (report.riskScore > 0) {
+                      // ── Flywheel: submit scan results to TC (consent-gated) ──
+                      // Never upload anything when the user has not consented or
+                      // has opted out of Threat Cloud.
+                      if (tcUploadAllowed && report.riskScore > 0) {
                         submitToTC(skill.name, skillDir, report).catch(() => {});
                       }
                     } catch (err) {

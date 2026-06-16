@@ -74,11 +74,17 @@ describe('configCommand', () => {
       expect(llmCmd).toBeDefined();
       const optionNames = llmCmd!.options.map((o) => o.long);
       expect(optionNames).toContain('--provider');
-      expect(optionNames).toContain('--api-key');
       expect(optionNames).toContain('--model');
       expect(optionNames).toContain('--endpoint');
       expect(optionNames).toContain('--show');
       expect(optionNames).toContain('--clear');
+    });
+
+    it('must NOT expose an --api-key option (secret via argv = ps leak)', () => {
+      const cmd = configCommand();
+      const llmCmd = cmd.commands.find((c) => c.name() === 'llm');
+      const optionNames = llmCmd!.options.map((o) => o.long);
+      expect(optionNames).not.toContain('--api-key');
     });
   });
 
@@ -144,27 +150,26 @@ describe('configCommand', () => {
       expect(mockSaveLlmConfig).not.toHaveBeenCalled();
     });
 
-    it('should accept "claude" as valid provider', async () => {
+    it('should NOT persist a cloud key for "claude" — prints env-var guidance instead', async () => {
       const cmd = configCommand();
-      await cmd.parseAsync(['llm', '--provider', 'claude', '--api-key', 'sk-ant-test1234'], {
-        from: 'user',
-      });
-      expect(mockSaveLlmConfig).toHaveBeenCalledWith(
-        expect.objectContaining({ provider: 'claude', apiKey: 'sk-ant-test1234' })
-      );
+      await cmd.parseAsync(['llm', '--provider', 'claude'], { from: 'user' });
+      // Cloud keys are read from the environment, never written to disk.
+      expect(mockSaveLlmConfig).not.toHaveBeenCalled();
+      const output = consoleSpy.mock.calls.map((c) => c[0]).join('\n');
+      expect(output).toContain('ANTHROPIC_API_KEY');
+      expect(output).toContain('OPENAI_API_KEY');
     });
 
-    it('should accept "openai" as valid provider', async () => {
+    it('should NOT persist a cloud key for "openai" — prints env-var guidance instead', async () => {
       const cmd = configCommand();
-      await cmd.parseAsync(['llm', '--provider', 'openai', '--api-key', 'sk-proj-test'], {
-        from: 'user',
-      });
-      expect(mockSaveLlmConfig).toHaveBeenCalledWith(
-        expect.objectContaining({ provider: 'openai', apiKey: 'sk-proj-test' })
-      );
+      await cmd.parseAsync(['llm', '--provider', 'openai'], { from: 'user' });
+      expect(mockSaveLlmConfig).not.toHaveBeenCalled();
+      const output = consoleSpy.mock.calls.map((c) => c[0]).join('\n');
+      expect(output).toContain('ANTHROPIC_API_KEY');
+      expect(output).toContain('OPENAI_API_KEY');
     });
 
-    it('should accept "ollama" without api-key', async () => {
+    it('should accept "ollama" (no key involved)', async () => {
       const cmd = configCommand();
       await cmd.parseAsync(['llm', '--provider', 'ollama'], { from: 'user' });
       expect(mockSaveLlmConfig).toHaveBeenCalledWith(
@@ -172,32 +177,23 @@ describe('configCommand', () => {
       );
     });
 
-    it('should require --api-key for claude provider', async () => {
+    it('should never pass an apiKey field to saveLlmConfig', async () => {
       const cmd = configCommand();
-      await cmd.parseAsync(['llm', '--provider', 'claude'], { from: 'user' });
-      const output = consoleSpy.mock.calls.map((c) => c[0]).join('\n');
-      expect(output).toContain('--api-key is required');
-      expect(mockSaveLlmConfig).not.toHaveBeenCalled();
-    });
-
-    it('should require --api-key for openai provider', async () => {
-      const cmd = configCommand();
-      await cmd.parseAsync(['llm', '--provider', 'openai'], { from: 'user' });
-      const output = consoleSpy.mock.calls.map((c) => c[0]).join('\n');
-      expect(output).toContain('--api-key is required');
-      expect(mockSaveLlmConfig).not.toHaveBeenCalled();
+      await cmd.parseAsync(['llm', '--provider', 'ollama'], { from: 'user' });
+      const saved = mockSaveLlmConfig.mock.calls[0]?.[0] as Record<string, unknown> | undefined;
+      expect(saved).toBeDefined();
+      expect(saved).not.toHaveProperty('apiKey');
     });
   });
 
   describe('config llm with --model and --endpoint', () => {
-    it('should forward model override when provided', async () => {
+    it('should forward model override when provided (ollama — the persisted path)', async () => {
       const cmd = configCommand();
-      await cmd.parseAsync(
-        ['llm', '--provider', 'claude', '--api-key', 'sk-test', '--model', 'claude-opus-4-6'],
-        { from: 'user' }
-      );
+      await cmd.parseAsync(['llm', '--provider', 'ollama', '--model', 'llama3.2'], {
+        from: 'user',
+      });
       expect(mockSaveLlmConfig).toHaveBeenCalledWith(
-        expect.objectContaining({ model: 'claude-opus-4-6' })
+        expect.objectContaining({ model: 'llama3.2' })
       );
     });
 
