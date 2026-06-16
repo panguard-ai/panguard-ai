@@ -25,7 +25,7 @@ export const STATS = {
   /** Must match packages/panguard/package.json "version" */
   cliVersion: '1.6.1',
   /** Synced from agent-threat-rules/stats.json by sync-atr-stats workflow */
-  atrVersion: '3.1.1',
+  atrVersion: '3.5.0',
   /** ATR v2.2.x: stable + experimental total */
   atrRules: 652,
   atrStableRules: 359,
@@ -251,7 +251,7 @@ export const STATS = {
     cisaKevCovered: 1,
     agentsProtected: 50,
     githubStars: 86,
-    platformsSupported: 17,
+    platformsSupported: 13,
   },
   /** Platform coverage */
   platform: {
