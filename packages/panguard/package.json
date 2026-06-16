@@ -54,6 +54,7 @@
     "@panguard-ai/scan-core": "workspace:*",
     "@panguard-ai/panguard-skill-auditor": "workspace:*",
     "@panguard-ai/panguard-mcp": "workspace:*",
+    "@panguard-ai/panguard-mcp-proxy": "workspace:*",
     "@sentry/node": "^8.0.0",
     "commander": "^12.0.0",
     "js-yaml": "^4.1.0",
