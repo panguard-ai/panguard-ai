@@ -45,14 +45,15 @@ describe('reportCommand', () => {
       const cmd = reportCommand();
       const subcommandNames = cmd.commands.map((c) => c.name());
       expect(subcommandNames).toContain('list-frameworks');
+      expect(subcommandNames).toContain('list-scopes');
       expect(subcommandNames).toContain('summary');
       expect(subcommandNames).toContain('generate');
       expect(subcommandNames).toContain('validate');
     });
 
-    it('should have exactly 4 subcommands', () => {
+    it('should have exactly 5 subcommands', () => {
       const cmd = reportCommand();
-      expect(cmd.commands).toHaveLength(4);
+      expect(cmd.commands).toHaveLength(5);
     });
   });
 

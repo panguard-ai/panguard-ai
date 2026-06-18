@@ -685,7 +685,14 @@ function computeReportHash(
     yamlKey: coverage.framework.yamlKey,
     organisation: orgName,
     reportDate,
-    scope: scope ? { system: scope.system, useCaseLabel: scope.useCaseLabel, categories: scope.categories, scopedRules: scope.scopedRules } : null,
+    scope: scope
+      ? {
+          system: scope.system,
+          useCaseLabel: scope.useCaseLabel,
+          categories: scope.categories,
+          scopedRules: scope.scopedRules,
+        }
+      : null,
     totalRules: coverage.totalRules,
     mappedRules: coverage.mappedRules,
     totalMappings: coverage.totalMappings,
@@ -905,7 +912,9 @@ async function generateAction(opts: {
   }
 
   const baseContent =
-    format === 'json' ? renderJson(coverage, orgName, scope) : renderMarkdown(coverage, orgName, scope);
+    format === 'json'
+      ? renderJson(coverage, orgName, scope)
+      : renderMarkdown(coverage, orgName, scope);
   const footer =
     format === 'json'
       ? ''
@@ -1014,9 +1023,18 @@ export function reportCommand(): Command {
     .option('--format <fmt>', 'Output format: md (default) | json | pdf')
     .option('--output <path>', 'Write report to file instead of stdout (required for pdf)')
     .option('--org <name>', 'Organisation / institution name for the report header')
-    .option('--scope <use-case>', 'Scope to a deployed system (e.g. credit-scoring) — see: pga report list-scopes')
-    .option('--system <name>', 'Name of the specific AI system assessed (e.g. "Retail Credit Decisioning Agent")')
-    .option('--categories <csv>', 'Override scope with explicit ATR rule categories, comma-separated')
+    .option(
+      '--scope <use-case>',
+      'Scope to a deployed system (e.g. credit-scoring) — see: pga report list-scopes'
+    )
+    .option(
+      '--system <name>',
+      'Name of the specific AI system assessed (e.g. "Retail Credit Decisioning Agent")'
+    )
+    .option(
+      '--categories <csv>',
+      'Override scope with explicit ATR rule categories, comma-separated'
+    )
     .option(
       '--sign <key>',
       'HMAC-SHA256 key for report signing (or set PANGUARD_REPORT_SIGNING_KEY env var)'
