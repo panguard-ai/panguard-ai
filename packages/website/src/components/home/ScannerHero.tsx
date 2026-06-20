@@ -114,8 +114,11 @@ function ScannerHeroInner() {
           <BrandLogo size={36} className="text-panguard-green mx-auto sm:w-12 sm:h-12" />
         </div>
 
-        {/* Title */}
+        {/* Title — product value leads; the open standard rides above as overline */}
         <div className="mb-5 animate-[fadeUp_0.6s_0.1s_ease_both]">
+          <p className="text-[11px] sm:text-xs uppercase tracking-[0.18em] text-brand-sage font-semibold mb-3">
+            {t('overline')}
+          </p>
           <h1 className="text-[clamp(22px,5vw,48px)] font-bold leading-[1.2] tracking-tight text-text-primary break-words">
             {t('titleLine1')} <span className="text-panguard-green">{t('titleLine2')}</span>
           </h1>
@@ -124,8 +127,8 @@ function ScannerHeroInner() {
           </p>
           <p className="mt-3 text-sm font-medium text-panguard-green">
             {isZh
-              ? '永久免費 · MIT 授權 · 免註冊 · 跑起來就是你自己的 Threat Cloud 感測器'
-              : 'Free forever · MIT-licensed · no account · runs as your own Threat Cloud sensor'}
+              ? '永久免費 · MIT 授權 · 免註冊 · 100% 跑在你自己的機器上'
+              : 'Free forever · MIT-licensed · no account · runs 100% on your machine'}
           </p>
         </div>
 
@@ -161,6 +164,8 @@ function ScannerHeroInner() {
               </button>
             </div>
           </div>
+
+          <p className="mt-3 text-xs text-text-secondary/90 font-medium">{t('microPreview')}</p>
 
           <div className="mt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
             <a
@@ -221,19 +226,18 @@ function ScannerHeroSkeleton() {
     <section className="relative min-h-[100svh] bg-surface-hero flex flex-col items-center justify-center px-5 sm:px-6 py-24">
       <div className="max-w-3xl w-full text-center space-y-5">
         <p className="text-sm font-medium text-brand-sage uppercase tracking-wider">
-          The open standard for AI agent security
+          Built on ATR — the open detection standard for AI agents
         </p>
         <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-text-primary leading-tight">
-          The open security standard{' '}
-          <span className="text-panguard-green">for the age of AI agents.</span>
+          Free, on-device security for{' '}
+          <span className="text-panguard-green">your AI agents.</span>
         </h1>
         <p className="text-base sm:text-lg text-text-secondary max-w-2xl mx-auto leading-relaxed">
-          Open, MIT-licensed detection rules for attacks on AI agents — the CVE and Sigma of the
-          agent world. 650+ rules across 10 categories, already adopted by Microsoft, Cisco and
-          MISP.
+          Scan every installed skill against 650+ open ATR rules, watch your agents at runtime, and
+          see it all in a local dashboard — nothing leaves your machine.
         </p>
         <p className="text-sm font-medium text-panguard-green">
-          Free forever · MIT-licensed · no account · runs as your own Threat Cloud sensor
+          Free forever · MIT-licensed · no account · runs 100% on your machine
         </p>
         <div className="max-w-xl mx-auto bg-surface-1 border border-border-default rounded-xl p-4 font-mono text-left">
           <code className="text-sm text-brand-sage">{INSTALL_COMMAND}</code>

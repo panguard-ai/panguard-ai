@@ -44,7 +44,7 @@ const TIERS_EN = [
     name: 'Sovereign',
     price: "Let's talk",
     period: '',
-    desc: 'Nation-state airgap · multi-tenant · custom compliance · Cisco/AMD/NVIDIA JV pre-integrated',
+    desc: 'Nation-state airgap · multi-tenant · custom compliance · dedicated integration support',
     cta: 'Sovereign Desk',
     href: '/contact?tier=sovereign',
   },
