@@ -63,7 +63,6 @@
     "zod": "^3.24.0"
   },
   "optionalDependencies": {
-    "@panguard-ai/threat-cloud": "workspace:*",
     "@panguard-ai/panguard-trap": "workspace:*",
     "agent-threat-rules": "^3.5.0"
   },

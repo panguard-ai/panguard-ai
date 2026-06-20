@@ -115,12 +115,12 @@ The marketing website sets the following security headers:
 
 ## Telemetry & Data Collection / 遙測與數據收集
 
-PanguardGuard uploads anonymized threat data to Panguard Threat Cloud by default.
+Collective defense (Panguard Threat Cloud upload) is opt-in and off by default. Nothing leaves your machine unless you explicitly enable it -- `pga scan` always runs with `--no-report`.
 
-- **No PII is ever collected** -- IP addresses are masked, no prompts or file contents are sent
-- **Fully opt-out** -- Use `panguard-guard start --no-telemetry` to disable all uploads
-- **Auditable** -- Use `--show-upload-data` to inspect exact payloads before upload
-- **Open source** -- All anonymization code is in `packages/panguard-guard/src/agent/report-agent.ts`
+- **Off by default** -- No threat data is uploaded until you explicitly enable collective defense
+- **No PII is ever collected** -- when enabled, IP addresses are masked and no prompts or file contents are sent
+- **Transparent** -- the complete list of fields that can ever be uploaded is documented in PRIVACY.md
+- **Open source** -- all anonymization logic lives in the open-source panguard-guard package and is auditable
 
 See `packages/panguard-guard/PRIVACY.md` for the complete list of uploaded fields.
 

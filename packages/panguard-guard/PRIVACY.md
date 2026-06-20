@@ -2,15 +2,16 @@
 
 ## Threat Intelligence Sharing
 
-By default, PanguardGuard uploads **anonymized** threat data to Panguard Threat Cloud.
-This creates a collective defense network: every installation contributes to and
-benefits from shared threat intelligence.
+Collective defense is **opt-in and off by default**. PanguardGuard uploads nothing
+unless you explicitly enable collective defense. When you do, only **anonymized**
+threat data is sent to Panguard Threat Cloud, so every participating installation
+can contribute to and benefit from shared threat intelligence. `pga scan` is always
+run with `--no-report` and never uploads.
 
-**You can fully opt out** with `--no-telemetry`:
-
-```bash
-panguard-guard start --no-telemetry
-```
+**Enabling collective defense.** It is presented as an explicit, off-by-default
+choice during first-run setup, and can be turned on or off at any time from the
+**Threat Cloud** page of the local Guard dashboard. To keep uploads off, leave it
+disabled — that is the default and requires no action.
 
 ## What Is Uploaded
 
@@ -27,7 +28,7 @@ When a threat is detected, the following anonymized data is uploaded:
 | `region`            | `US`                        | No (country only)           |
 | `severity`          | `high`                      | No                          |
 | `autoResponseTaken` | `block_input`               | No                          |
-| `panguardVersion`   | `0.1.0`                     | No                          |
+| `panguardVersion`   | `1.7.0`                     | No                          |
 | `osType`            | `linux`                     | No                          |
 | `patternHash`       | `a1b2c3...`                 | No (SHA-256 of pattern)     |
 | `confidence`        | `0.85`                      | No                          |
@@ -43,14 +44,10 @@ When a threat is detected, the following anonymized data is uploaded:
 
 ## Verifying Upload Data
 
-Use `--show-upload-data` to see exactly what is uploaded before it is sent:
-
-```bash
-panguard-guard start --show-upload-data
-```
-
-This prints the full JSON payload to the console before each upload, so you can
-verify that no sensitive data is included.
+The complete set of fields that can ever be uploaded is listed under "What Is
+Uploaded" above — nothing else is sent, and nothing is sent at all unless you
+have explicitly enabled collective defense. The anonymization logic that produces
+every payload is open source and auditable (see "Open Source Verification").
 
 ## Anonymization Method
 
@@ -81,12 +78,16 @@ similar attacks across installations without storing the actual attack content.
     | batch upload (50 events/batch, HTTPS)
     v
 [Panguard Threat Cloud]
-    | aggregate, generate community rules
+    | aggregate, publish community rules to the public ATR project
+    v
+[ATR project / bundled release]
+    | rules ship bundled and immutable at install
     v
 [Guard Engine]
-    | hourly sync: fetch new community rules
+    | notify-only: surface that a newer rule bundle exists
+    | (no live network fetch auto-applies rules)
     v
-[Better protection for everyone]
+[You choose when to upgrade to a new bundled release]
 ```
 
 ## Data Retention
@@ -97,8 +98,7 @@ are retained indefinitely but contain no per-event data.
 
 ## Open Source Verification
 
-All anonymization logic is open source and auditable:
-
-- Anonymization: `src/agent/report-agent.ts` (`generateAnonymizedData()`)
-- Upload client: `src/threat-cloud/index.ts`
-- ATR rules: [github.com/Agent-Threat-Rule/agent-threat-rules](https://github.com/Agent-Threat-Rule/agent-threat-rules)
+All anonymization logic is open source and auditable in the `panguard-guard`
+package — the report agent that strips PII and masks IP addresses, and the Threat
+Cloud upload client. The ATR detection rules are maintained in the public ATR
+project.

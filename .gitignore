@@ -53,6 +53,9 @@ test-results/
 # Internal files (not for public release)
 marketing/
 progress.md
+# Commercial billing/licensing plumbing — pricing SKUs, sales motion, license
+# signing keypair. Belongs in a private repo, never in the public/MIT tree.
+scripts/setup-stripe-test.ts
 .env.production
 threat-cloud.db
 threat-cloud.db-shm
