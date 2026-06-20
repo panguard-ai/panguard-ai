@@ -233,8 +233,8 @@ export default function RegulatedIndustriesPositioning() {
               </h2>
               <p className="text-base text-text-secondary max-w-2xl mx-auto">
                 {isZh
-                  ? '每條 ATR 規則自動對到 5 個合規框架的條文。每筆偵測產出 PDF + JSON + HTML 證據,SHA-256 + ed25519 簽章保證不能竄改。Vanta、Drata、Lakera 架構上做不到這件事。'
-                  : 'Every ATR rule auto-maps to clauses across 5 compliance frameworks. Every detection produces PDF + JSON + HTML evidence with SHA-256 + ed25519 signature. Architecturally impossible for Vanta / Drata / Lakera.'}
+                  ? '每條 ATR 規則自動對到 5 個合規框架的條文。每筆偵測產出 PDF + JSON + HTML 證據,SHA-256 + ed25519 簽章保證不能竄改。合規工具證明你有控制項;PanGuard 產出控制項背後、每一筆偵測的簽章證據。'
+                  : 'Every ATR rule auto-maps to clauses across 5 compliance frameworks. Every detection produces PDF + JSON + HTML evidence with a SHA-256 + ed25519 signature. Compliance tools attest that you have controls; PanGuard produces the signed, per-detection evidence behind them.'}
               </p>
             </div>
           </FadeInUp>

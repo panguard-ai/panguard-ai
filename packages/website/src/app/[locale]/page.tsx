@@ -7,7 +7,6 @@ import MissionBand from '@/components/home/MissionBand';
 import RegulatedIndustriesPositioning from '@/components/home/RegulatedIndustriesPositioning';
 import SecurityLayers from '@/components/home/SecurityLayers';
 import LiveStats from '@/components/home/LiveStats';
-import CoverageComparison from '@/components/home/CoverageComparison';
 import PricingPreview from '@/components/home/PricingPreview';
 import { RuleStatsProvider } from '@/contexts/RuleStatsContext';
 
@@ -28,31 +27,29 @@ export default async function Home() {
           <p id="definition" className="sr-only">
             {t('srDefinition')}
           </p>
-          {/* 1. Hero — install-first (positioning + free install CTA) */}
+          {/* 1. Hero — product-first (what you get + free install CTA) */}
           <ScannerHero />
-          {/* 2. Business model: the flywheel (standard spreads -> detection obligation -> proof product) */}
-          <FlywheelModel />
-          {/* 3. Mission band */}
-          <MissionBand />
-          {/* 4. How It Works: install -> scan -> sensor */}
+          {/* 2. How It Works: install -> scan -> guard (concrete onboarding, before philosophy) */}
           <HowItWorks />
+          {/* 3. Business model: the flywheel (standard spreads -> detection obligation -> proof product) */}
+          <FlywheelModel />
+          {/* 4. Mission band */}
+          <MissionBand />
           {/* 5. Live Stats */}
           <LiveStats />
-          {/* 6. Social proof: Cisco, OWASP, live metrics */}
+          {/* 6. Social proof: Cisco, Microsoft, live metrics */}
           <SocialProof />
-          {/* 7. 7-layer Security Architecture */}
+          {/* 7. 7-layer Security Architecture (single canonical layer section) */}
           <SecurityLayers />
-          {/* 8. Coverage Comparison vs Competitors */}
-          <CoverageComparison />
-          {/* 9. Real CVE Incidents */}
+          {/* 8. Real CVE Incidents + wild-scan finding */}
           <RealIncidents />
-          {/* 10. Product demo: Guard dashboard screenshots */}
+          {/* 9. Product demo: Guard dashboard screenshots */}
           <DemoShowcase />
-          {/* 11. Regulated industries / compliance — enterprise leg, below the fold */}
+          {/* 10. Regulated industries / compliance — enterprise leg, below the fold */}
           <RegulatedIndustriesPositioning />
-          {/* 12. Pricing Preview */}
+          {/* 11. Pricing Preview */}
           <PricingPreview />
-          {/* 13. CTA + Mission */}
+          {/* 12. CTA + Mission */}
           <CTARoadmap />
         </main>
       </RuleStatsProvider>

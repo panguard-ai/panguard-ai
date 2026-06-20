@@ -14,7 +14,7 @@
  *   packages/panguard/src/cli/index.ts         -> 23 top-level commands
  *   packages/panguard-mcp/src/server.ts        -> 11 MCP tools
  *   packages/panguard-skill-auditor/src/checks/ -> 8 audit checks
- *   agent-threat-rules/rules/                  -> 344 ATR rules (v2.1.3, pitch v5 canonical, 2026-05-12). Guard build may include drafts; TC live aggregates external community rules separately.
+ *   agent-threat-rules/rules/                  -> 652 ATR rules (v3.5.0, canonical 2026-06-20; npm latest 3.5.0). Guard build may include drafts; TC live aggregates external community rules separately.
  *   packages/panguard-guard/src/playbook/      -> 3 playbook templates
  *   packages/panguard-guard/src/collectors/     -> 4 log parsers
  *

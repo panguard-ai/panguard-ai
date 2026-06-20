@@ -748,9 +748,11 @@
     },
     "srDefinition": "Panguard AI is the commercial reference implementation of ATR (Agent Threat Rules), the open standard for detecting attacks on AI agents — the CVE and Sigma of the agent world. ATR is MIT-licensed, machine-readable, and already adopted by Microsoft, Cisco and MISP. PanGuard turns the free standard into signed, audit-ready compliance evidence.",
     "scannerHero": {
-      "titleLine1": "The open security standard",
-      "titleLine2": "for the age of AI agents.",
-      "subtitle": "Open, MIT-licensed detection rules for attacks on AI agents — the CVE and Sigma of the agent world. 650+ rules across 10 categories, already adopted by Microsoft, Cisco and MISP.",
+      "titleLine1": "Free, on-device security for",
+      "overline": "Built on ATR — the open detection standard for AI agents",
+      "microPreview": "Installs in seconds → scans your installed agents → flags & blocks known attacks.",
+      "titleLine2": "your AI agents.",
+      "subtitle": "Scan every installed skill against 650+ open ATR rules, watch your agents at runtime, and see it all in a local dashboard — nothing leaves your machine.",
       "scanLabel": "Check any MCP skill before you install",
       "tabUrl": "GitHub URL",
       "tabPaste": "Paste Content",
@@ -776,7 +778,7 @@
     },
     "demo": {
       "overline": "See it in action",
-      "title": "One command. Full protection.",
+      "title": "One command. Live on-device protection.",
       "subtitle": "Install PanGuard, and your AI agents are protected in under 60 seconds.",
       "tabs": {
         "dashboard": "Guard Dashboard",
@@ -790,7 +792,7 @@
       }
     },
     "socialProof": {
-      "overline": "Trusted by security teams",
+      "overline": "Adopted upstream by",
       "statRules": "ATR Detection Rules",
       "statScanned": "Skills Scanned",
       "statRecall": "SKILL.md Recall",
@@ -873,13 +875,13 @@
       "owaspBadge": "OWASP Agentic Top 10: 10/10 covered"
     },
     "howItWorks": {
-      "title": "Threat Crystallization",
-      "subtitle": "AI understands new threats. Crystallizes them into regex rules. Executes in 0ms. Protects everyone.",
+      "title": "How PanGuard protects you",
+      "subtitle": "Every installed skill is checked against 650+ ATR rules. Known attacks are blocked instantly. New ones become rules everyone gets within the hour.",
       "step1": {
         "title": "Scan",
         "subtitle": "Pattern-match against 650+ ATR rules",
         "timing": "3ms",
-        "detail": "Every skill is checked against the full ATR rule set. Known patterns are caught instantly with zero false negatives on matched signatures."
+        "detail": "Every skill is checked against the full ATR rule set. Known attack patterns are caught instantly and deterministically — the same verdict every run."
       },
       "step2": {
         "title": "Detect + Block",
