@@ -29,10 +29,25 @@ describe('redactSecrets', () => {
     expect(out.notifications.telegram.botToken).toBe(REDACTED);
     expect(out.notifications.email.auth.pass).toBe(REDACTED);
     expect(out.notifications.webhook.secret).toBe(REDACTED);
+    // A Slack/Discord webhook URL IS the credential — redact it (key name match).
+    expect(out.notifications.slack.webhookUrl).toBe(REDACTED);
+    // A generic, non-webhook `url` value survives (it is not itself a secret).
+    expect(out.notifications.webhook.url).toBe('https://x');
     // Non-secret fields survive so the reader can tell a channel is configured.
     expect(out.notifications.telegram.chatId).toBe('42');
     expect(out.notifications.email.host).toBe('mail');
-    expect(out.notifications.slack.webhookUrl).toBe('https://hooks.slack.com/aaa');
+  });
+
+  it('redacts webhook URLs by value shape even under an innocuous key name', () => {
+    const out = redactSecrets({
+      slack: { url: 'https://hooks.slack.com/services/T000/B000/XXXX' },
+      discord: { url: 'https://discord.com/api/webhooks/123/abc' },
+      docs: { url: 'https://example.com/readme' },
+    });
+    expect(out.slack.url).toBe(REDACTED);
+    expect(out.discord.url).toBe(REDACTED);
+    // A plain, non-credential URL is left intact.
+    expect(out.docs.url).toBe('https://example.com/readme');
   });
 
   it('leaves empty and non-string secret-named values untouched', () => {

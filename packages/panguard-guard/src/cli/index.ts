@@ -43,12 +43,29 @@ import {
 } from './interactive-handler.js';
 import type { ThreatContext } from './interactive-handler.js';
 import { DailySummaryCollector } from '../summary/daily-summary.js';
+import { isSafeOutboundUrl } from '../net/validate-outbound-url.js';
 
 import { createRequire } from 'node:module';
 const _require = createRequire(import.meta.url);
 const _pkg = _require('../../package.json') as { version: string };
 /** CLI version / CLI 版本 */
 export const CLI_VERSION: string = _pkg.version;
+
+/**
+ * Compute the honest startup status from the actual mode AND loaded rule count.
+ * A user in report-only mode, or in protection mode with zero loaded rules,
+ * must NEVER see "PROTECTED" — that would misrepresent the security posture.
+ */
+export function computeStartupStatus(
+  mode: string,
+  ruleCount: number
+): { label: string; status: 'safe' | 'caution' | 'critical' } {
+  if (mode === 'learning') return { label: 'LEARNING', status: 'caution' };
+  if (mode === 'report-only') return { label: 'REPORT-ONLY', status: 'caution' };
+  // protection mode
+  if (ruleCount <= 0) return { label: 'DEGRADED', status: 'critical' };
+  return { label: 'PROTECTED', status: 'safe' };
+}
 
 /**
  * Parse and execute CLI commands / 解析並執行 CLI 命令
@@ -308,14 +325,37 @@ async function commandStart(
   const rules = engine.getRuleCounts();
   const rulesSummary = `ATR: ${rules.atr}`;
 
+  // Zero loaded rules = detection is silently off. The engine's no-rules
+  // warning goes through the structured logger, which `commandStart` mutes to
+  // 'silent' in non-verbose mode — so a degraded Guard would otherwise start up
+  // looking healthy. Surface it loudly on stderr regardless of log level and in
+  // both the quiet (pga up) and normal output paths.
+  if (rules.atr <= 0) {
+    console.error(
+      `  ${c.critical(symbols.fail)} ${c.critical('DEGRADED')}: 0 ATR rules loaded — ` +
+        `pattern detection is OFF. Reinstall the @panguard-ai/atr package to restore detection.`
+    );
+  }
+
   // Status box (suppressed when called from pga up which has its own summary)
   if (process.env['PANGUARD_QUIET_GUARD']) {
     // Minimal output for pga up integration
     console.log(`  ${c.safe(symbols.pass)} Guard started (PID ${process.pid})`);
   } else {
+    const startupStatus = computeStartupStatus(config.mode, rules.atr);
+    const statusColor =
+      startupStatus.status === 'safe'
+        ? c.safe
+        : startupStatus.status === 'caution'
+          ? c.caution
+          : c.critical;
     console.log(
       statusPanel('PANGUARD AI Guard Active', [
-        { label: 'Status', value: c.safe('PROTECTED'), status: 'safe' },
+        {
+          label: 'Status',
+          value: statusColor(startupStatus.label),
+          status: startupStatus.status,
+        },
         { label: 'PID', value: c.sage(String(process.pid)) },
         { label: 'Mode', value: c.sage(config.mode) },
         { label: 'Rules', value: c.sage(rulesSummary) },
@@ -346,10 +386,20 @@ async function commandStart(
     }
     console.log('');
 
-    // Free tier: show what's enabled/disabled
-    console.log(
-      `  ${c.safe('\u2713')} Pattern matching + heuristic correlation on every event (Layer A + B)`
-    );
+    // Free tier: show what's enabled/disabled. With zero loaded ATR rules,
+    // pattern matching cannot fire \u2014 never paint a green checkmark over a
+    // non-functional detection layer. Show a red DEGRADED line instead so the
+    // banner matches the DEGRADED Status above.
+    if (rules.atr > 0) {
+      console.log(
+        `  ${c.safe('\u2713')} Pattern matching + heuristic correlation on every event (Layer A + B)`
+      );
+    } else {
+      console.log(
+        `  ${c.critical(symbols.fail)} ${c.critical('Layer A DEGRADED')}: 0 ATR rules loaded \u2014 pattern detection is OFF. ` +
+          `Reinstall the @panguard-ai/atr package to restore detection.`
+      );
+    }
 
     console.log('');
     const semanticOn = Boolean(
@@ -398,13 +448,20 @@ async function commandStart(
     if (telemetryBatch.length === 0) return;
     const batch = [...telemetryBatch];
     telemetryBatch.length = 0;
+    const telemetryUrl = `${TC_ENDPOINT}/api/telemetry`;
+    // SSRF guard: reject non-https / private / metadata endpoints, and refuse
+    // to follow redirects (a redirect could point telemetry at an internal host).
+    if (!isSafeOutboundUrl(telemetryUrl)) {
+      return;
+    }
     for (const evt of batch) {
       try {
-        void fetch(`${TC_ENDPOINT}/api/telemetry`, {
+        void fetch(telemetryUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...evt, ts: new Date().toISOString() }),
           signal: AbortSignal.timeout(3000),
+          redirect: 'error',
         }).catch(() => {
           /* best effort */
         });
@@ -585,12 +642,18 @@ async function commandStart(
     const getState = (): DashboardState => {
       const status = engine.getStatus();
       const rules = engine.getRuleCounts();
+      // Honest posture: only report 'protected' when actually enforcing
+      // (protection mode WITH loaded rules). Learning, report-only, and the
+      // degraded 0-rules case must never render as PROTECTED — they fall back
+      // to the cautionary 'learning' label until a 'report-only'/'degraded'
+      // variant is added to DashboardState (see dashboard-renderer.ts).
+      const tuiStatus: DashboardState['status'] = !status.running
+        ? 'stopped'
+        : status.mode === 'protection' && rules.atr > 0
+          ? 'protected'
+          : 'learning';
       return {
-        status: status.running
-          ? status.mode === 'learning'
-            ? 'learning'
-            : 'protected'
-          : 'stopped',
+        status: tuiStatus,
         uptime: status.uptime,
         eventsProcessed: status.eventsProcessed,
         threatsDetected: status.threatsDetected,

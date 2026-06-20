@@ -19,7 +19,7 @@
 
 import { writeFileSync, readFileSync, unlinkSync, existsSync, mkdirSync, lstatSync } from 'node:fs';
 import { execFile } from 'node:child_process';
-import { platform, homedir, userInfo } from 'node:os';
+import { platform, homedir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { createLogger } from '@panguard-ai/core';
 
@@ -270,13 +270,14 @@ async function uninstallLaunchd(): Promise<string> {
 // ---------------------------------------------------------------------------
 
 async function installSystemd(execArgv: string[], dataDir: string): Promise<string> {
-  const unitPath = `/etc/systemd/system/${SERVICE_NAME}.service`;
-
-  // Run as the human who installed it (SUDO_USER under `sudo`), NEVER as root.
-  // A security daemon must not itself be a root-level attack surface, and it
-  // monitors *that user's* agents — root would also be the wrong home/context.
-  const rawUser = process.env['SUDO_USER'] || userInfo().username;
-  const runUser = /^[a-z_][a-z0-9_-]{0,31}$/i.test(rawUser) ? rawUser : userInfo().username;
+  // Rootless `systemctl --user` unit — written to the per-user systemd dir, NOT
+  // the root-only /etc/systemd/system. This mirrors the macOS user-LaunchAgent
+  // philosophy: a security daemon must not be a root-level attack surface, it
+  // monitors *this user's* agents, and it must install without sudo so the
+  // "survives reboot" status reflects reality. (For survival across logout the
+  // user can enable lingering with `loginctl enable-linger`.)
+  const unitDir = join(homedir(), '.config', 'systemd', 'user');
+  const unitPath = join(unitDir, `${SERVICE_NAME}.service`);
 
   const unit = `[Unit]
 Description=${SERVICE_DISPLAY_NAME}
@@ -284,7 +285,6 @@ After=network.target
 
 [Service]
 Type=simple
-User=${runUser}
 NoNewPrivileges=true
 PrivateTmp=true
 ExecStart=${[...execArgv, 'start', '--data-dir', dataDir].map(systemdQuote).join(' ')}
@@ -294,30 +294,31 @@ StandardOutput=journal
 StandardError=journal
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 `;
 
+  mkdirSync(unitDir, { recursive: true });
   writeFileSync(unitPath, unit, 'utf-8');
-  await execFileAsync('/bin/systemctl', ['daemon-reload']);
-  await execFileAsync('/bin/systemctl', ['enable', SERVICE_NAME]);
-  await execFileAsync('/bin/systemctl', ['start', SERVICE_NAME]);
+  await execFileAsync('/bin/systemctl', ['--user', 'daemon-reload']);
+  await execFileAsync('/bin/systemctl', ['--user', 'enable', SERVICE_NAME]);
+  await execFileAsync('/bin/systemctl', ['--user', 'start', SERVICE_NAME]);
 
-  logger.info(`systemd service installed at ${unitPath} / systemd 服務已安裝`);
+  logger.info(`systemd --user service installed at ${unitPath} / systemd --user 服務已安裝`);
   return unitPath;
 }
 
 async function uninstallSystemd(): Promise<string> {
-  const unitPath = `/etc/systemd/system/${SERVICE_NAME}.service`;
+  const unitPath = join(homedir(), '.config', 'systemd', 'user', `${SERVICE_NAME}.service`);
 
-  await execFileAsync('/bin/systemctl', ['stop', SERVICE_NAME]);
-  await execFileAsync('/bin/systemctl', ['disable', SERVICE_NAME]);
+  await execFileAsync('/bin/systemctl', ['--user', 'stop', SERVICE_NAME]);
+  await execFileAsync('/bin/systemctl', ['--user', 'disable', SERVICE_NAME]);
 
   if (existsSync(unitPath)) {
     unlinkSync(unitPath);
-    await execFileAsync('/bin/systemctl', ['daemon-reload']);
+    await execFileAsync('/bin/systemctl', ['--user', 'daemon-reload']);
   }
 
-  logger.info('systemd service uninstalled / systemd 服務已解除安裝');
+  logger.info('systemd --user service uninstalled / systemd --user 服務已解除安裝');
   return unitPath;
 }
 

@@ -39,7 +39,7 @@ import type {
   GuardConfig,
   ThreatVerdict,
 } from '../types.js';
-import { saveConfig } from '../config.js';
+import { saveConfig, loadConfig } from '../config.js';
 import { redactSecrets } from '../redact.js';
 import { DashboardRelayClient, type RelayClientConfig } from './relay-client.js';
 
@@ -181,6 +181,7 @@ export class DashboardServer {
   private readonly maxRecentEvents = 200;
   private readonly port: number;
   private getConfig: (() => GuardConfig) | null = null;
+  private configApplier: ((cfg: GuardConfig) => void) | null = null;
   private getRulesProvider:
     | (() => Array<{
         id: string;
@@ -215,6 +216,19 @@ export class DashboardServer {
 
   setConfigGetter(getter: () => GuardConfig): void {
     this.getConfig = getter;
+  }
+
+  /**
+   * Wire the engine's live-config applier. When a config-writing handler (e.g.
+   * the Threat Cloud / mode POST) persists a new config to disk, it ALSO calls
+   * this so the engine mutates its in-memory `this.config` + `this.mode` and
+   * re-arms enforcement for the new mode. Without it, the daemon kept serving
+   * the stale config it was constructed with: GET /api/config and /api/status
+   * returned the old value, enforcement kept the old mode, and the UI control
+   * snapped back — the change looked rejected even though disk was updated.
+   */
+  setConfigApplier(applier: (cfg: GuardConfig) => void): void {
+    this.configApplier = applier;
   }
 
   /**
@@ -624,17 +638,17 @@ export class DashboardServer {
         this.handleSkillsApi(res);
         break;
       case '/api/ai-config':
-        // Read-only. The semantic-layer LLM is configured via env vars only
-        // (ANTHROPIC_API_KEY / OPENAI_API_KEY for cloud, or PANGUARD_SEMANTIC=1
-        // with a local Ollama) — never written through HTTP. A dashboard POST
-        // that persisted an API key and an arbitrary endpoint was a
-        // credential-write + data-exfil surface.
+        // Read-only. The semantic-layer LLM is configured ONLY via the terminal
+        // command `pga guard ai`, which reads the key echo-off and writes it
+        // AES-256-GCM-encrypted to ~/.panguard/llm.enc (read by the persistent
+        // daemon; shell env vars do not reach a launchd/systemd daemon). Never
+        // written through HTTP — a dashboard POST that persisted an API key and an
+        // arbitrary endpoint was a credential-write + data-exfil surface.
         if (req.method === 'POST') {
           this.jsonResponse(
             res,
             {
-              error:
-                'Read-only: configure the LLM via env vars (ANTHROPIC_API_KEY / OPENAI_API_KEY, or PANGUARD_SEMANTIC=1 with local Ollama)',
+              error: 'Read-only: configure the semantic layer with `pga guard ai` in your terminal',
             },
             405
           );
@@ -680,14 +694,24 @@ export class DashboardServer {
         break;
       case '/api/skills/whitelist':
         if (req.method === 'POST') {
-          this.handleWhitelistPost(req, res);
+          this.handleWhitelistPost(req, res).catch((err: unknown) => {
+            logger.error(
+              `handleWhitelistPost error: ${err instanceof Error ? err.message : String(err)}`
+            );
+            if (!res.headersSent) this.jsonResponse(res, { error: 'Internal error' }, 500);
+          });
         } else {
           this.jsonResponse(res, { error: 'Method not allowed' }, 405);
         }
         break;
       case '/api/skills/unwhitelist':
         if (req.method === 'POST') {
-          this.handleUnwhitelistPost(req, res);
+          this.handleUnwhitelistPost(req, res).catch((err: unknown) => {
+            logger.error(
+              `handleUnwhitelistPost error: ${err instanceof Error ? err.message : String(err)}`
+            );
+            if (!res.headersSent) this.jsonResponse(res, { error: 'Internal error' }, 500);
+          });
         } else {
           this.jsonResponse(res, { error: 'Method not allowed' }, 405);
         }
@@ -824,7 +848,14 @@ export class DashboardServer {
   private computeLayers(): LayerHealth {
     const cfg = this.getConfig?.();
     const ruleCount = this.status.atrRuleCount ?? 0;
-    const running = this.status.mode === 'learning' || this.status.mode === 'protection';
+    // Detection (Layer A/B) runs in every active mode — including report-only,
+    // which still evaluates events and records verdicts, it just takes no OS
+    // action. Treating report-only as "idle" was the dashboard saying detection
+    // was off while it was in fact firing. (HTML updatePBar already includes it.)
+    const running =
+      this.status.mode === 'learning' ||
+      this.status.mode === 'protection' ||
+      this.status.mode === 'report-only';
     const aiConfigured = !!cfg?.ai;
     return {
       a: {
@@ -843,7 +874,7 @@ export class DashboardServer {
         optional: true,
         detail: aiConfigured
           ? 'semantic verdict configured (advisory) · runs only on flagged events, not every action — typically a few cents/month, or free with local Ollama'
-          : 'off · bring your own LLM to catch novel attacks A/B miss and draft new ATR rules — runs only on flagged events, not every action, so a typical machine costs a few cents per month. Local & private: set PANGUARD_SEMANTIC=1 with Ollama (free, no API key, data stays on your machine). Cloud: set ANTHROPIC_API_KEY or OPENAI_API_KEY (read from the environment, never stored).',
+          : 'off · optional advisory LLM. Connect your own model with `pga guard ai` (free local Ollama, or a cloud key for a few cents/month). Advisory only — flags for review, never auto-blocks; runs only on already-flagged events.',
       },
     };
   }
@@ -1226,35 +1257,74 @@ export class DashboardServer {
   // Validation helpers
   // ---------------------------------------------------------------------------
 
+  /**
+   * True when `host` is a private/internal/loopback/link-local IPv4 address (or
+   * `localhost`). Self-contained so the SSRF check stays in this file.
+   */
+  private static isPrivateHost(host: string): boolean {
+    if (host === 'localhost' || host === '0.0.0.0') return true;
+    if (
+      host.startsWith('127.') ||
+      host.startsWith('10.') ||
+      host.startsWith('192.168.') ||
+      host.startsWith('169.254.') // includes the 169.254.169.254 metadata IP
+    )
+      return true;
+    // Block 172.16.0.0/12
+    if (host.startsWith('172.')) {
+      const second = parseInt(host.split('.')[1] ?? '0', 10);
+      if (second >= 16 && second <= 31) return true;
+    }
+    return false;
+  }
+
   private static isValidEndpointUrl(url: string): boolean {
     try {
       const parsed = new URL(url);
       if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return false;
       if (parsed.hostname.length === 0) return false;
 
-      // Block private/internal IPs to prevent SSRF
+      // Block private/internal IPs to prevent SSRF.
       const h = parsed.hostname.toLowerCase();
-      if (
-        h === 'localhost' ||
-        h.startsWith('127.') ||
-        h.startsWith('10.') ||
-        h.startsWith('192.168.') ||
-        h === '169.254.169.254' ||
-        h.startsWith('169.254.') ||
-        h === '[::1]' ||
-        h === '0.0.0.0'
-      )
-        return false;
-      // Block 172.16.0.0/12
-      if (h.startsWith('172.')) {
-        const second = parseInt(h.split('.')[1] ?? '0', 10);
-        if (second >= 16 && second <= 31) return false;
-      }
+      if (h === '[::1]') return false;
+
+      // Normalize an IPv6-mapped IPv4 (e.g. [::ffff:169.254.169.254] or
+      // [::ffff:7f00:1]) down to its embedded IPv4 so the private-IP checks
+      // below catch it — otherwise an operator can smuggle a private target
+      // past the literal-prefix checks.
+      const mapped = DashboardServer.extractMappedIpv4(h);
+      const candidate = mapped ?? h;
+
+      if (DashboardServer.isPrivateHost(candidate)) return false;
 
       return true;
     } catch {
       return false;
     }
+  }
+
+  /**
+   * If `host` is an IPv6-mapped IPv4 address, return the embedded dotted-quad
+   * IPv4; otherwise null. Accepts the URL bracket form ([...]), the
+   * dotted-quad tail (::ffff:1.2.3.4) and the hex tail (::ffff:0102:0304).
+   */
+  private static extractMappedIpv4(host: string): string | null {
+    // Strip URL IPv6 brackets if present.
+    const inner = host.startsWith('[') && host.endsWith(']') ? host.slice(1, -1) : host;
+    const m = /^::ffff:(.+)$/i.exec(inner);
+    const tail = m?.[1];
+    if (!tail) return null;
+    // Dotted-quad form: ::ffff:1.2.3.4
+    if (/^\d{1,3}(\.\d{1,3}){3}$/.test(tail)) return tail;
+    // Hex form: ::ffff:0102:0304  ->  1.2.3.4
+    const hex = /^([0-9a-f]{1,4}):([0-9a-f]{1,4})$/i.exec(tail);
+    if (hex?.[1] && hex[2]) {
+      const hi = parseInt(hex[1], 16);
+      const lo = parseInt(hex[2], 16);
+      if (Number.isNaN(hi) || Number.isNaN(lo)) return null;
+      return `${(hi >> 8) & 0xff}.${hi & 0xff}.${(lo >> 8) & 0xff}.${lo & 0xff}`;
+    }
+    return null;
   }
 
   // ---------------------------------------------------------------------------
@@ -1283,7 +1353,10 @@ export class DashboardServer {
       atrDrafterSubmitted: this.status.atrDrafterSubmitted ?? 0,
       lastSync,
       syncIntervalHours: 1,
-      threatCloudEnabled: config?.threatCloudEndpoint !== undefined,
+      // Consent-gated, default OFF — not endpoint presence (the endpoint has a
+      // hardcoded default, which made this read "enabled" for every user).
+      threatCloudEnabled: config?.threatCloudUploadEnabled === true,
+      threatCloudConfigured: config?.threatCloudEndpoint !== undefined,
     });
   }
 
@@ -1334,7 +1407,13 @@ export class DashboardServer {
     const consentAsked = existsSync(consentMarkerPath());
 
     this.jsonResponse(res, {
-      enabled: config?.threatCloudEndpoint !== undefined,
+      // `enabled` reflects actual consent (default OFF) — not endpoint presence.
+      // The endpoint ships with a hardcoded default, so keying `enabled` off it
+      // reported Threat Cloud as on for everyone, even users who never opted in.
+      enabled: config?.threatCloudUploadEnabled === true,
+      // `configured` is the old endpoint-presence signal, renamed so the UI can
+      // tell "an endpoint is set / reachable" apart from "the user consented".
+      configured: config?.threatCloudEndpoint !== undefined,
       connected: lastSync !== null,
       endpoint,
       uploadEnabled,
@@ -1406,7 +1485,19 @@ export class DashboardServer {
           return;
         }
 
-        const config = this.getConfig!();
+        // Merge base = the CURRENT ON-DISK config, not the stale live config
+        // the daemon was constructed with. Two consecutive saves (e.g. a mode
+        // change then a consent toggle) used to each spread the stale live
+        // config and rewrite the OTHER field back to its launch-time value —
+        // the consent POST would clobber a freshly-saved report-only mode back
+        // to protection. Re-reading disk makes saves compose instead of fight.
+        // Falls back to the live config when no file exists yet (fresh install).
+        const live = this.getConfig!();
+        const configPath = join(
+          live.dataDir ?? join(homedir(), '.panguard-guard'),
+          'config.json'
+        );
+        const config: GuardConfig = existsSync(configPath) ? loadConfig(configPath) : live;
         // consentGiven is the single collective-defense answer: it drives BOTH
         // flags so they can never drift apart (the CLI gate reads both). A plain
         // `uploadEnabled` is still honoured for the legacy upload toggle, but
@@ -1425,6 +1516,14 @@ export class DashboardServer {
         };
 
         saveConfig(updatedConfig);
+        // Push the persisted change into the live daemon so getConfig() /
+        // /api/status / enforcement immediately reflect it (no stale read, no
+        // UI snap-back). The engine mutates its in-memory config + mode and
+        // re-arms enforcement for the new mode. A restart is still required for
+        // OS-level response actions, which the UI surfaces as "pending restart".
+        if (this.configApplier) {
+          this.configApplier(updatedConfig);
+        }
         // The user has now answered the collective-defense question from the
         // dashboard, so the CLI first-run prompt must not re-ask and clobber it.
         if (update.consentGiven !== undefined) {

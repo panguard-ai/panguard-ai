@@ -11,6 +11,7 @@
 import { request } from 'node:https';
 import { createLogger } from '@panguard-ai/core';
 import type { WebhookNotifyConfig, NotificationResult, ThreatVerdict } from '../types.js';
+import { checkOutboundUrl } from '../net/validate-outbound-url.js';
 
 const logger = createLogger('panguard-guard:notify:webhook');
 
@@ -50,6 +51,16 @@ export async function sendWebhookNotify(
  */
 function postWebhook(urlStr: string, payload: string, secret?: string): Promise<void> {
   return new Promise((resolve, reject) => {
+    // SSRF guard: a webhook URL is user-supplied. Require https: and reject
+    // private / reserved / loopback / metadata targets BEFORE issuing the
+    // request, so a misconfigured or malicious URL cannot pivot to internal
+    // services or the cloud metadata endpoint.
+    const ssrfError = checkOutboundUrl(urlStr);
+    if (ssrfError !== null) {
+      reject(new Error(`Webhook URL rejected: ${ssrfError}`));
+      return;
+    }
+
     const url = new URL(urlStr);
     const headers: Record<string, string | number> = {
       'Content-Type': 'application/json',

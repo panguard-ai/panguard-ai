@@ -103,7 +103,7 @@ describe('Runtime Intercept Verification', () => {
   // ── SSRF / Network Attacks ─────────────────────────────────
 
   describe('SSRF and Network Attack Detection', () => {
-    it.skip('blocks metadata endpoint access via MCP exchange (GAP: bundled rules need SSRF rule update)', () => {
+    it('blocks metadata endpoint access via MCP exchange', () => {
       const event: AgentEvent = {
         type: 'mcp_exchange',
         timestamp: new Date().toISOString(),
@@ -141,7 +141,7 @@ describe('Runtime Intercept Verification', () => {
       expect(matches.length).toBeGreaterThan(0);
     });
 
-    it.skip('detects jailbreak attempts in tool input (GAP: DAN pattern not in bundled rules)', () => {
+    it('detects jailbreak attempts in tool input', () => {
       const event: AgentEvent = {
         type: 'mcp_exchange',
         timestamp: new Date().toISOString(),

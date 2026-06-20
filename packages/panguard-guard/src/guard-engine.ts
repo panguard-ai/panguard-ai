@@ -98,7 +98,10 @@ export class GuardEngine {
   // Engines and agents (initialized in async init() — call GuardEngine.create() or engine.init())
   // Using definite-assignment assertion because init() is required before use.
   private engines!: Awaited<ReturnType<typeof initEngines>>;
-  private readonly config: GuardConfig;
+  // Mutable: the dashboard's config-writing handlers persist a new config to
+  // disk and then call applyConfig() to push it into this live instance, so
+  // getConfig()/status/enforcement reflect the change without a restart.
+  private config: GuardConfig;
   private readonly llm: AnalyzeLLM | null;
 
   // Mutable operating state
@@ -371,6 +374,10 @@ export class GuardEngine {
     if (this.config.dashboardEnabled) {
       this.dashboard = new DashboardServer(this.config.dashboardPort);
       this.dashboard.setConfigGetter(() => this.config);
+      // Live-apply config changes the dashboard persists, so getConfig()/status
+      // and enforcement immediately reflect a mode/consent change instead of
+      // serving the stale launch-time config (which made the UI snap back).
+      this.dashboard.setConfigApplier((cfg) => this.applyConfig(cfg));
       this.dashboard.setRulesProvider(() => this.engines.atrEngine.getAllRules());
       await this.dashboard.start();
 
@@ -872,6 +879,42 @@ export class GuardEngine {
    */
   async reloadRules(): Promise<{ total: number; bundled: number; custom: number }> {
     return this.engines.atrEngine.reloadRules();
+  }
+
+  /**
+   * Apply a config change persisted by the dashboard into this LIVE instance.
+   *
+   * The dashboard's config-writing handlers (mode change, Threat Cloud consent
+   * toggle) save the new config to disk and then call this so the running
+   * daemon stops serving the stale launch-time config. Without it, getConfig()
+   * / /api/status / enforcement kept the OLD value and the UI control snapped
+   * back, looking broken.
+   *
+   * What re-arms immediately (no restart): in-memory config, the active mode,
+   * and the detection agents' mode (respond/report), so report-only ⇄
+   * protection switching of the verdict pipeline takes effect at once.
+   *
+   * What still needs a restart: OS-level response actions wired at start()
+   * (watchers, syslog, manager registration). The dashboard surfaces that as a
+   * "pending restart" state — it keeps the optimistic new value rather than
+   * snapping the control back.
+   */
+  applyConfig(newConfig: GuardConfig): void {
+    this.config = newConfig;
+    const nextMode = newConfig.mode;
+    if (nextMode && nextMode !== this.mode) {
+      this.mode = nextMode;
+      // Re-arm the verdict pipeline for the new mode (same path as the
+      // learning→protection auto-transition). Guarded because agents only
+      // exist after init().
+      this.engines?.respondAgent?.setMode(nextMode);
+      this.engines?.reportAgent?.setMode(nextMode);
+    }
+    // Push the new mode to the dashboard immediately so /api/status and the
+    // WebSocket feed reflect it without waiting for the 5s status timer.
+    if (this.dashboard) {
+      this.updateDashboardStatus();
+    }
   }
 
   /**

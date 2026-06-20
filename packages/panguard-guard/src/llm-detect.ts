@@ -79,12 +79,92 @@ function truthy(v: string | undefined): boolean {
   return v != null && v !== '' && v !== '0' && v.toLowerCase() !== 'false';
 }
 
-/** Read the encrypted LLM config written by `pga config llm`, if present. */
+/**
+ * Derive the machine-bound AES-256 key used to encrypt/decrypt the local LLM
+ * config. Shared by the reader and the writer so the two can never drift (a
+ * mismatch would make every persisted key undecryptable). This is obfuscation
+ * at rest for a local secret — not a substitute for the 0600 file perms — in a
+ * threat model where the local user is already trusted.
+ */
+async function deriveMachineKey(): Promise<Buffer> {
+  const { hostname, userInfo } = await import('node:os');
+  const { createHash } = await import('node:crypto');
+  const machineId = `${hostname()}-${userInfo().username}-panguard-ai`;
+  return createHash('sha256').update(machineId).digest();
+}
+
+/** Absolute path of the encrypted local LLM config. */
+export async function getEncryptedLlmConfigPath(): Promise<string> {
+  const { homedir } = await import('node:os');
+  return join(homedir(), '.panguard', 'llm.enc');
+}
+
+export interface EncryptedLlmConfigInput {
+  provider: 'ollama' | 'claude' | 'openai';
+  model?: string;
+  endpoint?: string;
+  /** Omitted/undefined for keyless providers (Ollama). */
+  apiKey?: string;
+}
+
+/**
+ * Persist the opt-in LLM config encrypted at rest (~/.panguard/llm.enc,
+ * AES-256-GCM, machine-bound key, 0600). The Guard daemon reads this on startup
+ * via readEncryptedConfig — so a cloud key set here actually reaches the
+ * launchd / systemd-spawned daemon, which does NOT inherit a shell environment
+ * variable. Returns the file path written.
+ */
+export async function writeEncryptedLlmConfig(cfg: EncryptedLlmConfigInput): Promise<string> {
+  const { homedir } = await import('node:os');
+  const { existsSync, mkdirSync, writeFileSync, chmodSync } = await import('node:fs');
+  const { createCipheriv, randomBytes } = await import('node:crypto');
+
+  const dir = join(homedir(), '.panguard');
+  if (!existsSync(dir)) mkdirSync(dir, { recursive: true, mode: 0o700 });
+
+  const key = await deriveMachineKey();
+  const iv = randomBytes(12);
+  const cipher = createCipheriv('aes-256-gcm', key, iv);
+  const plaintext = JSON.stringify({
+    provider: cfg.provider,
+    apiKey: cfg.apiKey,
+    model: cfg.model,
+    endpoint: cfg.endpoint,
+  });
+  const data = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
+  const authTag = cipher.getAuthTag();
+  const serialized = [
+    iv.toString('base64'),
+    authTag.toString('base64'),
+    data.toString('base64'),
+  ].join(':');
+
+  const llmPath = join(dir, 'llm.enc');
+  writeFileSync(llmPath, serialized, { encoding: 'utf-8', mode: 0o600 });
+  try {
+    chmodSync(llmPath, 0o600);
+  } catch {
+    /* best effort — platforms without POSIX permissions */
+  }
+  return llmPath;
+}
+
+/** Remove the encrypted local LLM config, if present. Returns true if removed. */
+export async function clearEncryptedLlmConfig(): Promise<boolean> {
+  const { homedir } = await import('node:os');
+  const { existsSync, rmSync } = await import('node:fs');
+  const llmPath = join(homedir(), '.panguard', 'llm.enc');
+  if (!existsSync(llmPath)) return false;
+  rmSync(llmPath);
+  return true;
+}
+
+/** Read the encrypted LLM config (written by `pga ai` / setup-ai), if present. */
 async function readEncryptedConfig(): Promise<ResolvedLLM | null> {
   try {
-    const { homedir, hostname, userInfo } = await import('node:os');
+    const { homedir } = await import('node:os');
     const { existsSync, readFileSync } = await import('node:fs');
-    const { createHash, createDecipheriv } = await import('node:crypto');
+    const { createDecipheriv } = await import('node:crypto');
 
     const llmPath = join(homedir(), '.panguard', 'llm.enc');
     if (!existsSync(llmPath)) return null;
@@ -92,8 +172,7 @@ async function readEncryptedConfig(): Promise<ResolvedLLM | null> {
     const parts = readFileSync(llmPath, 'utf-8').split(':');
     if (parts.length !== 3) return null;
 
-    const machineId = `${hostname()}-${userInfo().username}-panguard-ai`;
-    const key = createHash('sha256').update(machineId).digest();
+    const key = await deriveMachineKey();
     const iv = Buffer.from(parts[0]!, 'base64');
     const authTag = Buffer.from(parts[1]!, 'base64');
     const data = Buffer.from(parts[2]!, 'base64');

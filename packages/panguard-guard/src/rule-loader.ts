@@ -329,6 +329,21 @@ export async function loadAllRules(
         );
         return [] as Awaited<ReturnType<typeof threatCloud.fetchATRRules>>;
       }
+      // Cloud rule sync is opt-in AND fails closed: every rule must carry a valid
+      // publisher ed25519 signature, verified against PANGUARD_RULE_PUBKEY. The
+      // signing infrastructure that issues signed rules is NOT yet deployed, so
+      // with no publisher key provisioned this path would fetch rules and reject
+      // 100% of them. Be HONEST about that instead of silently loading zero:
+      // warn loudly and skip the network fetch entirely.
+      if (!process.env['PANGUARD_RULE_PUBKEY']) {
+        logger.warn(
+          'Cloud rule sync ENABLED but no publisher key (PANGUARD_RULE_PUBKEY) is provisioned. ' +
+            'Signed-rule infrastructure is not yet available, so NO cloud rules will be loaded ' +
+            '(fail-closed by design). Detection rules remain those from the signed package. ' +
+            'Set threatCloudRuleSyncEnabled=false to silence this warning.'
+        );
+        return [] as Awaited<ReturnType<typeof threatCloud.fetchATRRules>>;
+      }
       logger.warn(
         'Cloud rule sync ENABLED — fetching from Threat Cloud; each rule must pass publisher signature verification.'
       );

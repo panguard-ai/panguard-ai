@@ -24,6 +24,17 @@ let lastWhitelistSync: string | undefined;
 /** First sync always does full fetch, then switches to incremental */
 let isFirstSync = true;
 
+/**
+ * Minimum community confidence before a blacklist entry may revoke a locally
+ * whitelisted skill. Without a threshold, a single report (or a MITM /
+ * compromised Threat Cloud relay injecting one fabricated entry) could revoke
+ * protection for an arbitrary skill — turning the community feed into a
+ * poisoning vector. Require corroboration: enough distinct reports AND a
+ * meaningful average risk score.
+ */
+const BLACKLIST_MIN_REPORT_COUNT = 5;
+const BLACKLIST_MIN_AVG_RISK_SCORE = 50;
+
 /** Dependencies needed for cloud sync operations */
 export interface CloudSyncDeps {
   readonly atrEngine: GuardATREngine;
@@ -120,12 +131,27 @@ export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
       const since = isFirstSync ? undefined : lastBlacklistSync;
       const blacklist = await threatCloud.fetchSkillBlacklist(since);
       const whitelistMgr = atrEngine.getWhitelistManager();
+      let skippedLowConfidence = 0;
       for (const entry of blacklist) {
+        // Poisoning guard: only revoke when the community signal is corroborated.
+        if (
+          entry.reportCount < BLACKLIST_MIN_REPORT_COUNT ||
+          entry.avgRiskScore < BLACKLIST_MIN_AVG_RISK_SCORE
+        ) {
+          skippedLowConfidence++;
+          continue;
+        }
         const wasRevoked = whitelistMgr.revoke(
           entry.skillName,
           `community-blacklist: ${entry.reportCount} reports, avg risk ${entry.avgRiskScore}`
         );
         if (wasRevoked) revokedSkills++;
+      }
+      if (skippedLowConfidence > 0) {
+        logger.info(
+          `Community blacklist: ${skippedLowConfidence} entr(ies) skipped below revoke threshold ` +
+            `(>=${BLACKLIST_MIN_REPORT_COUNT} reports & >=${BLACKLIST_MIN_AVG_RISK_SCORE} avg risk required)`
+        );
       }
       if (revokedSkills > 0) {
         logger.warn(`Community blacklist: ${revokedSkills} skill(s) revoked`);

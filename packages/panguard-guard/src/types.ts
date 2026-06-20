@@ -371,6 +371,15 @@ export interface ThreatCloudUpdate {
   ruleContent: string;
   publishedAt: string;
   source: string;
+  /**
+   * Detached ed25519 signature (base64) over `ruleContent`, produced by the ATR
+   * publisher's signing key. REQUIRED for a network-delivered detection rule to
+   * be loaded: rule-loader fails CLOSED when this is absent or invalid (see
+   * verifyCloudRuleSignature). The signing infrastructure that populates this
+   * field is not yet deployed, so cloud rule sync currently loads zero rules
+   * even when explicitly enabled — by design, not silently.
+   */
+  signature?: string;
 }
 
 /** Threat cloud status / 威脅雲狀態 */
