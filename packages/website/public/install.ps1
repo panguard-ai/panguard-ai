@@ -139,13 +139,12 @@ if ((-not $NpmInstalled) -and (-not $SkipBinaryDownload)) {
                     throw "Checksum mismatch. Expected: $expectedHash Got: $actualHash"
                 }
             } else {
-                Write-Warn "No checksum entry for $expectedName. Skipping verification."
+                throw "No checksum entry for $expectedName -- refusing to install an unverified binary"
             }
         } catch {
-            if ($_.Exception.Message -match "Checksum mismatch") {
-                throw $_
-            }
-            Write-Warn "SHA256SUMS.txt not available. Skipping checksum verification."
+            # SECURITY: never extract a prebuilt binary we could not checksum-verify.
+            # Re-throw so the outer handler falls back to the source build.
+            throw "Could not verify binary checksum ($($_.Exception.Message)) -- refusing to install an unverified binary"
         }
 
         # Extract
@@ -349,32 +348,39 @@ if (-not $verified) {
     Write-Fail "Installation verification failed. panguard cannot execute.`nCheck Node.js installation and PATH."
 }
 
-# ── Auto Setup: connect AI agents + start Guard with dashboard ───
+# ── Activate protection: scan -> guard -> dashboard (one hardened path) ──
+# Identical to the npm flow `pga up`: scans, starts the Guard daemon, keeps
+# collective-defense OFF by default, and prints the REAL rule + threat counts.
+# We never hardcode or restate those numbers here.
 Write-Host ""
-Write-Info "Connecting to AI agents..."
+Write-Info "Activating protection (scan -> guard -> dashboard)..."
 try {
-    panguard setup --yes --skip-guard 2>$null
+    panguard up --yes
 } catch {
-    Write-Warn "Setup skipped. Run 'panguard setup' manually."
+    Write-Warn "Activation reported an issue. You can re-run it any time: panguard up"
 }
 
-Write-Host ""
-Write-Info "Starting Guard with dashboard..."
+# Open the AUTHENTICATED dashboard URL from the token the daemon persisted
+# (a bare URL without the token lands on a Not-authenticated screen).
+$GuardDir   = Join-Path $env:USERPROFILE ".panguard-guard"
+$ConfigFile = Join-Path $GuardDir "config.json"
+$TokenFile  = Join-Path $GuardDir "dashboard-token"
+$Port = 3100
 try {
-    Start-Process -NoNewWindow -FilePath "panguard" -ArgumentList "guard", "start", "--dashboard"
-    Start-Sleep -Seconds 2
-    Write-Ok "Guard started! Dashboard opening in your browser."
-} catch {
-    Write-Warn "Could not start Guard. Run 'panguard guard start --dashboard' manually."
-}
+    if (Test-Path $ConfigFile) {
+        $cfg = Get-Content $ConfigFile -Raw | ConvertFrom-Json
+        if ($cfg.dashboardPort) { $Port = $cfg.dashboardPort }
+    }
+} catch {}
+$Token = ""
+if (Test-Path $TokenFile) { $Token = (Get-Content $TokenFile -Raw).Trim() }
+if ($Token) { $DashUrl = "http://127.0.0.1:$Port/?token=$Token" } else { $DashUrl = "http://127.0.0.1:$Port" }
+try { if ($Token) { Start-Process $DashUrl } } catch {}
 
 Write-Host ""
-Write-Host "  Dashboard:  " -NoNewline; Write-Host "http://127.0.0.1:9100" -ForegroundColor Cyan
-Write-Host "  Guard:      running (learning mode, day 1/7)"
-Write-Host "  ATR rules:  61 detection rules loaded"
+Write-Host "  Dashboard:  " -NoNewline; Write-Host $DashUrl -ForegroundColor Cyan
 Write-Host ""
 Write-Host "  Panguard is installed and protecting your AI agents." -ForegroundColor Green
-Write-Host "  All detected AI platforms have been configured."
 Write-Host ""
 Write-Host "  Other commands:" -ForegroundColor White
 Write-Host "    panguard audit skill <path>   Audit a skill before installing"

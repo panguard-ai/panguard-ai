@@ -139,13 +139,12 @@ if ((-not $NpmInstalled) -and (-not $SkipBinaryDownload)) {
                     throw "Checksum mismatch. Expected: $expectedHash Got: $actualHash"
                 }
             } else {
-                Write-Warn "No checksum entry for $expectedName. Skipping verification."
+                throw "No checksum entry for $expectedName -- refusing to install an unverified binary"
             }
         } catch {
-            if ($_.Exception.Message -match "Checksum mismatch") {
-                throw $_
-            }
-            Write-Warn "SHA256SUMS.txt not available. Skipping checksum verification."
+            # SECURITY: never extract a prebuilt binary we could not checksum-verify.
+            # Re-throw so the outer handler falls back to the source build.
+            throw "Could not verify binary checksum ($($_.Exception.Message)) -- refusing to install an unverified binary"
         }
 
         # Extract
@@ -296,12 +295,12 @@ if ((-not $BinaryInstalled) -and (-not $NpmInstalled)) {
 @echo off
 setlocal
 set "SCRIPT_DIR=%~dp0"
-set "JS_ENTRY=%SCRIPT_DIR%..\source\packages\panguard\dist\cli\index.js"
-if not exist "%JS_ENTRY%" (
+set "BOOTSTRAP=%SCRIPT_DIR%..\source\packages\panguard\bin\panguard.cjs"
+if not exist "%BOOTSTRAP%" (
     echo Error: panguard installation appears corrupted.
     exit /b 1
 )
-node "%JS_ENTRY%" %*
+node "%BOOTSTRAP%" %*
 "@
     Set-Content -Path $wrapperPath -Value $wrapperContent -Encoding ASCII
 
@@ -349,24 +348,46 @@ if (-not $verified) {
     Write-Fail "Installation verification failed. panguard cannot execute.`nCheck Node.js installation and PATH."
 }
 
-# ── Quick Start Guide ────────────────────────────────────────────
+# ── Activate protection: scan -> guard -> dashboard (one hardened path) ──
+# Identical to the npm flow `pga up`: scans, starts the Guard daemon, keeps
+# collective-defense OFF by default, and prints the REAL rule + threat counts.
+# We never hardcode or restate those numbers here.
 Write-Host ""
-Write-Host "  Quick Start" -ForegroundColor White
-Write-Host "  ===========" -ForegroundColor DarkGray
+Write-Info "Activating protection (scan -> guard -> dashboard)..."
+try {
+    panguard up --yes
+} catch {
+    Write-Warn "Activation reported an issue. You can re-run it any time: panguard up"
+}
+
+# Open the AUTHENTICATED dashboard URL from the token the daemon persisted
+# (a bare URL without the token lands on a Not-authenticated screen).
+$GuardDir   = Join-Path $env:USERPROFILE ".panguard-guard"
+$ConfigFile = Join-Path $GuardDir "config.json"
+$TokenFile  = Join-Path $GuardDir "dashboard-token"
+$Port = 3100
+try {
+    if (Test-Path $ConfigFile) {
+        $cfg = Get-Content $ConfigFile -Raw | ConvertFrom-Json
+        if ($cfg.dashboardPort) { $Port = $cfg.dashboardPort }
+    }
+} catch {}
+$Token = ""
+if (Test-Path $TokenFile) { $Token = (Get-Content $TokenFile -Raw).Trim() }
+if ($Token) { $DashUrl = "http://127.0.0.1:$Port/?token=$Token" } else { $DashUrl = "http://127.0.0.1:$Port" }
+try { if ($Token) { Start-Process $DashUrl } } catch {}
+
 Write-Host ""
-Write-Host "  # Connect to Claude Code, Cursor, and other AI agents"
-Write-Host "  panguard setup"
+Write-Host "  Dashboard:  " -NoNewline; Write-Host $DashUrl -ForegroundColor Cyan
 Write-Host ""
-Write-Host "  # Audit installed AI skills for security threats"
-Write-Host "  panguard audit skill ."
+Write-Host "  Panguard is installed and protecting your AI agents." -ForegroundColor Green
 Write-Host ""
-Write-Host "  # Run a security scan"
-Write-Host "  panguard scan"
+Write-Host "  Other commands:" -ForegroundColor White
+Write-Host "    panguard audit skill <path>   Audit a skill before installing"
+Write-Host "    panguard scan --quick         Quick system security scan"
+Write-Host "    panguard guard status         Check Guard status"
+Write-Host "    panguard guard stop           Stop Guard"
 Write-Host ""
-Write-Host "  # Start 24/7 real-time protection"
-Write-Host "  panguard guard start"
-Write-Host ""
-Write-Host "  Documentation: https://panguard.ai/docs" -ForegroundColor DarkGray
-Write-Host "  Report issues: https://github.com/panguard-ai/panguard-ai/issues" -ForegroundColor DarkGray
+Write-Host "  Documentation: https://docs.panguard.ai" -ForegroundColor DarkGray
 Write-Host ""
 Write-Ok "Installation complete!"

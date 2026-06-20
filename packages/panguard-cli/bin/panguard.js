@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Thin wrapper: delegates to @panguard-ai/panguard CLI
 const { join, dirname } = require('path');
+const { pathToFileURL } = require('url');
 const { createRequire } = require('module');
 
 // resolve the installed @panguard-ai/panguard package directory
@@ -16,8 +17,10 @@ try {
   process.exit(1);
 }
 
+// Convert to a file:// URL before import(). Windows paths (C:\...) are not
+// valid ESM specifiers, so a raw path crashes with ERR_UNSUPPORTED_ESM_URL_SCHEME.
 const cli = join(pkgDir, 'dist', 'cli', 'index.js');
-import(cli).catch((e) => {
+import(pathToFileURL(cli).href).catch((e) => {
   console.error(e.message);
   process.exit(1);
 });

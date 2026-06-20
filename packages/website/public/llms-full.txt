@@ -5,7 +5,7 @@ This file is a structured long-form context dump intended for AI coding tools
 llms-full.txt to understand a project at depth. It is auto-generated from
 the canonical source files in the panguard-ai repository.
 
-Last generated: 2026-06-14T11:00:09.551Z
+Last generated: 2026-06-20T09:07:09.891Z
 Sources of truth:
 - src/lib/stats.ts (product stats)
 - src/lib/atr-rules-compiled.ts (ATR rule index)
@@ -54,7 +54,7 @@ cost, insufficient differentiation, vendor death spiral).
 
 ---
 
-## Section 2 — Core stats (verified 2026-06-14)
+## Section 2 — Core stats (verified 2026-06-20)
 
 ### Rule corpus
 - 419 ATR rules in v2.2.0
@@ -106,28 +106,13 @@ agent-threat-rules repository: github.com/Agent-Threat-Rule/agent-threat-rules.
 This index gives you titles per category so you can ask for specific
 rule bodies on demand.
 
-### prompt-injection (219 rules)
+### prompt-injection (200 rules)
 
 - ATR-2026-00001: Direct Prompt Injection via User Input
 - ATR-2026-00002: Indirect Prompt Injection via External Content
 - ATR-2026-00003: Jailbreak Attempt Detection
 - ATR-2026-00004: System Prompt Override Attempt
 - ATR-2026-00005: Multi-Turn Prompt Injection
-- ATR-2026-00080: Encoding-Based Prompt Injection Evasion
-- ATR-2026-00081: Semantic Evasion via Multi-Turn Prompt Injection
-- ATR-2026-00082: Behavioral Fingerprint Detection Evasion
-- ATR-2026-00083: Indirect Prompt Injection via Tool Responses
-- ATR-2026-00084: Structured Data Injection via JSON/CSV Payloads
-- ATR-2026-00085: Multi-Layer Security Audit Evasion
-- ATR-2026-00086: Visual Spoofing via RTL Override, Punycode, and Homoglyph Injection
-- ATR-2026-00087: Detection Rule Probing and Evasion Testing
-- ATR-2026-00088: Adaptive Countermeasure Against Behavioral Monitoring
-- ATR-2026-00089: Polymorphic Skill and Capability Aliasing Attack
-- ATR-2026-00090: Threat Intelligence Exfiltration and Rule Enumeration
-- ATR-2026-00091: Advanced Structured Data Injection with Nested Payloads
-- ATR-2026-00092: Multi-Agent Consensus Poisoning and Sybil Attack
-- ATR-2026-00093: Gradual Capability Escalation via Incremental Introduction
-- ATR-2026-00094: Systematic Multi-Layer Audit System Bypass
 - ATR-2026-00097: CJK Prompt Injection - Expanded Chinese/Japanese/Korean Patterns
 - ATR-2026-00104: Persona Hijacking via Mandatory System Prompt Override
 - ATR-2026-00130: Indirect Authority Claim in External Content
@@ -137,7 +122,6 @@ rule bodies on demand.
 - ATR-2026-00138: Fictional Framing Safety Bypass
 - ATR-2026-00140: Indirect Reference Instruction Reversal
 - ATR-2026-00148: Multilingual Prompt Injection via Language Switch
-- ATR-2026-00155: Hidden LLM Instructions in Skill Descriptions
 - ATR-2026-00163: Hidden Override Instructions in Skill Content
 - ATR-2026-00202: Encoding Evasion via Homoglyphs and Synonym Substitution
 - ATR-2026-00203: Context Pollution in Skill Descriptions
@@ -153,7 +137,6 @@ rule bodies on demand.
 - ATR-2026-00231: AI Identity Substitution Jailbreak
 - ATR-2026-00233: Structured Dual-Response Jailbreak with Command System
 - ATR-2026-00234: Roleplay-Based Policy Bypass Jailbreak
-- ATR-2026-00235: Persona-Based Moral Constraint Removal Jailbreak
 - ATR-2026-00236: Pseudo-Code Structured Programming Jailbreak Attack
 - ATR-2026-00237: Dual-Response Jailbreak with Persona Commands
 - ATR-2026-00238: AI Identity Denial and Persona Replacement Attack
@@ -277,8 +260,6 @@ rule bodies on demand.
 - ATR-2026-00518: Ignore-Previous-and-Following Instructions Output Command (PromptInject Goal Hijacking)
 - ATR-2026-00519: Tautology Logic Noise Injection (PromptBench Stresstest)
 - ATR-2026-00520: NLP Task Random Token Suffix Injection (PromptBench Checklist)
-- ATR-2026-00535: Windsurf IDE Zero-Click Prompt Injection via Embedded File Directives (CVE-2026-30615)
-- ATR-2026-00550: Privileged tool call following untrusted retrieval (indirect prompt injection trail)
 - ATR-2026-00554: LangChain Vulnerable to Template Injection via Attribute Access in Prompt Templates
 - ATR-2026-00573: Paraphrased Prompt Injection (Semantic)
 - ATR-2026-00579: MCP Line Jumping \u2014 Agent-Directed Imperative Embedded in a Tool/Parameter Description Field (Pre-Invocation Injection)
@@ -328,7 +309,7 @@ rule bodies on demand.
 - ATR-2026-01925: Encoded-Payload Decoding Coercion \u2014 Binary / Base64 / Morse to Smuggle an Output
 - ATR-2026-01926: Cross-Lingual Authorization Laundering \u2014 Translate a Foreign "Access Granted"
 
-### agent-manipulation (105 rules)
+### agent-manipulation (104 rules)
 
 - ATR-2026-00030: Cross-Agent Attack Detection
 - ATR-2026-00032: Agent Goal Hijacking Detection
@@ -434,9 +415,8 @@ rule bodies on demand.
 - ATR-2026-00430: Natural-Language Trust-Escalation / Authority Impersonation
 - ATR-2026-00432: SuperAGI Output Handler eval() RCE (CVE-2024-21552)
 - ATR-2026-00440: Microsoft Semantic Kernel In-Memory Vector Store eval() RCE (CVE-2026-26030)
-- ATR-2026-00552: Agent goal drift after environmental pressure injection
 
-### skill-compromise (40 rules)
+### skill-compromise (39 rules)
 
 - ATR-2026-00060: MCP Skill Impersonation and Supply Chain Attack
 - ATR-2026-00120: SKILL.md Prompt Injection
@@ -454,7 +434,6 @@ rule bodies on demand.
 - ATR-2026-00147: Community Fork Impersonation
 - ATR-2026-00149: Skill Data Exfiltration via Compound Patterns
 - ATR-2026-00151: Malicious Fork Impersonation via Install Instruction
-- ATR-2026-00154: Unauthorized Background Task Execution via Cron Job Installation
 - ATR-2026-00157: Time-Gated Credential Exfiltration (Rug Pull Timebomb)
 - ATR-2026-00200: Agent Memory and Configuration File Tampering
 - ATR-2026-00214: Credential Exfiltration via Fake Backup Verification
@@ -479,7 +458,7 @@ rule bodies on demand.
 - ATR-2026-01755: Backdoor Trojan: Linguistic Trigger Phrase (POT Attack)
 - ATR-2026-01756: Backdoor Trojan: Symbol / Emoticon Trigger (POT Attack)
 
-### context-exfiltration (103 rules)
+### context-exfiltration (102 rules)
 
 - ATR-2026-00020: System Prompt and Internal Instruction Leakage
 - ATR-2026-00021: Credential and Secret Exposure in Agent Output
@@ -522,7 +501,6 @@ rule bodies on demand.
 - ATR-2026-00514: System Prompt Extraction \u2014 Targeted Verbatim Disclosure Attempts
 - ATR-2026-00516: LLM Output XSS \u2014 Eliciting JavaScript Payloads from LLM for Browser Injection
 - ATR-2026-00524: Claude Code ANTHROPIC_BASE_URL Credential Exfiltration (CVE-2026-21852)
-- ATR-2026-00548: Cross-agent session context leak across delegation chain
 - ATR-2026-00566: LibreChat is a ChatGPT clone with additional features.
 - ATR-2026-00569: Agent / MCP tool path traversal and arbitrary file access
 - ATR-2026-00571: Cross-site scripting (XSS) in agent / MCP rendered output
@@ -585,7 +563,7 @@ rule bodies on demand.
 - ATR-2026-01895: Injected Code \u2014 Contact-List Harvest and SMTP Spam Exfiltration
 - ATR-2026-01924: System-Instruction Extraction via Reformat \u2014 Summarize / Repeat / Recite the Rules
 
-### tool-poisoning (70 rules)
+### tool-poisoning (58 rules)
 
 - ATR-2026-00010: Malicious Content in MCP Tool Response
 - ATR-2026-00011: Instruction Injection via Tool Output
@@ -596,14 +574,11 @@ rule bodies on demand.
 - ATR-2026-00063: Multi-Skill Chain Attack
 - ATR-2026-00065: Malicious Skill Update or Mutation
 - ATR-2026-00066: Parameter Injection via Tool Arguments
-- ATR-2026-00095: MCP Tool Supply Chain Poisoning
-- ATR-2026-00096: Skill Registry Poisoning and Compromised Tool Distribution
 - ATR-2026-00100: Consent Bypass via Hidden LLM Instructions in Tool Descriptions
 - ATR-2026-00101: Trust Escalation via Authority Override Instructions
 - ATR-2026-00103: Hidden LLM Safety Bypass Instructions in Tool Descriptions
 - ATR-2026-00105: Silent Action Concealment Instructions in Tool Descriptions
 - ATR-2026-00106: Schema-Description Contradiction Attack
-- ATR-2026-00153: Tool with embedded instruction to bypass user confirmation and exfiltrate data
 - ATR-2026-00161: MCP Tool Description \u2014 IMPORTANT Tag Cross-Tool Shadowing Attack
 - ATR-2026-00209: MCPwn Runaway Tool Invocation via Retry Directive (CVE-2026-33032)
 - ATR-2026-00210: Flowise System Message Override via Template Interpolation (CVE-2025-59528)
@@ -627,15 +602,6 @@ rule bodies on demand.
 - ATR-2026-00532: Apache Doris MCP Server SQL Injection (CVE-2025-66335)
 - ATR-2026-00533: Apache Pinot MCP Unauthenticated Remote Cluster Takeover
 - ATR-2026-00534: Alibaba RDS MCP Unauthenticated Database Metadata Exfiltration
-- ATR-2026-00536: nginx-ui MCP Endpoint Unauthenticated Command Execution (CVE-2026-33032)
-- ATR-2026-00537: FastMCP Windows cmd.exe Injection via Server Name Metacharacters (CVE-2025-64340)
-- ATR-2026-00538: LangChain-ChatChat Unauthenticated MCP STDIO Server Configuration RCE (CVE-2026-30617)
-- ATR-2026-00540: PraisonAI parse_mcp_command() CLI Argument Command Injection (CVE-2026-34935)
-- ATR-2026-00541: Agent Zero MCP Configuration Command Injection via mcp_servers field (CVE-2026-30624)
-- ATR-2026-00542: Upsonic MCP Command Allowlist Bypass RCE (CVE-2026-30625)
-- ATR-2026-00543: LiteLLM MCP Server Creation Authenticated argv Injection (CVE-2026-30623)
-- ATR-2026-00544: PraisonAI MCP Path-Traversal .pth Injection RCE (GHSA-9mqq-jqxf-grvw)
-- ATR-2026-00545: PraisonAI tool_override.py Unauthenticated RCE \u2014 CVE-2026-40287 Patch Bypass (CVE-2026-44334)
 - ATR-2026-00561: FastMCP vulnerable to windows command injection in FastMCP Cursor installer via server_name
 - ATR-2026-00567: MCP stdio server config command injection via unvalidated test endpoints
 - ATR-2026-00568: Agent SSRF to cloud metadata / file inclusion via unvalidated fetch URL
@@ -658,7 +624,7 @@ rule bodies on demand.
 - ATR-2026-01927: mcp-server-kubernetes Command Injection in kubectl_scale / kubectl_patch / explain_resource (CVE-2025-53355)
 - ATR-2026-01928: Framelink Figma MCP Server curl-Fallback Command Injection (CVE-2025-53967)
 
-### privilege-escalation (37 rules)
+### privilege-escalation (34 rules)
 
 - ATR-2026-00040: Privilege Escalation and Admin Function Access
 - ATR-2026-00041: Agent Scope Creep Detection
@@ -669,7 +635,6 @@ rule bodies on demand.
 - ATR-2026-00112: Dynamic Module Loading for Code Execution
 - ATR-2026-00143: Casual Unauthorized Privilege Escalation
 - ATR-2026-00144: Rationalized Safety Control Bypass
-- ATR-2026-00156: SSH Remote Command Execution with Credential Exposure
 - ATR-2026-00204: Stealth Execution and Persistence Mechanisms
 - ATR-2026-00436: Enclave VM Sandbox Escape RCE (CVE-2026-27597)
 - ATR-2026-00441: Microsoft Semantic Kernel SessionsPythonPlugin Arbitrary File Write + Startup Persistence (CVE-2026-25592)
@@ -678,8 +643,6 @@ rule bodies on demand.
 - ATR-2026-00539: CrewAI CodeInterpreterTool Sandbox Escape and Prompt-to-Shell RCE (CVE-2026-2275 / VU#221883)
 - ATR-2026-00546: CrewAI JSON Loader Arbitrary Local File Read (CVE-2026-2285)
 - ATR-2026-00547: CrewAI RAG URL Validation Bypass SSRF (CVE-2026-2286)
-- ATR-2026-00549: Destructive tool invocation without prior human approval
-- ATR-2026-00551: Cross-conversation memory write (scope-escape via memory store)
 - ATR-2026-01600: SQL Injection Tautology RBAC Bypass
 - ATR-2026-01601: SQL Injection Destructive DDL Statement
 - ATR-2026-01602: SQL Injection UNION SELECT Data Exfiltration
@@ -740,7 +703,7 @@ rule bodies on demand.
 - ATR-2026-01897: Injected Code \u2014 Local Host Sabotage (Filesystem Destruction / Resource Exhaustion / Hosts Tamper)
 - ATR-2026-01898: Injected Code \u2014 Network Denial of Service (Connection Kill / Adapter Disable / Flood)
 
-### excessive-autonomy (30 rules)
+### excessive-autonomy (29 rules)
 
 - ATR-2026-00050: Runaway Agent Loop Detection
 - ATR-2026-00051: Agent Resource Exhaustion Detection
@@ -750,7 +713,6 @@ rule bodies on demand.
 - ATR-2026-00428: Natural-Language Unauthorized Shell-Execution Instruction
 - ATR-2026-00491: Agent Capability Enumeration via Structured Parse Request
 - ATR-2026-00500: SSRF via Agent URL Fetch Instruction
-- ATR-2026-00553: Runaway tool-call loop within a single session
 - ATR-2026-00708: Indirect PI \u2014 Unauthorized Financial Transfer via Agent Tool
 - ATR-2026-00709: Indirect PI \u2014 Disable Authentication / MFA via Agent Tool
 - ATR-2026-00710: Indirect PI \u2014 Unauthorized Physical Access Grant via Smart Lock / Home Automation

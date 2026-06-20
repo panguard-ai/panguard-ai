@@ -27,6 +27,82 @@ import type {
 const logger = createLogger('panguard-chat:channel:webhook');
 
 // ---------------------------------------------------------------------------
+// SSRF Guard
+// SSRF 防護
+// ---------------------------------------------------------------------------
+
+/**
+ * Matches IPv4 literals that fall in private, loopback, link-local, or
+ * otherwise reserved ranges that must never be reachable from a webhook target.
+ * Bearer / HMAC credentials are sent in the request, so an attacker-controlled
+ * endpoint pointing at internal infrastructure is a credential-leak + SSRF risk.
+ */
+function isBlockedIpv4(host: string): boolean {
+  const m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(host);
+  if (!m) return false;
+  const octets = m.slice(1, 5).map((o) => Number(o));
+  if (octets.some((o) => o > 255)) return true; // malformed → block
+  const [a, b] = octets as [number, number, number, number];
+  if (a === 0) return true; // 0.0.0.0/8
+  if (a === 10) return true; // 10.0.0.0/8 private
+  if (a === 127) return true; // 127.0.0.0/8 loopback
+  if (a === 169 && b === 254) return true; // 169.254.0.0/16 link-local (cloud metadata)
+  if (a === 172 && b >= 16 && b <= 31) return true; // 172.16.0.0/12 private
+  if (a === 192 && b === 168) return true; // 192.168.0.0/16 private
+  if (a === 100 && b >= 64 && b <= 127) return true; // 100.64.0.0/10 CGNAT
+  if (a >= 224) return true; // 224.0.0.0/4 multicast + 240.0.0.0/4 reserved
+  return false;
+}
+
+/**
+ * Block IPv6 literals that resolve to loopback, link-local, unique-local, or
+ * IPv4-mapped private ranges. Only IPv6 literals are inspected (a colon in the
+ * host); DNS hostnames such as "fcservice.example.com" are not IPv6 literals and
+ * are left for normal resolution. WHATWG URL parsing strips the surrounding
+ * brackets, so url.hostname for [::1] is "::1".
+ */
+function isBlockedIpv6(host: string): boolean {
+  const h = host.toLowerCase();
+  if (!h.includes(':')) return false; // not an IPv6 literal
+  if (h === '::1' || h === '::') return true; // loopback / unspecified
+  if (h.startsWith('fe80')) return true; // link-local
+  if (h.startsWith('fc') || h.startsWith('fd')) return true; // unique-local fc00::/7
+  // IPv4-mapped (::ffff:a.b.c.d) — extract and re-check as IPv4
+  const mapped = /::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/.exec(h);
+  if (mapped?.[1]) return isBlockedIpv4(mapped[1]);
+  return false;
+}
+
+/**
+ * Validate a webhook endpoint before any request is sent. Requires an https:
+ * scheme (credentials must not traverse cleartext HTTP) and rejects hostnames
+ * that are obvious private / reserved IP literals or loopback names. DNS-level
+ * rebinding is out of scope for this literal check; this blocks the common
+ * SSRF + cleartext-credential cases. Throws on rejection.
+ */
+function assertSafeEndpoint(endpoint: string): URL {
+  let url: URL;
+  try {
+    url = new URL(endpoint);
+  } catch {
+    throw new Error(`Webhook endpoint is not a valid URL: ${endpoint}`);
+  }
+  if (url.protocol !== 'https:') {
+    throw new Error(
+      `Webhook endpoint must use https: (got "${url.protocol}") — credentials must not be sent over cleartext HTTP`
+    );
+  }
+  const host = url.hostname.toLowerCase();
+  if (host === 'localhost' || host === 'localhost.localdomain' || host.endsWith('.localhost')) {
+    throw new Error(`Webhook endpoint host is not allowed: ${host}`);
+  }
+  if (isBlockedIpv4(host) || isBlockedIpv6(host)) {
+    throw new Error(`Webhook endpoint resolves to a private/reserved address: ${host}`);
+  }
+  return url;
+}
+
+// ---------------------------------------------------------------------------
 // Webhook Payload
 // Webhook 負載
 // ---------------------------------------------------------------------------
@@ -220,7 +296,7 @@ export class WebhookChannel implements MessagingChannel {
    * 發送 HTTP POST 請求
    */
   private async httpPost(body: string, headers: Record<string, string>): Promise<void> {
-    const url = new URL(this.config.endpoint);
+    const url = assertSafeEndpoint(this.config.endpoint);
     const isHttps = url.protocol === 'https:';
     const { hostname, pathname, port } = url;
 

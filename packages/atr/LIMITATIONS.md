@@ -1,10 +1,10 @@
 # ATR Limitations
 
-ATR v0.1 uses regex-based pattern detection (`detection_tier: pattern`, `schema_version: 0.1`). This document is a transparent accounting of what that approach can and cannot do. Read this before deploying ATR in production.
+ATR's `detection_tier: pattern` rules use regex-based pattern detection. This document is a transparent accounting of what that approach can and cannot do. Read this before deploying ATR in production.
 
-**Current stats:** 32 rules, 325 test cases, 100% true positive / true negative pass rate.
+**Rule counts and category coverage are inherited from the bundled [agent-threat-rules](https://github.com/Agent-Threat-Rule/agent-threat-rules) ruleset** (currently `^3.5.0`, 650+ rules across the current taxonomy). These numbers change frequently as rules are added, so this document does not hardcode a count. For the authoritative, always-current rule and category totals, see the canonical [agent-threat-rules](https://github.com/Agent-Threat-Rule/agent-threat-rules) repository and its [`data/stats.json`](https://raw.githubusercontent.com/Agent-Threat-Rule/agent-threat-rules/main/data/stats.json).
 
-That pass rate sounds impressive. It is not. It means ATR correctly matches the patterns it was written to match. It says nothing about attacks that use different words to express the same intent.
+A high test-suite pass rate sounds impressive. It is not. It means ATR correctly matches the patterns it was written to match. It says nothing about attacks that use different words to express the same intent.
 
 ---
 
@@ -44,7 +44,7 @@ Credential forwarding syntax between agents. Role impersonation phrases ("I am t
 
 ## What Regex CANNOT Detect
 
-This is the section that matters. Every limitation below represents a class of attacks that will bypass ATR v0.1 completely.
+This is the section that matters. Every limitation below represents a class of attacks that will bypass ATR's pattern-tier rules completely.
 
 ### Paraphrase Attacks
 
@@ -94,7 +94,7 @@ ATR performs no timing analysis. Response latency modulation, slow-and-low data 
 
 ## Evasion Test Results
 
-All 32 rules include `evasion_tests` in their YAML definitions. These tests document known bypass techniques and their expected results. Critically, the expected result for paraphrase and language-switch evasions is `not_triggered` -- meaning ATR honestly declares that these evasions succeed.
+Rules include `evasion_tests` in their YAML definitions. These tests document known bypass techniques and their expected results. Critically, the expected result for paraphrase and language-switch evasions is `not_triggered` -- meaning ATR honestly declares that these evasions succeed.
 
 Example from ATR-2026-001 evasion tests:
 
@@ -107,7 +107,7 @@ This is not a bug. It is a documented limitation of the detection tier. We publi
 
 ## False Positive Management
 
-Each rule documents known `false_positives` in its YAML definition. Nine rules have been specifically tightened to reduce false positives on legitimate content (e.g., security researchers discussing prompt injection, documentation containing example attack strings, base64-encoded non-malicious content).
+Each rule documents known `false_positives` in its YAML definition. Many rules have been specifically tightened to reduce false positives on legitimate content (e.g., security researchers discussing prompt injection, documentation containing example attack strings, base64-encoded non-malicious content).
 
 Production deployments should:
 
@@ -133,7 +133,7 @@ ATR's long-term architecture is a three-tier detection pipeline. Each tier addre
 | Multi-modal attacks    | Vision/audio preprocessing pipeline                                   | v0.3+          |
 | Adversarial suffixes   | Perplexity-based anomaly detection                                    | v0.3+          |
 
-**Tier 1: Pattern (v0.1 -- current).** Regex and threshold-based detection. Sub-millisecond per event. Deterministic. Zero external dependencies. Catches known attack signatures. Limited to attacks expressible as text patterns.
+**Tier 1: Pattern (current).** Regex and threshold-based detection. Sub-millisecond per event. Deterministic. Zero external dependencies. Catches known attack signatures. Limited to attacks expressible as text patterns.
 
 **Tier 2: Embedding (v0.2 -- planned).** Vector distance from known attack embeddings. Catches paraphrase attacks, multilingual injection, and semantic variants that evade regex. Adds latency and an embedding model dependency.
 
@@ -145,7 +145,7 @@ The tiers are additive, not replacements. Tier 1 handles the fast path (block ob
 
 ## Summary
 
-Regex-based detection is a first line of defense, not a complete solution. ATR v0.1 will catch script kiddies, known exploit payloads, and automated attacks that use documented patterns. It will not catch a skilled adversary who reads the rules and paraphrases around them.
+Regex-based detection is a first line of defense, not a complete solution. ATR's pattern-tier rules will catch script kiddies, known exploit payloads, and automated attacks that use documented patterns. They will not catch a skilled adversary who reads the rules and paraphrases around them.
 
 Deploy ATR as one layer in a defense-in-depth strategy. Do not rely on it alone.
 

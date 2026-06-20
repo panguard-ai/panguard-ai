@@ -249,13 +249,27 @@ download_binary() {
     return 1
   fi
 
-  # Attempt checksum verification
+  # SECURITY: a prebuilt binary from GitHub Releases must be checksum-verified
+  # before extraction. If we cannot verify it (no SHA256SUMS, no entry for this
+  # tarball, or no sha256 tool), do NOT install the unverified binary — return 1
+  # so the caller falls back to the source build (git/https, built locally).
   local tarball_name="panguard-${PLATFORM}.tar.gz"
-  if download_file "$checksum_url" "$tmp_checksums" 2>/dev/null; then
-    verify_checksum "$tmp_tarball" "$tmp_checksums" "$tarball_name"
-  else
-    warn "SHA256SUMS.txt not available for this release. Skipping checksum verification."
+  if ! curl -fsSL -o "$tmp_checksums" "$checksum_url" 2>/dev/null; then
+    warn "Could not fetch SHA256SUMS.txt — refusing to install an unverified binary."
+    rm -f "$tmp_tarball" "$tmp_checksums"; trap - EXIT
+    return 1
   fi
+  if ! grep -q "$tarball_name" "$tmp_checksums" 2>/dev/null; then
+    warn "No checksum entry for ${tarball_name} — refusing to install an unverified binary."
+    rm -f "$tmp_tarball" "$tmp_checksums"; trap - EXIT
+    return 1
+  fi
+  if ! command -v sha256sum &>/dev/null && ! command -v shasum &>/dev/null; then
+    warn "No sha256sum/shasum to verify the binary — refusing to install unverified."
+    rm -f "$tmp_tarball" "$tmp_checksums"; trap - EXIT
+    return 1
+  fi
+  verify_checksum "$tmp_tarball" "$tmp_checksums" "$tarball_name"
 
   # Extract the verified tarball
   if ! tar -xzf "$tmp_tarball" -C "$INSTALL_DIR" 2>/dev/null; then
@@ -633,95 +647,52 @@ open_browser() {
 # Zero-interaction post-install: setup → guard → scan → dashboard.
 # No questions asked. Scan runs visibly, dashboard opens.
 auto_setup() {
-  local DASHBOARD_PORT=3100
-  local DASHBOARD_URL="http://127.0.0.1:${DASHBOARD_PORT}"
   local UI_LANG
   UI_LANG="$(detect_lang 2>/dev/null || echo "en")"
 
-  # 1. Connect AI agents
+  # Single hardened activation path — identical to the npm flow `pga up`:
+  # scan installed skills, start the (reboot-surviving) Guard daemon, keep
+  # collective-defense OFF by default, and print the REAL rule + threat counts.
+  # We never hardcode or restate those numbers here.
   echo ""
-  info "Configuring AI agent protection..."
-  if ! panguard setup --yes --skip-scan 2>/dev/null; then
-    warn "Agent setup had issues. Continuing with Guard startup..."
+  info "Activating protection (scan -> guard -> dashboard)..."
+  if ! panguard up --yes; then
+    warn "Activation reported an issue. You can re-run it any time: panguard up"
   fi
 
-  # 2. Start Guard (handle already-running gracefully)
-  #    IMPORTANT: `panguard guard start` is a BLOCKING foreground process
-  #    that never exits (it monitors). We MUST background it and NOT wait.
-  echo ""
-  if panguard guard status 2>/dev/null | grep -q "RUNNING"; then
-    info "Guard is already running."
+  # curl|bash is non-interactive, so `pga up` does not open a browser. Open the
+  # AUTHENTICATED dashboard URL ourselves, read from the token the daemon wrote
+  # (a bare URL without the token lands on a Not-authenticated screen).
+  local guard_dir="${HOME}/.panguard-guard"
+  local port token_val url
+  port="$(grep -oE '"dashboardPort"[[:space:]]*:[[:space:]]*[0-9]+' "${guard_dir}/config.json" 2>/dev/null | grep -oE '[0-9]+' | head -1)"
+  port="${port:-3100}"
+  token_val="$(cat "${guard_dir}/dashboard-token" 2>/dev/null || true)"
+  if [ -n "$token_val" ]; then
+    url="http://127.0.0.1:${port}/?token=${token_val}"
   else
-    info "Starting Guard with dashboard..."
-    # Background and detach — do NOT wait (it runs forever)
-    nohup panguard guard start --dashboard >/dev/null 2>&1 &
-    disown 2>/dev/null || true
+    url="http://127.0.0.1:${port}"
   fi
 
-  # Wait for dashboard to be ready (up to 15s)
-  local attempts=0 dashboard_ready=false
-  while [ $attempts -lt 15 ]; do
-    if curl -sf "${DASHBOARD_URL}" >/dev/null 2>&1; then
-      dashboard_ready=true
-      break
-    fi
-    sleep 1
-    attempts=$((attempts + 1))
-  done
-
-  if [ "$dashboard_ready" = "false" ]; then
-    warn "Dashboard not responding on port ${DASHBOARD_PORT}."
-    # Try to detect actual port from Guard status
-    local actual_port
-    actual_port=$(panguard guard status 2>/dev/null | grep -oE 'localhost:[0-9]+' | grep -oE '[0-9]+' || echo "")
-    if [ -n "$actual_port" ] && [ "$actual_port" != "$DASHBOARD_PORT" ]; then
-      DASHBOARD_PORT="$actual_port"
-      DASHBOARD_URL="http://127.0.0.1:${DASHBOARD_PORT}"
-      info "Dashboard detected on port ${DASHBOARD_PORT}."
-    fi
-  fi
-
-  # 3. Run scan with spinner (user sees progress, 60s timeout)
   echo ""
-  panguard scan --quick >/dev/null 2>&1 &
-  local scan_pid=$!
-  if [ "$UI_LANG" = "zh-TW" ]; then
-    spinner "$scan_pid" "Scanning AI agent configurations / 正在掃描 AI 代理設定" 60
+  if [ -n "$token_val" ] && open_browser "$url"; then
+    success "Dashboard opened in your browser."
   else
-    spinner "$scan_pid" "Scanning AI agent configurations" 60
-  fi
-
-  # 4. Open dashboard in browser (cross-platform)
-  local browser_opened=false
-  if open_browser "${DASHBOARD_URL}"; then
-    browser_opened=true
-  fi
-
-  # 5. Final status
-  echo ""
-  if [ "$browser_opened" = "true" ]; then
-    success "Done! Dashboard opened in your browser."
-  else
-    success "Done! Open the dashboard manually:"
+    success "Open your dashboard:"
   fi
   echo ""
-  echo -e "  Dashboard:  ${BLUE}${DASHBOARD_URL}${NC}"
-  echo "  Guard:      running (learning mode, day 1/7)"
-  echo "  ATR rules:  61 detection rules loaded"
-  echo "  Scan:       complete"
+  echo -e "  Dashboard:  ${BLUE}${url}${NC}"
   echo ""
   if [ "$UI_LANG" = "zh-TW" ]; then
-    echo -e "  ${BOLD}Panguard 已安裝完成。Guard 正在背景運行。${NC}"
-    echo "  所有偵測到的 AI 平台已自動設定。掃描完成。"
+    echo -e "  ${BOLD}Panguard 已安裝並啟用保護。${NC}"
   else
     echo -e "  ${BOLD}Panguard is installed and protecting your AI agents.${NC}"
-    echo "  All detected AI platforms configured. Scan complete."
   fi
   echo ""
-  echo "  Other commands:"
+  echo "  Useful commands:"
+  echo "    panguard status               Check protection status"
   echo "    panguard audit skill <path>   Audit a skill before installing"
-  echo "    panguard scan                 Full security scan"
-  echo "    panguard guard status         Check Guard status"
+  echo "    panguard guard ai             Add optional AI detection (Layer C)"
   echo "    panguard guard stop           Stop Guard"
   echo ""
 }

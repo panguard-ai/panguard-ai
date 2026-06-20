@@ -1,8 +1,8 @@
 /**
  * ATR (Agent Threat Rules) pattern detection check
  *
- * Evaluates skill manifests against the ATR rule engine (52+ rules)
- * covering prompt injection, tool poisoning, context exfiltration,
+ * Evaluates skill manifests against the ATR rule engine (the current ATR
+ * ruleset) covering prompt injection, tool poisoning, context exfiltration,
  * agent manipulation, privilege escalation, and CJK-aware patterns.
  *
  * This augments (does NOT replace) existing regex checks in instruction-check.ts.

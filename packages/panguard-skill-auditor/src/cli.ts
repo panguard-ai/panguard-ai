@@ -10,12 +10,15 @@
  */
 
 import { auditSkill } from './index.js';
+import { setLogLevel } from '@panguard-ai/core';
 import { readdir, stat } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { existsSync } from 'node:fs';
 
 interface CliOptions {
-  dir: string;
+  // undefined means the user did not pass --dir; we must NOT silently fall back
+  // to the current working directory.
+  dir: string | undefined;
   json: boolean;
   failOn: 'critical' | 'high' | 'medium' | 'low' | null;
   fleet: boolean;
@@ -23,7 +26,7 @@ interface CliOptions {
 
 function parseArgs(argv: string[]): CliOptions {
   const opts: CliOptions = {
-    dir: '.',
+    dir: undefined,
     json: false,
     failOn: null,
     fleet: false,
@@ -106,7 +109,24 @@ async function findSkillDirs(parent: string): Promise<string[]> {
 
 async function main(): Promise<void> {
   const opts = parseArgs(process.argv.slice(2));
-  const dir = resolve(opts.dir);
+
+  // No target specified: do NOT silently audit the current working directory.
+  // Without --dir (and not in --fleet mode) there is nothing to scan; show
+  // usage and exit non-zero so scripts treat it as an invalid invocation.
+  if (opts.dir === undefined && !opts.fleet) {
+    printHelp();
+    process.exit(2);
+  }
+
+  // On the human (non-JSON) output path, suppress the internal panguard-scan:*
+  // structured JSON logger so its debug lines never reach an end user. JSON
+  // mode keeps logs on stderr (separate from the machine-readable stdout), and
+  // an explicit PANGUARD_LOG_LEVEL override is always honoured.
+  if (!opts.json && process.env['PANGUARD_LOG_LEVEL'] === undefined) {
+    setLogLevel('silent');
+  }
+
+  const dir = resolve(opts.dir ?? '.');
 
   if (!existsSync(dir)) {
     console.error(`Directory not found: ${dir}`);

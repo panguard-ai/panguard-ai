@@ -21,6 +21,26 @@ import type { ThreatCloudDB } from './database.js';
 import { TC_DRAFTER_TOOLS, executeToolCall } from './llm-reviewer-tools.js';
 
 /**
+ * Simplified ReDoS safety check for LLM-generated regex patterns.
+ * Mirrors the scan-core engine guard (packages/scan-core/src/atr-engine.ts):
+ * detects catastrophic-backtracking constructs — nested quantifiers like
+ * (a+)+, overlapping alternations like (a|a)+, and star-of-star wildcards —
+ * that cause exponential time on non-matching input. An attacker who can
+ * influence the LLM's output could otherwise plant a ReDoS pattern that the
+ * scan engine later compiles and runs against untrusted content.
+ */
+function isSafeRegex(re: RegExp): boolean {
+  const src = re.source;
+  // Reject nested quantifiers: (pattern+)+ or (pattern*)+ or (pattern+)* etc.
+  if (/\([^)]*[+*]\)[+*{]/.test(src)) return false;
+  // Reject overlapping alternations with quantifiers: (a|a)+
+  if (/\(([^|)]+)\|\1\)[+*]/.test(src)) return false;
+  // Reject star-of-star: .*.*.* (3+ consecutive greedy wildcards)
+  if (/(\.\*){3,}/.test(src)) return false;
+  return true;
+}
+
+/**
  * Minimal rule shape for self-test — matches what the LLM drafter prompt
  * outputs. We only care about detection.conditions and test_cases.
  */
@@ -78,7 +98,12 @@ function selfTestRule(ruleContent: string): SelfTestResult {
     // Strip (?i) prefix — JS uses /pattern/i flag
     const pattern = c.value.replace(/^\(\?i\)/, '');
     try {
-      regexes.push(new RegExp(pattern, 'i'));
+      const compiled = new RegExp(pattern, 'i');
+      // ReDoS guard: a catastrophic-backtracking pattern would run during
+      // r.test() below on every TP/TN. Drop the condition so neither the
+      // self-test nor any downstream consumer executes an unsafe regex.
+      if (!isSafeRegex(compiled)) continue;
+      regexes.push(compiled);
     } catch {
       // Invalid regex — skip this condition. Other conditions may still work.
     }
@@ -882,13 +907,22 @@ If you cannot meet this bar, output NO_THREATS_FOUND instead of a weak rule.`;
             // Strip (?i) prefix — JS uses /pattern/i flag instead of PCRE inline (?i)
             const rawPattern = regexMatch[2]!;
             const jsPattern = rawPattern.replace(/^\(\?i\)/g, '');
+            let compiledPattern: RegExp;
             try {
-              new RegExp(jsPattern, 'i');
+              compiledPattern = new RegExp(jsPattern, 'i');
             } catch (regexErr) {
               console.log(
                 `[LLM] YAML block skipped — invalid regex: ${rawPattern.slice(0, 100)}. Error: ${regexErr instanceof Error ? regexErr.message : String(regexErr)}`
               );
               continue; // Skip rules with invalid regex
+            }
+            // ReDoS guard: reject LLM-generated patterns with catastrophic
+            // backtracking before they are stored or forwarded downstream.
+            if (!isSafeRegex(compiledPattern)) {
+              console.log(
+                `[LLM] YAML block skipped — unsafe (ReDoS-prone) regex: ${jsPattern.slice(0, 100)}`
+              );
+              continue; // Skip rules with ReDoS-vulnerable regex
             }
             // If we stripped (?i), also fix it in the rule content so downstream consumers don't hit the same issue
             if (rawPattern !== jsPattern) {

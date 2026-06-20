@@ -12,7 +12,7 @@
  * @module @panguard-ai/panguard-chat/cli
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, chmodSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { SETUP_STEPS, getWelcomeMessage } from '../onboarding/index.js';
@@ -112,11 +112,23 @@ async function commandSetup(args: string[]): Promise<void> {
         : `Config: channel=${channel}, userType=${userType}, language=${lang}`
     );
 
-    // Collect channel-specific config from args
-    const token = extractOption(args, '--token');
+    // Collect channel-specific config. The Telegram bot token is a secret and
+    // must NOT be passed via argv (visible in `ps`); read it from the
+    // PANGUARD_TELEGRAM_TOKEN environment variable instead.
+    const token = process.env['PANGUARD_TELEGRAM_TOKEN'];
     const chatId = extractOption(args, '--chat-id');
     const url = extractOption(args, '--url');
     const webhookUrl = extractOption(args, '--webhook-url');
+
+    if (channel === 'telegram' && chatId && !token) {
+      console.log('');
+      console.log(
+        lang === 'zh-TW'
+          ? '請透過環境變數提供 Telegram bot token(避免出現在程序清單中):'
+          : 'Provide the Telegram bot token via environment variable (keeps it out of the process list):'
+      );
+      console.log('  PANGUARD_TELEGRAM_TOKEN=<token> panguard-chat setup --channel telegram --chat-id <id>');
+    }
 
     const channels: ChatConfig['channels'] = {
       ...(channel === 'telegram' && token && chatId
@@ -155,7 +167,7 @@ async function commandSetup(args: string[]): Promise<void> {
 
     const configPath = process.env['PANGUARD_CHAT_CONFIG'] ?? CONFIG_FILE;
     mkdirSync(CONFIG_DIR, { recursive: true });
-    writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
+    writeConfigFile(configPath, config);
 
     console.log('');
     console.log(
@@ -322,7 +334,9 @@ function commandConfig(): void {
     return;
   }
 
-  console.log(JSON.stringify(config, null, 2));
+  // Redact secrets (bot tokens, SMTP password, webhook secret/URL) before
+  // printing — the config dump must never expose cleartext credentials.
+  console.log(JSON.stringify(redactSecrets(config), null, 2));
 }
 
 /**
@@ -368,7 +382,7 @@ function commandPrefs(args: string[]): void {
     };
     const configPath = process.env['PANGUARD_CHAT_CONFIG'] ?? CONFIG_FILE;
     mkdirSync(CONFIG_DIR, { recursive: true });
-    writeFileSync(configPath, JSON.stringify(newConfig, null, 2), 'utf-8');
+    writeConfigFile(configPath, newConfig);
     console.log('Notification preferences updated / 通知偏好已更新');
     console.log('');
     showPrefs(newPrefs);
@@ -418,8 +432,12 @@ Commands:
 Options:
   --channel <type>    Channel type (telegram, slack, email, webhook)
   --user-type <type>  User type (developer, boss, it_admin)
+  --chat-id <id>      Telegram chat id / Telegram 對話 ID
   --lang <lang>       Language (zh-TW, en) / 語言
   --data-dir <path>   Data directory / 資料目錄
+
+Secrets (via environment variables, never argv):
+  PANGUARD_TELEGRAM_TOKEN   Telegram bot token (kept out of the process list)
 
 Version: ${CLI_VERSION}
 `);
@@ -439,6 +457,44 @@ function extractOption(args: string[], option: string): string | undefined {
     return args[idx + 1];
   }
   return undefined;
+}
+
+/**
+ * Write the config file with owner-only (0600) permissions. The credential file
+ * holds bot tokens, SMTP passwords, and webhook secrets, so it must never be
+ * world- or group-readable. chmodSync is a belt-and-suspenders step that also
+ * tightens permissions on a pre-existing file whose mode predates this fix.
+ * 以 0600(僅擁有者可讀寫)權限寫入配置檔。
+ */
+function writeConfigFile(configPath: string, config: ChatConfig): void {
+  writeFileSync(configPath, JSON.stringify(config, null, 2), { encoding: 'utf-8', mode: 0o600 });
+  chmodSync(configPath, 0o600);
+}
+
+/**
+ * Object KEY names that carry secrets (case-insensitive). Mirrors the key-name
+ * approach in panguard-guard's redact module so a new secret-bearing field is
+ * caught automatically as long as its key looks secret-ish. Self-contained here
+ * because panguard-chat must not take a runtime dependency on panguard-guard.
+ */
+const SECRET_KEY_RE =
+  /(api[-_]?key|license[-_]?key|signing[-_]?secret|signing[-_]?key|private[-_]?key|bot[-_]?token|token|secret|password|passphrase|credential|webhook[-_]?url|\burl\b|\bpass\b)/i;
+
+/** Placeholder substituted for any redacted secret value. */
+const REDACTED = '[redacted]';
+
+/**
+ * Return a deep clone of `value` with every secret-named non-empty string field
+ * replaced by `[redacted]`. Non-string and empty values are left untouched so
+ * the reader can still tell whether a channel is configured. Never mutates input.
+ * 回傳深拷貝,將所有具機密性的字串欄位以 [redacted] 取代;不變動原物件。
+ */
+function redactSecrets<T>(value: T): T {
+  return JSON.parse(
+    JSON.stringify(value, (k, v) =>
+      SECRET_KEY_RE.test(k) && typeof v === 'string' && v ? REDACTED : v
+    )
+  ) as T;
 }
 
 // ---------------------------------------------------------------------------

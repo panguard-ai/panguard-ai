@@ -18,6 +18,70 @@ import type { TrapIntelligence } from './types.js';
 
 const logger = createLogger('panguard-trap:cloud-uploader');
 
+/**
+ * Validate that an upload endpoint is safe (HTTPS + not a private/reserved host).
+ * Prevents SSRF: trap intel must only ever leave to the real Threat Cloud,
+ * never to a loopback/private/link-local/reserved address an attacker could
+ * coerce via a poisoned config.
+ * 驗證上傳端點安全（HTTPS + 非私有/保留位址），防止 SSRF。
+ *
+ * @throws Error when the scheme is not https or the host is a private/reserved IP.
+ */
+function assertSafeEndpoint(endpoint: string): void {
+  let url: URL;
+  try {
+    url = new URL(endpoint);
+  } catch {
+    throw new Error(`Invalid Threat Cloud endpoint: ${endpoint}`);
+  }
+
+  if (url.protocol !== 'https:') {
+    throw new Error(`Threat Cloud endpoint must use https, got: ${url.protocol}`);
+  }
+
+  if (isPrivateOrReservedHost(url.hostname)) {
+    throw new Error(`Threat Cloud endpoint host is private or reserved: ${url.hostname}`);
+  }
+}
+
+/**
+ * True when a hostname is a loopback, private, link-local, or otherwise
+ * reserved address that the uploader must never POST to.
+ */
+function isPrivateOrReservedHost(hostname: string): boolean {
+  const host = hostname.replace(/^\[|\]$/g, '').toLowerCase();
+
+  if (host === 'localhost' || host.endsWith('.localhost')) return true;
+
+  // IPv6 loopback / unspecified / unique-local (fc00::/7) / link-local (fe80::/10)
+  if (host.includes(':')) {
+    if (host === '::1' || host === '::') return true;
+    if (host.startsWith('fc') || host.startsWith('fd')) return true;
+    if (host.startsWith('fe8') || host.startsWith('fe9') || host.startsWith('fea') || host.startsWith('feb')) {
+      return true;
+    }
+    return false;
+  }
+
+  // IPv4 dotted-quad ranges
+  const m = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (!m) return false;
+  const a = Number(m[1]);
+  const b = Number(m[2]);
+  const c = Number(m[3]);
+  const d = Number(m[4]);
+  if ([a, b, c, d].some((o) => o > 255)) return true; // malformed -> reject
+  if (a === 0) return true; // 0.0.0.0/8 "this network"
+  if (a === 10) return true; // 10.0.0.0/8
+  if (a === 127) return true; // 127.0.0.0/8 loopback
+  if (a === 169 && b === 254) return true; // 169.254.0.0/16 link-local
+  if (a === 172 && b >= 16 && b <= 31) return true; // 172.16.0.0/12
+  if (a === 192 && b === 168) return true; // 192.168.0.0/16
+  if (a === 100 && b >= 64 && b <= 127) return true; // 100.64.0.0/10 CGNAT
+  if (a >= 224) return true; // 224.0.0.0/4 multicast + 240.0.0.0/4 reserved
+  return false;
+}
+
 /** Serializable form of TrapIntelligence for HTTP POST */
 interface TrapIntelPayload {
   timestamp: string;
@@ -49,7 +113,9 @@ export class ThreatCloudUploader {
   private static readonly FLUSH_INTERVAL = 30_000;
 
   constructor(endpoint: string) {
-    this.endpoint = endpoint.replace(/\/+$/, '');
+    const normalized = endpoint.replace(/\/+$/, '');
+    assertSafeEndpoint(normalized);
+    this.endpoint = normalized;
 
     this.flushTimer = setInterval(() => {
       void this.flush();
@@ -96,6 +162,9 @@ export class ThreatCloudUploader {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: payload,
+        // Refuse redirects: a redirect could re-point the upload at a
+        // private/internal host that bypassed the constructor's check.
+        redirect: 'error',
         signal: AbortSignal.timeout(10_000),
       });
 

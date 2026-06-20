@@ -118,7 +118,7 @@ describe('ATR skill-scan regression (malware must not be reported clean)', () =>
 
       // Overall risk must reflect the threat.
       expect(['CRITICAL', 'HIGH']).toContain(report.riskLevel);
-    });
+    }, 30000); // auditSkill runs semgrep (~3-5s); allow headroom under parallel CI load
 
     it('reports a benign SKILL.md as low risk with no ATR findings', async () => {
       const dir = await makeTempDir();
@@ -133,6 +133,6 @@ describe('ATR skill-scan regression (malware must not be reported clean)', () =>
 
       const atrFindings = report.findings.filter((f) => f.id.startsWith('atr-'));
       expect(atrFindings).toHaveLength(0);
-    });
+    }, 30000); // auditSkill runs semgrep (~3-5s); allow headroom under parallel CI load
   });
 });
