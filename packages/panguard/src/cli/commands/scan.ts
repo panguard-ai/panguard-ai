@@ -23,13 +23,37 @@ import { runScan, runRemoteScan } from '@panguard-ai/panguard-scan';
 import { PANGUARD_VERSION } from '../../index.js';
 import { computeGrade, buildScanOutput, saveResults } from '../scan-helpers.js';
 import type { ScanOutputSystem } from '../scan-helpers.js';
-import { ensureTelemetryConsent } from '../consent.js';
+import { ensureTelemetryConsent, isThreatCloudUploadEnabled } from '../consent.js';
 import {
   reportTelemetry,
   reportScanToCloud,
   discoverLocalSkillCount,
   getLocalPlatform,
 } from '../telemetry.js';
+
+/**
+ * Count threats in the bundled ATR CLI's `--json` output. ATR's schema is
+ * { scan_type, skills_scanned, threats_detected, rules_loaded, results:[{file,
+ * content_hash, matches:[]}] } — there is NO `findings` key. Reading a
+ * non-existent `findings` field made `pga scan --all` count every skill (even
+ * actively-malicious ones) as clean. Returns the threat count, or -1 if the
+ * output could not be parsed.
+ */
+function countAtrThreats(jsonText: string): number {
+  try {
+    const j = JSON.parse(jsonText) as {
+      threats_detected?: number;
+      results?: Array<{ matches?: unknown[] }>;
+    };
+    if (typeof j.threats_detected === 'number') return j.threats_detected;
+    if (Array.isArray(j.results)) {
+      return j.results.reduce((n, r) => n + (Array.isArray(r.matches) ? r.matches.length : 0), 0);
+    }
+    return 0;
+  } catch {
+    return -1;
+  }
+}
 
 function remoteSystem(openPorts: number): ScanOutputSystem {
   return {
@@ -101,6 +125,7 @@ export function scanCommand(): Command {
       'medium'
     )
     .option('--save <path>', 'Save JSON results to file')
+    .option('--no-report', 'Do not report findings to Threat Cloud')
     .option('--target <host>', 'Remote target (IP or domain)')
     .action(
       async (
@@ -115,6 +140,7 @@ export function scanCommand(): Command {
           sarif: boolean;
           severity: string;
           save?: string;
+          report: boolean;
           target?: string;
         }
       ) => {
@@ -140,6 +166,14 @@ export function scanCommand(): Command {
 
           console.log(`\n  Scanning ${skills.length} installed skill(s)...\n`);
 
+          // PRIVACY GATE (see the `pga scan <path>` path below): the bundled ATR
+          // CLI uploads findings to Threat Cloud by default, anonymously, with no
+          // API key required. Force --no-report unless the user has opted in, so a
+          // batch scan of every installed skill never leaks without consent.
+          // The explicit `--no-report` flag (options.report === false) is a hard
+          // user override that suppresses reporting EVEN when opted in.
+          const tcUploadConsented = options.report !== false && isThreatCloudUploadEnabled();
+
           // Resolve the BUNDLED ATR scanner once (the ruleset PanGuard ships),
           // not a stale global `atr` on $PATH or npx@latest.
           const bundledAtr = await resolveBundledAtrCli();
@@ -160,6 +194,7 @@ export function scanCommand(): Command {
             try {
               const atrBin = bundledAtr ? process.execPath : useNpx ? 'npx' : 'atr';
               const baseArgs = ['scan', skillPath, '--severity', options.severity, '--json'];
+              if (!tcUploadConsented) baseArgs.push('--no-report');
               const atrArgs = bundledAtr
                 ? [bundledAtr, ...baseArgs]
                 : useNpx
@@ -170,11 +205,14 @@ export function scanCommand(): Command {
                 stdio: ['inherit', 'pipe', 'pipe'],
                 timeout: bundledAtr || !useNpx ? 30_000 : 90_000,
               });
-              const parsed = JSON.parse(result.toString()) as { findings?: unknown[] };
-              if (parsed.findings && parsed.findings.length > 0) {
+              // ATR reports threats via threats_detected / results[].matches[],
+              // NOT a `findings` array. Use the shared parser so a malicious
+              // skill can never be silently counted clean here.
+              const n = countAtrThreats(result.toString());
+              if (n > 0) {
                 threats++;
                 console.log(
-                  `  ${c.critical('!!')} ${c.bold(skill.name)} — ${parsed.findings.length} finding(s)`
+                  `  ${c.critical('!!')} ${c.bold(skill.name)} — ${n} finding(s)`
                 );
               } else {
                 clean++;
@@ -183,13 +221,13 @@ export function scanCommand(): Command {
               const e = err as { status?: number; stdout?: Buffer };
               if (e.status === 1 && e.stdout && e.stdout.length > 0) {
                 // ATR exits 1 when findings exist — parse them
-                try {
-                  const parsed = JSON.parse(e.stdout.toString()) as { findings?: unknown[] };
+                const n = countAtrThreats(e.stdout.toString());
+                if (n !== 0) {
                   threats++;
                   console.log(
-                    `  ${c.critical('!!')} ${c.bold(skill.name)} — ${parsed.findings?.length ?? '?'} finding(s)`
+                    `  ${c.critical('!!')} ${c.bold(skill.name)} — ${n > 0 ? n : '?'} finding(s)`
                   );
-                } catch {
+                } else {
                   threats++;
                   console.log(`  ${c.caution('!')} ${c.bold(skill.name)} — flagged`);
                 }
@@ -224,7 +262,18 @@ export function scanCommand(): Command {
               return;
             }
 
+            // PRIVACY GATE: the bundled ATR CLI reports findings to Threat Cloud
+            // by default (anonymous — it does NOT need an API key to upload). A
+            // user who has not explicitly opted in must never have scan results
+            // leave the machine, so force --no-report unless upload consent is on.
+            // This path is intentionally non-interactive: a one-off `pga scan`
+            // honours a prior opt-in but never prompts and never uploads by default.
+            // The explicit `--no-report` flag (options.report === false) is a hard
+            // user override that suppresses reporting EVEN when opted in.
+            const tcUploadConsented = options.report !== false && isThreatCloudUploadEnabled();
+
             const atrArgs = ['scan', resolvedPath, '--severity', options.severity];
+            if (!tcUploadConsented) atrArgs.push('--no-report');
             if (options.sarif) atrArgs.push('--sarif');
             else if (options.json) atrArgs.push('--json');
 
@@ -253,20 +302,27 @@ export function scanCommand(): Command {
               }
             }
 
-            // Pass TC client key (provisioned by `pga up`) to ATR via env var.
-            // ATR reads process.env.TC_API_KEY in tc-reporter.ts; no ATR code
-            // change needed (keeps ATR independent of PanGuard paths).
+            // Pass TC client key (provisioned by `pga up`) to ATR via env var,
+            // but ONLY when the user has opted in to upload. ATR reads
+            // process.env.TC_API_KEY in tc-reporter.ts; combined with --no-report
+            // above this means a non-consented scan neither authenticates nor
+            // uploads. If the user has not opted in, strip any inherited key so a
+            // shell-exported TC_API_KEY cannot turn a local scan into an upload.
             const scanEnv: NodeJS.ProcessEnv = { ...process.env };
-            if (!scanEnv['TC_API_KEY']) {
-              const clientKeyPath = joinPath(homedir(), '.panguard', 'tc-client-key');
-              if (pathExists(clientKeyPath)) {
-                try {
-                  const key = readFile(clientKeyPath, 'utf-8').trim();
-                  if (key.length > 0) scanEnv['TC_API_KEY'] = key;
-                } catch {
-                  /* ignore — scan still works without TC auth */
+            if (tcUploadConsented) {
+              if (!scanEnv['TC_API_KEY']) {
+                const clientKeyPath = joinPath(homedir(), '.panguard', 'tc-client-key');
+                if (pathExists(clientKeyPath)) {
+                  try {
+                    const key = readFile(clientKeyPath, 'utf-8').trim();
+                    if (key.length > 0) scanEnv['TC_API_KEY'] = key;
+                  } catch {
+                    /* ignore — scan still works without TC auth */
+                  }
                 }
               }
+            } else {
+              delete scanEnv['TC_API_KEY'];
             }
 
             const result = execFileSync(atrBin, atrArgs, {

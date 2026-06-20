@@ -39,8 +39,13 @@ type Lang = 'en' | 'zh-TW';
 const HOME = homedir();
 const PANGUARD_DIR = join(HOME, '.panguard');
 const CONFIG_PATH = join(PANGUARD_DIR, 'config.json');
+// `pga setup` writes the canonical config to ~/.panguard-guard/config.json, not
+// ~/.panguard/config.json. Doctor must check the guard config path so a freshly
+// configured install is not reported as broken.
+const GUARD_DIR = join(HOME, '.panguard-guard');
+const GUARD_CONFIG_PATH = join(GUARD_DIR, 'config.json');
 const LAST_SCAN_PATH = join(PANGUARD_DIR, 'last-scan.json');
-const GUARD_PID_PATH = join(HOME, '.panguard-guard', 'panguard-guard.pid');
+const GUARD_PID_PATH = join(GUARD_DIR, 'panguard-guard.pid');
 const LAUNCHD_PLIST_PATH = join(HOME, 'Library', 'LaunchAgents', 'ai.panguard.guard.plist');
 const ZSH_COMPLETIONS_PATH = join(HOME, '.zsh', 'completions', '_panguard');
 
@@ -59,28 +64,40 @@ function checkInstallation(): CheckResult {
 }
 
 function checkConfiguration(): CheckResult {
-  if (!existsSync(CONFIG_PATH)) {
+  // The canonical config `pga setup` writes is ~/.panguard-guard/config.json.
+  // Prefer it; fall back to the legacy ~/.panguard/config.json so installs that
+  // only have the master config still pass. A configured install must never be
+  // reported as broken just because the legacy path is absent.
+  const candidate = existsSync(GUARD_CONFIG_PATH)
+    ? GUARD_CONFIG_PATH
+    : existsSync(CONFIG_PATH)
+      ? CONFIG_PATH
+      : null;
+
+  if (!candidate) {
     return {
       status: 'fail',
       label: 'Configuration valid',
-      detail: '~/.panguard/config.json not found',
+      detail: '~/.panguard-guard/config.json not found',
       fix: 'Run "pga setup" to create your configuration',
     };
   }
 
+  const display = candidate === GUARD_CONFIG_PATH ? '~/.panguard-guard/config.json' : '~/.panguard/config.json';
+
   try {
-    const raw = readFileSync(CONFIG_PATH, 'utf-8');
+    const raw = readFileSync(candidate, 'utf-8');
     JSON.parse(raw);
     return {
       status: 'pass',
       label: 'Configuration valid',
-      detail: '~/.panguard/config.json',
+      detail: display,
     };
   } catch {
     return {
       status: 'fail',
       label: 'Configuration valid',
-      detail: '~/.panguard/config.json is not valid JSON',
+      detail: `${display} is not valid JSON`,
       fix: 'Run "pga setup" to regenerate the configuration file',
     };
   }
@@ -306,37 +323,38 @@ function checkLastScan(): CheckResult {
 const DEFAULT_TC_ENDPOINT = 'https://tc.panguard.ai';
 
 function checkThreatCloud(): CheckResult {
-  // TC defaults to tc.panguard.ai — no config required. Customer's audit/scan
-  // already uploads here transparently. Only flag as warn if customer has
-  // explicitly opted out (threatCloud.enabled: false) or pointed at a custom
-  // endpoint that's not reachable.
+  // Threat Cloud is OPT-IN and defaults to OFF. The single source of truth is the
+  // guard config's threatCloudUploadEnabled flag (the same gate the upload path
+  // checks with `=== true`). Nothing is shared unless the user explicitly opts in,
+  // so doctor must not imply sharing happens "by default".
   let endpoint = DEFAULT_TC_ENDPOINT;
-  let enabledFlag: boolean | undefined;
-  if (existsSync(CONFIG_PATH)) {
+  let uploadEnabled = false;
+  if (existsSync(GUARD_CONFIG_PATH)) {
     try {
-      const raw = readFileSync(CONFIG_PATH, 'utf-8');
+      const raw = readFileSync(GUARD_CONFIG_PATH, 'utf-8');
       const cfg = JSON.parse(raw) as {
-        threatCloud?: { endpoint?: string; enabled?: boolean };
+        threatCloudUploadEnabled?: boolean;
+        threatCloudEndpoint?: string;
       };
-      if (cfg.threatCloud?.endpoint) endpoint = cfg.threatCloud.endpoint;
-      enabledFlag = cfg.threatCloud?.enabled;
+      uploadEnabled = cfg.threatCloudUploadEnabled === true;
+      if (cfg.threatCloudEndpoint) endpoint = cfg.threatCloudEndpoint;
     } catch {
-      // Config parse error → fall through to default
+      // Config parse error → treat as not enabled (privacy-safe default)
     }
   }
 
-  if (enabledFlag === false) {
+  if (uploadEnabled) {
     return {
       status: 'pass',
       label: 'Threat Cloud',
-      detail: 'Disabled (opted out — pga config set threatCloud.enabled true to re-enable)',
+      detail: `Enabled (opted in) — sharing anonymized findings with ${endpoint.replace(/^https?:\/\//, '')}`,
     };
   }
 
   return {
     status: 'pass',
     label: 'Threat Cloud',
-    detail: `Connected to ${endpoint.replace(/^https?:\/\//, '')} (default — pga audit shares anonymized findings here)`,
+    detail: 'opt-in, currently OFF (enable: pga config set threat-cloud true)',
   };
 }
 

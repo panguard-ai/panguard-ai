@@ -127,9 +127,10 @@ describe('scanCommand', () => {
       expect(targetOpt!.flags).toContain('<host>');
     });
 
-    it('should have exactly 10 options', () => {
+    it('should have exactly 11 options', () => {
       const cmd = scanCommand();
-      expect(cmd.options).toHaveLength(10);
+      // 11 includes --no-report (explicit opt-out override for Threat Cloud reporting).
+      expect(cmd.options).toHaveLength(11);
     });
 
     it('should define --save option for saving JSON results to file', () => {
