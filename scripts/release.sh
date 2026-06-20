@@ -150,7 +150,6 @@ PUBLISH_ORDER=(
   "packages/panguard-web"
   "packages/panguard-trap"
   "packages/panguard-mcp-proxy"
-  "packages/threat-cloud"
   "packages/panguard-skill-auditor"
   "packages/panguard-mcp"
   "packages/panguard-guard"
