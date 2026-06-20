@@ -277,8 +277,13 @@ export class GuardEngine {
       config: this.config,
     };
     this.cloudSyncTimer = setupCloudSyncTimer(syncDeps);
-    // Await initial indicator sync so the blocklists are fresh on startup.
-    await syncThreatCloud(syncDeps);
+    // Initial indicator sync — FIRE-AND-FORGET (do NOT await). Awaiting it here
+    // blocked the daemon — and therefore the dashboard bind — on a Threat Cloud
+    // network call; a slow / firewalled / dead-IPv6 route to tc.panguard.ai hung
+    // startup for ~75s (the request idle-timeout doesn't cover TCP/TLS connect).
+    // The periodic timer above keeps blocklists fresh; the first pull just lands
+    // a moment after the daemon is already up. Mirrors checkForRuleUpdates below.
+    void syncThreatCloud(syncDeps);
 
     // Daily rule-update CHECK (notify-only): compares the bundled ruleset against
     // the latest published npm version and surfaces "update available" — it never
