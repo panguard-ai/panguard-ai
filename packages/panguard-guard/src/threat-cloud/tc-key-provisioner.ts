@@ -10,6 +10,7 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 import https from 'node:https';
 import http from 'node:http';
+import { checkOutboundUrl } from '../net/validate-outbound-url.js';
 
 const KEY_PATH = join(homedir(), '.panguard', 'tc-client-key');
 
@@ -25,6 +26,17 @@ export async function loadOrProvisionTCKey(
   endpoint: string,
   clientId: string
 ): Promise<string | undefined> {
+  // SSRF guard: never provision (or persist) a key from a plain-HTTP, private,
+  // or cloud-metadata endpoint. Same policy as ThreatCloudClient.selectTransport:
+  // https required, http allowed only for loopback. Validate BEFORE any I/O.
+  const endpointError = checkOutboundUrl(`${endpoint}/api/clients/register`, {
+    allowLoopback: true,
+  });
+  if (endpointError !== null) {
+    // Unsafe endpoint — refuse provisioning entirely (no cache read, no register).
+    return undefined;
+  }
+
   // Try cached key first
   try {
     if (existsSync(KEY_PATH)) {
@@ -54,7 +66,14 @@ export async function loadOrProvisionTCKey(
 function registerWithTC(endpoint: string, clientId: string): Promise<string | undefined> {
   return new Promise((resolve) => {
     const payload = JSON.stringify({ clientId });
-    const parsed = new URL(`${endpoint}/api/clients/register`);
+    const registerUrl = `${endpoint}/api/clients/register`;
+    // Defense in depth: re-validate here so this never issues a request to a
+    // plain-HTTP / private / metadata endpoint even if called directly.
+    if (checkOutboundUrl(registerUrl, { allowLoopback: true }) !== null) {
+      resolve(undefined);
+      return;
+    }
+    const parsed = new URL(registerUrl);
     const transport = parsed.protocol === 'https:' ? https : http;
 
     const req = transport.request(

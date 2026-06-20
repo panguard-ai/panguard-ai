@@ -99,8 +99,11 @@ const GuardConfigFileSchema = z
     threatCloudEndpoint: z.string().url().optional(),
     threatCloudApiKey: z.string().optional(),
     threatCloudUploadEnabled: z.boolean().optional(),
-    // Receive new ATR rules from Threat Cloud. ON by default; set false to pin
-    // to the bundled rules (offline) without disabling IP/domain blocklist feeds.
+    // Receive new ATR detection rules from Threat Cloud. OPT-IN, OFF by default:
+    // detection rules are executable trust and are loaded only from the signed
+    // package unless the user explicitly enables this AND signed-rule
+    // infrastructure is available. Leaving it off keeps detection pinned to the
+    // bundled rules without disabling IP/domain blocklist feeds.
     threatCloudRuleSyncEnabled: z.boolean().optional(),
     telemetryEnabled: z.boolean().optional(),
     trustedSkills: z.array(z.string()).optional(),
@@ -132,6 +135,8 @@ export const DEFAULT_GUARD_CONFIG: GuardConfig = {
   watchdogEnabled: true,
   watchdogInterval: 60000,
   threatCloudEndpoint: 'https://tc.panguard.ai',
+  // OPT-IN, OFF by default. Made explicit so config dumps show the real default.
+  threatCloudRuleSyncEnabled: false,
 };
 
 /** Master config path written by `panguard init` / `panguard init` 寫入的主配置路徑 */
@@ -157,14 +162,11 @@ export function loadConfig(configPath?: string): GuardConfig {
 
   // Fall back to master config from `panguard init`
   if (existsSync(MASTER_CONFIG_PATH)) {
-    logger.info(
-      `No guard config at ${guardPath}, loading from master config / ` +
-        `未找到守護配置，從主配置載入`
-    );
+    logger.debug(`No guard config at ${guardPath}, loading from master config`);
     return loadFromMasterConfig(MASTER_CONFIG_PATH);
   }
 
-  logger.info(`No config file found, using defaults / 找不到配置檔，使用預設值`);
+  logger.debug(`No config file found, using defaults`);
   return { ...DEFAULT_GUARD_CONFIG };
 }
 
@@ -198,12 +200,31 @@ function loadGuardConfigFile(path: string): GuardConfig {
       notifications: { ...DEFAULT_GUARD_CONFIG.notifications, ...(parsed.notifications ?? {}) },
       monitors: { ...DEFAULT_GUARD_CONFIG.monitors, ...(parsed.monitors ?? {}) },
     };
-    logger.info(`Loaded config from ${path} / 已從 ${path} 載入配置`);
+    logger.debug(`Loaded config from ${path}`);
     return merged;
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    logger.error(`Failed to load config: ${msg} / 載入配置失敗: ${msg}`);
-    return { ...DEFAULT_GUARD_CONFIG };
+    logger.error(`Failed to load config: ${msg}`);
+    // A parse failure means the user's settings — INCLUDING any telemetry /
+    // upload opt-out — could not be read. Silently inheriting
+    // DEFAULT_GUARD_CONFIG (mode: protection) would (a) hide the failure and
+    // (b) grant OS-action authority the operator may never have enabled, while
+    // discarding a privacy opt-out they did set. So: warn loudly on stderr
+    // regardless of log level, and fail safe to the most conservative posture
+    // (report-only, no telemetry, no upload). The corrupt file is left in place
+    // at `path` for the operator to inspect and repair.
+    process.stderr.write(
+      `\nCONFIG INVALID (${msg}) — running with built-in defaults; ` +
+        `your settings (including any telemetry opt-out) are NOT applied. ` +
+        `Fail-safe posture: report-only, telemetry off, uploads off. ` +
+        `Corrupt file kept at ${path}.\n\n`
+    );
+    return {
+      ...DEFAULT_GUARD_CONFIG,
+      mode: 'report-only',
+      telemetryEnabled: false,
+      threatCloudUploadEnabled: false,
+    };
   }
 }
 
@@ -261,15 +282,26 @@ function loadFromMasterConfig(masterPath: string): GuardConfig {
       };
     }
 
-    logger.info(
-      `Loaded and converted master config from ${masterPath} / ` +
-        `已從 ${masterPath} 載入並轉換主配置`
-    );
+    logger.debug(`Loaded and converted master config from ${masterPath}`);
     return config;
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    logger.error(`Failed to load master config: ${msg} / 載入主配置失敗: ${msg}`);
-    return { ...DEFAULT_GUARD_CONFIG };
+    logger.error(`Failed to load master config: ${msg}`);
+    // Same fail-safe rationale as loadGuardConfigFile: a parse failure here also
+    // discards the operator's settings, so warn loudly and drop to the most
+    // conservative posture rather than inheriting protection mode silently.
+    process.stderr.write(
+      `\nCONFIG INVALID (${msg}) — running with built-in defaults; ` +
+        `your settings (including any telemetry opt-out) are NOT applied. ` +
+        `Fail-safe posture: report-only, telemetry off, uploads off. ` +
+        `Corrupt file kept at ${masterPath}.\n\n`
+    );
+    return {
+      ...DEFAULT_GUARD_CONFIG,
+      mode: 'report-only',
+      telemetryEnabled: false,
+      threatCloudUploadEnabled: false,
+    };
   }
 }
 
@@ -331,7 +363,7 @@ export function saveConfig(config: GuardConfig, configPath?: string): void {
   } catch {
     /* best effort — platforms without POSIX permissions */
   }
-  logger.info(`Saved config to ${path} / 已儲存配置到 ${path}`);
+  logger.info(`Saved config to ${path}`);
 }
 
 /**
@@ -340,6 +372,6 @@ export function saveConfig(config: GuardConfig, configPath?: string): void {
 export function ensureDataDir(dataDir: string): void {
   if (!existsSync(dataDir)) {
     mkdirSync(dataDir, { recursive: true });
-    logger.info(`Created data directory: ${dataDir} / 已建立資料目錄: ${dataDir}`);
+    logger.info(`Created data directory: ${dataDir}`);
   }
 }

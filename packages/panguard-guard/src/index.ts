@@ -178,6 +178,16 @@ export type {
 export { GuardATREngine } from './engines/atr-engine.js';
 export type { GuardATREngineConfig } from './engines/atr-engine.js';
 
+// Opt-in semantic-layer (Layer C) LLM config — encrypted-at-rest writer/clearer
+// that the daemon reads on startup (so a cloud key reaches the launchd/systemd
+// daemon, which a shell env var would not). Read path stays internal.
+export {
+  writeEncryptedLlmConfig,
+  clearEncryptedLlmConfig,
+  getEncryptedLlmConfigPath,
+} from './llm-detect.js';
+export type { EncryptedLlmConfigInput } from './llm-detect.js';
+
 // Skill Whitelist / 技能白名單
 export { SkillWhitelistManager } from './engines/skill-whitelist.js';
 export type {

@@ -119,14 +119,20 @@ describe('loadConfig', () => {
     });
   });
 
-  it('should handle malformed JSON gracefully', () => {
+  it('should fail SAFE (not silently to protection) on malformed JSON', () => {
     const configPath = join(testDir, 'config.json');
     writeFileSync(configPath, '{ invalid json');
 
     const config = loadConfig(configPath);
 
-    // Should fall back to defaults
-    expect(config.mode).toBe(DEFAULT_GUARD_CONFIG.mode);
+    // A corrupt config must NOT silently inherit DEFAULT_GUARD_CONFIG's
+    // mode:protection (which would discard the user's telemetry opt-out and
+    // escalate enforcement). It must fail to the most conservative posture:
+    // report-only, telemetry off, uploads off — with a loud stderr warning.
+    expect(config.mode).toBe('report-only');
+    expect(config.telemetryEnabled).toBe(false);
+    expect(config.threatCloudUploadEnabled).toBe(false);
+    // Non-posture defaults still inherited.
     expect(config.actionPolicy).toEqual(DEFAULT_ACTION_POLICY);
   });
 

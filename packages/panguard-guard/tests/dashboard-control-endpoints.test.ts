@@ -106,11 +106,13 @@ describe('DashboardServer — 1.7 control endpoints', () => {
       expect(d.layers.b.state).toBe('active');
     });
 
-    it('Layer C reports off + BYO guidance when no semantic LLM is configured', async () => {
+    it('Layer C reports off + points at `pga guard ai` when no semantic LLM is configured', async () => {
       const d = await (await get('/api/status')).json();
       expect(d.layers.c.state).toBe('off');
       expect(d.layers.c.optional).toBe(true);
-      expect(d.layers.c.detail.toLowerCase()).toContain('bring your own');
+      // Off-state guidance points at the canonical secure connect path.
+      expect(d.layers.c.detail.toLowerCase()).toContain('pga guard ai');
+      expect(d.layers.c.detail.toLowerCase()).toContain('advisory');
     });
 
     it('Layer C is active when a BYO LLM is configured', async () => {
@@ -207,6 +209,96 @@ describe('DashboardServer — 1.7 control endpoints', () => {
     });
   });
 
+  describe('mode change is live — GET /api/config returns the NEW mode (no stale read)', () => {
+    // Mirror how the engine wires the dashboard: a MUTABLE live config behind
+    // setConfigGetter, plus setConfigApplier that mutates it. Without the
+    // applier, getConfig() kept returning the launch-time config, so
+    // /api/config and /api/status served the STALE mode and the UI snapped back.
+    let liveDashboard: DashboardServer;
+    let livePort: number;
+    let liveUrl: string;
+    let liveToken: string;
+    let liveDir: string;
+    let liveConfig: GuardConfig;
+
+    beforeEach(async () => {
+      liveDir = mkdtempSync(join(tmpdir(), 'pg-live-'));
+      liveConfig = baseConfig(liveDir); // starts in 'protection'
+      livePort = await pickFreePort();
+      liveDashboard = new DashboardServer(livePort);
+      liveDashboard.setConfigGetter(() => liveConfig);
+      // Mirror the engine's applyConfig: update the live config AND push the new
+      // mode into dashboard status (the engine does this via updateDashboardStatus
+      // so /api/status enforcement.mode follows the live mode without a restart).
+      liveDashboard.setConfigApplier((cfg) => {
+        liveConfig = cfg;
+        liveDashboard.updateStatus({ mode: cfg.mode });
+      });
+      await liveDashboard.start();
+      liveUrl = `http://127.0.0.1:${livePort}`;
+      liveToken = liveDashboard.getAuthToken();
+    });
+
+    afterEach(async () => {
+      await liveDashboard.stop();
+      rmSync(liveDir, { recursive: true, force: true });
+    });
+
+    it('GET /api/config reflects the new mode immediately after a mode POST', async () => {
+      // sanity: starts protection
+      const before = await (
+        await fetch(`${liveUrl}/api/config`, {
+          headers: { Authorization: `Bearer ${liveToken}` },
+        })
+      ).json();
+      expect(before.mode).toBe('protection');
+
+      const saveRes = await fetch(`${liveUrl}/api/threat-cloud`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${liveToken}` },
+        body: JSON.stringify({ mode: 'report-only' }),
+      });
+      expect(saveRes.status).toBe(200);
+
+      // The applier must have updated the LIVE config — no stale read.
+      const after = await (
+        await fetch(`${liveUrl}/api/config`, {
+          headers: { Authorization: `Bearer ${liveToken}` },
+        })
+      ).json();
+      expect(after.mode).toBe('report-only');
+
+      // /api/status enforcement posture follows the live mode too.
+      const status = await (
+        await fetch(`${liveUrl}/api/status`, {
+          headers: { Authorization: `Bearer ${liveToken}` },
+        })
+      ).json();
+      expect(status.enforcement.mode).toBe('report-only');
+    });
+
+    it('two consecutive saves compose — a consent toggle does not clobber a saved mode', async () => {
+      await fetch(`${liveUrl}/api/threat-cloud`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${liveToken}` },
+        body: JSON.stringify({ mode: 'report-only' }),
+      });
+      // Second save touches consent only — must NOT rewrite mode back.
+      await fetch(`${liveUrl}/api/threat-cloud`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${liveToken}` },
+        body: JSON.stringify({ consentGiven: true }),
+      });
+      const after = await (
+        await fetch(`${liveUrl}/api/config`, {
+          headers: { Authorization: `Bearer ${liveToken}` },
+        })
+      ).json();
+      expect(after.mode).toBe('report-only');
+      expect(after.threatCloudUploadEnabled).toBe(true);
+    });
+  });
+
   describe('enforcement posture — PROTECTED only when it will actually act', () => {
     it('protection mode with NO armed response = monitoring, not protected', async () => {
       dashboard.updateStatus({ mode: 'protection' });
@@ -253,9 +345,12 @@ describe('DashboardServer — 1.7 control endpoints', () => {
       expect(html).toContain('/api/rule-update');
     });
 
-    it('renders real layer health (renderLayers) + Layer C inline guidance hint', () => {
+    it('renders real layer health (renderLayers) + a Layer C connect CTA', () => {
       expect(html).toContain('renderLayers');
-      expect(html).toContain('id="lc-hint"');
+      // The old silent #lc-hint was replaced by a discoverable two-state CTA that
+      // deep-links to the Settings "Semantic layer (Layer C)" connect section.
+      expect(html).toContain('id="lc-cta"');
+      expect(html).toContain('id="p-settings-layerc"');
     });
 
     it('mode is a 3-state segmented control incl. report-only — no binary toggle', () => {

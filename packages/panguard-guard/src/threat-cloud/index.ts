@@ -679,11 +679,22 @@ export class ThreatCloudClient {
     throw new Error(`HTTPS required for Threat Cloud endpoint (got HTTP for ${parsed.hostname})`);
   }
 
-  /** Build common headers including Authorization if API key is configured */
-  private baseHeaders(): Record<string, string> {
-    const headers: Record<string, string> = {
-      'X-Panguard-Client-Id': this.clientId,
-    };
+  /**
+   * Build common headers, optionally including Authorization if an API key is
+   * configured.
+   *
+   * PRIVACY: the persistent device identifier (X-Panguard-Client-Id) is
+   * attached ONLY on consented upload requests (`identify: true`). Inbound
+   * rule/indicator pulls run anonymously so that simply receiving community
+   * intelligence — which happens on a ~5-minute timer regardless of upload
+   * consent — never beacons a stable device UUID, keeping the
+   * "nothing leaves your machine" promise for non-uploading users.
+   */
+  private baseHeaders(identify = false): Record<string, string> {
+    const headers: Record<string, string> = {};
+    if (identify) {
+      headers['X-Panguard-Client-Id'] = this.clientId;
+    }
     if (this.apiKey) {
       headers['Authorization'] = `Bearer ${this.apiKey}`;
     }
@@ -704,7 +715,8 @@ export class ThreatCloudClient {
           path: parsed.pathname + parsed.search,
           method: 'POST',
           headers: {
-            ...this.baseHeaders(),
+            // Upload POSTs are consent-gated at the call site — identify them.
+            ...this.baseHeaders(true),
             'Content-Type': 'application/json',
             'Content-Length': Buffer.byteLength(payload).toString(),
           },

@@ -10,9 +10,10 @@
  *       Origin is rejected (absent is NOT treated as same-origin).
  *     - A header-authenticated (Authorization: Bearer) POST is exempt (not a
  *       CSRF vector) — the legitimate CLI / test flow keeps working.
- *  3. Layer C onboarding copy points at the WORKING cloud path
- *     (ANTHROPIC_API_KEY / OPENAI_API_KEY env, or local Ollama) and never
- *     mentions the no-op `pga config llm`.
+ *  3. Layer C onboarding copy points at the canonical secure path
+ *     (`pga guard ai`, which reads the key echo-off and writes llm.enc that the
+ *     persistent daemon reads) — NOT env vars (which never reach a launchd/
+ *     systemd daemon) and never the no-op `pga config llm`.
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -133,7 +134,7 @@ describe('DashboardServer — security hardening (Cluster B)', () => {
       expect(body.ai).toBeNull();
     });
 
-    it('rejects POST to /api/ai-config (read-only) without mentioning `pga config llm`', async () => {
+    it('rejects POST to /api/ai-config (read-only) and points at the canonical `pga guard ai`', async () => {
       const res = await fetch(`${baseUrl}/api/ai-config`, {
         method: 'POST',
         headers: {
@@ -146,7 +147,10 @@ describe('DashboardServer — security hardening (Cluster B)', () => {
       expect(res.status).toBe(405);
       const body = await res.json();
       expect(body.error).not.toContain('pga config llm');
-      expect(body.error).toContain('ANTHROPIC_API_KEY');
+      // Canonical secure path is the terminal command (key read echo-off ->
+      // llm.enc), NOT env vars that never reach the launchd/systemd daemon.
+      expect(body.error).toContain('pga guard ai');
+      expect(body.error).not.toContain('ANTHROPIC_API_KEY');
     });
   });
 
@@ -237,15 +241,19 @@ describe('DashboardServer — security hardening (Cluster B)', () => {
   });
 
   describe('3. Layer C onboarding copy points at the working path', () => {
-    it('mentions ANTHROPIC_API_KEY / OPENAI_API_KEY env + Ollama, never `pga config llm`', async () => {
+    it('points at `pga guard ai` (canonical secure path), never env vars or `pga config llm`', async () => {
       const status = await (
         await fetch(`${baseUrl}/api/status`, { headers: { Authorization: `Bearer ${token}` } })
       ).json();
       const detail: string = status.layers.c.detail;
-      expect(detail).toContain('ANTHROPIC_API_KEY');
-      expect(detail).toContain('OPENAI_API_KEY');
-      expect(detail).toContain('PANGUARD_SEMANTIC=1');
+      // Canonical path is the terminal command that reads the key echo-off and
+      // writes it to llm.enc (read by the persistent daemon). Env vars never
+      // reach a launchd/systemd daemon, so they must NOT be advertised.
+      expect(detail).toContain('pga guard ai');
       expect(detail.toLowerCase()).toContain('ollama');
+      expect(detail).not.toContain('ANTHROPIC_API_KEY');
+      expect(detail).not.toContain('OPENAI_API_KEY');
+      expect(detail).not.toContain('PANGUARD_SEMANTIC=1');
       expect(detail).not.toContain('pga config llm');
     });
   });

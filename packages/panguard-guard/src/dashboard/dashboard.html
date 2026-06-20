@@ -75,6 +75,25 @@
         color: var(--text-primary);
         letter-spacing: 0.5px;
       }
+      .sb-brand-text {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+      }
+      .sb-brand .brand-tier {
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: var(--sage);
+        background: rgba(139, 154, 142, 0.14);
+        border: 1px solid rgba(139, 154, 142, 0.3);
+        border-radius: 4px;
+        padding: 1px 6px;
+        align-self: flex-start;
+        line-height: 1.6;
+      }
       .sb-nav {
         flex: 1;
         padding: 12px 0;
@@ -281,6 +300,224 @@
       .ei.benign,
       .ei.clean {
         border-left-color: var(--ok);
+      }
+
+      /* Readable event cards (replaces the raw JSON dump rows). A solo dev
+         scans these, not parses them: severity, plain summary, time. */
+      .ev-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 16px;
+        border-bottom: 1px solid var(--border);
+        border-left: 3px solid var(--text-muted);
+      }
+      .ev-card:last-child {
+        border-bottom: none;
+      }
+      .ev-card .ev-sev {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--text-muted);
+        flex-shrink: 0;
+      }
+      .ev-card .ev-body {
+        flex: 1;
+        min-width: 0;
+      }
+      .ev-card .ev-title {
+        font-size: 13px;
+        color: var(--text-primary);
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .ev-card .ev-meta {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 2px;
+        font-family: 'JetBrains Mono', 'SF Mono', monospace;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .ev-card .ev-sevtag {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        flex-shrink: 0;
+      }
+      .ev-card .ev-time {
+        font-size: 11px;
+        color: var(--text-muted);
+        font-family: 'JetBrains Mono', 'SF Mono', monospace;
+        flex-shrink: 0;
+      }
+      .ev-card.critical,
+      .ev-card.malicious {
+        border-left-color: var(--danger);
+      }
+      .ev-card.critical .ev-sev,
+      .ev-card.malicious .ev-sev {
+        background: var(--danger);
+      }
+      .ev-card.critical .ev-sevtag,
+      .ev-card.malicious .ev-sevtag {
+        color: var(--danger);
+      }
+      .ev-card.high {
+        border-left-color: var(--orange);
+      }
+      .ev-card.high .ev-sev {
+        background: var(--orange);
+      }
+      .ev-card.high .ev-sevtag {
+        color: var(--orange);
+      }
+      .ev-card.medium,
+      .ev-card.suspicious {
+        border-left-color: var(--warn);
+      }
+      .ev-card.medium .ev-sev,
+      .ev-card.suspicious .ev-sev {
+        background: var(--warn);
+      }
+      .ev-card.medium .ev-sevtag,
+      .ev-card.suspicious .ev-sevtag {
+        color: var(--warn);
+      }
+
+      /* First-run welcome guide */
+      .welcome {
+        position: relative;
+        background: linear-gradient(135deg, rgba(52, 211, 153, 0.1), rgba(139, 154, 142, 0.04));
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 22px 24px;
+        margin-bottom: 20px;
+        box-shadow: var(--glow);
+      }
+      .welcome-x {
+        position: absolute;
+        top: 12px;
+        right: 14px;
+        background: transparent;
+        border: 0;
+        color: var(--text-muted);
+        font-size: 22px;
+        line-height: 1;
+        cursor: pointer;
+        padding: 2px 6px;
+      }
+      .welcome-x:hover {
+        color: var(--text-primary);
+      }
+      .welcome-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+      .welcome-title {
+        font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+      .welcome-lead {
+        font-size: 13px;
+        color: var(--text-primary);
+        line-height: 1.65;
+        max-width: 72ch;
+        margin-bottom: 18px;
+      }
+      .welcome-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+        gap: 24px;
+      }
+      @media (max-width: 720px) {
+        .welcome-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .welcome-col-h {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        margin-bottom: 10px;
+      }
+      .welcome-opt {
+        font-weight: 500;
+        text-transform: none;
+        letter-spacing: 0;
+        color: var(--sage);
+      }
+      .welcome-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.9;
+        color: var(--text-muted);
+      }
+      .welcome-list strong {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+      .welcome-step {
+        background: var(--bg-raised);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 12px 14px;
+        margin-bottom: 10px;
+      }
+      .welcome-step:last-child {
+        margin-bottom: 0;
+      }
+      .welcome-step-h {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+      }
+      .welcome-step-b {
+        font-size: 12px;
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin-bottom: 8px;
+      }
+      .welcome-step-b strong {
+        color: var(--text-primary);
+        font-weight: 600;
+      }
+      .welcome-foot {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-top: 18px;
+        flex-wrap: wrap;
+      }
+      .welcome-later {
+        background: transparent;
+        border: 0;
+        color: var(--text-muted);
+        font-size: 12px;
+        cursor: pointer;
+        text-decoration: underline;
+      }
+      .welcome-later:hover {
+        color: var(--text-primary);
+      }
+      .welcome-foot-note {
+        font-size: 11px;
+        color: var(--text-muted);
       }
 
       /* Tables */
@@ -931,6 +1168,133 @@
         color: var(--ok);
       }
 
+      /* Neutral default + connecting state for the persistent status dot, so it
+         never reads green before a real armed status loads. */
+      .pbar .pb-dot {
+        background: var(--text-muted);
+      }
+      .pbar .pb-dot.warn {
+        background: var(--warn);
+        box-shadow: 0 0 6px rgba(251, 191, 36, 0.4);
+      }
+
+      /* Connection guidance banner: shown only when Guard is unreachable. The
+         single honest answer to "why is everything blank?" with the one fix. */
+      .conn-banner {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+        border: 1px solid var(--danger);
+        border-radius: 10px;
+        background: rgba(239, 68, 68, 0.08);
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--text-primary);
+      }
+      .conn-banner .cb-text {
+        flex: 1;
+        min-width: 200px;
+      }
+      .conn-banner .conn-cmd {
+        font-family: 'JetBrains Mono', 'SF Mono', monospace;
+        font-size: 13px;
+        background: var(--bg-base);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 4px 10px;
+        color: var(--emerald);
+      }
+
+      /* One fused posture hero: state (left) + score with one-click fixes
+         (right), collapsing to one column on narrow screens. */
+      .hero-fused {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        grid-template-areas: 'main score' 'fixes fixes';
+        gap: 18px 32px;
+        align-items: start;
+      }
+      .hp-main {
+        grid-area: main;
+        min-width: 0;
+      }
+      .hp-score {
+        grid-area: score;
+        text-align: center;
+        min-width: 140px;
+      }
+      .hp-fixes {
+        grid-area: fixes;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .hp-fixes:empty {
+        display: none;
+      }
+      .hp-state {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .hp-sub {
+        font-size: 14px;
+        color: var(--text-primary);
+        line-height: 1.6;
+        margin-top: 10px;
+        max-width: 56ch;
+      }
+      .hp-tagline {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 14px;
+        letter-spacing: 0.2px;
+      }
+      .score-num {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 56px;
+        font-weight: 700;
+        line-height: 1;
+        color: var(--emerald);
+      }
+      .score-cap {
+        font-size: 11px;
+        letter-spacing: 1px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-top: 4px;
+      }
+      .score-track {
+        height: 8px;
+        border-radius: 6px;
+        background: var(--bg-raised);
+        overflow: hidden;
+        margin: 12px 0 6px;
+      }
+      .score-fill {
+        height: 100%;
+        width: 0;
+        background: var(--emerald);
+        transition: width 0.4s;
+      }
+      .score-label {
+        font-size: 12px;
+        color: var(--text-muted);
+      }
+      @media (max-width: 720px) {
+        .hero-fused {
+          grid-template-columns: 1fr;
+          grid-template-areas: 'score' 'main' 'fixes';
+        }
+        .hp-score {
+          text-align: left;
+        }
+      }
+
       /* Threat Cloud flywheel */
       .flywheel {
         font-family: 'JetBrains Mono', 'SF Mono', monospace;
@@ -976,7 +1340,10 @@
             d="M 1017.32 323.354 C 1027.15 321.591 1105.66 333.344 1122.51 335.603 C 1166.74 341.267 1210.92 347.328 1255.05 353.786 C 1279.68 357.183 1305.51 360.23 1329.92 364.192 L 1329.98 526.684 C 1296.55 530.372 1261.73 535.721 1228.25 540.29 C 1228.4 510.591 1228.39 480.892 1228.23 451.193 C 1219.27 449.729 1209.61 448.427 1200.57 447.329 C 1144.13 440.467 1086.78 429.864 1030.24 424.572 C 1018.71 422.967 967.642 430.978 952.027 433.125 L 819.579 450.968 C 820.252 479.945 819.726 511.22 819.879 540.382 C 785.991 535.397 752.051 530.778 718.064 526.526 L 717.99 364.358 C 745.543 359.872 774.642 356.332 802.417 352.399 L 1017.32 323.354 z"
           />
         </svg>
-        <span>PANGUARD AI</span>
+        <div class="sb-brand-text">
+          <span class="sb-wordmark">PanGuard</span>
+          <span class="brand-tier" id="brand-tier">Community</span>
+        </div>
       </div>
       <div class="sb-nav">
         <div class="ni on" data-tab="overview">
@@ -1050,6 +1417,15 @@
             >COMMUNITY</span
           >
         </div>
+        <div class="ws-b" style="margin-top: 8px">
+          <span
+            id="welcome-reopen"
+            role="button"
+            tabindex="0"
+            style="font-size: 11px; color: var(--sage); cursor: pointer"
+            >Show welcome guide</span
+          >
+        </div>
       </div>
     </div>
 
@@ -1057,98 +1433,156 @@
     <div class="mn">
       <!-- Protection status bar (always visible) -->
       <div class="pbar" id="pbar">
-        <div class="pb-dot ok" id="pb-dot"></div>
-        <span class="pb-txt" id="pb-txt">CONNECTING…</span>
-        <span id="pb-detail">| -- rules active | Uptime: --</span>
+        <div class="pb-dot" id="pb-dot"></div>
+        <span class="pb-txt" id="pb-txt">Connecting…</span>
+        <span id="pb-detail">checking protection status…</span>
+      </div>
+
+      <!-- Connection guidance: hidden unless Guard is unreachable. Replaces the
+           old dead end where everything sat on a stale green "CONNECTING…". -->
+      <div class="conn-banner" id="conn-banner" style="display: none">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+        <div class="cb-text">
+          <strong>Guard isn't running on this machine.</strong>
+          Your agents aren't being watched right now. Start protection:
+        </div>
+        <code class="conn-cmd">pga up</code>
+        <button type="button" class="btn btn-secondary btn-sm" id="conn-copy">Copy</button>
       </div>
 
       <!-- ===== PAGE 1: Overview ===== -->
       <div class="pg on" id="p-overview">
         <div class="pt"><em data-i18n="t_ov">Overview</em></div>
 
-        <!-- Posture score: one number + the things dragging it down, each with a
-             one-click fix. Lead the screen with a single decision (DESIGN.md §2.1). -->
+        <!-- First-run welcome guide: positive first-contact orientation. Hidden by
+             default; shown ONCE on the first LIVE authenticated status (gated by a
+             localStorage flag + the single-source-of-truth live signal, so it can
+             never paint on top of the "Guard not running" banner or the 401 overlay).
+             Dismissible, never nags; reopenable from the sidebar. -->
         <div
-          class="hero"
-          id="posture-card"
-          style="display: flex; gap: 28px; align-items: center; flex-wrap: wrap"
+          class="welcome"
+          id="welcome-guide"
+          style="display: none"
+          role="region"
+          aria-label="Welcome to PanGuard Guard"
         >
-          <div style="display: flex; flex-direction: column; align-items: center; min-width: 120px">
-            <div
-              id="posture-score"
-              style="
-                font-family: 'Space Grotesk', sans-serif;
-                font-size: 56px;
-                font-weight: 700;
-                line-height: 1;
-                color: var(--emerald);
-              "
-            >
-              --
+          <button type="button" class="welcome-x" id="welcome-x" aria-label="Close welcome guide">
+            &times;
+          </button>
+          <div class="welcome-head">
+            <span class="dot dot-ok"></span>
+            <span class="welcome-title">You're protected. Here's the lay of the land.</span>
+          </div>
+          <div class="welcome-lead">
+            PanGuard Guard is watching the AI agents on this machine. Two detection layers run
+            automatically and need no setup: <strong>Layer A</strong> (proven ATR pattern rules) and
+            <strong>Layer B</strong> (behavioural heuristics). They run fully on-device — nothing
+            about your activity leaves this machine. Everything below is here only when you want it.
+          </div>
+
+          <div class="welcome-grid">
+            <div class="welcome-col">
+              <div class="welcome-col-h">Where things are</div>
+              <ul class="welcome-list">
+                <li><strong>Overview</strong> — am I safe right now? (this page)</li>
+                <li><strong>Threats</strong> — anything Guard has caught</li>
+                <li><strong>Coverage</strong> — which agent apps are protected</li>
+                <li><strong>Rules · Skills · Runtime</strong> — reference, not chores</li>
+                <li><strong>Settings</strong> — mode, the optional model, alerts</li>
+              </ul>
             </div>
-            <div
-              style="
-                font-size: 11px;
-                letter-spacing: 1px;
-                color: var(--text-muted);
-                text-transform: uppercase;
-                margin-top: 4px;
-              "
-            >
-              Posture
+            <div class="welcome-col">
+              <div class="welcome-col-h">
+                Optional next steps <span class="welcome-opt">— both off by default</span>
+              </div>
+
+              <div class="welcome-step">
+                <div class="welcome-step-h">Add a second opinion (Layer C)</div>
+                <div class="welcome-step-b">
+                  Optionally connect your own LLM for an advisory read on anything Layers A and B
+                  flag. It only ever <strong>flags for review — it can never block on its own</strong>.
+                  Runs on already-flagged events only, so a cloud key is a few cents a month; a local
+                  model (Ollama) is free. <strong>Your key is entered in the terminal, never here</strong>,
+                  and is stored encrypted on this machine.
+                </div>
+                <div class="cmd-box">
+                  <code id="welcome-ai-cmd">pga guard ai</code>
+                  <button class="cmd-copy" data-copy-target="welcome-ai-cmd" type="button">
+                    Copy
+                  </button>
+                </div>
+              </div>
+
+              <div class="welcome-step">
+                <div class="welcome-step-h">Join collective defense</div>
+                <div class="welcome-step-b">
+                  Optionally let the attacks Guard blocks here help draft new open rules for everyone —
+                  and get the community's new rules back sooner. Shares only a rule ID and a one-way
+                  hash; <strong>never your prompts, code, files, keys, IP, or hostname</strong>. Off
+                  until you turn it on.
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" data-goto="tcloud">
+                  Open Threat Cloud &rarr;
+                </button>
+              </div>
             </div>
           </div>
-          <div style="flex: 1; min-width: 240px">
-            <div
-              style="
-                height: 8px;
-                border-radius: 6px;
-                background: var(--bg-raised);
-                overflow: hidden;
-                margin-bottom: 6px;
-              "
-            >
-              <div
-                id="posture-bar"
-                style="height: 100%; width: 0; background: var(--emerald); transition: width 0.4s"
-              ></div>
-            </div>
-            <div id="posture-label" style="font-size: 13px; color: var(--text-muted)">
-              Calculating…
-            </div>
-            <div
-              id="posture-deductions"
-              style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px"
-            ></div>
+
+          <div class="welcome-foot">
+            <button type="button" class="btn btn-primary btn-sm" id="welcome-done">Got it</button>
+            <button type="button" class="welcome-later" id="welcome-later">Dismiss for now</button>
+            <span class="welcome-foot-note">
+              <code>pga</code> commands run in your terminal. Reopen this anytime from the sidebar.
+            </span>
           </div>
         </div>
 
-        <!-- Status hero -->
-        <div class="hero">
-          <div class="hero-head">
-            <div class="live-dot" id="hero-dot"></div>
-            <div class="hero-status" id="hero-status">CONNECTING…</div>
-            <span class="badge badge-protected" id="hero-badge" data-i18n="active">Active</span>
+        <!-- One fused posture hero: the single answer to "am I safe right now?".
+             Left = honest state + a plain-English line; right = the posture score
+             with one-click fixes. Starts NEUTRAL (never a static green "Active");
+             setConnState()/updateStatus() drive every element from one source of
+             truth, and a 401 swaps in the unauthenticated screen instead. All IDs
+             the JS drives are preserved (DESIGN.md §2.1: lead with one decision). -->
+        <div class="hero hero-fused" id="posture-card">
+          <div class="hp-main">
+            <div class="hp-state">
+              <span class="live-dot" id="hero-dot"></span>
+              <span class="hero-status" id="hero-status">Connecting…</span>
+              <span class="badge badge-off" id="hero-badge">Connecting…</span>
+            </div>
+            <div class="hp-sub" id="hero-desc">Checking Guard status on this machine…</div>
+            <div class="hp-tagline">
+              PanGuard Community — free, on-device protection for your AI agents.
+            </div>
           </div>
-          <div style="font-size: 13px; color: var(--text-muted); line-height: 1.6" id="hero-desc">
-            Every event runs through deterministic pattern matching and heuristic correlation —
-            on-device by default. An optional semantic layer (bring your own LLM) stays off until
-            you enable it.
+          <div class="hp-score">
+            <div class="score-num" id="posture-score">--</div>
+            <div class="score-cap">Posture</div>
+            <div class="score-track"><div class="score-fill" id="posture-bar"></div></div>
+            <div class="score-label" id="posture-label">Checking…</div>
           </div>
+          <div class="hp-fixes" id="posture-deductions"></div>
         </div>
 
         <!-- 4 KPI cards -->
         <div class="cg">
-          <div class="cd">
+          <div class="cd" title="Total ATR detection rules currently loaded and enforcing on this machine.">
             <div class="cl" data-i18n="k_rules">Rules Active</div>
             <div class="cv sg" id="v-rules">--</div>
           </div>
-          <div class="cd">
+          <div class="cd" title="Threats Guard has detected on this machine.">
             <div class="cl" data-i18n="k_threats">Threats Detected</div>
             <div class="cv sg" id="v-threats">0</div>
           </div>
-          <div class="cd">
-            <div class="cl" data-i18n="k_tc">TC Rules Synced</div>
+          <div
+            class="cd"
+            title="Detection rules pulled from the Threat Cloud network, included in your active rule set."
+          >
+            <div class="cl" data-i18n="k_tc">Threat Cloud rules synced</div>
             <div class="cv sg" id="v-tcsync">0</div>
           </div>
         </div>
@@ -1156,7 +1590,8 @@
         <!-- Detection layers status (renamed Tier → Layer A/B/C) -->
         <div class="fs">
           <h3>
-            <span class="dot dot-ok"></span> <span data-i18n="layer_title">Detection Layers</span>
+            <span class="dot dot-ok" id="layers-dot"></span>
+            <span data-i18n="layer_title">Detection Layers</span>
           </h3>
           <div class="desc">
             Layers A and B are deterministic and always on. Layer C is optional — bring your own LLM
@@ -1182,11 +1617,39 @@
             <div class="layer-bar"><div class="layer-fill" id="lc-bar"></div></div>
             <span class="layer-status" id="lc-st">Off &middot; bring your own</span>
           </div>
+          <!-- Layer C call-to-action: a discoverable two-state affordance that
+               replaces the old silent server-filled hint. Not connected -> why +
+               "Set up Layer C" deep-linking to the Settings section. Connected ->
+               a calm confirmation. Driven from status.layers.c.state. -->
           <div
-            class="layer-hint"
-            id="lc-hint"
-            style="margin-top: 8px; font-size: 12px; color: var(--text-muted); line-height: 1.6"
-          ></div>
+            class="lc-cta"
+            id="lc-cta"
+            style="
+              margin-top: 10px;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 12px;
+              flex-wrap: wrap;
+              padding: 10px 12px;
+              background: var(--bg-raised);
+              border: 1px solid var(--border);
+              border-radius: 10px;
+            "
+          >
+            <div
+              class="lc-cta-text"
+              id="lc-cta-text"
+              style="font-size: 12px; color: var(--text-muted); line-height: 1.6; flex: 1; min-width: 220px"
+            >
+              Optional: connect your own LLM for a second opinion on flagged events — catches novel
+              attacks A and B miss. Advisory only: it flags for review, never auto-blocks. Free with a
+              local model, or a few cents a month with a cloud key.
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" id="lc-cta-btn">
+              Set up Layer C
+            </button>
+          </div>
         </div>
 
         <!-- Uptime counter -->
@@ -1243,13 +1706,28 @@
             <button class="fb" data-sev="low" data-i18n="low">Low</button>
           </div>
           <div style="display: flex; gap: 8px; align-items: center">
-            <button class="btn btn-secondary btn-sm" id="btn-sarif">
+            <button
+              class="btn btn-secondary btn-sm"
+              id="btn-sarif"
+              title="Download a .sarif.json of detected threats (the standard format GitHub and code scanners read). Saved to your computer — nothing is uploaded, and it never includes your source code."
+            >
               <span data-i18n="exp_sarif">Export SARIF</span>
             </button>
-            <button class="btn btn-primary btn-sm" id="btn-evidence">
+            <button
+              class="btn btn-primary btn-sm"
+              id="btn-evidence"
+              title="Download a JSON evidence report of detections (rule IDs, timestamps, severities, matched patterns). Saved to your computer — nothing is uploaded, and it never includes your source code."
+            >
               <span data-i18n="exp_evidence">Generate Evidence Pack</span>
             </button>
           </div>
+        </div>
+
+        <div class="pd" style="margin: -6px 0 14px; font-size: 12px">
+          Export your detected threats as a file you can keep or share. SARIF is a standard format
+          GitHub and code scanners read; the Evidence Pack is a self-contained JSON report. Both
+          download to your computer — nothing is uploaded, and neither includes your source code or
+          file contents.
         </div>
 
         <!-- Suppression summary (anti alert-fatigue: only high-confidence shown by default) -->
@@ -1545,11 +2023,12 @@
       <div class="pg" id="p-tcloud">
         <div class="pt"><em data-i18n="t_tc">Threat Cloud</em></div>
         <div class="pd" data-i18n="d_tc">
-          Threat Cloud is PanGuard's anonymous threat-intelligence network. Your endpoint uploads
-          anonymized threat patterns (no code, no file contents). New detection rules ship in the
-          open ATR package — Guard checks once a day and tells you when an upgrade is available. It
-          never auto-pulls rule logic from the network, so a compromised relay can't change what
-          your engine enforces.
+          Threat Cloud is PanGuard's anonymous threat-intelligence network. It is
+          <strong>off by default — until you turn on Collective Defense below, nothing leaves this
+          machine.</strong> When you do enable it, your endpoint uploads anonymized threat signatures
+          (no code, no file contents). New detection rules ship in the open ATR package — Guard
+          checks once a day and tells you when an upgrade is available. It never auto-pulls rule logic
+          from the network, so a compromised relay can't change what your engine enforces.
         </div>
 
         <div id="tc-loading" class="empty">
@@ -1662,8 +2141,10 @@
           <div class="desc">
             Three modes. <strong>Learning</strong> builds a baseline and only logs.
             <strong>Report-only</strong> detects and records everything but never acts (recommended
-            for new deployments). <strong>Protection</strong> actively blocks per your enforcement
-            policy. Saving a change restarts detection with the new mode.
+            for new deployments). <strong>Protection</strong> actively blocks — but only using the
+            responses armed in your enforcement policy (by default that's nothing destructive: it
+            detects and notifies). Saving applies to new activity right away; it won't interrupt
+            actions already in progress.
           </div>
           <div
             id="st-mode-seg"
@@ -1739,11 +2220,117 @@
           ></div>
         </div>
 
+        <!-- ===== Semantic layer (Layer C) — optional advisory LLM =====
+             The headline "how do I connect a model" surface. Self-contained (does
+             NOT depend on a server string). No key field by design — the key is
+             entered only in the terminal via `pga guard ai`. -->
+        <div class="fs" id="p-settings-layerc">
+          <h3>
+            <span class="dot dot-off" id="lc-set-dot"></span>
+            Semantic layer (Layer C)
+            <span
+              id="lc-set-state"
+              style="margin-left: auto; font-size: 12px; font-weight: 600; color: var(--text-muted)"
+              >Off · optional</span
+            >
+          </h3>
+          <div class="desc">
+            An optional second opinion. Layers A and B (the always-on ATR pattern rules and
+            heuristics) do the blocking. Layer C adds your own LLM to read flagged events in plain
+            language and catch novel attacks the deterministic layers miss. It is
+            <strong>advisory only</strong> — it flags events for your review and
+            <strong>can never block on its own</strong>. It runs only on events A or B already
+            flagged, not on every action, so a cloud model typically costs a few cents a month, and a
+            local model is free.
+          </div>
+
+          <div class="cd-grid">
+            <div class="cd-box">
+              <div class="cd-box-title cd-good">Path 1 — Local model (free &amp; fully private)</div>
+              <ul class="cd-list">
+                <li>Runs a model on this machine with Ollama.</li>
+                <li>No API key, no cost — nothing leaves your computer.</li>
+                <li>Best if you want maximum privacy.</li>
+              </ul>
+            </div>
+            <div class="cd-box">
+              <div class="cd-box-title">Path 2 — Cloud model (bring your own key)</div>
+              <ul class="cd-list">
+                <li>Use an OpenAI or Anthropic key you already have.</li>
+                <li>Typically a few cents a month (flagged events only).</li>
+                <li>Your key is sent only to that provider — never to PanGuard.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div style="margin-top: 14px">
+            <div style="font-size: 13px; font-weight: 600; margin-bottom: 6px">How to connect</div>
+            <div class="desc" style="margin-bottom: 8px">
+              Run this one command in your terminal. It walks you through picking a model and, for a
+              cloud model, prompts for your key privately.
+              <strong>You never type the key into this dashboard.</strong>
+            </div>
+            <div class="cmd-box">
+              <code id="lc-cmd">pga guard ai</code>
+              <button class="cmd-copy" type="button" data-copy-target="lc-cmd">Copy</button>
+            </div>
+            <div class="desc" style="margin-top: 8px">
+              When it finishes, restart Guard with
+              <code>pga guard restart</code> — this panel will then show Layer C as connected.
+            </div>
+          </div>
+
+          <details style="margin-top: 14px">
+            <summary class="notify-summary">How your API key is protected</summary>
+            <ul class="cd-list" style="margin-top: 10px; padding-left: 18px">
+              <li>
+                <strong>Typed privately in the terminal.</strong> The key is read with the screen
+                echo off, so it never shows on screen, never lands in your shell history, and is never
+                passed as a command argument.
+              </li>
+              <li>
+                <strong>Never entered in the browser.</strong> This dashboard deliberately has no
+                field for your key — a localhost web page is a weaker place to handle a secret than
+                your terminal.
+              </li>
+              <li>
+                <strong>Encrypted at rest.</strong> Stored at
+                <code>~/.panguard/llm.enc</code> with AES-256-GCM, file permissions
+                <code>0600</code> (only you can read it).
+              </li>
+              <li>
+                <strong>Locked to this machine.</strong> The encryption key is derived from this
+                machine and user, so a copied file is useless anywhere else.
+              </li>
+              <li>
+                <strong>Sent only to your provider.</strong> Your key goes only to the model provider
+                you chose. It is never sent to PanGuard.
+              </li>
+            </ul>
+          </details>
+
+          <div style="margin-top: 14px">
+            <div style="font-size: 13px; font-weight: 600; margin-bottom: 6px">
+              Turn it off / remove your key
+            </div>
+            <div class="desc" style="margin-bottom: 8px">
+              Turns Layer C off and deletes the stored config (including any key) from this machine.
+            </div>
+            <div class="cmd-box">
+              <code id="lc-cmd-remove">pga guard ai --remove</code>
+              <button class="cmd-copy" type="button" data-copy-target="lc-cmd-remove">Copy</button>
+            </div>
+          </div>
+        </div>
+
         <div class="fs">
           <h3 data-i18n="st_tc">Threat Cloud Endpoint</h3>
           <div class="desc" data-i18n="st_tc_desc">
-            URL of the Threat Cloud relay. Leave empty for the default panguard.ai endpoint, or
-            specify your own air-gapped relay.
+            The server Guard talks to for Threat Cloud. <strong>Most people should leave this
+            blank</strong> — Guard uses the default (tc.panguard.ai). Change it only if you run your
+            own private or air-gapped relay: when Collective Defense is on, anonymized signatures and
+            the daily rule-update check go to whatever URL is set here. Your prompts, code, and keys
+            are never sent regardless.
           </div>
           <div class="fr">
             <label data-i18n="st_endpoint">Endpoint</label>
@@ -1776,7 +2363,9 @@
               You can also push each alert to a chat or inbox you already watch. Pick one below,
               paste its line into <code>~/.panguard-guard/config.json</code> (or run
               <code>pga setup</code> for a guided walk-through), then restart Guard. Secrets are
-              typed into that file, never into this dashboard.
+              typed into that file, never into this dashboard. Heads-up: any channel you add sends
+              alert summaries to that service (Slack's servers, your email provider, or your webhook
+              URL). Alerts always stay visible here regardless.
             </div>
             <div id="st-notify-list" style="display: flex; flex-direction: column; gap: 10px"></div>
           </details>
@@ -1790,8 +2379,11 @@
             >
           </h3>
           <div class="desc">
-            In Protection mode, only the responses armed below run automatically. Configure under
-            <code>enforcementPolicy</code> in <code>~/.panguard-guard/config.json</code>.
+            This list is <strong>read-only here</strong> — an "armed" response only runs
+            automatically when Guard Mode is set to Protection; in Learning or Report-only nothing
+            automatic happens. To change what's armed, edit
+            <code>enforcementPolicy</code> in <code>~/.panguard-guard/config.json</code> (or run
+            <code>pga setup</code>) and restart Guard.
           </div>
           <div
             id="st-enforce-list"
@@ -1808,7 +2400,8 @@
           <strong data-i18n="st_license">License Tier:</strong> <span id="st-tier-display">--</span
           ><br />
           <span data-i18n="st_license_desc"
-            >Community is free and unlimited — including SARIF and Evidence Pack export.</span
+            >Community is free and unlimited — including SARIF and Evidence Pack export. No features
+            are locked.</span
           >
           <br /><br />
           <a
@@ -1817,7 +2410,7 @@
             rel="noopener"
             style="color: var(--sage)"
             data-i18n="st_license_link"
-            >View pricing &rarr;</a
+            >Compare editions &rarr;</a
           >
         </div>
       </div>
@@ -1897,9 +2490,69 @@
           if (r.status === 401) {
             var wl = document.getElementById('wl');
             if (wl) wl.textContent = 'Invalid token';
+            // An unauthenticated visit (bare URL, expired/cleared cookie, wrong
+            // token) used to silently no-op and leave a static green "Active"
+            // badge — a dead end with no path forward. Render an explicit screen
+            // that tells the user exactly how to get an authenticated URL.
+            showUnauthenticated();
           }
           return r;
         });
+      }
+      /* Explicit unauthenticated state: the cookie that authorizes /api/* is
+         minted only by opening the launch URL `pga up` prints. A bare visit has
+         no cookie, so every /api/* call 401s. Instead of a fake-green dead end,
+         show how to get an authenticated URL and neutralize the hero badge. */
+      var _unauthShown = false;
+      function showUnauthenticated() {
+        if (_unauthShown) return;
+        _unauthShown = true;
+        // Neutralize the hero so it never reads green while unauthenticated.
+        var hs = document.getElementById('hero-status');
+        var hd = document.getElementById('hero-dot');
+        var hb = document.getElementById('hero-badge');
+        if (hs) {
+          hs.textContent = 'NOT AUTHENTICATED';
+          hs.style.color = 'var(--warn)';
+        }
+        if (hd) hd.style.background = 'var(--warn)';
+        if (hb) {
+          hb.textContent = 'Not authenticated';
+          hb.className = 'badge badge-off';
+          hb.title = 'Open the launch URL from `pga up` to authenticate this dashboard.';
+        }
+        var ov = document.getElementById('unauth-overlay');
+        if (ov) {
+          ov.style.display = 'flex';
+          return;
+        }
+        ov = document.createElement('div');
+        ov.id = 'unauth-overlay';
+        ov.style.cssText =
+          'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;' +
+          'justify-content:center;background:rgba(11,13,16,0.92);padding:24px';
+        ov.innerHTML =
+          '<div style="max-width:460px;background:var(--surface-2,#1b1f24);' +
+          'border:1px solid var(--border,#2a2f36);border-radius:12px;padding:28px;' +
+          'text-align:left;color:var(--text,#e6e8eb)">' +
+          '<div style="font-size:16px;font-weight:600;margin-bottom:10px">' +
+          'This dashboard is not authenticated</div>' +
+          '<div style="font-size:13px;color:var(--text-muted,#9aa1a9);line-height:1.6;margin-bottom:16px">' +
+          'For your security, the dashboard only accepts requests carrying a ' +
+          'one-time launch token. Opening this URL directly does not include it, ' +
+          'so live status and controls are unavailable.</div>' +
+          '<div style="font-size:13px;color:var(--text,#e6e8eb);margin-bottom:8px">' +
+          'To get an authenticated URL, run:</div>' +
+          '<div style="background:var(--surface-3,#0f1216);border-radius:8px;padding:12px 14px;' +
+          'font-family:ui-monospace,monospace;font-size:13px;color:var(--emerald,#34d399)">' +
+          'pga up</div>' +
+          '<div style="font-size:12px;color:var(--text-muted,#9aa1a9);line-height:1.6;margin-top:14px">' +
+          'It prints a link like ' +
+          '<code>http://127.0.0.1:&lt;port&gt;/?token=&hellip;</code> — open that ' +
+          'link to authenticate. If Guard is already running, re-run ' +
+          '<code>pga up</code> to reprint the authenticated link.</div>' +
+          '</div>';
+        document.body.appendChild(ov);
       }
 
       /* ============================================================ */
@@ -1960,6 +2613,8 @@
         licenseTier = tier;
         var badge = document.getElementById('lic-badge');
         if (badge) badge.textContent = tier.toUpperCase();
+        var brandTier = document.getElementById('brand-tier');
+        if (brandTier) brandTier.textContent = tier.charAt(0).toUpperCase() + tier.slice(1);
         var dispTier = document.getElementById('st-tier-display');
         if (dispTier) dispTier.textContent = tier;
       }
@@ -1967,15 +2622,143 @@
       /* ============================================================ */
       /*  WebSocket                                                    */
       /* ============================================================ */
+      /* ----------------------------------------------------------------
+         Connection state — ONE source of truth for "is Guard up?".
+         Drives pbar + hero + posture + footer together so they never
+         disagree. 'down' (Guard unreachable) is distinct from the 401
+         unauthenticated screen and surfaces the start-it guidance. The
+         old code left a stale green "CONNECTING…" forever when Guard was
+         simply not running; this collapses that into one honest answer.
+         ---------------------------------------------------------------- */
+      var _connState = '';
+      var _connectTimer = null;
+      var _downGrace = null;
+      function markConnLive() {
+        _connState = 'live';
+        if (_connectTimer) {
+          clearTimeout(_connectTimer);
+          _connectTimer = null;
+        }
+        if (_downGrace) {
+          clearTimeout(_downGrace);
+          _downGrace = null;
+        }
+        var b = document.getElementById('conn-banner');
+        if (b) b.style.display = 'none';
+        var wl = document.getElementById('wl');
+        var wd = document.getElementById('wd');
+        if (wl && wl.textContent !== 'Invalid token') wl.textContent = 'Connected';
+        if (wd) wd.classList.add('on');
+      }
+      // When Guard is unreachable we cannot claim any layer is "Active" — the
+      // HTML defaults to Active and renderLayers() only runs on live status, so
+      // neutralize the layer rows to avoid a residual false-green.
+      function setLayersUnknown() {
+        ['la', 'lb', 'lc'].forEach(function (k) {
+          var bar = document.getElementById(k + '-bar');
+          var st = document.getElementById(k + '-st');
+          if (bar) bar.className = 'layer-fill off';
+          if (st) {
+            st.textContent = '—';
+            st.className = 'layer-status off';
+          }
+        });
+        var ld = document.getElementById('layers-dot');
+        if (ld) ld.style.background = 'var(--text-muted)';
+      }
+      function setConnState(state) {
+        if (state === 'live') {
+          markConnLive();
+          return;
+        }
+        if (state === _connState) return;
+        _connState = state;
+        setLayersUnknown();
+        var dot = document.getElementById('pb-dot');
+        var txt = document.getElementById('pb-txt');
+        var det = document.getElementById('pb-detail');
+        var hs = document.getElementById('hero-status');
+        var hd = document.getElementById('hero-dot');
+        var hb = document.getElementById('hero-badge');
+        var hdsc = document.getElementById('hero-desc');
+        var sc = document.getElementById('posture-score');
+        var pl = document.getElementById('posture-label');
+        var pbar = document.getElementById('posture-bar');
+        var banner = document.getElementById('conn-banner');
+        var wl = document.getElementById('wl');
+        var wd = document.getElementById('wd');
+        if (state === 'connecting') {
+          if (dot) dot.className = 'pb-dot warn';
+          if (txt) txt.textContent = 'Connecting…';
+          if (hs) {
+            hs.textContent = 'Connecting…';
+            hs.style.color = 'var(--text-muted)';
+          }
+          if (hd) hd.style.background = 'var(--text-muted)';
+          if (hb) {
+            hb.textContent = 'Connecting…';
+            hb.className = 'badge badge-off';
+          }
+          if (hdsc) hdsc.textContent = 'Checking Guard status on this machine…';
+          if (banner) banner.style.display = 'none';
+          if (wl && wl.textContent !== 'Invalid token') wl.textContent = 'Connecting…';
+          if (wd) wd.classList.remove('on');
+        } else if (state === 'down') {
+          if (dot) dot.className = 'pb-dot bad';
+          if (txt) txt.textContent = 'GUARD NOT RUNNING';
+          if (det) det.textContent = '| start Guard to resume protection';
+          if (hs) {
+            hs.textContent = 'GUARD NOT RUNNING';
+            hs.style.color = 'var(--danger)';
+          }
+          if (hd) hd.style.background = 'var(--danger)';
+          if (hb) {
+            hb.textContent = 'Not running';
+            hb.className = 'badge badge-off';
+          }
+          if (hdsc)
+            hdsc.textContent =
+              'PanGuard Guard is not running on this machine, so your agents are not ' +
+              'being watched right now.';
+          if (sc) {
+            sc.textContent = '--';
+            sc.style.color = 'var(--danger)';
+          }
+          if (pl) pl.textContent = 'Guard isn’t running';
+          if (pbar) pbar.style.width = '0';
+          if (banner) banner.style.display = 'flex';
+          if (wl && wl.textContent !== 'Invalid token') wl.textContent = 'Not running';
+          if (wd) wd.classList.remove('on');
+        }
+      }
+
       function connectWS() {
         var ws = new WebSocket('ws://' + location.host + '/ws');
         ws.onopen = function () {
-          document.getElementById('wd').classList.add('on');
-          document.getElementById('wl').textContent = 'Connected';
+          if (_downGrace) {
+            clearTimeout(_downGrace);
+            _downGrace = null;
+          }
+          var wd = document.getElementById('wd');
+          var wl = document.getElementById('wl');
+          if (wd) wd.classList.add('on');
+          if (wl && wl.textContent !== 'Invalid token' && _connState !== 'down')
+            wl.textContent = 'Connected';
         };
         ws.onclose = function () {
-          document.getElementById('wd').classList.remove('on');
-          document.getElementById('wl').textContent = 'Disconnected';
+          var wd = document.getElementById('wd');
+          if (wd) wd.classList.remove('on');
+          // If we were live, give a short grace for an immediate reconnect before
+          // declaring Guard down — avoids flashing the banner on transient blips.
+          if (_connState === 'live') {
+            var wl = document.getElementById('wl');
+            if (wl && wl.textContent !== 'Invalid token') wl.textContent = 'Reconnecting…';
+            if (!_downGrace) {
+              _downGrace = setTimeout(function () {
+                if (_connState !== 'live') setConnState('down');
+              }, 4000);
+            }
+          }
           setTimeout(connectWS, 3000);
         };
         ws.onmessage = function (e) {
@@ -2005,6 +2788,13 @@
       }
       function updateStatus(s) {
         if (!s) return;
+        markConnLive();
+        // First-run welcome: only ever after a confirmed live+authenticated status,
+        // so it can never appear over the "Guard not running" banner or 401 overlay.
+        if (!_welcomeChecked) {
+          _welcomeChecked = true;
+          maybeShowWelcome();
+        }
         setKPI('v-rules', (s.atrRuleCount || 0).toLocaleString());
         var th = s.threatsDetected || 0;
         setKPI('v-threats', th);
@@ -2032,6 +2822,8 @@
           hb.className = 'badge ' + p.badge;
           hb.title = p.detail;
         }
+        var hdsc = document.getElementById('hero-desc');
+        if (hdsc && p.sub) hdsc.textContent = p.sub;
         updatePBar(s);
         renderLayers(s.layers);
         _lastStatus = s;
@@ -2101,7 +2893,7 @@
         var color = score >= 85 ? 'var(--emerald)' : score >= 60 ? 'var(--warn)' : 'var(--danger)';
         var label =
           score >= 85
-            ? 'Strong — your agents are well protected'
+            ? 'Strong — nothing needs your attention'
             : score >= 60
               ? 'Fair — a few things to address'
               : 'At risk — action needed';
@@ -2109,6 +2901,10 @@
         if (sc) {
           sc.textContent = score;
           sc.style.color = color;
+          sc.title =
+            'Starts at 100. Points come off for unresolved threats, a detection engine that ' +
+            'isn’t running, and agent platforms you haven’t connected. The optional semantic ' +
+            'layer (Layer C) being off never lowers your score — it’s opt-in by design.';
         }
         var bar = document.getElementById('posture-bar');
         if (bar) {
@@ -2164,6 +2960,10 @@
          rules are loaded, and Layer C shows the BYO-LLM guidance inline. */
       function renderLayers(L) {
         if (!L) return;
+        // Live status arrived: restore the section dot (cleared to neutral while
+        // Guard was unreachable) so it reflects real per-layer health again.
+        var ld = document.getElementById('layers-dot');
+        if (ld) ld.style.background = '';
         var map = { a: 'la', b: 'lb', c: 'lc' };
         Object.keys(map).forEach(function (k) {
           var ly = L[k];
@@ -2195,11 +2995,77 @@
           }
           if (bar) bar.className = 'layer-fill' + (active ? ' on' : '');
         });
-        // Surface Layer C's BYO-LLM guidance inline (how to actually connect it),
-        // not just a hover title — the original UI said "until you connect one"
-        // with no path. Cleared once a semantic LLM is configured.
-        var hint = document.getElementById('lc-hint');
-        if (hint) hint.textContent = L.c && L.c.state !== 'active' && L.c.detail ? L.c.detail : '';
+        // Layer C call-to-action: a real two-state affordance (not a server-filled
+        // hint). Not connected -> why + "Set up Layer C"; connected -> calm note.
+        var cOn = L.c && L.c.state === 'active';
+        var ctaText = document.getElementById('lc-cta-text');
+        var ctaBtn = document.getElementById('lc-cta-btn');
+        if (ctaText && ctaBtn) {
+          if (cOn) {
+            ctaText.textContent =
+              'Layer C is connected and adding an advisory second opinion on flagged events. ' +
+              'It never blocks on its own.';
+            ctaBtn.textContent = 'Manage Layer C';
+          } else {
+            ctaText.textContent =
+              'Optional: connect your own LLM for a second opinion on flagged events — catches ' +
+              'novel attacks A and B miss. Advisory only: it flags for review, never auto-blocks. ' +
+              'Free with a local model, or a few cents a month with a cloud key.';
+            ctaBtn.textContent = 'Set up Layer C';
+          }
+        }
+        renderLayerCSettings(L);
+      }
+      /* Reflect Layer C connected/off state in the Settings section header. Defaults
+         to Off in markup so it never reads green before real status loads. */
+      function renderLayerCSettings(L) {
+        var on = L && L.c && L.c.state === 'active';
+        var dot = document.getElementById('lc-set-dot');
+        var st = document.getElementById('lc-set-state');
+        if (dot) dot.className = 'dot ' + (on ? 'dot-ok' : 'dot-off');
+        if (st) {
+          st.textContent = on ? 'Connected · advisory' : 'Off · optional';
+          st.style.color = on ? 'var(--ok)' : 'var(--text-muted)';
+        }
+      }
+
+      /* ----------------------------------------------------------------
+         First-run welcome guide. Shown once on the first LIVE authenticated
+         status (called from updateStatus, after markConnLive), gated by a
+         localStorage flag so it never nags and never paints over the down/
+         unauth states. "Got it"/X persist; "Dismiss for now" returns next
+         launch; the sidebar link reopens it.
+         ---------------------------------------------------------------- */
+      var _welcomeChecked = false;
+      function maybeShowWelcome() {
+        try {
+          if (localStorage.getItem('pg.welcome.dismissed') === '1') return;
+        } catch (e) {
+          /* private mode: fall through and show once for this page load */
+        }
+        var w = document.getElementById('welcome-guide');
+        if (w) w.style.display = '';
+      }
+      function hideWelcome(persist) {
+        var w = document.getElementById('welcome-guide');
+        if (w) w.style.display = 'none';
+        if (persist) {
+          try {
+            localStorage.setItem('pg.welcome.dismissed', '1');
+          } catch (e) {
+            /* ignore */
+          }
+        }
+      }
+      function reopenWelcome() {
+        try {
+          localStorage.removeItem('pg.welcome.dismissed');
+        } catch (e) {
+          /* ignore */
+        }
+        nav('overview');
+        var w = document.getElementById('welcome-guide');
+        if (w) w.style.display = '';
       }
       /* Map the server's honest enforcement posture to a label/color. PROTECTED
          (emerald) ONLY when the daemon will actually act; 'protection' mode with
@@ -2215,6 +3081,7 @@
             color: 'var(--emerald)',
             badge: 'badge-protected',
             detail: 'Detecting and auto-responding (' + (enf.armedActions || []).join(', ') + ')',
+            sub: 'Your AI agents are protected. Threats are detected and blocked automatically.',
           },
           monitoring: {
             label: 'MONITORING',
@@ -2223,24 +3090,28 @@
             detail:
               'Detecting + notifying. No automatic OS response is armed — arm it under ' +
               'enforcementPolicy in config to auto-act.',
+            sub: 'Watching every action and alerting you. No automatic blocking is armed yet.',
           },
           'report-only': {
             label: 'REPORT-ONLY',
             color: 'var(--sage)',
             badge: 'badge-learning',
             detail: 'Recording detections only; takes no action by design.',
+            sub: 'Recording detections for your review. Guard takes no action by design.',
           },
           learning: {
             label: 'LEARNING',
             color: 'var(--warn)',
             badge: 'badge-learning',
             detail: 'Building a baseline of normal activity; logging only.',
+            sub: 'Learning what normal looks like on your machine. Logging only for now.',
           },
           off: {
             label: 'OFFLINE',
             color: 'var(--danger)',
             badge: 'badge-learning',
             detail: 'Guard is not running.',
+            sub: 'Guard is not running, so your agents are not being watched.',
           },
         };
         return MAP[enf.posture] || MAP.learning;
@@ -2268,21 +3139,37 @@
         if (emp) emp.style.display = 'none';
         var log = document.getElementById('ev-log');
         if (log) log.style.display = '';
-        var d = document.createElement('div');
-        var sev = (m.data && (m.data.severity || m.data.conclusion)) || 'benign';
-        d.className = 'ei ' + sev;
+        var data = (m && m.data) || {};
+        var sev = String(data.severity || data.conclusion || 'benign').toLowerCase();
         var t = m.timestamp ? m.timestamp.split('T')[1].split('.')[0] : '--:--:--';
-        d.innerHTML =
-          '<span class="ei-t">' +
+        // Plain-English summary instead of a raw JSON dump — a solo dev scans
+        // these. Prefer a human label; fall back to rule id / event type.
+        var title =
+          data.ruleName ||
+          data.message ||
+          data.ruleId ||
+          (m.type === 'new_verdict' ? 'Action reviewed' : 'Event detected');
+        var bits = [];
+        if (data.action) bits.push(String(data.action));
+        if (data.tool) bits.push(String(data.tool));
+        if (data.matchedPattern) bits.push('matched ' + String(data.matchedPattern).slice(0, 56));
+        var card = document.createElement('div');
+        card.className = 'ev-card ' + sev;
+        card.innerHTML =
+          '<span class="ev-sev"></span>' +
+          '<div class="ev-body">' +
+          '<div class="ev-title">' +
+          esc(String(title).slice(0, 140)) +
+          '</div>' +
+          (bits.length ? '<div class="ev-meta">' + esc(bits.join(' · ')) + '</div>' : '') +
+          '</div>' +
+          '<span class="ev-sevtag">' +
+          esc(sev) +
+          '</span>' +
+          '<span class="ev-time">' +
           t +
-          '</span>' +
-          '<span class="ei-y">' +
-          esc(m.type || '') +
-          '</span>' +
-          '<span class="ei-d">' +
-          esc(JSON.stringify(m.data || {}).slice(0, 200)) +
           '</span>';
-        log.prepend(d);
+        log.prepend(card);
         while (log.children.length > 20) log.removeChild(log.lastChild);
       }
 
@@ -2296,7 +3183,10 @@
           })
           .then(updateStatus)
           .catch(function () {
-            /* ignore */
+            // Fetch failed (not a 401 — that path shows the unauthenticated
+            // screen). On localhost this means Guard isn't reachable: surface
+            // the one honest "not running" state instead of a silent no-op.
+            if (!_unauthShown) setConnState('down');
           });
         refreshPostureAgents();
       }
@@ -2378,8 +3268,9 @@
               '<span id="th-supp-toggle" style="text-decoration:underline;cursor:pointer">' +
               low.length +
               ' low-confidence ' +
-              (showSuppressed ? '(hide)' : 'suppressed') +
-              '</span>';
+              (showSuppressed ? 'hidden (click to hide)' : 'hidden — show') +
+              '</span>' +
+              ' <span style="color:var(--text-muted)">(still recorded — hidden by default to cut noise)</span>';
             var tg = document.getElementById('th-supp-toggle');
             if (tg)
               tg.addEventListener('click', function () {
@@ -2469,7 +3360,7 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            toast('SARIF exported');
+            toast('SARIF file downloaded to your computer — nothing was uploaded.');
           })
           .catch(function () {
             toast('Network error');
@@ -2494,7 +3385,7 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            toast('Evidence pack generated');
+            toast('Evidence pack downloaded to your computer — nothing was uploaded.');
           })
           .catch(function () {
             toast('Network error');
@@ -2518,8 +3409,9 @@
                 esc(d.currentVersion || '?') +
                 ' &rarr; ' +
                 esc(d.latestVersion) +
-                '. Run <code>pga upgrade</code> to update. Rules are verified by npm and never ' +
-                'auto-applied.';
+                '. Run <code>pga upgrade</code> in your terminal when you\'re ready — your current ' +
+                'rules keep protecting you until you do, and nothing changes automatically. Rules ' +
+                'are verified by npm and never auto-applied.';
               b.style.display = '';
             } else {
               b.style.display = 'none';
@@ -2822,13 +3714,24 @@
           .then(function (d) {
             document.getElementById('tc-loading').style.display = 'none';
             document.getElementById('tc-content').style.display = '';
-            var isConnected = !!d.connected;
+            // Three honest states: sharing OFF by choice is "Off" (neutral), NOT a
+            // red "Disconnected" failure. Red is reserved for enabled-but-unreachable.
             var dot = document.getElementById('tc-conn-dot');
-            if (dot) dot.className = 'dot ' + (isConnected ? 'dot-ok' : 'dot-bad');
             var ctext = document.getElementById('tc-conn-text');
+            var connState = !d.uploadEnabled
+              ? { label: 'Off', cls: 'dot-off', color: 'var(--text-muted)' }
+              : d.connected
+                ? { label: 'Connected', cls: 'dot-ok', color: 'var(--ok)' }
+                : { label: 'Not reachable', cls: 'dot-bad', color: 'var(--danger)' };
+            if (dot) dot.className = 'dot ' + connState.cls;
             if (ctext) {
-              ctext.textContent = isConnected ? 'Connected' : 'Disconnected';
-              ctext.style.color = isConnected ? 'var(--ok)' : 'var(--danger)';
+              ctext.textContent = connState.label;
+              ctext.style.color = connState.color;
+              ctext.title = !d.uploadEnabled
+                ? 'Collective defense is off — your endpoint is not sharing or syncing. Turn it on below.'
+                : d.connected
+                  ? 'Connected to the Threat Cloud relay.'
+                  : 'Collective defense is on but the relay is not reachable right now.';
             }
             document.getElementById('tc-endpoint').textContent = d.endpoint || '--';
             setKPI('tc-recv', d.totalRulesReceived || 0);
@@ -2879,10 +3782,21 @@
       function toggleUpload() {
         var tog = document.getElementById('tc-toggle');
         var isOn = tog.classList.contains('on');
-        // consentGiven is the single collective-defense answer: the backend flips
-        // BOTH telemetryEnabled and threatCloudUploadEnabled together and records
-        // the consent marker, exactly like the CLI first-run prompt. Opt-in: this
-        // only turns sharing ON when the user clicks it from the OFF state.
+        // consentGiven flips collective defense BOTH on and off: the backend syncs
+        // telemetryEnabled + threatCloudUploadEnabled and records/clears the consent
+        // marker. Reversible either direction. Turning ON is the higher-consequence
+        // direction (anonymized signatures start leaving the machine), so confirm it;
+        // turning OFF is the safe direction and stays one click.
+        if (!isOn) {
+          var ok = window.confirm(
+            'Turn on collective defense?\n\n' +
+              'When Guard blocks an attack on this machine, it will share an anonymized signature ' +
+              '(the matched rule ID + a one-way hash of the payload + the source type) with the ATR ' +
+              'network.\n\nNever shared: your prompts, code, file contents, keys, IP address, or ' +
+              'hostname.\n\nYou can turn this off anytime.'
+          );
+          if (!ok) return;
+        }
         af('/api/threat-cloud', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -2893,7 +3807,11 @@
           })
           .then(function (d) {
             if (d.success) {
-              toast('Saved');
+              toast(
+                !isOn
+                  ? 'Collective defense ON — anonymized signatures will be shared.'
+                  : 'Collective defense OFF — nothing leaves this machine.'
+              );
               loadTCloud();
             } else {
               toast(d.error || 'Error');
@@ -2909,6 +3827,7 @@
          it to 'learning' on save — quietly downgrading enforcement. This 3-state
          segmented control preserves whatever the config actually is. */
       var selectedMode = 'learning';
+      var _modePendingRestart = false;
       var MODE_INFO = {
         learning: {
           desc: 'builds a baseline of normal activity and only logs — no blocking.',
@@ -2938,11 +3857,24 @@
         });
         var d = document.getElementById('st-mode-desc');
         if (d && MODE_INFO[selectedMode]) {
-          d.textContent = 'This mode ' + MODE_INFO[selectedMode].desc;
+          if (_modePendingRestart && selectedMode === 'protection') {
+            // Preserve the pending-restart note across loadSettings() re-renders
+            // so the OS-response caveat does not vanish on the next refresh.
+            d.innerHTML =
+              'This mode ' +
+              esc(MODE_INFO[selectedMode].desc) +
+              ' <span style="color:var(--warn)">Pending restart: automatic OS responses arm after ' +
+              'you restart Guard (<code>pga guard restart</code>).</span>';
+          } else {
+            d.textContent = 'This mode ' + MODE_INFO[selectedMode].desc;
+          }
         }
       }
       function selectMode(m) {
         if (!MODE_INFO[m]) return;
+        // A fresh selection clears any prior pending-restart note; it re-arms
+        // only after the next protection-mode save.
+        if (m !== selectedMode) _modePendingRestart = false;
         selectedMode = m;
         renderModeSeg();
       }
@@ -3066,6 +3998,9 @@
           .join('');
       }
       function loadSettings() {
+        // Reflect Layer C connected/off state when the tab is opened cold, from
+        // the last live status (the layer state rides on /api/status, not /api/config).
+        if (_lastStatus) renderLayerCSettings(_lastStatus.layers);
         af('/api/config')
           .then(function (r) {
             return r.json();
@@ -3094,6 +4029,7 @@
           });
       }
       function saveSettings() {
+        var priorMode = selectedMode;
         var body = {
           mode: selectedMode,
           endpoint: document.getElementById('st-tc-endpoint').value || undefined,
@@ -3108,15 +4044,40 @@
           })
           .then(function (d) {
             if (d.success) {
-              toast('Settings saved — restart Guard to apply a mode change');
+              // The daemon now live-applies the change (detection re-arms at
+              // once), so loadSettings() re-reads the NEW mode — the control no
+              // longer snaps back. Protection mode's OS-level response actions
+              // still need a restart, so surface that as a pending state rather
+              // than implying nothing happened.
+              if (body.mode === 'protection') {
+                toast('Saved. Detection is live now; restart Guard to arm automatic responses.');
+                showModePendingRestart();
+              } else {
+                toast('Saved — applied immediately.');
+              }
               loadSettings();
             } else {
               toast(d.error || 'Save failed');
+              // Revert the optimistic selection only when the save was rejected.
+              selectMode(priorMode);
             }
           })
           .catch(function () {
             toast('Network error');
           });
+      }
+      /* Keep the optimistic mode value and show a clear "pending restart" note
+         for the part that genuinely needs a restart (OS-level responses) —
+         never snap the control back to the old value. */
+      function showModePendingRestart() {
+        _modePendingRestart = true;
+        var d = document.getElementById('st-mode-desc');
+        if (d) {
+          d.innerHTML =
+            (MODE_INFO[selectedMode] ? 'This mode ' + esc(MODE_INFO[selectedMode].desc) : '') +
+            ' <span style="color:var(--warn)">Pending restart: automatic OS responses arm after ' +
+            'you restart Guard (<code>pga guard restart</code>).</span>';
+        }
       }
 
       /* ============================================================ */
@@ -3133,7 +4094,25 @@
         if (
           act === 'quarantine' &&
           !window.confirm(
-            'Quarantine "' + name + '"?\nIt moves to ~/.panguard/quarantine and can be restored.'
+            'Quarantine "' +
+              name +
+              '"?\n\n' +
+              'This moves the skill file out of your agent’s reach, so the agent can no longer use ' +
+              'it. The file is NOT deleted — it moves to ~/.panguard/quarantine and you can restore ' +
+              'it anytime from the Quarantined Files list below.'
+          )
+        ) {
+          return;
+        }
+        if (
+          act === 'whitelist' &&
+          !window.confirm(
+            'Mark "' +
+              name +
+              '" as safe?\n\n' +
+              'Guard will trust this skill and stop flagging it for behavior drift — this reduces ' +
+              'monitoring for it. Only do this for skills you installed and trust. You can undo it ' +
+              'later with Un-trust.'
           )
         ) {
           return;
@@ -3159,10 +4138,10 @@
             if (res.ok && res.d && res.d.success) {
               var msg =
                 act === 'quarantine'
-                  ? 'Quarantined: ' + name
+                  ? 'Quarantined ' + name + ' — moved out of the agent’s reach (restorable below).'
                   : act === 'unwhitelist'
-                    ? 'Removed from whitelist: ' + name
-                    : 'Marked safe: ' + name;
+                    ? 'Un-trusted ' + name + ' — Guard will evaluate it again like any unknown skill.'
+                    : 'Marked safe — Guard will stop flagging ' + name + '.';
               toast(msg);
               loadSkills();
               loadQuarantined();
@@ -3321,6 +4300,43 @@
             if (btn) nav(btn.getAttribute('data-goto'));
           });
         }
+        on('conn-copy', 'click', function () {
+          copyText('pga up', document.getElementById('conn-copy'));
+        });
+        // Layer C CTA on Overview deep-links to the Settings section.
+        on('lc-cta-btn', 'click', function () {
+          nav('settings');
+          setTimeout(function () {
+            var s = document.getElementById('p-settings-layerc');
+            if (s) s.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 60);
+        });
+        // Welcome guide: "Got it"/X persist the dismissal; "Dismiss for now" returns
+        // next launch; the sidebar link reopens it. Its [data-goto] button is not
+        // covered by the posture-deductions handler, so delegate nav here.
+        on('welcome-done', 'click', function () {
+          hideWelcome(true);
+        });
+        on('welcome-x', 'click', function () {
+          hideWelcome(true);
+        });
+        on('welcome-later', 'click', function () {
+          hideWelcome(false);
+        });
+        on('welcome-reopen', 'click', reopenWelcome);
+        on('welcome-reopen', 'keydown', function (e) {
+          if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            reopenWelcome();
+          }
+        });
+        var wg = document.getElementById('welcome-guide');
+        if (wg) {
+          wg.addEventListener('click', function (e) {
+            var b = e.target && e.target.closest ? e.target.closest('button[data-goto]') : null;
+            if (b) nav(b.getAttribute('data-goto'));
+          });
+        }
         on('btn-save', 'click', saveSettings);
         on('btn-reload', 'click', loadSettings);
       }
@@ -3329,12 +4345,18 @@
       /*  Boot                                                         */
       /* ============================================================ */
       (function () {
+        setConnState('connecting');
         wireEvents();
         connectWS();
         loadStatus();
         loadThreats();
         // Mark default nav active
         nav('overview');
+        // Fallback: if neither the WS push nor the initial fetch yields a live
+        // status within a few seconds, Guard is almost certainly not running.
+        _connectTimer = setTimeout(function () {
+          if (_connState !== 'live' && !_unauthShown) setConnState('down');
+        }, 6000);
       })();
     </script>
   </body>

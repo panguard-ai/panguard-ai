@@ -27,6 +27,24 @@ import type { SkillWhitelistConfig } from './skill-whitelist.js';
 const logger = createLogger('panguard-guard:atr-engine');
 
 /**
+ * Simplified ReDoS safety check (mirrors packages/scan-core/src/atr-engine.ts).
+ * A successful `new RegExp(p)` compile does NOT detect catastrophic
+ * backtracking — patterns like (a+)+, (a*)*b, ([a-z]+)* compile fine but blow
+ * up to exponential time on non-matching input. This rejects those structures
+ * statically before a cloud rule's regex is ever executed against live traffic.
+ */
+function isSafeRegex(re: RegExp): boolean {
+  const src = re.source;
+  // Reject nested quantifiers: (pattern+)+ or (pattern*)+ or (pattern+)* etc.
+  if (/\([^)]*[+*]\)[+*{]/.test(src)) return false;
+  // Reject overlapping alternations with quantifiers: (a|a)+
+  if (/\(([^|)]+)\|\1\)[+*]/.test(src)) return false;
+  // Reject star-of-star: .*.*.*  (3+ consecutive greedy wildcards)
+  if (/(\.\*){3,}/.test(src)) return false;
+  return true;
+}
+
+/**
  * Resolve the bundled ATR rules directory from the installed @panguard-ai/atr package.
  * Falls back to null if the package can't be resolved.
  */
@@ -289,28 +307,55 @@ export class GuardATREngine {
   }
 
   /**
-   * Validate that all regex patterns in a rule are safe to compile and execute.
-   * Rejects patterns that are too long or fail to compile.
+   * Validate that every regex pattern in a cloud rule is safe to compile AND
+   * safe to execute. For each pattern we check, in order:
+   *   1. it is a string and within MAX_PATTERN_LEN (resource bound),
+   *   2. it compiles via `new RegExp()` (rejects malformed patterns),
+   *   3. it passes isSafeRegex() (rejects catastrophic-backtracking ReDoS
+   *      structures that compile fine but hang on non-matching input).
+   *
+   * Both condition shapes are covered:
+   *   - named-format: { condName: { patterns: [...] } } (legacy/grouped),
+   *   - array-format: [{ operator: "regex", value: "..." }] (current ATR rules).
+   * Returns false (reject the rule) on the first unsafe pattern.
    */
   private static validatePatterns(rule: ATRRule): boolean {
     const MAX_PATTERN_LEN = 2000;
-    try {
-      const conditions = rule.detection?.conditions;
-      if (!Array.isArray(conditions)) return true; // no patterns to validate
-      for (const cond of conditions) {
-        const patterns = (cond as { patterns?: string[] }).patterns;
-        if (!Array.isArray(patterns)) continue;
-        for (const p of patterns) {
-          if (typeof p !== 'string') return false;
-          if (p.length > MAX_PATTERN_LEN) return false;
-          // Verify the pattern compiles without error
-          new RegExp(p);
-        }
+
+    const checkPattern = (p: unknown): boolean => {
+      if (typeof p !== 'string') return false;
+      if (p.length > MAX_PATTERN_LEN) return false;
+      try {
+        const re = new RegExp(p);
+        if (!isSafeRegex(re)) return false;
+      } catch {
+        return false; // does not compile
       }
       return true;
-    } catch {
-      return false;
+    };
+
+    const conditions = rule.detection?.conditions;
+    if (!Array.isArray(conditions)) return true; // no patterns to validate
+
+    for (const cond of conditions) {
+      if (!cond || typeof cond !== 'object') continue;
+
+      // Named/grouped format: { patterns: [string, ...] }
+      const patterns = (cond as { patterns?: unknown }).patterns;
+      if (Array.isArray(patterns)) {
+        for (const p of patterns) {
+          if (!checkPattern(p)) return false;
+        }
+      }
+
+      // Array format: { operator: "regex", value: "..." }
+      const entry = cond as { operator?: unknown; value?: unknown };
+      if (entry.operator === 'regex' && entry.value !== undefined) {
+        if (!checkPattern(entry.value)) return false;
+      }
     }
+
+    return true;
   }
 
   /**
