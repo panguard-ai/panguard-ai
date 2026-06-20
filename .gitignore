@@ -60,3 +60,4 @@ scripts/setup-stripe-test.ts
 threat-cloud.db
 threat-cloud.db-shm
 threat-cloud.db-wal
+scripts/__tests__/setup-stripe-test.test.ts
