@@ -87,23 +87,28 @@ describe('commandSetup config persistence', () => {
     tempDir = mkdtempSync(join(tmpdir(), 'chat-test-'));
     const configPath = join(tempDir, 'config.json');
     process.env['PANGUARD_CHAT_CONFIG'] = configPath;
+    // The bot token is a secret: it is read from the environment, never argv
+    // (a --token flag would be visible in `ps`). See cli/index.ts commandSetup.
+    process.env['PANGUARD_TELEGRAM_TOKEN'] = 'bot123';
 
-    const { runCLI } = await import('../src/cli/index.js');
-    await runCLI([
-      'setup',
-      '--channel',
-      'telegram',
-      '--user-type',
-      'it_admin',
-      '--token',
-      'bot123',
-      '--chat-id',
-      '456',
-    ]);
+    try {
+      const { runCLI } = await import('../src/cli/index.js');
+      await runCLI([
+        'setup',
+        '--channel',
+        'telegram',
+        '--user-type',
+        'it_admin',
+        '--chat-id',
+        '456',
+      ]);
 
-    const saved = JSON.parse(readFileSync(configPath, 'utf-8'));
-    expect(saved.channels.telegram.botToken).toBe('bot123');
-    expect(saved.channels.telegram.chatId).toBe('456');
+      const saved = JSON.parse(readFileSync(configPath, 'utf-8'));
+      expect(saved.channels.telegram.botToken).toBe('bot123');
+      expect(saved.channels.telegram.chatId).toBe('456');
+    } finally {
+      delete process.env['PANGUARD_TELEGRAM_TOKEN'];
+    }
   });
 
   it('should save default preferences with all enabled', async () => {

@@ -9,7 +9,7 @@
  * @module @panguard-ai/panguard-scan/scanners/discovery-scanner
  */
 
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import {
   detectOS,
   getNetworkInterfaces,
@@ -30,6 +30,36 @@ import {
 const logger = createLogger('panguard-scan:discovery');
 
 /**
+ * Run a fixed binary with a fixed args array and return trimmed stdout, or
+ * null on failure. Uses execFileSync (no shell) so arguments are never
+ * interpreted by a command interpreter.
+ *
+ * @param bin - Absolute path to the binary / 二進位檔絕對路徑
+ * @param args - Argument vector (never shell-interpreted) / 參數陣列（不經 shell）
+ * @param timeoutMs - Hard timeout in milliseconds / 逾時毫秒數
+ */
+function runCommand(bin: string, args: readonly string[], timeoutMs: number): string | null {
+  try {
+    return execFileSync(bin, [...args], {
+      timeout: timeoutMs,
+      stdio: ['ignore', 'pipe', 'ignore'],
+    })
+      .toString()
+      .trim();
+  } catch (err) {
+    // Some tools exit non-zero on success-with-results (e.g. `yum check-update`
+    // returns 100 when updates exist). execFileSync throws but still attaches
+    // captured stdout, so recover it rather than discarding usable output.
+    const stdout = (err as { stdout?: Buffer | string } | null)?.stdout;
+    if (stdout != null) {
+      const text = stdout.toString().trim();
+      if (text.length > 0) return text;
+    }
+    return null;
+  }
+}
+
+/**
  * Detect pending system updates based on platform.
  * Returns { pendingUpdates, autoUpdateEnabled }.
  */
@@ -38,62 +68,43 @@ function detectUpdateStatus(): { pendingUpdates: number; autoUpdateEnabled: bool
     const platform = process.platform;
 
     if (platform === 'darwin') {
-      // macOS: check Software Update
-      const output = execSync('softwareupdate -l 2>&1', { timeout: 10000 }).toString();
+      // macOS: check Software Update (stderr merged into the captured text by
+      // softwareupdate itself; we no longer rely on a shell 2>&1 redirect).
+      const output = runCommand('/usr/sbin/softwareupdate', ['-l'], 10000) ?? '';
       const matches = output.match(/\* /g);
       const pending = matches ? matches.length : 0;
       // Check if auto-update is enabled
-      let autoEnabled = false;
-      try {
-        const autoOutput = execSync(
-          'defaults read /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled 2>/dev/null',
-          { timeout: 5000 }
-        )
-          .toString()
-          .trim();
-        autoEnabled = autoOutput === '1';
-      } catch {
-        // Ignore — cannot determine auto-update status
-      }
+      const autoOutput = runCommand(
+        '/usr/bin/defaults',
+        ['read', '/Library/Preferences/com.apple.SoftwareUpdate', 'AutomaticCheckEnabled'],
+        5000
+      );
+      const autoEnabled = autoOutput === '1';
       return { pendingUpdates: pending, autoUpdateEnabled: autoEnabled };
     }
 
     if (platform === 'linux') {
       // Try apt (Debian/Ubuntu)
-      try {
-        const output = execSync('apt list --upgradable 2>/dev/null | grep -c upgradable', {
-          timeout: 10000,
-        })
-          .toString()
-          .trim();
-        const count = parseInt(output, 10);
-        const autoEnabled = (() => {
-          try {
-            return (
-              execSync('systemctl is-enabled unattended-upgrades 2>/dev/null', { timeout: 5000 })
-                .toString()
-                .trim() === 'enabled'
-            );
-          } catch {
-            return false;
-          }
-        })();
-        return { pendingUpdates: isNaN(count) ? 0 : count, autoUpdateEnabled: autoEnabled };
-      } catch {
-        /* not apt-based */
+      const aptOutput = runCommand('/usr/bin/apt', ['list', '--upgradable'], 10000);
+      if (aptOutput !== null) {
+        // Replaces shell `grep -c upgradable`: count lines mentioning upgradable.
+        const count = aptOutput.split('\n').filter((line) => line.includes('upgradable')).length;
+        const autoStatus = runCommand(
+          '/usr/bin/systemctl',
+          ['is-enabled', 'unattended-upgrades'],
+          5000
+        );
+        return { pendingUpdates: count, autoUpdateEnabled: autoStatus === 'enabled' };
       }
 
       // Try yum/dnf (RHEL/CentOS/Fedora)
-      try {
-        const output = execSync('yum check-update 2>/dev/null | tail -n +3 | wc -l', {
-          timeout: 10000,
-        })
-          .toString()
-          .trim();
-        const count = parseInt(output, 10);
-        return { pendingUpdates: isNaN(count) ? 0 : count, autoUpdateEnabled: false };
-      } catch {
-        /* not yum-based */
+      const yumOutput = runCommand('/usr/bin/yum', ['check-update'], 10000);
+      if (yumOutput !== null) {
+        // Replaces shell `tail -n +3 | wc -l`: skip the 2-line header, then
+        // count remaining non-empty package lines.
+        const lines = yumOutput.split('\n');
+        const count = lines.slice(2).filter((line) => line.trim().length > 0).length;
+        return { pendingUpdates: count, autoUpdateEnabled: false };
       }
     }
 

@@ -192,7 +192,7 @@ export async function executeInit(args: Record<string, unknown>) {
   };
 
   const configPath = path.join(dataDir, 'config.json');
-  await fs.writeFile(configPath, JSON.stringify(config, null, 2));
+  await fs.writeFile(configPath, JSON.stringify(config, null, 2), { mode: 0o600 });
 
   return {
     content: [
@@ -249,7 +249,7 @@ export async function executeDeploy(args: Record<string, unknown>) {
     notifications: {},
   };
   const configPath = path.join(dataDir, 'config.json');
-  await fs.writeFile(configPath, JSON.stringify(config, null, 2));
+  await fs.writeFile(configPath, JSON.stringify(config, null, 2), { mode: 0o600 });
 
   // Step 2: Run quick scan
   let scanResult: Awaited<ReturnType<typeof runScan>> | null = null;

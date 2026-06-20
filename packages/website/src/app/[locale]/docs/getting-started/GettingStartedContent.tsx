@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Copy, Check, Terminal, Monitor, Server } from 'lucide-react';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
@@ -13,7 +13,7 @@ import { STATS } from '@/lib/stats';
 // ---------------------------------------------------------------------------
 
 type Platform = 'macos' | 'linux' | 'windows';
-type InstallMethod = 'curl' | 'npm';
+type InstallMethod = 'curl' | 'npm' | 'brew';
 
 const PLATFORM_META: Record<Platform, { label: string; icon: typeof Terminal }> = {
   macos: { label: 'macOS', icon: Terminal },
@@ -31,39 +31,66 @@ interface InstallOption {
   recommended?: boolean;
   prereq?: string;
   command: string;
+  // One line: what happens when you run this.
+  what: { en: string; zh: string };
   note?: string;
 }
+
+// `pga up` does the same three things on every platform: scan your installed
+// skills, start runtime protection, and open the dashboard. One command.
+const PGA_UP_WHAT = {
+  en: 'pga up scans your skills, starts protection, and opens the dashboard.',
+  zh: 'pga up 掃描你的 skill、啟動防護、打開儀表板。',
+};
 
 const INSTALL_OPTIONS: Record<Platform, InstallOption[]> = {
   macos: [
     {
-      method: 'curl',
-      label: 'One-line Install',
+      method: 'npm',
+      label: 'npm (Recommended)',
       recommended: true,
+      command: 'npm install -g @panguard-ai/panguard && pga up',
+      what: PGA_UP_WHAT,
+      note: 'Requires Node.js 20+. Works on both Apple Silicon and Intel Mac.',
+    },
+    {
+      method: 'curl',
+      label: 'curl (no Node setup)',
       command: 'curl -fsSL https://get.panguard.ai | bash',
+      what: {
+        en: 'Installs the CLI without a Node.js setup. Run pga up afterward to scan, protect, and open the dashboard.',
+        zh: '不需要先裝 Node.js 就能安裝 CLI。裝完跑 pga up 即可掃描、防護、打開儀表板。',
+      },
       note: 'Apple Silicon (ARM64) native binary. Intel Mac users: install via npm, or enable Rosetta 2 first.',
     },
     {
-      method: 'npm',
-      label: 'npm',
-      command: 'npm install -g @panguard-ai/panguard && pga up',
-      note: 'Requires Node.js 20+. Works on both Apple Silicon and Intel Mac.',
+      method: 'brew',
+      label: 'Homebrew (macOS)',
+      command: 'brew install panguard-ai/tap/panguard && pga up',
+      what: PGA_UP_WHAT,
+      note: 'Installs from the PanGuard tap and keeps you on the latest release via brew upgrade.',
     },
   ],
   linux: [
     {
-      method: 'curl',
-      label: 'One-line Install',
-      recommended: true,
-      command: 'curl -fsSL https://get.panguard.ai | bash',
-      note: 'Supports x64 and ARM64 architectures. Requires Node.js 20+.',
-    },
-    {
       method: 'npm',
-      label: 'npm',
+      label: 'npm (Recommended)',
+      recommended: true,
       prereq:
         '# Ubuntu / Debian\ncurl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -\nsudo apt-get install -y nodejs\n\n# CentOS / RHEL\ncurl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -\nsudo yum install -y nodejs',
       command: 'npm install -g @panguard-ai/panguard && pga up',
+      what: PGA_UP_WHAT,
+      note: 'Requires Node.js 20+. Supports x64 and ARM64.',
+    },
+    {
+      method: 'curl',
+      label: 'curl (no Node setup)',
+      command: 'curl -fsSL https://get.panguard.ai | bash',
+      what: {
+        en: 'Installs the CLI without a Node.js setup. Run pga up afterward to scan, protect, and open the dashboard.',
+        zh: '不需要先裝 Node.js 就能安裝 CLI。裝完跑 pga up 即可掃描、防護、打開儀表板。',
+      },
+      note: 'Supports x64 and ARM64 architectures.',
     },
   ],
   windows: [
@@ -74,12 +101,17 @@ const INSTALL_OPTIONS: Record<Platform, InstallOption[]> = {
       prereq:
         '# Install Node.js first (pick one):\nwinget install OpenJS.NodeJS.LTS\n# Or download from https://nodejs.org (v20+ LTS)',
       command: 'npm install -g @panguard-ai/panguard && pga up',
+      what: PGA_UP_WHAT,
     },
     {
       method: 'curl',
       label: 'PowerShell',
       command:
         'powershell -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"',
+      what: {
+        en: 'Installs the CLI in PowerShell. Run pga up afterward to scan, protect, and open the dashboard.',
+        zh: '在 PowerShell 安裝 CLI。裝完跑 pga up 即可掃描、防護、打開儀表板。',
+      },
       note: 'If using PowerShell 7+: pwsh -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"',
     },
   ],
@@ -222,6 +254,8 @@ function TerminalOutput({ lines }: { lines: string[] }) {
 
 export default function GettingStartedContent() {
   const t = useTranslations('docs.gettingStarted');
+  const locale = useLocale();
+  const isZh = locale.startsWith('zh');
   const detectedPlatform = useDetectedPlatform();
   const [platform, setPlatform] = useState<Platform>('macos');
   const [method, setMethod] = useState<InstallMethod>('curl');
@@ -255,8 +289,10 @@ export default function GettingStartedContent() {
               {t('title')}
             </h1>
             <p className="text-text-secondary mt-4 text-lg leading-relaxed">{t('subtitle')}</p>
-            <p className="text-sm text-text-muted mt-3">
-              Free and open source under the MIT license. No account required.
+            <p className="text-sm text-text-muted mt-3 leading-relaxed">
+              {isZh
+                ? 'Community 版永久免費、MIT 授權、免註冊:本機完整防護、skill 掃描、即時儀表板全部包含。集體防禦遙測預設關閉,要不要分享由你決定。'
+                : 'The Community edition is free forever, MIT-licensed, and needs no account: full local protection, skill scanning, and the real-time dashboard are all included. Collective-defense telemetry is off by default — sharing is opt-in.'}
             </p>
           </FadeInUp>
         </div>
@@ -287,10 +323,22 @@ export default function GettingStartedContent() {
             {/* Install command */}
             <CodeBlock code={activeOption.command} label="Install" />
 
+            {/* What happens — one line */}
+            <p className="text-sm text-text-secondary mt-2">
+              {isZh ? activeOption.what.zh : activeOption.what.en}
+            </p>
+
             {/* Note */}
             {activeOption.note && (
-              <p className="text-xs text-text-muted mt-2">{activeOption.note}</p>
+              <p className="text-xs text-text-muted mt-1">{activeOption.note}</p>
             )}
+
+            {/* What pga up does */}
+            <p className="text-xs text-text-muted mt-3 leading-relaxed">
+              {isZh
+                ? 'pga up = 掃描你的 skill → 啟動防護 → 打開儀表板。一行指令。可選的語意層用 pga guard ai 開啟。'
+                : 'pga up = scan your skills, start protection, open the dashboard. One command. The optional semantic layer is enabled with pga guard ai.'}
+            </p>
 
             {/* Verify */}
             <div className="mt-6 pt-6 border-t border-border/40">
@@ -327,7 +375,7 @@ export default function GettingStartedContent() {
               <TerminalOutput
                 lines={[
                   `[OK] Panguard v${STATS.cliVersion} installed`,
-                  `[OK] Rule engine loaded (${STATS.atrRulesDisplay} ATR rules)`,
+                  '[OK] Rule engine loaded (650+ ATR rules)',
                   '[OK] Scan complete.',
                 ]}
               />
@@ -380,11 +428,12 @@ export default function GettingStartedContent() {
                     label="Claude Code"
                   />
                   <p>
-                    <strong className="text-text-primary">Step 4:</strong> Start inline protection
+                    <strong className="text-text-primary">Step 4:</strong> Start protection and open
+                    the dashboard
                   </p>
-                  <CodeBlock code="pga guard start --dashboard" label="Terminal" />
+                  <CodeBlock code="pga up" label="Terminal" />
                   <p className="text-xs text-panguard-green">
-                    Done! Claude Code now has 11 security tools via MCP. Guard detects and blocks
+                    Done! Claude Code now has security tools via MCP. Guard detects and blocks
                     threats at runtime.
                   </p>
                 </div>
@@ -426,10 +475,10 @@ export default function GettingStartedContent() {
                     label="OpenClaw"
                   />
                   <p>
-                    <strong className="text-text-primary">Step 5:</strong> Start Guard for
-                    continuous protection
+                    <strong className="text-text-primary">Step 5:</strong> Start protection and open
+                    the dashboard
                   </p>
-                  <CodeBlock code="pga guard start --dashboard" label="Terminal" />
+                  <CodeBlock code="pga up" label="Terminal" />
                   <p className="text-xs text-panguard-green">
                     Done! Every skill OpenClaw installs will be automatically audited.
                   </p>
@@ -488,8 +537,8 @@ jobs:
               <div className="mt-4 space-y-2 text-sm text-text-secondary">
                 <p>
                   <strong className="text-text-primary">What it does:</strong> Scans your repo for
-                  MCP config files and SKILL.md files using {STATS.atrRulesDisplay} ATR detection
-                  rules. Outputs SARIF to the GitHub Security tab.
+                  MCP config files and SKILL.md files using the current ATR ruleset (650+ rules,
+                  growing daily). Outputs SARIF to the GitHub Security tab.
                 </p>
                 <p>
                   <strong className="text-text-primary">Options:</strong>
@@ -717,7 +766,7 @@ jobs:
             <p className="text-text-secondary mb-6">{t('multiEndpointDesc')}</p>
 
             <CodeBlock
-              code={`#!/bin/bash\n# servers.txt: one IP per line\nfor server in $(cat servers.txt); do\n  ssh root@$server 'curl -fsSL https://get.panguard.ai | bash && panguard guard start'\ndone`}
+              code={`#!/bin/bash\n# servers.txt: one IP per line\nfor server in $(cat servers.txt); do\n  ssh root@$server 'curl -fsSL https://get.panguard.ai | bash'\ndone`}
               label={t('multiEndpointSshLabel')}
             />
 

@@ -225,13 +225,27 @@ download_binary() {
     fail "Downloaded tarball is empty or corrupted: ${download_url}"
   fi
 
-  # Attempt checksum verification
+  # SECURITY: a prebuilt binary from GitHub Releases must be checksum-verified
+  # before extraction. If we cannot verify it (no SHA256SUMS, no entry for this
+  # tarball, or no sha256 tool), do NOT install the unverified binary — return 1
+  # so the caller falls back to the source build (git/https, built locally).
   local tarball_name="panguard-${PLATFORM}.tar.gz"
-  if download_file "$checksum_url" "$tmp_checksums" 2>/dev/null; then
-    verify_checksum "$tmp_tarball" "$tmp_checksums" "$tarball_name"
-  else
-    warn "SHA256SUMS.txt not available for this release. Skipping checksum verification."
+  if ! curl -fsSL -o "$tmp_checksums" "$checksum_url" 2>/dev/null; then
+    warn "Could not fetch SHA256SUMS.txt — refusing to install an unverified binary."
+    rm -f "$tmp_tarball" "$tmp_checksums"; trap - EXIT
+    return 1
   fi
+  if ! grep -q "$tarball_name" "$tmp_checksums" 2>/dev/null; then
+    warn "No checksum entry for ${tarball_name} — refusing to install an unverified binary."
+    rm -f "$tmp_tarball" "$tmp_checksums"; trap - EXIT
+    return 1
+  fi
+  if ! command -v sha256sum &>/dev/null && ! command -v shasum &>/dev/null; then
+    warn "No sha256sum/shasum to verify the binary — refusing to install unverified."
+    rm -f "$tmp_tarball" "$tmp_checksums"; trap - EXIT
+    return 1
+  fi
+  verify_checksum "$tmp_tarball" "$tmp_checksums" "$tarball_name"
 
   # Extract the verified tarball
   if ! tar -xzf "$tmp_tarball" -C "$INSTALL_DIR" 2>/dev/null; then

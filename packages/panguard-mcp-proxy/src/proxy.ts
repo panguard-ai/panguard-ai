@@ -169,6 +169,12 @@ export class MCPProxy {
         `[panguard-proxy] Proxy active. ${ruleCount} rules protecting all tool calls.\n`
       );
     }
+    // MCP has no user-in-the-loop channel, so an 'ask' verdict cannot pause for
+    // approval — it is logged and forwarded, and surfaced on stderr as
+    // "FLAGGED (ask)". Document it here so operators know flagged calls still run.
+    process.stderr.write(
+      "[panguard-proxy] Note: 'ask' verdicts are logged-and-forwarded (no MCP user prompt); watch stderr for FLAGGED (ask) lines.\n"
+    );
   }
 
   /**
@@ -288,6 +294,16 @@ export class MCPProxy {
         };
       }
 
+      // An 'ask' verdict cannot pause for a human here — MCP has no
+      // user-in-the-loop channel — so the call is forwarded. Surface it loudly
+      // on stderr so a flagged-but-not-denied call is never silent (the journal
+      // entry above is easy to miss). Semantics are unchanged: logged + forwarded.
+      if (preResult.outcome === 'ask') {
+        process.stderr.write(
+          `[panguard-proxy] FLAGGED (ask): ${name} — ${preResult.reason}\n`
+        );
+      }
+
       // Forward to upstream
       const result = await client.callTool({ name, arguments: toolArgs });
 
@@ -341,6 +357,15 @@ export class MCPProxy {
               },
             ],
           };
+        }
+
+        // Same as the pre-call path: an 'ask' response verdict is logged +
+        // forwarded (no human-in-the-loop in MCP) — surface it loudly so it is
+        // never silent.
+        if (postResult.outcome === 'ask') {
+          process.stderr.write(
+            `[panguard-proxy] FLAGGED response (ask): ${name} — ${postResult.reason}\n`
+          );
         }
       }
 

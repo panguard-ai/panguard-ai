@@ -90,6 +90,25 @@ const throwingEvaluator: ProxyEvaluatorLike = {
   },
 };
 
+/** An evaluator that always returns 'ask' on the pre-call — flagged, not denied. */
+const askOnCall: ProxyEvaluatorLike = {
+  loadRules: async () => 0,
+  evaluateToolCall: async () => ({
+    outcome: 'ask',
+    reason: 'low-confidence match',
+    matchedRules: ['ATR-2026-00001'],
+    confidence: 40,
+    durationMs: 0,
+  }),
+  evaluateToolResponse: async () => ({
+    outcome: 'allow',
+    reason: '',
+    matchedRules: [],
+    confidence: 0,
+    durationMs: 0,
+  }),
+};
+
 /** Wire the stack with a chosen evaluator (for fail-mode tests). */
 async function wireWith(evaluator: ProxyEvaluatorLike): Promise<Client> {
   const upstream = makeUpstream();
@@ -120,6 +139,30 @@ describe('MCPProxy fail-mode (security-first default)', () => {
       expect(textOf(r)).toBe('hello world');
     } finally {
       delete process.env['PANGUARD_PROXY_FAIL_MODE'];
+    }
+  });
+});
+
+describe("MCPProxy 'ask' verdict (logged-and-forwarded, never silent)", () => {
+  it("writes a loud FLAGGED (ask) line and still forwards the call", async () => {
+    const lines: string[] = [];
+    const orig = process.stderr.write.bind(process.stderr);
+    // Capture stderr for the duration of this call.
+    process.stderr.write = ((chunk: string | Uint8Array): boolean => {
+      lines.push(typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString());
+      return true;
+    }) as typeof process.stderr.write;
+    try {
+      const agent = await wireWith(askOnCall);
+      const r = await agent.callTool({ name: 'echo', arguments: { text: 'hello world' } });
+      // 'ask' is logged-and-forwarded: the upstream result comes back unchanged...
+      expect(textOf(r)).toBe('hello world');
+      // ...but it must NOT be silent — the FLAGGED (ask) line names the tool.
+      const flagged = lines.join('');
+      expect(flagged).toContain('FLAGGED (ask)');
+      expect(flagged).toContain('echo');
+    } finally {
+      process.stderr.write = orig;
     }
   });
 });
