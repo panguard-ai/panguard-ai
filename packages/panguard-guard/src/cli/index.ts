@@ -236,16 +236,31 @@ async function commandStart(
     config.showUploadData = true;
   }
 
-  // Auto-provision TC client key if none configured
-  if (!config.threatCloudApiKey && config.threatCloudEndpoint) {
-    const { loadOrProvisionTCKey } = await import('../threat-cloud/tc-key-provisioner.js');
-    const { getAnonymousClientId } = await import('../threat-cloud/client-id.js');
-    const provisionedKey = await loadOrProvisionTCKey(
-      config.threatCloudEndpoint,
-      getAnonymousClientId()
-    );
-    if (provisionedKey) {
-      config.threatCloudApiKey = provisionedKey;
+  // Auto-provision a TC client key — ONLY when the user has opted into uploads,
+  // and NEVER block daemon startup on it. threatCloudEndpoint defaults to
+  // tc.panguard.ai, so without these guards a fresh daemon makes a blocking
+  // network call to Threat Cloud before the dashboard binds — and a slow /
+  // firewalled / unreachable (e.g. dead IPv6) route hangs it for ~75s (the
+  // request's idle-timeout does not cover the TCP/TLS connect phase). Gate on
+  // opt-in (default OFF = no call = instant start) and cap the wait so even an
+  // opted-in user with a bad network still gets a working daemon + dashboard.
+  if (
+    !config.threatCloudApiKey &&
+    config.threatCloudEndpoint &&
+    config.threatCloudUploadEnabled === true
+  ) {
+    try {
+      const { loadOrProvisionTCKey } = await import('../threat-cloud/tc-key-provisioner.js');
+      const { getAnonymousClientId } = await import('../threat-cloud/client-id.js');
+      const provisionedKey = await Promise.race([
+        loadOrProvisionTCKey(config.threatCloudEndpoint, getAnonymousClientId()),
+        new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), 4000)),
+      ]);
+      if (provisionedKey) {
+        config.threatCloudApiKey = provisionedKey;
+      }
+    } catch {
+      // Never let TC provisioning block or crash startup.
     }
   }
 
