@@ -20,7 +20,15 @@
  */
 
 import { Command } from 'commander';
-import { existsSync, readFileSync, writeFileSync, mkdirSync, renameSync, chmodSync } from 'node:fs';
+import {
+  existsSync,
+  readFileSync,
+  writeFileSync,
+  mkdirSync,
+  renameSync,
+  chmodSync,
+  rmSync,
+} from 'node:fs';
 import { join, dirname } from 'node:path';
 import { homedir } from 'node:os';
 import { c } from '@panguard-ai/core';
@@ -542,7 +550,14 @@ export function installFor(platform: HookPlatform): 'installed' | 'already' | 'e
         if (JSON.stringify(hooks).includes('pga hook run')) return 'already';
         for (const ev of ['beforeShellExecution', 'beforeMCPExecution']) {
           const arr = Array.isArray(hooks[ev]) ? [...(hooks[ev] as unknown[])] : [];
-          arr.push({ command: HOOK_CMD('cursor'), failClosed: true });
+          // failClosed must stay FALSE: if the `pga` binary is later removed
+          // (uninstall / npm-remove) but this config entry survives, a
+          // failClosed:true hook makes Cursor DENY every tool call when it
+          // cannot exec the missing command — bricking the agent. Failing OPEN
+          // means an orphaned hook degrades to no-protection (loud, recoverable)
+          // instead of a hard deny. Our own runHook is already fail-safe and
+          // never relies on the host's failClosed flag for enforcement.
+          arr.push({ command: HOOK_CMD('cursor'), failClosed: false });
           hooks[ev] = arr;
         }
         writeJson(path, { version: 1, ...s, hooks });
@@ -589,6 +604,118 @@ export function installFor(platform: HookPlatform): 'installed' | 'already' | 'e
 export function installHook(): 'installed' | 'already' {
   const r = installFor('claude-code');
   return r === 'error' ? 'already' : r;
+}
+
+/**
+ * Strip every PanGuard hook entry from one platform's config — the symmetric
+ * inverse of installFor. `install` (no flag) writes hooks across ~7 platforms;
+ * `uninstall` must be able to remove them all, or an orphaned failClosed hook
+ * left behind after `npm remove` can DENY every tool call and brick the agent.
+ *
+ * DATA-LOSS SAFETY mirrors installFor: a config that exists but cannot be parsed
+ * is treated as 'error' and NEVER overwritten (we'd wipe the user's other
+ * settings). 'absent' means there is nothing to remove. We only ever filter out
+ * entries whose command references `pga hook run`, preserving every other hook.
+ */
+export function uninstallFor(platform: HookPlatform): 'removed' | 'absent' | 'error' {
+  lastInstallError = null;
+  try {
+    // Helper: detect our entries inside an arbitrary host hook array by string.
+    const references = (v: unknown): boolean => JSON.stringify(v ?? null).includes('pga hook run');
+    const filterArr = (arr: unknown[]): unknown[] => arr.filter((e) => !references(e));
+
+    switch (platform) {
+      case 'claude-code':
+      case 'continue': {
+        // Both read ~/.claude/settings.json; the Claude entry covers both.
+        const path = claudeSettingsPath();
+        const r = readJsonForRoundTrip(path);
+        if (r.kind === 'corrupt') {
+          lastInstallError = `Claude settings (${path}) is not valid JSON (${r.error}). PanGuard did NOT modify it.`;
+          return 'error';
+        }
+        if (r.kind === 'absent') return 'absent';
+        const s = r.data as ClaudeSettings;
+        if (!isHookInstalled(s)) return 'absent';
+        writeJson(path, withHookRemoved(s));
+        return 'removed';
+      }
+      case 'codex': {
+        const path = join(homedir(), '.codex', 'hooks.json');
+        const r = readJsonForRoundTrip(path);
+        if (r.kind === 'corrupt') {
+          lastInstallError = `Codex hooks (${path}) is not valid JSON (${r.error}). PanGuard did NOT modify it.`;
+          return 'error';
+        }
+        if (r.kind === 'absent') return 'absent';
+        const s = r.data as ClaudeSettings;
+        if (!isHookInstalled(s)) return 'absent';
+        writeJson(path, withHookRemoved(s));
+        return 'removed';
+      }
+      case 'gemini': {
+        const path = join(homedir(), '.gemini', 'settings.json');
+        const r = readJsonForRoundTrip(path);
+        if (r.kind === 'corrupt') {
+          lastInstallError = `Gemini settings (${path}) is not valid JSON (${r.error}). PanGuard did NOT modify it.`;
+          return 'error';
+        }
+        if (r.kind === 'absent') return 'absent';
+        const s = r.data as { hooks?: { BeforeTool?: unknown[] }; [k: string]: unknown };
+        const before = Array.isArray(s.hooks?.BeforeTool) ? (s.hooks!.BeforeTool as unknown[]) : [];
+        if (!before.some(references)) return 'absent';
+        const filtered = filterArr(before);
+        writeJson(path, { ...s, hooks: { ...(s.hooks ?? {}), BeforeTool: filtered } });
+        return 'removed';
+      }
+      case 'cursor': {
+        const path = join(homedir(), '.cursor', 'hooks.json');
+        const r = readJsonForRoundTrip(path);
+        if (r.kind === 'corrupt') {
+          lastInstallError = `Cursor hooks (${path}) is not valid JSON (${r.error}). PanGuard did NOT modify it.`;
+          return 'error';
+        }
+        if (r.kind === 'absent') return 'absent';
+        const s = r.data as { version?: number; hooks?: Record<string, unknown[]> };
+        const hooks = { ...(s.hooks ?? {}) };
+        if (!JSON.stringify(hooks).includes('pga hook run')) return 'absent';
+        for (const ev of ['beforeShellExecution', 'beforeMCPExecution']) {
+          if (Array.isArray(hooks[ev])) hooks[ev] = filterArr(hooks[ev] as unknown[]);
+        }
+        writeJson(path, { ...s, hooks });
+        return 'removed';
+      }
+      case 'windsurf': {
+        const path = join(homedir(), '.codeium', 'windsurf', 'hooks.json');
+        const r = readJsonForRoundTrip(path);
+        if (r.kind === 'corrupt') {
+          lastInstallError = `Windsurf hooks (${path}) is not valid JSON (${r.error}). PanGuard did NOT modify it.`;
+          return 'error';
+        }
+        if (r.kind === 'absent') return 'absent';
+        const s = r.data as { hooks?: Record<string, unknown[]> };
+        const hooks = { ...(s.hooks ?? {}) };
+        if (!JSON.stringify(hooks).includes('pga hook run')) return 'absent';
+        for (const ev of ['pre_run_command', 'pre_write_code', 'pre_mcp_tool_use']) {
+          if (Array.isArray(hooks[ev])) hooks[ev] = filterArr(hooks[ev] as unknown[]);
+        }
+        writeJson(path, { ...s, hooks });
+        return 'removed';
+      }
+      case 'cline': {
+        // Filename-based: our own executable script. Safe to remove only when it
+        // is actually ours (references our hook), never a user-authored script.
+        const file = join(homedir(), 'Documents', 'Cline', 'Rules', 'Hooks', 'PreToolUse');
+        if (!existsSync(file)) return 'absent';
+        if (!readFileSync(file, 'utf-8').includes('pga hook run')) return 'absent';
+        rmSync(file);
+        return 'removed';
+      }
+    }
+  } catch (err) {
+    lastInstallError = err instanceof Error ? err.message : String(err);
+    return 'error';
+  }
 }
 
 /** Platforms that have a built-in-tool hook PanGuard can wire (closes the blind spot). */
@@ -662,27 +789,42 @@ export function hookCommand(): Command {
 
   cmd
     .command('uninstall')
-    .description('Remove the PanGuard hook from Claude-style settings')
-    .action(() => {
-      const settingsPath = claudeSettingsPath();
-      const read = readJsonForRoundTrip(settingsPath);
-      if (read.kind === 'corrupt') {
-        // Same data-loss rule as install: never write over a config we cannot
-        // parse. The hook entry may or may not be in there — refuse to guess.
-        console.log(
-          `  ${c.caution('Cannot uninstall:')} ${c.dim(
-            `${settingsPath} is not valid JSON (${read.error}). Fix or back up the file first.`
-          )}`
-        );
+    .description('Remove the PanGuard hook (all hookable platforms by default)')
+    .option('--platform <id>', 'A specific platform; omit for all hookable')
+    .option('--all', 'Remove from every hookable platform (default)')
+    .action((opts: { platform?: string; all?: boolean }) => {
+      // Default to ALL hookable platforms, mirroring `install`. `install` (no
+      // flag) wires ~7 platforms, so `uninstall` (no flag) must strip all of
+      // them — otherwise an orphaned hook (e.g. Cursor) is left behind to brick
+      // the agent after the `pga` binary is gone.
+      const targets = opts.platform
+        ? [opts.platform as HookPlatform].filter((p) => PLATFORMS[p])
+        : HOOKABLE_PLATFORMS;
+      if (!targets.length) {
+        console.log(`  ${c.caution(`Unknown platform: ${opts.platform}`)}`);
         return;
       }
-      const s = (read.kind === 'ok' ? read.data : {}) as ClaudeSettings;
-      if (!isHookInstalled(s)) {
-        console.log(`  ${c.dim('Hook not installed.')}`);
-        return;
+      let removed = 0;
+      for (const p of targets) {
+        const r = uninstallFor(p);
+        const tag =
+          r === 'removed'
+            ? c.safe('removed')
+            : r === 'absent'
+              ? c.dim('not installed')
+              : c.caution('error');
+        if (r === 'removed') removed++;
+        console.log(`  ${p.padEnd(12)} ${tag}`);
+        // On error, surface WHY (e.g. corrupt config we refused to overwrite).
+        if (r === 'error' && lastHookInstallError()) {
+          console.log(`  ${''.padEnd(12)} ${c.dim(lastHookInstallError()!)}`);
+        }
       }
-      writeJson(settingsPath, withHookRemoved(s));
-      console.log(`  ${c.safe('PreToolUse hook removed.')}`);
+      console.log(
+        removed > 0
+          ? `  ${c.dim('Restart the host agent for the change to take effect.')}`
+          : `  ${c.dim('Nothing to remove.')}`
+      );
     });
 
   cmd

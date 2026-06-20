@@ -505,12 +505,38 @@ export function setupCommand(): Command {
             let guardBin: string | undefined;
             try {
               const require = createRequire(import.meta.url);
-              guardBin = require.resolve('@panguard-ai/panguard-guard/dist/cli/index.js');
+              // The package's exports map only defines "." — resolving the deep
+              // subpath "@panguard-ai/panguard-guard/dist/cli/index.js" (or even
+              // "/package.json") directly throws ERR_PACKAGE_PATH_NOT_EXPORTED.
+              // Resolve the exported package root ("." → dist/index.js) instead,
+              // then derive the CLI entry: dist/index.js → dist → dist/cli/index.js.
+              const { dirname, join: rjoin } = await import('node:path');
+              const guardRootEntry = require.resolve('@panguard-ai/panguard-guard');
+              guardBin = rjoin(dirname(guardRootEntry), 'cli', 'index.js');
             } catch {
-              // Fallback: search common paths for npm global installs
+              // Fallback: search common paths for npm global / local installs
               const { existsSync: fe } = await import('node:fs');
               const { join: pjoin } = await import('node:path');
+              const { fileURLToPath } = await import('node:url');
+              const { dirname: pdirname } = await import('node:path');
+              // Relative to this panguard package's own node_modules — covers a
+              // plain local `npm install @panguard-ai/panguard` that hoists the
+              // guard dependency under the panguard package. This compiled file is
+              // dist/cli/commands/setup.js, so the package root is four dirs up
+              // (commands -> cli -> dist -> package root).
+              const panguardPkgDir = pdirname(
+                pdirname(pdirname(pdirname(fileURLToPath(import.meta.url))))
+              );
               const candidates = [
+                pjoin(
+                  panguardPkgDir,
+                  'node_modules',
+                  '@panguard-ai',
+                  'panguard-guard',
+                  'dist',
+                  'cli',
+                  'index.js'
+                ),
                 pjoin(
                   homedir(),
                   '.panguard',
@@ -791,7 +817,9 @@ export function setupCommand(): Command {
         console.log(`    ${c.sage('pga up')}           Start protection + dashboard`);
         console.log(`    ${c.sage('pga status')}       Check protection status`);
         console.log(`    ${c.sage('pga scan')}         Scan all installed skills`);
-        console.log(`    ${c.sage('pga audit <url>')}  Audit a skill before installing`);
+        console.log(
+          `    ${c.sage('pga audit skill <url>')}  Audit a skill before installing`
+        );
         console.log();
         console.log(c.dim('  Open source (MIT). If PanGuard helps you, star us on GitHub:'));
         console.log(c.sage('  https://github.com/panguard-ai/panguard-ai'));

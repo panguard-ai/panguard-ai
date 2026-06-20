@@ -22,7 +22,10 @@ import {
 } from '@panguard-ai/core';
 import type { StatusItem, TableColumn } from '@panguard-ai/core';
 import { readConfig } from '../../init/config-writer.js';
+import { loadGuardConfig } from '../guard-config.js';
 import type { Lang } from '../../init/types.js';
+
+const GUARD_CONFIG_PATH = join(homedir(), '.panguard-guard', 'config.json');
 
 export function statusCommand(): Command {
   return new Command('status')
@@ -416,23 +419,28 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
   }
 }
 
+/** Read the most recent scan summary, shared by both config and guard-only paths. */
+function readLastScan(): SystemStatus['lastScan'] {
+  const scanResultPath = join(homedir(), '.panguard', 'last-scan.json');
+  if (!existsSync(scanResultPath)) return null;
+  try {
+    const scanData = JSON.parse(readFileSync(scanResultPath, 'utf-8'));
+    return {
+      timestamp: scanData.scannedAt ?? new Date().toISOString(),
+      riskScore: scanData.riskScore ?? 0,
+      findings: scanData.findings?.length ?? 0,
+      grade: scoreToGrade(scanData.riskScore ?? 0),
+    };
+  } catch {
+    return null;
+  }
+}
+
 function collectStatus(config: ReturnType<typeof readConfig>): SystemStatus {
   const configPath = join(homedir(), '.panguard', 'config.json');
 
-  if (!config) {
-    return {
-      configLoaded: false,
-      configPath,
-      guard: null,
-      lastScan: null,
-      notifications: { channel: 'none', configured: false },
-      trap: null,
-      ai: { preference: 'rules_only' },
-      modules: {},
-    };
-  }
-
-  // Check if guard is running (PID file)
+  // Check if guard is running (PID file) — this is the canonical liveness signal,
+  // identical to what `pga guard status` uses (PID file + process.kill(pid, 0)).
   const guardPidPath = join(homedir(), '.panguard-guard', 'panguard-guard.pid');
   let guardRunning = false;
   let guardPid: number | undefined;
@@ -449,22 +457,60 @@ function collectStatus(config: ReturnType<typeof readConfig>): SystemStatus {
     }
   }
 
-  // Check for last scan result
-  let lastScan: SystemStatus['lastScan'] = null;
-  const scanResultPath = join(homedir(), '.panguard', 'last-scan.json');
-  if (existsSync(scanResultPath)) {
-    try {
-      const scanData = JSON.parse(readFileSync(scanResultPath, 'utf-8'));
-      lastScan = {
-        timestamp: scanData.scannedAt ?? new Date().toISOString(),
-        riskScore: scanData.riskScore ?? 0,
-        findings: scanData.findings?.length ?? 0,
-        grade: scoreToGrade(scanData.riskScore ?? 0),
+  // `pga setup` writes the canonical guard config to ~/.panguard-guard/config.json,
+  // NOT ~/.panguard/config.json (the latter is rarely written). So treat the
+  // product as initialized whenever the guard daemon is alive OR a guard config
+  // exists — otherwise a freshly-configured + running install wrongly reports
+  // "Not initialized / run pga setup", disagreeing with `pga guard status`.
+  const guardConfig = loadGuardConfig();
+  const guardConfigExists = existsSync(GUARD_CONFIG_PATH);
+
+  if (!config) {
+    // No master config, but the guard may still be configured and running.
+    // configLoaded must reflect reality (initialized) and guard must not be null
+    // when the daemon is alive, so this command agrees with `pga guard status`.
+    const initialized = guardRunning || guardConfigExists;
+    if (!initialized) {
+      return {
+        configLoaded: false,
+        configPath,
+        guard: null,
+        lastScan: null,
+        notifications: { channel: 'none', configured: false },
+        trap: null,
+        ai: { preference: 'rules_only' },
+        modules: {},
       };
-    } catch {
-      // ignore
     }
+
+    const guardMode =
+      typeof guardConfig.mode === 'string' && guardConfig.mode ? guardConfig.mode : 'monitoring';
+    const guardProvider =
+      typeof guardConfig['ai'] === 'object' && guardConfig['ai'] !== null
+        ? ((guardConfig['ai'] as { provider?: string }).provider ?? undefined)
+        : undefined;
+
+    return {
+      configLoaded: true,
+      configPath: GUARD_CONFIG_PATH,
+      guard: {
+        running: guardRunning,
+        mode: guardMode,
+        pid: guardPid,
+      },
+      lastScan: readLastScan(),
+      notifications: { channel: 'none', configured: false },
+      trap: null,
+      ai: {
+        preference: guardProvider ? 'cloud_ai' : 'rules_only',
+        provider: guardProvider,
+      },
+      modules: { guard: { enabled: true, status: guardRunning ? 'active' : 'ready' } },
+    };
   }
+
+  // Check for last scan result
+  const lastScan = readLastScan();
 
   // Build module status
   const modules: Record<string, { enabled: boolean; status: string }> = {};

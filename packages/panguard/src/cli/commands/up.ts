@@ -4,11 +4,11 @@
  * Flow: scan installed skills → warn about threats → start Guard → open dashboard
  */
 
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { existsSync, readFileSync, readdirSync, statSync, mkdirSync, openSync } from 'node:fs';
+import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { homedir, platform } from 'node:os';
-import { execFile } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
 import { Command } from 'commander';
 import { runCLI } from '@panguard-ai/panguard-guard';
 import { c, setLogLevel } from '@panguard-ai/core';
@@ -623,13 +623,58 @@ export function upCommand(): Command {
               await new Promise((r) => setTimeout(r, 100));
             }
           } else {
-            // Ephemeral fallback: a background daemon that stops at reboot.
-            process.env['PANGUARD_QUIET_GUARD'] = '1';
-            const args = ['start'];
-            if (opts.dashboard) args.push('--dashboard');
-            if (opts.verbose) args.push('--verbose');
+            // Ephemeral fallback (no reboot-surviving service, e.g. --no-persist
+            // or a non-macOS host without an installed service): spawn a DETACHED
+            // background daemon so protection actually runs until reboot. Running
+            // the guard in-process (runCLI('start')) would die the moment `pga up`
+            // returns — commandStart is a foreground daemon, so it must be its own
+            // process, exactly like the launchd/systemd path. spawn + detached +
+            // unref() is what keeps it alive after this process exits.
+            // Re-launch THIS CLI entry running `guard --watch` — the exact command
+            // the launchd/systemd service runs — as a detached process. Resolving
+            // the guard package would fail here: its exports map defines only an
+            // `import` condition, so require.resolve (CJS) throws "No exports main".
+            // process.argv[1] is the running CLI entry and needs no resolution.
+            const watchArgs = ['guard', '--watch'];
+            if (opts.dashboard) watchArgs.push('--dashboard');
+            if (opts.verbose) watchArgs.push('--verbose');
+            // Resolve to an absolute path: when invoked as `node ./dist/...` the
+            // entry is relative, and a detached child must not depend on inheriting
+            // the right cwd to find it.
+            const cliEntry = process.argv[1] ? resolve(process.argv[1]) : '';
             try {
-              await runCLI(args);
+              if (cliEntry && existsSync(cliEntry)) {
+                // Send the daemon's console output to its own log (like launchd),
+                // not /dev/null, so a failed background start is diagnosable.
+                let outFd: number | 'ignore' = 'ignore';
+                try {
+                  const gdir = join(homedir(), '.panguard-guard');
+                  if (!existsSync(gdir)) mkdirSync(gdir, { recursive: true, mode: 0o700 });
+                  outFd = openSync(join(gdir, 'panguard-guard.log'), 'a');
+                } catch {
+                  outFd = 'ignore';
+                }
+                const child = spawn(process.execPath, [cliEntry, ...watchArgs], {
+                  detached: true,
+                  stdio: ['ignore', outFd, outFd],
+                  env: { ...process.env, PANGUARD_QUIET_GUARD: '1' },
+                });
+                child.unref();
+                // Wait briefly for the detached daemon to come up so the summary
+                // + authenticated-URL step below reflect a running guard.
+                for (let i = 0; i < 30 && !isGuardRunning(); i++) {
+                  await new Promise((r) => setTimeout(r, 100));
+                }
+              } else {
+                // Last-resort fallback (no resolvable CLI entry): in-process start.
+                // Protection lasts only while this process lives — degraded, but
+                // better than no daemon at all.
+                process.env['PANGUARD_QUIET_GUARD'] = '1';
+                const inProc = ['start'];
+                if (opts.dashboard) inProc.push('--dashboard');
+                if (opts.verbose) inProc.push('--verbose');
+                await runCLI(inProc);
+              }
             } catch (err) {
               process.stderr.write(
                 `  ${c.caution('Guard start failed:')} ${err instanceof Error ? err.message : String(err)}\n`

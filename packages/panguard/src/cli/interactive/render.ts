@@ -104,7 +104,7 @@ export function renderMenu(lang: Lang): void {
 export function renderFooter(lang: Lang): void {
   const quit = lang === 'zh-TW' ? '\u9000\u51FA' : 'Quit';
   const help = lang === 'zh-TW' ? '\u8AAA\u660E' : 'Help';
-  const langToggle = '\u4E2D/EN';
+  const langToggle = lang === 'zh-TW' ? '\u4E2D/EN' : 'Lang';
 
   console.log(`${c.dim(`[q] ${quit}   [h] ${help}   [b] ${langToggle}`)}`);
   console.log('');

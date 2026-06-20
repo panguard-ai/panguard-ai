@@ -143,7 +143,11 @@ program.addCommand(hacktivityCommand(), hidden);
 program.addCommand(migrateProCommand(), hidden);
 
 const userArgs = process.argv.slice(2);
-const helpFlags = new Set(['-h', '--help', '-V', '--version']);
+// "-v" is treated as a version alias too: a single-letter flag must never fall
+// through to the side-effectful first-run setup wizard (which writes config
+// files). Commander only registers -V/--version, so we map -v to version output
+// ourselves below.
+const helpFlags = new Set(['-h', '--help', '-V', '--version', '-v']);
 const hasSubcommand = userArgs.some((a) => !a.startsWith('-'));
 const hasHelpOrVersion = userArgs.some((a) => helpFlags.has(a));
 // The `hook` command is invoked by Claude Code per tool call and its stdout is
@@ -306,6 +310,15 @@ async function checkForUpdates(): Promise<void> {
 }
 
 async function main(): Promise<void> {
+  // "-v" version alias. Commander only registers -V/--version, so a bare `pga -v`
+  // would otherwise reach program.parseAsync() as an unknown option (or, worse,
+  // fall through to the first-run setup wizard which writes config). Handle it
+  // here, printing the same bare version string as --version, then exit.
+  if (userArgs.length === 1 && userArgs[0] === '-v') {
+    console.log(PANGUARD_VERSION);
+    return;
+  }
+
   // Show "what's new" on interactive use (not --json, not --help, not the hook)
   const isJsonMode = userArgs.includes('--json');
   if (!hasHelpOrVersion && !isJsonMode && !isHookCommand) {

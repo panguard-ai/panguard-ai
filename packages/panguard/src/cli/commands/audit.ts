@@ -254,6 +254,20 @@ export function auditCommand(): Command {
         } else {
           resolvedPath = path.resolve(skillPath);
 
+          // Validate the local path exists before auditing — mirrors `pga scan
+          // <path>`. Without this, auditSkill() on a missing path silently
+          // returned an empty (clean) report, so a typo'd path rendered a green
+          // PASS instead of an error.
+          if (!existsSync(resolvedPath)) {
+            if (options.json) {
+              console.log(JSON.stringify({ error: `Path not found: ${resolvedPath}` }));
+            } else {
+              console.error(`Error: Path not found: ${resolvedPath}`);
+            }
+            process.exitCode = 1;
+            return;
+          }
+
           if (!options.json) {
             banner('Panguard Skill Auditor');
             console.log(c.dim(`  Scanning: ${resolvedPath}`));
@@ -667,6 +681,22 @@ response:
         // Exit code
         if (report.riskLevel === 'CRITICAL') process.exitCode = 2;
         else if (report.riskLevel === 'HIGH') process.exitCode = 1;
+
+        // Explicit exit. The Threat Cloud client (ThreatCloudClient) starts a
+        // 60s flush `setInterval` per instance and this command creates several
+        // transient instances (blacklist, submit, proposal, scan-event) that go
+        // out of scope without stopFlushTimer(), each leaving an unreferenced
+        // timer / keep-alive socket that pins the event loop open for ~120s. All
+        // meaningful async work above is already awaited and best-effort uploads
+        // are fire-and-forget by design, so once output is flushed we terminate
+        // deterministically instead of hanging on those leaked handles. The
+        // fast --no-cloud / --json paths reach here with the same exit code, so
+        // a clean exit does not change their behavior.
+        const code = process.exitCode ?? 0;
+        const done = (): never => process.exit(code);
+        // Drain stdout before exiting so no rendered report is truncated.
+        if (process.stdout.writableLength === 0) done();
+        else process.stdout.write('', done);
       }
     );
 

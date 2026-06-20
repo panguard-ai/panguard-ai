@@ -63,30 +63,16 @@ export async function askTelemetryConsent(): Promise<boolean> {
 
   console.log('');
   console.log(`  ${symbols.info} ${c.bold('Collective defense (optional, off by default)')}`);
-  console.log(`  ${c.dim('集體防禦（選用，預設關閉）')}`);
   console.log('');
   console.log(`  ${c.dim('Why turn it on: every attack PanGuard blocks on your machine can become')}`);
   console.log(`  ${c.dim('a new ATR rule that protects everyone — and you get those community')}`);
   console.log(`  ${c.dim('rules back faster. More sensors means faster detection for all of us.')}`);
-  console.log(
-    `  ${c.dim('開啟的理由：你這台機器擋下的每一次攻擊，都能變成一條新的 ATR 規則保護所有人，')}`
-  );
-  console.log(
-    `  ${c.dim('而你也能更快收到社群回流的規則。感測器越多，大家的偵測都越快。')}`
-  );
   console.log('');
   console.log(`  ${c.dim('What is shared: only the matched rule ID, a one-way hash of the payload,')}`);
   console.log(`  ${c.dim('and the source type. Never your prompts, code, file contents, keys, IP')}`);
   console.log(`  ${c.dim('address, or hostname. A random install ID only. Raw samples are never sent.')}`);
-  console.log(
-    `  ${c.dim('分享的內容：只有命中的規則 ID、payload 的單向雜湊、來源類型。絕不含你的')}`
-  );
-  console.log(
-    `  ${c.dim('prompt、程式碼、檔案內容、金鑰、IP 或主機名。只有一組隨機安裝 ID，從不上傳原始樣本。')}`
-  );
   console.log('');
   console.log(`  ${c.dim('Stays off unless you opt in. Change anytime: pga config set telemetry true/false')}`);
-  console.log(`  ${c.dim('不開就維持關閉。隨時可改：pga config set telemetry true/false')}`);
   console.log('');
 
   // Opt-in: default is NO. Pressing Enter declines (default OFF).
@@ -101,10 +87,8 @@ export async function askTelemetryConsent(): Promise<boolean> {
 
   if (answer) {
     console.log(`  ${c.safe('Thank you — you are helping defend the commons.')}`);
-    console.log(`  ${c.dim('謝謝你 — 你正在幫忙守護整個社群。')}`);
   } else {
     console.log(`  ${c.dim('No problem. Nothing leaves your machine.')}`);
-    console.log(`  ${c.dim('沒問題，不會有任何資料離開這台機器。')}`);
   }
   console.log('');
 
@@ -129,6 +113,23 @@ function promptYesNo(question: string, defaultYes = false): Promise<boolean> {
       resolve(normalized === 'y' || normalized === 'yes');
     });
   });
+}
+
+/**
+ * Non-interactive read: has the user explicitly opted in to Threat Cloud upload?
+ *
+ * Use this on one-off code paths (e.g. `pga scan <path>`) that must NEVER trigger
+ * an outbound upload — or an interactive prompt — but still need to honour a prior
+ * opt-in. Defaults to FALSE (no upload) when config is absent or unreadable, so the
+ * privacy guarantee holds by default. Gate is `=== true`, matching the guard's
+ * upload gate.
+ */
+export function isThreatCloudUploadEnabled(): boolean {
+  try {
+    return loadGuardConfig().threatCloudUploadEnabled === true;
+  } catch {
+    return false;
+  }
 }
 
 /**

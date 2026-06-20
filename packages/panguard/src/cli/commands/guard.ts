@@ -9,7 +9,12 @@ import { homedir, platform } from 'node:os';
 import { request as httpNodeRequest } from 'node:http';
 import { execFileSync as nodeExecFileSync } from 'node:child_process';
 import { Command } from 'commander';
-import { runCLI } from '@panguard-ai/panguard-guard';
+import {
+  runCLI,
+  writeEncryptedLlmConfig,
+  clearEncryptedLlmConfig,
+  getEncryptedLlmConfigPath,
+} from '@panguard-ai/panguard-guard';
 import { c, box, header, symbols, divider } from '@panguard-ai/core';
 import { ensurePersistentService } from './persist.js';
 
@@ -150,8 +155,14 @@ export function guardCommand(): Command {
 
   cmd
     .command('setup-ai')
-    .description('Interactive AI layer setup')
-    .action(async () => {
+    .alias('ai')
+    .description('Connect the optional semantic layer (Layer C): local Ollama (free) or a cloud key')
+    .option('--remove', 'Remove the stored LLM config and turn Layer C off')
+    .action(async (opts: { remove?: boolean }) => {
+      if (opts.remove) {
+        await commandRemoveAi();
+        return;
+      }
       await commandSetupAi();
     });
 
@@ -192,6 +203,77 @@ function readLine(prompt: string): Promise<string> {
       resolve(data.trim());
     });
   });
+}
+
+/**
+ * Read a secret from stdin without echoing it. The key never appears on screen,
+ * in argv, or in shell history. Falls back to a plain line read when stdin is
+ * not a TTY (e.g. piped input in scripts).
+ */
+function readSecret(prompt: string): Promise<string> {
+  return new Promise((resolve) => {
+    const stdin = process.stdin;
+    const NL = String.fromCharCode(10);
+    process.stdout.write(prompt);
+    stdin.setEncoding('utf-8');
+
+    if (!stdin.isTTY) {
+      stdin.resume();
+      stdin.once('data', (data: string) => {
+        stdin.pause();
+        resolve(data.trim());
+      });
+      return;
+    }
+
+    const wasRaw = stdin.isRaw;
+    stdin.setRawMode(true);
+    stdin.resume();
+    let buf = '';
+    const onData = (ch: string): void => {
+      const code = ch.charCodeAt(0);
+      // Enter (CR=13 / LF=10) or Ctrl-D (EOT=4) terminates input.
+      if (code === 13 || code === 10 || code === 4) {
+        stdin.removeListener('data', onData);
+        stdin.setRawMode(wasRaw);
+        stdin.pause();
+        process.stdout.write(NL);
+        resolve(buf.trim());
+        return;
+      }
+      if (code === 3) {
+        // Ctrl-C: abort without leaking the buffer.
+        stdin.setRawMode(wasRaw);
+        process.stdout.write(NL);
+        process.exit(130);
+      }
+      if (code === 127 || code === 8) {
+        buf = buf.slice(0, -1);
+        return;
+      }
+      buf += ch;
+    };
+    stdin.on('data', onData);
+  });
+}
+
+/** Remove the stored (encrypted) LLM config — turns the optional Layer C off. */
+async function commandRemoveAi(): Promise<void> {
+  const encPath = await getEncryptedLlmConfigPath();
+  const removed = await clearEncryptedLlmConfig();
+  console.log('');
+  if (removed) {
+    console.log(`  ${symbols.pass} Removed stored LLM config (${c.sage(encPath)}).`);
+    console.log(
+      `  ${c.dim('Layer C is now off. Cloud env vars (ANTHROPIC_API_KEY / OPENAI_API_KEY), if set, still apply — unset them too for a full opt-out. Restart guard to apply:')} ${c.sage('pga guard restart')}`
+    );
+  } else {
+    console.log(`  ${symbols.info} No stored LLM config to remove.`);
+    console.log(
+      `  ${c.dim('If you set ANTHROPIC_API_KEY / OPENAI_API_KEY in your environment, unset them to disable Layer C.')}`
+    );
+  }
+  console.log('');
 }
 
 /** Interactive AI setup command */
@@ -332,6 +414,22 @@ async function commandSetupAi(): Promise<void> {
     }
 
     existingConfig = { ...existingConfig, ai: aiConfig };
+
+    // Persist to the encrypted store the daemon reads first (resolveOptedInLLM),
+    // so the local model is used deterministically — no PANGUARD_SEMANTIC=1
+    // probe needed, and it survives a launchd/systemd restart. Ollama carries no
+    // secret, so this is just provider/model/endpoint. If a cloud key is also
+    // configured below, that write overwrites this one (cloud takes priority).
+    try {
+      await writeEncryptedLlmConfig({
+        provider: 'ollama',
+        model: ollamaModel,
+        endpoint: ollamaEndpoint || undefined,
+      });
+    } catch {
+      /* non-fatal — daemon can still discover Ollama via PANGUARD_SEMANTIC=1 */
+    }
+
     console.log('');
     console.log(`  ${symbols.pass} Local AI configured: ${c.sage(`ollama / ${ollamaModel}`)}`);
     console.log(`  ${c.dim('本地 AI 已設定')}: ollama / ${ollamaModel}`);
@@ -340,76 +438,86 @@ async function commandSetupAi(): Promise<void> {
 
   // Step 2b: Cloud AI
   //
-  // Security: the wizard NEVER persists a raw cloud API key. The semantic layer
-  // reads the key only from the ANTHROPIC_API_KEY / OPENAI_API_KEY environment
-  // variables (see llm-detect.ts) — a persisted `ai.apiKey` in config.json is
-  // never read and would only sit on disk as a plaintext-leak liability. We
-  // store the chosen provider/model (no secret) so status/dashboard can show
-  // the intended provider, and tell the user which env var to set.
+  // The cloud key is persisted ENCRYPTED at rest (~/.panguard/llm.enc,
+  // AES-256-GCM, machine-bound, 0600) via writeEncryptedLlmConfig — the Guard
+  // daemon reads it on startup (resolveOptedInLLM). This is what makes Layer C
+  // actually work with the launchd/systemd-spawned daemon, which does NOT
+  // inherit a shell environment variable. Users who prefer a key that never
+  // touches disk can instead export ANTHROPIC_API_KEY / OPENAI_API_KEY (also
+  // read at startup). Prefer no key at all? Local AI (Ollama) needs none.
   if (setupCloud) {
     console.log(divider('Layer 3: Cloud AI'));
     console.log('');
-
-    const envProvider = process.env['ANTHROPIC_API_KEY']
-      ? 'claude'
-      : process.env['OPENAI_API_KEY']
-        ? 'openai'
-        : null;
-    if (envProvider) {
-      console.log(
-        `  ${symbols.pass} Cloud key detected in environment: ${c.sage(envProvider === 'claude' ? 'ANTHROPIC_API_KEY' : 'OPENAI_API_KEY')}`
-      );
-      console.log(`  ${c.dim('已在環境變數中偵測到雲端金鑰')}`);
-    } else {
-      console.log(`  ${symbols.info} No cloud key in the environment yet.`);
-      console.log(`  ${c.dim('環境變數中尚未設定雲端金鑰。')}`);
-    }
-    console.log('');
-    console.log(
-      `  ${c.dim('Panguard never stores your cloud key on disk. Provide it via the')}`
-    );
-    console.log(`  ${c.dim('environment variable the semantic layer reads at startup:')}`);
-    console.log(
-      `  ${c.dim('PanGuard 從不把雲端金鑰寫到硬碟。請用語意層啟動時讀取的環境變數提供：')}`
-    );
-    console.log(`    ${c.sage('export ANTHROPIC_API_KEY=sk-ant-...')}   ${c.dim('# Anthropic')}`);
-    console.log(`    ${c.sage('export OPENAI_API_KEY=sk-...')}          ${c.dim('# OpenAI')}`);
-    console.log(
-      `  ${c.dim('Prefer no key and full privacy? Pick Local AI (Ollama) instead — $0, on-device.')}`
-    );
-    console.log(`  ${c.dim('想完全不用金鑰、保有完整隱私？改選本地 AI（Ollama）— $0、裝置端執行。')}`);
-    console.log('');
     // Honest cost framing (verified): the semantic judge runs ONLY on events the
-    // deterministic layers already flagged, so it fires a handful of times a day
-    // for a typical developer — roughly a few cents per month, not a precise $.
+    // deterministic layers already flagged — a handful of times a day for a
+    // typical developer, so roughly a few cents per month.
     console.log(`  ${c.dim('Cost: the cloud judge runs only on already-flagged events — a handful of')}`);
     console.log(`  ${c.dim('times a day for typical use, so roughly a few cents per month. You pay')}`);
     console.log(`  ${c.dim('your AI provider directly; PanGuard adds no markup and no subscription.')}`);
     console.log(
-      `  ${c.dim('費用：雲端判斷層只在已標記的事件上執行 — 一般使用一天幾次，')}`
-    );
-    console.log(
-      `  ${c.dim('大約每月幾美分。費用直接付給你的 AI 供應商；PanGuard 不加價、不收訂閱費。')}`
+      `  ${c.dim('費用：雲端判斷層只在已標記的事件上執行 — 一般一天幾次，約每月幾美分；直接付給供應商。')}`
     );
     console.log('');
 
-    const provider = await readLine(`  Preferred cloud provider [claude/openai] (default claude): `);
+    const provider = await readLine(`  Cloud provider [claude/openai] (default claude): `);
     const cloudProvider = provider === 'openai' ? 'openai' : 'claude';
     const defaultModel = cloudProvider === 'claude' ? 'claude-sonnet-4-20250514' : 'gpt-4o';
-
     const model = await readLine(`  Model [${defaultModel}]: `);
     const cloudModel = model || defaultModel;
+    const envVarName = cloudProvider === 'claude' ? 'ANTHROPIC_API_KEY' : 'OPENAI_API_KEY';
+    const envHasKey =
+      (cloudProvider === 'claude' && !!process.env['ANTHROPIC_API_KEY']) ||
+      (cloudProvider === 'openai' && !!process.env['OPENAI_API_KEY']);
 
-    // Store provider + model ONLY — never a secret. If local AI was just
-    // configured, demote it to fallback metadata under aiLocal.
+    console.log('');
+    console.log(`  How would you like to provide the key?`);
+    console.log(
+      `    ${c.sage('1')} - Paste it now (stored encrypted on this machine; the daemon reads it)`
+    );
+    console.log(`    ${c.sage('2')} - I'll set ${envVarName} in my environment myself`);
+    if (envHasKey) {
+      console.log(`        ${c.dim(`(${envVarName} is already set in this shell)`)}`);
+    }
+    console.log('');
+    const keyChoice = await readLine(`  Choice [1]: `);
+
+    let persistedKey = false;
+    if (keyChoice !== '2') {
+      // Hidden input: the key never appears on screen, in argv, or in shell history.
+      const key = await readSecret(`  Paste ${envVarName} (input hidden): `);
+      if (key) {
+        try {
+          const encPath = await writeEncryptedLlmConfig({
+            provider: cloudProvider,
+            model: cloudModel,
+            apiKey: key,
+          });
+          persistedKey = true;
+          console.log(
+            `  ${symbols.pass} Key stored encrypted at ${c.sage(encPath)} ${c.dim('(0600, AES-256-GCM)')}`
+          );
+          console.log(`  ${c.dim('Remove it any time with:')} ${c.sage('pga guard ai --remove')}`);
+        } catch (err: unknown) {
+          console.log(
+            `  ${symbols.fail} Could not store key: ${err instanceof Error ? err.message : String(err)}`
+          );
+        }
+      } else {
+        console.log(`  ${symbols.info} No key entered — Layer C stays off until you provide one.`);
+      }
+    } else {
+      console.log('');
+      console.log(`  ${c.dim('Set it before restarting guard:')} ${c.sage(`export ${envVarName}=...`)}`);
+    }
+
+    // Store provider + model (NO secret) in the master config so status/dashboard
+    // can show the intended provider. The secret lives only in llm.enc (encrypted)
+    // or the env var. If local AI was also configured, keep it as fallback metadata.
     const currentAi = (existingConfig['ai'] ?? {}) as Record<string, unknown>;
     if (setupLocal && currentAi['provider'] === 'ollama') {
       existingConfig = {
         ...existingConfig,
-        ai: {
-          provider: cloudProvider,
-          model: cloudModel,
-        },
+        ai: { provider: cloudProvider, model: cloudModel },
         aiLocal: {
           provider: currentAi['provider'],
           model: currentAi['model'],
@@ -419,10 +527,7 @@ async function commandSetupAi(): Promise<void> {
     } else {
       existingConfig = {
         ...existingConfig,
-        ai: {
-          provider: cloudProvider,
-          model: cloudModel,
-        },
+        ai: { provider: cloudProvider, model: cloudModel },
       };
     }
 
@@ -430,9 +535,11 @@ async function commandSetupAi(): Promise<void> {
     console.log(
       `  ${symbols.pass} Cloud AI provider set: ${c.sage(`${cloudProvider} / ${cloudModel}`)}`
     );
-    if (!envProvider) {
+    if (persistedKey || envHasKey) {
+      console.log(`  ${c.dim('Restart guard to activate Layer C:')} ${c.sage('pga guard restart')}`);
+    } else {
       console.log(
-        `  ${symbols.warn} Set ${c.sage(cloudProvider === 'claude' ? 'ANTHROPIC_API_KEY' : 'OPENAI_API_KEY')} in your environment before restarting guard, or the semantic layer stays off.`
+        `  ${symbols.warn} Layer C stays off until ${c.sage(envVarName)} is set; then run ${c.sage('pga guard restart')}.`
       );
     }
     console.log('');

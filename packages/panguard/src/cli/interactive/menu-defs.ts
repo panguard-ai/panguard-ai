@@ -42,7 +42,7 @@ export const MENU_DEFS: MenuDef[] = [
   {
     key: 'guard',
     icon: '\u2713',
-    number: 3,
+    number: 2,
     en: 'Guard Engine',
     zh: '\u5B88\u8B77\u5F15\u64CE',
     enDesc: 'Real-time monitoring and continuous protection',
@@ -53,7 +53,7 @@ export const MENU_DEFS: MenuDef[] = [
   {
     key: 'trap',
     icon: '\u00B7',
-    number: 4,
+    number: 3,
     en: 'Honeypot System',
     zh: '\u871C\u7F50\u7CFB\u7D71',
     enDesc: 'SSH/HTTP/FTP/Redis decoy services + attacker profiler + Threat Cloud upload',
@@ -65,7 +65,7 @@ export const MENU_DEFS: MenuDef[] = [
   {
     key: 'notify',
     icon: '\u00B7',
-    number: 5,
+    number: 4,
     en: 'Notifications',
     zh: '\u901A\u77E5\u7CFB\u7D71',
     enDesc: 'LINE, Telegram, Slack, Email, Webhook channels',
@@ -76,7 +76,7 @@ export const MENU_DEFS: MenuDef[] = [
   {
     key: 'threat-cloud',
     icon: '\u00B7',
-    number: 6,
+    number: 5,
     en: 'Threat Cloud',
     zh: '\u5A01\u8105\u60C5\u5831',
     enDesc: 'Threat intelligence REST API server',
@@ -87,7 +87,7 @@ export const MENU_DEFS: MenuDef[] = [
   {
     key: 'demo',
     icon: '\u00B7',
-    number: 7,
+    number: 6,
     en: 'Auto Demo',
     zh: '\u81EA\u52D5\u5C55\u793A',
     enDesc: 'Run through all security modules',
@@ -98,7 +98,7 @@ export const MENU_DEFS: MenuDef[] = [
   {
     key: 'audit',
     icon: '\u25A0',
-    number: 8,
+    number: 7,
     en: 'Skill Auditor',
     zh: '\u6280\u80FD\u5BE9\u8A08',
     enDesc: 'Audit AI agent skills for security issues',
