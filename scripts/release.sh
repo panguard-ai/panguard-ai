@@ -74,7 +74,6 @@ PACKAGES=(
   "packages/panguard-web/package.json"
   "packages/panguard-trap/package.json"
   "packages/panguard-mcp-proxy/package.json"
-  "packages/threat-cloud/package.json"
   "packages/panguard-skill-auditor/package.json"
   "packages/panguard-mcp/package.json"
   "packages/panguard-guard/package.json"

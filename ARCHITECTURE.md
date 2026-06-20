@@ -20,16 +20,19 @@ Technical architecture of the Panguard AI platform. For product-level documentat
  Scan  Guard   Chat   Trap  Report   MCP   Skill    ATR
         |                                  Auditor  Standard
         |
-   4-Agent Pipeline
+   Guard Detection Pipeline
    Detect -> Analyze -> Respond -> Report
         |
-   +----+----+----+
-   |    |    |    |
-  Sigma YARA ATR Builtin
-  3760  5961  100  20
+   +------------+------------+
+   |            |            |
+ Layer A     Layer B      Layer C
+ ATR regex   Heuristics   Semantic LLM
+ + AST                    (advisory, opt-in)
+ 652 rules
+ v3.5.0
         |
    Threat Cloud
-   Collective Intelligence
+   Collective defense (opt-in, off by default)
         |
    Manager (optional)
    Up to 500 agents
@@ -68,27 +71,30 @@ Technical architecture of the Panguard AI platform. For product-level documentat
 
 ---
 
-## Three-Layer Detection Funnel
+## Three-Layer Detection Pipeline
 
-All events pass through a cost-optimized detection funnel:
+All events pass through a layered detection pipeline. The deterministic core
+(Layer A + Layer B) is always on and can block; the semantic layer (Layer C) is
+advisory-only and opt-in.
 
 ```
                     Event Stream
                          |
               +----------+----------+
               |                     |
-         Layer 1: Rules        (no match)
-         3,760 Sigma                |
-         5,961 YARA            Layer 2: Local AI
-         100 ATR               Ollama on GPU
-         <50ms, $0             ~2s, $0
-         Catches 90%                |
-              |               (uncertain)
+         Layer A: ATR rules    (no match)
+         652 ATR rules v3.5.0       |
+         regex / AST           Layer B: Heuristics
+         deterministic         behavioral / anomaly
+         always on, can block  deterministic
+              |                always on, can block
               |                     |
-         (matched)            Layer 3: Cloud AI
-              |               Claude / OpenAI
-              |               ~5s, $0.008
-              |               Catches 3%
+         (matched)            (uncertain, opt-in)
+              |                     |
+              |               Layer C: Semantic LLM
+              |               bring-your-own key
+              |               advisory only,
+              |               never auto-blocks
               |                     |
               +----------+----------+
                          |
@@ -96,9 +102,13 @@ All events pass through a cost-optimized detection funnel:
                   Block / Alert / Log
 ```
 
-**Graceful degradation:** Cloud unavailable -> Local AI handles it. Local AI unavailable -> Rules engine keeps running. Protection never stops.
+**Deterministic core:** Layer A (ATR regex/AST) and Layer B (heuristics) are the
+always-on deterministic core and are the only layers that can block. They run
+fully offline with no network dependency.
 
-**Desktop optimization:** On laptops/desktops, Layer 2 (Ollama) is skipped to avoid resource contention. Events go directly from Layer 1 to Layer 3.
+**Semantic layer (Layer C):** Off by default. When enabled, it requires the
+user's own LLM API key and produces advisory signals only -- it never
+auto-blocks. Disabling it leaves the deterministic core fully functional.
 
 ---
 
@@ -132,19 +142,22 @@ Event -> [Detect Agent] -> [Analyze Agent] -> [Respond Agent] -> [Report Agent]
 
 ## ATR Rule Architecture
 
-ATR (Agent Threat Rules) is a YAML-based detection format for AI agent threats:
+ATR (Agent Threat Rules) is a YAML-based detection format for AI agent threats.
+Panguard ships ATR v3.5.0 -- 652 rules across 10 categories -- bundled and
+immutable at install time:
 
 ```
 rules/
-  prompt-injection/        # 5 rules
-  tool-poisoning/          # 4 rules
-  context-exfiltration/    # 3 rules
-  agent-manipulation/      # 3 rules
-  privilege-escalation/    # 2 rules
-  excessive-autonomy/      # 2 rules
-  skill-compromise/        # 7 rules
-  data-poisoning/          # 1 rule
-  model-security/          # 2 rules
+  prompt-injection/
+  tool-poisoning/
+  context-exfiltration/
+  agent-manipulation/
+  privilege-escalation/
+  excessive-autonomy/
+  skill-compromise/
+  data-poisoning/
+  model-security/
+  ...                      # 10 categories, 652 rules total (v3.5.0)
 ```
 
 Each rule contains:
@@ -155,39 +168,47 @@ Each rule contains:
 - OWASP and MITRE ATLAS mappings
 - Severity calibration and response actions
 
-ATR rules are loaded by the Guard engine's ATR Engine and evaluated in parallel with Sigma and YARA rules.
+ATR rules are loaded by the Guard engine's ATR Engine as the deterministic Layer A. Rules are bundled and immutable at install; rule updates are notify-only and are never fetched and auto-applied over the network.
 
 ---
 
-## Threat Cloud Data Flow
+## Threat Cloud Data Flow (opt-in, off by default)
+
+Collective defense is opt-in and off by default. Nothing leaves the user's
+machine unless they explicitly enable it. `pga scan` is always forced
+`--no-report`.
 
 ```
 Your Machine                    Threat Cloud                   Other Users
      |                               |                              |
-  Threat detected              Receives anonymized            Receives new rule
-     |                         threat signature                     |
-  Anonymize                          |                        Rule engine
-  (strip all PII,              Validate + deduplicate         auto-updates
-   keep only pattern)                |                              |
-     |                         Generate Sigma/YARA rule        Protection
-  Upload via TLS 1.3                 |                         active
-     |                         Consensus check
-     +--------->               (3+ clients confirm)
+  Threat detected              Receives anonymized            Notified of
+  (collective defense          threat signature               candidate rule
+   explicitly enabled)               |                              |
+     |                         Validate + deduplicate         Review and
+  Anonymize                          |                        upgrade on their
+  (strip all PII,              Generate candidate rule        own schedule
+   keep only pattern)                |                        (notify-only,
+     |                         Consensus check                 no auto-apply)
+  Upload via TLS 1.3           (3+ clients confirm)                 |
+     +--------->                     |                         Protection
+                               Promote to stable               active
                                      |
-                               Promote to stable
-                                     |
-                               Push to all users
+                               Publish update
                                      +---------->
 ```
 
 **Privacy guarantees:**
 
-- Only anonymized threat signatures leave your machine
+- Collective defense is opt-in and off by default
+- Only anonymized threat signatures leave your machine, and only after you opt in
 - Zero raw data, zero telemetry, zero source code
 - TLS 1.3 encrypted transport
-- Can be turned off anytime (Community tier works fully offline)
+- Community tier works fully offline with collective defense disabled
 
-**Auto-generated rules:** The Threat Intel Pipeline runs every 6 hours, pulling from 11 threat intelligence sources. Currently: 605 auto-generated Sigma rules + 43 auto-generated YARA rules, with 808 promoted to stable.
+**Rule updates are notify-only:** Bundled rules are immutable at install. When a
+newer rule set is published, Panguard notifies the user; updates are never
+fetched and applied automatically over the network. (The 1.6.1 security fix
+removed live network auto-apply of rules.)
 
 ---
 
@@ -253,7 +274,7 @@ Vercel deployment. Next.js 14 with ISR. Bilingual (EN + zh-TW).
 | ---------------------- | ----------------------------------- | ------- | -------- | ------------------------------------------------------ |
 | core                   | @panguard-ai/core                   | 0.3.3   | GA       | Shared foundation: rules, AI, monitor, discovery, i18n |
 | panguard               | @panguard-ai/panguard               | 0.3.3   | GA       | Unified CLI with 22 commands                           |
-| atr                    | agent-threat-rules                  | 0.1.0   | RFC      | Open detection standard for AI agent threats           |
+| atr                    | agent-threat-rules                  | 3.5.0   | RFC      | Open detection standard for AI agent threats (652 rules) |
 | panguard-scan          | @panguard-ai/panguard-scan          | 0.2.0   | GA       | 60-second security scanning                            |
 | panguard-guard         | @panguard-ai/panguard-guard         | 0.2.0   | GA       | Real-time monitoring, 4-agent pipeline                 |
 | panguard-chat          | @panguard-ai/panguard-chat          | 0.2.0   | GA       | 6-channel notification system                          |
@@ -279,7 +300,7 @@ Vercel deployment. Next.js 14 with ISR. Bilingual (EN + zh-TW).
 | ci.yml                | push/PR     | Lint, format, typecheck, test with coverage |
 | deploy.yml            | push main   | Deploy website (Vercel) + backend (Docker)  |
 | publish.yml           | release tag | Publish packages to npm                     |
-| threat-intel-sync.yml | every 6h    | Update threat intelligence feeds            |
+| threat-intel-sync.yml | scheduled   | Refresh server-side threat intel (no client auto-apply) |
 | installer-e2e.yml     | event       | E2E testing for installer                   |
 | cli-smoke.yml         | event       | CLI smoke tests                             |
 | release.yml           | manual      | Create GitHub releases                      |

@@ -1,7 +1,7 @@
 /**
  * MigratorIR → ATR YAML object.
  *
- * Output shape is the actual ATR rule shape (see /Users/user/Downloads/agent-threat-rules/
+ * Output shape is the actual ATR rule shape (see
  * rules/prompt-injection/ATR-2026-00001-direct-prompt-injection.yaml as reference):
  *
  *     detection:
