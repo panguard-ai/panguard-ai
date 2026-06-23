@@ -171,9 +171,11 @@ export function auditCommand(): Command {
           tcEndpoint: string;
         }
       ) => {
-        if (options.verbose) {
+        // --json must emit ONLY the JSON object on stdout, so always silence logs
+        // in JSON mode (even with --verbose). Otherwise verbose → debug, plain → silent.
+        if (options.verbose && !options.json) {
           setLogLevel('debug');
-        } else if (!options.json) {
+        } else {
           setLogLevel('silent');
         }
 
