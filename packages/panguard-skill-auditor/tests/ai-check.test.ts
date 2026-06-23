@@ -171,8 +171,10 @@ describe('checkWithAI', () => {
       const result = await checkWithAI('instructions', 'desc', llm);
       expect(result.findings).toHaveLength(0);
       expect(result.status).toBe('info');
-      expect(result.label).toContain('Error');
-      expect(result.label).toContain('API rate limit exceeded');
+      // Optional Layer 2 failure degrades to a clean skip — never an alarming
+      // "Error", and never leaks the raw provider error message to the user.
+      expect(result.label).toContain('Skipped');
+      expect(result.label).not.toContain('rate limit');
     });
 
     it('should handle non-Error thrown values gracefully', async () => {
@@ -183,7 +185,7 @@ describe('checkWithAI', () => {
       const result = await checkWithAI('instructions', 'desc', llm);
       expect(result.findings).toHaveLength(0);
       expect(result.status).toBe('info');
-      expect(result.label).toContain('unknown');
+      expect(result.label).toContain('Skipped');
     });
 
     it('should handle malformed JSON from LLM gracefully', async () => {

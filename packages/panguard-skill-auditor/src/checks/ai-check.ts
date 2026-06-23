@@ -143,11 +143,14 @@ export async function checkWithAI(
         : `AI Analysis: ${findings.length} semantic issue(s) found`;
 
     return { status, label, findings };
-  } catch (error) {
-    // LLM failure should not block the audit
+  } catch {
+    // Layer 2 (local AI) is optional and advisory. A missing model, an
+    // unreachable server, or any provider error must never read like a product
+    // failure — the deterministic layers (pattern + ATR rules) already ran.
+    // Degrade to a clean skip rather than surfacing a raw provider error.
     return {
       status: 'info',
-      label: `AI Analysis: Error (${error instanceof Error ? error.message : 'unknown'})`,
+      label: 'AI Analysis: Skipped (local AI unavailable)',
       findings: [],
     };
   }

@@ -242,6 +242,9 @@ export function scanCommand(): Command {
             `\n  ${c.safe(String(clean))} clean  |  ${threats > 0 ? c.critical(String(threats)) : '0'} flagged${errors > 0 ? `  |  ${c.caution(String(errors))} errors` : ''}`
           );
           console.log(`  ${c.dim('Run "pga scan <path>" for details on a specific skill.')}\n`);
+          // Non-zero exit when threats are found so `pga scan` is usable as a CI
+          // gate (matches `pga audit`, which exits 2 on CRITICAL).
+          if (threats > 0) process.exitCode = 2;
           return;
         }
 
