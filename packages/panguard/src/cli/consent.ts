@@ -68,16 +68,18 @@ export async function askTelemetryConsent(): Promise<boolean> {
   console.log(`  ${c.dim('a new ATR rule that protects everyone — and you get those community')}`);
   console.log(`  ${c.dim('rules back faster. More sensors means faster detection for all of us.')}`);
   console.log('');
-  console.log(`  ${c.dim('What is shared: only the matched rule ID, a one-way hash of the payload,')}`);
-  console.log(`  ${c.dim('and the source type. Never your prompts, code, file contents, keys, IP')}`);
-  console.log(`  ${c.dim('address, or hostname. A random install ID only. Raw samples are never sent.')}`);
+  console.log(`  ${c.dim('What is shared: the matched rule ID(s), attack category + MITRE technique,')}`);
+  console.log(`  ${c.dim('a coarse country region, and a truncated IP (last two octets zeroed).')}`);
+  console.log(`  ${c.dim('Never your prompts, code, file contents, secrets, file paths, hostname,')}`);
+  console.log(`  ${c.dim('or username. Raw samples are never sent. A stable random install ID links')}`);
+  console.log(`  ${c.dim('your own submissions (pseudonymous, not fully anonymous).')}`);
   console.log('');
   console.log(`  ${c.dim('Stays off unless you opt in. Change anytime: pga config set telemetry true/false')}`);
   console.log('');
 
   // Opt-in: default is NO. Pressing Enter declines (default OFF).
   const answer = await promptYesNo(
-    '  Join collective defense and share anonymized threat signatures? [y/N] ',
+    '  Join collective defense and share minimal threat signatures? [y/N] ',
     false
   );
 

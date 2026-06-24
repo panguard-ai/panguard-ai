@@ -903,6 +903,10 @@ async function submitToTC(
     findings: ReadonlyArray<{ id: string; category: string; severity: string; title: string }>;
   }
 ): Promise<void> {
+  // Defense-in-depth: never let a raw filesystem path become the uploaded skill
+  // name. discoverAllSkills() yields registry/manifest names, but strip path
+  // separators + cap length so a path-like name can't leak a local directory tree.
+  skillName = skillName.replace(/[\\/]/g, '_').slice(0, 80);
   const { ThreatCloudClient } = await import('@panguard-ai/panguard-guard');
   const { contentHash, patternHash } = await import('@panguard-ai/scan-core');
   const { readFileSync: rf, existsSync: fe } = await import('node:fs');
