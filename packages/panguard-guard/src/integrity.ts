@@ -135,6 +135,20 @@ export function manifestPath(dataDir: string): string {
 }
 
 /**
+ * Durable breadcrumb proving the guard sealed at least once. Lets the start path
+ * distinguish a TRUE first run (no breadcrumb → safe to auto-seal) from a manifest
+ * that was DELETED after a prior seal (breadcrumb present → suspicious; do NOT
+ * silently re-seal a possibly-tampered config).
+ */
+function initMarkerPath(dataDir: string): string {
+  return join(dataDir, '.integrity-initialized');
+}
+
+export function wasInitialized(dataDir: string): boolean {
+  return existsSync(initMarkerPath(dataDir));
+}
+
+/**
  * Seal the current config + self-state into the manifest (atomic, 0600). Call this
  * at the END of every LEGITIMATE config write / install so a user's own change
  * re-establishes trust instead of looking like tampering.
@@ -157,6 +171,13 @@ export function sealConfigManifest(
   const tmp = `${path}.tmp`;
   writeFileSync(tmp, JSON.stringify({ ...inner, mac }, null, 2), { mode: 0o600 });
   renameSync(tmp, path);
+  // Durable "has been sealed" breadcrumb (best-effort) so a later manifest deletion
+  // is distinguishable from a genuine first run.
+  try {
+    writeFileSync(initMarkerPath(dataDir), inner.sealedAt, { mode: 0o600 });
+  } catch {
+    /* best-effort breadcrumb */
+  }
 }
 
 function readManifest(dataDir: string): (SealedInner & { mac?: string }) | 'absent' | 'unreadable' {

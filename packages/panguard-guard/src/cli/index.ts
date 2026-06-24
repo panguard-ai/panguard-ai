@@ -264,6 +264,38 @@ async function commandStart(
     }
   }
 
+  // S5: verify config integrity + self-state before the engine starts. On a genuine
+  // first run, establish the seal. On tamper / self-removal, start anyway but warn
+  // LOUDLY — never silently honor a weakened config as if PROTECTED (the S2 invariant).
+  try {
+    const { verifyConfigIntegrity, checkSelfState, sealConfigManifest, wasInitialized } =
+      await import('../integrity.js');
+    const cfgRecord = config as unknown as Record<string, unknown>;
+    let verdict = verifyConfigIntegrity(cfgRecord, dataDir);
+    const selfState = checkSelfState(dataDir);
+    if (verdict.status === 'unsealed' && !wasInitialized(dataDir)) {
+      sealConfigManifest(cfgRecord, [], dataDir); // true first run — establish trust
+      verdict = { status: 'sealed', findings: [], checkedAt: verdict.checkedAt };
+    }
+    if (verdict.status !== 'sealed' || !selfState.ok) {
+      process.stderr.write(
+        `\n[panguard-guard] INTEGRITY: ${verdict.status.toUpperCase()} — protection state may have been changed outside the guard.\n`
+      );
+      // Field NAME only, never the value — config can hold secrets.
+      for (const f of verdict.findings) {
+        process.stderr.write(`  - config.${f.field} changed (${f.severity})\n`);
+      }
+      for (const f of selfState.findings) {
+        process.stderr.write(`  - ${f.kind} ${f.reason}${f.label ? ` (${f.label})` : ''}\n`);
+      }
+      process.stderr.write(
+        '  Run "pga doctor" to review. If you made this change, re-run "pga up" to re-seal.\n\n'
+      );
+    }
+  } catch {
+    /* integrity is best-effort — never block daemon startup (consistent with TC provisioning) */
+  }
+
   const engine = await GuardEngine.create(config);
 
   const shutdown = async () => {
