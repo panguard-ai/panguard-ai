@@ -152,19 +152,95 @@ export interface Emission {
 }
 
 /**
+ * Thrown when we cannot form a VALID host-contract output for a RECOGNIZED
+ * protocol (unknown format, invalid verdict, or a self-check failure). The caller
+ * turns this into a fail-CLOSED block — never a silent allow.
+ */
+export class HookContractError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'HookContractError';
+  }
+}
+
+function safeDecision(
+  stdout: string | undefined,
+  pred: (o: Record<string, unknown>) => boolean
+): boolean {
+  if (!stdout) return false;
+  try {
+    return pred(JSON.parse(stdout) as Record<string, unknown>);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Single source of truth for each host's deny contract, shared by emitFor's
+ * runtime self-check AND the golden contract tests (tests/hook-contract.test.ts).
+ * `verify` confirms a built emission actually expresses the intended decision for
+ * the format — a drifted field name or empty output fails it, converting a silent
+ * non-enforcement into a thrown HookContractError.
+ */
+export const HOST_CONTRACTS: Record<
+  OutputFormat,
+  { readonly denyExit: number; readonly usesStdout: boolean; verify(e: Emission, v: 'ask' | 'deny'): boolean }
+> = {
+  claude: {
+    denyExit: 0,
+    usesStdout: true,
+    verify: (e, v) =>
+      e.exit === 0 &&
+      safeDecision(
+        e.stdout,
+        (o) =>
+          (o['hookSpecificOutput'] as Record<string, unknown> | undefined)?.['permissionDecision'] ===
+          v
+      ),
+  },
+  cursor: {
+    denyExit: 0,
+    usesStdout: true,
+    verify: (e, v) => e.exit === 0 && safeDecision(e.stdout, (o) => o['permission'] === v),
+  },
+  gemini: {
+    denyExit: 0,
+    usesStdout: true,
+    verify: (e, v) => e.exit === 0 && safeDecision(e.stdout, (o) => o['decision'] === v),
+  },
+  cline: {
+    denyExit: 0,
+    usesStdout: true,
+    verify: (e) => e.exit === 0 && safeDecision(e.stdout, (o) => o['cancel'] === true),
+  },
+  windsurf: {
+    denyExit: 2,
+    usesStdout: false,
+    verify: (e) => e.exit === 2 && !e.stdout && typeof e.stderr === 'string' && e.stderr.length > 0,
+  },
+};
+
+/**
  * Build the exact host response for a verdict. ALLOW = abstain (exit 0, no
  * stdout) so we never bypass the host's own permission flow. ASK downgrades to
  * deny on hosts without an ask verdict (codex/cline/windsurf) — safe, never to
  * allow. Pure + exported for testing.
  */
 export function emitFor(platform: HookPlatform, verdict: Verdict, reason: string): Emission {
+  // Validate the verdict — an unexpected value must never silently produce an
+  // empty/garbled emission (which the host would read as allow).
+  if (verdict !== 'allow' && verdict !== 'ask' && verdict !== 'deny') {
+    throw new HookContractError(`invalid verdict: ${String(verdict)}`);
+  }
   const spec = PLATFORMS[platform];
+  if (!spec) throw new HookContractError(`unknown platform: ${String(platform)}`);
   if (verdict === 'allow') return { exit: 0 };
   // Downgrade ask→deny where the host has no ask verdict.
   const v: 'ask' | 'deny' = verdict === 'ask' && !spec.ask ? 'deny' : verdict;
+  let out: Emission;
   switch (spec.format) {
     case 'claude':
-      return {
+      out = {
         exit: 0,
         stdout: JSON.stringify({
           hookSpecificOutput: {
@@ -174,20 +250,37 @@ export function emitFor(platform: HookPlatform, verdict: Verdict, reason: string
           },
         }),
       };
+      break;
     case 'cursor':
-      return {
+      out = {
         exit: 0,
         stdout: JSON.stringify({ permission: v, agent_message: reason, user_message: reason }),
       };
+      break;
     case 'gemini':
-      return { exit: 0, stdout: JSON.stringify({ decision: v, reason }) };
+      out = { exit: 0, stdout: JSON.stringify({ decision: v, reason }) };
+      break;
     case 'cline':
       // No ask; deny → cancel:true. (ask already downgraded to deny above.)
-      return { exit: 0, stdout: JSON.stringify({ cancel: true, errorMessage: reason }) };
+      out = { exit: 0, stdout: JSON.stringify({ cancel: true, errorMessage: reason }) };
+      break;
     case 'windsurf':
       // No JSON contract: the ONLY non-zero exit we ever emit is exactly 2.
-      return { exit: 2, stderr: reason };
+      out = { exit: 2, stderr: reason };
+      break;
+    default: {
+      // Exhaustiveness: a future OutputFormat with no adapter must NOT fall
+      // through to a silent allow — it throws and the caller fails CLOSED.
+      const _never: never = spec.format;
+      throw new HookContractError(`unknown output format: ${String(_never)}`);
+    }
   }
+  // Self-check: the built output must actually express the decision for this
+  // format. A drifted field name or empty output fails here → fail CLOSED.
+  if (!HOST_CONTRACTS[spec.format].verify(out, v)) {
+    throw new HookContractError(`malformed ${spec.format} emission for verdict "${v}"`);
+  }
+  return out;
 }
 
 // ── 0-rules fail-open detection (degraded-protection signal) ─────────────────
@@ -236,6 +329,55 @@ function signalZeroRulesFailOpen(): void {
   } catch {
     /* best-effort marker; never block the agent on a write failure */
   }
+}
+
+/**
+ * Record a contract/protocol fail-CLOSED event in the same status file doctor and
+ * the dashboard already read, so a silent-non-enforcement risk becomes visible.
+ */
+function writeContractMarker(platform: string, reason: string): void {
+  try {
+    const path = hookStatusPath();
+    mkdirSync(dirname(path), { recursive: true });
+    writeFileSync(
+      path,
+      JSON.stringify(
+        { degraded: true, ruleCount: 0, reason, platform, at: new Date().toISOString() },
+        null,
+        2
+      ),
+      { mode: 0o600 }
+    );
+  } catch {
+    /* best-effort */
+  }
+}
+
+/**
+ * Contract/protocol failure on the ENFORCEMENT path: fail CLOSED + LOUD, never
+ * the silent allow. For a KNOWN platform, emit its best-effort deny AND exit 2 so
+ * both JSON-honoring and exit-code-honoring hosts block. For an UNRECOGNIZED
+ * protocol we cannot form a valid output, so exit 2 (the most broadly honored
+ * block convention) with a screaming stderr line. This is distinct from an
+ * operational error (stdin/evaluator), which stays fail-OPEN so a buggy hook
+ * never bricks the agent.
+ */
+function failClosed(platform: HookPlatform | string, reason: string): never {
+  process.stderr.write(
+    `[panguard-hook] FATAL: cannot express a deny for protocol "${platform}" — ` +
+      `FAILING CLOSED (blocking the tool call). ${reason}\n`
+  );
+  writeContractMarker(String(platform), 'contract-unformable');
+  const known = (PLATFORMS as Record<string, PlatformSpec>)[platform as string];
+  if (known) {
+    try {
+      const e = emitFor(platform as HookPlatform, 'deny', `PanGuard: ${reason}`);
+      if (e.stdout) process.stdout.write(e.stdout);
+    } catch {
+      /* fall through to the universal exit-2 block */
+    }
+  }
+  process.exit(2);
 }
 
 /**
@@ -304,9 +446,15 @@ function readStdin(): Promise<string> {
 
 /**
  * The hook. Reads the tool call, evaluates the COMMAND CONTENT, emits the host's
- * exact verdict. FAIL-SAFE: any error → allow (exit 0) + stderr log — a buggy
- * hook must never brick the agent (the proxy + daemon remain). The windsurf
- * adapter's only non-zero exit is 2 (exit 1 = silent fail-open there).
+ * exact verdict. Failure handling is split by CAUSE:
+ *   - OPERATIONAL error (stdin parse / evaluator load / 0 rules) on a recognized
+ *     protocol → fail OPEN (exit 0) + loud stderr — a buggy hook must never brick
+ *     the agent (the proxy + daemon remain).
+ *   - CONTRACT/PROTOCOL failure (unknown platform, invalid verdict, or a
+ *     self-check failure that means we cannot express a deny the host will honor)
+ *     → fail CLOSED + loud (exit 2 + best-effort deny) — better to block than to
+ *     silently let a flagged tool call run because our output drifted.
+ * The windsurf adapter's only non-zero exit is 2 (exit 1 = silent fail-open there).
  */
 export async function runHook(platform: HookPlatform): Promise<void> {
   const apply = (e: Emission): never => {
@@ -334,16 +482,40 @@ export async function runHook(platform: HookPlatform): Promise<void> {
     // Neutral tool name so tool_name-existence rules never fire on a built-in
     // tool name; only the command content is judged.
     const result = await evaluator.evaluateToolCall('command', { input: norm.content });
-    if (result.outcome === 'allow') process.exit(0);
+
+    // Validate the evaluator outcome. An unexpected/unknown value must DENY
+    // (fail closed), never fall through to allow.
+    const rawOutcome = result.outcome as unknown;
+    const outcome: Verdict =
+      rawOutcome === 'allow' || rawOutcome === 'ask' || rawOutcome === 'deny' ? rawOutcome : 'deny';
+    if (outcome === 'allow') process.exit(0);
+    if (outcome !== rawOutcome) {
+      process.stderr.write(
+        `[panguard-hook] WARNING: unrecognized evaluator outcome "${String(rawOutcome)}" — denying (fail-closed).\n`
+      );
+      writeContractMarker(platform, 'unrecognized-evaluator-outcome');
+    }
 
     const rules = result.matchedRules?.length
       ? ` [${result.matchedRules.slice(0, 3).join(', ')}]`
       : '';
     const reason = `PanGuard: ${result.reason || 'matched a detection rule'}${rules}`;
-    apply(emitFor(platform, result.outcome as Verdict, reason));
+    // Contract/protocol failures fail CLOSED (emitFor throws HookContractError);
+    // they must NOT fall into the operational catch below (which fails open).
+    let emission: Emission;
+    try {
+      emission = emitFor(platform, outcome, reason);
+    } catch (e) {
+      if (e instanceof HookContractError) failClosed(platform, e.message);
+      throw e;
+    }
+    apply(emission);
   } catch (err) {
+    // Operational error (stdin parse, evaluator load, etc.) on a recognized
+    // protocol → fail OPEN: a buggy hook must never brick the agent. (Inability
+    // to express a deny / unrecognized protocol fails CLOSED above, not here.)
     process.stderr.write(
-      `[panguard-hook] error (allowing): ${err instanceof Error ? err.message : String(err)}\n`
+      `[panguard-hook] operational error (allowing): ${err instanceof Error ? err.message : String(err)}\n`
     );
     process.exit(0);
   }
@@ -751,10 +923,19 @@ export function hookCommand(): Command {
   cmd
     .command('run')
     .description('Run the tool-call hook (invoked by the host agent; reads stdin)')
-    .option('--platform <id>', 'Host platform (claude-code default)', 'claude-code')
+    // No default: we must distinguish "absent" (legitimate claude-code default,
+    // used by `pga up`) from an EXPLICIT but unknown value (must fail closed, not
+    // silently emit Claude JSON to a non-Claude host = a silent allow).
+    .option('--platform <id>', 'Host platform (claude-code if omitted)')
     .action(async (opts: { platform?: string }) => {
-      const p = (opts.platform ?? 'claude-code') as HookPlatform;
-      await runHook(PLATFORMS[p] ? p : 'claude-code');
+      if (opts.platform == null) {
+        await runHook('claude-code');
+        return;
+      }
+      if (!(PLATFORMS as Record<string, PlatformSpec>)[opts.platform]) {
+        failClosed(opts.platform, `unknown --platform "${opts.platform}"`);
+      }
+      await runHook(opts.platform as HookPlatform);
     });
 
   cmd

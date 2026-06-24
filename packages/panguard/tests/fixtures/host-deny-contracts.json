@@ -1,0 +1,38 @@
+{
+  "_doc": "FROZEN byte-exact PreToolUse DENY emission per host, transcribed from each host's published hook contract (verified 2026-06). emitFor(platform,'deny','REASON') MUST equal these. A failing assertion means either an adapter drifted OR the host changed its contract — re-verify against the host docs and update emitFor + this fixture IN LOCKSTEP. Never loosen a test to make it pass. reason placeholder = 'REASON'.",
+  "claude-code": {
+    "_src": "code.claude.com/docs/en/hooks — exit 0 + hookSpecificOutput.permissionDecision",
+    "exit": 0,
+    "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"REASON\"}}"
+  },
+  "continue": {
+    "_src": "Continue PreToolUse — same claude hookSpecificOutput shape",
+    "exit": 0,
+    "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"REASON\"}}"
+  },
+  "codex": {
+    "_src": "developers.openai.com/codex/hooks — permissionDecision; 'ask' parsed-but-unsupported so ask==deny",
+    "exit": 0,
+    "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"REASON\"}}"
+  },
+  "cursor": {
+    "_src": "cursor.com/docs/hooks — permission + agent_message/user_message",
+    "exit": 0,
+    "stdout": "{\"permission\":\"deny\",\"agent_message\":\"REASON\",\"user_message\":\"REASON\"}"
+  },
+  "gemini": {
+    "_src": "Gemini CLI BeforeTool — decision + reason",
+    "exit": 0,
+    "stdout": "{\"decision\":\"deny\",\"reason\":\"REASON\"}"
+  },
+  "cline": {
+    "_src": "Cline hook-reference — cancel:true blocks (cline#7479)",
+    "exit": 0,
+    "stdout": "{\"cancel\":true,\"errorMessage\":\"REASON\"}"
+  },
+  "windsurf": {
+    "_src": "Windsurf — exit 2 + stderr blocks; no stdout JSON contract",
+    "exit": 2,
+    "stderr": "REASON"
+  }
+}
