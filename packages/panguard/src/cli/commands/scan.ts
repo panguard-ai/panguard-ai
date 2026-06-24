@@ -334,6 +334,38 @@ export function scanCommand(): Command {
               env: scanEnv,
             });
             process.stdout.write(result);
+            // `pga scan <path>` must exit non-zero when threats are found so it is
+            // usable as a CI gate — the bundled ATR CLI itself always exits 0.
+            // Matches `pga audit` (exit 2 on a confirmed threat).
+            const out = result.toString();
+            let threats = 0;
+            if (options.json) {
+              try {
+                threats = (JSON.parse(out) as { threats_detected?: number }).threats_detected ?? 0;
+              } catch {
+                /* unparseable JSON → leave 0 */
+              }
+            } else if (options.sarif) {
+              try {
+                threats =
+                  (JSON.parse(out) as { runs?: Array<{ results?: unknown[] }> }).runs?.[0]?.results
+                    ?.length ?? 0;
+              } catch {
+                /* unparseable SARIF → leave 0 */
+              }
+            } else {
+              // Strip ANSI color codes BEFORE reading the count: the colored number itself
+              // contains ANSI digits (e.g. [32m) that would otherwise be misread as the count.
+              const plain = out.replace(/\u001b\[[0-9;]*m/g, '');
+              const m = plain.match(/Threats found:\s*(\d+)/i);
+              if (m && m[1]) threats = parseInt(m[1], 10);
+              // Scope note: scan = ATR rules only; audit = full multi-layer. Stated
+              // so the two commands' counts never look like a bug when they differ.
+              console.log(
+                c.dim('  ATR rule scan. For a full multi-layer review: pga audit skill <path>')
+              );
+            }
+            if (threats > 0) process.exitCode = 2;
           } catch (err: unknown) {
             const e = err as { status?: number; stdout?: Buffer };
             // ATR exits 1 on findings with fail-on-finding — still show output

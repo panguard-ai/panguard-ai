@@ -150,8 +150,8 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
     console.log(
       `  ${symbols.info} ${
         lang === 'zh-TW'
-          ? '\u57F7\u884C \u300Cpga setup\u300D\u958B\u59CB\u8A2D\u5B9A\u3002'
-          : 'Run "pga setup" to get started.'
+          ? '\u57F7\u884C \u300Cpga up\u300D\u958B\u59CB\u9632\u8B77\uFF08\u6383\u63CF + \u5100\u8868\u677F\uFF09\u3002'
+          : 'Run "pga up" to start protection (scan + dashboard).'
       }`
     );
     console.log('');
@@ -356,7 +356,7 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
         `  ${c.safe(String(safeCount))} safe  ${c.dim('|')}  ${unknownCount > 0 ? c.caution(String(unknownCount)) : c.dim('0')} unscanned`
       );
       console.log(
-        `  ${c.dim(lang === 'zh-TW' ? '\u57F7\u884C pga setup \u6383\u63CF\u5168\u90E8 skill' : 'Run pga setup to scan all skills')}`
+        `  ${c.dim(lang === 'zh-TW' ? '\u57F7\u884C pga scan \u6383\u63CF\u5168\u90E8 skill' : 'Run pga scan to scan all skills')}`
       );
       console.log('');
 
