@@ -10,7 +10,6 @@
  */
 
 import {
-  appendFileSync,
   mkdirSync,
   readFileSync,
   statSync,
@@ -31,15 +30,30 @@ import type {
   GuardMode,
 } from '../types.js';
 import { updateBaseline } from '../memory/baseline.js';
+import {
+  AuditChain,
+  buildActor,
+  newDecisionId,
+  type Actor,
+  type ChainedRecord,
+  type RuleRef,
+  type VerifyResult,
+} from '../audit/index.js';
 
 const logger = createLogger('panguard-guard:report-agent');
 
-/** Full report record written to JSONL */
+/** Full report record written to JSONL (payload inside the tamper-evident chain). */
 export interface ReportRecord {
   event: SecurityEvent;
   verdict: ThreatVerdict;
   response: ResponseResult;
   timestamp: string;
+  /** Forensic attribution (who/where) — back-compat optional. */
+  actor?: Actor;
+  /** Correlates this record across the pipeline — back-compat optional. */
+  decisionId?: string;
+  /** Lifted rule identity from verdict.evidence — back-compat optional. */
+  rule?: RuleRef;
 }
 
 /** Daily/weekly summary structure */
@@ -78,8 +92,20 @@ export class ReportAgent {
   private mode: GuardMode;
   private reportCount = 0;
   private readonly rotation: RotationConfig;
+  /**
+   * Tamper-evident chain over events.jsonl. The head-anchor lives at
+   * <dataDir>/chainHead.json (rotation-independent) so the chain SPANS rotation:
+   * after the active file is rotated out, the next file's first record links to
+   * the rotated-out file's last hash (carried in the head-anchor).
+   */
+  private readonly chain: AuditChain;
 
-  constructor(logPath: string, mode: GuardMode, rotation?: Partial<RotationConfig>) {
+  constructor(
+    logPath: string,
+    mode: GuardMode,
+    rotation?: Partial<RotationConfig>,
+    auditKey?: Buffer
+  ) {
     this.logPath = logPath;
     this.mode = mode;
     this.rotation = { ...DEFAULT_ROTATION, ...rotation };
@@ -90,6 +116,12 @@ export class ReportAgent {
     } catch {
       // Directory may already exist
     }
+
+    // Head-anchor defaults to `<logPath>.head` (e.g. events.jsonl.head). It is
+    // rotation-independent (never renamed when events.jsonl rotates to .1) and
+    // distinct per log file, so the events / manifest / proxy chains in the same
+    // dataDir do not collide on a shared chainHead.json.
+    this.chain = new AuditChain(logPath, { key: auditKey });
   }
 
   /** Update operating mode */
@@ -112,12 +144,17 @@ export class ReportAgent {
     // Step 1: Check if rotation needed before writing
     this.rotateIfNeeded();
 
-    // Step 2: Log to JSONL
+    // Step 2: Log to JSONL (tamper-evident chain). Lift rule identity from the
+    // verdict's rule-match evidence and attach forensic attribution.
+    const rule = liftRuleRef(verdict);
     const record: ReportRecord = {
       event,
       verdict,
       response,
       timestamp: new Date().toISOString(),
+      actor: buildActor(),
+      decisionId: newDecisionId(),
+      ...(rule ? { rule } : {}),
     };
     this.appendLog(record);
 
@@ -177,6 +214,9 @@ export class ReportAgent {
     // Rename current log to .1
     try {
       renameSync(this.logPath, join(dir, `${base}.1`));
+      // The chain spans rotation: the rotation-independent head-anchor still
+      // holds the rotated-out file's last hash, so the next append chains to it.
+      this.chain.noteRotation();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       logger.error(`Log rotation rename failed: ${msg}`);
@@ -240,13 +280,23 @@ export class ReportAgent {
   // ---------------------------------------------------------------------------
 
   private appendLog(record: ReportRecord): void {
-    try {
-      const line = JSON.stringify(record) + '\n';
-      appendFileSync(this.logPath, line, 'utf-8');
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      logger.error(`Failed to write log: ${msg}`);
-    }
+    // Append through the tamper-evident chain. AuditChain.append is itself
+    // fail-open (logs to stderr, never throws) so a broken audit file never
+    // bricks the pipeline.
+    this.chain.append<ReportRecord>(record);
+  }
+
+  /**
+   * Verify the durable events.jsonl chain end-to-end (spans rotated files).
+   * Returns the chain verdict an auditor / the dashboard export embeds.
+   */
+  async verify(): Promise<VerifyResult> {
+    return this.chain.verify();
+  }
+
+  /** Expose the chain for export readers (dashboard reads the durable log). */
+  getChain(): AuditChain {
+    return this.chain;
   }
 
   // ---------------------------------------------------------------------------
@@ -315,8 +365,8 @@ export class ReportAgent {
         rl.on('line', (line) => {
           if (!line.trim()) return;
           try {
-            const record = JSON.parse(line) as ReportRecord;
-            if (new Date(record.timestamp) >= after) {
+            const record = unwrapReportRecord(line);
+            if (record && new Date(record.timestamp) >= after) {
               records.push(record);
             }
           } catch {
@@ -462,8 +512,8 @@ export class ReportAgent {
       const lines = content.trim().split('\n').filter(Boolean);
       for (const line of lines) {
         try {
-          const record = JSON.parse(line) as ReportRecord;
-          if (new Date(record.timestamp) >= after) {
+          const record = unwrapReportRecord(line);
+          if (record && new Date(record.timestamp) >= after) {
             records.push(record);
           }
         } catch {
@@ -549,6 +599,46 @@ export class ReportAgent {
 // ---------------------------------------------------------------------------
 // Utility functions
 // ---------------------------------------------------------------------------
+
+/**
+ * Parse a JSONL line into a ReportRecord, transparently unwrapping the
+ * tamper-evident chain envelope. New lines are ChainedRecord<ReportRecord>
+ * (payload is the report); pre-chain legacy lines are a bare ReportRecord.
+ * Both are supported so a mid-upgrade log reads cleanly.
+ */
+function unwrapReportRecord(line: string): ReportRecord | null {
+  const parsed = JSON.parse(line) as Record<string, unknown>;
+  // Chained line: { seq, ts, payload, prevHash, hash } — unwrap .payload.
+  if (
+    typeof parsed['hash'] === 'string' &&
+    typeof parsed['prevHash'] === 'string' &&
+    parsed['payload'] !== undefined
+  ) {
+    return (parsed as unknown as ChainedRecord<ReportRecord>).payload;
+  }
+  // Legacy bare ReportRecord.
+  if (typeof parsed['timestamp'] === 'string') {
+    return parsed as unknown as ReportRecord;
+  }
+  return null;
+}
+
+/**
+ * Lift rule identity (id + version) from the verdict's rule-match evidence so
+ * forensic queries can index by rule without re-parsing nested evidence.
+ */
+function liftRuleRef(verdict: ThreatVerdict): RuleRef | undefined {
+  for (const e of verdict.evidence ?? []) {
+    if (e.source !== 'rule_match') continue;
+    const data = e.data as Record<string, unknown> | undefined;
+    const id = (data?.['ruleId'] ?? data?.['rule_id']) as string | undefined;
+    if (id) {
+      const version = (data?.['version'] ?? data?.['ruleVersion']) as string | undefined;
+      return version ? { id, version } : { id };
+    }
+  }
+  return undefined;
+}
 
 function getCountryCode(): string {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;

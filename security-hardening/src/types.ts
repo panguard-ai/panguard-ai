@@ -70,6 +70,24 @@ export type AuditAction =
   | 'security_scan';
 
 /**
+ * Forensic actor attribution (who/where produced the event).
+ * 鑑識歸屬：誰、在哪台機器產生此事件。
+ *
+ * Optional for back-compat. The local durable log carries the full value
+ * (including os username); export paths anonymize the username.
+ */
+export interface AuditActor {
+  /** OS username on the producing machine / 產生端機器的作業系統使用者名稱 */
+  user: string;
+  /** Hostname of the producing machine / 產生端機器的主機名稱 */
+  host: string;
+  /** Process id / 程序 id */
+  pid: number;
+  /** Agent identity when the event came from a guarded agent session */
+  agent?: { platform: string; sessionId: string; agentId: string };
+}
+
+/**
  * Audit event for security operations
  * 安全操作的稽核事件
  */
@@ -88,6 +106,12 @@ export interface AuditEvent {
   module: string;
   /** Additional context / 額外上下文 */
   context?: Record<string, unknown>;
+  /** Forensic attribution (optional, back-compat) / 鑑識歸屬（選用，向後相容） */
+  actor?: AuditActor;
+  /** Correlates a decision across records (optional) / 跨記錄關聯的決策 id（選用） */
+  decisionId?: string;
+  /** Lifted rule identity for forensic indexing (optional) / 提升至頂層的規則身分（選用） */
+  rule?: { id: string; version?: string };
 }
 
 /**

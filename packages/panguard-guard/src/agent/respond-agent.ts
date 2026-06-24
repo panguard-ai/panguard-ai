@@ -59,13 +59,14 @@ export class RespondAgent {
     mode: GuardMode,
     whitelistedIPs: string[] = [],
     dataDir = '/var/panguard-guard',
-    enforcementPolicy: EnforcementPolicy = DEFAULT_ENFORCEMENT_POLICY
+    enforcementPolicy: EnforcementPolicy = DEFAULT_ENFORCEMENT_POLICY,
+    auditKey?: Buffer
   ) {
     this.actionPolicy = actionPolicy;
     this.mode = mode;
     this.enforcementPolicy = enforcementPolicy;
     this.additionalWhitelistedIPs = new Set(whitelistedIPs);
-    this.manifest = new ActionManifest(dataDir);
+    this.manifest = new ActionManifest(dataDir, auditKey);
     this.atrHandlers = new ATRActionHandlers(dataDir);
   }
 

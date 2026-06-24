@@ -160,7 +160,11 @@ describe('RespondAgent.addBlockedIP()', () => {
     const lines = content.trim().split('\n').filter(Boolean);
     expect(lines.length).toBeGreaterThanOrEqual(1);
 
-    const entry = JSON.parse(lines[lines.length - 1]);
+    // The manifest is now a tamper-evident chain: each line is a ChainedRecord
+    // whose .payload holds the original ActionManifestEntry. Unwrap it (the
+    // documented downstream shim) before asserting on the entry shape.
+    const line = JSON.parse(lines[lines.length - 1]);
+    const entry = line.payload ?? line;
     expect(entry.action).toBe('block_ip');
     expect(entry.target).toBe('10.20.30.40');
     expect(entry.verdict.conclusion).toBe('policy_block');
