@@ -23,6 +23,7 @@ import {
 import type { StatusItem, TableColumn } from '@panguard-ai/core';
 import { readConfig } from '../../init/config-writer.js';
 import { loadGuardConfig } from '../guard-config.js';
+import { readAuthenticatedDashboardUrl, dashboardBaseUrl } from '../dashboard-url.js';
 import type { Lang } from '../../init/types.js';
 
 const GUARD_CONFIG_PATH = join(homedir(), '.panguard-guard', 'config.json');
@@ -171,6 +172,17 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
           ? '\u672A\u904B\u884C'
           : 'Not running',
       status: status.guard.running ? 'safe' : 'caution',
+    });
+  }
+
+  // Dashboard URL — always-on wayfinding so the user can answer "where's my
+  // dashboard?" without re-running `pga up`. Only shown when the daemon is up;
+  // prefer the authenticated (?token=) URL the daemon persisted, else the base.
+  if (status.guard?.running) {
+    systemItems.push({
+      label: lang === 'zh-TW' ? '儀表板' : 'Dashboard',
+      value: c.sage(readAuthenticatedDashboardUrl() ?? dashboardBaseUrl()),
+      status: 'safe',
     });
   }
 
