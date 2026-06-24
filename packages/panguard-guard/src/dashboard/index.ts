@@ -40,6 +40,7 @@ import type {
   ThreatVerdict,
 } from '../types.js';
 import { saveConfig, loadConfig } from '../config.js';
+import { verifyConfigIntegrity, checkSelfState } from '../integrity.js';
 import { redactSecrets } from '../redact.js';
 import { DashboardRelayClient, type RelayClientConfig } from './relay-client.js';
 import {
@@ -172,9 +173,15 @@ interface LayerHealth {
  */
 interface EnforcementStatus {
   readonly mode: string;
-  readonly posture: 'protected' | 'monitoring' | 'report-only' | 'learning' | 'off';
+  readonly posture: 'protected' | 'monitoring' | 'report-only' | 'learning' | 'off' | 'tampered';
   readonly osActionsArmed: boolean;
   readonly armedActions: string[];
+  /** S5: config-integrity + self-removal verdict surfaced to the cockpit. */
+  readonly integrity?: {
+    readonly status: string;
+    readonly changedFields: number;
+    readonly selfRemoval: number;
+  };
 }
 
 /**
@@ -925,7 +932,25 @@ export class DashboardServer {
     else if (mode === 'report-only') posture = 'report-only';
     else if (mode === 'learning') posture = 'learning';
     else posture = 'off';
-    return { mode, posture, osActionsArmed, armedActions: armed };
+
+    // S5: config integrity + self-removal override the posture. Never claim
+    // PROTECTED/MONITORING when the config was changed outside the guard or a
+    // hook/LaunchAgent/proxy was removed — the cockpit must stay honest (S2).
+    let integrity: EnforcementStatus['integrity'];
+    if (cfg) {
+      try {
+        const dataDir = cfg.dataDir ?? join(homedir(), '.panguard-guard');
+        const v = verifyConfigIntegrity(cfg as unknown as Record<string, unknown>, dataDir);
+        const self = checkSelfState(dataDir);
+        integrity = { status: v.status, changedFields: v.findings.length, selfRemoval: self.findings.length };
+        if (v.status === 'tampered' || v.status === 'manifest-tampered' || !self.ok) {
+          posture = 'tampered';
+        }
+      } catch {
+        /* integrity is best-effort — never break the status response */
+      }
+    }
+    return { mode, posture, osActionsArmed, armedActions: armed, integrity };
   }
 
   private normalizeLicenseTier(t: string): 'community' | 'pilot' | 'enterprise' | 'free' | 'pro' {

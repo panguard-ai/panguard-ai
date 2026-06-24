@@ -17,6 +17,7 @@ import { c, symbols, box, header } from '@panguard-ai/core';
 import { PANGUARD_VERSION } from '../../index.js';
 import { readHookProtectionStatus } from './hook.js';
 import { SERVICE_PLIST_BASENAME } from './persist.js';
+import { verifyConfigIntegrity, checkSelfState } from '@panguard-ai/panguard-guard';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -103,6 +104,58 @@ function checkConfiguration(): CheckResult {
       detail: `${display} is not valid JSON`,
       fix: 'Run "pga setup" to regenerate the configuration file',
     };
+  }
+}
+
+function checkConfigIntegrity(): CheckResult {
+  // S5: detect tampering of the guard config + silent removal of its hooks / service.
+  // Tamper-EVIDENCE only (a same-user attacker can re-seal) — surfaces unauthorized
+  // changes the guard did not make, so this never reads as a false "all clear".
+  if (!existsSync(GUARD_CONFIG_PATH)) {
+    return { status: 'pass', label: 'Config integrity', detail: 'no guard config yet (run "pga up")' };
+  }
+  let config: Record<string, unknown>;
+  try {
+    config = JSON.parse(readFileSync(GUARD_CONFIG_PATH, 'utf-8')) as Record<string, unknown>;
+  } catch {
+    return {
+      status: 'fail',
+      label: 'Config integrity',
+      detail: 'guard config is not valid JSON',
+      fix: 'Run "pga setup" to regenerate the configuration',
+    };
+  }
+  try {
+    const verdict = verifyConfigIntegrity(config, GUARD_DIR);
+    const self = checkSelfState(GUARD_DIR);
+    if (verdict.status === 'unsealed') {
+      return {
+        status: 'warn',
+        label: 'Config integrity',
+        detail: 'integrity baseline not established',
+        fix: 'Run "pga up" to seal the current configuration',
+      };
+    }
+    if (verdict.status === 'sealed' && self.ok) {
+      return { status: 'pass', label: 'Config integrity', detail: 'config sealed; hooks + service intact' };
+    }
+    const parts: string[] = [];
+    if (verdict.status !== 'sealed') {
+      // Field NAMES only — never the values (config can hold secrets).
+      const fields = verdict.findings.map((f) => f.field).join(', ');
+      parts.push(`config ${verdict.status}${fields ? ` (${fields})` : ''}`);
+    }
+    if (!self.ok) {
+      parts.push(`removed: ${self.findings.map((f) => `${f.kind} ${f.reason}`).join(', ')}`);
+    }
+    return {
+      status: 'fail',
+      label: 'Config integrity',
+      detail: parts.join('; '),
+      fix: 'If this change was yours, run "pga up" to re-seal. Otherwise protection may have been weakened — review the config and reinstall.',
+    };
+  } catch {
+    return { status: 'warn', label: 'Config integrity', detail: 'integrity check unavailable' };
   }
 }
 
@@ -570,6 +623,7 @@ function runAllChecks(): CheckResult[] {
   return [
     checkInstallation(),
     checkConfiguration(),
+    checkConfigIntegrity(),
     checkCredentials(),
     checkAiProvider(),
     checkAiLayerLocal(),
