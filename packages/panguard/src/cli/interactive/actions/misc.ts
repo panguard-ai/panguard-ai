@@ -17,42 +17,29 @@ export async function actionReport(lang: Lang): Promise<void> {
   breadcrumb(['Panguard', lang === 'zh-TW' ? '\u5408\u898F\u5831\u544A' : 'Compliance Report']);
   console.log('');
   if (lang === 'zh-TW') {
-    console.log('  \u5408\u898F\u5831\u544A');
+    console.log('  \u5408\u898F\u5831\u544A\uFF08Enterprise \u529F\u80FD\uFF09');
     console.log('');
-    console.log('  \u652F\u6301\u516D\u5927\u6846\u67B6\uFF1A');
-    console.log('    \u2022 eu-ai-act        EU AI Act (Regulation 2024/1689)');
-    console.log('    \u2022 colorado-ai-act  Colorado SB24-205');
-    console.log('    \u2022 nist-ai-rmf      NIST AI RMF 1.0');
-    console.log('    \u2022 iso-42001        ISO/IEC 42001:2023');
-    console.log('    \u2022 owasp-agentic    OWASP Agentic Top 10:2026');
-    console.log('    \u2022 owasp-llm        OWASP LLM Top 10:2025');
+    console.log('  \u5C07\u5075\u6E2C\u7D50\u679C\u6620\u5C04\u5230\u5408\u898F\u6846\u67B6\uFF08EU AI Act / NIST AI RMF /');
+    console.log('  ISO 42001 / OWASP \u7B49\uFF09\u3001\u9644 SHA-256 + \u53EF\u9078\u7C3D\u7AE0\u4F9B\u7A3D\u6838\u9A57\u8B49\u7684');
+    console.log('  \u5408\u898F\u8B49\u64DA\u5831\u544A\uFF0C\u662F Enterprise \u65B9\u6848\u529F\u80FD\uFF0C\u4E0D\u5728\u514D\u8CBB Community CLI \u5167\u3002');
     console.log('');
-    console.log('  \u5F9E CLI \u57F7\u884C\uFF1A');
-    console.log('    pga report list-frameworks');
-    console.log('    pga report summary --framework eu-ai-act');
-    console.log('    pga report generate --framework nist-ai-rmf --format pdf --output report.pdf');
+    console.log('  Community \u7248\u63D0\u4F9B\u5E95\u5C64\u5075\u6E2C\uFF08\u5831\u544A\u7684\u7D20\u6750\uFF09\uFF1A');
+    console.log('    pga scan <path>          \u7528\u5167\u5EFA ATR \u898F\u5247\u6383\u63CF');
+    console.log('    pga audit skill <path>   \u5BE9\u6838\u4E00\u500B skill');
     console.log('');
-    console.log(
-      '  \u6BCF\u4EFD\u5831\u544A\u9644\u5E36 SHA-256 hash\uFF0C\u53EF\u9078\u914D HMAC \u7C3D\u7AE0\uFF0C\u7A3D\u6838\u54E1\u53EF\u76F4\u63A5\u9A57\u8B49\u5B8C\u6574\u6027\u3002'
-    );
+    console.log('  \u4E86\u89E3 Enterprise\uFF1Ahttps://panguard.ai');
   } else {
-    console.log('  Compliance Report');
+    console.log('  Compliance Report (Enterprise feature)');
     console.log('');
-    console.log('  Six frameworks supported:');
-    console.log('    \u2022 eu-ai-act        EU AI Act (Regulation 2024/1689)');
-    console.log('    \u2022 colorado-ai-act  Colorado SB24-205');
-    console.log('    \u2022 nist-ai-rmf      NIST AI RMF 1.0');
-    console.log('    \u2022 iso-42001        ISO/IEC 42001:2023');
-    console.log('    \u2022 owasp-agentic    OWASP Agentic Top 10:2026');
-    console.log('    \u2022 owasp-llm        OWASP LLM Top 10:2025');
+    console.log('  Compliance evidence reports \u2014 detection results mapped to EU AI Act /');
+    console.log('  NIST AI RMF / ISO 42001 / OWASP, with a SHA-256 + optional signature auditors');
+    console.log('  can verify \u2014 are part of the Enterprise plan, not the free Community CLI.');
     console.log('');
-    console.log('  Run from CLI:');
-    console.log('    pga report list-frameworks');
-    console.log('    pga report summary --framework eu-ai-act');
-    console.log('    pga report generate --framework nist-ai-rmf --format pdf --output report.pdf');
+    console.log('  The Community edition gives you the underlying detection (the report inputs):');
+    console.log('    pga scan <path>          scan with the bundled ATR ruleset');
+    console.log('    pga audit skill <path>   audit a skill before you install it');
     console.log('');
-    console.log('  Each report carries a SHA-256 integrity hash with optional HMAC signature.');
-    console.log('  Auditors can verify the report has not been tampered with.');
+    console.log('  Learn more about Enterprise: https://panguard.ai');
   }
   console.log('');
 }
