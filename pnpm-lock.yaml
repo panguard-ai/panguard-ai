@@ -451,6 +451,9 @@ importers:
       '@panguard-ai/containment':
         specifier: workspace:*
         version: link:../containment
+      '@panguard-ai/panguard-guard':
+        specifier: workspace:*
+        version: link:../panguard-guard
       agent-threat-rules:
         specifier: ^3.5.0
         version: 3.5.0(zod@3.25.76)

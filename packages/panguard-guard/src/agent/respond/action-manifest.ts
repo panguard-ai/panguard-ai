@@ -3,19 +3,22 @@
  * @module @panguard-ai/panguard-guard/agent/respond/action-manifest
  */
 
-import { appendFileSync, readFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { createLogger } from '@panguard-ai/core';
 import type { ResponseAction, ThreatVerdict } from '../../types.js';
 import type { ActionManifestEntry } from './types.js';
+import { AuditChain, type ChainedRecord, type VerifyResult } from '../../audit/index.js';
 
 const logger = createLogger('panguard-guard:action-manifest');
 
 export class ActionManifest {
   private readonly entries: ActionManifestEntry[] = [];
   private readonly manifestPath: string;
+  /** Tamper-evident chain over action-manifest.jsonl. */
+  private readonly chain: AuditChain;
 
-  constructor(dataDir: string) {
+  constructor(dataDir: string, auditKey?: Buffer) {
     this.manifestPath = `${dataDir}/action-manifest.jsonl`;
 
     // Ensure manifest directory exists
@@ -24,6 +27,10 @@ export class ActionManifest {
     } catch {
       // Directory may already exist
     }
+
+    // Head-anchor defaults to `<manifestPath>.head` (per-file, rotation-independent)
+    // so it never collides with the events / proxy chain anchors in the same dataDir.
+    this.chain = new AuditChain(this.manifestPath, { key: auditKey });
 
     this.load();
   }
@@ -74,25 +81,30 @@ export class ActionManifest {
     }
   }
 
-  /** Persist a single entry to the JSONL file */
+  /**
+   * Persist a single entry through the tamper-evident chain. The original
+   * ActionManifestEntry shape is preserved verbatim inside record.payload so the
+   * load() reader (and any external reader after the .payload unwrap shim) keeps
+   * working. AuditChain.append is fail-open (logs to stderr, never throws).
+   */
   persist(entry: ActionManifestEntry): void {
-    try {
-      appendFileSync(this.manifestPath, JSON.stringify(entry) + '\n', 'utf-8');
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      logger.error(`Failed to persist action manifest: ${msg}`);
-    }
+    this.chain.append<ActionManifestEntry>(entry);
   }
 
-  /** Load existing manifest entries from disk */
+  /** Verify the durable action-manifest chain end-to-end. */
+  async verify(): Promise<VerifyResult> {
+    return this.chain.verify();
+  }
+
+  /** Load existing manifest entries from disk, unwrapping the chain envelope. */
   private load(): void {
     try {
       const content = readFileSync(this.manifestPath, 'utf-8');
       const lines = content.trim().split('\n').filter(Boolean);
       for (const line of lines) {
         try {
-          const entry = JSON.parse(line) as ActionManifestEntry;
-          this.entries.push(entry);
+          const entry = unwrapManifestEntry(line);
+          if (entry) this.entries.push(entry);
         } catch {
           // Skip malformed lines
         }
@@ -102,4 +114,24 @@ export class ActionManifest {
       // Manifest file may not exist yet
     }
   }
+}
+
+/**
+ * Parse a JSONL line into an ActionManifestEntry, unwrapping the tamper-evident
+ * chain envelope. New lines are ChainedRecord<ActionManifestEntry>; pre-chain
+ * legacy lines are a bare entry. Both are supported for mid-upgrade logs.
+ */
+function unwrapManifestEntry(line: string): ActionManifestEntry | null {
+  const parsed = JSON.parse(line) as Record<string, unknown>;
+  if (
+    typeof parsed['hash'] === 'string' &&
+    typeof parsed['prevHash'] === 'string' &&
+    parsed['payload'] !== undefined
+  ) {
+    return (parsed as unknown as ChainedRecord<ActionManifestEntry>).payload;
+  }
+  if (typeof parsed['id'] === 'string') {
+    return parsed as unknown as ActionManifestEntry;
+  }
+  return null;
 }

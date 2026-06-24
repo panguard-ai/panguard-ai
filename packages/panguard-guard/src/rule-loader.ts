@@ -24,6 +24,7 @@ import type { GuardConfig, LicenseTier, AnalyzeLLM } from './types.js';
 import { TIER_FEATURES } from './types.js';
 
 import { DetectAgent, AnalyzeAgent, RespondAgent, ReportAgent } from './agent/index.js';
+import { getAuditKey } from './audit/index.js';
 import { loadBaseline } from './memory/index.js';
 import { InvestigationEngine } from './investigation/index.js';
 import { ThreatCloudClient } from './threat-cloud/index.js';
@@ -167,6 +168,12 @@ export async function initEngines(
     });
   }
 
+  // Resolve the tamper-evident audit HMAC key once (keychain-first, file
+  // fallback). getAuditKey never throws; on total failure it yields an in-memory
+  // key so audit signing still works for the life of the process. Shared by the
+  // action-manifest chain (RespondAgent) and the events chain (ReportAgent).
+  const auditKey = await getAuditKey();
+
   // EnforcementPolicy: take from config or fall back to the conservative
   // DEFAULT_ENFORCEMENT_POLICY (all OS actions OFF) defined in safety-rules.ts.
   // Operators must explicitly opt in to enforcement via GuardConfig.enforcementPolicy.
@@ -175,7 +182,8 @@ export async function initEngines(
     config.mode,
     [],
     config.dataDir,
-    config.enforcementPolicy
+    config.enforcementPolicy,
+    auditKey
   );
   respondAgent.setWhitelistManager(atrEngine.getWhitelistManager());
 
@@ -203,7 +211,12 @@ export async function initEngines(
     );
   }
 
-  const reportAgent = new ReportAgent(join(config.dataDir, 'events.jsonl'), config.mode);
+  const reportAgent = new ReportAgent(
+    join(config.dataDir, 'events.jsonl'),
+    config.mode,
+    undefined,
+    auditKey
+  );
   const investigationEngine = new InvestigationEngine(baseline);
 
   // Auto-provision TC client key so a fresh `pga up` becomes a Threat Cloud sensor

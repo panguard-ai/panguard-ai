@@ -12,7 +12,11 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true
   },
-  "references": [{ "path": "../atr" }, { "path": "../containment" }],
+  "references": [
+    { "path": "../atr" },
+    { "path": "../containment" },
+    { "path": "../panguard-guard" }
+  ],
   "include": ["src/**/*.ts"],
   "exclude": ["dist", "tests"]
 }

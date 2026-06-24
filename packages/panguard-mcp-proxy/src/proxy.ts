@@ -25,7 +25,7 @@ import {
   GetPromptRequestSchema,
   ReadResourceRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-import { appendFileSync, mkdirSync } from 'node:fs';
+import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { ProxyEvaluator } from './evaluator.js';
@@ -39,17 +39,15 @@ import {
   applyMcpGate,
 } from '@panguard-ai/containment';
 import type { McpGateVerdict } from '@panguard-ai/containment';
+import {
+  AuditChain,
+  buildActor,
+  newDecisionId,
+  getAuditKey,
+  type VerifyResult,
+} from '@panguard-ai/panguard-guard/audit';
 
 const VERDICT_LOG = join(homedir(), '.panguard-guard', 'proxy-verdicts.jsonl');
-
-function logVerdict(entry: Record<string, unknown>): void {
-  try {
-    mkdirSync(join(homedir(), '.panguard-guard'), { recursive: true });
-    appendFileSync(VERDICT_LOG, JSON.stringify({ ...entry, ts: new Date().toISOString() }) + '\n');
-  } catch {
-    /* best-effort logging */
-  }
-}
 
 export interface ProxyConfig {
   /** Command to start the upstream MCP server */
@@ -60,6 +58,10 @@ export interface ProxyConfig {
   readonly evalTimeout?: number;
   /** Fail mode: 'closed' blocks on error (safer), 'open' allows on error (default for availability) */
   readonly failMode?: 'open' | 'closed';
+  /** Stable session id for this proxy run (default: per-process unique). */
+  readonly sessionId?: string;
+  /** Agent id behind this proxy (default: PANGUARD_AGENT_ID env or 'mcp-agent'). */
+  readonly agentId?: string;
 }
 
 /** The subset of ProxyEvaluator the proxy uses — injectable for testing. */
@@ -82,10 +84,18 @@ export class MCPProxy {
   private readonly riskStore: InMemoryRiskStore;
   /** Confidence at/above which an evaluator deny escalates the whole session. */
   private static readonly ESCALATE_CONFIDENCE = 95;
-  /** One stdio session per proxy process. */
-  private readonly sessionId = 'mcp-proxy-session';
+  /**
+   * One stdio session per proxy process. Defaults to a per-process unique id
+   * (not the old hardcoded constant) so verdict lines from distinct runs are
+   * distinguishable; overridable via config for correlation with an orchestrator.
+   */
+  private readonly sessionId: string;
+  /** Agent id behind this proxy — written into every verdict line for attribution. */
+  private readonly agentId: string;
   /** Upstream tool names = the Layer 0 capability scope (populated in start()). */
   private upstreamToolNames = new Set<string>();
+  /** Tamper-evident chain over proxy-verdicts.jsonl (lazily keyed in connect()). */
+  private chain: AuditChain | null = null;
 
   constructor(config: ProxyConfig, deps: { evaluator?: ProxyEvaluatorLike } = {}) {
     this.config = config;
@@ -103,6 +113,9 @@ export class MCPProxy {
       config.failMode ??
       (envFailMode === 'open' || envFailMode === 'closed' ? envFailMode : 'closed');
     this.evalTimeout = config.evalTimeout ?? 5000;
+    this.sessionId =
+      config.sessionId ?? `mcp-proxy-${process.pid}-${Date.now().toString(36)}`;
+    this.agentId = config.agentId ?? process.env['PANGUARD_AGENT_ID'] ?? 'mcp-agent';
     // Sync sub-ms pre-check. Runs in front of the async evaluator so the worst
     // payloads (and any session the brain flags) are blocked instantly — and,
     // with fail-closed as the default, an unavailable async evaluator denies.
@@ -131,6 +144,7 @@ export class MCPProxy {
    * in-memory transports without spawning a process.
    */
   async connect(upstreamTransport: Transport, agentTransport: Transport): Promise<void> {
+    await this.ensureChain();
     const ruleCount = await this.evaluator.loadRules();
     process.stderr.write(`[panguard-proxy] Loaded ${ruleCount} ATR rules\n`);
 
@@ -188,7 +202,7 @@ export class MCPProxy {
       name,
       args: toolArgs,
       sessionId: this.sessionId,
-      agentId: 'mcp-agent',
+      agentId: this.agentId,
       capabilities: this.upstreamToolNames.size > 0 ? this.upstreamToolNames : new Set([name]),
     });
   }
@@ -208,6 +222,69 @@ export class MCPProxy {
     if (verdict.outcome === 'deny' && verdict.confidence >= MCPProxy.ESCALATE_CONFIDENCE) {
       this.riskStore.set(this.sessionId, { level: 'high', reasons: [...verdict.matchedRules] });
     }
+  }
+
+  /**
+   * Lazily build the tamper-evident verdict chain. The audit key is resolved
+   * keychain-first (file fallback); getAuditKey never throws. Chain construction
+   * is best-effort — if it fails, verdict logging silently no-ops rather than
+   * bricking the proxy (fail-open on audit).
+   */
+  private async ensureChain(): Promise<void> {
+    if (this.chain) return;
+    try {
+      mkdirSync(join(homedir(), '.panguard-guard'), { recursive: true });
+      const key = await getAuditKey();
+      // Head-anchor defaults to `<VERDICT_LOG>.head` (per-file) so it never
+      // collides with the events / manifest chain anchors in the same dataDir.
+      this.chain = new AuditChain(VERDICT_LOG, { key });
+    } catch (err) {
+      process.stderr.write(
+        `[panguard-audit] proxy chain init failed (verdict logging disabled): ${
+          err instanceof Error ? err.message : String(err)
+        }\n`
+      );
+    }
+  }
+
+  /**
+   * Append a verdict to the tamper-evident chain. The REAL sessionId/agentId are
+   * carried in actor.agent (the old code dropped them), plus a decisionId and the
+   * lifted matched rule id. AuditChain.append is fail-open so a broken audit file
+   * never blocks a tool call.
+   */
+  private logVerdict(entry: {
+    phase: string;
+    tool: string;
+    outcome: string;
+    reason: string;
+    rules?: readonly string[];
+    ms?: number;
+  }): void {
+    if (!this.chain) return;
+    const rules = entry.rules ?? [];
+    this.chain.append({
+      phase: entry.phase,
+      tool: entry.tool,
+      outcome: entry.outcome,
+      reason: entry.reason,
+      rules: [...rules],
+      ms: entry.ms,
+      ts: new Date().toISOString(),
+      decisionId: newDecisionId(),
+      actor: buildActor({
+        platform: 'mcp-proxy',
+        sessionId: this.sessionId,
+        agentId: this.agentId,
+      }),
+      ...(rules.length > 0 ? { rule: { id: rules[0]! } } : {}),
+    });
+  }
+
+  /** Verify the durable proxy-verdicts chain end-to-end. */
+  async verify(): Promise<VerifyResult | null> {
+    await this.ensureChain();
+    return this.chain ? this.chain.verify() : null;
   }
 
   private registerHandlers(): void {
@@ -230,7 +307,7 @@ export class MCPProxy {
       // instantly, even if the async evaluator times out fail-open.
       const gateVerdict = this.gateCheck(name, toolArgs);
       if (!gateVerdict.allow) {
-        logVerdict({
+        this.logVerdict({
           phase: 'pre-gate',
           tool: name,
           outcome: 'deny',
@@ -270,7 +347,7 @@ export class MCPProxy {
         };
       }
 
-      logVerdict({
+      this.logVerdict({
         phase: 'pre',
         tool: name,
         outcome: preResult.outcome,
@@ -334,7 +411,7 @@ export class MCPProxy {
           };
         }
 
-        logVerdict({
+        this.logVerdict({
           phase: 'post',
           tool: name,
           outcome: postResult.outcome,

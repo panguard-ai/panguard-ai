@@ -42,6 +42,14 @@ import type {
 import { saveConfig, loadConfig } from '../config.js';
 import { redactSecrets } from '../redact.js';
 import { DashboardRelayClient, type RelayClientConfig } from './relay-client.js';
+import {
+  AuditChain,
+  getAuditKey,
+  anonymizeActorForExport,
+  type ChainedRecord,
+  type VerifyResult,
+} from '../audit/index.js';
+import type { ReportRecord } from '../agent/report-agent.js';
 
 // ESM-compatible __dirname resolution. import.meta.dirname is Node 20.11+
 // but the project's engines field already requires >=20, so fall back to
@@ -600,14 +608,24 @@ export class DashboardServer {
         break;
       case '/api/export/sarif':
         if (req.method === 'POST') {
-          this.handleSarifExport(res);
+          this.handleSarifExport(res).catch((err: unknown) => {
+            logger.error(
+              `handleSarifExport error: ${err instanceof Error ? err.message : String(err)}`
+            );
+            if (!res.headersSent) this.jsonResponse(res, { error: 'Export failed' }, 500);
+          });
         } else {
           this.jsonResponse(res, { error: 'Method not allowed' }, 405);
         }
         break;
       case '/api/export/evidence':
         if (req.method === 'POST') {
-          this.handleEvidenceExport(res);
+          this.handleEvidenceExport(res).catch((err: unknown) => {
+            logger.error(
+              `handleEvidenceExport error: ${err instanceof Error ? err.message : String(err)}`
+            );
+            if (!res.headersSent) this.jsonResponse(res, { error: 'Export failed' }, 500);
+          });
         } else {
           this.jsonResponse(res, { error: 'Method not allowed' }, 405);
         }
@@ -670,7 +688,12 @@ export class DashboardServer {
         this.handleLoadedRulesApi(res);
         break;
       case '/api/proxy-verdicts':
-        this.handleProxyVerdictsApi(res);
+        this.handleProxyVerdictsApi(res).catch((err: unknown) => {
+          logger.error(
+            `handleProxyVerdictsApi error: ${err instanceof Error ? err.message : String(err)}`
+          );
+          if (!res.headersSent) this.jsonResponse(res, { error: 'Read failed' }, 500);
+        });
         break;
       case '/api/installed-skills':
         this.handleInstalledSkillsApi(res).catch((err: unknown) => {
@@ -1004,21 +1027,77 @@ export class DashboardServer {
   }
 
   /**
+   * Resolve the durable events.jsonl path from config (falls back to the default
+   * data dir). This is the REAL on-disk log — exports read it, not the bounded
+   * in-memory recentVerdicts snapshot — which is what proves the export reflects
+   * what was actually persisted.
+   */
+  private eventsLogPath(): string {
+    const dataDir = this.getConfig?.()?.dataDir ?? join(homedir(), '.panguard-guard');
+    return join(dataDir, 'events.jsonl');
+  }
+
+  /**
+   * Read the durable events chain end-to-end and verify it.
+   *
+   * Honesty contract: this reads the on-disk events.jsonl (across rotation) via
+   * AuditChain.readAll() and verifies the hash chain. A tampered or corrupt log
+   * NEVER throws here — the caller catches and marks integrity:'TAMPERED' and
+   * still emits the document (an auditor must always get a verdict, even a bad one).
+   */
+  private async readDurableEventsVerified(): Promise<{
+    records: ReportRecord[];
+    verify: VerifyResult;
+    headSeq: number;
+    headHash: string;
+  }> {
+    const key = await getAuditKey().catch(() => undefined);
+    const chain = new AuditChain(this.eventsLogPath(), { key });
+    const chained = await chain.readAll();
+    const verify = await chain.verify();
+    const head = chain.getHead();
+    // Unwrap each chained record to its ReportRecord payload (downstream shape).
+    const records = chained
+      .map((rec) => (rec as ChainedRecord<ReportRecord>).payload)
+      .filter((p): p is ReportRecord => !!p && typeof p === 'object');
+    return { records, verify, headSeq: head.seq, headHash: head.hash };
+  }
+
+  /**
    * Real SARIF 2.1.0 export.
    * - tool.driver.rules: every ATR rule actually loaded by this Guard instance.
-   * - results: one entry per recent event whose detection produced a verdict
-   *   (status.recentVerdicts plus correlated recentEvents).
+   * - results: one entry per durable event in the on-disk events.jsonl chain.
    * - level mapping: malicious=error, suspicious=warning, benign=note.
+   * - run.properties.attestation.chain: the hash-chain verdict over the durable
+   *   log; integrity:'TAMPERED' when verification fails (still emitted).
    *
    * Compatible with GitHub Code Scanning, Microsoft Defender XDR, Sentinel,
    * and any SARIF 2.1.0 consumer.
    */
-  private handleSarifExport(res: ServerResponse): void {
+  private async handleSarifExport(res: ServerResponse): Promise<void> {
     const cfg = this.getConfig?.();
     const workspaceId = (cfg as { workspaceId?: string } | undefined)?.workspaceId ?? 'local';
     const generatedAt = new Date().toISOString();
     const rules = this.loadAtrRulesForExport();
-    const verdicts = this.status.recentVerdicts ?? [];
+
+    // Read the DURABLE on-disk events chain (not the in-memory snapshot) and
+    // verify it. Never 500 on a tampered/corrupt log — catch and mark.
+    let durable: { records: ReportRecord[]; verify: VerifyResult; headSeq: number; headHash: string };
+    try {
+      durable = await this.readDurableEventsVerified();
+    } catch (err) {
+      logger.error(
+        `SARIF export durable read failed (emitting TAMPERED): ${
+          err instanceof Error ? err.message : String(err)
+        }`
+      );
+      durable = {
+        records: [],
+        verify: { ok: false, verifiedCount: 0, firstBadIndex: -1, reason: 'empty' },
+        headSeq: -1,
+        headHash: '',
+      };
+    }
 
     const severityToLevel = (s: string): 'error' | 'warning' | 'note' | 'none' => {
       const v = s.toLowerCase();
@@ -1028,10 +1107,15 @@ export class DashboardServer {
       return 'none';
     };
 
-    const results = verdicts.map((v, idx) => {
-      const ruleMatch = (v.evidence ?? []).find((e) => e.source === 'rule_match');
-      const ruleData = ruleMatch?.data as { rule_id?: string; ruleId?: string } | undefined;
-      const ruleId = ruleData?.rule_id ?? ruleData?.ruleId ?? 'ATR-UNCLASSIFIED';
+    const results = durable.records.map((rec, idx) => {
+      const v = rec.verdict;
+      const ruleId =
+        rec.rule?.id ??
+        (() => {
+          const ruleMatch = (v.evidence ?? []).find((e) => e.source === 'rule_match');
+          const ruleData = ruleMatch?.data as { rule_id?: string; ruleId?: string } | undefined;
+          return ruleData?.rule_id ?? ruleData?.ruleId ?? 'ATR-UNCLASSIFIED';
+        })();
       return {
         ruleId,
         ruleIndex: rules.findIndex((r) => r.id === ruleId),
@@ -1045,6 +1129,9 @@ export class DashboardServer {
           recommendedAction: v.recommendedAction,
           mitreTechnique: v.mitreTechnique,
           verdictIndex: idx,
+          // Forensic attribution, username-anonymized for the exported document.
+          actor: anonymizeActorForExport(rec.actor),
+          decisionId: rec.decisionId,
         },
         locations: [
           {
@@ -1057,6 +1144,17 @@ export class DashboardServer {
         ],
       };
     });
+
+    const integrity = durable.verify.ok ? 'VERIFIED' : 'TAMPERED';
+    const attestationChain = {
+      algorithm: 'sha256-hmac',
+      verified: durable.verify.ok,
+      verifiedCount: durable.verify.verifiedCount,
+      firstBadIndex: durable.verify.firstBadIndex,
+      reason: durable.verify.reason,
+      headSeq: durable.headSeq,
+      headHash: durable.headHash,
+    };
 
     const sarif = {
       $schema: 'https://json.schemastore.org/sarif-2.1.0.json',
@@ -1099,6 +1197,8 @@ export class DashboardServer {
             rules_loaded: rules.length,
             threats_detected: this.status.threatsDetected,
             events_processed: this.status.eventsProcessed,
+            integrity,
+            attestation: { chain: attestationChain },
           },
           results,
         },
@@ -1117,27 +1217,53 @@ export class DashboardServer {
   /**
    * Real Evidence Pack export.
    * - Includes every loaded ATR rule with its severity/category for the auditor.
-   * - Includes every verdict from recentVerdicts (anonymized — no event payloads).
-   * - Computes SHA-256 of the canonical content for tamper-evidence.
-   * - Format: PanGuard evidence-pack v1.0 (proprietary JSON envelope).
+   * - Includes every verdict from the DURABLE on-disk events.jsonl chain (NOT the
+   *   bounded in-memory recentVerdicts snapshot) — verdicts are anonymized.
+   * - Embeds attestation.chain {algorithm, verified, verifiedCount, firstBadIndex,
+   *   reason, headSeq, headHash} — the hash-chain verdict over the durable log.
+   * - Sets top-level integrity:'TAMPERED' when verification fails, and STILL
+   *   emits (an auditor must always receive a verdict, even a failing one).
+   * - Also keeps the document self-SHA-256 over the canonical content.
    *
    * Suitable for SOC 2 / EU AI Act Article 15 audit submission alongside the
    * deeper enterprise PDF (panguard-enterprise/migrator/src/evidence/pdf.ts).
    */
-  private handleEvidenceExport(res: ServerResponse): void {
+  private async handleEvidenceExport(res: ServerResponse): Promise<void> {
     const cfg = this.getConfig?.();
     const workspaceId = (cfg as { workspaceId?: string } | undefined)?.workspaceId ?? 'local';
     const generatedAt = new Date().toISOString();
     const rules = this.loadAtrRulesForExport();
-    const verdicts = this.status.recentVerdicts ?? [];
+
+    // Read the DURABLE on-disk events chain and verify it. Never 500 on a
+    // tampered/corrupt log — catch and mark integrity:'TAMPERED'.
+    let durable: { records: ReportRecord[]; verify: VerifyResult; headSeq: number; headHash: string };
+    try {
+      durable = await this.readDurableEventsVerified();
+    } catch (err) {
+      logger.error(
+        `Evidence export durable read failed (emitting TAMPERED): ${
+          err instanceof Error ? err.message : String(err)
+        }`
+      );
+      durable = {
+        records: [],
+        verify: { ok: false, verifiedCount: 0, firstBadIndex: -1, reason: 'empty' },
+        headSeq: -1,
+        headHash: '',
+      };
+    }
+
+    const integrity: 'VERIFIED' | 'TAMPERED' = durable.verify.ok ? 'VERIFIED' : 'TAMPERED';
 
     const content = {
       kind: 'panguard.evidence-pack',
-      version: '1.0',
+      version: '1.1',
       workspace_id: workspaceId,
       generated_at: generatedAt,
       panguard_version: '1.5.6',
       mode: this.status.mode,
+      // Top-level integrity verdict over the durable audit log.
+      integrity,
       summary: {
         threats_total: this.status.threatsDetected,
         events_processed: this.status.eventsProcessed,
@@ -1146,6 +1272,7 @@ export class DashboardServer {
         rules_loaded: rules.length,
         uptime_ms: this.status.uptime,
         baseline_confidence: this.status.baselineConfidence,
+        durable_events: durable.records.length,
       },
       rules_loaded: rules.map((r) => ({
         id: r.id,
@@ -1153,19 +1280,33 @@ export class DashboardServer {
         severity: r.severity,
         category: r.category,
       })),
-      verdicts: verdicts.map((v, idx) => ({
+      verdicts: durable.records.map((rec, idx) => ({
         index: idx,
-        conclusion: v.conclusion,
-        confidence: v.confidence,
-        reasoning: v.reasoning,
-        recommendedAction: v.recommendedAction,
-        mitreTechnique: v.mitreTechnique,
-        evidence_sources: (v.evidence ?? []).map((e) => e.source),
+        conclusion: rec.verdict.conclusion,
+        confidence: rec.verdict.confidence,
+        reasoning: rec.verdict.reasoning,
+        recommendedAction: rec.verdict.recommendedAction,
+        mitreTechnique: rec.verdict.mitreTechnique,
+        evidence_sources: (rec.verdict.evidence ?? []).map((e) => e.source),
+        rule: rec.rule,
+        decisionId: rec.decisionId,
+        // Username-anonymized actor — never leak OS usernames into the auditor doc.
+        actor: anonymizeActorForExport(rec.actor),
       })),
       attestation: {
         method: 'sha256',
         note: 'SHA-256 below is over the canonical JSON of this document with this field set to null. Verify by recomputing the hash with attestation.sha256 = null and comparing.',
         sha256: '',
+        // Hash-chain attestation over the durable on-disk events log.
+        chain: {
+          algorithm: 'sha256-hmac',
+          verified: durable.verify.ok,
+          verifiedCount: durable.verify.verifiedCount,
+          firstBadIndex: durable.verify.firstBadIndex,
+          reason: durable.verify.reason,
+          headSeq: durable.headSeq,
+          headHash: durable.headHash,
+        },
       },
     };
 
@@ -1549,31 +1690,45 @@ export class DashboardServer {
     }
   }
 
-  private handleProxyVerdictsApi(res: ServerResponse): void {
+  private async handleProxyVerdictsApi(res: ServerResponse): Promise<void> {
     const verdictLog = join(homedir(), '.panguard-guard', 'proxy-verdicts.jsonl');
     if (!existsSync(verdictLog)) {
-      this.jsonResponse(res, { verdicts: [], total: 0 });
+      this.jsonResponse(res, { verdicts: [], total: 0, verified: true, firstBadIndex: -1 });
       return;
     }
 
     try {
-      const raw = readFileSync(verdictLog, 'utf-8');
-      const lines = raw.trim().split('\n').filter(Boolean);
-      // Return last 50 verdicts, newest first
-      const verdicts = lines
+      const key = await getAuditKey().catch(() => undefined);
+      const chain = new AuditChain(verdictLog, { key });
+      const records = await chain.readAll();
+      const verify = await chain.verify();
+      // Unwrap the chain envelope to the original verdict payload, newest first.
+      const verdicts = records
         .slice(-50)
         .reverse()
-        .map((line) => {
-          try {
-            return JSON.parse(line);
-          } catch {
-            return null;
-          }
-        })
-        .filter(Boolean);
-      this.jsonResponse(res, { verdicts, total: lines.length });
-    } catch {
-      this.jsonResponse(res, { verdicts: [], total: 0 });
+        .map((rec) => {
+          const payload = (rec as ChainedRecord<Record<string, unknown>>).payload;
+          return payload ?? rec; // legacy lines have no .payload
+        });
+      this.jsonResponse(res, {
+        verdicts,
+        total: records.length,
+        verified: verify.ok,
+        firstBadIndex: verify.firstBadIndex,
+        reason: verify.reason,
+      });
+    } catch (err) {
+      // Never 500 on a tampered/corrupt log — report the failure honestly.
+      logger.error(
+        `Proxy verdicts read failed: ${err instanceof Error ? err.message : String(err)}`
+      );
+      this.jsonResponse(res, {
+        verdicts: [],
+        total: 0,
+        verified: false,
+        firstBadIndex: -1,
+        reason: 'empty',
+      });
     }
   }
 

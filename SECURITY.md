@@ -133,10 +133,79 @@ ATR rules are open-source YAML detection rules for AI agent threats.
 - **Verification**: All rules are YAML files with regex patterns -- no executable code
 - **Custom rules**: Users can add their own rules to `~/.panguard-guard/atr-rules/`
 
+## Tamper-Evident Audit Log / 防竄改稽核日誌
+
+PanGuard Guard writes its durable security logs (`~/.panguard-guard/events.jsonl`,
+`proxy-verdicts.jsonl`, `action-manifest.jsonl`) as an append-only **hash chain**.
+Each record is linked to its predecessor by a SHA-256 hash and signed with a
+per-machine HMAC key, so any edit, deletion, reorder, insertion, or tail
+truncation breaks the chain and is detectable.
+
+PanGuard Guard 的持久化安全日誌以 append-only **雜湊鏈** 寫入。每筆記錄以 SHA-256
+與前一筆相連，並用每台機器的 HMAC 金鑰簽章，因此任何修改、刪除、重排、插入或尾端
+截斷都會破壞鏈，可被偵測。
+
+### Scope: tamper-EVIDENCE, not tamper-PREVENTION / 範圍：防竄改「證據」非「防止」
+
+This feature makes tampering **detectable**, not **impossible**. The HMAC key is
+stored keychain-first, with a same-user-readable file fallback
+(`~/.panguard/audit-key`, mode 0600). An attacker who already has read access to
+the key **as the same OS user** can recompute a consistent chain — so we never
+claim the log is "immutable". What we guarantee:
+
+- Verification (`AuditChain.verify()`) reports `ok`, `verifiedCount`,
+  `firstBadIndex`, and a machine-readable `reason`
+  (`hash-break` / `seq-gap` / `bad-hmac` / `truncated` / `empty` /
+  `unchained-legacy`).
+- Exports (SARIF + Evidence Pack) read the **durable on-disk log** — not an
+  in-memory snapshot — and embed `attestation.chain`. If verification fails the
+  document is marked `integrity: "TAMPERED"` and **still emitted** (an auditor
+  always receives a verdict).
+- Audit-WRITE failures are deliberately **fail-open**: a broken audit file logs
+  loudly to stderr but never bricks a tool call or the daemon.
+
+本功能讓竄改**可被偵測**，而非**不可能**。HMAC 金鑰以 keychain 優先，並有同一使用者可
+讀的檔案後援（`~/.panguard/audit-key`，權限 0600）。**以相同作業系統使用者身分**已能讀取
+金鑰的攻擊者可以重算出一致的鏈 — 因此我們從不宣稱日誌「不可變」。
+
+### Privacy / 隱私
+
+The **local** durable log keeps full forensic attribution
+(`actor.user` / `host` / `pid` / agent `sessionId` / `agentId`). The **exported**
+auditor document **anonymizes the OS username** (replaced by a salted hash) so a
+forwarded document never leaks real usernames.
+
+本機持久化日誌保留完整鑑識歸屬；對外匯出的稽核文件會將作業系統使用者名稱匿名化（以加鹽
+雜湊取代），避免洩漏真實使用者名稱。
+
+### Closing the same-user gap: remote anchoring (enterprise) / 補足同一使用者缺口：遠端錨定（企業版）
+
+The same-user-key limit is closed by **remote anchoring**: periodically publishing
+the chain head (`getHead()` → `{ seq, hash }`) to an external authority
+(PanGuard Threat Cloud). Once a head is anchored remotely, an attacker can no
+longer silently rewrite history up to that point, because the local chain must
+still match the remotely-pinned head. `AuditChain` exposes a no-op anchor seam
+(`getHead()` + an optional `anchor` hook) for this upgrade; the community build
+ships the local-only chain.
+
+同一使用者金鑰的限制由**遠端錨定**補足：定期將鏈頭發佈到外部權威（PanGuard Threat
+Cloud）。`AuditChain` 提供無操作的錨定接縫（`getHead()` + 選用的 `anchor` hook）作為此升級
+的接點；社群版只內建本機鏈。
+
+### Verifying an export yourself / 自行驗證匯出
+
+The Evidence Pack's `attestation.chain.headHash` is the SHA-256 of the last
+durable record. Re-running Guard's verification over the same on-disk log
+reproduces the `verified` / `firstBadIndex` verdict; a mismatch means the log was
+altered after it was written.
+
 ## Known Limitations / 已知限制
 
 - CSP uses `unsafe-inline` for script-src due to Next.js JSON-LD requirements
 - Website rate limiting is per-instance on serverless (Vercel WAF recommended for production)
+- Audit log is tamper-EVIDENT, not tamper-PROOF: a same-user attacker who reads
+  the local HMAC key can recompute a consistent chain (closed by enterprise
+  remote anchoring — see "Tamper-Evident Audit Log" above)
 
 ## License / 授權
 
