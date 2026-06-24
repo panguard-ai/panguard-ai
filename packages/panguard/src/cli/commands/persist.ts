@@ -16,8 +16,15 @@ import { join, dirname } from 'node:path';
 import { homedir, platform } from 'node:os';
 import { execFile } from 'node:child_process';
 
-/** launchd label — matches the proven installed service so installs are idempotent. */
-const SERVICE_LABEL = 'com.panguard.panguard-guard';
+/**
+ * launchd label — matches the proven installed service so installs are idempotent.
+ * Exported as the SINGLE SOURCE OF TRUTH for the plist name: doctor / self-removal
+ * checks must derive the path from this, never hard-code it (a drift = a service
+ * health check that reads the wrong file and always reports "not installed").
+ */
+export const SERVICE_LABEL = 'com.panguard.panguard-guard';
+/** The LaunchAgent plist basename derived from the label. */
+export const SERVICE_PLIST_BASENAME = `${SERVICE_LABEL}.plist`;
 const DATA_DIR = join(homedir(), '.panguard-guard');
 
 function plistPath(): string {
