@@ -17,6 +17,23 @@ const _pkg = _require('../package.json') as { version: string };
 export const PANGUARD_GUARD_VERSION: string = _pkg.version;
 export const CLAWGUARD_NAME = 'PanguardGuard';
 
+// S5: config-integrity + self-removal detection API (consumed by `pga doctor`).
+export {
+  verifyConfigIntegrity,
+  checkSelfState,
+  sealConfigManifest,
+  manifestPath,
+  wasInitialized,
+} from './integrity.js';
+export type {
+  IntegrityVerdict,
+  IntegrityFinding,
+  SelfStateVerdict,
+  SelfStateFinding,
+  SelfStateRef,
+  IntegrityStatus,
+} from './integrity.js';
+
 // Types / 型別
 export type {
   InvestigationTool,
