@@ -16,6 +16,7 @@ import { execFileSync } from 'node:child_process';
 import { c, symbols, box, header } from '@panguard-ai/core';
 import { PANGUARD_VERSION } from '../../index.js';
 import { readHookProtectionStatus } from './hook.js';
+import { SERVICE_PLIST_BASENAME } from './persist.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -46,7 +47,9 @@ const GUARD_DIR = join(HOME, '.panguard-guard');
 const GUARD_CONFIG_PATH = join(GUARD_DIR, 'config.json');
 const LAST_SCAN_PATH = join(PANGUARD_DIR, 'last-scan.json');
 const GUARD_PID_PATH = join(GUARD_DIR, 'panguard-guard.pid');
-const LAUNCHD_PLIST_PATH = join(HOME, 'Library', 'LaunchAgents', 'ai.panguard.guard.plist');
+// Derive from persist.ts's single source of truth — a hard-coded name here drifts
+// from what `pga up` actually installs and makes the service check always fail.
+const LAUNCHD_PLIST_PATH = join(HOME, 'Library', 'LaunchAgents', SERVICE_PLIST_BASENAME);
 const ZSH_COMPLETIONS_PATH = join(HOME, '.zsh', 'completions', '_panguard');
 
 // ---------------------------------------------------------------------------
