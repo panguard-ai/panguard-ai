@@ -126,7 +126,7 @@ export function configCommand(): Command {
       }) => {
         console.log(banner(PANGUARD_VERSION));
         console.log(
-          `  ${c.dim('Note: detection is deterministic by default (ATR rules + heuristics). The OPTIONAL advisory semantic layer can flag findings for review but never auto-blocks. This build never stores a cloud API key on disk.')}`
+          `  ${c.dim('Note: detection is deterministic by default (ATR rules + heuristics). The OPTIONAL advisory semantic layer can flag findings for review but never auto-blocks. To CONNECT a cloud key use "pga guard ai" (stores it encrypted, 0600); this command sets provider/model + local Ollama options only.')}`
         );
         console.log('');
 
@@ -180,12 +180,13 @@ export function configCommand(): Command {
           return;
         }
 
-        // Cloud providers: never collect or persist a key. The semantic layer
-        // reads the key only from the environment (see llm-detect.ts). Tell the
-        // user which env var to set instead of writing a plaintext secret.
+        // Cloud providers: the canonical connect path is `pga guard ai`, which
+        // stores the key encrypted (AES-256-GCM, 0600) so the launchd/systemd
+        // daemon can read it. This command does not collect a secret; point the
+        // user at the real command, with the env-var route as the alternative.
         if (options.provider !== 'ollama') {
           console.log(
-            `  ${c.dim(`Panguard does not store a cloud API key. Provider '${options.provider}' reads its key from the environment:`)}`
+            `  ${c.dim(`To connect a '${options.provider}' key, run "pga guard ai" (stores it encrypted, 0600). Or set it as an environment variable yourself:`)}`
           );
           printCloudKeyGuidance();
           return;

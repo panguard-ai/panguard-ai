@@ -147,6 +147,18 @@ function computeSkillHash(skillDir: string): string {
   return contentHash(content);
 }
 
+/**
+ * Privacy-safe skill name for Threat Cloud submission. A manifest name is one the
+ * skill author chose to publish, so it is safe to share. The on-disk basename can
+ * embed a repo / client / project / username, so when there is no manifest name we
+ * send a short non-reversible label instead of leaking the local path.
+ */
+function safeSkillName(manifestName: string | undefined, resolvedPath: string): string {
+  const trimmed = manifestName?.trim();
+  if (trimmed) return trimmed.slice(0, 64);
+  return `skill-${contentHash(path.basename(resolvedPath)).slice(0, 12)}`;
+}
+
 export function auditCommand(): Command {
   const cmd = new Command('audit').description('Audit security of OpenClaw skills');
 
@@ -456,7 +468,7 @@ export function auditCommand(): Command {
         // ── Report to Threat Cloud (flywheel) — OPT-IN upload only ──
         if (cloudUploadAllowed && report.riskScore > 0) {
           const skillHash = computeSkillHash(resolvedPath);
-          const skillName = report.manifest?.name ?? path.basename(resolvedPath);
+          const skillName = safeSkillName(report.manifest?.name, resolvedPath);
 
           const submission = {
             skillHash,
@@ -517,7 +529,7 @@ export function auditCommand(): Command {
               '.panguard-guard'
             );
             const tc = await ThreatCloudClient.create(options.tcEndpoint, dataDir);
-            const skillName = report.manifest?.name ?? path.basename(resolvedPath);
+            const skillName = safeSkillName(report.manifest?.name, resolvedPath);
 
             const highFindings = report.findings
               .filter((f) => f.severity === 'critical' || f.severity === 'high')
@@ -624,7 +636,7 @@ response:
                 event_type: 'cli_scan',
                 source: 'cli-user',
                 metadata: {
-                  skill: report.manifest?.name ?? path.basename(resolvedPath),
+                  skill: safeSkillName(report.manifest?.name, resolvedPath),
                   risk: report.riskLevel,
                   score: report.riskScore,
                   remote: !!remoteSource,

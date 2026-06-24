@@ -1521,9 +1521,9 @@
                 <div class="welcome-step-h">Join collective defense</div>
                 <div class="welcome-step-b">
                   Optionally let the attacks Guard blocks here help draft new open rules for everyone —
-                  and get the community's new rules back sooner. Shares only a rule ID and a one-way
-                  hash; <strong>never your prompts, code, files, keys, IP, or hostname</strong>. Off
-                  until you turn it on.
+                  and get the community's new rules back sooner. Shares only the matched rule ID(s),
+                  attack category, a coarse region, and a truncated IP; <strong>never your prompts,
+                  code, files, secrets, paths, or hostname</strong>. Off until you turn it on.
                 </div>
                 <button type="button" class="btn btn-secondary btn-sm" data-goto="tcloud">
                   Open Threat Cloud &rarr;
@@ -2104,9 +2104,9 @@
               <div class="cd-box">
                 <div class="cd-box-title">What is shared (and what is never shared)</div>
                 <ul class="cd-list">
-                  <li>Shared: the matched rule ID, a one-way hash of the payload, and the source type.</li>
-                  <li>Never shared: your prompts, code, file contents, keys, IP address, or hostname.</li>
-                  <li>A random install ID only — raw samples never leave this machine.</li>
+                  <li>Shared: the matched rule ID(s), attack category + MITRE technique, a coarse country region, and a truncated IP (last two octets zeroed).</li>
+                  <li>Never shared: your prompts, code, file contents, secrets, file paths, hostname, or username.</li>
+                  <li>A stable random install ID links your own submissions (pseudonymous) — raw samples never leave this machine.</li>
                 </ul>
               </div>
             </div>
@@ -3790,10 +3790,10 @@
         if (!isOn) {
           var ok = window.confirm(
             'Turn on collective defense?\n\n' +
-              'When Guard blocks an attack on this machine, it will share an anonymized signature ' +
-              '(the matched rule ID + a one-way hash of the payload + the source type) with the ATR ' +
-              'network.\n\nNever shared: your prompts, code, file contents, keys, IP address, or ' +
-              'hostname.\n\nYou can turn this off anytime.'
+              'When Guard blocks an attack on this machine, it will share a minimal signature ' +
+              '(the matched rule ID + attack category + a coarse region + a truncated IP) with the ATR ' +
+              'network.\n\nNever shared: your prompts, code, file contents, secrets, file paths, ' +
+              'hostname, or username.\n\nYou can turn this off anytime.'
           );
           if (!ok) return;
         }
