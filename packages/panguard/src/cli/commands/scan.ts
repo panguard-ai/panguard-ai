@@ -356,6 +356,7 @@ export function scanCommand(): Command {
             } else {
               // Strip ANSI color codes BEFORE reading the count: the colored number itself
               // contains ANSI digits (e.g. [32m) that would otherwise be misread as the count.
+              // eslint-disable-next-line no-control-regex -- ESC byte is intentional for ANSI stripping
               const plain = out.replace(/\u001b\[[0-9;]*m/g, '');
               const m = plain.match(/Threats found:\s*(\d+)/i);
               if (m && m[1]) threats = parseInt(m[1], 10);
