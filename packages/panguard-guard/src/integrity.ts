@@ -217,7 +217,12 @@ export function verifyConfigIntegrity(
       const was = sealed[f];
       const now = config[f];
       if (canonical(was) !== canonical(now)) {
-        findings.push({ field: f, was, now, severity: CRITICAL_FIELDS.has(f) ? 'critical' : 'warn' });
+        findings.push({
+          field: f,
+          was,
+          now,
+          severity: CRITICAL_FIELDS.has(f) ? 'critical' : 'warn',
+        });
       }
     }
     return { status: 'tampered', findings, checkedAt };

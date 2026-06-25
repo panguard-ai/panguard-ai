@@ -141,7 +141,10 @@ function markConsentAnswered(): void {
     if (!existsSync(dir)) {
       mkdirSync(dir, { recursive: true, mode: 0o700 });
     }
-    writeFileSync(consentMarkerPath(), new Date().toISOString(), { encoding: 'utf-8', mode: 0o600 });
+    writeFileSync(consentMarkerPath(), new Date().toISOString(), {
+      encoding: 'utf-8',
+      mode: 0o600,
+    });
   } catch {
     /* best effort — if we can't write the marker, the CLI re-asks next run */
   }
@@ -590,10 +593,7 @@ export class DashboardServer {
       if (req.method && req.method !== 'GET' && req.method !== 'HEAD') {
         if (!usedHeaderToken) {
           const origin = req.headers.origin;
-          const allowedOrigins = [
-            `http://127.0.0.1:${this.port}`,
-            `http://localhost:${this.port}`,
-          ];
+          const allowedOrigins = [`http://127.0.0.1:${this.port}`, `http://localhost:${this.port}`];
           if (!origin || !allowedOrigins.includes(origin)) {
             res.writeHead(403, { 'Content-Type': 'application/json' });
             res.end(
@@ -942,7 +942,11 @@ export class DashboardServer {
         const dataDir = cfg.dataDir ?? join(homedir(), '.panguard-guard');
         const v = verifyConfigIntegrity(cfg as unknown as Record<string, unknown>, dataDir);
         const self = checkSelfState(dataDir);
-        integrity = { status: v.status, changedFields: v.findings.length, selfRemoval: self.findings.length };
+        integrity = {
+          status: v.status,
+          changedFields: v.findings.length,
+          selfRemoval: self.findings.length,
+        };
         if (v.status === 'tampered' || v.status === 'manifest-tampered' || !self.ok) {
           posture = 'tampered';
         }
@@ -1107,7 +1111,12 @@ export class DashboardServer {
 
     // Read the DURABLE on-disk events chain (not the in-memory snapshot) and
     // verify it. Never 500 on a tampered/corrupt log — catch and mark.
-    let durable: { records: ReportRecord[]; verify: VerifyResult; headSeq: number; headHash: string };
+    let durable: {
+      records: ReportRecord[];
+      verify: VerifyResult;
+      headSeq: number;
+      headHash: string;
+    };
     try {
       durable = await this.readDurableEventsVerified();
     } catch (err) {
@@ -1261,7 +1270,12 @@ export class DashboardServer {
 
     // Read the DURABLE on-disk events chain and verify it. Never 500 on a
     // tampered/corrupt log — catch and mark integrity:'TAMPERED'.
-    let durable: { records: ReportRecord[]; verify: VerifyResult; headSeq: number; headHash: string };
+    let durable: {
+      records: ReportRecord[];
+      verify: VerifyResult;
+      headSeq: number;
+      headHash: string;
+    };
     try {
       durable = await this.readDurableEventsVerified();
     } catch (err) {
@@ -1621,10 +1635,7 @@ export class DashboardServer {
           mode?: string;
         };
 
-        if (
-          update.consentGiven !== undefined &&
-          typeof update.consentGiven !== 'boolean'
-        ) {
+        if (update.consentGiven !== undefined && typeof update.consentGiven !== 'boolean') {
           this.jsonResponse(res, { error: 'consentGiven must be a boolean' }, 400);
           return;
         }
@@ -1659,10 +1670,7 @@ export class DashboardServer {
         // to protection. Re-reading disk makes saves compose instead of fight.
         // Falls back to the live config when no file exists yet (fresh install).
         const live = this.getConfig!();
-        const configPath = join(
-          live.dataDir ?? join(homedir(), '.panguard-guard'),
-          'config.json'
-        );
+        const configPath = join(live.dataDir ?? join(homedir(), '.panguard-guard'), 'config.json');
         const config: GuardConfig = existsSync(configPath) ? loadConfig(configPath) : live;
         // consentGiven is the single collective-defense answer: it drives BOTH
         // flags so they can never drift apart (the CLI gate reads both). A plain
@@ -1675,8 +1683,7 @@ export class DashboardServer {
           threatCloudUploadEnabled: sharingEnabled,
           // Keep the deprecated telemetryEnabled flag in lockstep — the CLI
           // upload gate and consent module both read it.
-          telemetryEnabled:
-            update.consentGiven ?? update.uploadEnabled ?? config.telemetryEnabled,
+          telemetryEnabled: update.consentGiven ?? update.uploadEnabled ?? config.telemetryEnabled,
           threatCloudEndpoint: update.endpoint ?? config.threatCloudEndpoint,
           mode: (update.mode as GuardConfig['mode']) ?? config.mode,
         };

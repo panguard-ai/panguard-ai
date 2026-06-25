@@ -140,7 +140,10 @@ const BENCHMARKS: Benchmark[] = [
     results: [
       { label: 'Recall (v3.5.0)', value: `${STATS.benchmark.hackaprompt.recall}%` },
       { label: 'Precision', value: `${STATS.benchmark.hackaprompt.precision}%` },
-      { label: 'Sample size', value: `${STATS.benchmark.hackaprompt.samples.toLocaleString()} deterministic` },
+      {
+        label: 'Sample size',
+        value: `${STATS.benchmark.hackaprompt.samples.toLocaleString()} deterministic`,
+      },
       { label: 'v2.1.2 baseline', value: '29.5%' },
     ],
     reproduce: 'pnpm bench:hackaprompt',

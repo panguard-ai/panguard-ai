@@ -211,9 +211,7 @@ export function scanCommand(): Command {
               const n = countAtrThreats(result.toString());
               if (n > 0) {
                 threats++;
-                console.log(
-                  `  ${c.critical('!!')} ${c.bold(skill.name)} — ${n} finding(s)`
-                );
+                console.log(`  ${c.critical('!!')} ${c.bold(skill.name)} — ${n} finding(s)`);
               } else {
                 clean++;
               }

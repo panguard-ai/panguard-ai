@@ -168,7 +168,10 @@ export default function HowItWorksContent() {
               <div className="grid sm:grid-cols-2 gap-4 mt-4">
                 {(t.raw('ruleEngine.paths') as Array<{ name: string; desc: string }>).map(
                   (path, i) => (
-                    <div key={path.name} className="bg-surface-2 rounded-lg border border-border p-4">
+                    <div
+                      key={path.name}
+                      className="bg-surface-2 rounded-lg border border-border p-4"
+                    >
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-bold text-brand-sage tabular-nums">{`0${i + 1}`}</span>
                         <p className="text-sm font-semibold text-text-primary">{path.name}</p>
@@ -177,7 +180,7 @@ export default function HowItWorksContent() {
                         {path.desc}
                       </p>
                     </div>
-                  ),
+                  )
                 )}
               </div>
             </div>

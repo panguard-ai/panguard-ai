@@ -65,7 +65,9 @@ export function newDecisionId(): string {
  * and never leak a real OS username into a forwarded document. Host/pid/agent
  * are retained (operationally useful, not personally identifying in the same way).
  */
-export function anonymizeActorForExport(actor: Actor | undefined): Record<string, unknown> | undefined {
+export function anonymizeActorForExport(
+  actor: Actor | undefined
+): Record<string, unknown> | undefined {
   if (!actor) return undefined;
   return {
     user_hash: hashUser(actor.user),

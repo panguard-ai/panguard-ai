@@ -8,14 +8,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createServer } from 'node:http';
-import {
-  mkdtempSync,
-  rmSync,
-  readFileSync,
-  writeFileSync,
-  existsSync,
-  statSync,
-} from 'node:fs';
+import { mkdtempSync, rmSync, readFileSync, writeFileSync, existsSync, statSync } from 'node:fs';
 import { tmpdir, homedir } from 'node:os';
 import { join } from 'node:path';
 import { DashboardServer } from '../src/dashboard/index.js';
@@ -70,9 +63,7 @@ function makeVerdict(conclusion: ThreatVerdict['conclusion'], ruleId: string): T
     conclusion,
     confidence: 90,
     reasoning: `detected ${conclusion}`,
-    evidence: [
-      { source: 'rule_match', description: 'matched', confidence: 90, data: { ruleId } },
-    ],
+    evidence: [{ source: 'rule_match', description: 'matched', confidence: 90, data: { ruleId } }],
     recommendedAction: 'block_tool',
   };
 }
@@ -89,7 +80,12 @@ function makeReportRecord(ruleId: string, msg: string): ReportRecord {
       metadata: {},
     } as ReportRecord['event'],
     verdict: makeVerdict('malicious', ruleId),
-    response: { action: 'block_tool', success: true, details: '', timestamp: new Date().toISOString() },
+    response: {
+      action: 'block_tool',
+      success: true,
+      details: '',
+      timestamp: new Date().toISOString(),
+    },
     timestamp: new Date().toISOString(),
     actor: buildActor(),
     decisionId: newDecisionId(),
@@ -218,7 +214,9 @@ describe('Export honesty — reads the durable log and proves it', () => {
     const res = await authed('/api/export/sarif');
     expect(res.status).toBe(200);
     const sarif = (await res.json()) as {
-      runs: Array<{ properties: { integrity?: string; attestation?: { chain?: { verified?: boolean } } } }>;
+      runs: Array<{
+        properties: { integrity?: string; attestation?: { chain?: { verified?: boolean } } };
+      }>;
     };
     expect(sarif.runs[0]!.properties.integrity).toBe('VERIFIED');
     expect(sarif.runs[0]!.properties.attestation?.chain?.verified).toBe(true);
@@ -234,7 +232,11 @@ describe('Export honesty — reads the durable log and proves it', () => {
 
 describe('Attribution — proxy/report records carry forensic actor', () => {
   it('buildActor includes user/host/pid and (when given) real agent identity', () => {
-    const actor = buildActor({ platform: 'mcp-proxy', sessionId: 'sess-real', agentId: 'agent-real' });
+    const actor = buildActor({
+      platform: 'mcp-proxy',
+      sessionId: 'sess-real',
+      agentId: 'agent-real',
+    });
     expect(typeof actor.user).toBe('string');
     expect(actor.user.length).toBeGreaterThan(0);
     expect(typeof actor.host).toBe('string');

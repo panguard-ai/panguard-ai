@@ -127,7 +127,9 @@ async function commandSetup(args: string[]): Promise<void> {
           ? '請透過環境變數提供 Telegram bot token(避免出現在程序清單中):'
           : 'Provide the Telegram bot token via environment variable (keeps it out of the process list):'
       );
-      console.log('  PANGUARD_TELEGRAM_TOKEN=<token> panguard-chat setup --channel telegram --chat-id <id>');
+      console.log(
+        '  PANGUARD_TELEGRAM_TOKEN=<token> panguard-chat setup --channel telegram --chat-id <id>'
+      );
     }
 
     const channels: ChatConfig['channels'] = {

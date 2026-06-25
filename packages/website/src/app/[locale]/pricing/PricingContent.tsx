@@ -941,7 +941,7 @@ export default function PricingContent() {
                 <p className="text-sm text-text-secondary leading-[1.85] flex-1">
                   {isZh
                     ? '由國家紅隊以自有對抗樣本，對 ATR 全部規則進行完整測試。我們提供偵測引擎、Migrator 工具與完整的失敗案例揭露。'
-                    : "The national red team runs its own adversarial corpus against the full ATR rule set. We provide the detection engine, Migrator tooling, and full failure-case disclosure."}
+                    : 'The national red team runs its own adversarial corpus against the full ATR rule set. We provide the detection engine, Migrator tooling, and full failure-case disclosure.'}
                 </p>
                 <p className="text-xs text-text-muted leading-[1.85] mt-3">
                   {isZh

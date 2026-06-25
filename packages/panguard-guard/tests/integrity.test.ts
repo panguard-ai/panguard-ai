@@ -70,7 +70,10 @@ describe('config integrity — seal/verify', () => {
     for (const [field, cfg] of cases) {
       const v = verifyConfigIntegrity(cfg, dir);
       expect(v.status, field).toBe('tampered');
-      expect(v.findings.some((x) => x.field === field), field).toBe(true);
+      expect(
+        v.findings.some((x) => x.field === field),
+        field
+      ).toBe(true);
     }
   });
 
@@ -125,7 +128,11 @@ describe('self-removal detection', () => {
   it('ADVERSARIAL: hook entry stripped from settings (marker gone) → marker-gone finding', () => {
     const settings = join(dir, 'settings.json');
     writeFileSync(settings, '{"hooks":{"PreToolUse":[{"command":"pga hook run"}]}}');
-    sealConfigManifest(baseConfig(), [{ kind: 'hook', path: settings, marker: 'pga hook run' }], dir);
+    sealConfigManifest(
+      baseConfig(),
+      [{ kind: 'hook', path: settings, marker: 'pga hook run' }],
+      dir
+    );
     writeFileSync(settings, '{"hooks":{}}'); // attacker removed our hook but kept the file
     const v = checkSelfState(dir);
     expect(v.ok).toBe(false);

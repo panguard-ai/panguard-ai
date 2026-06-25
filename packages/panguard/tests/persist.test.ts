@@ -12,7 +12,11 @@ import { describe, it, expect } from 'vitest';
 import { buildGuardPlist } from '../src/cli/commands/persist.js';
 
 describe('buildGuardPlist — matches the proven launchd service contract', () => {
-  const plist = buildGuardPlist('/usr/local/bin/node', '/opt/homebrew/lib/node_modules/@panguard-ai/panguard/bin/panguard.cjs', '/Users/x/.panguard-guard');
+  const plist = buildGuardPlist(
+    '/usr/local/bin/node',
+    '/opt/homebrew/lib/node_modules/@panguard-ai/panguard/bin/panguard.cjs',
+    '/Users/x/.panguard-guard'
+  );
 
   it('runs the proven command: <node> <script> guard --watch', () => {
     expect(plist).toContain('<string>/usr/local/bin/node</string>');
