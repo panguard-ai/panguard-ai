@@ -113,8 +113,7 @@ export class MCPProxy {
       config.failMode ??
       (envFailMode === 'open' || envFailMode === 'closed' ? envFailMode : 'closed');
     this.evalTimeout = config.evalTimeout ?? 5000;
-    this.sessionId =
-      config.sessionId ?? `mcp-proxy-${process.pid}-${Date.now().toString(36)}`;
+    this.sessionId = config.sessionId ?? `mcp-proxy-${process.pid}-${Date.now().toString(36)}`;
     this.agentId = config.agentId ?? process.env['PANGUARD_AGENT_ID'] ?? 'mcp-agent';
     // Sync sub-ms pre-check. Runs in front of the async evaluator so the worst
     // payloads (and any session the brain flags) are blocked instantly — and,
@@ -376,9 +375,7 @@ export class MCPProxy {
       // on stderr so a flagged-but-not-denied call is never silent (the journal
       // entry above is easy to miss). Semantics are unchanged: logged + forwarded.
       if (preResult.outcome === 'ask') {
-        process.stderr.write(
-          `[panguard-proxy] FLAGGED (ask): ${name} — ${preResult.reason}\n`
-        );
+        process.stderr.write(`[panguard-proxy] FLAGGED (ask): ${name} — ${preResult.reason}\n`);
       }
 
       // Forward to upstream

@@ -165,7 +165,9 @@ export function configCommand(): Command {
           console.log(`    ${c.dim('$')} pga config llm --provider claude`);
           console.log(`    ${c.dim('$')} pga config llm --provider openai`);
           console.log(`    ${c.dim('$')} pga config llm --provider ollama`);
-          console.log(`    ${c.dim('$')} pga config llm --provider ollama --endpoint http://gpu:11434`);
+          console.log(
+            `    ${c.dim('$')} pga config llm --provider ollama --endpoint http://gpu:11434`
+          );
           console.log('');
           console.log(`    ${c.dim('$')} pga config llm --show`);
           console.log(`    ${c.dim('$')} pga config llm --clear`);

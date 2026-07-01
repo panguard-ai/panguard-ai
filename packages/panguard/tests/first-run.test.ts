@@ -59,11 +59,10 @@ describe('first-run detection', () => {
       mockExistsSync.mockReturnValue(false);
       markInitialized();
       expect(mockMkdirSync).toHaveBeenCalledWith(DIR, { recursive: true, mode: 0o700 });
-      expect(mockWriteFileSync).toHaveBeenCalledWith(
-        MARKER,
-        expect.any(String),
-        { encoding: 'utf-8', mode: 0o600 }
-      );
+      expect(mockWriteFileSync).toHaveBeenCalledWith(MARKER, expect.any(String), {
+        encoding: 'utf-8',
+        mode: 0o600,
+      });
     });
 
     it('is idempotent — does not rewrite when the marker already exists', () => {

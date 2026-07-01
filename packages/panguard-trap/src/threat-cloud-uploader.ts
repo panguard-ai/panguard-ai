@@ -57,7 +57,12 @@ function isPrivateOrReservedHost(hostname: string): boolean {
   if (host.includes(':')) {
     if (host === '::1' || host === '::') return true;
     if (host.startsWith('fc') || host.startsWith('fd')) return true;
-    if (host.startsWith('fe8') || host.startsWith('fe9') || host.startsWith('fea') || host.startsWith('feb')) {
+    if (
+      host.startsWith('fe8') ||
+      host.startsWith('fe9') ||
+      host.startsWith('fea') ||
+      host.startsWith('feb')
+    ) {
       return true;
     }
     return false;

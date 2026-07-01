@@ -144,7 +144,7 @@ describe('MCPProxy fail-mode (security-first default)', () => {
 });
 
 describe("MCPProxy 'ask' verdict (logged-and-forwarded, never silent)", () => {
-  it("writes a loud FLAGGED (ask) line and still forwards the call", async () => {
+  it('writes a loud FLAGGED (ask) line and still forwards the call', async () => {
     const lines: string[] = [];
     const orig = process.stderr.write.bind(process.stderr);
     // Capture stderr for the duration of this call.

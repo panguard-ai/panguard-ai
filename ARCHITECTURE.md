@@ -270,24 +270,24 @@ Vercel deployment. Next.js 14 with ISR. Bilingual (EN + zh-TW).
 
 ## Package Inventory
 
-| Package                | npm Name                            | Version | Maturity | Description                                            |
-| ---------------------- | ----------------------------------- | ------- | -------- | ------------------------------------------------------ |
-| core                   | @panguard-ai/core                   | 0.3.3   | GA       | Shared foundation: rules, AI, monitor, discovery, i18n |
-| panguard               | @panguard-ai/panguard               | 0.3.3   | GA       | Unified CLI with 22 commands                           |
+| Package                | npm Name                            | Version | Maturity | Description                                              |
+| ---------------------- | ----------------------------------- | ------- | -------- | -------------------------------------------------------- |
+| core                   | @panguard-ai/core                   | 0.3.3   | GA       | Shared foundation: rules, AI, monitor, discovery, i18n   |
+| panguard               | @panguard-ai/panguard               | 0.3.3   | GA       | Unified CLI with 22 commands                             |
 | atr                    | agent-threat-rules                  | 3.5.0   | RFC      | Open detection standard for AI agent threats (652 rules) |
-| panguard-scan          | @panguard-ai/panguard-scan          | 0.2.0   | GA       | 60-second security scanning                            |
-| panguard-guard         | @panguard-ai/panguard-guard         | 0.2.0   | GA       | Real-time monitoring, 4-agent pipeline                 |
-| panguard-chat          | @panguard-ai/panguard-chat          | 0.2.0   | GA       | 6-channel notification system                          |
-| panguard-trap          | @panguard-ai/panguard-trap          | 0.2.0   | GA       | 8 honeypot service types                               |
-| panguard-report        | @panguard-ai/panguard-report        | 0.2.0   | GA       | Compliance reports (CMA, ISO 27001, SOC 2)             |
-| panguard-mcp           | @panguard-ai/panguard-mcp           | 0.1.0   | Beta     | MCP server with 11 tools                               |
-| panguard-skill-auditor | @panguard-ai/panguard-skill-auditor | 0.1.1   | Beta     | 7-check skill security analysis                        |
-| panguard-auth          | @panguard-ai/panguard-auth          | 0.2.0   | GA       | Auth, session management, usage metering               |
-| manager                | @panguard-ai/manager                | 0.2.0   | GA       | Distributed agent orchestration (500 max)              |
-| threat-cloud           | @panguard-ai/threat-cloud           | 0.2.0   | GA       | Collective threat intelligence backend                 |
-| panguard-web           | @panguard-ai/panguard-web           | 0.2.0   | GA       | Website content engine                                 |
-| security-hardening     | @panguard-ai/security-hardening     | 0.1.1   | GA       | Security policy enforcement                            |
-| website                | @panguard-ai/website                | 0.2.0   | GA       | Next.js 14 marketing site (39 pages)                   |
+| panguard-scan          | @panguard-ai/panguard-scan          | 0.2.0   | GA       | 60-second security scanning                              |
+| panguard-guard         | @panguard-ai/panguard-guard         | 0.2.0   | GA       | Real-time monitoring, 4-agent pipeline                   |
+| panguard-chat          | @panguard-ai/panguard-chat          | 0.2.0   | GA       | 6-channel notification system                            |
+| panguard-trap          | @panguard-ai/panguard-trap          | 0.2.0   | GA       | 8 honeypot service types                                 |
+| panguard-report        | @panguard-ai/panguard-report        | 0.2.0   | GA       | Compliance reports (CMA, ISO 27001, SOC 2)               |
+| panguard-mcp           | @panguard-ai/panguard-mcp           | 0.1.0   | Beta     | MCP server with 11 tools                                 |
+| panguard-skill-auditor | @panguard-ai/panguard-skill-auditor | 0.1.1   | Beta     | 7-check skill security analysis                          |
+| panguard-auth          | @panguard-ai/panguard-auth          | 0.2.0   | GA       | Auth, session management, usage metering                 |
+| manager                | @panguard-ai/manager                | 0.2.0   | GA       | Distributed agent orchestration (500 max)                |
+| threat-cloud           | @panguard-ai/threat-cloud           | 0.2.0   | GA       | Collective threat intelligence backend                   |
+| panguard-web           | @panguard-ai/panguard-web           | 0.2.0   | GA       | Website content engine                                   |
+| security-hardening     | @panguard-ai/security-hardening     | 0.1.1   | GA       | Security policy enforcement                              |
+| website                | @panguard-ai/website                | 0.2.0   | GA       | Next.js 14 marketing site (39 pages)                     |
 
 **Maturity levels:** GA = Generally Available, Beta = Feature complete but evolving, RFC = Request for Comments (open standard)
 
@@ -295,12 +295,12 @@ Vercel deployment. Next.js 14 with ISR. Bilingual (EN + zh-TW).
 
 ## CI/CD
 
-| Workflow              | Trigger     | Purpose                                     |
-| --------------------- | ----------- | ------------------------------------------- |
-| ci.yml                | push/PR     | Lint, format, typecheck, test with coverage |
-| deploy.yml            | push main   | Deploy website (Vercel) + backend (Docker)  |
-| publish.yml           | release tag | Publish packages to npm                     |
+| Workflow              | Trigger     | Purpose                                                 |
+| --------------------- | ----------- | ------------------------------------------------------- |
+| ci.yml                | push/PR     | Lint, format, typecheck, test with coverage             |
+| deploy.yml            | push main   | Deploy website (Vercel) + backend (Docker)              |
+| publish.yml           | release tag | Publish packages to npm                                 |
 | threat-intel-sync.yml | scheduled   | Refresh server-side threat intel (no client auto-apply) |
-| installer-e2e.yml     | event       | E2E testing for installer                   |
-| cli-smoke.yml         | event       | CLI smoke tests                             |
-| release.yml           | manual      | Create GitHub releases                      |
+| installer-e2e.yml     | event       | E2E testing for installer                               |
+| cli-smoke.yml         | event       | CLI smoke tests                                         |
+| release.yml           | manual      | Create GitHub releases                                  |

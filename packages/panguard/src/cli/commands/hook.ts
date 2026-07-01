@@ -184,7 +184,11 @@ function safeDecision(
  */
 export const HOST_CONTRACTS: Record<
   OutputFormat,
-  { readonly denyExit: number; readonly usesStdout: boolean; verify(e: Emission, v: 'ask' | 'deny'): boolean }
+  {
+    readonly denyExit: number;
+    readonly usesStdout: boolean;
+    verify(e: Emission, v: 'ask' | 'deny'): boolean;
+  }
 > = {
   claude: {
     denyExit: 0,
@@ -194,8 +198,9 @@ export const HOST_CONTRACTS: Record<
       safeDecision(
         e.stdout,
         (o) =>
-          (o['hookSpecificOutput'] as Record<string, unknown> | undefined)?.['permissionDecision'] ===
-          v
+          (o['hookSpecificOutput'] as Record<string, unknown> | undefined)?.[
+            'permissionDecision'
+          ] === v
       ),
   },
   cursor: {
@@ -408,7 +413,11 @@ function clearZeroRulesFailOpen(ruleCount: number): void {
  * `degraded: true` means the most recent hook run loaded 0 rules and therefore
  * allowed every built-in-tool call (no enforcement).
  */
-export function readHookProtectionStatus(): { degraded: boolean; ruleCount: number; at: string } | null {
+export function readHookProtectionStatus(): {
+  degraded: boolean;
+  ruleCount: number;
+  at: string;
+} | null {
   try {
     const path = hookStatusPath();
     if (!existsSync(path)) return null;
@@ -1022,9 +1031,7 @@ export function hookCommand(): Command {
         );
         return;
       }
-      const installed = isHookInstalled(
-        (read.kind === 'ok' ? read.data : {}) as ClaudeSettings
-      );
+      const installed = isHookInstalled((read.kind === 'ok' ? read.data : {}) as ClaudeSettings);
       console.log(
         installed
           ? `  ${c.safe('Built-in-tool hook ACTIVE')} (Claude). Hookable platforms: ${HOOKABLE_PLATFORMS.join(', ')}.`

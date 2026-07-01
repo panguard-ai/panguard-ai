@@ -19,11 +19,19 @@ export async function actionReport(lang: Lang): Promise<void> {
   if (lang === 'zh-TW') {
     console.log('  \u5408\u898F\u5831\u544A\uFF08Enterprise \u529F\u80FD\uFF09');
     console.log('');
-    console.log('  \u5C07\u5075\u6E2C\u7D50\u679C\u6620\u5C04\u5230\u5408\u898F\u6846\u67B6\uFF08EU AI Act / NIST AI RMF /');
-    console.log('  ISO 42001 / OWASP \u7B49\uFF09\u3001\u9644 SHA-256 + \u53EF\u9078\u7C3D\u7AE0\u4F9B\u7A3D\u6838\u9A57\u8B49\u7684');
-    console.log('  \u5408\u898F\u8B49\u64DA\u5831\u544A\uFF0C\u662F Enterprise \u65B9\u6848\u529F\u80FD\uFF0C\u4E0D\u5728\u514D\u8CBB Community CLI \u5167\u3002');
+    console.log(
+      '  \u5C07\u5075\u6E2C\u7D50\u679C\u6620\u5C04\u5230\u5408\u898F\u6846\u67B6\uFF08EU AI Act / NIST AI RMF /'
+    );
+    console.log(
+      '  ISO 42001 / OWASP \u7B49\uFF09\u3001\u9644 SHA-256 + \u53EF\u9078\u7C3D\u7AE0\u4F9B\u7A3D\u6838\u9A57\u8B49\u7684'
+    );
+    console.log(
+      '  \u5408\u898F\u8B49\u64DA\u5831\u544A\uFF0C\u662F Enterprise \u65B9\u6848\u529F\u80FD\uFF0C\u4E0D\u5728\u514D\u8CBB Community CLI \u5167\u3002'
+    );
     console.log('');
-    console.log('  Community \u7248\u63D0\u4F9B\u5E95\u5C64\u5075\u6E2C\uFF08\u5831\u544A\u7684\u7D20\u6750\uFF09\uFF1A');
+    console.log(
+      '  Community \u7248\u63D0\u4F9B\u5E95\u5C64\u5075\u6E2C\uFF08\u5831\u544A\u7684\u7D20\u6750\uFF09\uFF1A'
+    );
     console.log('    pga scan <path>          \u7528\u5167\u5EFA ATR \u898F\u5247\u6383\u63CF');
     console.log('    pga audit skill <path>   \u5BE9\u6838\u4E00\u500B skill');
     console.log('');

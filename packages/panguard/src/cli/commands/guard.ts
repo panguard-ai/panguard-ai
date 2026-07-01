@@ -156,7 +156,9 @@ export function guardCommand(): Command {
   cmd
     .command('setup-ai')
     .alias('ai')
-    .description('Connect the optional semantic layer (Layer C): local Ollama (free) or a cloud key')
+    .description(
+      'Connect the optional semantic layer (Layer C): local Ollama (free) or a cloud key'
+    )
     .option('--remove', 'Remove the stored LLM config and turn Layer C off')
     .action(async (opts: { remove?: boolean }) => {
       if (opts.remove) {
@@ -367,7 +369,9 @@ async function commandSetupAi(): Promise<void> {
     console.log(divider('Layer 2: Local AI'));
     console.log('');
     // Honest cost framing: local inference never calls a paid API.
-    console.log(`  ${c.dim('Cost: $0 and fully private — runs on your machine, nothing leaves it.')}`);
+    console.log(
+      `  ${c.dim('Cost: $0 and fully private — runs on your machine, nothing leaves it.')}`
+    );
     console.log(`  ${c.dim('費用：$0 且完全私密 — 在你的機器上執行，不會有任何資料離開。')}`);
     console.log('');
 
@@ -451,9 +455,15 @@ async function commandSetupAi(): Promise<void> {
     // Honest cost framing (verified): the semantic judge runs ONLY on events the
     // deterministic layers already flagged — a handful of times a day for a
     // typical developer, so roughly a few cents per month.
-    console.log(`  ${c.dim('Cost: the cloud judge runs only on already-flagged events — a handful of')}`);
-    console.log(`  ${c.dim('times a day for typical use, so roughly a few cents per month. You pay')}`);
-    console.log(`  ${c.dim('your AI provider directly; PanGuard adds no markup and no subscription.')}`);
+    console.log(
+      `  ${c.dim('Cost: the cloud judge runs only on already-flagged events — a handful of')}`
+    );
+    console.log(
+      `  ${c.dim('times a day for typical use, so roughly a few cents per month. You pay')}`
+    );
+    console.log(
+      `  ${c.dim('your AI provider directly; PanGuard adds no markup and no subscription.')}`
+    );
     console.log(
       `  ${c.dim('費用：雲端判斷層只在已標記的事件上執行 — 一般一天幾次，約每月幾美分；直接付給供應商。')}`
     );
@@ -507,7 +517,9 @@ async function commandSetupAi(): Promise<void> {
       }
     } else {
       console.log('');
-      console.log(`  ${c.dim('Set it before restarting guard:')} ${c.sage(`export ${envVarName}=...`)}`);
+      console.log(
+        `  ${c.dim('Set it before restarting guard:')} ${c.sage(`export ${envVarName}=...`)}`
+      );
     }
 
     // Store provider + model (NO secret) in the master config so status/dashboard
@@ -536,7 +548,9 @@ async function commandSetupAi(): Promise<void> {
       `  ${symbols.pass} Cloud AI provider set: ${c.sage(`${cloudProvider} / ${cloudModel}`)}`
     );
     if (persistedKey || envHasKey) {
-      console.log(`  ${c.dim('Restart guard to activate Layer C:')} ${c.sage('pga guard restart')}`);
+      console.log(
+        `  ${c.dim('Restart guard to activate Layer C:')} ${c.sage('pga guard restart')}`
+      );
     } else {
       console.log(
         `  ${symbols.warn} Layer C stays off until ${c.sage(envVarName)} is set; then run ${c.sage('pga guard restart')}.`
