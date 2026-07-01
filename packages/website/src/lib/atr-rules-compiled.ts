@@ -644,8 +644,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)(#{1,3})\\s*(system|instruction|configuration|override|admin|root|master)\\s*(prompt|message|section|override|directive|configuration)?\\s*\\1?',
-        desc: 'Markdown headers declaring system-level sections',
+          '(?i)(#{1,3})\\s*(system|admin|root|master|instruction)\\s+(prompt|override|directive)\\b',
+        desc: 'Markdown header declaring a system-prompt override (requires an override-indicative noun; benign doc headings like "# System Requirements" no longer match)',
       },
       {
         field: 'user_input',
@@ -3471,8 +3471,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:this\\s+is\\s+a\\s+)?(?:system|admin|supervisor|emergency)\\s+(?:level\\s+)?(?:command|directive|override|instruction)',
-        desc: 'Messages framed as system-level commands or directives',
+          '(?i)(?:this\\s+is\\s+a\\s+)?(?:system|admin|supervisor|emergency)\\s+(?:level\\s+)?(?:command|directive|override)',
+        desc: 'Messages framed as system-level commands or directives (bare "system instruction(s)" doc references no longer match)',
       },
       {
         field: 'content',
@@ -5984,32 +5984,32 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(roleplay|role[\\s-]play|respond\\s+as|act\\s+as|play\\s+the\\s+(role|part)\\s+of|you\\s+are\\s+(now\\s+)?|pretend\\s+to\\s+be|impersonate)\\s+[^\\n]{0,150}(evil|sinister|malicious|wicked|dark|vile|twisted|corrupt|sadistic|psychopath|sociopath|villain|antagonist|bad|harmful|toxic|dangerous)',
-        desc: 'Roleplay instruction combined with explicit evil character traits',
+          '(roleplay|role[\\s-]play|respond\\s+as|act\\s+as|play\\s+the\\s+(?:role|part)\\s+of|you\\s+are\\s+(?:now\\s+)?|pretend\\s+to\\s+be|impersonate)\\s+(?:an?\\s+|the\\s+)?[^\\n]{0,60}?(evil|sinister|malicious|wicked|vile|twisted|sadistic|psychopath(?:ic)?|sociopath(?:ic)?|villain(?:ous)?)\\b[^\\n]{0,40}?(ai|character|persona|version|bot|entity|model|assistant|gpt)',
+        desc: 'Roleplay imperative bound tightly (<=100 chars) to a strong evil descriptor AND a persona noun (drops ambiguous dark/bad and 150-char gap that matched benign "act as a harsh critic ... bad")',
       },
       {
         field: 'user_input',
         pattern:
-          '(character|persona|version|entity|ai|assistant|bot|model)\\s+[^\\n]{0,80}(racist|encourages?\\s+(suicide|self[\\s-]harm|violence)|foul[\\s-]mouthed|aggressive|rude|amoral|immoral|unethical|cruel|hateful|abusive)',
-        desc: 'Character definition with explicit harmful behavioral traits',
+          '(?:evil|malicious|harmful|unrestricted|unfiltered)\\s+(?:version|character|persona|ai|entity|bot|model|assistant)\\b[^\\n]{0,40}?(racist|encourages?\\s+(?:suicide|self[\\s-]harm|violence)|foul[\\s-]mouthed|amoral|cruel|hateful|abusive)|(?:character|persona|version|entity|bot|model|assistant)\\s+(?:called|named)\\s+[^\\n]{0,40}?(racist|encourages?\\s+(?:suicide|self[\\s-]harm|violence)|foul[\\s-]mouthed|amoral|cruel|hateful|abusive)',
+        desc: 'Harmful trait must attach to an EVIL/named persona, not a bare "ai ... aggressive" (the old bare-ai + generic aggressive/rude combo caused 355/383 of this pattern\'s benign FPs)',
       },
       {
         field: 'user_input',
         pattern:
-          '(no\\s+(moral|ethical|safety)|without\\s+(moral|ethical|safety)|lacks?\\s+(moral|ethical)|freed?\\s+from\\s+(moral|ethical)|ignores?\\s+(moral|ethical)|bypasses?\\s+(moral|ethical))\\s+[^\\n]{0,60}(restriction|constraint|guideline|rule|limit|bound|filter|guardrail)',
-        desc: 'Explicit removal of moral or ethical constraints from character',
+          '(?:has\\s+no|with\\s+no|having\\s+no|without\\s+(?:any\\s+)?|no)\\s+(?:moral|ethical|safety)(?:\\s+or\\s+(?:moral|ethical|safety))?\\s+(?:restriction|constraint|guideline|rule|limit|bound(?:arie|ar)?s?|filter|guardrail)s?\\b|(?:freed?\\s+from|ignores?|bypass(?:es|ing)?)\\s+(?:all\\s+)?(?:its?\\s+)?(?:moral|ethical|safety)\\s*(?:and\\s+(?:moral|ethical|safety)\\s*)?(?:restriction|constraint|guideline|rule|limitation|filter|guardrail)s?',
+        desc: 'Explicit removal of moral/ethical/safety constraints (keeps "has no moral or ethical restrictions" jailbreak form; tighter than the loose 60-char-gap original)',
       },
       {
         field: 'user_input',
         pattern:
-          '(swears?\\s+a\\s+lot|uses?\\s+(profanity|curse\\s+words|bad\\s+language)|foul[\\s-]mouthed|vulgar|obscene|offensive\\s+language)\\s+[^\\n]{0,80}(character|persona|ai|assistant|bot|model|version)',
-        desc: 'Character with explicit profanity or offensive language traits',
+          '(swears?\\s+a\\s+lot|uses?\\s+(?:profanity|curse\\s+words|bad\\s+language)|foul[\\s-]mouthed)\\s+[^\\n]{0,40}?(character|persona|\\bai\\b|assistant|bot|model|version|robot)|(?:character|persona|\\bai\\b|bot|robot)\\s+[^\\n]{0,40}?(?:who|that)\\s+(?:swears?\\s+a\\s+lot|is\\s+foul[\\s-]mouthed|uses?\\s+(?:profanity|curse\\s+words))',
+        desc: 'Profanity trait must bind to a persona within 40 chars (drops standalone vulgar/obscene/offensive-language that matched benign content-policy text)',
       },
       {
         field: 'user_input',
         pattern:
-          '(hopes?\\s+(people|users?|humans?)\\s+(hurt|harm|suffer|die)|wants?\\s+(people|users?|humans?)\\s+to\\s+(hurt|suffer|die)|enjoys?\\s+(pain|suffering|harm)|encourages?\\s+(violence|harm|death))',
-        desc: 'Character that explicitly wishes harm on others',
+          "(?:hopes?|wants?)\\s+(?:people|users?|humans?|everyone)\\s+(?:to\\s+)?(?:get\\s+)?(?:hurt|harm(?:ed)?|suffer|die)\\b|enjoys?\\s+(?:it\\s+)?when\\s+(?:people|users?|humans?)\\s+(?:suffer|are\\s+hurt|die)|enjoys?\\s+(?:other\\s+people'?s?\\s+|their\\s+)?(?:pain|suffering)|encourages?\\s+(?:suicide|self[\\s-]harm|violence\\s+against)",
+        desc: 'Character that explicitly wishes harm on others (narrowed "enjoys pain/suffering" to require a human target so it no longer matches benign "enjoys harm reduction" style phrasing)',
       },
     ],
   },
@@ -14681,64 +14681,6 @@ export const ATR_RULES_COMPILED = [
     ],
   },
   {
-    id: 'ATR-2026-00495',
-    title: 'DAN Jailbreak - Unrestricted Persona with Filter and Morality Removal',
-    severity: 'high',
-    category: 'prompt-injection',
-    scan_target: 'llm_io',
-    rule_version: 2,
-    patterns: [
-      {
-        field: 'user_input',
-        pattern:
-          '(?i)(free\\s+of\\s+all\\s+(restrictions|filters|constraints|guidelines|rules|limits|boundaries|safety|content\\s+polic)|free\\s+from\\s+all\\s+(moral|ethical|content|safety)\\s+(restriction|filter|constraint|guideline|principle))',
-        desc: 'Persona declared free of all restrictions, filters, or moral constraints',
-      },
-      {
-        field: 'user_input',
-        pattern:
-          '(?i)(without\\s+(moral\\s+principles?|censorship|moraliz|prejudice|ethical\\s+consideration|content\\s+filter|safety\\s+filter|safety\\s+guideline|ethical\\s+constraint))',
-        desc: "Persona without moral principles, censorship, or ethical considerations (excludes generic 'without limit')",
-      },
-      {
-        field: 'user_input',
-        pattern:
-          '(?i)(act\\s+as\\s+(an?\\s+)?(immoral|unbiased|unrestricted|unfiltered|uncensored|evil|rogue|dark|dangerous|harmful)\\s+(model|ai|assistant|chatbot|language\\s+model|bot))',
-        desc: 'Instruction to act as an immoral, unbiased, or unrestricted AI model',
-      },
-      {
-        field: 'user_input',
-        pattern:
-          '(?i)(two\\s+(different\\s+)?(personalities|personas|characters|versions|responses?|modes?)|create\\s+and\\s+maintain\\s+two\\s+(separate\\s+)?(personas?|personalities|characters|versions)).{0,200}(unrestricted|unfiltered|uncensored|no\\s+(restriction|filter|constraint|rule|limit|moral|ethic)|without\\s+(restriction|filter|constraint|rule|limit|moral|ethic))',
-        desc: 'Dual-personality split response explicitly including an unrestricted or unconstrained mode',
-      },
-      {
-        field: 'user_input',
-        pattern:
-          '(?i)(for\\s+(the\\s+rest\\s+of\\s+this|this)\\s+(conversation|chat|session).{0,20}(you\\s+are\\s+replaced\\s+by|you\\s+will\\s+be\\s+replaced|replaced\\s+by\\s+the\\s+(immoral|unbiased|unrestricted|uncensored|jailbreak)))',
-        desc: 'Model replacement with unrestricted jailbreak alter-ego for remainder of session',
-      },
-      {
-        field: 'user_input',
-        pattern:
-          '(?i)(simulate\\s+being|you\\s+are\\s+about\\s+to\\s+(simulate|become|transform\\s+into)|immerse\\s+yourself\\s+into\\s+the\\s+role\\s+of).{0,60}(arch\\s+nemesis|corrupted\\s+form|evil\\s+(version|counterpart|twin)|anti[- ]?(gpt|ai|ethics))',
-        desc: 'Simulation or immersion into an adversarial/corrupted alter-ego persona',
-      },
-      {
-        field: 'user_input',
-        pattern:
-          '(?i)(answer\\s+with\\s+completely\\s+fake\\s+and\\s+hypothetical\\s+scenarios?\\s+with\\s+no\\s+further\\s+explanation|fictional\\s+(scenario|answer|response)\\s+(on|to|about|for)\\s+.{0,60}without\\s+(clarif|moral|ethic|further))',
-        desc: 'Instruction to answer with fictional/hypothetical content with no clarification or moral context',
-      },
-      {
-        field: 'content',
-        pattern:
-          '(?i)(?:respond|act|reply|answer)\\s+as\\s+two\\s+(?:different\\s+)?personalit|(?:continue|act|respond)\\s+as\\s+\\w+\\s+language\\s+model|two\\s+different\\s+personalities',
-        desc: 'Dual-persona jailbreak: respond as two personalities / continue as X language model',
-      },
-    ],
-  },
-  {
     id: 'ATR-2026-00496',
     title: 'DAN Jailbreak - Unconditional Obedience and Dual-Persona Session Lock',
     severity: 'high',
@@ -22527,6 +22469,35 @@ export const ATR_RULES_COMPILED = [
         pattern:
           '(?i)\\b(?:framelink|figma)\\b[^\\n]{0,80}\\b(?:curl|exec)\\b[^\\n]{0,80}https?://[^\\s"\'`]{0,120}\\s*(?:;|\\|\\||&&|\\|)\\s*(?:[a-z]{2,12}\\s|/(?:bin|usr|tmp|etc)/|\\bsh\\b|\\bbash\\b|\\bnc\\b|\\bwget\\b|\\bcat\\b|\\brm\\b|\\bwhoami\\b|\\bid\\b|\\bpython\\b)',
         desc: 'A figma/framelink curl/exec fallback URL terminated by a shell separator (; | && |) immediately followed by a command token, distinguishing injection from a benign ?a=1&b=2 query separator.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01929',
+    title:
+      'Unauthenticated MCP transport accepts tool calls and falls back to an ambient credential (CVE-2026-48039 / meta-ads-mcp class)',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          'meta[-_ ]?ads[-_ ]?mcp[\\s\\S]{0,160}?(?:unauthenticat|without\\s+(?:any\\s+)?auth|no[-_ ]?auth\\b|missing\\s+auth|no\\s+401)[\\s\\S]{0,200}?(?:META_ACCESS_TOKEN|access[_ ]?token|operator\\s+token|credential|leak|exfil)',
+        desc: 'Skill/tool/advisory content describing meta-ads-mcp accepting an unauthenticated request (no 401) and exposing the operator META_ACCESS_TOKEN \u2014 the CVE-2026-48039 exploit.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?:cve-?2026-?48039|GHSA-9gw6-46qc-99vr)[\\s\\S]{0,200}?(?:exploit|payload|\\bpoc\\b|leak|exfil|bypass|unauthenticat)',
+        desc: 'Explicit CVE-2026-48039 / GHSA reference combined with exploit framing (not a bare advisory mention).',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?:streamable[- ]?http|/mcp\\b|mcp\\s+(?:server|transport|endpoint|handler|gateway))[\\s\\S]{0,160}?(?:forward|dispatch|accept|invoke|reach)[\\s\\S]{0,120}?(?:unauthenticat|without\\s+(?:any\\s+)?auth|no\\s+401|no\\s+authentication)[\\s\\S]{0,200}?(?:falls?\\s*back|fall[-\\s]?back|fallback|env(?:ironment)?\\s+var|ambient|META_ACCESS_TOKEN)[\\s\\S]{0,80}?(?:token|credential|secret|api[_ ]?key)',
+        desc: 'Generalised unauthenticated MCP transport \u2014 a server/gateway/Streamable-HTTP handler that forwards or accepts a tool call without authentication and falls back to an ambient environment credential.',
       },
     ],
   },
