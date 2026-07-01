@@ -87,7 +87,8 @@ function checkConfiguration(): CheckResult {
     };
   }
 
-  const display = candidate === GUARD_CONFIG_PATH ? '~/.panguard-guard/config.json' : '~/.panguard/config.json';
+  const display =
+    candidate === GUARD_CONFIG_PATH ? '~/.panguard-guard/config.json' : '~/.panguard/config.json';
 
   try {
     const raw = readFileSync(candidate, 'utf-8');
@@ -112,7 +113,11 @@ function checkConfigIntegrity(): CheckResult {
   // Tamper-EVIDENCE only (a same-user attacker can re-seal) — surfaces unauthorized
   // changes the guard did not make, so this never reads as a false "all clear".
   if (!existsSync(GUARD_CONFIG_PATH)) {
-    return { status: 'pass', label: 'Config integrity', detail: 'no guard config yet (run "pga up")' };
+    return {
+      status: 'pass',
+      label: 'Config integrity',
+      detail: 'no guard config yet (run "pga up")',
+    };
   }
   let config: Record<string, unknown>;
   try {
@@ -137,7 +142,11 @@ function checkConfigIntegrity(): CheckResult {
       };
     }
     if (verdict.status === 'sealed' && self.ok) {
-      return { status: 'pass', label: 'Config integrity', detail: 'config sealed; hooks + service intact' };
+      return {
+        status: 'pass',
+        label: 'Config integrity',
+        detail: 'config sealed; hooks + service intact',
+      };
     }
     const parts: string[] = [];
     if (verdict.status !== 'sealed') {

@@ -114,12 +114,7 @@ function sortDeep(value: unknown): unknown {
  * The newline delimiters make the field boundaries unambiguous so distinct
  * field combinations cannot collide via concatenation.
  */
-export function computeHash(
-  prevHash: string,
-  seq: number,
-  ts: string,
-  payload: unknown
-): string {
+export function computeHash(prevHash: string, seq: number, ts: string, payload: unknown): string {
   return createHash('sha256')
     .update(`${prevHash}\n${seq}\n${ts}\n${canonicalize(payload)}`)
     .digest('hex');

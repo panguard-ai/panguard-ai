@@ -229,8 +229,7 @@ function ScannerHeroSkeleton() {
           Built on ATR — the open detection standard for AI agents
         </p>
         <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-text-primary leading-tight">
-          Free, on-device security for{' '}
-          <span className="text-panguard-green">your AI agents.</span>
+          Free, on-device security for <span className="text-panguard-green">your AI agents.</span>
         </h1>
         <p className="text-base sm:text-lg text-text-secondary max-w-2xl mx-auto leading-relaxed">
           Scan every installed skill against 650+ open ATR rules, watch your agents at runtime, and

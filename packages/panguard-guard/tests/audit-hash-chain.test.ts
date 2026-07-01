@@ -7,14 +7,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import {
-  mkdtempSync,
-  rmSync,
-  readFileSync,
-  writeFileSync,
-  existsSync,
-  statSync,
-} from 'node:fs';
+import { mkdtempSync, rmSync, readFileSync, writeFileSync, existsSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { randomBytes } from 'node:crypto';
@@ -215,7 +208,7 @@ describe('AuditChain adversarial — tampering is DETECTED', () => {
   });
 
   it('truncate the tail with a higher head-anchor => truncated', async () => {
-    const chain = await seed(4);
+    await seed(4);
     // head-anchor now remembers seq 3. Truncate the last two records on disk.
     const recs = readLines(logPath);
     writeLines(logPath, recs.slice(0, 2)); // keep seq 0,1

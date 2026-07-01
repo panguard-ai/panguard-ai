@@ -14,7 +14,10 @@ import { execFileSync } from 'node:child_process';
 import { emitFor, HookContractError, type HookPlatform } from '../src/cli/commands/hook.js';
 
 const fixtures = JSON.parse(
-  readFileSync(join(fileURLToPath(new URL('.', import.meta.url)), 'fixtures/host-deny-contracts.json'), 'utf-8')
+  readFileSync(
+    join(fileURLToPath(new URL('.', import.meta.url)), 'fixtures/host-deny-contracts.json'),
+    'utf-8'
+  )
 ) as Record<string, { exit: number; stdout?: string; stderr?: string }>;
 
 const PLATFORMS: HookPlatform[] = [
@@ -55,7 +58,9 @@ describe('hook host-contract — frozen golden (byte-exact deny)', () => {
 
 describe('hook host-contract — adversarial / fail-closed', () => {
   it('invalid verdict throws HookContractError (never a silent empty emission)', () => {
-    expect(() => emitFor('claude-code', 'flag' as unknown as 'deny', 'r')).toThrow(HookContractError);
+    expect(() => emitFor('claude-code', 'flag' as unknown as 'deny', 'r')).toThrow(
+      HookContractError
+    );
   });
 
   it('unknown platform throws HookContractError (never a silent undefined)', () => {
@@ -66,7 +71,10 @@ describe('hook host-contract — adversarial / fail-closed', () => {
 
   it('a mutated fixture would fail the golden gate (proves the gate actually catches drift)', () => {
     const real = emitFor('claude-code', 'deny', 'REASON');
-    const drifted = { ...real, stdout: (real.stdout ?? '').replace('permissionDecision', 'decision') };
+    const drifted = {
+      ...real,
+      stdout: (real.stdout ?? '').replace('permissionDecision', 'decision'),
+    };
     expect(drifted.stdout).not.toBe(fixtures['claude-code'].stdout);
   });
 });

@@ -18,10 +18,7 @@ import { ensureTelemetryConsent } from '../consent.js';
 import { installFor, toHookPlatform } from './hook.js';
 import { ensurePersistentService, type PersistResult } from './persist.js';
 import { isFirstRun, markInitialized } from '../first-run.js';
-import {
-  readAuthenticatedDashboardUrl,
-  dashboardBaseUrl,
-} from '../dashboard-url.js';
+import { readAuthenticatedDashboardUrl, dashboardBaseUrl } from '../dashboard-url.js';
 
 type Lang = 'en' | 'zh-TW';
 

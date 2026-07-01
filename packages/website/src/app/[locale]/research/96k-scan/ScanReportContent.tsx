@@ -376,8 +376,8 @@ dGFycmQzdHh3KSI=' | base64 -D | bash`}</code>
               Scan Your AI Agent Skills. Now.
             </h2>
             <p className="text-text-secondary mb-8 max-w-lg mx-auto">
-              One command. Under 5 seconds per skill. Works with Claude Code, Cursor, OpenClaw,
-              and 10 more platforms.
+              One command. Under 5 seconds per skill. Works with Claude Code, Cursor, OpenClaw, and
+              10 more platforms.
             </p>
           </FadeInUp>
           <FadeInUp delay={0.1}>

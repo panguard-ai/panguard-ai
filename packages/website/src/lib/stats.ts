@@ -209,7 +209,12 @@ export const STATS = {
    */
   benchmark: {
     // PINT (Invariant Labs / Lakera adversarial corpus, 850 samples) — v3.5.0
-    pint: { recall: 0.6363636363636364, precision: 0.9965277777777778, fp: 0.002506265664160401, samples: 850 },
+    pint: {
+      recall: 0.6363636363636364,
+      precision: 0.9965277777777778,
+      fp: 0.002506265664160401,
+      samples: 850,
+    },
     // SKILL.md real-world corpus (ClawHub + OpenClaw + Skills.sh, 498 manually-labeled samples) — v3.5.0
     skill: { recall: 1, precision: 0.97, fp: 0.002, samples: 498 },
     // NVIDIA garak in-the-wild corpus — v3.5.0 (down from 98.0%: rule ATR-2026-00495 deprecated)
