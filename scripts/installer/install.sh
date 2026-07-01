@@ -665,7 +665,11 @@ auto_setup() {
   # (a bare URL without the token lands on a Not-authenticated screen).
   local guard_dir="${HOME}/.panguard-guard"
   local port token_val url
-  port="$(grep -oE '"dashboardPort"[[:space:]]*:[[:space:]]*[0-9]+' "${guard_dir}/config.json" 2>/dev/null | grep -oE '[0-9]+' | head -1)"
+  # `|| true`: under `set -euo pipefail`, a failed activation means config.json
+  # was never written; the grep pipe then exits non-zero and (via pipefail) kills
+  # the whole installer mid-success. Guard it like the token read below so a
+  # best-effort activation hiccup falls back to the default port, never aborts.
+  port="$(grep -oE '"dashboardPort"[[:space:]]*:[[:space:]]*[0-9]+' "${guard_dir}/config.json" 2>/dev/null | grep -oE '[0-9]+' | head -1 || true)"
   port="${port:-3100}"
   token_val="$(cat "${guard_dir}/dashboard-token" 2>/dev/null || true)"
   if [ -n "$token_val" ]; then
