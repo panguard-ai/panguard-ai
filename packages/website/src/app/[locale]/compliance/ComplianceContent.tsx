@@ -400,7 +400,7 @@ export default function ComplianceContent() {
           <FadeInUp delay={0.1}>
             <div className="mt-8 bg-surface-2 rounded-xl border border-border p-4 max-w-md mx-auto">
               <code className="text-sm text-brand-sage font-mono">
-                npm install -g @panguard-ai/panguard && pga up
+                npm install -g panguard && pga up
               </code>
             </div>
           </FadeInUp>

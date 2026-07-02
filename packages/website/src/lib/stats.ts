@@ -25,20 +25,21 @@ export const STATS = {
   /** Must match packages/panguard/package.json "version" */
   cliVersion: '1.7.3',
   /** Synced from agent-threat-rules/stats.json by sync-atr-stats workflow */
-  atrVersion: '3.5.0',
-  /** ATR v2.2.x: stable + experimental total */
-  atrRules: 652,
-  atrStableRules: 359,
-  atrExperimentalRules: 62,
+  atrVersion: '3.5.4',
+  /** Total rules on main (disk == data/stats.json, verified against origin/main) */
+  atrRules: 675,
+  /** Maturity lanes: 'stable' rules run in the enforce lane; test/experimental are advisory */
+  atrStableRules: 132,
+  atrExperimentalRules: 61,
   /** Community ATR rules from Threat Cloud flywheel (TC-side aggregation, separate from main repo) */
   atrCommunityRules: 93,
-  /** Total unique detection patterns across all ATR rules (compiled from YAML) */
-  atrPatterns: 920,
-  totalRules: 652,
+  /** Total detection patterns (regex conditions) across all ATR rules on main */
+  atrPatterns: 3034,
+  totalRules: 675,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
-  totalRulesDisplay: '652' as const,
+  totalRulesDisplay: '675' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '652' as const,
+  atrRulesDisplay: '675' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,
