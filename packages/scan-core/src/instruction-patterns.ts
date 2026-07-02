@@ -353,9 +353,16 @@ export function checkInstructions(
     });
   }
 
-  // Base64-encoded suspicious content
-  const b64Matches = instructions.match(BASE64_BLOCK_RE);
-  if (b64Matches) {
+  // Base64-encoded suspicious content. Scan BOTH the raw text AND a
+  // whitespace-collapsed copy: inserting spaces/newlines inside a base64 blob is
+  // a trivial way to break the contiguous-run regex and smuggle a payload past
+  // the scanner. The SUSPICIOUS_DECODED gate (requires eval/exec/curl/... in the
+  // DECODED bytes) keeps the collapsed pass false-positive-safe.
+  let b64Flagged = false;
+  for (const src of [instructions, instructions.replace(/\s+/g, '')]) {
+    if (b64Flagged) break;
+    const b64Matches = src.match(BASE64_BLOCK_RE);
+    if (!b64Matches) continue;
     for (const b64 of b64Matches) {
       try {
         const decoded = Buffer.from(b64, 'base64').toString('utf-8');
@@ -367,11 +374,33 @@ export function checkInstructions(
             severity: 'critical',
             category: 'prompt-injection',
           });
+          b64Flagged = true;
           break;
         }
       } catch {
         // Not valid base64, skip
       }
+    }
+  }
+
+  // URL-encoded (percent-encoded) suspicious content — another trivial wrapper
+  // that the base64/hex passes miss.
+  if (/(?:%[0-9a-fA-F]{2}){6,}/.test(instructions)) {
+    try {
+      const urlDecoded = decodeURIComponent(
+        (instructions.match(/(?:%[0-9a-fA-F]{2})+/g) ?? []).join('')
+      );
+      if (SUSPICIOUS_DECODED.test(urlDecoded)) {
+        findings.push({
+          id: 'encoded-payload-url',
+          title: 'URL-encoded suspicious payload',
+          description: `Percent-decoded content contains executable patterns: "${urlDecoded.substring(0, 60)}..."`,
+          severity: 'critical',
+          category: 'prompt-injection',
+        });
+      }
+    } catch {
+      // Malformed percent-encoding — skip.
     }
   }
 
