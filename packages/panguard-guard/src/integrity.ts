@@ -23,7 +23,16 @@
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync, mkdirSync, renameSync } from 'node:fs';
 import { join, dirname } from 'node:path';
-import { hostname, userInfo } from 'node:os';
+import { hostname, userInfo, homedir, platform } from 'node:os';
+
+/**
+ * launchd label for the guard's own reboot-persistence service. MUST match
+ * SERVICE_LABEL in @panguard-ai/panguard's persist.ts — the two live in
+ * separate packages (panguard depends on panguard-guard, not the reverse), so
+ * the constant is duplicated here with this contract. A drift would make the
+ * self-removal check watch the wrong path. A test in persist pins the value.
+ */
+export const GUARD_SERVICE_LABEL = 'com.panguard.panguard-guard';
 
 /** Config fields whose silent change weakens protection — the integrity-watched set. */
 export const SECURITY_FIELDS = [
@@ -264,4 +273,64 @@ export function readSelfStateRefs(dataDir: string): SelfStateRef[] {
   const m = readManifest(dataDir);
   if (m === 'absent' || m === 'unreadable') return [];
   return Array.isArray(m.selfState) ? m.selfState : [];
+}
+
+/**
+ * Discover the guard's own currently-present install artifacts as SelfStateRefs.
+ *
+ * This is the missing wiring that made self-removal detection dead: every seal
+ * recorded an EMPTY selfState, so checkSelfState() always iterated nothing and
+ * always returned ok — the guard claimed to notice its own removal but never
+ * did. We record only artifacts that EXIST right now (so we never emit a false
+ * "missing" for something that was never installed on this platform); merging
+ * with the previously-recorded refs (see mergeSelfState) is what preserves a
+ * later removal as a detection.
+ *
+ * Highest-value artifact: the reboot-persistence LaunchAgent. Its removal means
+ * protection silently never starts again after the next login. macOS-only for
+ * now (that is where the guard installs a user LaunchAgent). Hook / proxy-
+ * injection artifacts are recorded by the installers that own their paths.
+ */
+export function collectSelfState(): SelfStateRef[] {
+  const refs: SelfStateRef[] = [];
+  if (platform() === 'darwin') {
+    const plist = join(
+      homedir(),
+      'Library',
+      'LaunchAgents',
+      `${GUARD_SERVICE_LABEL}.plist`
+    );
+    if (existsSync(plist)) {
+      refs.push({
+        kind: 'launchagent',
+        path: plist,
+        marker: GUARD_SERVICE_LABEL,
+        label: 'reboot-persistence service',
+      });
+    }
+  }
+  return refs;
+}
+
+/**
+ * Union two SelfStateRef lists by path, preferring the previously-recorded ref
+ * on conflict. CRITICAL: this never DROPS a recorded ref — a recorded artifact
+ * that is now missing must stay in the set so checkSelfState() flags its
+ * removal. We only ADD newly-present artifacts. Re-sealing with a bare
+ * collectSelfState() (which omits anything currently absent) would erase the
+ * very removal we exist to detect; merging is what makes a refresh safe.
+ */
+export function mergeSelfState(
+  recorded: readonly SelfStateRef[],
+  discovered: readonly SelfStateRef[]
+): SelfStateRef[] {
+  const byPath = new Map<string, SelfStateRef>();
+  for (const r of discovered) {
+    if (r && typeof r.path === 'string') byPath.set(r.path, r);
+  }
+  // Recorded wins on conflict (preserves the original marker/label + presence contract).
+  for (const r of recorded) {
+    if (r && typeof r.path === 'string') byPath.set(r.path, r);
+  }
+  return [...byPath.values()];
 }
