@@ -176,7 +176,14 @@ interface LayerHealth {
  */
 interface EnforcementStatus {
   readonly mode: string;
-  readonly posture: 'protected' | 'monitoring' | 'report-only' | 'learning' | 'off' | 'tampered';
+  readonly posture:
+    | 'protected'
+    | 'monitoring'
+    | 'report-only'
+    | 'learning'
+    | 'off'
+    | 'tampered'
+    | 'degraded';
   readonly osActionsArmed: boolean;
   readonly armedActions: string[];
   /** S5: config-integrity + self-removal verdict surfaced to the cockpit. */
@@ -932,6 +939,14 @@ export class DashboardServer {
     else if (mode === 'report-only') posture = 'report-only';
     else if (mode === 'learning') posture = 'learning';
     else posture = 'off';
+
+    // Detection engine is a no-op with zero rules loaded — the guard cannot
+    // detect anything, so an active/report posture would be a fake-green claim.
+    // Downgrade to 'degraded' (matches the CLI TUI, which gates on rule count).
+    const ruleCount = this.status.atrRuleCount ?? 0;
+    if (ruleCount <= 0 && (posture === 'protected' || posture === 'monitoring' || posture === 'report-only')) {
+      posture = 'degraded';
+    }
 
     // S5: config integrity + self-removal override the posture. Never claim
     // PROTECTED/MONITORING when the config was changed outside the guard or a
