@@ -5,9 +5,9 @@ import { useState, useEffect } from 'react';
 type OS = 'mac' | 'linux' | 'windows';
 
 const INSTALL_COMMANDS: Record<OS, string> = {
-  mac: 'npm install -g @panguard-ai/panguard && pga up',
-  linux: 'npm install -g @panguard-ai/panguard && pga up',
-  windows: 'npm install -g @panguard-ai/panguard && pga up',
+  mac: 'npm install -g panguard && pga up',
+  linux: 'npm install -g panguard && pga up',
+  windows: 'npm install -g panguard && pga up',
 };
 
 const PROMPTS: Record<OS, string> = {

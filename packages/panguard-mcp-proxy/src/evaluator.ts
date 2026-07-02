@@ -144,8 +144,25 @@ export class ProxyEvaluator {
     return parts.join('\n');
   }
 
-  /** Evaluate a tool call (PreToolUse) */
-  async evaluateToolCall(toolName: string, args: Record<string, unknown>): Promise<EvalResult> {
+  /**
+   * Evaluate a tool call (PreToolUse).
+   *
+   * `eventType` selects which ATR rules apply. The MCP proxy sees genuine
+   * MCP exchanges, so it keeps the 'mcp_exchange' default. The Claude-Code /
+   * Gemini / Codex PreToolUse hook wraps built-in tools (Bash, Edit, Write,
+   * WebFetch) — those are 'tool_call' events. Passing 'tool_call' makes the
+   * engine run the tool_call rule set (shell injection, credential theft,
+   * SSRF, RCE, privilege escalation) AND, via the engine's mcp-over-tool
+   * exception, the mcp_exchange rules — while correctly skipping
+   * multi_agent_comm and llm_io rules that never apply to a shell command.
+   * The old hardcoded 'mcp_exchange' both missed the tool_call attack rules
+   * and false-fired multi_agent_comm rules on ordinary commands.
+   */
+  async evaluateToolCall(
+    toolName: string,
+    args: Record<string, unknown>,
+    eventType: AgentEvent['type'] = 'mcp_exchange'
+  ): Promise<EvalResult> {
     const start = Date.now();
 
     // Check Guard blocklist first (instant deny, no regex needed)
@@ -163,7 +180,7 @@ export class ProxyEvaluator {
     // Flatten args into natural text so ATR regexes can match content like paths and commands
     const flatContent = `${toolName} ${this.flattenArgs(args)}`;
     const event: AgentEvent = {
-      type: 'mcp_exchange' as AgentEvent['type'],
+      type: eventType,
       timestamp: new Date().toISOString(),
       content: flatContent,
       fields: {
