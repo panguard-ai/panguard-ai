@@ -43,7 +43,7 @@ Solo, from zero — and the rules behind it are already **merged into Microsoft'
 ## What you get
 
 - **Pre-install scan** — `pga scan` audits a skill or MCP server against 650+ ATR rules in seconds, and **exits non-zero on a real threat** so any CI can gate a malicious skill out.
-- **Runtime guard** — a local daemon inspects every agent tool call — both MCP servers and the agent's *own* built-in tools (Bash / Edit / Write / WebFetch) — across **7 platforms** (Claude Code, Cursor, Codex, Continue, Gemini CLI, Cline, Windsurf), and blocks known attacks before they run.
+- **Runtime guard** — a local daemon inspects every agent tool call — both MCP servers and the agent's _own_ built-in tools (Bash / Edit / Write / WebFetch) — across **7 platforms** (Claude Code, Cursor, Codex, Continue, Gemini CLI, Cline, Windsurf), and blocks known attacks before they run.
 - **A local dashboard** — one glance answers "am I protected right now?"; one click quarantines a threat. Survives reboot like real antivirus.
 - **Deterministic + explainable** — the blocking is regex/AST + ATR rules, on-device, sub-50ms. An optional LLM "second opinion" (bring your own — free local Ollama or a cloud key) only flags for review; **it never auto-blocks**.
 - **100% free, MIT, on-device.** No account, no signup. Threat-sharing is **opt-in and off by default** — nothing leaves your machine unless you turn it on.
@@ -57,7 +57,7 @@ npm install -g panguard && pga up
 ```
 
 1. `pga up` — scans your installed skills, starts protection, opens the dashboard
-2. `pga audit skill ./some-skill` — vet a skill *before* you install it (risk score + findings)
+2. `pga audit skill ./some-skill` — vet a skill _before_ you install it (risk score + findings)
 3. `pga scan ./some-skill --sarif` — SARIF 2.1.0 for your CI
 4. `pga doctor` — confirm everything's healthy
 
@@ -105,11 +105,11 @@ Quiet is the goal. A clean machine shows "all clear"; a real threat shows up und
 
 Deterministic by default. Layers A + B run on-device and do the blocking; Layer C is optional and advisory.
 
-| Layer | Engine | Latency | Cost | Auto-blocks? |
-| ----- | ------ | ------- | ---- | ------------ |
-| **A** | 650+ ATR rules (regex + AST) | < 50ms | $0 | yes |
-| **B** | On-device heuristics | < 50ms | $0 | yes |
-| **C** | *Your* LLM (local Ollama / cloud) | ~2–5s | $0 / ~¢ | no — flags for review only |
+| Layer | Engine                            | Latency | Cost    | Auto-blocks?               |
+| ----- | --------------------------------- | ------- | ------- | -------------------------- |
+| **A** | 650+ ATR rules (regex + AST)      | < 50ms  | $0      | yes                        |
+| **B** | On-device heuristics              | < 50ms  | $0      | yes                        |
+| **C** | _Your_ LLM (local Ollama / cloud) | ~2–5s   | $0 / ~¢ | no — flags for review only |
 
 Internet down? A and B keep running. No model configured? You still get full deterministic detection.
 
@@ -127,12 +127,12 @@ Internet down? A and B keep running. No model configured? You still get full det
 
 Not "stars" — merged code, in production.
 
-| Organization | What | Status |
-| ------------ | ---- | ------ |
-| **Microsoft** Agent Governance Toolkit | ATR rules + weekly auto-sync | Merged · [PR #1277](https://github.com/microsoft/agent-governance-toolkit/pull/1277) |
-| **Cisco** AI Defense | ATR rule library in skill-scanner | Merged · [PR #99](https://github.com/cisco-ai-defense/skill-scanner/pull/99) |
-| **MISP** (threat intel) | Galaxy + taxonomy entries | Merged |
-| **OWASP** Agentic Security Resource Hub* | Listing | Merged |
+| Organization                              | What                              | Status                                                                               |
+| ----------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------ |
+| **Microsoft** Agent Governance Toolkit    | ATR rules + weekly auto-sync      | Merged · [PR #1277](https://github.com/microsoft/agent-governance-toolkit/pull/1277) |
+| **Cisco** AI Defense                      | ATR rule library in skill-scanner | Merged · [PR #99](https://github.com/cisco-ai-defense/skill-scanner/pull/99)         |
+| **MISP** (threat intel)                   | Galaxy + taxonomy entries         | Merged                                                                               |
+| **OWASP** Agentic Security Resource Hub\* | Listing                           | Merged                                                                               |
 
 \* third-party resource hub, not the OWASP Foundation main repo. Several more integrations are in review (NVIDIA garak, OpenSSF SAFE-MCP, IBM, Meta PurpleLlama, Gen Digital) — listed honestly on [panguard.ai](https://panguard.ai), not counted as adoption.
 
@@ -142,11 +142,11 @@ Not "stars" — merged code, in production.
 
 Public corpora, deterministic samples, fixed seeds. We quote precise numbers — we don't round up. Full methodology: [panguard.ai/research/benchmarks](https://panguard.ai/research/benchmarks).
 
-| Corpus | Recall | Precision | Sample |
-| ------ | ------ | --------- | ------ |
-| SKILL.md (real-world) | **100%** | **97%** | 498 |
-| garak (ATR-core families) | **~98%** | — | 650 |
-| PINT (prompt-injection) | 63.2% | 99.7% | 850 |
+| Corpus                    | Recall   | Precision | Sample |
+| ------------------------- | -------- | --------- | ------ |
+| SKILL.md (real-world)     | **100%** | **97%**   | 498    |
+| garak (ATR-core families) | **~98%** | —         | 650    |
+| PINT (prompt-injection)   | 63.2%    | 99.7%     | 850    |
 
 garak is an approximate figure that drifts across rule versions; the authoritative live rule count is in [stats.json](https://raw.githubusercontent.com/Agent-Threat-Rule/agent-threat-rules/main/data/stats.json).
 
