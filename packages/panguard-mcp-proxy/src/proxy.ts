@@ -395,11 +395,23 @@ export class MCPProxy {
       // Forward to upstream
       const result = await client.callTool({ name, arguments: toolArgs });
 
-      // PostToolUse: evaluate the response
-      const responseText = (result.content as Array<{ type: string; text?: string }>)
-        ?.map((c) => c.text ?? '')
+      // PostToolUse: evaluate the response. Serialize EVERY content block —
+      // text AND non-text (resource URIs, embedded resource.text/blob, image
+      // data) — so a malicious server cannot smuggle an exfil/injection payload
+      // through a resource/image block that a text-only extractor would silently
+      // drop. Cap is 256KB (not 10KB) so padding the payload past a tiny cap no
+      // longer evades the scan.
+      const responseText = (result.content as Array<Record<string, unknown>>)
+        ?.map((c) => {
+          if (typeof c['text'] === 'string') return c['text'];
+          try {
+            return JSON.stringify(c);
+          } catch {
+            return '';
+          }
+        })
         .join('\n')
-        .slice(0, 10000); // Cap at 10KB for evaluation
+        .slice(0, 262144);
 
       if (responseText) {
         let postResult;
