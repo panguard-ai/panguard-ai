@@ -119,9 +119,19 @@ export class MCPProxy {
     this.evalTimeout = config.evalTimeout ?? 5000;
     this.sessionId = config.sessionId ?? `mcp-proxy-${process.pid}-${Date.now().toString(36)}`;
     this.agentId = config.agentId ?? process.env['PANGUARD_AGENT_ID'] ?? 'mcp-agent';
-    // Sync sub-ms pre-check. Runs in front of the async evaluator so the worst
-    // payloads (and any session the brain flags) are blocked instantly — and,
-    // with fail-closed as the default, an unavailable async evaluator denies.
+    // Sync sub-ms pre-check (InlineGate.onAction) that reads riskStore: once a
+    // session is escalated to 'high' it fast-blocks subsequent calls before the
+    // async evaluator even runs. That escalation is FED by recordEvalVerdict()
+    // (a real ATR deny -> riskStore.set high), so the session-risk loop is live.
+    //
+    // HONEST SCOPE (Community): the async behavioral brain — RiskAnalyzer.analyze
+    // via guard.onSessionActivity — is NOT driven here; it needs a real
+    // ContentDetector + per-session event feed and, more importantly, a real
+    // ContainmentController to act on its verdicts (Community ships Noop). So the
+    // detector is a deliberate no-op, not a forgotten wire: content detection is
+    // the ATR engine (evaluateToolCall/evaluateToolResponse) and session
+    // escalation is the sync riskStore path above. Wiring the behavioral brain +
+    // active containment is a Pro-tier layer, tracked separately.
     this.riskStore = new InMemoryRiskStore();
     this.guard = new GuardGate({
       gate: new InlineGate(),
