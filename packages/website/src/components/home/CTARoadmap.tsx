@@ -6,7 +6,7 @@ import { Terminal, Copy, Check, ArrowUp, Star, ExternalLink } from 'lucide-react
 import FadeInUp from '@/components/FadeInUp';
 import { STATS } from '@/lib/stats';
 
-export const INSTALL_COMMAND = 'npm install -g @panguard-ai/panguard && pga up';
+export const INSTALL_COMMAND = 'npm install -g panguard && pga up';
 
 export default function CTARoadmap() {
   const t = useTranslations('home.ctaRoadmap');

@@ -14,7 +14,7 @@
  *   packages/panguard/src/cli/index.ts         -> 23 top-level commands
  *   packages/panguard-mcp/src/server.ts        -> 11 MCP tools
  *   packages/panguard-skill-auditor/src/checks/ -> 8 audit checks
- *   agent-threat-rules/rules/                  -> 652 ATR rules (v3.5.0, canonical 2026-06-20; npm latest 3.5.0). Guard build may include drafts; TC live aggregates external community rules separately.
+ *   agent-threat-rules/rules/                  -> 675 ATR rules (v3.5.4; npm latest 3.5.4, verified against origin/main). Guard build may include drafts; TC live aggregates external community rules separately.
  *   packages/panguard-guard/src/playbook/      -> 3 playbook templates
  *   packages/panguard-guard/src/collectors/     -> 4 log parsers
  *
@@ -25,15 +25,16 @@ export const STATS = {
   /** Must match packages/panguard/package.json "version" */
   cliVersion: '1.7.3',
   /** Synced from agent-threat-rules/stats.json by sync-atr-stats workflow */
-  atrVersion: '3.5.0',
-  /** ATR v2.2.x: stable + experimental total */
+  atrVersion: '3.5.4',
+  /** Total rules on main (disk == data/stats.json, verified against origin/main) */
   atrRules: 675,
-  atrStableRules: 359,
-  atrExperimentalRules: 62,
+  /** Maturity lanes: 'stable' rules run in the enforce lane; test/experimental are advisory */
+  atrStableRules: 132,
+  atrExperimentalRules: 61,
   /** Community ATR rules from Threat Cloud flywheel (TC-side aggregation, separate from main repo) */
   atrCommunityRules: 93,
-  /** Total unique detection patterns across all ATR rules (compiled from YAML) */
-  atrPatterns: 920,
+  /** Total detection patterns (regex conditions) across all ATR rules on main */
+  atrPatterns: 3034,
   totalRules: 675,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
   totalRulesDisplay: '675' as const,

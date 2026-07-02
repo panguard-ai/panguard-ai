@@ -684,13 +684,22 @@ export function upCommand(): Command {
         // The daemon persists its launch token once the dashboard is listening.
         // The launchd path writes the PID file before the dashboard token, so
         // there can be a brief window where the daemon is up but the token is
-        // not yet on disk — poll up to ~2s before falling back to guidance, so
-        // we never open/print a bare URL that 401s.
+        // not yet on disk. The dashboard server starts INSIDE the just-launched
+        // guard daemon and needs a few seconds to load rules, bind its port, and
+        // write its auth token. 2s (then 15s) was too short — on a first run the
+        // daemon also loads the full ruleset before binding, so the token can
+        // take longer than 15s to land and `pga up` fell to the "re-run" path
+        // (which re-runs the whole scan). Poll up to ~40s so the common AND the
+        // slow-first-run paths actually open the dashboard; only a pathological
+        // start falls back (to `pga status`, not a full re-scan).
         let dashboardUrl: string | null = null;
         if (opts.dashboard && isGuardRunning()) {
-          for (let i = 0; i < 20; i++) {
+          for (let i = 0; i < 400; i++) {
             dashboardUrl = readAuthenticatedDashboardUrl();
             if (dashboardUrl) break;
+            if (i === 10) {
+              console.log(`  ${c.dim(t(lang, 'Starting dashboard...', '正在啟動儀表板...'))}`);
+            }
             await new Promise((r) => setTimeout(r, 100));
           }
         }
@@ -704,12 +713,13 @@ export function upCommand(): Command {
             console.log(`\n  ${c.sage(`Opening dashboard: ${dashboardBaseUrl()}`)}\n`);
             openBrowser(dashboardUrl);
           } else if (isGuardRunning()) {
+            const base = dashboardBaseUrl();
             console.log(
               `\n  ${c.caution(
                 t(
                   lang,
-                  `Dashboard is still starting. Re-run "pga up" in a moment to open it.`,
-                  `儀表板仍在啟動中。請稍後再次執行「pga up」開啟。`
+                  `Dashboard is starting at ${base} — run "pga status" for the ready link (no re-scan needed).`,
+                  `儀表板正在啟動：${base} — 執行「pga status」取得就緒連結(不需重新掃描)。`
                 )
               )}\n`
             );

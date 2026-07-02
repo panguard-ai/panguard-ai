@@ -49,7 +49,7 @@ const INSTALL_OPTIONS: Record<Platform, InstallOption[]> = {
       method: 'npm',
       label: 'npm (Recommended)',
       recommended: true,
-      command: 'npm install -g @panguard-ai/panguard && pga up',
+      command: 'npm install -g panguard && pga up',
       what: PGA_UP_WHAT,
       note: 'Requires Node.js 20+. Works on both Apple Silicon and Intel Mac.',
     },
@@ -78,7 +78,7 @@ const INSTALL_OPTIONS: Record<Platform, InstallOption[]> = {
       recommended: true,
       prereq:
         '# Ubuntu / Debian\ncurl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -\nsudo apt-get install -y nodejs\n\n# CentOS / RHEL\ncurl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -\nsudo yum install -y nodejs',
-      command: 'npm install -g @panguard-ai/panguard && pga up',
+      command: 'npm install -g panguard && pga up',
       what: PGA_UP_WHAT,
       note: 'Requires Node.js 20+. Supports x64 and ARM64.',
     },
@@ -100,7 +100,7 @@ const INSTALL_OPTIONS: Record<Platform, InstallOption[]> = {
       recommended: true,
       prereq:
         '# Install Node.js first (pick one):\nwinget install OpenJS.NodeJS.LTS\n# Or download from https://nodejs.org (v20+ LTS)',
-      command: 'npm install -g @panguard-ai/panguard && pga up',
+      command: 'npm install -g panguard && pga up',
       what: PGA_UP_WHAT,
     },
     {
@@ -408,10 +408,7 @@ export default function GettingStartedContent() {
                   <p>
                     <strong className="text-text-primary">Step 1:</strong> Open your terminal
                   </p>
-                  <CodeBlock
-                    code="npm install -g @panguard-ai/panguard && pga up"
-                    label="Install"
-                  />
+                  <CodeBlock code="npm install -g panguard && pga up" label="Install" />
                   <p>
                     <strong className="text-text-primary">Step 2:</strong> Auto-configure Claude
                     Code
@@ -453,10 +450,7 @@ export default function GettingStartedContent() {
                   <p>
                     <strong className="text-text-primary">Step 1:</strong> Install PanGuard
                   </p>
-                  <CodeBlock
-                    code="npm install -g @panguard-ai/panguard && pga up"
-                    label="Install"
-                  />
+                  <CodeBlock code="npm install -g panguard && pga up" label="Install" />
                   <p>
                     <strong className="text-text-primary">Step 2:</strong> Auto-configure OpenClaw
                   </p>

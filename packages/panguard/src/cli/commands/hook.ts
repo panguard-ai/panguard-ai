@@ -465,7 +465,14 @@ function readStdin(): Promise<string> {
  *     silently let a flagged tool call run because our output drifted.
  * The windsurf adapter's only non-zero exit is 2 (exit 1 = silent fail-open there).
  */
-export async function runHook(platform: HookPlatform): Promise<void> {
+export async function runHook(platform: HookPlatform, enforce = false): Promise<void> {
+  // Default posture is ADVISORY: detect + warn on stderr, but NEVER block. A
+  // false positive on a legitimate agent operation must not wall off the agent's
+  // work mid-session — that is the #1 uninstall trigger for a live-agent guard.
+  // Blocking is opt-in (--enforce flag or PANGUARD_HOOK_ENFORCE=1). The
+  // deterministic pre-install scan (pga scan) and the MCP proxy remain the
+  // enforcing layers; the PreToolUse hook defaults to visibility, not a wall.
+  const enforcing = enforce || process.env['PANGUARD_HOOK_ENFORCE'] === '1';
   const apply = (e: Emission): never => {
     if (e.stdout) process.stdout.write(e.stdout);
     if (e.stderr) process.stderr.write(e.stderr + '\n');
@@ -489,8 +496,15 @@ export async function runHook(platform: HookPlatform): Promise<void> {
     // Rules loaded → ensure any prior degraded marker is cleared.
     clearZeroRulesFailOpen(ruleCount);
     // Neutral tool name so tool_name-existence rules never fire on a built-in
-    // tool name; only the command content is judged.
-    const result = await evaluator.evaluateToolCall('command', { input: norm.content });
+    // tool name; only the command content is judged. 'tool_call' selects the
+    // tool_call rule set (shell injection, credential theft, SSRF, RCE) plus
+    // mcp_exchange rules — a built-in tool call is neither multi-agent comms
+    // nor an LLM prompt, so those rule families are correctly skipped.
+    const result = await evaluator.evaluateToolCall(
+      'command',
+      { input: norm.content },
+      'tool_call'
+    );
 
     // Validate the evaluator outcome. An unexpected/unknown value must DENY
     // (fail closed), never fall through to allow.
@@ -509,6 +523,18 @@ export async function runHook(platform: HookPlatform): Promise<void> {
       ? ` [${result.matchedRules.slice(0, 3).join(', ')}]`
       : '';
     const reason = `PanGuard: ${result.reason || 'matched a detection rule'}${rules}`;
+
+    // POSTURE gate: at this point `outcome` is a real deny/ask verdict (allow
+    // already exited; an unrecognized outcome already failed closed above). In
+    // the default advisory posture, downgrade that verdict to a NON-BLOCKING
+    // stderr advisory and allow the tool call. Only --enforce turns it into a
+    // host-level block.
+    if (!enforcing) {
+      process.stderr.write(
+        `[panguard] advisory (not blocked): ${reason} — run the hook with --enforce to block.\n`
+      );
+      process.exit(0);
+    }
     // Contract/protocol failures fail CLOSED (emitFor throws HookContractError);
     // they must NOT fall into the operational catch below (which fails open).
     let emission: Emission;
@@ -936,15 +962,20 @@ export function hookCommand(): Command {
     // used by `pga up`) from an EXPLICIT but unknown value (must fail closed, not
     // silently emit Claude JSON to a non-Claude host = a silent allow).
     .option('--platform <id>', 'Host platform (claude-code if omitted)')
-    .action(async (opts: { platform?: string }) => {
+    .option(
+      '--enforce',
+      'Block flagged tool calls. Default is advisory: detect + warn on stderr, never block.'
+    )
+    .action(async (opts: { platform?: string; enforce?: boolean }) => {
+      const enforce = opts.enforce === true;
       if (opts.platform == null) {
-        await runHook('claude-code');
+        await runHook('claude-code', enforce);
         return;
       }
       if (!(PLATFORMS as Record<string, PlatformSpec>)[opts.platform]) {
         failClosed(opts.platform, `unknown --platform "${opts.platform}"`);
       }
-      await runHook(opts.platform as HookPlatform);
+      await runHook(opts.platform as HookPlatform, enforce);
     });
 
   cmd
