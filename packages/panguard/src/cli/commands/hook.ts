@@ -83,11 +83,26 @@ function contentFromArgs(toolName: string, input: ToolInput): string {
   // shell
   if (t.includes('bash') || t.includes('shell') || t.includes('command') || t === 'run')
     return str(i['command'] ?? i['cmd'] ?? i['command_line']);
-  // file write/edit
+  // notebook — MUST precede the write/edit branch: "NotebookEdit" contains
+  // "edit", so an earlier edit branch would shadow it and drop the cell source.
+  if (t.includes('notebook'))
+    return `${str(i['file_path'] ?? i['path'] ?? i['notebook_path'])} ${str(
+      i['new_source'] ?? i['source'] ?? i['content']
+    )}`.trim();
+  // file write / edit / patch — extract EVERY content-bearing field so no write
+  // payload is ever dropped: Claude new_string/content, Codex apply_patch `input`,
+  // generic patch/diff. Dropping the content here = malicious writes ship blind.
   if (t.includes('write') || t.includes('edit') || t.includes('replace') || t.includes('patch'))
-    return `${str(i['file_path'] ?? i['path'] ?? i['filePath'])} ${str(i['new_string'] ?? i['content'] ?? i['new_str'])}`.trim();
+    return `${str(i['file_path'] ?? i['path'] ?? i['filePath'])} ${str(
+      i['new_string'] ??
+        i['content'] ??
+        i['new_str'] ??
+        i['new_source'] ??
+        i['input'] ??
+        i['patch'] ??
+        i['diff']
+    )}`.trim();
   if (t.includes('read')) return str(i['file_path'] ?? i['path'] ?? i['filePath']);
-  if (t.includes('notebook')) return str(i['new_source']);
   // web
   if (t.includes('fetch') || t.includes('web'))
     return `${str(i['url'])} ${str(i['prompt'] ?? i['query'])}`.trim();
@@ -115,7 +130,12 @@ export function normalizeInput(
   if (platform === 'windsurf') {
     const ti = (payload['tool_info'] ?? {}) as Record<string, unknown>;
     const action = str(payload['agent_action_name']);
-    const content = str(ti['command_line'] ?? ti['file_path']) || contentFromArgs(action, ti);
+    // Use the full arg extraction (contentFromArgs now reads file_path AND the
+    // write `content` for write-ish actions, so pre_write_code is scanned on its
+    // code, not just the path). Fall back to the raw command_line/file_path only
+    // if the action didn't route to a content-bearing branch.
+    const content =
+      contentFromArgs(action, ti).trim() || str(ti['command_line'] ?? ti['file_path']);
     return content ? { toolName: action || 'command', content } : null;
   }
   if (platform === 'cursor') {
@@ -436,21 +456,39 @@ export function readHookProtectionStatus(): {
   }
 }
 
-function readStdin(): Promise<string> {
+/** Read stdin, signalling `truncated` when the payload blew past the cap. A tool
+ *  call padded past the cap truncates mid-JSON and would break JSON.parse — under
+ *  a blocking posture we must refuse to fail open on that (it is an evasion). */
+function readStdin(): Promise<{ data: string; truncated: boolean }> {
   return new Promise((resolve) => {
     let data = '';
     if (process.stdin.isTTY) {
-      resolve('');
+      resolve({ data: '', truncated: false });
       return;
     }
     process.stdin.setEncoding('utf-8');
+    const CAP = 8_000_000; // real tool-call payloads are tiny; 8MB is generous
     process.stdin.on('data', (chunk) => {
       data += chunk;
-      if (data.length > 1_000_000) resolve(data);
+      if (data.length > CAP) resolve({ data, truncated: true });
     });
-    process.stdin.on('end', () => resolve(data));
-    process.stdin.on('error', () => resolve(data));
+    process.stdin.on('end', () => resolve({ data, truncated: false }));
+    process.stdin.on('error', () => resolve({ data, truncated: false }));
   });
+}
+
+/** Hook enforcement posture:
+ *  - 'advisory' → detect + warn on stderr, NEVER block (pure telemetry).
+ *  - 'guarded'  → DEFAULT. Block only hard-deny (critical / high-stable) verdicts;
+ *                 stay advisory on lower-confidence 'ask' matches so a false
+ *                 positive can never wall off legitimate agent work.
+ *  - 'enforce'  → block every deny AND ask verdict (strict). */
+export type HookPosture = 'advisory' | 'guarded' | 'enforce';
+
+function resolvePosture(opts: { enforce?: boolean; advisory?: boolean }): HookPosture {
+  if (process.env['PANGUARD_HOOK_ENFORCE'] === '1' || opts.enforce) return 'enforce';
+  if (process.env['PANGUARD_HOOK_ADVISORY'] === '1' || opts.advisory) return 'advisory';
+  return 'guarded';
 }
 
 /**
@@ -465,22 +503,51 @@ function readStdin(): Promise<string> {
  *     silently let a flagged tool call run because our output drifted.
  * The windsurf adapter's only non-zero exit is 2 (exit 1 = silent fail-open there).
  */
-export async function runHook(platform: HookPlatform, enforce = false): Promise<void> {
-  // Default posture is ADVISORY: detect + warn on stderr, but NEVER block. A
-  // false positive on a legitimate agent operation must not wall off the agent's
-  // work mid-session — that is the #1 uninstall trigger for a live-agent guard.
-  // Blocking is opt-in (--enforce flag or PANGUARD_HOOK_ENFORCE=1). The
-  // deterministic pre-install scan (pga scan) and the MCP proxy remain the
-  // enforcing layers; the PreToolUse hook defaults to visibility, not a wall.
-  const enforcing = enforce || process.env['PANGUARD_HOOK_ENFORCE'] === '1';
+export async function runHook(
+  platform: HookPlatform,
+  opts: { enforce?: boolean; advisory?: boolean } = {}
+): Promise<void> {
+  // Default posture is GUARDED: block only hard-deny verdicts (critical, or
+  // high-severity + stable maturity — credential exfil, RCE, SSRF, tool
+  // poisoning), and stay advisory on lower-confidence 'ask' matches. Hard-deny is
+  // high-confidence and low-FP, so blocking it is real protection; the FP-prone
+  // matches never wall off legitimate agent work (the #1 uninstall trigger).
+  // --enforce (or PANGUARD_HOOK_ENFORCE=1) blocks 'ask' too; --advisory (or
+  // PANGUARD_HOOK_ADVISORY=1) is pure detect-and-warn telemetry.
+  const posture = resolvePosture(opts);
   const apply = (e: Emission): never => {
     if (e.stdout) process.stdout.write(e.stdout);
     if (e.stderr) process.stderr.write(e.stderr + '\n');
     process.exit(e.exit);
   };
   try {
-    const raw = await readStdin();
-    const payload = JSON.parse(raw || '{}') as Record<string, unknown>;
+    const { data: raw, truncated } = await readStdin();
+    // Oversized payload (padded past the reader cap → truncated mid-JSON). Under a
+    // blocking posture, refuse to fail open on this evasion vector.
+    if (truncated) {
+      if (posture === 'advisory') {
+        process.stderr.write('[panguard] advisory: oversized tool-call payload not scanned.\n');
+        process.exit(0);
+      }
+      failClosed(platform, 'oversized tool-call payload (possible evasion) — blocked');
+    }
+    let payload: Record<string, unknown> = {};
+    if (raw.trim()) {
+      try {
+        payload = JSON.parse(raw) as Record<string, unknown>;
+      } catch {
+        // Unparseable input on a recognized platform. Malformed JSON cannot be
+        // scanned, so under a blocking posture fail CLOSED (never let a payload
+        // hide a command behind broken JSON); advisory just warns.
+        if (posture === 'advisory') {
+          process.stderr.write(
+            '[panguard] advisory: unparseable tool-call payload not scanned.\n'
+          );
+          process.exit(0);
+        }
+        failClosed(platform, 'unparseable tool-call payload — blocked (fail-closed)');
+      }
+    }
     const norm = normalizeInput(platform, payload);
     if (!norm || !norm.content.trim()) process.exit(0);
 
@@ -524,15 +591,19 @@ export async function runHook(platform: HookPlatform, enforce = false): Promise<
       : '';
     const reason = `PanGuard: ${result.reason || 'matched a detection rule'}${rules}`;
 
-    // POSTURE gate: at this point `outcome` is a real deny/ask verdict (allow
-    // already exited; an unrecognized outcome already failed closed above). In
-    // the default advisory posture, downgrade that verdict to a NON-BLOCKING
-    // stderr advisory and allow the tool call. Only --enforce turns it into a
-    // host-level block.
-    if (!enforcing) {
-      process.stderr.write(
-        `[panguard] advisory (not blocked): ${reason} — run the hook with --enforce to block.\n`
-      );
+    // POSTURE gate. `outcome` is a real 'deny' (hard-deny: critical / high-stable)
+    // or 'ask' (lower-confidence) verdict here (allow already exited; an
+    // unrecognized outcome already failed closed above).
+    //   guarded (default) → block 'deny', advise 'ask'
+    //   enforce           → block both
+    //   advisory          → block neither
+    const block = posture === 'enforce' || (posture === 'guarded' && outcome === 'deny');
+    if (!block) {
+      const hint =
+        posture === 'guarded' && outcome === 'ask'
+          ? ' — enforce mode (--enforce) would also block lower-confidence matches'
+          : '';
+      process.stderr.write(`[panguard] advisory (not blocked): ${reason}${hint}\n`);
       process.exit(0);
     }
     // Contract/protocol failures fail CLOSED (emitFor throws HookContractError);
@@ -558,7 +629,9 @@ export async function runHook(platform: HookPlatform, enforce = false): Promise<
 
 // ── Registration (per-platform config; idempotent, non-clobbering) ───────────
 
-const HOOK_CMD = (p: HookPlatform): string => `pga hook run --platform ${p}`;
+const HOOK_CMD = (p: HookPlatform, posture: HookPosture = 'guarded'): string =>
+  `pga hook run --platform ${p}` +
+  (posture === 'enforce' ? ' --enforce' : posture === 'advisory' ? ' --advisory' : '');
 const TOOL_MATCHER = EVALUATED_TOOLS.join('|');
 
 /**
@@ -699,7 +772,10 @@ export function withHookRemoved(settings: ClaudeSettings): ClaudeSettings {
  * (configOrAbort returns {}). Every writer spreads the parsed object first, so
  * all existing top-level keys are preserved.
  */
-export function installFor(platform: HookPlatform): 'installed' | 'already' | 'error' {
+export function installFor(
+  platform: HookPlatform,
+  posture: HookPosture = 'guarded'
+): 'installed' | 'already' | 'error' {
   lastInstallError = null;
   try {
     switch (platform) {
@@ -712,7 +788,7 @@ export function installFor(platform: HookPlatform): 'installed' | 'already' | 'e
         const s = base as ClaudeSettings;
         if (isHookInstalled(s)) return 'already';
         // withHookInstalled spreads `s`, preserving permissions/env/model/MCP keys.
-        writeJson(settingsPath, withHookInstalled(s, HOOK_CMD('claude-code')));
+        writeJson(settingsPath, withHookInstalled(s, HOOK_CMD('claude-code', posture)));
         return 'installed';
       }
       case 'codex': {
@@ -725,7 +801,7 @@ export function installFor(platform: HookPlatform): 'installed' | 'already' | 'e
         const pre = Array.isArray(hooks.PreToolUse) ? [...hooks.PreToolUse] : [];
         pre.push({
           matcher: 'Bash|apply_patch',
-          hooks: [{ type: 'command', command: HOOK_CMD('codex') }],
+          hooks: [{ type: 'command', command: HOOK_CMD('codex', posture) }],
         });
         writeJson(path, { ...s, hooks: { ...hooks, PreToolUse: pre } });
         return 'installed';
@@ -742,7 +818,7 @@ export function installFor(platform: HookPlatform): 'installed' | 'already' | 'e
         before.push({
           matcher: 'run_shell_command|write_file|replace',
           hooks: [
-            { name: 'panguard-atr', type: 'command', command: HOOK_CMD('gemini'), timeout: 10000 },
+            { name: 'panguard-atr', type: 'command', command: HOOK_CMD('gemini', posture), timeout: 10000 },
           ],
         });
         writeJson(path, { ...s, hooks: { ...(s.hooks ?? {}), BeforeTool: before } });
@@ -764,7 +840,7 @@ export function installFor(platform: HookPlatform): 'installed' | 'already' | 'e
           // means an orphaned hook degrades to no-protection (loud, recoverable)
           // instead of a hard deny. Our own runHook is already fail-safe and
           // never relies on the host's failClosed flag for enforcement.
-          arr.push({ command: HOOK_CMD('cursor'), failClosed: false });
+          arr.push({ command: HOOK_CMD('cursor', posture), failClosed: false });
           hooks[ev] = arr;
         }
         writeJson(path, { version: 1, ...s, hooks });
@@ -779,7 +855,7 @@ export function installFor(platform: HookPlatform): 'installed' | 'already' | 'e
         if (JSON.stringify(hooks).includes('pga hook run')) return 'already';
         for (const ev of ['pre_run_command', 'pre_write_code', 'pre_mcp_tool_use']) {
           const arr = Array.isArray(hooks[ev]) ? [...(hooks[ev] as unknown[])] : [];
-          arr.push({ command: HOOK_CMD('windsurf'), show_output: true });
+          arr.push({ command: HOOK_CMD('windsurf', posture), show_output: true });
           hooks[ev] = arr;
         }
         writeJson(path, { ...s, hooks });
@@ -794,7 +870,7 @@ export function installFor(platform: HookPlatform): 'installed' | 'already' | 'e
         if (existsSync(file) && readFileSync(file, 'utf-8').includes('pga hook run'))
           return 'already';
         mkdirSync(dir, { recursive: true });
-        writeFileSync(file, '#!/usr/bin/env bash\nexec pga hook run --platform cline\n', {
+        writeFileSync(file, `#!/usr/bin/env bash\nexec ${HOOK_CMD('cline', posture)}\n`, {
           mode: 0o755,
         });
         chmodSync(file, 0o755);
@@ -964,25 +1040,32 @@ export function hookCommand(): Command {
     .option('--platform <id>', 'Host platform (claude-code if omitted)')
     .option(
       '--enforce',
-      'Block flagged tool calls. Default is advisory: detect + warn on stderr, never block.'
+      'Strict: block every flagged tool call (deny AND lower-confidence ask matches).'
     )
-    .action(async (opts: { platform?: string; enforce?: boolean }) => {
-      const enforce = opts.enforce === true;
+    .option(
+      '--advisory',
+      'Detect-only: warn on stderr, never block (pure telemetry). Default is guarded: block critical/high-confidence deny verdicts, advise the rest.'
+    )
+    .action(async (opts: { platform?: string; enforce?: boolean; advisory?: boolean }) => {
+      const postureOpts = { enforce: opts.enforce === true, advisory: opts.advisory === true };
       if (opts.platform == null) {
-        await runHook('claude-code', enforce);
+        await runHook('claude-code', postureOpts);
         return;
       }
       if (!(PLATFORMS as Record<string, PlatformSpec>)[opts.platform]) {
         failClosed(opts.platform, `unknown --platform "${opts.platform}"`);
       }
-      await runHook(opts.platform as HookPlatform, enforce);
+      await runHook(opts.platform as HookPlatform, postureOpts);
     });
 
   cmd
     .command('install')
     .description('Register the hook for a platform (or all hookable detected platforms)')
     .option('--platform <id>', 'A specific platform; omit for all hookable')
-    .action((opts: { platform?: string }) => {
+    .option('--enforce', 'Strict posture: block deny AND lower-confidence ask matches.')
+    .option('--advisory', 'Detect-only posture: warn, never block (pure telemetry).')
+    .action((opts: { platform?: string; enforce?: boolean; advisory?: boolean }) => {
+      const posture: HookPosture = opts.enforce ? 'enforce' : opts.advisory ? 'advisory' : 'guarded';
       const targets = opts.platform
         ? [opts.platform as HookPlatform].filter((p) => PLATFORMS[p])
         : HOOKABLE_PLATFORMS;
@@ -991,7 +1074,7 @@ export function hookCommand(): Command {
         return;
       }
       for (const p of targets) {
-        const r = installFor(p);
+        const r = installFor(p, posture);
         const tag =
           r === 'installed'
             ? c.safe('installed')
@@ -1005,6 +1088,15 @@ export function hookCommand(): Command {
           console.log(`  ${''.padEnd(12)} ${c.dim(lastHookInstallError()!)}`);
         }
       }
+      // Be HONEST about the posture that was actually wired — never imply
+      // blocking the user didn't opt into, nor hide that guarded blocks criticals.
+      const postureLine =
+        posture === 'enforce'
+          ? 'Posture: ENFORCE — every flagged tool call is blocked.'
+          : posture === 'advisory'
+            ? 'Posture: ADVISORY — threats are detected and logged, never blocked. Re-run with --enforce to block.'
+            : 'Posture: GUARDED — critical/high-confidence threats are BLOCKED; lower-confidence matches are advisory. Use --enforce to block those too, or --advisory for detect-only.';
+      console.log(`  ${c.dim(postureLine)}`);
       console.log(`  ${c.dim('Restart the host agent for the hook to take effect.')}`);
     });
 
