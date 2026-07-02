@@ -9,7 +9,7 @@
 
 import { Command } from 'commander';
 import { execFile, spawn } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, chmodSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir, platform } from 'node:os';
 import { createRequire } from 'node:module';
@@ -42,8 +42,16 @@ function persistToWhitelist(skillNames: readonly string[], source: 'manual' | 's
   const guardDir = join(homedir(), '.panguard-guard');
   const whitelistPath = join(guardDir, 'skill-whitelist.json');
 
+  // Trust-critical store: the whitelist decides which skills are ALLOWED, so it
+  // must be owner-only (0700 dir / 0600 file). A world-readable trust store is an
+  // information leak and inconsistent with the rest of ~/.panguard-guard.
   if (!existsSync(guardDir)) {
-    mkdirSync(guardDir, { recursive: true });
+    mkdirSync(guardDir, { recursive: true, mode: 0o700 });
+  }
+  try {
+    chmodSync(guardDir, 0o700);
+  } catch {
+    /* best-effort: non-POSIX filesystems (e.g. Windows) ignore modes */
   }
 
   // Load existing whitelist if present
@@ -85,7 +93,13 @@ function persistToWhitelist(skillNames: readonly string[], source: 'manual' | 's
     existingNames.add(normalized);
   }
 
-  writeFileSync(whitelistPath, JSON.stringify(existing, null, 2), 'utf-8');
+  writeFileSync(whitelistPath, JSON.stringify(existing, null, 2), { encoding: 'utf-8', mode: 0o600 });
+  try {
+    // writeFileSync's mode only applies on CREATE; chmod an existing file too.
+    chmodSync(whitelistPath, 0o600);
+  } catch {
+    /* best-effort */
+  }
 }
 
 /** Platform-specific restart instructions */

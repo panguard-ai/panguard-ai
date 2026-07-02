@@ -67,7 +67,11 @@ export interface ProxyConfig {
 /** The subset of ProxyEvaluator the proxy uses — injectable for testing. */
 export interface ProxyEvaluatorLike {
   loadRules(): Promise<number>;
-  evaluateToolCall(toolName: string, args: Record<string, unknown>): Promise<EvalResult>;
+  evaluateToolCall(
+    toolName: string,
+    args: Record<string, unknown>,
+    eventType?: string
+  ): Promise<EvalResult>;
   evaluateToolResponse(toolName: string, response: string): Promise<EvalResult>;
 }
 
@@ -218,7 +222,11 @@ export class MCPProxy {
     confidence: number;
     matchedRules: readonly string[];
   }): void {
-    if (verdict.outcome === 'deny' && verdict.confidence >= MCPProxy.ESCALATE_CONFIDENCE) {
+    // Normalize confidence to a 0-100 scale before the threshold check: the ATR
+    // engine reports match confidence on a 0-1 scale, so comparing it raw to a
+    // 0-100 threshold (95) made this escalation NEVER fire for a real deny.
+    const conf = verdict.confidence <= 1 ? verdict.confidence * 100 : verdict.confidence;
+    if (verdict.outcome === 'deny' && conf >= MCPProxy.ESCALATE_CONFIDENCE) {
       this.riskStore.set(this.sessionId, { level: 'high', reasons: [...verdict.matchedRules] });
     }
   }
@@ -325,11 +333,17 @@ export class MCPProxy {
         };
       }
 
-      // PreToolUse: evaluate the call
+      // PreToolUse: evaluate the call as a 'tool_call' event so the full
+      // tool_call rule family (shell injection, SSRF, SQLi, credential theft,
+      // privilege escalation, tool poisoning) runs — an MCP tool call carries
+      // exactly those payloads in its args. Via the engine's mcp-over-tool
+      // exception this is a superset of the mcp_exchange rules, so nothing that
+      // 'mcp_exchange' caught is lost. (The old default silently skipped ~44
+      // tool_call rules on every MCP call.)
       let preResult;
       try {
         preResult = await Promise.race([
-          this.evaluator.evaluateToolCall(name, toolArgs),
+          this.evaluator.evaluateToolCall(name, toolArgs, 'tool_call'),
           new Promise<never>((_, reject) =>
             setTimeout(() => reject(new Error('timeout')), this.evalTimeout)
           ),

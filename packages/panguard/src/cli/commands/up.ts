@@ -583,6 +583,9 @@ export function upCommand(): Command {
                   `    ${c.safe(`Built-in tools guarded on ${done.length} platform(s)`)} ` +
                     `${c.dim(`(${done.join(', ')} — restart the agent to activate)`)}`
                 );
+                console.log(
+                  `    ${c.dim('Guarded = critical/high-confidence threats blocked, the rest advisory. `pga hook install --enforce` blocks everything.')}`
+                );
               }
             }
           }
