@@ -500,7 +500,11 @@ export async function runHook(platform: HookPlatform, enforce = false): Promise<
     // tool_call rule set (shell injection, credential theft, SSRF, RCE) plus
     // mcp_exchange rules — a built-in tool call is neither multi-agent comms
     // nor an LLM prompt, so those rule families are correctly skipped.
-    const result = await evaluator.evaluateToolCall('command', { input: norm.content }, 'tool_call');
+    const result = await evaluator.evaluateToolCall(
+      'command',
+      { input: norm.content },
+      'tool_call'
+    );
 
     // Validate the evaluator outcome. An unexpected/unknown value must DENY
     // (fail closed), never fall through to allow.
