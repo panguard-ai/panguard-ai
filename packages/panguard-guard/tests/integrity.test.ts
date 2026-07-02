@@ -12,6 +12,9 @@ import {
   verifyConfigIntegrity,
   checkSelfState,
   manifestPath,
+  collectSelfState,
+  mergeSelfState,
+  readSelfStateRefs,
   type SelfStateRef,
 } from '../src/integrity.js';
 
@@ -142,5 +145,47 @@ describe('self-removal detection', () => {
   it('unsealed (no manifest) → self-state check is ok (nothing recorded yet)', () => {
     expect(existsSync(manifestPath(dir))).toBe(false);
     expect(checkSelfState(dir)).toEqual({ ok: true, findings: [] });
+  });
+});
+
+describe('self-state discovery + merge (finding #20 — dead self-removal wiring)', () => {
+  it('mergeSelfState never DROPS a recorded ref — a removed artifact stays detectable', () => {
+    // This is the safety property: re-sealing with a bare collectSelfState() (which
+    // omits anything currently absent) would erase the very removal we detect.
+    const plistRef: SelfStateRef = { kind: 'launchagent', path: '/x/plist', marker: 'L' };
+    expect(mergeSelfState([plistRef], [])).toEqual([plistRef]);
+  });
+
+  it('mergeSelfState adds a newly-present artifact', () => {
+    const a: SelfStateRef = { kind: 'launchagent', path: '/x/a' };
+    const b: SelfStateRef = { kind: 'hook', path: '/x/b' };
+    const merged = mergeSelfState([a], [b]);
+    expect(merged.map((r) => r.path).sort()).toEqual(['/x/a', '/x/b']);
+  });
+
+  it('mergeSelfState: recorded wins on a path conflict (keeps the original marker)', () => {
+    const rec: SelfStateRef = { kind: 'launchagent', path: '/x/p', marker: 'ORIG' };
+    const disc: SelfStateRef = { kind: 'launchagent', path: '/x/p', marker: 'NEW' };
+    expect(mergeSelfState([rec], [disc])).toEqual([rec]);
+  });
+
+  it('END-TO-END: a re-seal with merge keeps a removed LaunchAgent flagged as missing', () => {
+    const plist = join(dir, 'com.panguard.panguard-guard.plist');
+    writeFileSync(plist, '<plist/>');
+    sealConfigManifest(baseConfig(), [{ kind: 'launchagent', path: plist, marker: 'x' }], dir);
+    rmSync(plist); // attacker removes the persistence service
+    // Config-save re-seal path: merge recorded refs with freshly discovered ones
+    // (which no longer include the deleted plist). The removal must survive.
+    const merged = mergeSelfState(readSelfStateRefs(dir), collectSelfState());
+    sealConfigManifest(baseConfig(), merged, dir);
+    const v = checkSelfState(dir);
+    expect(v.ok).toBe(false);
+    expect(v.findings[0]).toMatchObject({ kind: 'launchagent', reason: 'missing' });
+  });
+
+  it('collectSelfState records only currently-present artifacts (no false "missing")', () => {
+    for (const ref of collectSelfState()) {
+      expect(existsSync(ref.path)).toBe(true);
+    }
   });
 });

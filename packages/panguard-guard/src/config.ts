@@ -11,7 +11,12 @@ import { z } from 'zod';
 import { createLogger } from '@panguard-ai/core';
 import type { GuardConfig } from './types.js';
 import { DEFAULT_ACTION_POLICY } from './types.js';
-import { sealConfigManifest, readSelfStateRefs } from './integrity.js';
+import {
+  sealConfigManifest,
+  readSelfStateRefs,
+  collectSelfState,
+  mergeSelfState,
+} from './integrity.js';
 
 const logger = createLogger('panguard-guard:config');
 
@@ -365,11 +370,18 @@ export function saveConfig(config: GuardConfig, configPath?: string): void {
     /* best effort — platforms without POSIX permissions */
   }
   logger.info(`Saved config to ${path}`);
-  // Re-seal the integrity manifest so this LEGITIMATE write re-establishes trust
-  // (preserving any recorded self-state refs), rather than later reading as
-  // tampering on the next start. Best-effort: a seal failure must never fail a save.
+  // Re-seal the integrity manifest so this LEGITIMATE write re-establishes trust,
+  // rather than later reading as tampering on the next start. Merge the recorded
+  // self-state refs with the guard's currently-present artifacts: this preserves a
+  // recorded-but-now-missing artifact (so its removal is still flagged) while
+  // folding in any newly-installed one. Best-effort: a seal failure must never
+  // fail a save.
   try {
-    sealConfigManifest(config as unknown as Record<string, unknown>, readSelfStateRefs(dir), dir);
+    sealConfigManifest(
+      config as unknown as Record<string, unknown>,
+      mergeSelfState(readSelfStateRefs(dir), collectSelfState()),
+      dir
+    );
   } catch {
     /* best-effort — integrity sealing must not block a config save */
   }

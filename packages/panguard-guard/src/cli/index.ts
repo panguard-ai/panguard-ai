@@ -268,14 +268,35 @@ async function commandStart(
   // first run, establish the seal. On tamper / self-removal, start anyway but warn
   // LOUDLY — never silently honor a weakened config as if PROTECTED (the S2 invariant).
   try {
-    const { verifyConfigIntegrity, checkSelfState, sealConfigManifest, wasInitialized } =
-      await import('../integrity.js');
+    const {
+      verifyConfigIntegrity,
+      checkSelfState,
+      sealConfigManifest,
+      wasInitialized,
+      collectSelfState,
+      mergeSelfState,
+      readSelfStateRefs,
+    } = await import('../integrity.js');
     const cfgRecord = config as unknown as Record<string, unknown>;
     let verdict = verifyConfigIntegrity(cfgRecord, dataDir);
     const selfState = checkSelfState(dataDir);
     if (verdict.status === 'unsealed' && !wasInitialized(dataDir)) {
-      sealConfigManifest(cfgRecord, [], dataDir); // true first run — establish trust
+      // True first run — establish trust AND record the guard's own artifacts so
+      // their later removal is detectable. Sealing empty refs (the old behavior)
+      // left checkSelfState iterating nothing → self-removal detection was dead.
+      sealConfigManifest(cfgRecord, collectSelfState(), dataDir);
       verdict = { status: 'sealed', findings: [], checkedAt: verdict.checkedAt };
+    } else if (verdict.status === 'sealed' && selfState.ok) {
+      // Config trust intact and nothing currently missing: fold in any newly-present
+      // artifacts (LaunchAgent installed after the first seal, or an in-place upgrade
+      // from a build that sealed empty refs). Merge never drops a recorded ref, and
+      // we only re-seal an already-verified config when the inventory actually grew —
+      // so this never masks a tamper nor rewrites the manifest needlessly.
+      const recorded = readSelfStateRefs(dataDir);
+      const merged = mergeSelfState(recorded, collectSelfState());
+      if (merged.length > recorded.length) {
+        sealConfigManifest(cfgRecord, merged, dataDir);
+      }
     }
     if (verdict.status !== 'sealed' || !selfState.ok) {
       process.stderr.write(
