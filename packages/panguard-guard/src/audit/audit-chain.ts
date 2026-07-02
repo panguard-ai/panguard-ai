@@ -89,9 +89,7 @@ export class AuditChain {
     this.logPath = logPath;
     this.key = opts.key;
     this.anchor = opts.anchor ?? (() => {});
-    this.headPath = opts.dataDir
-      ? join(opts.dataDir, 'chainHead.json')
-      : `${logPath}.head`;
+    this.headPath = opts.dataDir ? join(opts.dataDir, 'chainHead.json') : `${logPath}.head`;
 
     try {
       mkdirSync(dirname(logPath), { recursive: true, mode: 0o700 });
@@ -207,9 +205,7 @@ export class AuditChain {
    * of truth, so rotation needs no special chain handling here.
    */
   noteRotation(): void {
-    logger.info(
-      `Audit chain spans rotation at seq ${this.head.seq} (head hash carried forward)`
-    );
+    logger.info(`Audit chain spans rotation at seq ${this.head.seq} (head hash carried forward)`);
   }
 
   // ---------------------------------------------------------------------------

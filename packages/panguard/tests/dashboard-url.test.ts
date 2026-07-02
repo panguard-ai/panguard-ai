@@ -78,9 +78,7 @@ describe('dashboard-url helpers', () => {
       mockReadFileSync.mockImplementation((p: string) =>
         p === TOKEN ? 'secret-token-xyz\n' : JSON.stringify({ dashboardPort: 3100 })
       );
-      expect(readAuthenticatedDashboardUrl()).toBe(
-        'http://127.0.0.1:3100/?token=secret-token-xyz'
-      );
+      expect(readAuthenticatedDashboardUrl()).toBe('http://127.0.0.1:3100/?token=secret-token-xyz');
     });
   });
 });

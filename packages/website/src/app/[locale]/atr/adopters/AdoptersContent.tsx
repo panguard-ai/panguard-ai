@@ -43,7 +43,8 @@ const ADOPTERS: readonly Adopter[] = [
   {
     org: 'Cisco AI Defense',
     category: 'big-tech',
-    noteEn: 'The full ATR rule pack in skill-scanner production, auto-synced to the latest ATR release.',
+    noteEn:
+      'The full ATR rule pack in skill-scanner production, auto-synced to the latest ATR release.',
     noteZh: '完整 ATR 規則包進入 skill-scanner production，並自動同步至最新 ATR 發行。',
     prs: [
       {

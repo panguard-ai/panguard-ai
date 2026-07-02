@@ -13,8 +13,13 @@ import {
   type IngestKey,
 } from '../src/threat-cloud/seal.js';
 
-async function makeIngestKey(kid = 'test-key'): Promise<{ key: IngestKey; privateKey: CryptoKey; publicJwk: JWK }> {
-  const { publicKey, privateKey } = await generateKeyPair('ECDH-ES', { crv: 'X25519', extractable: true });
+async function makeIngestKey(
+  kid = 'test-key'
+): Promise<{ key: IngestKey; privateKey: CryptoKey; publicJwk: JWK }> {
+  const { publicKey, privateKey } = await generateKeyPair('ECDH-ES', {
+    crv: 'X25519',
+    extractable: true,
+  });
   const publicJwk = await exportJWK(publicKey);
   const key: IngestKey = {
     kid,
