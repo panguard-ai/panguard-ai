@@ -28,6 +28,25 @@ function makeFinding(
 // ---------------------------------------------------------------------------
 
 describe('calculateRiskScore', () => {
+  describe('anti-evasion floor (attacker-controllable reducer context)', () => {
+    // A malicious skill can stack defensive/educational prose to drive the
+    // context multiplier to its 0.3 floor. That must never hide a real payload.
+    it('a real CRITICAL finding never collapses below HIGH under a strong reducer multiplier', () => {
+      const { level } = calculateRiskScore([makeFinding('c', 'critical')], 0.3);
+      expect(['HIGH', 'CRITICAL']).toContain(level);
+    });
+    it('a real HIGH finding never collapses to LOW under a strong reducer multiplier', () => {
+      const { level } = calculateRiskScore([makeFinding('h', 'high')], 0.3);
+      expect(['MEDIUM', 'HIGH', 'CRITICAL']).toContain(level);
+      expect(level).not.toBe('LOW');
+    });
+    it('legitimate context may still SOFTEN a critical (critical -> HIGH is allowed)', () => {
+      const { level } = calculateRiskScore([makeFinding('c', 'critical')], 0.3);
+      // softened, but still clearly flagged — not silently downgraded to LOW/MEDIUM
+      expect(level).toBe('HIGH');
+    });
+  });
+
   describe('empty findings', () => {
     it('returns score 0 and level LOW for empty array', () => {
       const { score, level } = calculateRiskScore([]);
@@ -138,12 +157,14 @@ describe('calculateRiskScore', () => {
     });
   });
 
-  describe('contextMultiplier < 0.6 weakens critical override', () => {
-    it('critical finding with multiplier 0.5 yields MEDIUM (not HIGH)', () => {
-      const findings = [makeFinding('f1', 'critical')]; // raw = 25, * 0.5 = 12 (< 15 threshold for MEDIUM via score)
+  describe('contextMultiplier < 0.6 weakens critical override (bounded by anti-evasion floor)', () => {
+    it('critical finding with multiplier 0.5 is softened to HIGH — never below', () => {
+      const findings = [makeFinding('f1', 'critical')];
       const { level } = calculateRiskScore(findings, 0.5);
-      // weakenedCriticalOverride = true (0.5 < 0.6), so critical forces MEDIUM only
-      expect(level).toBe('MEDIUM');
+      // weakenedCriticalOverride = true (0.5 < 0.6): critical no longer FORCES
+      // CRITICAL, but the anti-evasion floor keeps a real critical at HIGH — it
+      // must not be hidden by (attacker-controllable) reducer context.
+      expect(level).toBe('HIGH');
     });
 
     it('critical finding with multiplier exactly 0.6 still yields CRITICAL', () => {
@@ -155,10 +176,10 @@ describe('calculateRiskScore', () => {
       expect(level).toBe('CRITICAL');
     });
 
-    it('critical finding with multiplier 0.3 (below 0.6) yields MEDIUM', () => {
+    it('critical finding with multiplier 0.3 (max reduction) is still HIGH, not MEDIUM/LOW', () => {
       const findings = [makeFinding('f1', 'critical')];
       const { level } = calculateRiskScore(findings, 0.3);
-      expect(level).toBe('MEDIUM');
+      expect(level).toBe('HIGH');
     });
   });
 
