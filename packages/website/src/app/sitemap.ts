@@ -54,6 +54,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/resources',
     '/press',
     '/trust',
+    '/trust/signing-key',
     '/legal/privacy',
     '/legal/terms',
     '/legal/cookies',

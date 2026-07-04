@@ -2857,8 +2857,49 @@
       "title": "Need compliance documentation?",
       "desc": "Request SOC 2 reports, penetration test summaries, or our Data Processing Agreement. All documentation is available to the community.",
       "cta1": "Request Documentation",
-      "cta2": "View Security Practices"
+      "cta2": "View Security Practices",
+      "cta3": "Report Signing Key"
     }
+  },
+  "trustSigningKey": {
+    "overline": "Trust Center",
+    "title": "Report Signing Key",
+    "subtitle": "Every audit report PanGuard issues is signed with the Ed25519 key published on this page. Pin the key ID below and verify any report offline — no account, no API, and no trust in the delivery channel required.",
+    "facts": {
+      "title": "Active signing key",
+      "statusActive": "Active",
+      "issuer": "Issuer",
+      "keyId": "Key ID",
+      "algorithm": "Algorithm",
+      "created": "Created",
+      "usage": "Usage",
+      "usageValue": "Audit report signing",
+      "payloadFormat": "Payload format"
+    },
+    "pem": {
+      "title": "Public key (PEM)",
+      "copy": "Copy",
+      "copied": "Copied",
+      "desc": "SPKI-encoded Ed25519 public key. Safe to distribute; the private key never leaves the issuing machine. The key ID is the first 16 hex characters of the SHA-256 of this key's DER encoding, prefixed with pgk1-."
+    },
+    "verify": {
+      "title": "Verify a report",
+      "copy": "Copy",
+      "steps": {
+        "0": "Obtain the report in JSON format. Audit reports are delivered as HTML, Markdown and JSON sharing one hash and one signature.",
+        "1": "Run the verify command below. It recomputes the report's canonical SHA-256 from the body and checks the embedded Ed25519 signature fully offline.",
+        "2": "Confirm the reported key_id matches this page. A report signed by a key not published here must not be trusted."
+      }
+    },
+    "wellKnown": {
+      "title": "Machine-readable key pinning",
+      "desc": "Automation and CI pipelines can pin the current key set from the well-known endpoint. Keys are listed with an active or revoked status."
+    },
+    "limits": {
+      "title": "What this signature is — and is not",
+      "desc": "The signature proves report integrity (any modification is detectable) and issuing origin (only PanGuard holds the private key). It is an issuer-held cryptographic signature, not a certificate issued by a government-approved or qualified certification authority. Jurisdiction-specific legal framing and limitations are stated inside every signed report."
+    },
+    "backToTrust": "Back to Trust Center"
   },
   "security": {
     "overline": "Security & Trust",
@@ -5228,6 +5269,10 @@
     "trust": {
       "title": "Trust Center",
       "description": "Security you can verify. Review our compliance status, security architecture, data handling practices, and subprocessor relationships."
+    },
+    "trustSigningKey": {
+      "title": "Report Signing Key",
+      "description": "The Ed25519 public key PanGuard signs audit reports with. Pin the key ID and verify report integrity and origin fully offline."
     },
     "security": {
       "title": "Security",
