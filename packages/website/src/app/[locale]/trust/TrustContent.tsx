@@ -347,6 +347,12 @@ export default function TrustContent() {
               >
                 {t('cta.cta2')}
               </Link>
+              <Link
+                href="/trust/signing-key"
+                className="border border-border text-text-secondary hover:text-text-primary hover:border-brand-sage font-semibold rounded-full px-8 py-3.5 transition-all duration-200"
+              >
+                {t('cta.cta3')}
+              </Link>
             </div>
           </FadeInUp>
         </div>
