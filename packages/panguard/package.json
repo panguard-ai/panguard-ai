@@ -48,14 +48,14 @@
   "dependencies": {
     "@panguard-ai/atr": "workspace:*",
     "@panguard-ai/core": "workspace:*",
-    "@panguard-ai/panguard-scan": "workspace:*",
-    "@panguard-ai/panguard-guard": "workspace:*",
     "@panguard-ai/panguard-chat": "workspace:*",
-    "@panguard-ai/security-hardening": "workspace:*",
-    "@panguard-ai/scan-core": "workspace:*",
-    "@panguard-ai/panguard-skill-auditor": "workspace:*",
+    "@panguard-ai/panguard-guard": "workspace:*",
     "@panguard-ai/panguard-mcp": "workspace:*",
     "@panguard-ai/panguard-mcp-proxy": "workspace:*",
+    "@panguard-ai/panguard-scan": "workspace:*",
+    "@panguard-ai/panguard-skill-auditor": "workspace:*",
+    "@panguard-ai/scan-core": "workspace:*",
+    "@panguard-ai/security-hardening": "workspace:*",
     "@sentry/node": "^8.0.0",
     "commander": "^12.0.0",
     "js-yaml": "^4.1.0",
@@ -64,7 +64,7 @@
   },
   "optionalDependencies": {
     "@panguard-ai/panguard-trap": "workspace:*",
-    "agent-threat-rules": "^3.5.0"
+    "agent-threat-rules": "^3.5.5"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
