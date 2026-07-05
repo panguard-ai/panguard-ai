@@ -4,12 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <title>PanGuard Guard Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&family=Noto+Sans+TC:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
     <style>
       :root {
         --sage: #8b9a8e; /* brand identity / presence */
@@ -34,10 +28,10 @@
       }
       body {
         font-family:
-          'Inter',
-          'Noto Sans TC',
           -apple-system,
           BlinkMacSystemFont,
+          'Segoe UI',
+          system-ui,
           sans-serif;
         background: var(--bg-base);
         color: var(--text-primary);
@@ -69,7 +63,7 @@
         flex-shrink: 0;
       }
       .sb-brand span {
-        font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
         font-size: 14px;
         font-weight: 700;
         color: var(--text-primary);
@@ -172,7 +166,7 @@
 
       /* Typography */
       .pt {
-        font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
         font-size: 20px;
         font-weight: 700;
         margin-bottom: 6px;
@@ -189,7 +183,7 @@
         line-height: 1.5;
       }
       .st {
-        font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
         font-size: 14px;
         font-weight: 600;
         color: var(--text-muted);
@@ -217,7 +211,7 @@
         border-color: var(--sage);
       }
       .cl {
-        font-family: 'Inter', 'Noto Sans TC', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
         font-size: 11px;
         font-weight: 500;
         text-transform: uppercase;
@@ -226,7 +220,7 @@
         margin-bottom: 6px;
       }
       .cv {
-        font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
         font-size: 28px;
         font-weight: 700;
       }
@@ -243,7 +237,7 @@
         color: var(--danger);
       }
       .cv-sm {
-        font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
         font-size: 20px;
         font-weight: 700;
       }
@@ -260,7 +254,7 @@
         padding: 10px 16px;
         border-bottom: 1px solid var(--border);
         font-size: 12px;
-        font-family: 'JetBrains Mono', 'SF Mono', monospace;
+        font-family: ui-monospace, 'SF Mono', Menlo, monospace;
         display: flex;
         gap: 10px;
         align-items: flex-start;
@@ -338,7 +332,7 @@
         font-size: 11px;
         color: var(--text-muted);
         margin-top: 2px;
-        font-family: 'JetBrains Mono', 'SF Mono', monospace;
+        font-family: ui-monospace, 'SF Mono', Menlo, monospace;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -354,7 +348,7 @@
       .ev-card .ev-time {
         font-size: 11px;
         color: var(--text-muted);
-        font-family: 'JetBrains Mono', 'SF Mono', monospace;
+        font-family: ui-monospace, 'SF Mono', Menlo, monospace;
         flex-shrink: 0;
       }
       .ev-card.critical,
@@ -423,7 +417,7 @@
         margin-bottom: 8px;
       }
       .welcome-title {
-        font-family: 'Space Grotesk', 'Noto Sans TC', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
         font-size: 18px;
         font-weight: 700;
         color: var(--text-primary);
@@ -557,7 +551,7 @@
         background: rgba(139, 154, 142, 0.04);
       }
       .mono {
-        font-family: 'JetBrains Mono', 'SF Mono', monospace;
+        font-family: ui-monospace, 'SF Mono', Menlo, monospace;
         font-size: 12px;
       }
 
@@ -659,7 +653,7 @@
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        font-family: 'Inter', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
       }
       .badge-protected {
         background: rgba(46, 213, 115, 0.15);
@@ -907,7 +901,7 @@
       }
       .cmd-box code {
         flex: 1;
-        font-family: 'JetBrains Mono', 'SF Mono', monospace;
+        font-family: ui-monospace, 'SF Mono', Menlo, monospace;
         font-size: 12px;
         color: var(--text-primary);
         white-space: pre-wrap;
@@ -1162,7 +1156,7 @@
         margin-bottom: 16px;
       }
       .hero-status {
-        font-family: 'Space Grotesk', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
         font-size: 24px;
         font-weight: 700;
         color: var(--ok);
@@ -1199,7 +1193,7 @@
         min-width: 200px;
       }
       .conn-banner .conn-cmd {
-        font-family: 'JetBrains Mono', 'SF Mono', monospace;
+        font-family: ui-monospace, 'SF Mono', Menlo, monospace;
         font-size: 13px;
         background: var(--bg-base);
         border: 1px solid var(--border);
@@ -1255,7 +1249,7 @@
         letter-spacing: 0.2px;
       }
       .score-num {
-        font-family: 'Space Grotesk', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
         font-size: 56px;
         font-weight: 700;
         line-height: 1;
@@ -1297,7 +1291,7 @@
 
       /* Threat Cloud flywheel */
       .flywheel {
-        font-family: 'JetBrains Mono', 'SF Mono', monospace;
+        font-family: ui-monospace, 'SF Mono', Menlo, monospace;
         font-size: 12px;
         color: var(--text-muted);
         background: var(--bg-raised);
@@ -2048,7 +2042,7 @@
               class="desc"
               id="tc-endpoint"
               style="
-                font-family: 'JetBrains Mono', monospace;
+                font-family: ui-monospace, 'SF Mono', Menlo, monospace;
                 font-size: 12px;
                 color: var(--text-muted);
               "
@@ -2544,7 +2538,7 @@
           '<div style="font-size:13px;color:var(--text,#e6e8eb);margin-bottom:8px">' +
           'To get an authenticated URL, run:</div>' +
           '<div style="background:var(--surface-3,#0f1216);border-radius:8px;padding:12px 14px;' +
-          'font-family:ui-monospace,monospace;font-size:13px;color:var(--emerald,#34d399)">' +
+          'font-family:ui-monospace,\'SF Mono\',Menlo,monospace;font-size:13px;color:var(--emerald,#34d399)">' +
           'pga up</div>' +
           '<div style="font-size:12px;color:var(--text-muted,#9aa1a9);line-height:1.6;margin-top:14px">' +
           'It prints a link like ' +
