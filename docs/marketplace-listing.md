@@ -8,7 +8,7 @@ AI agent security scanner — audit MCP skills for threats, monitor agents 24/7,
 
 ### Long Description
 
-PanGuard scans MCP skills before you install them, catching SSH key exfiltration, prompt injection, credential theft, and supply chain attacks. 11 security tools via MCP: skill auditing, real-time monitoring, code scanning, compliance reports, and more. Powered by ATR (Agent Threat Rules) — an open detection standard with 61 rules and 474 patterns. Free, open source, MIT licensed.
+PanGuard scans MCP skills before you install them, catching SSH key exfiltration, prompt injection, credential theft, and supply chain attacks. 11 security tools via MCP: skill auditing, real-time monitoring, code scanning, compliance reports, and more. Powered by ATR (Agent Threat Rules) — an open detection standard with 675 rules and 1,200+ patterns. Free, open source, MIT licensed.
 
 ### Tags/Keywords
 
@@ -41,7 +41,7 @@ security, audit, mcp, skill-auditor, threat-detection, guard, monitoring, atr
 2. Add entry under **Security** section:
 
 ```markdown
-- [PanGuard](https://github.com/panguard-ai/panguard) - AI agent security scanner with skill auditing, 24/7 monitoring, and community threat intelligence. 61 ATR rules, 11 MCP tools.
+- [PanGuard](https://github.com/panguard-ai/panguard) - AI agent security scanner with skill auditing, 24/7 monitoring, and community threat intelligence. 675 ATR rules, 11 MCP tools.
 ```
 
 3. Submit PR with title: "Add PanGuard — AI agent security scanner"
@@ -91,7 +91,7 @@ security, audit, mcp, skill-auditor, threat-detection, guard, monitoring, atr
 
 ### 7. npm (DONE)
 
-Already published: `@panguard-ai/panguard-mcp@1.3.0`
+Already published: `@panguard-ai/panguard-mcp@1.7.3`
 
 ---
 

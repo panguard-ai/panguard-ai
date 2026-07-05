@@ -38,7 +38,7 @@ This is exactly where mobile apps were before Apple introduced App Review in 200
 
 ## What We Did
 
-We built [ATR (Agent Threat Rules)](https://github.com/Agent-Threat-Rule/agent-threat-rules) — the first open detection standard for AI agent threats. 61 rules across 9 threat categories, with 474 detection patterns.
+We built [ATR (Agent Threat Rules)](https://github.com/Agent-Threat-Rule/agent-threat-rules) — the first open detection standard for AI agent threats. 675 rules across 10 threat categories, with 1,200+ detection patterns.
 
 Then we scanned the entire MCP ecosystem on npm.
 

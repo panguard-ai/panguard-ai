@@ -1,6 +1,6 @@
 {
   "name": "panguard",
-  "version": "1.3.0",
+  "version": "1.7.3",
   "license": "MIT",
   "description": "AI security for agents and servers -- one command to protect everything",
   "bin": {
@@ -28,6 +28,10 @@
   "homepage": "https://panguard.ai",
   "repository": {
     "type": "git",
-    "url": "https://github.com/panguard-ai/panguard-ai"
+    "url": "https://github.com/panguard-ai/panguard-ai",
+    "directory": "packages/panguard-cli"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
