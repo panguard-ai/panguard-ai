@@ -96,8 +96,8 @@ importers:
         specifier: 2.45.6
         version: 2.45.6
       agent-threat-rules:
-        specifier: ^3.5.5
-        version: 3.5.5(zod@3.25.76)
+        specifier: ^3.5.6
+        version: 3.5.6(zod@3.25.76)
       jose:
         specifier: ^5.9.0
         version: 5.10.0
@@ -169,8 +169,8 @@ importers:
   packages/atr:
     dependencies:
       agent-threat-rules:
-        specifier: ^3.5.5
-        version: 3.5.5(zod@3.25.76)
+        specifier: ^3.5.6
+        version: 3.5.6(zod@3.25.76)
     devDependencies:
       '@types/node':
         specifier: ^22.14.0
@@ -226,8 +226,8 @@ importers:
   packages/migrator-community:
     dependencies:
       agent-threat-rules:
-        specifier: ^3.5.5
-        version: 3.5.5(zod@3.25.76)
+        specifier: ^3.5.6
+        version: 3.5.6(zod@3.25.76)
       commander:
         specifier: ^12.1.0
         version: 12.1.0
@@ -313,8 +313,8 @@ importers:
         specifier: workspace:*
         version: link:../panguard-trap
       agent-threat-rules:
-        specifier: ^3.5.5
-        version: 3.5.5(zod@3.25.76)
+        specifier: ^3.5.6
+        version: 3.5.6(zod@3.25.76)
 
   packages/panguard-chat:
     dependencies:
@@ -359,8 +359,8 @@ importers:
         specifier: workspace:*
         version: link:../../security-hardening
       agent-threat-rules:
-        specifier: ^3.5.5
-        version: 3.5.5(zod@3.25.76)
+        specifier: ^3.5.6
+        version: 3.5.6(zod@3.25.76)
       jose:
         specifier: ^5.9.0
         version: 5.10.0
@@ -455,8 +455,8 @@ importers:
         specifier: workspace:*
         version: link:../panguard-guard
       agent-threat-rules:
-        specifier: ^3.5.5
-        version: 3.5.5(zod@3.25.76)
+        specifier: ^3.5.6
+        version: 3.5.6(zod@3.25.76)
 
   packages/panguard-report:
     dependencies:
@@ -517,8 +517,8 @@ importers:
         specifier: workspace:*
         version: link:../scan-core
       agent-threat-rules:
-        specifier: ^3.5.5
-        version: 3.5.5(zod@3.25.76)
+        specifier: ^3.5.6
+        version: 3.5.6(zod@3.25.76)
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -2664,8 +2664,8 @@ packages:
     resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
     engines: {node: '>= 14'}
 
-  agent-threat-rules@3.5.5:
-    resolution: {integrity: sha512-UrZW2fOJnbcEi9vgN3Dbmr3532nEnJqpsIJZXHt5F7HlBF70T4jtX7I+1xN9cVB7n8oZWk7A1lrfckueMgEbbQ==}
+  agent-threat-rules@3.5.6:
+    resolution: {integrity: sha512-0TdoziKVJ0g5MhuSUCy1kzmlYKXti6qIMjWC802/0PBplYZVe7ktbqGbRN6ZxsVh9kKwiwnl77lRlC5YUKprlg==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -7566,7 +7566,7 @@ snapshots:
 
   agent-base@7.1.4: {}
 
-  agent-threat-rules@3.5.5(zod@3.25.76):
+  agent-threat-rules@3.5.6(zod@3.25.76):
     dependencies:
       '@modelcontextprotocol/sdk': 1.29.0(zod@3.25.76)
       js-yaml: 4.1.1
