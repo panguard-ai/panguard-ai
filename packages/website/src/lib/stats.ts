@@ -27,7 +27,7 @@ export const STATS = {
   /** Synced from agent-threat-rules/stats.json by sync-atr-stats workflow */
   atrVersion: '3.5.0',
   /** Total rules on main (disk == data/stats.json, verified against origin/main) */
-  atrRules: 675,
+  atrRules: 683,
   /** Maturity lanes: 'stable' rules run in the enforce lane; test/experimental are advisory */
   atrStableRules: 132,
   atrExperimentalRules: 61,
@@ -35,11 +35,11 @@ export const STATS = {
   atrCommunityRules: 93,
   /** Total detection patterns (regex conditions) across all ATR rules on main */
   atrPatterns: 3034,
-  totalRules: 675,
+  totalRules: 683,
   /** Use this for all user-facing display — avoids stale hardcoded counts */
-  totalRulesDisplay: '675' as const,
+  totalRulesDisplay: '683' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '675' as const,
+  atrRulesDisplay: '683' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,
