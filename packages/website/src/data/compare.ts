@@ -286,11 +286,11 @@ export const COMPARE: ComparisonEntry[] = [
     framing: {
       en: [
         'OWASP Agentic Top 10 (released 2026) defines ten categories of risk specific to AI agents: ASI01 Agent Goal Hijack, ASI02 Tool Misuse, ASI03 Identity & Privilege Abuse, ASI04 Agentic Supply Chain, ASI05 Unexpected Code Execution, ASI06 Memory & Context Poisoning, ASI07 Insecure Inter-Agent Communication, ASI08 Cascading Failures, ASI09 Human-Agent Trust Exploitation, ASI10 Rogue Agents. It is a checklist of what to worry about, with brief examples per category.',
-        'ATR is the executable detection layer. Each ATR rule lists which OWASP Agentic IDs it covers. A SOC using OWASP as a checklist can deploy ATR and immediately get detection coverage for every category — 10 of 10 categories with at least one rule, 77 total category-rule mappings across the corpus.',
+        'ATR is the executable detection layer. Each ATR rule lists which OWASP Agentic IDs it covers. A SOC using OWASP as a checklist can deploy ATR and immediately get detection coverage for every category — 10 of 10 categories with at least one rule, 866 total category-rule mappings across the corpus.',
       ],
       zh: [
         'OWASP Agentic Top 10（2026 發布）定義了 AI agent 特有的十類風險:ASI01 Agent 目標劫持、ASI02 工具濫用、ASI03 身份與權限濫用、ASI04 Agent 供應鏈、ASI05 非預期程式碼執行、ASI06 記憶體與上下文污染、ASI07 不安全的 Agent 間通訊、ASI08 連鎖故障、ASI09 人機信任濫用、ASI10 失控 Agent。這是「該擔心什麼」的 checklist,每類有簡短的範例。',
-        'ATR 是可執行的偵測層。每條 ATR 規則列出它涵蓋哪些 OWASP Agentic ID。一個用 OWASP 當 checklist 的 SOC,部署 ATR 後就立刻獲得每個類別的偵測覆蓋——10 個類別都至少有一條規則,規則庫共有 77 個類別-規則對應。',
+        'ATR 是可執行的偵測層。每條 ATR 規則列出它涵蓋哪些 OWASP Agentic ID。一個用 OWASP 當 checklist 的 SOC,部署 ATR 後就立刻獲得每個類別的偵測覆蓋——10 個類別都至少有一條規則,規則庫共有 866 個類別-規則對應。',
       ],
     },
     rows: [
@@ -308,7 +308,7 @@ export const COMPARE: ComparisonEntry[] = [
       },
       {
         feature: 'OWASP Agentic Top 10 coverage',
-        atr: '10/10 categories with 77 mappings',
+        atr: '10/10 categories with 866 mappings',
         other: '10/10 (it IS the 10/10)',
         winner: 'tie',
       },

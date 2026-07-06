@@ -444,7 +444,7 @@ export const LAYERS: readonly Layer[] = [
     status: 'partial',
     what: {
       en: 'L7 Govern is what compliance teams and auditors see. Today: audit log of every admin action (actor, IP, timestamp), client key registration + revocation, OWASP Agentic Top 10 mapping (10/10), NIST AI RMF mapping (100% / 1,566 mappings shipped in ATR v2.1.0), EU AI Act + ISO 42001 metadata auto-tagged via Migrator Enterprise. Planned: `pga report --framework <name>` for per-rule Markdown / PDF reports, and AIAM — agent identity, scope, delegation.',
-      zh: 'L7 治理是合規團隊與稽核員看的東西。今天：每個 admin 動作的稽核日誌（actor、IP、時間戳）、client key 註冊 + 撤銷、OWASP Agentic Top 10 對應（10/10）、NIST AI RMF 100% 對應（1,566 個 mapping，於 ATR v2.1.0 上線）、EU AI Act + ISO 42001 metadata 由 Migrator Enterprise 自動標註。規劃中：`pga report --framework <name>` 產出每條規則對應的 Markdown / PDF 報告；AIAM — agent 身分、scope、委派。',
+      zh: 'L7 治理是合規團隊與稽核員看的東西。今天：每個 admin 動作的稽核日誌（actor、IP、時間戳）、client key 註冊 + 撤銷、OWASP Agentic Top 10 對應（10/10）、NIST AI RMF 逐規則 metadata 對應（提交審查中）、EU AI Act + ISO 42001 metadata 由 Migrator Enterprise 自動標註。規劃中：`pga report --framework <name>` 產出每條規則對應的 Markdown / PDF 報告；AIAM — agent 身分、scope、委派。',
     },
     why: {
       en: 'EU AI Act high-risk obligations are enforced from December 2027 (omnibus delay). Colorado AI Act enforcement began 2026-06-01. F500 RFPs are asking for per-rule framework mapping, not just "we scan." Auditors need a path from detected event → triggered rule → controlled article. Compliance teams need SOC2 Type II attestation. We publish honest timelines and commit to them.',
@@ -455,12 +455,12 @@ export const LAYERS: readonly Layer[] = [
       zh: '今天：threat-cloud/src/audit-logger.ts 加上 audit_log SQLite migration v2-v3。ATR v2.1.0 規則內建 `compliance.nist_ai_rmf` metadata 區塊（1,566 個 mapping）。Migrator Enterprise 在規則轉換時自動標註 EU AI Act 條文與 ISO 42001 條款。規劃中：`pga report` 讀規則 YAML + TC 稽核日誌，產 Markdown / PDF 報告；AIAM package（panguard-auth）— OAuth 2.0 device flow、JWT issue/verify、policy evaluator。',
     },
     proof: {
-      en: 'Today: audit-logger.ts (143 lines, fully implemented) · admin dashboard with pagination/filter · client_keys table · OWASP Agentic Top 10 mapping 10/10 categories, 77 rule links · NIST AI RMF 100% mapped (1,566 mappings, ATR v2.1.0) · Migrator Enterprise auto-tags EU AI Act + ISO 42001 · Planned: pga report unifies all frameworks · AIAM · SOC 2 Type 1 in preparation.',
-      zh: '今天：audit-logger.ts（143 行，完整實作）· admin 儀表板 pagination/filter · client_keys table · OWASP Agentic Top 10 對應 10/10 類別、77 條規則連結 · NIST AI RMF 100% 對應（1,566 個 mapping，ATR v2.1.0）· Migrator Enterprise 自動標註 EU AI Act + ISO 42001 · 規劃中：pga report 整合所有框架 · AIAM · SOC 2 Type 1 準備中。',
+      en: 'Today: audit-logger.ts (143 lines, fully implemented) · admin dashboard with pagination/filter · client_keys table · OWASP Agentic Top 10 mapping 10/10 categories, 866 rule links · NIST AI RMF per-rule metadata mapping (submission in review) · Migrator Enterprise auto-tags EU AI Act + ISO 42001 · Planned: pga report unifies all frameworks · AIAM · SOC 2 Type 1 in preparation.',
+      zh: '今天：audit-logger.ts（143 行，完整實作）· admin 儀表板 pagination/filter · client_keys table · OWASP Agentic Top 10 對應 10/10 類別、866 條規則連結 · NIST AI RMF 逐規則 metadata 對應（提交審查中）· Migrator Enterprise 自動標註 EU AI Act + ISO 42001 · 規劃中：pga report 整合所有框架 · AIAM · SOC 2 Type 1 準備中。',
     },
     proofShort: {
-      en: 'NIST AI RMF 100% · OWASP 10/10 · audit log live · pga report planned',
-      zh: 'NIST AI RMF 100% · OWASP 10/10 · 稽核日誌已上線 · pga report 規劃中',
+      en: 'NIST AI RMF per-rule mapping · OWASP 10/10 · audit log live · pga report planned',
+      zh: 'NIST AI RMF 逐規則對應 · OWASP 10/10 · 稽核日誌已上線 · pga report 規劃中',
     },
     tryIt: {
       intro: {
