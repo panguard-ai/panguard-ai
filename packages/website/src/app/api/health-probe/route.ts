@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
 
 /**
  * /api/health-probe — server-side liveness probe of public Panguard services.
@@ -116,7 +117,12 @@ async function probeOne(target: ProbeTarget): Promise<ProbeResult> {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const ip = getClientIP(request);
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   const results = await Promise.all(TARGETS.map(probeOne));
   const aggregate: ProbeStatus = results.every((r) => r.status === 'operational')
     ? 'operational'

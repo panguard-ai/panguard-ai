@@ -6,7 +6,7 @@ import { Link, usePathname, useRouter } from '@/navigation';
 import type { Locale } from '@/navigation';
 import BrandLogo from './ui/BrandLogo';
 /* ─── Locale Switcher ─── */
-function LocaleSwitcher() {
+function LocaleSwitcher({ compact = false }: { compact?: boolean }) {
   const locale = useLocale() as Locale;
   const pathname = usePathname();
   const router = useRouter();
@@ -15,11 +15,15 @@ function LocaleSwitcher() {
     router.replace(pathname, { locale: target });
   };
 
+  // compact = inside the desktop pill (pill itself is the hit area);
+  // default keeps 44px touch targets for the mobile menu.
+  const sizing = compact ? 'px-3 py-1.5' : 'px-3 py-1 min-h-[44px] min-w-[44px]';
+
   return (
     <div className="inline-flex items-center bg-surface-1 border border-border rounded-full p-0.5">
       <button
         onClick={() => switchTo('en')}
-        className={`relative px-3 py-1 min-h-[44px] min-w-[44px] text-xs font-medium rounded-full transition-all duration-300 ${
+        className={`relative ${sizing} text-xs font-medium rounded-full transition-all duration-300 ${
           locale === 'en'
             ? 'text-surface-0 bg-brand-sage'
             : 'text-text-tertiary hover:text-text-secondary'
@@ -29,7 +33,7 @@ function LocaleSwitcher() {
       </button>
       <button
         onClick={() => switchTo('zh-TW')}
-        className={`relative px-3 py-1 min-h-[44px] min-w-[44px] text-xs font-medium rounded-full transition-all duration-300 ${
+        className={`relative ${sizing} text-xs font-medium rounded-full transition-all duration-300 ${
           locale === 'zh-TW'
             ? 'text-surface-0 bg-brand-sage'
             : 'text-text-tertiary hover:text-text-secondary'
@@ -104,7 +108,7 @@ function NavDropdown({ label, items }: { label: string; items: DropdownItem[] })
         onClick={() => setOpen(!open)}
         aria-expanded={open}
         aria-haspopup="true"
-        className="flex items-center gap-1 px-3 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
+        className="flex items-center gap-1 rounded-full px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-2 transition duration-200"
       >
         {label}
         <ChevronDown
@@ -113,7 +117,7 @@ function NavDropdown({ label, items }: { label: string; items: DropdownItem[] })
       </button>
       {open && (
         <div className="absolute top-full left-0 pt-2 z-[100]">
-          <div className="bg-surface-1 border border-border rounded-xl shadow-xl p-1.5 min-w-[260px]">
+          <div className="nav-pill rounded-2xl p-1.5 min-w-[260px]">
             {items.map((item) => (
               <Link
                 key={item.href}
@@ -196,72 +200,70 @@ export default function NavBar() {
   return (
     <nav
       aria-label="Main navigation"
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-surface-0/80 backdrop-blur-xl border-b border-border'
-          : 'bg-transparent border-b border-transparent'
-      }`}
+      data-scrolled={scrolled}
+      className="sticky top-3 sm:top-4 z-50 py-2"
     >
-      {/* Brand accent line */}
-      <div className="h-[2px] bg-gradient-to-r from-transparent via-brand-sage/60 to-transparent" />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
+        {/* Logo pill */}
+        <div className="nav-pill rounded-full h-12 px-4 flex items-center">
+          <Logo />
+        </div>
 
-      <div className="h-16 flex items-center justify-between px-4 sm:px-6 lg:px-[120px]">
-        <Logo />
+        {/* Links pill: desktop nav + CTA + locale switcher + mobile hamburger */}
+        <div className="nav-pill rounded-full h-12 px-2 flex items-center gap-1">
+          {/* Desktop nav — xl gate: at lg the full row overflows max-w-7xl */}
+          <div className="hidden xl:flex items-center gap-0.5">
+            <NavDropdown label={t('product')} items={productItems} />
+            <NavDropdown label={t('atr')} items={atrItems} />
+            {topLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="rounded-full px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-2 transition duration-200"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
 
-        {/* Desktop nav */}
-        <div className="hidden lg:flex items-center gap-0.5">
-          <NavDropdown label={t('product')} items={productItems} />
-          <NavDropdown label={t('atr')} items={atrItems} />
-          {topLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="px-3 py-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
+          {/* Desktop CTA + Locale Switcher */}
+          <div className="hidden xl:flex items-center gap-2 pl-1">
+            <LocaleSwitcher compact />
+            <a
+              href="https://github.com/panguard-ai/panguard-ai"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary border border-border hover:border-text-tertiary rounded-full px-4 py-1.5 transition-all duration-200"
             >
-              {link.label}
+              <Star className="w-3.5 h-3.5" /> GitHub
+            </a>
+            <Link
+              href="/docs/getting-started"
+              className="sheen lift bg-panguard-green text-surface-hero font-semibold text-sm rounded-full px-5 py-2 hover:bg-panguard-green-light transition-all duration-200 active:scale-[0.98]"
+            >
+              {t('install')}
             </Link>
-          ))}
-        </div>
+          </div>
 
-        {/* Desktop CTA + Locale Switcher */}
-        <div className="hidden lg:flex items-center gap-3">
-          <LocaleSwitcher />
-          <a
-            href="https://github.com/panguard-ai/panguard-ai"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary border border-border hover:border-text-tertiary rounded-full px-4 py-2 transition-all duration-200"
+          {/* Mobile hamburger */}
+          <button
+            className="xl:hidden p-2 text-text-secondary"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
           >
-            <Star className="w-3.5 h-3.5" /> GitHub
-          </a>
-          <Link
-            href="/docs/getting-started"
-            className="bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-5 py-2.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98]"
-          >
-            {t('install')}
-          </Link>
+            {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
-
-        {/* Mobile hamburger */}
-        <button
-          className="lg:hidden p-2 -mr-2 text-text-secondary"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
-          aria-expanded={mobileOpen}
-        >
-          {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu — inline disclosure (page stays interactive), not a modal dialog */}
       {mobileOpen && (
         <div
-          role="dialog"
-          aria-modal="true"
           aria-label="Navigation menu"
-          className="fixed inset-0 top-[66px] bg-surface-0/98 backdrop-blur-xl z-40 overflow-y-auto lg:hidden"
+          className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-2 xl:hidden"
         >
-          <div className="p-6 space-y-1">
+          <div className="nav-pill rounded-2xl overflow-y-auto max-h-[calc(100vh-7rem)] p-6 space-y-1">
             <div className="flex justify-center mb-4">
               <LocaleSwitcher />
             </div>
@@ -348,7 +350,7 @@ export default function NavBar() {
             <div className="pt-4 border-t border-border space-y-3">
               <Link
                 href="/docs/getting-started"
-                className="block text-center bg-brand-sage text-surface-0 font-semibold text-sm rounded-full px-5 py-3"
+                className="block text-center bg-panguard-green text-surface-hero font-semibold text-sm rounded-full px-5 py-3 hover:bg-panguard-green-light transition-colors duration-200"
                 onClick={() => setMobileOpen(false)}
               >
                 {t('install')}

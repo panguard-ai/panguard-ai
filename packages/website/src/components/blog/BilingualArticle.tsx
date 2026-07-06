@@ -182,6 +182,38 @@ interface BilingualArticleProps {
   defaultLang: 'en' | 'zh';
 }
 
+/* ─── As-of disclaimer ───
+ * Historical posts cite point-in-time figures (rule counts, benchmarks).
+ * This note quarantines those numbers as of the publication date instead
+ * of letting them read as live claims.
+ */
+function AsOfNote({ lang }: { lang: 'en' | 'zh' }) {
+  const linkClass =
+    'text-brand-sage underline underline-offset-2 decoration-brand-sage/40 hover:decoration-brand-sage transition-colors';
+  return (
+    <div className="rounded-xl border border-border bg-surface-1 px-4 py-3 text-xs text-text-muted mb-8">
+      {lang === 'zh' ? (
+        <>
+          本文中的數字(規則數、benchmark)以發文當日為準。最新數字請見{' '}
+          <a href="/research/benchmarks" className={linkClass}>
+            /research/benchmarks
+          </a>
+          。
+        </>
+      ) : (
+        <>
+          Figures in this post (rule counts, benchmarks) are as of its publication date. Current
+          numbers live at{' '}
+          <a href="/research/benchmarks" className={linkClass}>
+            /research/benchmarks
+          </a>
+          .
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function BilingualArticle({ enPost, zhPost, defaultLang }: BilingualArticleProps) {
   const [lang, setLang] = useState<'en' | 'zh'>(defaultLang);
   const activePost = lang === 'zh' && zhPost ? zhPost : enPost;
@@ -246,6 +278,7 @@ export default function BilingualArticle({ enPost, zhPost, defaultLang }: Biling
           </button>
         </div>
       )}
+      <AsOfNote lang={lang} />
       <div className="prose-panguard">{blocks.map((block, i) => renderBlock(block, i))}</div>
     </div>
   );

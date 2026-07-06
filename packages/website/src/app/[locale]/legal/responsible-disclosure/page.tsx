@@ -1,11 +1,18 @@
 import type { Metadata } from 'next';
 import { LEGAL_LAST_UPDATED } from '@/lib/constants';
+import { buildAlternates } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Vulnerability Disclosure Policy',
-  description:
-    'Report security vulnerabilities to Panguard AI. Our responsible disclosure program and bug bounty guidelines.',
-};
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  return {
+    title: 'Vulnerability Disclosure Policy',
+    description:
+      'Report security vulnerabilities to Panguard AI. Our responsible disclosure program and bug bounty guidelines.',
+    alternates: buildAlternates('/legal/responsible-disclosure', locale),
+  };
+}
 
 export default function ResponsibleDisclosurePage() {
   return (

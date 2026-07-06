@@ -1,11 +1,10 @@
 'use client';
 
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import SectionTitle from '@/components/ui/SectionTitle';
 import { Link } from '@/navigation';
-import { useRuleStats } from '@/hooks/useRuleStats';
 import { ArrowRight } from 'lucide-react';
 import {
   ShieldIcon,
@@ -125,7 +124,7 @@ const collectiveConfigs = [
 const resilienceConfigs = [
   { key: 'optimal' as const, color: 'bg-[#22c55e]', icon: CheckIcon },
   { key: 'cloudUnavailable' as const, color: 'bg-[#f59e0b]', icon: AlertIcon },
-  { key: 'engineOnly' as const, color: 'bg-[#f59e0b]', icon: AlertIcon },
+  { key: 'llmOffline' as const, color: 'bg-[#f59e0b]', icon: AlertIcon },
   { key: 'emergency' as const, color: 'bg-[#ef4444]', icon: AlertIcon },
 ];
 
@@ -147,109 +146,15 @@ const stackConfigs = [
   { key: 'item14' as const, icon: AnalyticsIcon },
 ];
 
-/* ─── Rule Production: four fast paths to high-quality rules ───
-   Copy is inline (bilingual) on purpose: this section is owned by the
-   technology page and kept out of the shared messages catalog. All four
-   paths are real, shipping pipelines in the ATR repo / migrator-community:
-     CVE feed      -> scripts/cve-collect.ts + sync-cvelistv5.ts
-     Red-team/PoC  -> scripts/generate-detection-from-poc.ts
-     Community     -> scripts/local-crystallize.ts + promote-detection-ready.ts
-     Converter     -> packages/migrator-community (Sigma/YARA -> ATR YAML, MIT)
-   Rule count stays dynamic via useRuleStats() — never hardcode it. */
-type RuleProductionCopy = {
-  overline: string;
-  title: string;
-  subtitle: string;
-  problemTitle: string;
-  problemBody: string;
-  paths: Array<{ tag: string; name: string; desc: string }>;
-  footnote: string;
-};
-
-const ruleProductionCopy: Record<'en' | 'zh-TW', RuleProductionCopy> = {
-  en: {
-    overline: 'Rule Production',
-    title: 'Four fast paths to high-quality rules',
-    subtitle:
-      'Models ship a new version every few weeks. Hand-writing detection the old way takes weeks per rule and stays a step behind. ATR produces vetted rules from four sources at once, so the rule base grows daily and every new rule raises the cost of attacking your agents.',
-    problemTitle: 'The old way is slow and complex',
-    problemBody:
-      'Traditional detection waits on a committee: someone reverse-engineers an attack, hand-tunes a signature, runs a review cycle, then ships weeks later. By the time the rule lands, the model and the attack have already moved on. ATR closes that gap by mass-producing rules from live sources and gating each one on precision before it goes out.',
-    paths: [
-      {
-        tag: 'CVE feed',
-        name: 'Disclosed CVEs',
-        desc: 'A collector pulls AI / agent / LLM / MCP CVEs from upstream feeds the moment they publish, so a disclosed vulnerability becomes a detection candidate the same day instead of next quarter.',
-      },
-      {
-        tag: 'Red-team / PoC',
-        name: 'Proof-of-concept attacks',
-        desc: 'Real exploit payloads and red-team PoCs are parsed into generalized detection patterns — the attack signal, not the prose around it — so a working attack turns straight into a rule.',
-      },
-      {
-        tag: 'Converter',
-        name: 'The Sigma / YARA bridge',
-        desc: 'The community converter carries 20 years of SOC detection IP — Sigma, YARA, Snort — across to ATR YAML. It lays the foundation; the new AI defense wall is rebuilt on top. Free and MIT-licensed.',
-      },
-      {
-        tag: 'Community flywheel',
-        name: 'Captures from the field',
-        desc: 'Every install that opts into the semantic layer can surface a novel attack, draft it as an ATR proposal with evidence, and — only on community consensus — push it to everyone. The more people run it, the faster the rule base catches up to model speed.',
-      },
-    ],
-    footnote:
-      'Every path runs through the same precision gate before a rule ships. Rules grow daily.',
-  },
-  'zh-TW': {
-    overline: '規則生產',
-    title: '四條快路造高品質規則',
-    subtitle:
-      '模型每隔幾週就升級一版。用老方法手寫偵測,一條規則要數週,而且永遠慢半拍。ATR 同時從四個來源量產經過驗證的規則,規則庫每天增長,每多一條都墊高攻擊你 agent 的成本。',
-    problemTitle: '老方法又慢又複雜',
-    problemBody:
-      '傳統偵測卡在委員會流程:先有人逆向一個攻擊、手調簽章、跑審查週期,數週後才出貨。等規則落地,模型和攻擊早就換代了。ATR 從活來源量產規則、並在出貨前對每一條把關精準度,直接補上這段時間差。',
-    paths: [
-      {
-        tag: 'CVE 流',
-        name: '公開 CVE',
-        desc: '收集器在上游一發布就抓 AI / agent / LLM / MCP 的 CVE,公開的漏洞當天就變成偵測候選,而不是等到下一季。',
-      },
-      {
-        tag: '紅隊 / PoC',
-        name: '概念驗證攻擊',
-        desc: '把真實的攻擊 payload 和紅隊 PoC 解析成可泛化的偵測 pattern — 取攻擊訊號本身,不是周邊文字 — 一個能跑的攻擊就直接變成一條規則。',
-      },
-      {
-        tag: '轉換器',
-        name: 'Sigma / YARA 的橋',
-        desc: '社群轉換器把 20 年的 SOC 偵測 IP — Sigma、YARA、Snort — 搬過來變成 ATR YAML。它打地基,新的 AI 防禦牆在上面重新砌起。免費、MIT 授權。',
-      },
-      {
-        tag: '社群飛輪',
-        name: '一線的捕獲',
-        desc: '每個啟用語意層的安裝都能浮出一種新型攻擊、帶著證據草擬成 ATR 提案 — 並且只在社群共識下 — 推給所有人。用的人越多,規則庫追上模型速度的速度越快。',
-      },
-    ],
-    footnote: '每一條路徑出貨前都過同一道精準度閘。規則每天增長。',
-  },
-};
-
-const rulePathIcons = [ScanIcon, AlertIcon, IntegrationIcon, NetworkIcon];
-
 export default function TechnologyContent() {
   const t = useTranslations('technology');
-  const locale = useLocale();
-  const ruleCopy = ruleProductionCopy[locale === 'zh-TW' ? 'zh-TW' : 'en'];
-  const { totalRules } = useRuleStats();
-  const ruleCountLabel =
-    locale === 'zh-TW' ? `${totalRules} 條規則,每天增長` : `${totalRules} rules and growing daily`;
 
   return (
     <>
       <p id="definition" className="sr-only">
-        Panguard&apos;s detection engine uses ATR (Agent Threat Rules) -- the first open standard
-        for AI agent threat detection -- across multiple deterministic detection stages that run
-        entirely on-device, with no LLM in the detection path.
+        Panguard&apos;s detection engine uses ATR (Agent Threat Rules) -- an open, executable standard
+        for AI agent threat detection -- across multiple detection stages with graceful degradation
+        from cloud to fully offline operation.
       </p>
 
       {/* -- Hero -- */}
@@ -275,65 +180,7 @@ export default function TechnologyContent() {
         </div>
       </section>
 
-      {/* -- Rule Production: four fast paths -- */}
-      <SectionWrapper dark>
-        <SectionTitle
-          overline={ruleCopy.overline}
-          title={ruleCopy.title}
-          subtitle={ruleCopy.subtitle}
-        />
-
-        {/* Live rule count + problem framing */}
-        <div className="max-w-3xl mx-auto mt-12">
-          <FadeInUp>
-            <div className="flex justify-center mb-8">
-              <div className="inline-flex items-center gap-2 bg-brand-sage/10 text-brand-sage text-xs font-semibold px-4 py-2 rounded-full">
-                <NetworkIcon className="w-3.5 h-3.5" />
-                <span>{ruleCountLabel}</span>
-              </div>
-            </div>
-          </FadeInUp>
-          <FadeInUp delay={0.05}>
-            <div className="bg-surface-2 rounded-xl border border-border p-6 sm:p-8">
-              <p className="text-[11px] uppercase tracking-wider text-text-tertiary font-semibold mb-2">
-                {ruleCopy.problemTitle}
-              </p>
-              <p className="text-sm text-text-secondary leading-relaxed">{ruleCopy.problemBody}</p>
-            </div>
-          </FadeInUp>
-        </div>
-
-        {/* Four paths grid */}
-        <div className="grid gap-4 sm:grid-cols-2 mt-6 max-w-4xl mx-auto">
-          {ruleCopy.paths.map((path, i) => {
-            const Icon = rulePathIcons[i] || ScanIcon;
-            return (
-              <FadeInUp key={path.tag} delay={i * 0.08}>
-                <div className="bg-surface-2 rounded-xl border border-border p-6 h-full flex flex-col">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="shrink-0 w-9 h-9 rounded-lg bg-brand-sage/10 flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-brand-sage" />
-                    </div>
-                    <span className="bg-brand-sage/10 text-brand-sage text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full">
-                      {path.tag}
-                    </span>
-                  </div>
-                  <p className="text-sm font-bold text-text-primary mb-1.5">{path.name}</p>
-                  <p className="text-xs text-text-secondary leading-relaxed flex-1">{path.desc}</p>
-                </div>
-              </FadeInUp>
-            );
-          })}
-        </div>
-
-        <FadeInUp delay={0.4}>
-          <p className="text-center text-xs text-text-tertiary mt-8 max-w-2xl mx-auto">
-            {ruleCopy.footnote}
-          </p>
-        </FadeInUp>
-      </SectionWrapper>
-
-      {/* -- Deterministic Detection Stages -- */}
+      {/* -- Three-Layer Funnel -- */}
       <SectionWrapper>
         <SectionTitle
           overline={t('defenseFunnel.overline')}

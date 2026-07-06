@@ -77,14 +77,14 @@ export default function GovernanceContent() {
   return (
     <SectionWrapper>
       <header className="mb-12 max-w-3xl">
-        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-700">
-          <span className="h-1.5 w-1.5 rounded-full bg-slate-600" />
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-surface-1 px-3 py-1 text-xs font-medium text-text-secondary">
+          <span className="h-1.5 w-1.5 rounded-full bg-brand-sage" />
           {isZh ? '治理 · 版本 1.1' : 'Governance · Version 1.1'}
         </div>
-        <h1 className="mb-4 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
+        <h1 className="mb-4 text-4xl font-semibold tracking-tight text-text-primary sm:text-5xl">
           {isZh ? 'ATR 治理' : 'ATR Governance'}
         </h1>
-        <p className="text-lg leading-relaxed text-slate-600">
+        <p className="text-lg leading-relaxed text-text-secondary">
           {isZh
             ? 'ATR 是公開、社群驅動的偵測標準。本頁說明決策權威、Technical Steering Committee (TSC) 結構、利益衝突政策，以及 Enterprise Member 計畫。'
             : 'ATR is a public, community-driven detection standard. This page documents decision authority, the Technical Steering Committee structure, conflict-of-interest policy, and the Enterprise Member program.'}
@@ -104,24 +104,24 @@ export default function GovernanceContent() {
 
       <div className="mt-8 grid gap-4 md:grid-cols-3">
         {FOUNDING_THREE.map((seat) => (
-          <div key={seat.role} className="rounded-lg border border-slate-200 p-6">
+          <div key={seat.role} className="rounded-2xl border border-border bg-surface-1 p-6">
             <div className="mb-3 flex items-center justify-between">
-              <Users className="h-5 w-5 text-slate-500" aria-hidden />
+              <Users className="h-5 w-5 text-text-muted" aria-hidden />
               <StatusPill status={seat.status} isZh={isZh} />
             </div>
-            <div className="text-xs uppercase tracking-wide text-slate-500">
+            <div className="text-xs uppercase tracking-wide text-text-muted">
               {isZh ? seat.roleZh : seat.role}
             </div>
-            <div className="mt-1 text-base font-semibold text-slate-900">{seat.holder}</div>
-            <div className="text-sm text-slate-600">{seat.org}</div>
-            <p className="mt-3 text-xs leading-relaxed text-slate-500">
+            <div className="mt-1 text-base font-semibold text-text-primary">{seat.holder}</div>
+            <div className="text-sm text-text-secondary">{seat.org}</div>
+            <p className="mt-3 text-xs leading-relaxed text-text-muted">
               {isZh ? seat.noteZh : seat.noteEn}
             </p>
           </div>
         ))}
       </div>
 
-      <p className="mt-6 max-w-3xl text-sm leading-relaxed text-slate-600">
+      <p className="mt-6 max-w-3xl text-sm leading-relaxed text-text-secondary">
         {isZh
           ? '席-3 (社群／威脅情資席) 辭職時，由 TSC 三席全體同意決定接任者。任一席次不得單獨否決。公開會議每兩週一次，會議記錄存於 repo。'
           : 'Seat-3 (community / threat-intel) succession requires TSC supermajority (3-of-3); no single seat may veto. Bi-weekly open meetings; minutes posted to the repo.'}
@@ -132,23 +132,23 @@ export default function GovernanceContent() {
           title={isZh ? '決策權威' : 'Decision Authority'}
           subtitle={isZh ? 'TSC 就任後' : 'Once TSC is seated'}
         />
-        <div className="mt-8 overflow-hidden rounded-lg border border-slate-200">
+        <div className="mt-8 overflow-hidden rounded-2xl border border-border">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50">
+            <thead className="bg-surface-1">
               <tr>
-                <th className="px-4 py-3 font-medium text-slate-600">
+                <th className="px-4 py-3 font-medium text-text-secondary">
                   {isZh ? '決策' : 'Decision'}
                 </th>
-                <th className="px-4 py-3 font-medium text-slate-600">
+                <th className="px-4 py-3 font-medium text-text-secondary">
                   {isZh ? '投票門檻' : 'Vote Threshold'}
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-border">
               {AUTHORITY.map((row) => (
                 <tr key={row.en}>
-                  <td className="px-4 py-3 text-slate-900">{isZh ? row.zh : row.en}</td>
-                  <td className="px-4 py-3 font-mono text-slate-700">{row.vote}</td>
+                  <td className="px-4 py-3 text-text-primary">{isZh ? row.zh : row.en}</td>
+                  <td className="px-4 py-3 font-mono text-text-secondary">{row.vote}</td>
                 </tr>
               ))}
             </tbody>
@@ -165,37 +165,39 @@ export default function GovernanceContent() {
         />
         <div className="mt-6 space-y-3">
           {COI.map((rule, i) => (
-            <div key={i} className="flex gap-3 rounded-lg border border-slate-200 p-4">
-              <Scale className="mt-0.5 h-5 w-5 shrink-0 text-slate-500" aria-hidden />
-              <p className="text-sm leading-relaxed text-slate-700">{isZh ? rule.zh : rule.en}</p>
+            <div key={i} className="flex gap-3 rounded-2xl border border-border bg-surface-1 p-4">
+              <Scale className="mt-0.5 h-5 w-5 shrink-0 text-text-muted" aria-hidden />
+              <p className="text-sm leading-relaxed text-text-secondary">
+                {isZh ? rule.zh : rule.en}
+              </p>
             </div>
           ))}
         </div>
       </div>
 
       <div className="mt-16 grid gap-6 md:grid-cols-2">
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50/40 p-6">
+        <div className="rounded-2xl border border-brand-sage/40 bg-surface-1 p-6">
           <div className="mb-3 flex items-center gap-2">
-            <FileCheck className="h-5 w-5 text-emerald-700" aria-hidden />
-            <h3 className="text-base font-semibold text-emerald-900">
+            <FileCheck className="h-5 w-5 text-brand-sage" aria-hidden />
+            <h3 className="text-base font-semibold text-text-primary">
               {isZh ? 'ATR Certified Skill（免費）' : 'ATR Certified Skill (Free)'}
             </h3>
           </div>
-          <p className="text-sm leading-relaxed text-emerald-900">
+          <p className="text-sm leading-relaxed text-text-secondary">
             {isZh
               ? '社群運營的免費認證。CI 通過、零 critical 發現的 skill 取得 atr-certified 標籤。決定權在 CI 與社群審閱者，非任何商業實體。'
               : 'Community-run, free. Skills with zero critical findings against the current ATR corpus receive the atr-certified label. Decisions are made by CI and community reviewers, not by any commercial entity.'}
           </p>
         </div>
 
-        <div className="rounded-lg border border-slate-300 bg-slate-50 p-6">
+        <div className="rounded-2xl border border-border bg-surface-1 p-6">
           <div className="mb-3 flex items-center gap-2">
-            <Users className="h-5 w-5 text-slate-700" aria-hidden />
-            <h3 className="text-base font-semibold text-slate-900">
+            <Users className="h-5 w-5 text-text-secondary" aria-hidden />
+            <h3 className="text-base font-semibold text-text-primary">
               {isZh ? 'Enterprise Member（$10,000 / 年）' : 'Enterprise Member ($10,000 / year)'}
             </h3>
           </div>
-          <p className="text-sm leading-relaxed text-slate-700">
+          <p className="text-sm leading-relaxed text-text-secondary">
             {isZh
               ? '採 Apache Software Foundation Platinum Sponsor 模型。提供治理投票權、RFC 早期存取、優先 PR 審閱 SLA、Logo 露出。Enterprise Member 不能影響個別規則的接受或拒絕。'
               : 'Modeled on the Apache Software Foundation Platinum Sponsor program. Grants governance voting rights, early RFC access, priority PR review SLA, logo placement. Enterprise Members cannot influence individual rule acceptance.'}
@@ -203,8 +205,8 @@ export default function GovernanceContent() {
         </div>
       </div>
 
-      <div className="mt-16 rounded-lg border border-slate-200 bg-slate-50 p-6">
-        <h3 className="mb-4 text-base font-semibold text-slate-900">
+      <div className="mt-16 rounded-2xl border border-border bg-surface-1 p-6">
+        <h3 className="mb-4 text-base font-semibold text-text-primary">
           {isZh ? '聯絡與參與' : 'Contact and Participation'}
         </h3>
         <div className="grid gap-4 sm:grid-cols-3">
@@ -229,13 +231,13 @@ export default function GovernanceContent() {
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
             href={'/atr/spec' as never}
-            className="inline-flex items-center gap-1 rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+            className="inline-flex items-center gap-1 rounded-xl bg-surface-2 px-4 py-2 text-sm font-medium text-text-primary hover:bg-surface-3"
           >
             {isZh ? '核心規範' : 'Core Specification'}
           </Link>
           <Link
             href={'/atr/cite' as never}
-            className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-white"
+            className="inline-flex items-center gap-1 rounded-xl border border-border px-4 py-2 text-sm font-medium text-text-primary hover:border-border-hover hover:bg-surface-1"
           >
             {isZh ? '引用方式' : 'How to Cite'}
           </Link>
@@ -243,7 +245,7 @@ export default function GovernanceContent() {
             href={`${REPO_BLOB}/GOVERNANCE.md`}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-white"
+            className="inline-flex items-center gap-1 rounded-xl border border-border px-4 py-2 text-sm font-medium text-text-primary hover:border-border-hover hover:bg-surface-1"
           >
             {isZh ? '完整 GOVERNANCE.md' : 'GOVERNANCE.md on GitHub'}
           </a>
@@ -259,10 +261,10 @@ function StatusPill({ status, isZh }: { status: Seat['status']; isZh: boolean })
   const labelZh = status === 'confirmed' ? '已確認' : status === 'pending' ? '確認中' : '待提名';
   const color =
     tone === 'emerald'
-      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+      ? 'bg-panguard-green/10 text-panguard-green border-panguard-green/30'
       : tone === 'amber'
-        ? 'bg-amber-50 text-amber-700 border-amber-200'
-        : 'bg-slate-100 text-slate-700 border-slate-200';
+        ? 'bg-amber-400/10 text-amber-300 border-amber-400/30'
+        : 'bg-surface-2 text-text-secondary border-border';
   return (
     <span
       className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${color}`}
@@ -285,11 +287,11 @@ function ContactRow({
 }) {
   const inner = (
     <>
-      <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-slate-500">
+      <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-text-muted">
         {icon}
         {label}
       </div>
-      <div className="mt-1 font-mono text-sm text-slate-900">{value}</div>
+      <div className="mt-1 font-mono text-sm text-text-primary">{value}</div>
     </>
   );
   if (href)
@@ -298,7 +300,7 @@ function ContactRow({
         href={href}
         target={href.startsWith('mailto') ? undefined : '_blank'}
         rel="noreferrer"
-        className="block hover:text-emerald-700"
+        className="block hover:text-brand-sage"
       >
         {inner}
       </a>

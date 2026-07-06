@@ -77,14 +77,14 @@ export default function CiteContent() {
   return (
     <SectionWrapper>
       <header className="mb-12 max-w-3xl">
-        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-700">
-          <span className="h-1.5 w-1.5 rounded-full bg-slate-600" />
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-surface-1 px-3 py-1 text-xs font-medium text-text-secondary">
+          <span className="h-1.5 w-1.5 rounded-full bg-brand-sage" />
           {isZh ? '引用 · 學術／政策／白皮書' : 'Citation · Academic / Policy / Whitepaper'}
         </div>
-        <h1 className="mb-4 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
+        <h1 className="mb-4 text-4xl font-semibold tracking-tight text-text-primary sm:text-5xl">
           {isZh ? '如何引用 ATR' : 'How to Cite ATR'}
         </h1>
-        <p className="text-lg leading-relaxed text-slate-600">
+        <p className="text-lg leading-relaxed text-text-secondary">
           {isZh
             ? 'ATR 在 Zenodo 註冊永久 DOI，可在學術論文、政策文件、白皮書與供應商規範中以下列格式引用。每份文件變更發行時版本會自動更新；DOI 不變。'
             : 'ATR has a persistent Zenodo DOI suitable for academic papers, policy documents, whitepapers, and vendor specifications. Version updates per release; the DOI is stable.'}
@@ -116,11 +116,11 @@ export default function CiteContent() {
         ))}
       </div>
 
-      <div className="mt-16 rounded-lg border border-slate-200 bg-slate-50 p-6">
-        <h3 className="mb-2 text-base font-semibold text-slate-900">
+      <div className="mt-16 rounded-2xl border border-border bg-surface-1 p-6">
+        <h3 className="mb-2 text-base font-semibold text-text-primary">
           {isZh ? '對審查者與監管者' : 'For reviewers and regulators'}
         </h3>
-        <p className="text-sm leading-relaxed text-slate-700">
+        <p className="text-sm leading-relaxed text-text-secondary">
           {isZh
             ? '若需要規範性的版本鎖定引用 (例：政策文件採納特定 ATR 版本作為合規基準)，建議直接引用 GitHub 的 tag (例如 v'
             : 'For normative version-locked citation (e.g., policy documents adopting a specific ATR version as a compliance baseline), cite the GitHub release tag (e.g., v'}
@@ -134,7 +134,7 @@ export default function CiteContent() {
             href={`https://doi.org/${DOI}`}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1 rounded-md bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800"
+            className="inline-flex items-center gap-1 rounded-xl bg-surface-2 px-4 py-2 font-medium text-text-primary hover:bg-surface-3"
           >
             {isZh ? 'Zenodo 頁面' : 'Zenodo record'}{' '}
             <ExternalLink className="h-3 w-3" aria-hidden />
@@ -143,7 +143,7 @@ export default function CiteContent() {
             href={`${REPO}/blob/main/CITATION.cff`}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-4 py-2 font-medium text-slate-700 hover:bg-white"
+            className="inline-flex items-center gap-1 rounded-xl border border-border px-4 py-2 font-medium text-text-primary hover:border-border-hover hover:bg-surface-1"
           >
             CITATION.cff <ExternalLink className="h-3 w-3" aria-hidden />
           </a>
@@ -161,15 +161,15 @@ function CodeBlock({ block, isZh }: { block: Block; isZh: boolean }) {
     setTimeout(() => setCopied(false), 1500);
   };
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-200">
-      <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-4 py-2">
-        <div className="font-mono text-xs font-medium text-slate-600">
+    <div className="overflow-hidden rounded-2xl border border-border">
+      <div className="flex items-center justify-between border-b border-border bg-surface-1 px-4 py-2">
+        <div className="font-mono text-xs font-medium text-text-secondary">
           {isZh ? block.labelZh : block.labelEn}
         </div>
         <button
           onClick={onCopy}
           type="button"
-          className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+          className="inline-flex items-center gap-1 rounded-md border border-border bg-surface-2 px-2 py-1 text-xs font-medium text-text-primary hover:bg-surface-3"
         >
           {copied ? (
             <>
@@ -182,7 +182,7 @@ function CodeBlock({ block, isZh }: { block: Block; isZh: boolean }) {
           )}
         </button>
       </div>
-      <pre className="overflow-x-auto bg-slate-950 px-4 py-4 text-xs leading-relaxed text-slate-100">
+      <pre className="overflow-x-auto bg-surface-2 px-4 py-4 text-xs leading-relaxed text-text-primary">
         <code>{block.content}</code>
       </pre>
     </div>
@@ -192,8 +192,8 @@ function CodeBlock({ block, isZh }: { block: Block; isZh: boolean }) {
 function KvBox({ label, value, href }: { label: string; value: string; href?: string }) {
   const inner = (
     <>
-      <div className="text-xs uppercase tracking-wide text-slate-500">{label}</div>
-      <div className="mt-1 break-all font-mono text-sm font-semibold text-slate-900">{value}</div>
+      <div className="text-xs uppercase tracking-wide text-text-muted">{label}</div>
+      <div className="mt-1 break-all font-mono text-sm font-semibold text-text-primary">{value}</div>
     </>
   );
   if (href)
@@ -202,10 +202,10 @@ function KvBox({ label, value, href }: { label: string; value: string; href?: st
         href={href}
         target="_blank"
         rel="noreferrer"
-        className="block rounded-lg border border-slate-200 p-5 hover:border-emerald-400"
+        className="block rounded-2xl border border-border bg-surface-1 p-5 hover:border-border-hover"
       >
         {inner}
       </a>
     );
-  return <div className="rounded-lg border border-slate-200 p-5">{inner}</div>;
+  return <div className="rounded-2xl border border-border bg-surface-1 p-5">{inner}</div>;
 }

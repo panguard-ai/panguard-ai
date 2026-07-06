@@ -1,15 +1,22 @@
 import type { Metadata } from 'next';
+import { buildAlternates } from '@/lib/seo';
 
 const MSA_LAST_UPDATED_EN = 'May 20, 2026';
 const MSA_LAST_UPDATED_ZH = '2026年5月20日';
 const MSA_VERSION = 'v1.0';
 const MSA_PDF_URL = '/legal/01-MSA.pdf';
 
-export const metadata: Metadata = {
-  title: 'Master Services Agreement',
-  description:
-    'PanGuard AI Master Services Agreement. Governs all paid engagements with PanGuard. Delaware C-Corp governing law.',
-};
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  return {
+    title: 'Master Services Agreement',
+    description:
+      'PanGuard AI Master Services Agreement. Governs all paid engagements with PanGuard. Delaware C-Corp governing law.',
+    alternates: buildAlternates('/legal/msa', locale),
+  };
+}
 
 export default async function MSAPage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;

@@ -7,15 +7,26 @@ import { ArrowRight, AlertTriangle, Shield, ExternalLink } from 'lucide-react';
 import { STATS } from '@/lib/stats';
 
 const eco = STATS.ecosystem;
-const safePercent = ((eco.findingsClean / eco.skillsScanned) * 100).toFixed(1);
-const critPercent = ((eco.findingsCritical / eco.skillsScanned) * 100).toFixed(1);
-const highPercent = ((eco.findingsHigh / eco.skillsScanned) * 100).toFixed(1);
-const medPercent = ((eco.findingsMedium / eco.skillsScanned) * 100).toFixed(1);
-const lowPercent = ((eco.findingsLow / eco.skillsScanned) * 100).toFixed(1);
-const flaggedPercent = (
-  ((eco.skillsScanned - eco.findingsClean) / eco.skillsScanned) *
-  100
-).toFixed(0);
+/**
+ * Single reconciled scan total: the sum of the severity breakdown IS the set of
+ * packages whose scan produced a classification. Every headline number, stat
+ * band, tile, and meta figure derives from this one denominator so they all add
+ * up. (skillsScanned counts every entry we touched; the classified breakdown is
+ * the subset that yielded a clean/critical/high/medium/low verdict.)
+ */
+const scannedTotal =
+  eco.findingsClean +
+  eco.findingsCritical +
+  eco.findingsHigh +
+  eco.findingsMedium +
+  eco.findingsLow;
+const flaggedCount = scannedTotal - eco.findingsClean;
+const safePercent = ((eco.findingsClean / scannedTotal) * 100).toFixed(1);
+const critPercent = ((eco.findingsCritical / scannedTotal) * 100).toFixed(1);
+const highPercent = ((eco.findingsHigh / scannedTotal) * 100).toFixed(1);
+const medPercent = ((eco.findingsMedium / scannedTotal) * 100).toFixed(1);
+const lowPercent = ((eco.findingsLow / scannedTotal) * 100).toFixed(1);
+const flaggedPercent = ((flaggedCount / scannedTotal) * 100).toFixed(0);
 
 /* Real findings from ecosystem scan (anonymized) */
 const CASE_STUDIES = [
@@ -98,13 +109,13 @@ export default function EcosystemReportContent() {
             SECURITY RESEARCH
           </p>
           <h1 className="text-[clamp(26px,5vw,52px)] font-bold text-text-primary leading-[1.1] max-w-4xl mx-auto">
-            We Scanned {eco.skillsScanned.toLocaleString()} MCP Packages.
+            We Scanned {scannedTotal.toLocaleString()} MCP Packages.
             <br />
             <span className="text-red-400">{flaggedPercent}% Had Security Issues.</span>
           </h1>
           <p className="text-text-secondary mt-4 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            The first large-scale security audit of the MCP skill ecosystem.{' '}
-            {eco.skillsScanned.toLocaleString()} packages analyzed.{' '}
+            A large-scale security audit of the MCP skill ecosystem.{' '}
+            {scannedTotal.toLocaleString()} packages analyzed.{' '}
             {eco.toolsExtracted.toLocaleString()} tool definitions extracted. {flaggedPercent}%
             flagged.
           </p>
@@ -120,7 +131,7 @@ export default function EcosystemReportContent() {
         <FadeInUp>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 max-w-5xl mx-auto">
             <NumberCard
-              value={eco.skillsScanned.toLocaleString()}
+              value={scannedTotal.toLocaleString()}
               label="Packages Scanned"
               color="text-text-primary"
             />
@@ -175,14 +186,15 @@ export default function EcosystemReportContent() {
               <p>
                 We crawled {eco.entriesCrawled.toLocaleString()} MCP/AI skill entries from{' '}
                 {eco.registrySources} sources (npm registry, GitHub repositories, community
-                awesome-lists). Of these, {eco.skillsScanned.toLocaleString()} had parseable
-                SKILL.md, README.md files, or built JavaScript that could be analyzed.
+                awesome-lists). Of these, {scannedTotal.toLocaleString()} had parseable
+                SKILL.md, README.md files, or built JavaScript that could be analyzed and produced
+                a severity classification.
               </p>
               <p>Each skill was scanned using:</p>
               <ul className="list-disc list-inside space-y-1 ml-4">
                 <li>
                   <strong className="text-text-primary">{STATS.atrRules} ATR rules</strong> with{' '}
-                  {STATS.atrPatterns}+ detection patterns across 8 threat categories
+                  {STATS.atrPatterns}+ detection patterns across 10 threat categories
                 </li>
                 <li>
                   <strong className="text-text-primary">Secret detection</strong>: AWS keys, GitHub
@@ -371,8 +383,8 @@ export default function EcosystemReportContent() {
                 Apple introduced App Review in 2008.
               </p>
               <p className="text-text-primary font-semibold">
-                AI agents need a review standard. That standard is ATR (Agent Threat Rules) — the
-                first open detection framework purpose-built for AI agent threats.
+                AI agents need a review standard. That standard is ATR (Agent Threat Rules) — an
+                open, executable detection framework purpose-built for AI agent threats.
               </p>
             </div>
           </div>
@@ -424,7 +436,7 @@ export default function EcosystemReportContent() {
             <div className="flex flex-wrap gap-3 justify-center">
               <a
                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                  'We scanned 2,386 MCP packages. 49% had security issues.\n\nSSH keys, API tokens, prompt injection — all found in real packages from npm.\n\nFull report + free scanner:'
+                  `We scanned ${scannedTotal.toLocaleString()} MCP packages. ${flaggedPercent}% had security issues.\n\nSSH keys, API tokens, prompt injection — all found in real packages from npm.\n\nFull report + free scanner:`
                 )}&url=${encodeURIComponent('https://panguard.ai/research/mcp-ecosystem-scan')}`}
                 target="_blank"
                 rel="noopener noreferrer"

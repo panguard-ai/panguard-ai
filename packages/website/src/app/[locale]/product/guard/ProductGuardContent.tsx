@@ -173,11 +173,15 @@ export default function ProductGuardContent() {
           title={t('features.title')}
           subtitle={t('features.subtitle')}
         />
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-14">
+        <div className="flex flex-wrap justify-center gap-4 mt-14">
           {featureKeys.map((key, i) => {
             const Icon = featureIcons[i];
             return (
-              <FadeInUp key={key} delay={i * 0.08}>
+              <FadeInUp
+                key={key}
+                delay={i * 0.08}
+                className="w-full sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)]"
+              >
                 <div className="bg-surface-2 rounded-xl border border-border p-6 h-full card-glow">
                   <Icon className="w-5 h-5 text-brand-sage mb-4" />
                   <p className="text-sm font-bold text-text-primary mb-2">

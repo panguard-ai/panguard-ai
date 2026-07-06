@@ -1,11 +1,18 @@
 import type { Metadata } from 'next';
 import { LEGAL_LAST_UPDATED } from '@/lib/constants';
+import { buildAlternates } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Security Whitepaper',
-  description:
-    'How Panguard AI handles security. Honest disclosures: what we do today, what we plan, what we do not pretend to have.',
-};
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  return {
+    title: 'Security Whitepaper',
+    description:
+      'How Panguard AI handles security. Honest disclosures: what we do today, what we plan, what we do not pretend to have.',
+    alternates: buildAlternates('/legal/security', locale),
+  };
+}
 
 export default function SecurityWhitepaperPage() {
   return (
@@ -70,7 +77,7 @@ export default function SecurityWhitepaperPage() {
             CLI / Guard does not require authentication for local scanning. Threat Cloud aggregation
             requires an API key auto-issued to each Guard install. Single sign-on (SAML 2.0 / OIDC),
             enforced MFA, and WebAuthn are <strong>not implemented today</strong>; they are part of
-            the AIAM identity layer scheduled for Q3 2026.
+            the planned AIAM identity layer.
           </p>
           <h3 className="text-base font-medium text-text-primary mt-4 mb-2">3.2 Internal Access</h3>
           <p>
@@ -114,22 +121,12 @@ export default function SecurityWhitepaperPage() {
               <div className="flex items-center gap-2">
                 <p className="font-medium text-text-primary">SOC 2 Type 1</p>
                 <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#f59e0b]/10 text-[#f59e0b] border border-[#f59e0b]/20">
-                  In flight — target Oct 1, 2026
+                  In preparation
                 </span>
               </div>
               <p className="mt-1 text-text-tertiary">
-                Vanta selected (June 2026 contract). A-LIGN engaged as primary CPA candidate. Audit
-                fieldwork July-August 2026, Type 1 attestation target October 1, 2026. Type 2
-                fieldwork begins April 2027.
-              </p>
-              <p className="mt-2">
-                <a
-                  href="/samples/soc2-roadmap/PanGuard-SOC2-Roadmap-2026.pdf"
-                  download
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-sage hover:text-brand-sage-light"
-                >
-                  Download full SOC 2 roadmap (PDF, 57 KB)
-                </a>
+                SOC 2 Type 1 is in preparation. The timeline will be announced when audit fieldwork
+                is scheduled. Type 2 will follow Type 1.
               </p>
             </div>
             <div className="p-3 bg-surface-1 border border-border rounded-lg">
@@ -156,9 +153,10 @@ export default function SecurityWhitepaperPage() {
           <h2 className="text-lg font-semibold text-text-primary mb-3">7. Third-Party Audits</h2>
           <p>
             We have not yet engaged third-party penetration testing or external code audit. Both are
-            scheduled to begin alongside SOC 2 Type 1 in Q3 2026. Customers requiring vendor-risk
-            evidence prior to that timeline should contact us — we will share what we have today
-            (architecture diagrams, audit log samples, threat model) under NDA.
+            planned alongside SOC 2 Type 1 preparation; timing will be announced with the audit
+            schedule. Customers requiring vendor-risk evidence before then should contact us — we
+            will share what we have today (architecture diagrams, audit log samples, threat model)
+            under NDA.
           </p>
         </section>
 

@@ -3,20 +3,24 @@ import { getTranslations } from 'next-intl/server';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import ScannerHero from '@/components/home/ScannerHero';
-import MissionBand from '@/components/home/MissionBand';
-import RegulatedIndustriesPositioning from '@/components/home/RegulatedIndustriesPositioning';
-import SecurityLayers from '@/components/home/SecurityLayers';
-import LiveStats from '@/components/home/LiveStats';
-import PricingPreview from '@/components/home/PricingPreview';
 import { RuleStatsProvider } from '@/contexts/RuleStatsContext';
 
-const SocialProof = dynamic(() => import('@/components/home/SocialProof'));
-const DemoShowcase = dynamic(() => import('@/components/home/DemoShowcase'));
 const RealIncidents = dynamic(() => import('@/components/home/RealIncidents'));
-const HowItWorks = dynamic(() => import('@/components/home/HowItWorks'));
-const FlywheelModel = dynamic(() => import('@/components/home/FlywheelModel'));
-const CTARoadmap = dynamic(() => import('@/components/home/CTARoadmap'));
+const PositioningSplit = dynamic(() => import('@/components/home/v4/PositioningSplit'));
+const ProofBand = dynamic(() => import('@/components/home/v4/ProofBand'));
+const ArchitectureBeat = dynamic(() => import('@/components/home/v4/ArchitectureBeat'));
+const DemoShowcase = dynamic(() => import('@/components/home/DemoShowcase'));
+const CrystallizeMission = dynamic(() => import('@/components/home/v4/CrystallizeMission'));
+const PricingPreview = dynamic(() => import('@/components/home/PricingPreview'));
+const FinalCta = dynamic(() => import('@/components/home/v4/FinalCta'));
 
+/**
+ * Homepage — researched 10-beat blueprint (2026-07-05):
+ * hero(scanner+FX) → why-now band → positioning split → proof band
+ * → architecture bento+table → demo → migrator → crystallization+mission
+ * → pricing → final CTA. Classic arc: problem → solution → proof →
+ * product → price → close. Each claim and stat appears exactly once.
+ */
 export default async function Home() {
   const t = await getTranslations('home');
   return (
@@ -27,30 +31,24 @@ export default async function Home() {
           <p id="definition" className="sr-only">
             {t('srDefinition')}
           </p>
-          {/* 1. Hero — product-first (what you get + free install CTA) */}
+          {/* 1. Hero — the scanner, with scan-beam / radar-ping / entrance FX */}
           <ScannerHero />
-          {/* 2. How It Works: install -> scan -> guard (concrete onboarding, before philosophy) */}
-          <HowItWorks />
-          {/* 3. Business model: the flywheel (standard spreads -> detection obligation -> proof product) */}
-          <FlywheelModel />
-          {/* 4. Mission band */}
-          <MissionBand />
-          {/* 5. Live Stats */}
-          <LiveStats />
-          {/* 6. Social proof: Cisco, Microsoft, live metrics */}
-          <SocialProof />
-          {/* 7. 7-layer Security Architecture (single canonical layer section) */}
-          <SecurityLayers />
-          {/* 8. Real CVE Incidents + wild-scan finding */}
+          {/* 2. Why now — real incidents, full-bleed accent band */}
           <RealIncidents />
-          {/* 9. Product demo: Guard dashboard screenshots */}
+          {/* 3. Positioning — one platform, both procurement gates (two-col) */}
+          <PositioningSplit />
+          {/* 4. Proof — single credibility band (adopters + verified stats) */}
+          <ProofBand />
+          {/* 5. Architecture — 7-layer bento + honest coverage table */}
+          <ArchitectureBeat />
+          {/* 6. Product visual — Guard dashboard */}
           <DemoShowcase />
-          {/* 10. Regulated industries / compliance — enterprise leg, below the fold */}
-          <RegulatedIndustriesPositioning />
-          {/* 11. Pricing Preview */}
+          {/* 7. Threat crystallization + the one mission moment */}
+          <CrystallizeMission />
+          {/* 8. Pricing */}
           <PricingPreview />
-          {/* 12. CTA + Mission */}
-          <CTARoadmap />
+          {/* 9. Close — install command + scan CTA */}
+          <FinalCta />
         </main>
       </RuleStatsProvider>
       <Footer />

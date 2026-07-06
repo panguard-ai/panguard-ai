@@ -342,8 +342,8 @@ export default function ScanResultCard({
         <div className="px-5 py-4 border-t border-border bg-surface-2/40">
           <p className="text-[11px] font-semibold text-panguard-green mb-3">
             {isZh
-              ? `Layer 2(稽核)攔到 ${report.findings.length} 個攻擊 — Layer 3-6 runtime 守護,L1/L7 2026 Q2/Q3 上線`
-              : `Layer 2 (Audit) caught ${report.findings.length} attack${report.findings.length > 1 ? 's' : ''} — Layers 3-6 protect at runtime, L1/L7 ship Q2/Q3 2026`}
+              ? `Layer 2(稽核)攔到 ${report.findings.length} 個攻擊 — Layer 3-6 runtime 守護,L1/L7 規劃中`
+              : `Layer 2 (Audit) caught ${report.findings.length} attack${report.findings.length > 1 ? 's' : ''} — Layers 3-6 protect at runtime, L1/L7 planned`}
           </p>
           <ul className="space-y-1.5 text-[11px] text-text-secondary">
             <li className="flex items-start gap-2">
@@ -466,12 +466,12 @@ export default function ScanResultCard({
             : 'Start 24/7 protection for all your AI agents'}
         </p>
         <code className="inline-block text-[11px] bg-surface-2 border border-border rounded-lg px-3 py-1.5 text-panguard-green font-mono select-all mb-2">
-          npm install -g panguard && pga up
+          npm install -g @panguard-ai/panguard && pga up
         </code>
         <p className="text-[10px] text-text-muted mb-2">
           {isZh
-            ? `一行安裝。自動偵測 13 個平台：Claude Code、Cursor、Windsurf、Gemini CLI 等。${STATS.totalRulesDisplay} ATR 偵測規則即時防護。`
-            : `One command. Auto-detects 13 platforms: Claude Code, Cursor, Windsurf, Gemini CLI + more. ${STATS.totalRulesDisplay} ATR detection rules.`}
+            ? `一行安裝。自動偵測你的 AI agent(Claude Code、Cursor、Windsurf、Gemini CLI 等 agent runtime),把 ${STATS.totalRulesDisplay} 條 ATR 規則的即時防護裝進去。`
+            : `One command. Auto-detects your AI agents (Claude Code, Cursor, Windsurf, Gemini CLI + more) and installs ${STATS.totalRulesDisplay} ATR rules of real-time protection.`}
         </p>
         <Link
           href="/docs/getting-started"

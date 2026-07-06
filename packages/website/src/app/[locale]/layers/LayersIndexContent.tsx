@@ -63,8 +63,8 @@ export default function LayersIndexContent() {
           <FadeInUp delay={0.1}>
             <p className="text-lg sm:text-xl text-text-secondary max-w-2xl mx-auto mt-6 leading-relaxed">
               {isZh
-                ? '其他廠商只覆蓋 1-2 層。PanGuard 今天覆蓋 5 層(L2-L6),L1 Discover 2026 Q2 上線,L7 Govern Q2/Q3 上線。誠實標 gap,不假打勾。'
-                : 'Most vendors cover 1-2 layers. PanGuard ships 5 layers today (L2-L6), with L1 Discover in Q2 2026 and L7 Govern Q2/Q3 2026. We mark the gaps openly — no fake checkmarks.'}
+                ? '其他廠商只覆蓋 1-2 層。PanGuard 今天覆蓋 5 層(L2-L6),L1 Discover 與 L7 Govern 規劃中,尚未承諾日期。誠實標 gap,不假打勾。'
+                : 'Most vendors cover 1-2 layers. PanGuard ships 5 layers today (L2-L6); L1 Discover and the remaining L7 Govern pieces are planned, with no dates committed. We mark the gaps openly — no fake checkmarks.'}
             </p>
           </FadeInUp>
           <FadeInUp delay={0.2}>
@@ -137,15 +137,15 @@ export default function LayersIndexContent() {
           <FadeInUp>
             <h2 className="text-[clamp(20px,3vw,36px)] font-bold text-text-primary leading-[1.15]">
               {isZh
-                ? '一次買齊 7 層,比買 5 家省 40%'
-                : 'Get all 7 layers for ~40% less than 5 vendors'}
+                ? '七層防護,一次裝好 — 今天全部免費'
+                : 'All 7 layers in one install — free today'}
             </h2>
           </FadeInUp>
           <FadeInUp delay={0.1}>
             <p className="text-text-secondary mt-5 leading-relaxed">
               {isZh
-                ? 'F500 CISO 今天為單層廠商付 $400-600K/年(Lakera + Apono + Straiker + Cisco bundle)。PanGuard 7 層整合只要其中一小部分(洽詢定價)。節省費用的同時,拿掉 vendor fatigue 與整合成本。'
-                : "F500 CISOs today pay $400-600K/yr across single-layer vendors (Lakera + Apono + Straiker + Cisco bundle). PanGuard's 7-layer consolidation lands at a fraction of that (contact us for pricing) — cheaper plus no vendor fatigue plus one SOC to train."}
+                ? '各家單層廠商要你一層一層買、一家一家整合。PanGuard 把七層做在同一個開源安裝裡 — 今天出貨的一切免費,企業運營層(feed、支援、規模化證據)在 roadmap 上。'
+                : "Single-layer vendors sell one layer each and leave the integration to you. PanGuard ships all seven in one open-source install — everything shipped today is free; enterprise operations (feed, support, evidence at scale) are on the roadmap."}
             </p>
           </FadeInUp>
           <FadeInUp delay={0.2}>

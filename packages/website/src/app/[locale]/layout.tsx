@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
-import { Inter, Space_Grotesk, JetBrains_Mono, Noto_Sans_TC } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
+import { Inter, Space_Grotesk, JetBrains_Mono, Noto_Sans_TC, Newsreader } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -36,6 +36,24 @@ const notoSansTC = Noto_Sans_TC({
   display: 'swap',
 });
 
+// Serif voice reserved for paper (signed-evidence) islands only
+const newsreader = Newsreader({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  style: ['normal', 'italic'],
+  variable: '--font-serif',
+  display: 'swap',
+});
+
+// Brand color (brand.sage) — keep in sync with tailwind.config.ts
+const BRAND_COLOR = '#8B9A8E';
+
+export const viewport: Viewport = {
+  themeColor: BRAND_COLOR,
+  width: 'device-width',
+  initialScale: 1,
+};
+
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
@@ -48,7 +66,7 @@ export async function generateMetadata(props: {
   return {
     metadataBase: new URL('https://panguard.ai'),
     title: {
-      default: 'Panguard AI',
+      default: t('title'),
       template: '%s | Panguard AI',
     },
     description: t('description'),
@@ -132,7 +150,7 @@ export default async function LocaleLayout(
   return (
     <html
       lang={locale === 'zh-TW' ? 'zh-TW' : 'en'}
-      className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} ${notoSansTC.variable}`}
+      className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} ${notoSansTC.variable} ${newsreader.variable}`}
       suppressHydrationWarning
     >
       <head>

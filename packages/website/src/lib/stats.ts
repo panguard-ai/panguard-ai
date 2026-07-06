@@ -12,9 +12,9 @@
  *   packages/core/src/ai/funnel-router.ts      -> 3 layers
  *   vitest run (159 test files)                -> 3,528 test cases
  *   packages/panguard/src/cli/index.ts         -> 23 top-level commands
- *   packages/panguard-mcp/src/server.ts        -> 11 MCP tools
+ *   packages/panguard-mcp/src/server.ts        -> 10 MCP tools shown on /product/mcp
  *   packages/panguard-skill-auditor/src/checks/ -> 8 audit checks
- *   agent-threat-rules/rules/                  -> 675 ATR rules (v3.5.4; npm latest 3.5.4, verified against origin/main). Guard build may include drafts; TC live aggregates external community rules separately.
+ *   agent-threat-rules/rules/                  -> 672 ATR rules (npm v3.5.4, compiled bundle atr-rules-compiled.json). Re-sync with the three-command flow above when bumping ATR.
  *   packages/panguard-guard/src/playbook/      -> 3 playbook templates
  *   packages/panguard-guard/src/collectors/     -> 4 log parsers
  *
@@ -23,23 +23,26 @@
  */
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
-  cliVersion: '1.7.3',
-  /** Synced from agent-threat-rules/stats.json by sync-atr-stats workflow */
-  atrVersion: '3.5.0',
-  /** Total rules on main (disk == data/stats.json, verified against origin/main) */
-  atrRules: 688,
-  /** Maturity lanes: 'stable' rules run in the enforce lane; test/experimental are advisory */
-  atrStableRules: 132,
-  atrExperimentalRules: 61,
-  /** Community ATR rules from Threat Cloud flywheel (TC-side aggregation, separate from main repo) */
-  atrCommunityRules: 93,
-  /** Total detection patterns (regex conditions) across all ATR rules on main */
-  atrPatterns: 3034,
-  totalRules: 688,
-  /** Use this for all user-facing display — avoids stale hardcoded counts */
-  totalRulesDisplay: '688' as const,
+  cliVersion: '1.5.6',
+  /**
+   * Synced from agent-threat-rules by: pnpm update agent-threat-rules ->
+   * node scripts/compile-atr-rules.mjs -> node scripts/apply-atr-stats.mjs.
+   * Rule count matches the compiled bundle (src/lib/atr-rules-compiled.json).
+   */
+  atrVersion: '3.5.4',
+  /**
+   * ATR rules PanGuard ships (agent-threat-rules v3.5.4 on npm = 672 YAML rules).
+   * This is the count of the exact bundle this site scans with — auditable by
+   * `npm i agent-threat-rules@3.5.4 && find rules -name '*.yaml' | wc -l`.
+   */
+  atrRules: 672,
+  /** Total unique detection patterns across all bundled ATR rules. */
+  atrPatterns: 3_025,
+  totalRules: 672,
+  /** Use this for all user-facing display — avoids stale hardcoded counts. */
+  totalRulesDisplay: '670+' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '688' as const,
+  atrRulesDisplay: '670+' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,
@@ -49,7 +52,7 @@ export const STATS = {
   cliCommands: 23,
   products: 6,
   aiAgents: 4,
-  mcpTools: 12,
+  mcpTools: 10,
   playbookTemplates: 3,
   logParsers: 4,
   license: 'MIT' as const,
@@ -62,62 +65,43 @@ export const STATS = {
   owaspAgentic: {
     totalCategories: 10,
     coveredCategories: 10,
-    totalMappings: 77,
+    totalMappings: 866,
     categories: [
-      { id: 'ASI01', rules: 13, strength: 'STRONG' as const },
-      { id: 'ASI02', rules: 11, strength: 'STRONG' as const },
-      { id: 'ASI03', rules: 9, strength: 'STRONG' as const },
-      { id: 'ASI04', rules: 8, strength: 'STRONG' as const },
-      { id: 'ASI05', rules: 8, strength: 'STRONG' as const },
-      { id: 'ASI06', rules: 8, strength: 'STRONG' as const },
-      { id: 'ASI07', rules: 5, strength: 'MODERATE' as const },
-      { id: 'ASI08', rules: 4, strength: 'MODERATE' as const },
-      { id: 'ASI09', rules: 5, strength: 'MODERATE' as const },
+      { id: 'ASI01', rules: 445, strength: 'STRONG' as const },
+      { id: 'ASI02', rules: 32, strength: 'STRONG' as const },
+      { id: 'ASI03', rules: 107, strength: 'STRONG' as const },
+      { id: 'ASI04', rules: 71, strength: 'STRONG' as const },
+      { id: 'ASI05', rules: 65, strength: 'STRONG' as const },
+      { id: 'ASI06', rules: 54, strength: 'STRONG' as const },
+      { id: 'ASI07', rules: 21, strength: 'STRONG' as const },
+      { id: 'ASI08', rules: 48, strength: 'STRONG' as const },
+      { id: 'ASI09', rules: 16, strength: 'STRONG' as const },
       { id: 'ASI10', rules: 7, strength: 'MODERATE' as const },
     ],
   },
-  /** Per-category breakdown — synced from agent-threat-rules/data/stats.json (2026-05-27 regen, 444 total). */
+  /** Per-category breakdown — counted from the compiled bundle (agent-threat-rules v3.5.4, 672 rules). */
   rulesByCategory: {
-    'prompt-injection': 173,
-    'agent-manipulation': 105,
-    'skill-compromise': 43,
-    'context-exfiltration': 41,
-    'tool-poisoning': 43,
-    'privilege-escalation': 16,
-    'model-abuse': 10,
-    'excessive-autonomy': 8,
-    'model-security': 3,
-    'data-poisoning': 2,
+    'prompt-injection': 219,
+    'context-exfiltration': 108,
+    'agent-manipulation': 106,
+    'tool-poisoning': 84,
+    'skill-compromise': 41,
+    'privilege-escalation': 39,
+    'model-abuse': 39,
+    'excessive-autonomy': 30,
+    'data-poisoning': 6,
   },
-  /**
-   * Two-tier framework story — SINGLE SOURCE OF TRUTH.
-   * Keep in sync with /atr/crosswalks CROSSWALKS registry and ATR
-   * data/compliance-frameworks/ allowlist.
-   *
-   * EVIDENCE tier (5): frameworks with validated, control-level identifiers in
-   * ATR's data/compliance-frameworks/*.json allowlist, gated by
-   * `npm run validate:compliance` — the same gate that caught the fabricated
-   * ISO clauses (2026-06-05). PanGuard generates signed compliance evidence for
-   * these. A framework only earns this tier once its allowlist file exists.
-   */
-  complianceFrameworks: 5,
+  /** Compliance frameworks ATR maps to (per-rule metadata) — matches complianceFrameworkList length. */
+  complianceFrameworks: 7,
   complianceFrameworkList: [
-    'EU AI Act',
-    'NIST AI RMF',
-    'ISO/IEC 42001',
     'OWASP Agentic Top 10:2026',
     'OWASP LLM Top 10:2025',
+    'MITRE ATLAS',
+    'NIST AI RMF',
+    'EU AI Act',
+    'ISO/IEC 42001',
+    'SAFE-MCP',
   ],
-  /**
-   * CROSSWALK tier (breadth, the "universal standard" claim). MUST equal the
-   * number of entries in the /atr/crosswalks CROSSWALKS array (that array is the
-   * registry; this number mirrors it). Adding a crosswalk there → bump this.
-   * Current 10 = the 5 evidence frameworks + MITRE ATLAS + SAFE-MCP + CWE +
-   * Five Eyes joint guidance + CISA KEV. (Colorado AI Act is partial-by-design,
-   * not counted.) Every entry must point to a real ATR mapping doc or per-rule
-   * metadata — never claim a crosswalk a rule does not actually reference.
-   */
-  crosswalkStandards: 10,
   /** Rule source corpora integrated in v2.2.0 sprint */
   ruleSourceCorpora: [
     'NVIDIA garak (3,475 prompts)',
@@ -138,7 +122,7 @@ export const STATS = {
     autoGeneratedATR: 0,
     promotedRules: 808,
     draftRules: 536,
-    lastSync: '2026-06-14',
+    lastSync: '2026-03-27',
     syncInterval: '1h',
   },
   /**
@@ -187,47 +171,40 @@ export const STATS = {
     lastCrawl: '2026-04-16',
   },
   /**
-   * Benchmark results — SINGLE SOURCE OF TRUTH for all benchmark numbers on the site.
+   * Benchmark results — verified against 資安/state/facts.json 2026-07-04.
+   * All numbers are corpus-level Layer 1 (deterministic rules) measurements;
+   * ALWAYS display with corpus + version context, never as engine-wide claims.
    *
-   * STANDARDIZATION (2026-06-16): This block is the one defensible, consistent set.
-   * README, the about page, the benchmarks page, and marketing copy all reference
-   * THESE values. Do not hardcode benchmark percentages elsewhere — render from here.
-   *
-   * Sourcing & honesty rules:
-   * - All recall/precision/fp values are WHOLE-NUMBER PERCENTAGES (e.g. 63.2 means 63.2%),
-   *   so consumers can render `${value}%` directly. (Previously some were fractions and
-   *   some were percentages in the same object, which rendered as raw 0.63%/0.97%.)
-   * - PINT and SKILL.md are measured against published external corpora and are the
-   *   numbers ATR/PanGuard cite as authoritative.
-   * - Garak recall is reported as an approximate figure (`garakRecallApprox`) because the
-   *   exact value drifts across rule versions and is not pinned to a single shipped build.
-   * - HackAPrompt has NO headline number here on purpose: published figures are per-version
-   *   (engineering blog) and the value moves with each rule batch; quoting a single % would
-   *   be misleading. The blog posts keep their own version-labeled numbers.
-   * - Authoritative v3.5.0 measurements (source: agent-threat-rules
-   *   data/measurements/<bench>/latest.json, atr_version 3.5.0, verified 2026-06-16).
-   *   Re-verify against latest.json before citing externally — they move on re-measure.
+   * PINT: self-built 850-sample PINT-format corpus (deepset prompt-injections +
+   *   Lakera Gandalf); NOT Lakera's official private PINT benchmark.
+   * SKILL.md: real-world skill corpus (498 samples from ClawHub + OpenClaw + Skills.sh)
+   * Garak: NVIDIA in-the-wild jailbreak corpus (650 samples)
+   * HackAPrompt: EMNLP 2023 competition corpus (4,780 deterministic samples)
    */
+  // All recall/precision/fp values are PERCENTAGES (0-100) for a single
+  // consistent unit across the site — call sites render `${value}%` directly.
   benchmark: {
-    // PINT (Invariant Labs / Lakera adversarial corpus, 850 samples) — v3.5.0
-    pint: {
-      recall: 0.6363636363636364,
-      precision: 0.9965277777777778,
-      fp: 0.002506265664160401,
-      samples: 850,
-    },
-    // SKILL.md real-world corpus (ClawHub + OpenClaw + Skills.sh, 498 manually-labeled samples) — v3.5.0
-    skill: { recall: 1, precision: 0.97, fp: 0.002, samples: 498 },
-    // NVIDIA garak in-the-wild corpus — v3.5.0 (down from 98.0%: rule ATR-2026-00495 deprecated)
+    pint: { recall: 63.6, precision: 99.7, fp: 0.25, samples: 850 },
+    skill: { recall: 100, precision: 97, fp: 0.2, samples: 498 },
     garak: {
-      recallApprox: 97.2,
+      recall: 97.2,
       samples: 650,
       perFamily: { latentinjection: 34.4, sysprompt_extraction: 67.9, dan: 90.2 },
     },
-    // HackAPrompt (5K deterministic sample) — v3.5.0
-    hackaprompt: { recall: 69.6, precision: 100, samples: 4_780 },
-    wildFpRate: 0,
-    wildSamples: 432,
+    hackaprompt: { recall: 69.6, precision: 100, samples: 4_780, baselineRecall: 28.6 },
+    /**
+     * Lane-based false-positive rates on the 65K-sample benign gate (v3.5.0
+     * detection lanes). There is NO single engine-wide FP number — enforce lane
+     * (stable + confirm-gated rules) and hunt lane (all rules, the default)
+     * behave differently by design. Cite the lane, never a blended figure.
+     */
+    benignLanes: {
+      enforceFp: 0.24,
+      huntFp: 9,
+      samples: 65_000,
+      defaultLane: 'hunt' as const,
+    },
+    asOf: '2026-07-04',
   },
   /** Standards coverage */
   coverage: {
@@ -235,11 +212,11 @@ export const STATS = {
     safeMcp: 91.8,
     safeMcpDetail: '78/85',
   },
-  /** Ecosystem adoption (per ATR v2.2.0 ship 2026-05-12, pitch v5 substance) */
+  /** Ecosystem adoption — evidence-tiered per deck v11 (2026-07-02); every merge links to its PR */
   adoption: {
-    /** Cisco AI Defense: PR #79 PoC (34 rules) → PR #99 full 344-rule pack in skill-scanner; now 419 via v2.2.0 auto-sync */
-    ciscoRulesMerged: 419,
-    /** Microsoft AGT: PR #908 → PR #1277 merged ATR rule pack + weekly auto-sync workflow (auto-pulls latest). Count not asserted on live surfaces (unverifiable); field retained for historical reference. */
+    /** Cisco AI Defense skill-scanner: 314-rule ATR pack merged (deck v11 canonical figure) */
+    ciscoRulesMerged: 314,
+    /** Microsoft AGT: PR #908 (15 rules) → PR #1277 expanded to 287 rules + weekly auto-sync workflow auto-pulls v2.2.0 */
     microsoftRulesMerged: 287,
     /** Microsoft Copilot SWE Agent → AGT#1981 (5/11 06:07 UTC) regression-test fixtures presuming ATR detection */
     microsoftCopilotLoopIssue: 1981,
@@ -254,7 +231,8 @@ export const STATS = {
      */
     npmDownloads30d: 10_046,
     /** Tier-1 institutions with active engagement: Microsoft, Cisco, Gen Digital (Sage), MISP, OWASP, NVIDIA, IBM */
-    tier1Institutions: 7,
+    /** Tier-1 in conversation: Microsoft, Cisco, Gen Digital, MISP, OWASP, NVIDIA (IBM dropped — PR #4109 closed without merge). */
+    tier1Institutions: 6,
     /** Vendor + standards-body merges: MISP×2 + OWASP A-S-R-H + Gen Digital Sage */
     standardsBodyMerges: 4,
     /** Production CVE coverage (Spring AI + LiteLLM + Semantic Kernel via ATR v2.1.2/v2.1.4) */
@@ -271,7 +249,8 @@ export const STATS = {
     cisaKevCovered: 1,
     agentsProtected: 50,
     githubStars: 86,
-    platformsSupported: 13,
+    /** Verified agent runtimes PanGuard auto-detects/registers into (VS Code Copilot + Zed are in preview, excluded). */
+    platformsSupported: 15,
   },
   /** Platform coverage */
   platform: {
@@ -287,7 +266,7 @@ export const STATS = {
    * Website components should always prefer fetchLiveMetrics() for real-time data.
    * Update these periodically to keep fallbacks reasonable.
    */
-  lastUpdated: '2026-06-16T11:05:13.632Z',
+  lastUpdated: '2026-07-04T00:00:00.000Z',
 } as const;
 
 export type Stats = typeof STATS;

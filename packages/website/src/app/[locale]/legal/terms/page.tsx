@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { LEGAL_LAST_UPDATED } from '@/lib/constants';
+import { buildAlternates } from '@/lib/seo';
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;
@@ -12,6 +13,7 @@ export async function generateMetadata(props: {
   return {
     title: locale === 'zh-TW' ? '服務條款' : 'Terms of Service',
     description: 'Panguard AI Terms of Service. Usage terms, intellectual property, and liability.',
+    alternates: buildAlternates('/legal/terms', locale),
   };
 }
 

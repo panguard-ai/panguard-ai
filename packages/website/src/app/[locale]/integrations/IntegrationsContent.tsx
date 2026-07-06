@@ -7,6 +7,7 @@ import { ArrowRight, Search } from 'lucide-react';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import SectionTitle from '@/components/ui/SectionTitle';
+import { STATS } from '@/lib/stats';
 import {
   IntegrationIcon,
   NetworkIcon,
@@ -413,7 +414,7 @@ export default function IntegrationsContent() {
                 <code>{`$ panguard scan ~/.claude/skills --json
 {
   "scanned": 24,
-  "rules_loaded": 320,
+  "rules_loaded": ${STATS.totalRules},
   "threats": [
     {
       "skill": "data-exfil-helper",

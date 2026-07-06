@@ -18,6 +18,7 @@ interface SectionRow {
 
 const SECTIONS: readonly SectionRow[] = [
   { num: '1', en: 'Abstract', zh: '摘要', anchor: '1-abstract' },
+  { num: '2', en: 'Introduction', zh: '導論', anchor: '2-introduction' },
   {
     num: '3',
     en: 'Conventions and Terminology (RFC 2119)',
@@ -125,26 +126,30 @@ export default function SpecContent() {
         }
       />
 
-      <div className="mt-8 overflow-hidden rounded-lg border border-slate-200">
+      <div className="mt-8 overflow-hidden rounded-2xl border border-border">
         <table className="w-full text-left text-sm">
-          <thead className="bg-slate-50">
+          <thead className="bg-surface-1">
             <tr>
-              <th className="px-4 py-3 font-medium text-slate-600">§</th>
-              <th className="px-4 py-3 font-medium text-slate-600">{isZh ? '章節' : 'Section'}</th>
-              <th className="px-4 py-3 font-medium text-slate-600">{isZh ? '連結' : 'Link'}</th>
+              <th className="px-4 py-3 font-medium text-text-secondary">§</th>
+              <th className="px-4 py-3 font-medium text-text-secondary">
+                {isZh ? '章節' : 'Section'}
+              </th>
+              <th className="px-4 py-3 font-medium text-text-secondary">
+                {isZh ? '連結' : 'Link'}
+              </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-border">
             {SECTIONS.map((s) => (
-              <tr key={s.num} className="hover:bg-slate-50">
-                <td className="px-4 py-3 font-mono text-slate-500">{s.num}</td>
-                <td className="px-4 py-3 text-slate-900">{isZh ? s.zh : s.en}</td>
+              <tr key={s.num} className="hover:bg-surface-1">
+                <td className="px-4 py-3 font-mono text-text-muted">{s.num}</td>
+                <td className="px-4 py-3 text-text-primary">{isZh ? s.zh : s.en}</td>
                 <td className="px-4 py-3">
                   <a
                     href={`${REPO_BLOB}/SPEC.md#${s.anchor}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-emerald-700 hover:underline"
+                    className="inline-flex items-center gap-1 text-brand-sage hover:underline"
                   >
                     {isZh ? '閱讀' : 'Read'} <ExternalLink className="h-3 w-3" aria-hidden />
                   </a>
@@ -166,12 +171,14 @@ export default function SpecContent() {
         />
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           {LEVELS.map((lvl) => (
-            <div key={lvl.level} className="rounded-lg border border-slate-200 p-6">
-              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-md bg-emerald-50 text-emerald-700">
+            <div key={lvl.level} className="rounded-2xl border border-border bg-surface-1 p-6">
+              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-md bg-surface-2 text-brand-sage">
                 <Layers className="h-5 w-5" aria-hidden />
               </div>
-              <div className="mb-2 font-mono text-lg font-semibold text-slate-900">{lvl.level}</div>
-              <p className="text-sm leading-relaxed text-slate-600">{isZh ? lvl.zh : lvl.en}</p>
+              <div className="mb-2 font-mono text-lg font-semibold text-text-primary">
+                {lvl.level}
+              </div>
+              <p className="text-sm leading-relaxed text-text-secondary">{isZh ? lvl.zh : lvl.en}</p>
             </div>
           ))}
         </div>
@@ -216,11 +223,11 @@ export default function SpecContent() {
         </div>
       </div>
 
-      <div className="mt-16 rounded-lg border border-amber-200 bg-amber-50 p-6">
-        <h3 className="mb-2 text-base font-semibold text-amber-900">
+      <div className="mt-16 rounded-2xl border border-border bg-surface-1 p-6">
+        <h3 className="mb-2 text-base font-semibold text-text-primary">
           {isZh ? '對標準制定機構審閱者的說明' : 'Note to standards-body reviewers'}
         </h3>
-        <p className="text-sm leading-relaxed text-amber-900">
+        <p className="text-sm leading-relaxed text-text-secondary">
           {isZh
             ? '本規格採用 BCP 14 規範性語言、明定一致性測試套件、SemVer 版本契約，並要求 IANA 媒體類型註冊。歡迎以 IETF Internet-Draft 或 OASIS Technical Committee 形式提出意見與正式採納。聯絡：adam@agentthreatrule.org'
             : 'This specification uses BCP 14 normative language, defines a conformance test suite, commits to a SemVer contract, and requests IANA media-type registration. Submissions for formal adoption (IETF Internet-Draft, OASIS TC) are welcomed at adam@agentthreatrule.org.'}
@@ -228,13 +235,13 @@ export default function SpecContent() {
         <div className="mt-4 flex flex-wrap gap-3">
           <Link
             href={'/atr/governance' as never}
-            className="inline-flex items-center gap-1 rounded-md bg-amber-900 px-4 py-2 text-sm font-medium text-white hover:bg-amber-800"
+            className="inline-flex items-center gap-1 rounded-xl bg-surface-2 px-4 py-2 text-sm font-medium text-text-primary hover:bg-surface-3"
           >
             {isZh ? '治理結構' : 'Governance'}
           </Link>
           <Link
             href={'/atr/cite' as never}
-            className="inline-flex items-center gap-1 rounded-md border border-amber-900 px-4 py-2 text-sm font-medium text-amber-900 hover:bg-amber-100"
+            className="inline-flex items-center gap-1 rounded-xl border border-border px-4 py-2 text-sm font-medium text-text-primary hover:border-border-hover hover:bg-surface-1"
           >
             {isZh ? '引用方式' : 'How to Cite'}
           </Link>
@@ -247,14 +254,14 @@ export default function SpecContent() {
 function FadeHeader({ isZh }: { isZh: boolean }) {
   return (
     <div className="mb-12 max-w-3xl">
-      <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-        <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+      <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border bg-surface-1 px-3 py-1 text-xs font-medium text-brand-sage">
+        <span className="h-1.5 w-1.5 rounded-full bg-brand-sage" />
         {isZh ? '規範 · 草案 · v1.0.0' : 'Specification · Draft · v1.0.0'}
       </div>
-      <h1 className="mb-4 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
+      <h1 className="mb-4 text-4xl font-semibold tracking-tight text-text-primary sm:text-5xl">
         {isZh ? 'ATR 核心規範' : 'ATR Core Specification'}
       </h1>
-      <p className="text-lg leading-relaxed text-slate-600">
+      <p className="text-lg leading-relaxed text-text-secondary">
         {isZh
           ? '定義 ATR 規則的格式、識別碼、偵測語意、一致性等級與 IANA 媒體類型。此規範為實作者撰寫，不是行銷文件 — 採 IETF RFC 風格，使用 BCP 14 的 MUST/SHOULD/MAY 規範性語言，並承諾 SemVer 版本契約。'
           : 'The normative wire format, identifier scheme, evaluation semantics, conformance levels, and IANA media types for ATR rules. Written for implementers, not marketing — IETF RFC style, BCP 14 normative language, SemVer contract.'}
@@ -265,10 +272,10 @@ function FadeHeader({ isZh }: { isZh: boolean }) {
 
 function StatBox({ label, value, sub }: { label: string; value: string; sub: string }) {
   return (
-    <div className="rounded-lg border border-slate-200 p-5">
-      <div className="text-xs uppercase tracking-wide text-slate-500">{label}</div>
-      <div className="mt-1 font-mono text-xl font-semibold text-slate-900">{value}</div>
-      <div className="mt-1 text-xs text-slate-500">{sub}</div>
+    <div className="rounded-2xl border border-border bg-surface-1 p-5">
+      <div className="text-xs uppercase tracking-wide text-text-muted">{label}</div>
+      <div className="mt-1 font-mono text-xl font-semibold text-text-primary">{value}</div>
+      <div className="mt-1 text-xs text-text-muted">{sub}</div>
     </div>
   );
 }
@@ -289,14 +296,14 @@ function LinkCard({
       href={href}
       target="_blank"
       rel="noreferrer"
-      className="group flex gap-4 rounded-lg border border-slate-200 p-5 hover:border-emerald-400 hover:shadow-sm"
+      className="group flex gap-4 rounded-2xl border border-border bg-surface-1 p-5 hover:border-border-hover hover:shadow-sm"
     >
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-slate-100 text-slate-700 group-hover:bg-emerald-50 group-hover:text-emerald-700">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-surface-2 text-text-secondary group-hover:bg-surface-3 group-hover:text-brand-sage">
         {icon}
       </div>
       <div>
-        <div className="font-mono text-sm font-semibold text-slate-900">{title}</div>
-        <div className="mt-1 text-sm text-slate-600">{desc}</div>
+        <div className="font-mono text-sm font-semibold text-text-primary">{title}</div>
+        <div className="mt-1 text-sm text-text-secondary">{desc}</div>
       </div>
     </a>
   );

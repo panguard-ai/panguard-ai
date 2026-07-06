@@ -253,6 +253,69 @@ body::after {
   }
 }
 
+/* ─── Layer A: Scan-Beam Grid Reveal (hero) ───
+   A brighter copy of the hero grid rides inside a masked band that sweeps
+   vertically, "revealing" the grid as a scan beam passes. Pure CSS, GPU
+   transform only. Absorbs the older .hero-scanline for the scanner hero. */
+.scan-reveal {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+.scan-reveal-layer {
+  position: absolute;
+  top: -20%;
+  left: 0;
+  right: 0;
+  height: 140%;
+  background-image:
+    linear-gradient(rgba(139, 154, 142, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 154, 142, 0.09) 1px, transparent 1px);
+  background-size: 120px 120px;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 45%,
+    black 55%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(to bottom, transparent 0%, black 45%, black 55%, transparent 100%);
+  -webkit-mask-size: 100% 40%;
+  mask-size: 100% 40%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  will-change: transform;
+  animation: scan-reveal-sweep 10s ease-in-out infinite alternate;
+}
+/* 1px bright beam line riding the center of the masked band */
+.scan-reveal-layer::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(139, 154, 142, 0.15);
+}
+@keyframes scan-reveal-sweep {
+  from {
+    transform: translateY(-30%);
+  }
+  to {
+    transform: translateY(30%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scan-reveal-layer {
+    animation: none;
+    opacity: 0.3;
+  }
+}
+
 /* Shield glow ring pulse */
 .hero-glow-ring {
   background: radial-gradient(circle, rgba(139, 154, 142, 0.06) 0%, transparent 70%);
@@ -443,17 +506,20 @@ body::after {
   }
 }
 
-/* Fallback: force-show content quickly if IntersectionObserver/JS fails.
-   Reduced from 2s→0.3s so content is never invisible for more than a blink. */
+/* Fallback: force-show content if IntersectionObserver/JS never reveals it.
+   This is a safety net so scroll-reveal content can never become a permanent
+   void — e.g. below-the-fold cards during a fast scroll, or in headless
+   full-page captures where the observer does not fire progressively.
+   The delay lets the normal scroll-reveal transition play first; after it,
+   any still-hidden element is forced visible. */
 @keyframes force-show {
   to {
-    opacity: 1 !important;
-    transform: none !important;
+    opacity: 1;
+    transform: none;
   }
 }
-/* Reduced 0.3s → 0.05s so above-the-fold content is never blank-on-load. */
-.js-ready .animate-on-scroll {
-  animation: force-show 0.01s 0.05s forwards;
+.js-ready .animate-on-scroll:not(.is-visible) {
+  animation: force-show 0.4s 1.2s forwards;
 }
 /* Force-show framer-motion elements that are still hidden after 1s.
    This catches whileInView elements that haven't scrolled into viewport yet.
@@ -621,10 +687,14 @@ main [style*='opacity:0'] {
   text-rendering: geometricPrecision;
 }
 
+/* Body-copy leading only. Deliberately NOT bare `span`: the v2 two-tone
+   headlines inject <span> into h1/h2 line boxes (sageRich, reveal words,
+   KPI values) and an inline span's line-height would blow the heading
+   leading open to 1.85 exactly where the signature device is used. */
 :lang(zh) p,
 :lang(zh) li,
 :lang(zh) dd,
-:lang(zh) span {
+:lang(zh) :is(p, li, dd) span {
   line-height: 1.85;
 }
 
@@ -675,7 +745,7 @@ main [style*='opacity:0'] {
   :lang(zh) p,
   :lang(zh) li,
   :lang(zh) dd,
-  :lang(zh) span {
+  :lang(zh) :is(p, li, dd) span {
     line-height: 1.75;
   }
 }
@@ -774,4 +844,167 @@ code {
 
 .prose-panguard li {
   margin-bottom: 0.5rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   v2 Design Craft Layer — editorial dark (deck v11) × tasteskill
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Film grain overlay (1.5% fractalNoise, whole site) ─── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.015;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ─── Sheen sweep on hover (CTAs, nav pills, copy buttons) ─── */
+.sheen {
+  position: relative;
+  overflow: hidden;
+}
+.sheen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-125%) skewX(-18deg);
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.14) 50%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+.sheen:hover::after {
+  animation: sheen-sweep 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes sheen-sweep {
+  to {
+    transform: translateX(125%) skewX(-18deg);
+  }
+}
+
+/* ─── Paper island: signed-evidence sections invert to warm paper ─── */
+.paper {
+  background: #f5f1e8;
+  color: #161210;
+  background-image: radial-gradient(
+      ellipse 120% 60% at 50% 0%,
+      rgba(255, 255, 255, 0.65) 0%,
+      transparent 60%
+    ),
+    linear-gradient(180deg, #f7f3ea 0%, #f5f1e8 45%, #f0eadd 100%);
+}
+.paper ::selection {
+  background: rgba(107, 122, 110, 0.25);
+  color: #161210;
+}
+.paper h1,
+.paper h2,
+.paper h3,
+.paper h4 {
+  color: #161210;
+}
+
+/* ─── Word-level blur reveal for interstitial statements ─── */
+.js-ready .reveal-word-blur {
+  opacity: 0;
+  transform: translateY(14px);
+  filter: blur(8px);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.js-ready .reveal-text-container.is-visible .reveal-word-blur {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* ─── Micro-interactions ─── */
+.lift {
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.lift:hover {
+  transform: translateY(-1px);
+}
+.lift:active {
+  transform: scale(0.98);
+}
+
+/* ─── Floating pill nav chrome ─── */
+.nav-pill {
+  background: rgba(26, 22, 20, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(245, 241, 232, 0.08);
+  box-shadow:
+    0 6px 18px -6px rgba(0, 0, 0, 0.5),
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(245, 241, 232, 0.05);
+}
+
+/* ─── Dashed provisional border (deck: projected / in-conversation) ─── */
+.border-provisional {
+  border-style: dashed;
+}
+
+/* ─── Terminal island scan output colors ─── */
+.term-critical {
+  color: #ef4444;
+}
+.term-high {
+  color: #f97316;
+}
+.term-dim {
+  color: #9a9490;
+}
+.term-ok {
+  color: #34d399;
+}
+
+/* ─── Scrolled elevation for floating nav pills ─── */
+[data-scrolled='true'] .nav-pill {
+  box-shadow:
+    0 10px 28px -8px rgba(0, 0, 0, 0.65),
+    0 1px 2px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(245, 241, 232, 0.06);
+}
+
+/* ─── Keyboard focus ring (brand, replaces UA default on warm-dark) ─── */
+:focus-visible {
+  outline: 2px solid #8b9a8e;
+  outline-offset: 2px;
+}
+.bg-panguard-green:focus-visible {
+  outline-color: #34d399;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheen:hover::after {
+    animation: none;
+  }
+  .js-ready .reveal-word-blur {
+    transition-duration: 0.01ms !important;
+    filter: none !important;
+  }
+  .lift,
+  .lift:hover,
+  .lift:active {
+    transform: none;
+  }
+  .hero-entrance,
+  .hero-entrance-fade {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+  }
 }
