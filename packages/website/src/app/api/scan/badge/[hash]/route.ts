@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { checkRateLimit, getClientIP } from '@/lib/rate-limit';
 
 /**
  * GET /api/scan/badge/:hash.svg
@@ -98,7 +99,22 @@ async function lookupStatus(hash: string): Promise<BadgeStatus> {
   return 'unknown';
 }
 
-export async function GET(_request: Request, { params }: { params: Promise<{ hash: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ hash: string }> }) {
+  const ip = getClientIP(request);
+  if (!checkRateLimit(ip)) {
+    // This endpoint is an <img> badge — return a valid SVG (not JSON) so the
+    // image never breaks, while still skipping the upstream Threat Cloud
+    // fan-out that the rate limit is meant to protect.
+    return new NextResponse(buildBadge('unknown'), {
+      status: 200,
+      headers: {
+        'Content-Type': 'image/svg+xml',
+        'Cache-Control': 'public, max-age=60',
+        'Retry-After': '60',
+      },
+    });
+  }
+
   const { hash } = await params;
   const cleanHash = hash
     .replace(/\.svg$/, '')

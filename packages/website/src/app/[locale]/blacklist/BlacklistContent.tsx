@@ -13,21 +13,24 @@ export default function BlacklistContent() {
   const t = useTranslations('blacklistPage');
   const stats = useEcosystemStats();
 
+  // Hero funnel: Total Scanned -> Threats Detected -> Malicious Blocked.
+  // Each number is distinct and reconciles with the Severity Breakdown below:
+  //   threatsDetected == breakdown "High" total, blacklistedSkills == breakdown "Critical".
   const STAT_CARDS = [
     {
-      key: 'maliciousFound' as const,
+      key: 'totalScanned' as const,
+      value: stats.skillsScanned.toLocaleString(),
+      color: 'text-text-primary',
+    },
+    {
+      key: 'threatsDetected' as const,
+      value: stats.threatsDetected.toLocaleString(),
+      color: 'text-orange-400',
+    },
+    {
+      key: 'maliciousBlocked' as const,
       value: stats.blacklistedSkills.toLocaleString(),
       color: 'text-red-400',
-    },
-    {
-      key: 'critical' as const,
-      value: stats.threatsDetected.toLocaleString(),
-      color: 'text-red-400',
-    },
-    {
-      key: 'high' as const,
-      value: stats.skillsScanned.toLocaleString(),
-      color: 'text-orange-400',
     },
   ];
 

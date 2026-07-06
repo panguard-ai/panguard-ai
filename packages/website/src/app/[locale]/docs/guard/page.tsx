@@ -1,18 +1,25 @@
 import type { Metadata } from 'next';
+import { buildAlternates } from '@/lib/seo';
+import { STATS } from '@/lib/stats';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import GuardDocsContent from './GuardDocsContent';
 
-export const metadata: Metadata = {
-  title: 'Panguard Guard — Documentation',
-  description:
-    'Inline skill behavior detection with deterministic, on-device analysis. Configure detection rules, response actions, and threat monitoring.',
-  openGraph: {
-    title: 'Panguard Guard — Panguard AI Docs',
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  return {
+    title: 'Panguard Guard — Documentation',
     description:
-      'Inline skill behavior detection: 650+ ATR detection rules, deterministic on-device analysis, automated response.',
-  },
-};
+      'Real-time skill behavior monitoring with AI pipeline. Configure detection rules, response actions, and threat monitoring.',
+    alternates: buildAlternates('/docs/guard', locale),
+    openGraph: {
+      title: 'Panguard Guard — Panguard AI Docs',
+      description: `24/7 skill behavior monitoring: ${STATS.totalRulesDisplay} ATR detection rules, AI analysis, automated response.`,
+    },
+  };
+}
 
 export default function GuardDocsPage() {
   return (

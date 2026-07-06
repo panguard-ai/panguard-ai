@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/navigation';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
+import { STATS } from '@/lib/stats';
 
 /* ────────────────────────  Constants  ──────────────────────────── */
 
@@ -23,6 +24,13 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 
 export default function BenchmarkContent() {
   const t = useTranslations('docs.benchmark');
+
+  // Source test-suite figures from STATS (single source of truth) rather than
+  // hardcoded translation strings, which drift out of date.
+  const methodValueOverrides: Partial<Record<(typeof METHOD_KEYS)[number], string>> = {
+    testFiles: String(STATS.testFiles),
+    testCases: STATS.testsPassing.toLocaleString('en-US'),
+  };
 
   return (
     <>
@@ -59,7 +67,7 @@ export default function BenchmarkContent() {
                     {t(`methodLabel.${key}`)}
                   </p>
                   <p className="text-text-primary font-semibold text-lg">
-                    {t(`methodValue.${key}`)}
+                    {methodValueOverrides[key] ?? t(`methodValue.${key}`)}
                   </p>
                 </div>
               ))}

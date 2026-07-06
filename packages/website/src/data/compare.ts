@@ -8,6 +8,8 @@
  * The credibility this earns is worth more than the cheap dunk.
  */
 
+import { STATS } from '@/lib/stats';
+
 export interface CompareRow {
   feature: string;
   atr: string;
@@ -53,11 +55,11 @@ export const COMPARE: ComparisonEntry[] = [
     framing: {
       en: [
         'Sigma is the open detection standard for SIEM (Security Information and Event Management). Rules describe log patterns — Windows Event ID 4625 with logon type 3 and source IP outside the allowlist — and SIEM engines (Splunk, ELK, Microsoft Sentinel) load and evaluate them. Sigma is a decade old, has thousands of community rules, and is the de-facto language for detection engineering.',
-        'ATR is the open detection standard for AI agents. Rules describe agent-context patterns — `tool_call.arguments` containing a base64-encoded reverse shell, `model_output` containing markdown image references with credential parameters, `agent_event.event_type` of unauthorized_file_read — and ATR engines (PanGuard Guard, Microsoft AGT, Cisco AI Defense skill-scanner) load and evaluate them. ATR is two years old, has 650+ rules, and is becoming the de-facto language for AI agent detection.',
+        `ATR is the open detection standard for AI agents. Rules describe agent-context patterns — \`tool_call.arguments\` containing a base64-encoded reverse shell, \`model_output\` containing markdown image references with credential parameters, \`agent_event.event_type\` of unauthorized_file_read — and ATR engines (PanGuard Guard, Microsoft AGT, Cisco AI Defense skill-scanner) load and evaluate them. ATR is two years old, has ${STATS.totalRulesDisplay} rules, and is becoming the de-facto language for AI agent detection.`,
       ],
       zh: [
         'Sigma 是 SIEM（Security Information and Event Management）的開放偵測標準。規則描述 log 模式——Windows Event ID 4625 加上 logon type 3 加上來源 IP 在 allowlist 之外——SIEM 引擎（Splunk、ELK、Microsoft Sentinel）載入並執行。Sigma 已經十年,有數千條社群規則,是偵測工程的事實標準語言。',
-        'ATR 是 AI agent 的開放偵測標準。規則描述 agent-context 模式——`tool_call.arguments` 包含 base64 編碼的 reverse shell、`model_output` 包含夾帶憑證參數的 markdown 圖片參照、`agent_event.event_type` 為 unauthorized_file_read——ATR 引擎（PanGuard Guard、Microsoft AGT、Cisco AI Defense skill-scanner）載入並執行。ATR 兩年歷史,650+ 條規則,正在成為 AI agent 偵測的事實標準語言。',
+        `ATR 是 AI agent 的開放偵測標準。規則描述 agent-context 模式——\`tool_call.arguments\` 包含 base64 編碼的 reverse shell、\`model_output\` 包含夾帶憑證參數的 markdown 圖片參照、\`agent_event.event_type\` 為 unauthorized_file_read——ATR 引擎（PanGuard Guard、Microsoft AGT、Cisco AI Defense skill-scanner）載入並執行。ATR 兩年歷史,${STATS.totalRulesDisplay} 條規則,正在成為 AI agent 偵測的事實標準語言。`,
       ],
     },
     rows: [
@@ -69,7 +71,7 @@ export const COMPARE: ComparisonEntry[] = [
       },
       {
         feature: 'Maturity',
-        atr: '2 years, 650+ rules',
+        atr: `2 years, ${STATS.totalRulesDisplay} rules`,
         other: '10+ years, thousands of community rules',
         winner: 'other',
       },
@@ -141,8 +143,8 @@ export const COMPARE: ComparisonEntry[] = [
       zh: 'ATR vs garak — 偵測規則 vs 對抗式測試',
     },
     oneLiner: {
-      en: "garak generates adversarial prompts to probe LLM weaknesses pre-deployment. ATR detects malicious patterns in agent runtime traffic. garak finds vulnerabilities in models; ATR catches exploits against agents. Both are needed. ATR rules pass garak's test corpus at ~97.2% recall.",
-      zh: 'garak 產生對抗式 prompt,在部署前探測 LLM 弱點。ATR 在 agent runtime 偵測流量中的惡意模式。garak 找模型漏洞;ATR 抓針對 agent 的 exploit。兩者都需要。ATR 規則在 garak 的測試語料庫上召回率約 97.2%。',
+      en: `garak generates adversarial prompts to probe LLM weaknesses pre-deployment. ATR detects malicious patterns in agent runtime traffic. garak finds vulnerabilities in models; ATR catches exploits against agents. Both are needed. ATR rules pass garak's test corpus at ${STATS.benchmark.garak.recall}% recall.`,
+      zh: `garak 產生對抗式 prompt,在部署前探測 LLM 弱點。ATR 在 agent runtime 偵測流量中的惡意模式。garak 找模型漏洞;ATR 抓針對 agent 的 exploit。兩者都需要。ATR 規則在 garak 的測試語料庫上召回率 ${STATS.benchmark.garak.recall}%。`,
     },
     framing: {
       en: [
@@ -169,13 +171,13 @@ export const COMPARE: ComparisonEntry[] = [
       },
       {
         feature: 'Sample size',
-        atr: '650+ detection rules',
+        atr: `${STATS.totalRulesDisplay} detection rules`,
         other: 'Hundreds of probe types',
         winner: 'tie',
       },
       {
         feature: 'Garak benchmark recall',
-        atr: '~97.2% recall on 650 samples',
+        atr: `${STATS.benchmark.garak.recall}% on ${STATS.benchmark.garak.samples}-sample corpus`,
         other: '—',
         winner: 'atr',
       },
@@ -197,8 +199,8 @@ export const COMPARE: ComparisonEntry[] = [
       zh: '你在部署前評估 LLM。你想知道哪些攻擊對你的模型有效,好讓你 patch、retrain、或強化 system prompt。你想要研究級的測試套件,有可重現的 probe。',
     },
     bottomLine: {
-      en: "Use both. Run garak in CI before any model change ships. Run ATR in production against every request. garak finds what to fix; ATR catches what was missed. ATR's public benchmark against garak's corpus (~97.2% recall on 650 samples) measures that overlap honestly.",
-      zh: '兩個都用。Model 變更要 ship 之前,在 CI 跑 garak。生產環境對每個 request 跑 ATR。garak 找出該修什麼;ATR 抓住漏掉的。ATR 對 garak 語料庫的公開 benchmark（650 個樣本約 97.2% 召回率）誠實地量化這個重疊。',
+      en: `Use both. Run garak in CI before any model change ships. Run ATR in production against every request. garak finds what to fix; ATR catches what was missed. ATR's public benchmark against garak's corpus (${STATS.benchmark.garak.recall}% recall on ${STATS.benchmark.garak.samples} samples) measures that overlap honestly.`,
+      zh: `兩個都用。Model 變更要 ship 之前,在 CI 跑 garak。生產環境對每個 request 跑 ATR。garak 找出該修什麼;ATR 抓住漏掉的。ATR 對 garak 語料庫的公開 benchmark（${STATS.benchmark.garak.samples} 個樣本 ${STATS.benchmark.garak.recall}% 召回率）誠實地量化這個重疊。`,
     },
     references: [
       { label: 'NVIDIA garak on GitHub', url: 'https://github.com/NVIDIA/garak' },
@@ -358,23 +360,23 @@ export const COMPARE: ComparisonEntry[] = [
       zh: 'PanGuard AI vs Cisco DefenseClaw — 開放標準 vs 企業平台',
     },
     oneLiner: {
-      en: 'Cisco DefenseClaw is a full enterprise AI security platform. PanGuard AI is the open standard plus commercial platform — same scope, different starting point. Cisco AI Defense actually ships the full ATR rule pack in production (PR #99, auto-synced to the latest ATR release in skill-scanner) so there is no peer competition at the rule layer.',
-      zh: 'Cisco DefenseClaw 是完整企業 AI 安全平台。PanGuard AI 是開放標準加商業平台——範圍相同,起點不同。Cisco AI Defense 在生產環境實際使用完整 ATR 規則包（PR #99,於 skill-scanner 自動同步至最新 ATR 發行）,所以規則層沒有 peer 競爭。',
+      en: `Cisco DefenseClaw is a full enterprise AI security platform. PanGuard AI is the open standard plus commercial platform — same scope, different starting point. Cisco AI Defense actually ships ATR rules in production (PR #99 merged the full pack into skill-scanner, now ${STATS.totalRulesDisplay} rules via auto-sync) so there is no peer competition at the rule layer.`,
+      zh: `Cisco DefenseClaw 是完整企業 AI 安全平台。PanGuard AI 是開放標準加商業平台——範圍相同,起點不同。Cisco AI Defense 在生產環境實際使用 ATR 規則（PR #99 把完整規則包合併進 skill-scanner,經自動同步現為 ${STATS.totalRulesDisplay} 條）,所以規則層沒有 peer 競爭。`,
     },
     framing: {
       en: [
         "Cisco DefenseClaw (positioned at RSA 2026) is a packaged enterprise AI security platform — runtime, dashboard, integrations, SLA, the works. It is sold to F500-grade buyers as a single product with Cisco's sales motion behind it. The differentiator is enterprise infrastructure integration and Cisco's existing customer relationships.",
-        "PanGuard AI takes a different approach: ship the open rule standard (ATR) first, build the commercial platform on top. ATR is MIT-licensed and adopted by Cisco itself — Cisco AI Defense's skill-scanner runs the full ATR rule pack in production via PR #99 (merged 2026-04-22), auto-synced to the latest release. So this is not really a competition at the rule layer. The competition is at the platform layer: who has the better runtime, compliance evidence, and migration tooling.",
+        `PanGuard AI takes a different approach: ship the open rule standard (ATR) first, build the commercial platform on top. ATR is MIT-licensed and adopted by Cisco itself — Cisco AI Defense's skill-scanner runs the full ATR rule pack (${STATS.totalRulesDisplay} rules) in production via PR #99 (merged 2026-04-22, auto-syncs to latest). So this is not really a competition at the rule layer. The competition is at the platform layer: who has the better runtime, compliance evidence, and migration tooling.`,
       ],
       zh: [
         'Cisco DefenseClaw (RSA 2026 推出) 是打包好的企業 AI 安全平台——runtime、dashboard、整合、SLA,一應俱全。賣給 F500 級買家的單一產品,背後有 Cisco 的銷售動能。差異化點是企業基礎設施整合與 Cisco 既有客戶關係。',
-        'PanGuard AI 採不同路徑:先 ship 開放規則標準（ATR）,再在上面建商業平台。ATR 是 MIT 授權,Cisco 自己也採用——Cisco AI Defense 的 skill-scanner 透過 PR #99（2026-04-22 合併）在生產環境跑完整 ATR 規則包,並自動同步至最新發行。所以這在規則層其實不算競爭。競爭在平台層:誰有更好的 runtime、合規 evidence、migration 工具。',
+        `PanGuard AI 採不同路徑:先 ship 開放規則標準（ATR）,再在上面建商業平台。ATR 是 MIT 授權,Cisco 自己也採用——Cisco AI Defense 的 skill-scanner 透過 PR #99（2026-04-22 合併,自動同步至最新）在生產環境跑完整 ATR 規則包（${STATS.totalRulesDisplay} 條）。所以這在規則層其實不算競爭。競爭在平台層:誰有更好的 runtime、合規 evidence、migration 工具。`,
       ],
     },
     rows: [
       {
         feature: 'Rule standard',
-        atr: 'ATR (open, MIT, full rule pack) — Cisco runs these too',
+        atr: `ATR (open, MIT, ${STATS.totalRulesDisplay} rules) — Cisco runs these too`,
         other: 'Same — Cisco ships ATR',
         winner: 'tie',
       },
@@ -404,7 +406,7 @@ export const COMPARE: ComparisonEntry[] = [
       },
       {
         feature: 'Pricing',
-        atr: 'Community $0, Pilot $25K, Enterprise & Sovereign (sales-led pricing — contact us)',
+        atr: 'Community $0, Pilot $25K, Enterprise $150-500K, Sovereign $5-20M',
         other: 'Enterprise contracts, custom pricing',
         winner: 'context',
       },
@@ -416,7 +418,7 @@ export const COMPARE: ComparisonEntry[] = [
       },
       {
         feature: 'Sovereign deployment',
-        atr: 'Sovereign tier explicit (sales-led pricing, airgap, Cisco/AMD/NVIDIA JV pre-integrated)',
+        atr: 'Sovereign tier explicit ($5-20M/nation, airgap; ATR merged into Cisco AI Defense skill-scanner PR #99)',
         other: 'Custom enterprise engagements',
         winner: 'context',
       },
@@ -430,8 +432,8 @@ export const COMPARE: ComparisonEntry[] = [
       zh: '你是 Cisco 用戶。Cisco 在你的 DR、SD-WAN、XDR。DefenseClaw 接到既有的 Cisco 基礎設施,你的採購、支援、SLA 關係已經在 Cisco。企業整合成本近乎零。',
     },
     bottomLine: {
-      en: "These are not actually competitors at the layer that matters. Both organizations are shipping the same ATR rule set in production. The choice is between Cisco's commercial bundle (heavyweight, integrated, expensive) and PanGuard's open-plus-commercial model (lightweight, vendor-neutral, scaling from a free Community tier up to sales-led enterprise and sovereign engagements). If you are already a Cisco customer, the integration advantage probably wins. Everyone else benefits more from PanGuard's open posture.",
-      zh: '在關鍵的那一層,這兩家其實不算對手。兩家組織都在生產環境跑同一套 ATR 規則。選擇在於 Cisco 的商業 bundle（重量級、整合、貴）vs PanGuard 的開放+商業模式（輕量、廠商中立、從免費的 Community tier 一路到業務洽談的企業與主權級方案）。如果你已經是 Cisco 客戶,整合優勢大概會贏。其他人從 PanGuard 的開放姿態獲益更多。',
+      en: "These are not actually competitors at the layer that matters. Both organizations are shipping the same ATR rule set in production. The choice is between Cisco's commercial bundle (heavyweight, integrated, expensive) and PanGuard's open-plus-commercial model (lightweight, vendor-neutral, scales from $0 to $20M). If you are already a Cisco customer, the integration advantage probably wins. Everyone else benefits more from PanGuard's open posture.",
+      zh: '在關鍵的那一層,這兩家其實不算對手。兩家組織都在生產環境跑同一套 ATR 規則。選擇在於 Cisco 的商業 bundle（重量級、整合、貴）vs PanGuard 的開放+商業模式（輕量、廠商中立、從 $0 規模到 $20M）。如果你已經是 Cisco 客戶,整合優勢大概會贏。其他人從 PanGuard 的開放姿態獲益更多。',
     },
     references: [
       {

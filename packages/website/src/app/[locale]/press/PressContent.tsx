@@ -225,10 +225,16 @@ export default function PressContent() {
 
   const [activeTab, setActiveTab] = useState<FilterTab>('All');
 
+  // Only surface filters that actually have items — an empty "Coverage" tab
+  // reads as an unfinished section.
+  const hasCoverage = pressItems.some((i) => i.type === 'coverage');
+  const hasPressReleases = pressItems.some((i) => i.type === 'press-release');
+  const showFilters = hasCoverage && hasPressReleases;
+
   const filterTabs: { key: FilterTab; label: string }[] = [
     { key: 'All', label: t('filters.all') },
     { key: 'Press Releases', label: t('filters.pressReleases') },
-    { key: 'Coverage', label: t('filters.coverage') },
+    ...(hasCoverage ? [{ key: 'Coverage' as FilterTab, label: t('filters.coverage') }] : []),
   ];
 
   const filtered =
@@ -245,11 +251,17 @@ export default function PressContent() {
     <>
       {/* ───────────── Hero ───────────── */}
       <SectionWrapper spacing="spacious">
-        <SectionTitle overline={t('overline')} title={t('title')} subtitle={t('subtitle')} />
+        <SectionTitle
+          as="h1"
+          overline={t('overline')}
+          title={t('title')}
+          subtitle={t('subtitle')}
+        />
       </SectionWrapper>
 
       {/* ───────────── Filter Tabs ───────────── */}
-      <SectionWrapper spacing="tight">
+      {showFilters && (
+        <SectionWrapper spacing="tight">
         <FadeInUp>
           <div className="flex flex-wrap items-center gap-2 justify-center">
             {filterTabs.map((tab) => (
@@ -267,14 +279,15 @@ export default function PressContent() {
             ))}
           </div>
         </FadeInUp>
-      </SectionWrapper>
+        </SectionWrapper>
+      )}
 
       {/* ───────────── Press Releases ───────────── */}
       {pressReleases.length > 0 && (
         <SectionWrapper>
           <FadeInUp>
             <h3 className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold mb-8">
-              {t('filters.pressReleases')}
+              {pressReleases.length === 1 ? t('latestLabel') : t('filters.pressReleases')}
             </h3>
           </FadeInUp>
           <div className="grid md:grid-cols-2 gap-6">

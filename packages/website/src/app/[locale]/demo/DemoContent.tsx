@@ -153,8 +153,10 @@ export default function DemoContent() {
                     SOC 2 Type 1 Roadmap (PDF)
                   </h3>
                   <p className="mt-2 text-sm text-text-secondary leading-relaxed">
-                    Vanta contract June 2026 · A-LIGN auditor July 2026 · Attestation Oct 1, 2026.
-                    Full timeline, 6 control families, NDA-shareable artifacts list.
+                    SOC 2 Type 1 readiness in progress; Vanta/Drata vendor evaluation underway;
+                    auditor engagement and attestation targeted Q4 2026 / Q1 2027 (subject to
+                    fieldwork scheduling). Full timeline, 6 control families, NDA-shareable artifacts
+                    list.
                   </p>
                   <p className="mt-4 text-sm font-semibold text-brand-sage group-hover:text-brand-sage-light">
                     Download (57 KB) →

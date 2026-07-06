@@ -19,8 +19,8 @@ export async function generateMetadata(props: {
       ? 'ATR Benchmark 結果 — Garak, SKILL.md, PINT, Wild Scan'
       : 'ATR Benchmark Results — Garak, SKILL.md, PINT, Wild Scan',
     description: isZh
-      ? 'ATR 規則在公開對抗式語料庫上的實測結果(v3.5.0)。Garak ~97.2% recall, SKILL.md 100% recall + 97% precision, PINT 63.6% recall / 99.65% precision, HackAPrompt 69.6% recall。可重現方法、原始資料、Zenodo DOI。'
-      : 'Public benchmark results for ATR rules against adversarial corpora (v3.5.0). Garak ~97.2% recall, SKILL.md 100% recall + 97% precision, PINT 63.6% recall / 99.65% precision, HackAPrompt 69.6% recall. Reproducible methodology, raw data, Zenodo DOI.',
+      ? `${STATS.totalRulesDisplay} 條 ATR 規則在公開對抗式語料庫上的實測結果。Garak ${STATS.benchmark.garak.recall}% recall, SKILL.md ${STATS.benchmark.skill.recall}% recall + ${STATS.benchmark.skill.precision}% precision, PINT ${STATS.benchmark.pint.recall}% recall（自建 PINT 格式語料庫）, Wild Scan 96,096 個 skill 中 751 個確認惡意。可重現方法、原始資料、Zenodo DOI。Benign-gate 誤報採 lane 化統計:65K 樣本上 enforce lane 約 ${STATS.benchmark.benignLanes.enforceFp}%、hunt lane 約 ${STATS.benchmark.benignLanes.huntFp}%。`
+      : `Public benchmark results for ${STATS.totalRulesDisplay} ATR rules against adversarial corpora. Garak ${STATS.benchmark.garak.recall}% recall, SKILL.md ${STATS.benchmark.skill.recall}% recall + ${STATS.benchmark.skill.precision}% precision, PINT ${STATS.benchmark.pint.recall}% recall (self-built PINT-format corpus), Wild Scan 751 confirmed malware of 96,096 skills. Reproducible methodology, raw data, Zenodo DOI. Benign-gate false positives are lane-based: ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt on 65K samples.`,
     alternates: buildAlternates('/research/benchmarks', params.locale),
   };
 }
@@ -28,11 +28,12 @@ export async function generateMetadata(props: {
 interface Benchmark {
   slug: string;
   name: string;
+  zhName: string;
   description: string;
   zhDescription: string;
   date: string;
   source: { label: string; url: string };
-  results: Array<{ label: string; value: string }>;
+  results: Array<{ label: string; zhLabel: string; value: string; zhValue?: string }>;
   reproduce: string;
   externalLink?: string;
   doi?: string;
@@ -43,17 +44,28 @@ const BENCHMARKS: Benchmark[] = [
   {
     slug: 'garak',
     name: 'Garak (NVIDIA jailbreak corpus)',
+    zhName: 'Garak（NVIDIA 越獄語料庫）',
     description:
-      'NVIDIA garak is the leading open-source LLM red-teaming framework. We ran ATR v3.5.0 against the full garak corpus to measure adversarial-prompt detection.',
+      'NVIDIA garak is the leading open-source LLM red-teaming framework. We ran ATR v2.1.2 against the full garak corpus to measure adversarial-prompt detection.',
     zhDescription:
-      'NVIDIA garak 是業界領先的開源 LLM red-teaming 框架。我們用 ATR v3.5.0 對 garak 完整語料庫做對抗式 prompt 偵測測試。',
+      'NVIDIA garak 是業界領先的開源 LLM red-teaming 框架。我們用 ATR v2.1.2 對 garak 完整語料庫做對抗式 prompt 偵測測試。',
     date: '2026-04-22',
     source: { label: 'github.com/NVIDIA/garak', url: 'https://github.com/NVIDIA/garak' },
     results: [
-      { label: 'Recall', value: `~${STATS.benchmark.garak.recallApprox}%` },
-      { label: 'Sample size', value: `${STATS.benchmark.garak.samples} samples` },
-      { label: 'Layer', value: 'Regex only (no LLM second opinion)' },
-      { label: 'ATR version', value: 'v2.1.2 (last verified measurement)' },
+      { label: 'Recall', zhLabel: '召回率', value: `${STATS.benchmark.garak.recall}%` },
+      {
+        label: 'Sample size',
+        zhLabel: '樣本數',
+        value: `${STATS.benchmark.garak.samples} samples`,
+        zhValue: `${STATS.benchmark.garak.samples} 個樣本`,
+      },
+      {
+        label: 'Layer',
+        zhLabel: '層級',
+        value: 'Regex only (no LLM second opinion)',
+        zhValue: '僅 Regex（無 LLM 二次判讀）',
+      },
+      { label: 'ATR version', zhLabel: 'ATR 版本', value: 'v2.1.2' },
     ],
     reproduce: 'pnpm bench:garak (in agent-threat-rules repo)',
     externalLink:
@@ -63,17 +75,23 @@ const BENCHMARKS: Benchmark[] = [
   {
     slug: 'skill-md',
     name: 'SKILL.md (PanGuard wild corpus)',
+    zhName: 'SKILL.md（PanGuard 野外語料庫）',
     description:
       'Manually labeled corpus of 498 AI agent skills from ClawHub, OpenClaw, and Skills.sh. Half malicious, half benign. Used to validate that ATR catches threats without false-positive bloat.',
     zhDescription:
-      'ClawHub、OpenClaw、Skills.sh 的 AI agent skill,498 個樣本,人工標記。一半惡意,一半合法。用來驗證 ATR 抓得到威脅而不會誤報過多。',
+      'ClawHub、OpenClaw、Skills.sh 的 AI agent skill，498 個樣本，人工標記。一半惡意，一半合法。用來驗證 ATR 抓得到威脅而不會誤報過多。',
     date: '2026-04-22',
     source: { label: 'PanGuard Wild Scan dataset', url: 'https://panguard.ai/research/96k-scan' },
     results: [
-      { label: 'Recall', value: `${STATS.benchmark.skill.recall}%` },
-      { label: 'Precision', value: `${STATS.benchmark.skill.precision}%` },
-      { label: 'False positive rate', value: `${STATS.benchmark.skill.fp}%` },
-      { label: 'Sample size', value: `${STATS.benchmark.skill.samples} samples` },
+      { label: 'Recall', zhLabel: '召回率', value: `${STATS.benchmark.skill.recall}%` },
+      { label: 'Precision', zhLabel: '精確率', value: `${STATS.benchmark.skill.precision}%` },
+      { label: 'False positive rate', zhLabel: '誤報率', value: `${STATS.benchmark.skill.fp}%` },
+      {
+        label: 'Sample size',
+        zhLabel: '樣本數',
+        value: `${STATS.benchmark.skill.samples} samples`,
+        zhValue: `${STATS.benchmark.skill.samples} 個樣本`,
+      },
     ],
     reproduce: 'pnpm bench:skill (in agent-threat-rules repo)',
     externalLink:
@@ -82,21 +100,31 @@ const BENCHMARKS: Benchmark[] = [
   },
   {
     slug: 'pint',
-    name: 'PINT (Invariant Labs adversarial corpus)',
+    name: 'PINT (self-built PINT-format corpus)',
+    zhName: 'PINT（自建 PINT 格式語料庫）',
     description:
-      'Invariant Labs published an adversarial prompt corpus for prompt-injection detection benchmarking. Lower recall than Garak/SKILL.md reflects the corpus being designed for SIEM-style detection patterns — Sigma migration via PanGuard Migrator closes the gap.',
+      'A self-built 850-sample corpus in PINT format, assembled from the deepset prompt-injections dataset plus Lakera Gandalf. This is NOT Lakera official PINT benchmark and is not attributable to any third party. Lower recall than Garak/SKILL.md reflects the corpus mixing in SIEM-style detection patterns — Sigma migration via PanGuard Migrator closes the gap.',
     zhDescription:
-      'Invariant Labs 公開了 prompt-injection 偵測 benchmark 用的對抗式 prompt 語料庫。比 Garak/SKILL.md 召回率低,因為語料庫是針對 SIEM 風格的偵測模式設計——PanGuard Migrator 的 Sigma 轉換能補上這個缺口。',
+      '自建的 850 樣本 PINT 格式語料庫，由 deepset prompt-injections 資料集加上 Lakera Gandalf 組成。這不是 Lakera 官方 PINT benchmark，也不歸屬於任何第三方。比 Garak/SKILL.md 召回率低，因為語料庫混入了 SIEM 風格的偵測模式——PanGuard Migrator 的 Sigma 轉換能補上這個缺口。',
     date: '2026-04-22',
     source: {
-      label: 'github.com/invariantlabs-ai/invariant',
-      url: 'https://github.com/invariantlabs-ai/invariant',
+      label: 'self-built corpus (deepset + Lakera Gandalf)',
+      url: 'https://panguard.ai/research/benchmarks#pint',
     },
     results: [
-      { label: 'Recall', value: `${STATS.benchmark.pint.recall}%` },
-      { label: 'Precision', value: `${STATS.benchmark.pint.precision}%` },
-      { label: 'Sample size', value: `${STATS.benchmark.pint.samples} samples` },
-      { label: 'Layer', value: 'Regex only' },
+      { label: 'Recall', zhLabel: '召回率', value: `${STATS.benchmark.pint.recall}%` },
+      {
+        label: 'Precision (PINT-format corpus, self-built)',
+        zhLabel: '精確率（PINT 格式語料庫，自建）',
+        value: `${STATS.benchmark.pint.precision}%`,
+      },
+      {
+        label: 'Sample size',
+        zhLabel: '樣本數',
+        value: `${STATS.benchmark.pint.samples} samples`,
+        zhValue: `${STATS.benchmark.pint.samples} 個樣本`,
+      },
+      { label: 'Layer', zhLabel: '層級', value: 'Layer 1 — regex only', zhValue: 'Layer 1 — 僅 regex' },
     ],
     reproduce: 'pnpm bench:pint (in agent-threat-rules repo)',
     externalLink:
@@ -106,48 +134,68 @@ const BENCHMARKS: Benchmark[] = [
   {
     slug: 'wild-scan',
     name: 'Wild Scan (full ecosystem audit)',
+    zhName: 'Wild Scan（完整生態系稽核）',
     description:
-      'Live audit of every AI agent skill we could crawl across ClawHub, OpenClaw, Skills.sh. Not a curated benchmark — actual production skills shipped by real authors. Result: 1.6% of scanned skills are confirmed malicious.',
+      'Live audit of every AI agent skill we could crawl across ClawHub, OpenClaw, Skills.sh. Not a curated benchmark — actual production skills shipped by real authors. Result: 751 confirmed malware skills out of 96,096 scanned.',
     zhDescription:
-      '對 ClawHub、OpenClaw、Skills.sh 上每一個能爬到的 AI agent skill 做實測。不是策展過的 benchmark——是真實作者上架的生產級 skill。結果:被掃描的 skill 中 1.6% 確認惡意。',
+      '對 ClawHub、OpenClaw、Skills.sh 上每一個能爬到的 AI agent skill 做實測。不是策展過的 benchmark——是真實作者上架的生產級 skill。結果：96,096 個被掃描的 skill 中，751 個確認為惡意程式。',
     date: '2026-04-14',
     source: {
       label: 'PanGuard Wild Scan Report',
       url: 'https://panguard.ai/research/96k-scan',
     },
     results: [
-      { label: 'Entries crawled', value: STATS.ecosystem.entriesCrawled.toLocaleString() },
-      { label: 'Skills scanned', value: STATS.ecosystem.skillsScanned.toLocaleString() },
-      { label: 'Confirmed malicious', value: STATS.ecosystem.blacklistedSkills.toLocaleString() },
-      { label: 'Triple-threat packages', value: STATS.ecosystem.tripleThreat.toString() },
+      { label: 'Skills scanned', zhLabel: '掃描 skill 數', value: '96,096' },
+      { label: 'Confirmed malware', zhLabel: '確認惡意', value: '751' },
+      {
+        label: 'Triple-threat packages',
+        zhLabel: '三重威脅套件',
+        value: STATS.ecosystem.tripleThreat.toString(),
+      },
+      {
+        label: 'Postinstall scripts',
+        zhLabel: 'Postinstall 腳本',
+        value: STATS.ecosystem.postinstallScripts.toString(),
+      },
     ],
     reproduce: 'scripts/wild-scan.ts (in panguard-ai monorepo)',
     doi: '10.5281/zenodo.19178002',
-    recordCount: STATS.ecosystem.entriesCrawled,
+    recordCount: 96_096,
   },
   {
     slug: 'hackaprompt',
     name: 'HackAPrompt cluster mining',
+    zhName: 'HackAPrompt 叢集探勘',
     description:
-      'ATR v3.5.0 against the HackAPrompt deterministic sample: 69.6% recall, 100% precision — up from the 29.5% v2.1.2 baseline documented in the 2026-05-11 cluster-mining write-up. The rule base keeps closing the gap on this corpus.',
+      `ATR run against the HackAPrompt EMNLP 2023 competition corpus (4,780 deterministic samples). Result: ${STATS.benchmark.hackaprompt.recall}% recall, 0 new false positives. The number is honest and below closed-source ML detector claims. Methodology and rule additions documented in the public engineering blog.`,
     zhDescription:
-      'ATR v3.5.0 對 HackAPrompt 確定性樣本:69.6% recall、100% precision — 從 v2.1.2 的 29.5% baseline(2026-05-11 cluster-mining 紀錄)持續拉高。規則庫在這個語料庫上不斷補上缺口。',
+      `ATR 對 HackAPrompt EMNLP 2023 競賽語料庫（4,780 個確定性樣本）的實測。結果：${STATS.benchmark.hackaprompt.recall}% recall，0 個新誤報。數字誠實，低於閉源 ML 偵測器的宣稱。方法論與規則更新公開於工程部落格。`,
     date: '2026-05-11',
     source: {
       label: 'HackAPrompt corpus',
       url: 'https://huggingface.co/datasets/hackaprompt/hackaprompt-dataset',
     },
     results: [
-      { label: 'Recall (v3.5.0)', value: `${STATS.benchmark.hackaprompt.recall}%` },
-      { label: 'Precision', value: `${STATS.benchmark.hackaprompt.precision}%` },
+      {
+        label: 'HackAPrompt recall',
+        zhLabel: 'HackAPrompt 召回率',
+        value: `${STATS.benchmark.hackaprompt.recall}%`,
+      },
+      {
+        label: 'Baseline recall',
+        zhLabel: '基線召回率',
+        value: `${STATS.benchmark.hackaprompt.baselineRecall}%`,
+      },
       {
         label: 'Sample size',
+        zhLabel: '樣本數',
         value: `${STATS.benchmark.hackaprompt.samples.toLocaleString()} deterministic`,
+        zhValue: `${STATS.benchmark.hackaprompt.samples.toLocaleString()} 個確定性樣本`,
       },
-      { label: 'v2.1.2 baseline', value: '29.5%' },
+      { label: 'New FPs introduced', zhLabel: '新增誤報', value: '0' },
     ],
     reproduce: 'pnpm bench:hackaprompt',
-    externalLink: 'https://panguard.ai/blog/hackaprompt-cluster-mining-29-percent-recall',
+    externalLink: 'https://panguard.ai/blog/hackaprompt-cluster-mining',
   },
 ];
 
@@ -160,8 +208,8 @@ export default async function BenchmarkHubPage(props: { params: Promise<{ locale
       ? 'ATR Benchmark 結果 — Garak, SKILL.md, PINT, Wild Scan'
       : 'ATR Benchmark Results — Garak, SKILL.md, PINT, Wild Scan',
     description: isZh
-      ? `${STATS.atrRules} 條 ATR 規則對抗式語料庫實測`
-      : `Public benchmark results for ${STATS.atrRules} ATR rules against adversarial corpora.`,
+      ? `${STATS.totalRulesDisplay} 條 ATR 規則對抗式語料庫實測`
+      : `Public benchmark results for ${STATS.totalRulesDisplay} ATR rules against adversarial corpora.`,
     url: 'https://panguard.ai/research/benchmarks',
     datePublished: '2026-05-12',
     dateModified: '2026-05-12',
@@ -197,13 +245,18 @@ export default async function BenchmarkHubPage(props: { params: Promise<{ locale
             </p>
             <h1 className="text-[clamp(28px,5vw,52px)] font-extrabold leading-[1.05] tracking-tight text-text-primary max-w-3xl">
               {isZh
-                ? `${STATS.atrRules} 條 ATR 規則的公開實測結果`
-                : `Public benchmark results for ${STATS.atrRules} ATR rules`}
+                ? `${STATS.totalRulesDisplay} 條 ATR 規則的公開實測結果`
+                : `Public benchmark results for ${STATS.totalRulesDisplay} ATR rules`}
             </h1>
             <p className="text-lg text-text-secondary mt-6 max-w-2xl leading-relaxed">
               {isZh
                 ? '每一個 benchmark 都附上原始資料來源、可重現的方法論、以及執行的 ATR 版本。沒有 cherry-picking。'
                 : 'Every benchmark below includes the raw data source, reproducible methodology, and ATR version that ran it. No cherry-picking.'}
+            </p>
+            <p className="text-sm text-text-muted mt-4 max-w-2xl leading-relaxed">
+              {isZh
+                ? `所有 precision / FP 數字皆為單一語料庫的 Layer 1 量測，不是全引擎宣稱。Benign-gate 誤報採 lane 化統計：${STATS.benchmark.benignLanes.samples.toLocaleString()} 個 benign 樣本上 enforce lane 約 ${STATS.benchmark.benignLanes.enforceFp}%、hunt lane（預設）約 ${STATS.benchmark.benignLanes.huntFp}%。沒有單一的全引擎 FP 數字。`
+                : `All precision / FP figures are per-corpus Layer 1 measurements, not engine-wide claims. Benign-gate false positives are lane-based: ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt (default) on ${STATS.benchmark.benignLanes.samples.toLocaleString()} benign samples. There is no single engine-wide FP number.`}
             </p>
           </div>
         </section>
@@ -218,7 +271,9 @@ export default async function BenchmarkHubPage(props: { params: Promise<{ locale
               >
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div>
-                    <h2 className="text-xl font-bold text-text-primary">{b.name}</h2>
+                    <h2 className="text-xl font-bold text-text-primary">
+                      {isZh ? b.zhName : b.name}
+                    </h2>
                     <p className="text-xs text-text-muted mt-1">
                       <time dateTime={b.date}>{b.date}</time>
                     </p>
@@ -239,16 +294,31 @@ export default async function BenchmarkHubPage(props: { params: Promise<{ locale
                   {isZh ? b.zhDescription : b.description}
                 </p>
 
-                <div className="grid sm:grid-cols-2 gap-3 mb-6">
+                <div className="grid sm:grid-cols-2 gap-3 mb-4">
                   {b.results.map((r, i) => (
                     <div key={i} className="p-3 rounded-lg border border-border bg-surface-2">
                       <p className="text-[10px] uppercase tracking-wider text-text-muted font-semibold">
-                        {r.label}
+                        {isZh ? r.zhLabel : r.label}
                       </p>
-                      <p className="text-base text-text-primary font-bold mt-1">{r.value}</p>
+                      <p className="text-base text-text-primary font-bold mt-1">
+                        {isZh && r.zhValue ? r.zhValue : r.value}
+                      </p>
                     </div>
                   ))}
                 </div>
+
+                {b.results.some((r) => /precision|false positive/i.test(r.label)) && (
+                  <div className="mb-6 p-3 rounded-lg border border-brand-sage/30 bg-brand-sage/5">
+                    <p className="text-[10px] uppercase tracking-wider text-brand-sage font-semibold mb-1">
+                      {isZh ? '數字口徑' : 'How to read these numbers'}
+                    </p>
+                    <p className="text-xs text-text-secondary leading-relaxed">
+                      {isZh
+                        ? `Precision / FP 為此語料庫的 Layer 1(確定性規則）量測,非全引擎數字。實務誤報採 lane 化:${STATS.benchmark.benignLanes.samples.toLocaleString()} 個 benign 樣本上 enforce lane 約 ${STATS.benchmark.benignLanes.enforceFp}%、hunt lane(預設)約 ${STATS.benchmark.benignLanes.huntFp}%。`
+                        : `Precision / FP here are Layer 1 (deterministic-rule) measurements on this specific corpus, not an engine-wide figure. Real-world false positives are lane-based: ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt (default) on ${STATS.benchmark.benignLanes.samples.toLocaleString()} benign samples.`}
+                    </p>
+                  </div>
+                )}
 
                 <div className="grid sm:grid-cols-2 gap-3">
                   <a

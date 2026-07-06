@@ -238,7 +238,14 @@ async function fetchGitHubFile(
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(10_000) });
     if (!res.ok) return null;
-    return await res.text();
+    // Reject oversized remote content before buffering/scanning it (matches the
+    // 100 KB paste-mode cap). An attacker-controlled GitHub URL could otherwise
+    // point at a huge SKILL.md/README and amplify regex/CPU work per request.
+    const declared = Number(res.headers.get('content-length'));
+    if (Number.isFinite(declared) && declared > 100_000) return null;
+    const text = await res.text();
+    if (text.length > 100_000) return null;
+    return text;
   } catch {
     return null;
   }

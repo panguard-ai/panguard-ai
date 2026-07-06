@@ -191,6 +191,74 @@ export function softwareApplicationSchema(opts: {
 }
 
 /**
+ * Pricing-page schema. Emits a SoftwareApplication whose offers mirror the
+ * three canonical tiers on /pricing (Community $0, Pilot $25K / 90 days,
+ * Enterprise $150K-500K/yr). Google treats SoftwareApplication offers as a
+ * pricing-eligible product, so this is what makes the pricing rich result
+ * eligible.
+ *
+ * NOTE: aggregateRating is intentionally omitted. We have no real, verifiable
+ * review/rating data, and Google penalizes fabricated ratings. Add an
+ * `aggregateRating` block here ONLY when there is a genuine source.
+ */
+export function pricingApplicationSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    '@id': 'https://panguard.ai/pricing#software',
+    name: 'PanGuard AI',
+    description:
+      'AI agent security platform built on the open ATR detection standard. Community tier is free and open source; Pilot and Enterprise add hosted compliance, evidence packs, and managed runtime guard.',
+    url: 'https://panguard.ai/pricing',
+    applicationCategory: 'SecurityApplication',
+    applicationSubCategory: 'AI Agent Security',
+    operatingSystem: 'macOS, Linux, Windows',
+    softwareVersion: STATS.cliVersion,
+    license: 'https://opensource.org/licenses/MIT',
+    isAccessibleForFree: true,
+    publisher: { '@id': ORG_ID },
+    author: { '@id': PERSON_ADAM_ID },
+    datePublished: '2026-01-01',
+    dateModified: STATS.lastUpdated,
+    sameAs: ['https://github.com/panguard-ai/panguard-ai'],
+    offers: [
+      {
+        '@type': 'Offer',
+        name: 'Community',
+        description: 'Unlimited open-source scanning and detection. MIT licensed.',
+        price: '0',
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock',
+        url: 'https://panguard.ai/pricing',
+      },
+      {
+        '@type': 'Offer',
+        name: 'Pilot (90 days)',
+        description: 'Fixed-scope 90-day pilot with hosted compliance evidence and onboarding.',
+        price: '25000',
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock',
+        url: 'https://panguard.ai/scoping',
+      },
+      {
+        '@type': 'Offer',
+        name: 'Enterprise (annual)',
+        description:
+          'Annual platform license: managed runtime guard, compliance reporting, and evidence packs.',
+        priceSpecification: {
+          '@type': 'PriceSpecification',
+          priceCurrency: 'USD',
+          minPrice: '150000',
+          maxPrice: '500000',
+        },
+        availability: 'https://schema.org/InStock',
+        url: 'https://panguard.ai/contact?tier=enterprise',
+      },
+    ],
+  } as Record<string, unknown>;
+}
+
+/**
  * Dataset schema for benchmark publications and ecosystem scan reports.
  */
 export function datasetSchema(opts: {

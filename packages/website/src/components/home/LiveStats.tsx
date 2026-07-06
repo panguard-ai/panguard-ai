@@ -3,6 +3,7 @@
 import { useLocale } from 'next-intl';
 import FadeInUp from '@/components/FadeInUp';
 import { STATS } from '@/lib/stats';
+import { StatV2 } from './v2/primitives';
 
 export default function LiveStats() {
   const locale = useLocale();
@@ -15,11 +16,11 @@ export default function LiveStats() {
     },
     {
       label: isZh ? 'Garak 對抗樣本' : 'Garak prompts',
-      value: STATS.benchmark.garak.samples.toString(),
+      value: STATS.benchmark.garak.samples.toLocaleString(),
     },
     {
       label: isZh ? 'Garak recall' : 'Garak recall',
-      value: `~${STATS.benchmark.garak.recallApprox}%`,
+      value: `${STATS.benchmark.garak.recall}%`,
     },
     {
       label: isZh ? '已掃描技能' : 'Skills scanned',
@@ -28,19 +29,15 @@ export default function LiveStats() {
   ];
 
   return (
-    <section className="relative px-5 sm:px-6 py-8 sm:py-12 bg-surface-2 border-y border-border">
-      <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+    <section className="border-y border-border-subtle bg-surface-2">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+        <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
           {stats.map((stat, i) => (
             <FadeInUp key={stat.label} delay={i * 0.05}>
-              <div className="text-center">
-                <p className="text-2xl sm:text-3xl font-extrabold text-brand-sage tabular-nums">
-                  {stat.value}
-                </p>
-                <p className="text-[10px] sm:text-xs text-text-muted mt-2 uppercase tracking-wider">
-                  {stat.label}
-                </p>
-              </div>
+              <StatV2
+                value={<span className="tabular-nums">{stat.value}</span>}
+                label={stat.label}
+              />
             </FadeInUp>
           ))}
         </div>

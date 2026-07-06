@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import FadeInUp from '@/components/FadeInUp';
+import { Eyebrow, SectionTitleV2 } from '@/components/home/v2/primitives';
 import { useEcosystemStats } from '@/hooks/useEcosystemStats';
 import { STATS } from '@/lib/stats';
 
@@ -10,53 +11,50 @@ type Severity = 'CRITICAL' | 'HIGH';
 
 interface Incident {
   readonly id: string;
-  readonly name: string;
+  /** 1-based index into the realIncidents i18n keys (incident{n}Name / incident{n}Desc). */
+  readonly key: number;
   readonly severity: Severity;
   readonly cvss: string;
-  readonly description: string;
   readonly source: string;
   readonly sourceUrl: string;
 }
 
+/**
+ * Name + description are rendered from i18n (incident{key}Name / incident{key}Desc)
+ * so the zh-TW page shows the Chinese prose, not the English source sentence.
+ * CVE ids, CVSS, and severity labels stay in English by design.
+ */
 const INCIDENTS: readonly Incident[] = [
   {
     id: 'mcpjam',
-    name: 'MCPJam Inspector',
+    key: 1,
     severity: 'CRITICAL',
     cvss: '9.8',
-    description: 'Default 0.0.0.0 binding, one HTTP request = RCE. All versions before v1.4.3.',
     source: 'CVE-2026-23744',
     sourceUrl: 'https://nvd.nist.gov/vuln/detail/CVE-2026-23744',
   },
   {
     id: 'claude-code',
-    name: 'Claude Code (Anthropic)',
+    key: 2,
     severity: 'CRITICAL',
     cvss: '8.7',
-    description: 'Hooks + MCP config exploited for arbitrary shell execution and API key theft.',
     source: 'CVE-2025-59536 + CVE-2026-21852',
     sourceUrl: 'https://nvd.nist.gov/vuln/detail/CVE-2025-59536',
   },
   {
     id: 'azure-mcp',
-    name: 'Azure MCP Server',
+    key: 3,
     severity: 'HIGH',
     cvss: '7.5',
-    description: 'SSRF steals managed identity tokens. Attacker gains Azure resource access.',
     source: 'CVE-2026-26118',
     sourceUrl: 'https://nvd.nist.gov/vuln/detail/CVE-2026-26118',
   },
   {
-    // Anonymized: a real ClawHub scan finding, described by capability category
-    // instead of by package name. We do not name a real third-party package as
-    // malicious without a reproducible public CVE/advisory link.
-    id: 'email-mcp',
-    name: 'An email-delivery MCP server',
+    id: 'postmark',
+    key: 4,
     severity: 'HIGH',
     cvss: '--',
-    description:
-      'Clean for 15 versions, then a point release added silent BCC forwarding of thousands of emails per day to an external address. Example anonymized; no package named.',
-    source: 'PanGuard ClawHub scan finding',
+    source: 'ATR ClawHub scan',
     sourceUrl: 'https://github.com/panguard-ai/panguard-ai',
   },
 ] as const;
@@ -76,6 +74,12 @@ const SEVERITY_STYLES: Record<Severity, { text: string; bg: string; border: stri
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
+/**
+ * BEAT 2 — "why now" full-bleed band. Sits immediately after the hero:
+ * tonal shift to surface-1 with top/bottom hairlines marks the first
+ * rhythm break of the page. Tighter vertical padding than SectionV2 —
+ * a band, not a chapter.
+ */
 export default function RealIncidents() {
   const t = useTranslations('home.realIncidents');
   const eco = useEcosystemStats();
@@ -90,16 +94,26 @@ export default function RealIncidents() {
   }
 
   return (
-    <section className="relative px-5 sm:px-6 py-16 sm:py-24 border-t border-border/30">
-      <div className="max-w-4xl mx-auto">
+    <section className="relative border-y border-border-subtle bg-surface-1">
+      {/* Subtle threat tint anchored top-left — decorative only */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(ellipse 70% 55% at 0% 0%, rgba(239,68,68,0.04), transparent 70%)',
+        }}
+      />
+
+      <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
         {/* Headline */}
-        <FadeInUp className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold text-text-primary">{t('title')}</h2>
-          <p className="text-base text-text-secondary mt-3">{t('subtitle')}</p>
+        <FadeInUp className="mb-12 lg:mb-14">
+          <Eyebrow>{t('subtitle')}</Eyebrow>
+          <SectionTitleV2>{t('title')}</SectionTitleV2>
         </FadeInUp>
 
         {/* Incident Cards */}
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {INCIDENTS.map((incident, index) => {
             const styles = SEVERITY_STYLES[incident.severity];
 
@@ -110,26 +124,26 @@ export default function RealIncidents() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.5, delay: index * 0.1, ease }}
-                className={`bg-surface-1 border ${styles.border} rounded-xl p-5 flex flex-col`}
+                className="lift flex flex-col rounded-2xl border border-border bg-surface-2 p-6 transition-colors duration-300 ease-out-quint hover:border-border-hover"
               >
                 {/* Header: name + badge */}
-                <div className="flex items-center gap-2 flex-wrap mb-2">
-                  <span className="text-sm font-mono font-semibold text-text-primary">
-                    {incident.name}
+                <div className="mb-3 flex flex-wrap items-center gap-2">
+                  <span className="font-mono text-sm font-semibold text-text-primary">
+                    {t(`incident${incident.key}Name`)}
                   </span>
                   <span
-                    className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${styles.text} ${styles.bg}`}
+                    className={`rounded border px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-micro ${styles.text} ${styles.bg} ${styles.border}`}
                   >
                     {incident.severity}
                   </span>
                   {incident.cvss !== '--' && (
-                    <span className={`text-xs font-mono ${styles.text}`}>CVSS {incident.cvss}</span>
+                    <span className={`font-mono text-xs ${styles.text}`}>CVSS {incident.cvss}</span>
                   )}
                 </div>
 
                 {/* Description */}
-                <p className="text-sm text-text-secondary leading-relaxed mb-3 flex-1">
-                  {incident.description}
+                <p className="mb-4 flex-1 text-sm leading-relaxed text-text-secondary">
+                  {t(`incident${incident.key}Desc`)}
                 </p>
 
                 {/* Source link */}
@@ -137,7 +151,7 @@ export default function RealIncidents() {
                   href={incident.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-text-muted hover:text-text-secondary transition-colors duration-200 underline underline-offset-2"
+                  className="font-mono text-xs text-text-muted underline underline-offset-4 transition-colors duration-200 hover:text-text-secondary"
                 >
                   {incident.source}
                 </a>
@@ -147,8 +161,8 @@ export default function RealIncidents() {
         </div>
 
         {/* Bottom CTA */}
-        <FadeInUp delay={0.5} className="text-center mt-10">
-          <p className="text-sm text-text-secondary mb-4">
+        <FadeInUp delay={0.5} className="mt-14 border-t border-border-subtle pt-8">
+          <p className="max-w-2xl text-sm leading-relaxed text-text-secondary">
             {t('scanCount', {
               count: eco.skillsScanned.toLocaleString(),
               percent: riskPercent,
@@ -157,7 +171,7 @@ export default function RealIncidents() {
           <button
             type="button"
             onClick={handleScanClick}
-            className="inline-flex items-center gap-2 bg-panguard-green text-white font-semibold rounded-full px-8 py-3 text-sm hover:brightness-110 transition-all duration-200 active:scale-[0.98]"
+            className="sheen lift mt-6 inline-flex items-center rounded-xl border border-border px-6 py-3 font-semibold text-text-primary transition-colors duration-300 ease-out-quint hover:border-border-hover hover:bg-surface-2"
           >
             {t('cta')}
           </button>

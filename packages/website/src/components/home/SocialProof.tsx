@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { STATS } from '@/lib/stats';
+import { Eyebrow } from './v2/primitives';
 
 /**
  * Upstream adopters only. Strict rules:
@@ -15,39 +16,40 @@ import { STATS } from '@/lib/stats';
 const ADOPTERS: readonly { name: string; detail: string; highlight?: boolean }[] = [
   {
     name: 'Cisco AI Defense',
-    detail: 'Full ATR rule pack merged (PR #79 + #99)',
+    detail: `${STATS.adoption.ciscoRulesMerged} ATR rules merged (PR #79 + #99)`,
     highlight: true,
   },
   {
     name: 'Microsoft AGT',
-    detail: 'ATR rules merged + weekly auto-sync (PR #908 + #1277)',
+    detail: `${STATS.adoption.microsoftRulesMerged} ATR rules merged (PR #908 + #1277)`,
     highlight: true,
   },
-  { name: 'NVIDIA Garak', detail: `${STATS.benchmark.garak.recallApprox}% recall · PR open` },
+  { name: 'NVIDIA Garak', detail: `${STATS.benchmark.garak.recall}% recall · PR open` },
 ];
 
 export default function SocialProof() {
   const t = useTranslations('home.socialProof');
 
   return (
-    <section className="relative px-5 sm:px-6 py-10 sm:py-14 border-b border-border/30">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center">
-          <p className="text-[11px] uppercase tracking-[0.15em] text-text-muted font-semibold mb-6">
-            {t('overline')}
-          </p>
-          <div className="flex flex-wrap justify-center gap-8 sm:gap-12">
-            {ADOPTERS.map((a) => (
-              <div key={a.name} className="flex flex-col items-center gap-1">
-                <span
-                  className={`text-sm sm:text-base font-bold ${a.highlight ? 'text-panguard-green' : 'text-text-secondary'}`}
-                >
-                  {a.name}
-                </span>
-                <span className="text-[10px] text-text-muted">{a.detail}</span>
-              </div>
-            ))}
-          </div>
+    <section className="relative">
+      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
+        <Eyebrow>{t('overline')}</Eyebrow>
+        <div className="mt-8 flex flex-wrap gap-3 sm:gap-4">
+          {ADOPTERS.map((a) => (
+            <div
+              key={a.name}
+              className={`lift rounded-xl border ${
+                a.highlight ? 'border-brand-sage/40' : 'border-border hover:border-border-hover'
+              } bg-surface-1 px-5 py-4 transition-colors duration-300 ease-out-quint`}
+            >
+              <span className="block text-sm font-semibold text-text-primary sm:text-base">
+                {a.name}
+              </span>
+              <span className="mt-1.5 block font-mono text-[10px] uppercase tracking-micro text-text-muted">
+                {a.detail}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </section>

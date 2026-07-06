@@ -17,7 +17,7 @@ const productConfigs = [
     key: 'atr' as const,
     icon: AnalyticsIcon,
     badgeColor: 'bg-brand-sage/10 text-brand-sage border-brand-sage/20',
-    description: `ATR (Agent Threat Rules) is the first open standard for detecting AI agent threats. YAML-based rules across 10 categories cover prompt injection, tool poisoning, skill compromise, unauthorized access, data exfiltration, and more. ATR gives the security community a shared language for AI agent threats. Rules are open-source, human-readable, and machine-enforceable.`,
+    description: `ATR (Agent Threat Rules) is an open, executable standard for detecting AI agent threats. YAML-based rules across 10 categories cover prompt injection, tool poisoning, skill compromise, unauthorized access, data exfiltration, and more. ATR gives the security community a shared language for AI agent threats. Rules are open-source, human-readable, and machine-enforceable.`,
     features: [
       'Rules across 10 threat categories, growing continuously',
       'YAML-based, human-readable rule format',

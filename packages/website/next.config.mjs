@@ -143,6 +143,7 @@ const nextConfig = {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
           },
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
           // CSP is now set dynamically in middleware.ts with nonce-based script-src
         ],
       },

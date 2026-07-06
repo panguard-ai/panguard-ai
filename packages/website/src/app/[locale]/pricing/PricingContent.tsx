@@ -306,13 +306,8 @@ export default function PricingContent() {
               </p>
               <p className="text-sm text-text-secondary leading-[1.85]">
                 {isZh
-                  ? '個人開發者、小團隊,以及任何想自架完整防護產品的組織。Community 不是殘廢試用版——它是功能完整的免費防護。Enterprise 另加規則遷移、合規證據、SSO 與治理(不是閹割 vs 付費,而是自架 vs 業務洽談)。'
-                  : 'Individual developers, small teams, and any organisation that wants the complete, free protection product, self-hosted. Community is not a crippled trial — it is the full protection product. Enterprise adds rule migration, compliance evidence, SSO, and governance (not crippled-vs-paid, just self-hosted vs sales-led).'}
-              </p>
-              <p className="text-[13px] text-brand-sage/90 leading-[1.85] mt-3">
-                {isZh
-                  ? '你在前線擋下的攻擊會變成新的 ATR 規則,保護所有人——跑的人越多,每個人被保護得越快。'
-                  : 'Your frontline catches become new ATR rules that protect everyone — the more people run it, the faster everyone is protected.'}
+                  ? '個人開發者、小團隊，以及任何想自架完整 7 層 PanGuard 堆疊的組織。功能與 Enterprise 完全相同——差別在自架部署與社群支援。'
+                  : 'Individual developers, small teams, and any organisation that wants to self-host the full 7-layer PanGuard stack. Feature parity with Enterprise — only difference is self-hosted deployment and community support.'}
               </p>
 
               <div className="my-7 flex-1">
@@ -320,25 +315,23 @@ export default function PricingContent() {
                   {(isZh
                     ? [
                         `${STATS.atrRules} 條 ATR 偵測規則(MIT 授權)`,
-                        '防護 13 個 AI agent 平台(Claude Code、Cursor、Gemini CLI、Codex、Cline、Windsurf、Continue 等)',
-                        '內建工具防護(PreToolUse hook)+ MCP proxy——攔截惡意 shell / 檔案寫入 / web-fetch,不只 MCP 呼叫',
-                        '常駐 Guard daemon——重開機後自動恢復(launchd / systemd)、預設 fail-closed',
-                        '本地 Web dashboard——誠實 posture + 一鍵隔離 / 還原 / 白名單',
-                        'SARIF + Evidence Pack 匯出——免費,無付費牆',
                         '無 agent / endpoint / tenant 數量上限',
-                        'Threat Cloud 感測器 + 簽章規則更新(< 24 小時,可隨時停用)',
-                        '一行安裝:pga up · GitHub + Discord 社群支援',
+                        '5 層今天已上線:L2 稽核 · L3 防護 · L4 偵測 · L5 誘捕 · L6 反應',
+                        '2 層 2026 Q2/Q3 補:L1 探索 · L7 治理',
+                        'Threat Cloud 感測器自動註冊 · 匿名遙測(可隨時停用)',
+                        'Threat Cloud 規則更新(< 24 小時)',
+                        'GitHub Issues + Discord 社群支援',
+                        'pga CLI:scan · audit · up · guard · status · sensor',
                       ]
                     : [
                         `${STATS.atrRules} ATR detection rules (MIT licensed)`,
-                        'Protects 13 AI agent platforms (Claude Code, Cursor, Gemini CLI, Codex, Cline, Windsurf, Continue + more)',
-                        'Built-in-tool protection (PreToolUse hook) + MCP proxy — blocks malicious shell / file writes / web-fetch, not just MCP calls',
-                        'Always-on Guard daemon — survives reboot (launchd / systemd), fail-closed by default',
-                        'Local web dashboard — honest posture + one-click quarantine / restore / whitelist',
-                        'SARIF + Evidence Pack export — free, no paywall',
                         'Unlimited agents / endpoints / tenants',
-                        'Threat Cloud sensor + signed rule updates (< 24h, opt-out anytime)',
-                        'One-command install: pga up · community support via GitHub + Discord',
+                        '5 layers shipped today: L2 Audit · L3 Protect · L4 Detect · L5 Deceive · L6 Respond',
+                        '2 layers coming Q2/Q3 2026: L1 Discover · L7 Govern',
+                        'Auto-registers as Threat Cloud sensor · anonymous telemetry (opt-out anytime)',
+                        'Threat Cloud rule updates (< 24h)',
+                        'Community support via GitHub Issues + Discord',
+                        'pga CLI: scan · audit · up · guard · status · sensor',
                       ]
                   ).map((f) => (
                     <li key={f} className="flex items-start gap-2.5">
@@ -382,8 +375,8 @@ export default function PricingContent() {
               </p>
               <p className="text-sm text-text-secondary leading-[1.85]">
                 {isZh
-                  ? 'F500 採購流程前的試水合約。IT Director 層級可審核通過，不需要進到 CFO 議程。試點結束後可全額抵入 Y1 Enterprise 年約。$25K 僅前 3 個 Founding Customer 適用,第 4 個起轉 Enterprise(業務洽談定價)。'
-                  : 'A pre-procurement pilot contract for F500. IT Director can approve without reaching CFO. The full $25K credits toward Y1 Enterprise. $25K applies to the first 3 Founding Customers only — after that, all engagements move to Enterprise (sales-led pricing).'}
+                  ? 'F500 採購流程前的試水合約。IT Director 層級可審核通過，不需要進到 CFO 議程。試點結束後可全額抵入 Y1 Enterprise 年約。$25K 僅前 3 個 Founding Customer 適用,第 4 個起 Enterprise $250K 起跳 (sales-led)。'
+                  : 'A pre-procurement pilot contract for F500. IT Director can approve without reaching CFO. The full $25K credits toward Y1 Enterprise. $25K applies to the first 3 Founding Customers only — after that, all engagements move to Enterprise $250K base (sales-led).'}
               </p>
 
               <div className="my-7 flex-1">
@@ -396,7 +389,7 @@ export default function PricingContent() {
                         '自訂 ATR rule pack 試做',
                         'SIEM webhook 整合樣板',
                         'LLM 額度全包(crystallization + 規則 enrichment ~$200/月,我們吃 token 成本)',
-                        `偵測 0% 依賴 LLM——deterministic ATR 規則,Garak ~${STATS.benchmark.garak.recallApprox}% recall`,
+                        `偵測 0% 依賴 LLM——${STATS.totalRulesDisplay} 條 deterministic rules @ ${STATS.benchmark.garak.recall}% recall`,
                         '90 天後升級 Enterprise 或乾淨結束',
                         '可 credit 全額 $25K 到 Y1 Enterprise 年約',
                       ]
@@ -407,7 +400,7 @@ export default function PricingContent() {
                         'Custom ATR rule pack trial',
                         'SIEM webhook integration template',
                         'LLM credits included (crystallization + rule enrichment ~$200/mo, we eat the token cost)',
-                        `Detection runs 0% on LLM — deterministic ATR rules, ~${STATS.benchmark.garak.recallApprox}% Garak recall`,
+                        `Detection runs 0% on LLM — ${STATS.totalRulesDisplay} deterministic rules @ ${STATS.benchmark.garak.recall}% recall`,
                         'Clean exit or upgrade to Enterprise at day 90',
                         'Full $25K credit to Y1 Enterprise contract on upgrade',
                       ]
@@ -462,12 +455,13 @@ export default function PricingContent() {
               </div>
 
               <div className="mt-5 flex items-baseline gap-1.5">
-                <span className="text-3xl font-extrabold text-text-primary">
-                  {isZh ? '洽談定價' : "Let's talk"}
+                <span className="text-3xl font-extrabold text-text-primary">$150K</span>
+                <span className="text-xs text-text-muted">
+                  {isZh ? '起 · 客製年約' : 'floor · custom annual'}
                 </span>
               </div>
               <p className="text-[11px] text-text-muted mt-1">
-                {isZh ? '客製年約 · 私訊我們' : 'Custom annual contract · contact us'}
+                {isZh ? '目標 $250-350K · 上限 $500K+' : 'Target $250-350K · up to $500K+'}
               </p>
 
               <p className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage mt-4 mb-1">
@@ -564,12 +558,13 @@ export default function PricingContent() {
               </div>
 
               <div className="mt-5 flex items-baseline gap-1.5">
-                <span className="text-3xl font-extrabold text-text-primary">
-                  {isZh ? '洽談定價' : "Let's talk"}
+                <span className="text-3xl font-extrabold text-text-primary">$5-20M</span>
+                <span className="text-xs text-text-muted">
+                  {isZh ? '/ 國家 · 年約' : '/ nation · annual'}
                 </span>
               </div>
               <p className="text-[11px] text-text-muted mt-1">
-                {isZh ? '國家級部署 · 私訊我們' : 'Nation-scale deployment · contact us'}
+                {isZh ? '對話進行中 · 1 個 Saudi PIF 線索' : 'Active dialogue · 1 Saudi PIF lead'}
               </p>
 
               <p className="text-[11px] uppercase tracking-wider font-semibold text-indigo-300 mt-4 mb-1">
@@ -577,8 +572,8 @@ export default function PricingContent() {
               </p>
               <p className="text-sm text-text-secondary leading-[1.85]">
                 {isZh
-                  ? '主權國家 AI 基礎建設、央行、國防、跨部會合規平台。已透過 Cisco AI Defense / AMD / NVIDIA JV 鏈路繼承 ATR——導入零新供應商風險。'
-                  : 'Sovereign AI infrastructure, central banks, defense, cross-ministry compliance platforms. ATR already inherited via announced Cisco / AMD / NVIDIA JVs — no new-vendor risk.'}
+                  ? '主權國家 AI 基礎建設、央行、國防、跨部會合規平台。ATR 已 merge 進 Cisco AI Defense 的 skill-scanner(PR #99),導入零新供應商風險。'
+                  : "Sovereign AI infrastructure, central banks, defense, cross-ministry compliance platforms. ATR is already merged into Cisco AI Defense's skill-scanner (PR #99) — no new-vendor risk."}
               </p>
 
               <div className="my-7 flex-1">
@@ -593,7 +588,7 @@ export default function PricingContent() {
                         '客製化合規證據(本國法規 + EU AI Act + NIST AI RMF + ISO 42001 + OWASP Agentic)',
                         '主權級 ATR 規則貢獻通道 · 國家紅隊回傳',
                         '專屬 SLA · 24/7 國家級支援',
-                        'AMD / Cisco / NVIDIA JV 預整合',
+                        'ATR 已 merge 進 Cisco AI Defense skill-scanner(PR #99)',
                         '可選: ATR 國家代碼空間(rule namespacing)',
                       ]
                     : [
@@ -602,7 +597,7 @@ export default function PricingContent() {
                         'Custom compliance evidence (national regs + EU AI Act + NIST AI RMF + ISO 42001 + OWASP Agentic)',
                         'Sovereign-level ATR contribution channel · national red-team feedback',
                         'Dedicated SLA · 24/7 nation-state support',
-                        'Pre-integrated with AMD / Cisco / NVIDIA JVs',
+                        "ATR merged into Cisco AI Defense skill-scanner (PR #99)",
                         'Optional: ATR national namespace (rule namespacing)',
                       ]
                   ).map((f) => (
@@ -632,8 +627,8 @@ export default function PricingContent() {
             </p>
             <p className="text-sm text-text-secondary leading-[1.85]">
               {isZh
-                ? '首 5 家 F500 Enterprise 客戶可鎖定創始價（業務洽談定價），交換條件為公開 logo 與 case study 授權。第 6 家起恢復標準定價。'
-                : 'The first 5 F500 Enterprise customers can lock a founding rate (contact us for pricing), in exchange for public logo and case study rights. Standard pricing resumes from customer six onwards.'}
+                ? '首 5 家 F500 Enterprise 客戶可鎖定 $100K × 2 年的創始價（標準定價區間為 $250K–$350K），交換條件為公開 logo 與 case study 授權。第 6 家起恢復標準定價。'
+                : 'The first 5 F500 Enterprise customers can lock the founding rate of $100K × 2 years (versus the standard $250K–$350K range), in exchange for public logo and case study rights. Standard pricing resumes from customer six onwards.'}
             </p>
           </div>
         </FadeInUp>
@@ -756,8 +751,8 @@ export default function PricingContent() {
               <div className="space-y-4 text-[14px] text-text-secondary leading-[1.85]">
                 <p>
                   {isZh
-                    ? '每筆偵測事件都對應到具體的 ATR 規則 ID，並串連五大框架的條文：EU AI Act、NIST AI RMF、ISO/IEC 42001、OWASP Agentic Top 10、OWASP LLM Top 10。報告為 PDF 與 JSON 雙格式輸出，附 SHA-256 與 Merkle tree 簽章。'
-                    : 'Each detection event is mapped to a specific ATR rule ID and threaded across articles in five frameworks: EU AI Act, NIST AI RMF, ISO/IEC 42001, OWASP Agentic Top 10, and OWASP LLM Top 10. Reports are delivered in PDF and JSON, signed with SHA-256 and Merkle tree.'}
+                    ? '每筆偵測事件都對應到具體的 ATR 規則 ID，並串連六大框架的條文：EU AI Act、Colorado AI Act、NIST AI RMF、ISO/IEC 42001、OWASP Agentic Top 10、OWASP LLM Top 10。報告為 PDF 與 JSON 雙格式輸出，附 SHA-256 與 Merkle tree 簽章。'
+                    : 'Each detection event is mapped to a specific ATR rule ID and threaded across articles in six frameworks: EU AI Act, Colorado AI Act, NIST AI RMF, ISO/IEC 42001, OWASP Agentic Top 10, and OWASP LLM Top 10. Reports are delivered in PDF and JSON, signed with SHA-256 and Merkle tree.'}
                 </p>
                 <p>
                   {isZh
@@ -775,13 +770,13 @@ export default function PricingContent() {
                     ? [
                         'NIST AI RMF 100% 規則覆蓋（1,566 個 mapping，於 ATR v2.1.0 上線）',
                         'EU AI Act Article 9、12、14、15、50 自動對照',
-                        '季度合規報告：每筆偵測 → ATR 規則 ID → 五大框架條文',
+                        '季度合規報告：每筆偵測 → ATR 規則 ID → 六大框架條文',
                         'PDF 與 JSON 雙格式，SHA-256 與 Merkle tree 不可竄改簽章',
                       ]
                     : [
                         'NIST AI RMF 100% rule coverage (1,566 mappings, shipped in ATR v2.1.0)',
                         'EU AI Act Articles 9, 12, 14, 15, and 50 auto-mapped',
-                        'Quarterly compliance reports threading detection event → ATR rule ID → 5-framework articles',
+                        'Quarterly compliance reports threading detection event → ATR rule ID → 6-framework articles',
                         'Tamper-evident PDF + JSON outputs signed with SHA-256 and Merkle tree',
                       ]
                   ).map((f) => (
@@ -940,8 +935,8 @@ export default function PricingContent() {
                 </div>
                 <p className="text-sm text-text-secondary leading-[1.85] flex-1">
                   {isZh
-                    ? '由國家紅隊以自有對抗樣本，對 ATR 全部規則進行完整測試。我們提供偵測引擎、Migrator 工具與完整的失敗案例揭露。'
-                    : 'The national red team runs its own adversarial corpus against the full ATR rule set. We provide the detection engine, Migrator tooling, and full failure-case disclosure.'}
+                    ? `由國家紅隊以自有對抗樣本，對 ATR 全 ${STATS.totalRulesDisplay} 條規則進行完整測試。我們提供偵測引擎、Migrator 工具與完整的失敗案例揭露。`
+                    : `The national red team runs its own adversarial corpus against ATR's full ${STATS.totalRulesDisplay}-rule library. We provide the detection engine, Migrator tooling, and full failure-case disclosure.`}
                 </p>
                 <p className="text-xs text-text-muted leading-[1.85] mt-3">
                   {isZh
@@ -956,9 +951,7 @@ export default function PricingContent() {
                   {isZh ? 'Path 3 · 商業合約落地' : 'Path 3 · Commercial Reference Deployment'}
                 </p>
                 <div className="flex items-baseline gap-2 mb-3">
-                  <span className="text-3xl font-extrabold text-text-primary">
-                    {isZh ? '洽詢定價' : 'Contact us'}
-                  </span>
+                  <span className="text-3xl font-extrabold text-text-primary">$5–20M</span>
                   <span className="text-xs text-text-muted">
                     {isZh ? '/ 多年合約' : '/ multi-year'}
                   </span>
@@ -1050,9 +1043,7 @@ export default function PricingContent() {
                   <span className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage">
                     {isZh ? 'Path 3 · 商業合約' : 'Path 3 · Commercial'}
                   </span>
-                  <span className="text-sm font-semibold text-text-primary">
-                    {isZh ? '洽詢定價' : 'Contact us'}
-                  </span>
+                  <span className="text-sm font-semibold text-text-primary">$5–20M</span>
                   <span className="text-[11px] text-text-muted">
                     {isZh ? '多年期 reference' : 'Multi-year reference'}
                   </span>
@@ -1075,8 +1066,8 @@ export default function PricingContent() {
             }
             subtitle={
               isZh
-                ? 'Cisco AI Defense 已採用完整 ATR 規則包（自動同步至最新版本）；Microsoft AGT 透過每週自動同步引入 ATR 規則；NVIDIA garak、Gen Digital Sage、IBM mcp-context-forge 的整合正在進行中。若貴公司的產品需要精修到 Cisco 已合併 PR 品質的版本——包含 draft 規則的早期存取、五大框架合規 metadata，以及白標部署——OEM tier 是為這個情境設計的方案。'
-                : 'Cisco AI Defense ships the full ATR rule pack (auto-synced to latest). Microsoft AGT ships ATR rules with weekly auto-sync. NVIDIA garak, Gen Digital Sage, and IBM mcp-context-forge integrations are in flight. For vendors who need the Cisco-merge-PR-quality enriched version — early access to draft rules, five-framework compliance metadata, white-label deployment — the OEM tier is purpose-built for that scenario.'
+                ? `Cisco AI Defense 已採用完整 ${STATS.totalRulesDisplay} 條 ATR 規則包；Microsoft AGT 採用 ${STATS.adoption.microsoftRulesMerged} 條並啟用每週自動同步；NVIDIA garak 的整合正在進行中。若貴公司的產品需要精修到 Cisco 已合併 PR 品質的版本——包含 draft 規則的早期存取、五大框架合規 metadata，以及白標部署——OEM tier 是為這個情境設計的方案。`
+                : `Cisco AI Defense ships the full ${STATS.totalRulesDisplay}-rule ATR pack. Microsoft AGT ships ${STATS.adoption.microsoftRulesMerged} rules with weekly auto-sync. NVIDIA garak integration is in flight. For vendors who need the Cisco-merge-PR-quality enriched version — early access to draft rules, five-framework compliance metadata, white-label deployment — the OEM tier is purpose-built for that scenario.`
             }
           />
 
@@ -1087,9 +1078,7 @@ export default function PricingContent() {
                   {isZh ? 'OEM Use License' : 'OEM Use License'}
                 </p>
                 <div className="flex items-baseline gap-2 mb-3">
-                  <span className="text-3xl font-extrabold text-text-primary">
-                    {isZh ? '洽詢定價' : 'Contact us'}
-                  </span>
+                  <span className="text-3xl font-extrabold text-text-primary">$2–10M</span>
                   <span className="text-xs text-text-muted">/ {isZh ? '年' : 'year'}</span>
                 </div>
                 <p className="text-[13px] text-text-secondary leading-[1.85] mb-4">
@@ -1260,9 +1249,7 @@ Auditor-ready artefacts
                   {isZh ? '年會員費' : 'annual membership'}
                 </p>
                 <div className="mt-4 flex items-baseline gap-2">
-                  <span className="text-3xl font-extrabold text-text-primary">
-                    {isZh ? '洽詢定價' : 'Contact us'}
-                  </span>
+                  <span className="text-3xl font-extrabold text-text-primary">$10K</span>
                   <span className="text-xs text-text-muted">/ {isZh ? '年' : 'year'}</span>
                 </div>
                 <p className="text-[13px] text-text-secondary mt-4 leading-relaxed">

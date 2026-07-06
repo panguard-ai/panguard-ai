@@ -5,11 +5,13 @@ export default function SectionTitle({
   title,
   subtitle,
   center = true,
+  as: TitleTag = 'h2',
 }: {
   overline?: string;
   title: string;
   subtitle?: string;
   center?: boolean;
+  as?: 'h1' | 'h2';
 }) {
   const align = center ? 'text-center mx-auto' : '';
   return (
@@ -22,9 +24,9 @@ export default function SectionTitle({
           </p>
         </div>
       )}
-      <h2 className="text-[clamp(24px,4vw,48px)] text-text-primary leading-[1.15] font-bold">
+      <TitleTag className="text-[clamp(24px,4vw,48px)] text-text-primary leading-[1.15] font-bold">
         {title}
-      </h2>
+      </TitleTag>
       {subtitle && (
         <p className="text-sm sm:text-base text-text-secondary mt-4 sm:mt-6 leading-relaxed">
           {subtitle}
