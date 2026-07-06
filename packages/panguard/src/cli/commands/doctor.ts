@@ -469,13 +469,26 @@ function checkSystemService(): CheckResult {
 function checkHookProtection(): CheckResult {
   // The built-in-tool PreToolUse hook fails OPEN when it loads 0 rules (correct:
   // it must never brick the agent). But silent permanent no-protection is not
-  // acceptable — the hook records a degraded marker we surface here.
+  // acceptable — the hook records a degraded marker we surface here. A recorded
+  // `reason` means the OPPOSITE failure mode: a contract/protocol failure where
+  // the hook failed CLOSED (blocked the tool call) — report that accurately
+  // instead of claiming tool calls were allowed.
   const status = readHookProtectionStatus();
   if (!status) {
     return {
       status: 'pass',
       label: 'Built-in-tool hook',
       detail: 'No degraded protection recorded',
+    };
+  }
+  if (status.degraded && status.reason) {
+    return {
+      status: 'fail',
+      label: 'Built-in-tool hook',
+      detail: `Hook failed CLOSED (blocked a tool call) — ${status.reason} on host protocol "${
+        status.platform || 'unknown'
+      }"${status.at ? ` at ${status.at}` : ''}`,
+      fix: 'If PanGuard or the host agent was updated, re-register the hook with "pga guard install". A manual or test invocation also records this; the marker clears on the next healthy run',
     };
   }
   if (status.degraded) {

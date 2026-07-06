@@ -324,6 +324,43 @@ describe('readHookProtectionStatus — 0-rules fail-open is surfaced, not silent
     writeFileSync(p, JSON.stringify({ degraded: false, ruleCount: 652, at: 'x' }));
     expect(readHookProtectionStatus()?.degraded).toBe(false);
   });
+
+  it('surfaces reason+platform for a fail-CLOSED contract marker (not conflated with fail-open)', () => {
+    home = mkdtempSync(join(tmpdir(), 'pg-hook-status-'));
+    process.env['HOME'] = home;
+    const p = markerPath(home);
+    mkdirSync(join(p, '..'), { recursive: true });
+    writeFileSync(
+      p,
+      JSON.stringify({
+        degraded: true,
+        ruleCount: 0,
+        reason: 'contract-unformable',
+        platform: 'totally-unknown-host',
+        at: '2026-07-05T14:51:14.184Z',
+      })
+    );
+    const s = readHookProtectionStatus();
+    expect(s).not.toBeNull();
+    expect(s!.degraded).toBe(true);
+    expect(s!.reason).toBe('contract-unformable');
+    expect(s!.platform).toBe('totally-unknown-host');
+  });
+
+  it('leaves reason/platform undefined on a plain 0-rules fail-open marker', () => {
+    home = mkdtempSync(join(tmpdir(), 'pg-hook-status-'));
+    process.env['HOME'] = home;
+    const p = markerPath(home);
+    mkdirSync(join(p, '..'), { recursive: true });
+    writeFileSync(
+      p,
+      JSON.stringify({ degraded: true, ruleCount: 0, at: '2026-06-16T00:00:00.000Z' })
+    );
+    const s = readHookProtectionStatus();
+    expect(s).not.toBeNull();
+    expect(s!.reason).toBeUndefined();
+    expect(s!.platform).toBeUndefined();
+  });
 });
 
 describe('pga hook run — real stdin→decision (clean JSON, no banner)', () => {

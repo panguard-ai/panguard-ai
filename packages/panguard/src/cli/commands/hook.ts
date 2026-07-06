@@ -430,13 +430,19 @@ function clearZeroRulesFailOpen(ruleCount: number): void {
 /**
  * Read the last-recorded hook protection status, for `pga doctor` / dashboard.
  * Returns null when no hook has run yet (no marker) or the marker is unreadable.
- * `degraded: true` means the most recent hook run loaded 0 rules and therefore
- * allowed every built-in-tool call (no enforcement).
+ * Two OPPOSITE degraded modes share this marker — tell them apart by `reason`:
+ * - `degraded: true` with no `reason`: the run loaded 0 rules and allowed every
+ *   built-in-tool call (fail-OPEN, no enforcement).
+ * - `degraded: true` with a `reason` ('contract-unformable',
+ *   'unrecognized-evaluator-outcome'): the hook could not trust its own
+ *   protocol/verdict and failed CLOSED — it BLOCKED the tool call.
  */
 export function readHookProtectionStatus(): {
   degraded: boolean;
   ruleCount: number;
   at: string;
+  reason?: string;
+  platform?: string;
 } | null {
   try {
     const path = hookStatusPath();
@@ -445,11 +451,17 @@ export function readHookProtectionStatus(): {
       degraded?: boolean;
       ruleCount?: number;
       at?: string;
+      reason?: string;
+      platform?: string;
     };
     return {
       degraded: parsed.degraded === true,
       ruleCount: typeof parsed.ruleCount === 'number' ? parsed.ruleCount : 0,
       at: typeof parsed.at === 'string' ? parsed.at : '',
+      ...(typeof parsed.reason === 'string' && parsed.reason ? { reason: parsed.reason } : {}),
+      ...(typeof parsed.platform === 'string' && parsed.platform
+        ? { platform: parsed.platform }
+        : {}),
     };
   } catch {
     return null;
