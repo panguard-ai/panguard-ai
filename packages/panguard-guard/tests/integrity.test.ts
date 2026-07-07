@@ -291,11 +291,7 @@ describe('forgetSelfState — legitimate self-removal rebuilds trust (inverse of
     // now flags a permanent "missing" (the trap forgetSelfState exists to break).
     const plist = join(dir, 'com.panguard.panguard-guard.plist');
     writeFileSync(plist, '<plist/>');
-    sealConfigManifest(
-      baseConfig(),
-      [{ kind: 'launchagent', path: plist, marker: 'x' }],
-      dir
-    );
+    sealConfigManifest(baseConfig(), [{ kind: 'launchagent', path: plist, marker: 'x' }], dir);
     rmSync(plist); // uninstall removes the persistence service file
 
     // Baseline: without forgetting, checkSelfState reports the removed artifact missing.

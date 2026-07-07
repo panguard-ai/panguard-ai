@@ -94,7 +94,10 @@ function persistToWhitelist(skillNames: readonly string[], source: 'manual' | 's
     existingNames.add(normalized);
   }
 
-  writeFileSync(whitelistPath, JSON.stringify(existing, null, 2), { encoding: 'utf-8', mode: 0o600 });
+  writeFileSync(whitelistPath, JSON.stringify(existing, null, 2), {
+    encoding: 'utf-8',
+    mode: 0o600,
+  });
   try {
     // writeFileSync's mode only applies on CREATE; chmod an existing file too.
     chmodSync(whitelistPath, 0o600);
@@ -174,7 +177,9 @@ export function setupCommand(): Command {
             openBrowser(url);
           } else {
             console.log(
-              c.yellow(`  ${symbols.warn} Dashboard is still starting. Run "pga status" for the link.`)
+              c.yellow(
+                `  ${symbols.warn} Dashboard is still starting. Run "pga status" for the link.`
+              )
             );
             console.log(c.dim(`    It will be served at ${dashboardBaseUrl()}`));
           }
@@ -526,15 +531,15 @@ export function setupCommand(): Command {
           const installGuard =
             !options.skipService &&
             (options.yes ||
-            options.json ||
-            (await promptConfirm({
-              message: {
-                en: 'Install Panguard Guard as system service? (recommended, auto-start on boot)',
-                'zh-TW': '安裝 Panguard Guard 為系統服務？（建議安裝，開機自動啟動）',
-              },
-              defaultValue: true,
-              lang: L,
-            })));
+              options.json ||
+              (await promptConfirm({
+                message: {
+                  en: 'Install Panguard Guard as system service? (recommended, auto-start on boot)',
+                  'zh-TW': '安裝 Panguard Guard 為系統服務？（建議安裝，開機自動啟動）',
+                },
+                defaultValue: true,
+                lang: L,
+              })));
 
           if (installGuard) {
             if (!options.json) {
@@ -763,9 +768,7 @@ export function setupCommand(): Command {
           if (!options.yes && !options.json) {
             console.log();
             console.log(`  ${c.bold('Join Collective Defense (optional, off by default)')}`);
-            console.log(
-              c.dim('    If you agree, PanGuard connects to Threat Cloud and will:')
-            );
+            console.log(c.dim('    If you agree, PanGuard connects to Threat Cloud and will:'));
             console.log(
               c.dim('    · share minimal ANONYMIZED threat signatures (matched rule ID, attack')
             );
@@ -834,7 +837,9 @@ export function setupCommand(): Command {
                   )
                 );
                 console.log(
-                  c.dim('    Sharing anonymized signatures (incl. unknown threats); rules auto-update.')
+                  c.dim(
+                    '    Sharing anonymized signatures (incl. unknown threats); rules auto-update.'
+                  )
                 );
               } else {
                 console.log(

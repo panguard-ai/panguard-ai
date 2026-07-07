@@ -3,6 +3,7 @@
 Security auditor for OpenClaw and AgentSkills SKILL.md files — audit before deployment.
 
 Analyze skill security:
+
 - Pre-deployment vulnerability scanning
 - SKILL.md format validation
 - Risk categorization and reporting

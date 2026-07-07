@@ -3,6 +3,7 @@
 Containment primitives for threat isolation and recovery — resource limits, process isolation, and state rollback.
 
 Implement containment strategies:
+
 - Resource constraint enforcement
 - Process and sandbox isolation
 - State rollback on threat detection

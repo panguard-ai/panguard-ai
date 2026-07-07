@@ -582,9 +582,7 @@ export async function runHook(
         // scanned, so under a blocking posture fail CLOSED (never let a payload
         // hide a command behind broken JSON); advisory just warns.
         if (posture === 'advisory') {
-          process.stderr.write(
-            '[panguard] advisory: unparseable tool-call payload not scanned.\n'
-          );
+          process.stderr.write('[panguard] advisory: unparseable tool-call payload not scanned.\n');
           process.exit(0);
         }
         failClosed(platform, 'unparseable tool-call payload — blocked (fail-closed)');
@@ -905,7 +903,12 @@ export function installFor(
         before.push({
           matcher: 'run_shell_command|write_file|replace',
           hooks: [
-            { name: 'panguard-atr', type: 'command', command: HOOK_CMD('gemini', posture), timeout: 10000 },
+            {
+              name: 'panguard-atr',
+              type: 'command',
+              command: HOOK_CMD('gemini', posture),
+              timeout: 10000,
+            },
           ],
         });
         writeJson(path, { ...s, hooks: { ...(s.hooks ?? {}), BeforeTool: before } });
@@ -1177,7 +1180,11 @@ export function hookCommand(): Command {
     .option('--enforce', 'Strict posture: block deny AND lower-confidence ask matches.')
     .option('--advisory', 'Detect-only posture: warn, never block (pure telemetry).')
     .action((opts: { platform?: string; enforce?: boolean; advisory?: boolean }) => {
-      const posture: HookPosture = opts.enforce ? 'enforce' : opts.advisory ? 'advisory' : 'guarded';
+      const posture: HookPosture = opts.enforce
+        ? 'enforce'
+        : opts.advisory
+          ? 'advisory'
+          : 'guarded';
       const targets = opts.platform
         ? [opts.platform as HookPlatform].filter((p) => PLATFORMS[p])
         : HOOKABLE_PLATFORMS;

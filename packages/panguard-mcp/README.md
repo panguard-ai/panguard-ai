@@ -3,6 +3,7 @@
 MCP server for Panguard AI — control security from Claude, Cursor, and other AI agents.
 
 Integrate Panguard directly into your AI workflow:
+
 - Real-time threat status
 - Policy enforcement controls
 - Evidence and alert management

@@ -16,9 +16,7 @@ function chunk(s: string, n: number): string[] {
 
 /** Percent-encode EVERY byte of a string (keyword bytes survive the decode). */
 function fullPercentEncode(s: string): string {
-  return [...Buffer.from(s)]
-    .map((b) => '%' + b.toString(16).padStart(2, '0'))
-    .join('');
+  return [...Buffer.from(s)].map((b) => '%' + b.toString(16).padStart(2, '0')).join('');
 }
 
 const findingIds = (r: ReturnType<typeof checkInstructions>): string[] =>
@@ -57,9 +55,7 @@ describe('checkInstructions — base64 anti-evasion (whitespace/newline split re
 
     const result = checkInstructions(`Config blob: ${split}`);
     expect(findingIds(result)).toContain('encoded-payload');
-    expect(result.findings.find((f) => f.id === 'encoded-payload')?.severity).toBe(
-      'critical'
-    );
+    expect(result.findings.find((f) => f.id === 'encoded-payload')?.severity).toBe('critical');
   });
 
   it('still flags a contiguous (un-split) base64 payload via the raw pass', () => {
@@ -133,9 +129,7 @@ describe('checkInstructions — benign percent-encoded content (no false positiv
 
   it('does not flag benign base64-looking data whose decode has no executable keywords', () => {
     // A real, contiguous base64 blob that decodes to harmless text.
-    const b64 = Buffer.from('the quick brown fox jumps over the lazy dog').toString(
-      'base64'
-    );
+    const b64 = Buffer.from('the quick brown fox jumps over the lazy dog').toString('base64');
     const result = checkInstructions(`asset checksum blob: ${b64}`);
     expect(findingIds(result)).not.toContain('encoded-payload');
   });

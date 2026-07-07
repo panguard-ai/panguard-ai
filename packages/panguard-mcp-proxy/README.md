@@ -3,6 +3,7 @@
 MCP Proxy — runtime interception for AI agent tool calls using ATR (Agent Threat Rules).
 
 Transparent tool-call evaluation:
+
 - Intercepts MCP tool calls at runtime
 - Evaluates threats against 675+ ATR rules
 - Allows or blocks execution based on policy

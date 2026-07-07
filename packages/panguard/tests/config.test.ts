@@ -267,7 +267,10 @@ describe('pga config set — boolean validation (no silent reverse-set)', () => 
   const configPath = (h: string): string => join(h, '.panguard-guard', 'config.json');
 
   // Run the real CLI. Returns exit status + whatever was persisted (or null).
-  const run = (h: string, args: string[]): { status: number; config: Record<string, unknown> | null } => {
+  const run = (
+    h: string,
+    args: string[]
+  ): { status: number; config: Record<string, unknown> | null } => {
     const r = spawnSync(process.execPath, [bin, 'config', 'set', ...args], {
       env: { ...process.env, HOME: h },
       encoding: 'utf-8',

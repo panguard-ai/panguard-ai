@@ -69,7 +69,7 @@ describe('flagged-skills store', () => {
     expect(lastScanAt(d)).toBe('2026-07-07T01:00:00.000Z');
   });
 
-  it('a scan that did NOT look at a skill keeps that skill\'s prior flag', () => {
+  it("a scan that did NOT look at a skill keeps that skill's prior flag", () => {
     const d = sandbox();
     recordScanResults({
       dataDir: d,
@@ -84,7 +84,9 @@ describe('flagged-skills store', () => {
       flagged: [{ name: 'other-skill', platform: 'claude-code', riskLevel: 'HIGH' }],
       scannedAt: '2026-07-07T02:00:00.000Z',
     });
-    const names = readFlaggedSkills(d).map((f) => f.name).sort();
+    const names = readFlaggedSkills(d)
+      .map((f) => f.name)
+      .sort();
     expect(names).toEqual(['other-skill', 'repo-helper']);
   });
 

@@ -344,8 +344,9 @@ function checkLastScan(): CheckResult {
   let scannedAtIso = lastScanAt();
   if (!scannedAtIso && existsSync(LAST_SCAN_PATH)) {
     try {
-      scannedAtIso = (JSON.parse(readFileSync(LAST_SCAN_PATH, 'utf-8')) as { scannedAt?: string })
-        .scannedAt ?? null;
+      scannedAtIso =
+        (JSON.parse(readFileSync(LAST_SCAN_PATH, 'utf-8')) as { scannedAt?: string }).scannedAt ??
+        null;
     } catch {
       /* fall through to the no-scan branch */
     }
@@ -393,9 +394,7 @@ function checkLastScan(): CheckResult {
     status: flaggedCount > 0 ? 'warn' : 'pass',
     label: 'Last scan',
     detail: `${when}${threatNote}`,
-    ...(flaggedCount > 0
-      ? { fix: 'Review flagged skills: "pga status" (or remove them)' }
-      : {}),
+    ...(flaggedCount > 0 ? { fix: 'Review flagged skills: "pga status" (or remove them)' } : {}),
   };
 }
 

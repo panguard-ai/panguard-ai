@@ -155,8 +155,8 @@ export default function DemoContent() {
                   <p className="mt-2 text-sm text-text-secondary leading-relaxed">
                     SOC 2 Type 1 readiness in progress; Vanta/Drata vendor evaluation underway;
                     auditor engagement and attestation targeted Q4 2026 / Q1 2027 (subject to
-                    fieldwork scheduling). Full timeline, 6 control families, NDA-shareable artifacts
-                    list.
+                    fieldwork scheduling). Full timeline, 6 control families, NDA-shareable
+                    artifacts list.
                   </p>
                   <p className="mt-4 text-sm font-semibold text-brand-sage group-hover:text-brand-sage-light">
                     Download (57 KB) →

@@ -306,12 +306,7 @@ export function readSelfStateRefs(dataDir: string): SelfStateRef[] {
 export function collectSelfState(): SelfStateRef[] {
   const refs: SelfStateRef[] = [];
   if (platform() === 'darwin') {
-    const plist = join(
-      homedir(),
-      'Library',
-      'LaunchAgents',
-      `${GUARD_SERVICE_LABEL}.plist`
-    );
+    const plist = join(homedir(), 'Library', 'LaunchAgents', `${GUARD_SERVICE_LABEL}.plist`);
     if (existsSync(plist)) {
       refs.push({
         kind: 'launchagent',

@@ -28,7 +28,10 @@ export default function ArchFlow() {
 
       <div className="mt-12 flex flex-col items-stretch gap-3 lg:flex-row lg:items-center">
         {stages.map((stage, i) => (
-          <div key={stage.label} className="flex flex-1 flex-col items-stretch gap-3 lg:flex-row lg:items-center">
+          <div
+            key={stage.label}
+            className="flex flex-1 flex-col items-stretch gap-3 lg:flex-row lg:items-center"
+          >
             {i > 0 && (
               <span
                 aria-hidden
@@ -39,7 +42,9 @@ export default function ArchFlow() {
             )}
             <div
               className={`flex-1 rounded-2xl border p-5 ${
-                stage.emphasized ? 'border-brand-sage/40 bg-surface-1' : 'border-border bg-surface-1'
+                stage.emphasized
+                  ? 'border-brand-sage/40 bg-surface-1'
+                  : 'border-border bg-surface-1'
               }`}
             >
               <p className="font-mono text-[11px] uppercase tracking-micro text-text-primary">

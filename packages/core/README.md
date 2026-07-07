@@ -3,6 +3,7 @@
 Shared UI, format, and logging primitives for the PanGuard Community suite.
 
 Core modules providing consistent interfaces and utilities across PanGuard packages:
+
 - UI components and styling foundations
 - Standard logging and telemetry
 - Shared data formats and validators

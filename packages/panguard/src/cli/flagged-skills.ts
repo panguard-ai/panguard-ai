@@ -83,14 +83,12 @@ export function lastScanAt(dataDir: string = defaultDataDir()): string | null {
  * verdict. Immutable: builds a new store, never mutates the old one. Best-effort —
  * a write failure never breaks the scan.
  */
-export function recordScanResults(
-  opts: {
-    scannedNames: readonly string[];
-    flagged: readonly Omit<FlaggedSkill, 'normalizedName' | 'scannedAt'>[];
-    scannedAt: string;
-    dataDir?: string;
-  }
-): void {
+export function recordScanResults(opts: {
+  scannedNames: readonly string[];
+  flagged: readonly Omit<FlaggedSkill, 'normalizedName' | 'scannedAt'>[];
+  scannedAt: string;
+  dataDir?: string;
+}): void {
   const dataDir = opts.dataDir ?? defaultDataDir();
   try {
     const prev = readFlaggedStore(dataDir);

@@ -75,18 +75,14 @@ export async function askTelemetryConsent(): Promise<boolean> {
   console.log(
     `  ${c.dim('and you get every community rule back automatically. With the local AI')}`
   );
-  console.log(
-    `  ${c.dim('layer on (free — pga guard setup-ai), PanGuard ALSO reports UNKNOWN')}`
-  );
+  console.log(`  ${c.dim('layer on (free — pga guard setup-ai), PanGuard ALSO reports UNKNOWN')}`);
   console.log(
     `  ${c.dim('suspicious behavior it can’t yet match to a rule — so novel attacks the')}`
   );
   console.log(`  ${c.dim('AI flags become new rules too. Reporting an unknown never blocks it.')}`);
   console.log('');
   console.log(`  ${c.bold('If you agree, PanGuard will:')}`);
-  console.log(
-    `  ${c.dim('  1. Connect to Threat Cloud and share minimal, ANONYMIZED threat')}`
-  );
+  console.log(`  ${c.dim('  1. Connect to Threat Cloud and share minimal, ANONYMIZED threat')}`);
   console.log(
     `  ${c.dim('     signatures — the matched rule ID(s) (or “none” for unknown threats),')}`
   );
@@ -110,17 +106,12 @@ export async function askTelemetryConsent(): Promise<boolean> {
   );
   console.log(`  ${c.dim('ID links your own submissions (pseudonymous, not fully anonymous).')}`);
   console.log('');
-  console.log(
-    `  ${c.dim('Turn off anytime: pga config set telemetry false (upload) /')}`
-  );
+  console.log(`  ${c.dim('Turn off anytime: pga config set telemetry false (upload) /')}`);
   console.log(`  ${c.dim('pga config set threat-cloud false (rule sync).')}`);
   console.log('');
 
   // Opt-in: default is NO. Pressing Enter declines (default OFF).
-  const answer = await promptYesNo(
-    '  Agree and join Collective Defense? [y/N] ',
-    false
-  );
+  const answer = await promptYesNo('  Agree and join Collective Defense? [y/N] ', false);
 
   const config = loadGuardConfig();
   // A single "I agree" wires the whole loop: contribute (upload) AND receive

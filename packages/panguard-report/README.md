@@ -3,6 +3,7 @@
 AI-powered security incident report generator — automatically create compliance and investigation reports from threat data.
 
 Generate detailed security reports:
+
 - Automated incident documentation
 - Compliance-ready formats
 - Threat timeline and evidence

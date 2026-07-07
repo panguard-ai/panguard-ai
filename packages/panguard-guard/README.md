@@ -3,6 +3,7 @@
 AI real-time endpoint monitoring and auto-response — the core daemon powering Panguard security.
 
 Monitor and respond to threats:
+
 - Real-time agent behavior analysis
 - Automatic threat mitigation
 - Local dashboard integration

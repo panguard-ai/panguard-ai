@@ -3,6 +3,7 @@
 Unified skill scanning engine — ATR rule evaluation + risk scoring, shared between the CLI auditor and website.
 
 Provides the core scanning logic:
+
 - ATR (Agent Threat Rules) engine wrapper
 - Risk scoring and categorization
 - Test case evaluation
