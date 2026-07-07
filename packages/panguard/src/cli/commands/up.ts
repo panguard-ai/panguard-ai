@@ -19,6 +19,7 @@ import { installFor, toHookPlatform } from './hook.js';
 import { ensurePersistentService, type PersistResult } from './persist.js';
 import { isFirstRun, markInitialized } from '../first-run.js';
 import { readAuthenticatedDashboardUrl, dashboardBaseUrl } from '../dashboard-url.js';
+import { recordScanResults, type RiskLevel } from '../flagged-skills.js';
 
 type Lang = 'en' | 'zh-TW';
 
@@ -456,6 +457,17 @@ export function upCommand(): Command {
                 process.stdout.write('\r' + ' '.repeat(80) + '\r');
 
                 threatCount = threats.length;
+                // Persist the scan verdict so `pga status` / `pga doctor` show the
+                // real severity of a flagged skill (not "UNKNOWN"/"No scan result").
+                recordScanResults({
+                  scannedNames: unknown.map((s) => s.name),
+                  flagged: threats.map((t) => ({
+                    name: t.name,
+                    platform: t.platform,
+                    riskLevel: t.riskLevel as RiskLevel,
+                  })),
+                  scannedAt: new Date().toISOString(),
+                });
                 if (threats.length > 0) {
                   console.log(`  ${c.critical(c.bold(`${threats.length} threat(s) detected:`))}\n`);
                   for (const threat of threats) {
@@ -508,6 +520,13 @@ export function upCommand(): Command {
                 }
               } else {
                 console.log(`  ${c.safe(`${ok()} All ${skills.length} skills verified safe.`)}\n`);
+                // Every installed skill is whitelisted-safe: record a clean scan so
+                // doctor shows a real timestamp and any stale flag is cleared.
+                recordScanResults({
+                  scannedNames: skills.map((s) => s.name),
+                  flagged: [],
+                  scannedAt: new Date().toISOString(),
+                });
               }
             }
           } catch {
