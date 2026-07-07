@@ -29,20 +29,20 @@ export const STATS = {
    * node scripts/compile-atr-rules.mjs -> node scripts/apply-atr-stats.mjs.
    * Rule count matches the compiled bundle (src/lib/atr-rules-compiled.json).
    */
-  atrVersion: '3.5.4',
+  atrVersion: '3.5.0',
   /**
    * ATR rules PanGuard ships (agent-threat-rules v3.5.4 on npm = 672 YAML rules).
    * This is the count of the exact bundle this site scans with — auditable by
    * `npm i agent-threat-rules@3.5.4 && find rules -name '*.yaml' | wc -l`.
    */
-  atrRules: 672,
+  atrRules: 688,
   /** Total unique detection patterns across all bundled ATR rules. */
   atrPatterns: 3_025,
-  totalRules: 672,
+  totalRules: 688,
   /** Use this for all user-facing display — avoids stale hardcoded counts. */
-  totalRulesDisplay: '670+' as const,
+  totalRulesDisplay: '688' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '670+' as const,
+  atrRulesDisplay: '688' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,
@@ -184,7 +184,7 @@ export const STATS = {
   // All recall/precision/fp values are PERCENTAGES (0-100) for a single
   // consistent unit across the site — call sites render `${value}%` directly.
   benchmark: {
-    pint: { recall: 63.6, precision: 99.7, fp: 0.25, samples: 850 },
+    pint: { recall: 63.64, precision: 99.65, fp: 0.25, samples: 850 },
     skill: { recall: 100, precision: 97, fp: 0.2, samples: 498 },
     garak: {
       recall: 97.2,
@@ -266,7 +266,7 @@ export const STATS = {
    * Website components should always prefer fetchLiveMetrics() for real-time data.
    * Update these periodically to keep fallbacks reasonable.
    */
-  lastUpdated: '2026-07-04T00:00:00.000Z',
+  lastUpdated: '2026-06-16T11:05:13.632Z',
 } as const;
 
 export type Stats = typeof STATS;
