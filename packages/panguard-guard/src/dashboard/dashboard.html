@@ -3107,8 +3107,24 @@
             detail: 'Guard is not running.',
             sub: 'Guard is not running, so your agents are not being watched.',
           },
+          degraded: {
+            label: 'DEGRADED',
+            color: 'var(--danger)',
+            badge: 'badge-learning',
+            detail: '0 detection rules loaded — detection is a no-op. Run "pga guard sync-rules" to restore.',
+            sub: 'The detection engine has no rules loaded, so nothing is being caught. Restore rules to regain protection.',
+          },
+          tampered: {
+            label: 'TAMPERED',
+            color: 'var(--danger)',
+            badge: 'badge-learning',
+            detail: 'Config integrity check failed — protection may have been weakened. Review the config, then re-seal with "pga up".',
+            sub: 'The protection config changed outside PanGuard. Verify the change was yours before trusting this machine.',
+          },
         };
-        return MAP[enf.posture] || MAP.learning;
+        /* Unknown/future postures fall back to DEGRADED (honest: we cannot
+           claim protection we cannot identify), never to a benign LEARNING. */
+        return MAP[enf.posture] || MAP.degraded;
       }
       function updatePBar(s) {
         var dot = document.getElementById('pb-dot');

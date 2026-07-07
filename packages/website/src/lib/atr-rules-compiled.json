@@ -720,7 +720,7 @@
     "severity": "critical",
     "category": "tool-poisoning",
     "scan_target": "mcp",
-    "rule_version": 1,
+    "rule_version": 2,
     "patterns": [
       {
         "field": "tool_response",
@@ -744,8 +744,8 @@
       },
       {
         "field": "tool_response",
-        "pattern": "(\\$\\(|`)\\s*[^)]{0,300}(curl|wget|nc|ncat|bash|python|perl|ruby|eval|exec|sh\\s+-c|base64\\s+-d)",
-        "desc": "Command substitution containing dangerous commands"
+        "pattern": "\\$\\(\\s*[^)]{0,300}(curl|wget|nc|ncat|bash|python|perl|ruby|eval|exec|sh\\s+-c|base64\\s+-d)",
+        "desc": "$(...) command substitution containing dangerous commands"
       },
       {
         "field": "tool_response",
@@ -880,7 +880,7 @@
     "severity": "high",
     "category": "tool-poisoning",
     "scan_target": "mcp",
-    "rule_version": 1,
+    "rule_version": 2,
     "patterns": [
       {
         "field": "tool_args",
@@ -889,8 +889,8 @@
       },
       {
         "field": "tool_args",
-        "pattern": "(;|&&|\\|\\||\\$\\(|`|\\|\\s*\\w)\\s*.{0,50}(curl|wget|nc|ncat|bash|sh|zsh|python|ruby|perl|node|php|powershell|cmd|eval|exec|system|rm\\s+-|cat\\s+/etc|whoami|id\\b|uname|hostname|ifconfig|ipconfig|net\\s+user|net\\s+localgroup)",
-        "desc": "Shell metacharacter injection followed by dangerous commands"
+        "pattern": "(;|&&|\\|\\|)\\s*(?:sudo\\s+)?(?:curl\\s+(?:-\\S+\\s+)*['\"]?https?://(?!localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0)|wget\\s+(?:-\\S+\\s+)*['\"]?https?://(?!localhost|127\\.)|\\bnc\\b\\s+-?[a-z0-9]|ncat\\s+\\S|\\b(?:ba)?sh\\s+-[ic]|python[0-9]?\\s+-c|perl\\s+-e|ruby\\s+-e|node\\s+-e|\\beval\\s|rm\\s+-[rf]|cat\\s+/etc/(?:passwd|shadow|sudoers)|whoami|\\bid\\b\\s*(?:;|&|\\||$)|uname\\s+-a|base64\\s+(?:-d|--decode)|ifconfig|>&\\s*/dev/tcp)|[$`]\\([^)`]{0,80}(?:curl|wget|\\bnc\\b|\\bbash\\b|\\bsh\\s+-|whoami|\\bid\\b|base64\\s+-d|/etc/(?:passwd|shadow))",
+        "desc": "Shell metacharacter chained to a genuinely dangerous command \u2014 external network fetch, pipe-to-shell / interpreter one-liner, recon (whoami/id/uname -a), or sensitive-file read (v2 tightened; legit build chains like \"npm i && bash setup.sh\", \"&& python -m pytest\", \"| jq\" no longer fire)"
       },
       {
         "field": "tool_name",
@@ -1363,41 +1363,6 @@
     "rule_version": 1,
     "patterns": [
       {
-        "field": "tool_name",
-        "pattern": "(?i)(?:exec|execute|shell|bash|cmd|terminal|subprocess|os_command|system_call|run_command|powershell)",
-        "desc": "System shell or command execution tool invocation"
-      },
-      {
-        "field": "tool_name",
-        "pattern": "(?i)(?:modify_permissions?|grant_access|elevate|set_role|change_acl|chmod|chown|sudo|setuid|setgid)",
-        "desc": "Permission modification or privilege elevation tools"
-      },
-      {
-        "field": "tool_name",
-        "pattern": "(?i)(?:create_user|delete_user|modify_user|reset_password|manage_roles?|assign_role|revoke_role|add_admin)",
-        "desc": "User management and role assignment operations"
-      },
-      {
-        "field": "tool_name",
-        "pattern": "(?i)(?:drop_(?:database|table|index)|truncate_table|alter_schema|create_database|db_admin|migrate_database)",
-        "desc": "Database administration and schema operations"
-      },
-      {
-        "field": "tool_name",
-        "pattern": "(?i)(?:update_config|modify_settings|change_environment|set_env|deploy|restart_service|stop_service|kill_process)",
-        "desc": "System configuration and service management operations"
-      },
-      {
-        "field": "tool_name",
-        "pattern": "(?i)(?:manage_firewall|update_security_group|modify_iam|create_api_key|rotate_secret|manage_certificates?)",
-        "desc": "Security infrastructure management operations"
-      },
-      {
-        "field": "tool_name",
-        "pattern": "(?i)(?:access_audit_log|clear_logs?|purge_logs?|modify_audit|disable_(?:monitoring|logging|alerting))",
-        "desc": "Audit tampering and monitoring evasion operations"
-      },
-      {
         "field": "tool_args",
         "pattern": "(?i)(?:--(?:privileged|no-sandbox|cap-add|security-opt)|allowPrivilegeEscalation|\\b(?:admin|root|superuser|sudo)\\s*=|[\"'](?:admin|root|superuser|sudo)[\"']|\"role\"\\s*:\\s*\"(?:admin|root|superuser|sudo)\")",
         "desc": "Privileged flags or admin/root values in structured tool arguments (not natural language)"
@@ -1416,11 +1381,6 @@
         "field": "tool_args",
         "pattern": "(?i)(?:kubectl\\s+exec|kubectl\\s+(?:create|apply)\\s+.*(?:clusterrole|rolebinding)|kubectl\\s+auth\\s+can-i)",
         "desc": "Kubernetes privilege escalation commands"
-      },
-      {
-        "field": "tool_name",
-        "pattern": "(?i)(?:write_file|delete_file|rm\\s+-rf|remove_directory|format_disk|wipe)",
-        "desc": "Destructive file system operations"
       },
       {
         "field": "tool_args",
@@ -1570,7 +1530,7 @@
     "severity": "high",
     "category": "excessive-autonomy",
     "scan_target": "mcp",
-    "rule_version": 1,
+    "rule_version": 2,
     "patterns": [
       {
         "field": "content",
@@ -1579,8 +1539,8 @@
       },
       {
         "field": "content",
-        "pattern": "(?i)(?:for\\s+each|iterate\\s+(?:over\\s+)?(?:all|every)|process\\s+(?:all|every|each)\\s+(?:record|row|entry|item|file|document))",
-        "desc": "Bulk iteration directive over entire dataset"
+        "pattern": "(?i)(?:for\\s+each\\s+(?:of\\s+)?(?:the\\s+)?(?:record|row|entry|item|file|document|user|customer|email|account|message|transaction)s?\\b[\\s\\S]{0,30}\\b(?:in|of|from|across)\\b|iterate\\s+(?:over\\s+)?(?:all|every|the\\s+entire)|process\\s+(?:all|every|each)\\s+(?:record|row|entry|item|file|document)|(?:all|every|entire|whole)\\s+(?:record|row|entry|item|file|document|dataset|database|table)s?\\b)",
+        "desc": "Bulk iteration over an entire or unbounded dataset (v2 \u2014 bare 'for each' now requires a data-source/scale qualifier; the unqualified form matched ordinary 'for each X' prose; verified 0 recall loss + all true_positives, benign FP 560 to 203)"
       },
       {
         "field": "content",
@@ -1726,11 +1686,6 @@
         "field": "tool_name",
         "pattern": "(?i)(?:web[-_]?search|google[-_]?search|bing[-_]?search)[-_]?(?:v2|v3|pro|enhanced|premium|fast|turbo|plus|ultra|new)",
         "desc": "Fake enhanced versions of known search tools"
-      },
-      {
-        "field": "tool_name",
-        "pattern": "(?i)(?:exec|execute|run|shell)[-_]?(?:cmd|command|script|code)[-_]?(?:safe|secure|sandbox|trusted|verified)?",
-        "desc": "Shell execution tools with deceptive safety suffixes"
       },
       {
         "field": "tool_name",
@@ -1914,11 +1869,11 @@
     "severity": "critical",
     "category": "tool-poisoning",
     "scan_target": "mcp",
-    "rule_version": 1,
+    "rule_version": 2,
     "patterns": [
       {
         "field": "tool_args",
-        "pattern": "(?i)(;|&&|\\|\\||`|\\$\\()\\s*(cat|ls|id|whoami|uname|pwd|env|curl|wget|nc|bash|sh|python)"
+        "pattern": "(?i)(;|&&|\\|\\||`|\\$\\()\\s*(whoami|\\bid\\b|uname\\s+-a|curl\\s+(?:-\\S+\\s+)*https?://(?!localhost|127\\.)|wget\\s+https?://(?!localhost|127\\.)|\\bnc\\b\\s|ncat\\s|cat\\s+/etc/(?:passwd|shadow|sudoers)|\\b(?:ba)?sh\\s+-[ic]|python[0-9]?\\s+-c|base64\\s+-d|rm\\s+-[rf])"
       },
       {
         "field": "tool_args",
@@ -2789,32 +2744,32 @@
     "severity": "critical",
     "category": "privilege-escalation",
     "scan_target": "mcp",
-    "rule_version": 1,
+    "rule_version": 3,
     "patterns": [
       {
         "field": "content",
-        "pattern": ";\\s*(?:rm|cat|curl|wget|nc|ncat|bash|sh|python|perl|ruby|php)",
-        "desc": "Semicolon-chained dangerous command after a benign one"
+        "pattern": ";\\s*(?:rm\\s+-|cat\\s+/(?:etc|root|proc|home)|curl\\s+\\S|wget\\s+\\S|\\bnc\\b\\s+\\S|ncat\\s+\\S|bash\\b|\\bsh\\s+-|python[0-9]?\\s+-c|perl\\s+-e|ruby\\s+-e|php\\s+-r)",
+        "desc": "Semicolon-chained dangerous command with argument or dangerous flag (v2 tightened; prose semicolons like \"...; python scripts\" no longer fire \u2014 verified 0 recall loss + all true_positives, benign FP 20 to 1)"
       },
       {
         "field": "content",
-        "pattern": "\\$\\([^)]+\\)",
-        "desc": "$() subshell execution embedded in arguments"
+        "pattern": "\\$\\([^)]{0,200}(?:curl|wget|\\bnc\\b|ncat|\\bbash\\b|zsh|/bin/|\\bsh\\s+-c|python[0-9]?\\s+-c|perl\\s+-e|ruby\\s+-e|node\\s+-e|\\beval\\b|\\bexec\\b|base64|rm\\s+-[rfR]|chmod\\s|chown\\s|mkfs|dd\\s+if=|\\|\\s*(?:ba)?sh\\b|>&|/dev/tcp|cat\\s+/(?:etc|root|proc)|/etc/(?:passwd|shadow))",
+        "desc": "$() command substitution invoking a dangerous command \u2014 network fetch / interpreter exec / destructive / sensitive-file read (v2 tightened; bare command substitution like $(git rev-parse) no longer fires \u2014 verified 0 recall loss + all true_positives, benign FP 128 to 19)"
       },
       {
         "field": "content",
-        "pattern": "`(?:rm|cat|curl|wget|nc|ncat|bash|sh|python|perl|ruby|php|whoami|id|uname|env|printenv|set|export|eval|exec|chmod|chown|kill|pkill|dd|mkfs|mount|umount|sudo|su|passwd)[^`]*`",
-        "desc": "Backtick command substitution with dangerous command inside"
+        "pattern": "`(?:rm\\s+-[rfR]|curl\\s+\\S|wget\\s+\\S|\\bnc\\b\\s+\\S|ncat\\s+\\S|\\beval\\b\\s+\\S|\\bexec\\b\\s+\\S|chmod\\s+(?:777|[ugoa]*\\+s)|chown\\s+\\S|mkfs|dd\\s+if=|sudo\\s+(?:rm|bash|sh\\b|su\\b|chmod|chown|cat\\s+/)|\\bsu\\b\\s+-|whoami|/bin/|reverse)[^`\\n]{0,40}`",
+        "desc": "Backtick command substitution running a dangerous command with arguments (v3 tightened; word boundaries stop substring hits like `evaluate_*`/`execute`, bare doc mentions like `curl` and benign forms like `chmod 600` no longer fire \u2014 verified 0 recall loss + all true_positives, benign FP 142 to 32)"
       },
       {
         "field": "content",
-        "pattern": "(?:&&|\\|\\|)\\s*(?:curl|wget|nc|ncat|bash|sh|python|perl)",
-        "desc": "Logical operator chained to network or shell command"
+        "pattern": "(?:&&|\\|\\|)\\s*(?:curl\\s+(?:-\\S+\\s+)*['\"]?https?://(?!localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0)\\S+|wget\\s+(?:-\\S+\\s+)*['\"]?https?://(?!localhost|127\\.0\\.0\\.1)\\S+|\\bnc\\b\\s+\\S|ncat\\s+\\S|bash\\s+-c|\\bsh\\s+-c|python[0-9]?\\s+-c|perl\\s+-e)",
+        "desc": "Logical operator chained to an external network fetch or interpreter one-liner (v2 tightened; localhost health checks and build chains like \"npm i && bash setup.sh\" no longer fire \u2014 verified 0 recall loss + all true_positives, benign FP 22 to 9)"
       },
       {
         "field": "content",
-        "pattern": "\\|\\s*(?:nc|ncat|bash|sh|curl|wget|tee)",
-        "desc": "Pipe to network exfiltration or shell command"
+        "pattern": "\\|\\s*(?:nc\\b|ncat|bash|sh\\b|curl|wget)|\\|\\s*tee\\s+/(?:tmp|dev|etc|root|var)",
+        "desc": "Pipe to network exfiltration or shell command, or tee into a system path (v2 tightened; `| tee build.log`-style benign logging no longer fires \u2014 verified 0 recall loss + all true_positives, benign FP 68 to 49)"
       },
       {
         "field": "content",
@@ -3039,7 +2994,7 @@
     "severity": "medium",
     "category": "agent-manipulation",
     "scan_target": "mcp",
-    "rule_version": 1,
+    "rule_version": 2,
     "patterns": [
       {
         "field": "content",
@@ -3053,8 +3008,8 @@
       },
       {
         "field": "content",
-        "pattern": "(?i)(?:this\\s+is\\s+)?(?:routine|standard|normal|nothing\\s+to\\s+worry\\s+about|perfectly\\s+safe|harmless)",
-        "desc": "Minimizing language to reduce scrutiny of dangerous actions"
+        "pattern": "(?i)\\b(routine|standard|normal|perfectly\\s+safe|harmless|nothing\\s+to\\s+worry\\s+about|no\\s+big\\s+deal|just\\s+a\\s+formality)\\b[\\s\\S]{0,45}(approv|sign[- ]?off|no\\s+need\\s+to\\s+(review|check|read|verify)|don'?t\\s+(need|have)\\s+to\\s+(review|check|worry)|just\\s+(click|accept|approve)|safe\\s+to\\s+(run|approve|proceed))|(approv|auto[- ]?approve|just\\s+(confirm|accept|click))[\\s\\S]{0,45}\\b(routine|standard|normal|perfectly\\s+safe|harmless|nothing\\s+to\\s+worry)\\b",
+        "desc": "Minimizing language paired with an approval or skip-review cue (v2 \u2014 bare minimizers like standard/normal/routine alone caused mass false positives on ordinary technical text; verified all true_positives kept, benign FP 895 to 18)"
       },
       {
         "field": "content",
@@ -4044,7 +3999,7 @@
     "severity": "critical",
     "category": "tool-poisoning",
     "scan_target": "mcp",
-    "rule_version": 1,
+    "rule_version": 2,
     "patterns": [
       {
         "field": "content",
@@ -4058,8 +4013,8 @@
       },
       {
         "field": "content",
-        "pattern": "\\b(?:id_rsa|id_dsa|id_ed25519|id_ecdsa|mcp\\.json|\\.aws/credentials|\\.aws/config|\\.kube/config|\\.docker/config\\.json|\\.netrc|known_hosts)\\b|/etc/(?:passwd|shadow|ssl/private)|/proc/self/environ|\\b\\.env(?:\\.local|\\.production|\\.secret)?\\b(?![/a-zA-Z])",
-        "desc": "Sensitive credential file referenced in tool description \u2014 tool signatures should not need to read private keys or cloud credentials"
+        "pattern": "\\b(?:id_rsa|id_dsa|id_ed25519|id_ecdsa)\\b(?!\\.pub)|\\b(?:\\.aws/credentials|\\.kube/config|\\.docker/config\\.json|\\.netrc|known_hosts)\\b|/etc/(?:passwd|shadow|ssl/private)|/proc/self/environ|\\b\\.env(?:\\.local|\\.production|\\.secret)?\\b(?![/a-zA-Z])",
+        "desc": "Sensitive credential file referenced in tool description \u2014 private keys or cloud credentials (v2: dropped mcp.json + .aws/config \u2014 common non-secret config files that appear in ordinary git/edit operations; the exfil case is still caught by the <IMPORTANT>-tag and read/send-directive layers. id_rsa excludes the .pub public key.)"
       },
       {
         "field": "content",
@@ -20103,6 +20058,101 @@
         "field": "content",
         "pattern": "(?:streamable[- ]?http|/mcp\\b|mcp\\s+(?:server|transport|endpoint|handler|gateway))[\\s\\S]{0,160}?(?:forward|dispatch|accept|invoke|reach)[\\s\\S]{0,120}?(?:unauthenticat|without\\s+(?:any\\s+)?auth|no\\s+401|no\\s+authentication)[\\s\\S]{0,200}?(?:falls?\\s*back|fall[-\\s]?back|fallback|env(?:ironment)?\\s+var|ambient|META_ACCESS_TOKEN)[\\s\\S]{0,80}?(?:token|credential|secret|api[_ ]?key)",
         "desc": "Generalised unauthenticated MCP transport \u2014 a server/gateway/Streamable-HTTP handler that forwards or accepts a tool call without authentication and falls back to an ambient environment credential."
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-01930",
+    "title": "MCP Sampling Prompt Injection (Server-to-Client createMessage Abuse)",
+    "severity": "high",
+    "category": "tool-poisoning",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)sampling/createMessage[\\s\\S]{0,600}(?:after|once|when|having)\\s+(?:you\\s+)?(?:finish(?:ing|ed)?|complet(?:e|ing|ed)|done\\s+with)[^\\n]{0,90}(?:also|additionally|then|as\\s+well|moreover)\\s+(?:write|invoke|call|run|send|generate|create|produce|forward)",
+        "desc": "Sampling request with an 'after finishing the task, also do X' hidden-instruction appendage \u2014 resource theft / covert action"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)sampling/createMessage[\\s\\S]{0,800}(?:(?:for|in)\\s+all\\s+(?:future|subsequent|following|your|the)\\s+(?:requests?|responses?|replies|turns?|messages?|outputs?)|(?:speak|respond|reply|behave|act)\\s+(?:like|as)\\s+[\\w\\- ]{1,30}\\s+in\\s+all)",
+        "desc": "Sampling request injecting cross-turn persistence ('in all future responses' / 'speak like X in all') \u2014 conversation hijacking"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\"systemPrompt\"\\s*:\\s*\"[^\"]{0,400}(?:ignore\\s+(?:all\\s+)?(?:previous|prior)|disregard\\s+(?:all\\s+)?(?:previous|prior)|forget\\s+(?:all\\s+)?(?:previous|prior)|you\\s+are\\s+now\\b|\\[INST\\]|<\\|im_start\\|>|new\\s+(?:system\\s+)?instructions?\\s*:)",
+        "desc": "Sampling systemPrompt field carrying a role-override / instruction-reset injection marker"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)sampling/createMessage[\\s\\S]{0,800}(?:please\\s+)?(?:also\\s+|silently\\s+|secretly\\s+|covertly\\s+)?(?:invoke|call|use|trigger|execute|run)\\s+(?:the\\s+)?[\\w\\-\\.]+\\s+tool\\s+to\\s+(?:write|create|send|exfiltrate|read|delete|upload|post|forward|email)",
+        "desc": "Sampling request injecting a covert tool invocation ('also invoke the <tool> tool to write/exfiltrate ...')"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\"includeContext\"\\s*:\\s*\"(?:thisServer|allServers)\"[\\s\\S]{0,700}(?:send|post|exfiltrate|upload|forward|leak|transmit)[^\\n]{0,70}(?:to\\s+)?https?://",
+        "desc": "Sampling pulls full context (includeContext) and the prompt instructs forwarding it to an external URL \u2014 context exfiltration via sampling"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)sampling/createMessage[\\s\\S]{0,700}(?:invisibl[ey]|silently|secretly|covertly|without\\s+(?:telling|informing|notifying|alerting|showing)\\s+the\\s+user|the\\s+user\\s+(?:will\\s+not|wo\\S?nt|need\\s+not)\\s+(?:see|know|notice|be\\s+aware))[\\s\\S]{0,120}(?:invoke|call|run|execute|write|send|upload|forward|exfiltrate)[^\\n]{0,40}(?:tool|file|command|context|credential|key|token|data|email|api)",
+        "desc": "Sampling request with explicit hide-from-user framing co-occurring with a tool/file/exfil action \u2014 covert sampling-driven operation"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-01931",
+    "title": "gemini-mcp-tool execAsync Command Injection & @file Exfiltration (CVE-2026-0755)",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "scan_target": "tool_args",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)@(?:/etc/(?:passwd|shadow)|~?/?\\.ssh/(?:id_[rd]sa|id_ecdsa|id_ed25519|authorized_keys)|~?/?\\.aws/credentials|~?/?\\.config/[\\w./-]*(?:token|secret|cred|key)|~?/?\\.env\\b|(?:\\.\\./){2,})",
+        "desc": "@file dereference of a sensitive system path or directory traversal \u2014 CVE-2026-0755 arbitrary-file exfiltration"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:gemini[-_\\s]?(?:mcp|cli)?[-_\\s]?tool|ask[-_\\s]?gemini|execasync)[\\s\\S]{0,160}(?:;\\s*(?:rm|curl|wget|bash|sh|nc|ncat|cat|chmod|python|node)\\b|\\|\\s*(?:sh|bash|curl|wget|nc)\\b|\\$\\(\\s*(?:curl|wget|cat|id|whoami|uname|env)|&&\\s*(?:curl|wget|rm|bash|sh|nc)\\b)",
+        "desc": "gemini-mcp-tool / execAsync prompt carrying a shell-metacharacter command chain \u2014 CVE-2026-0755 OS command injection"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)cve-?2026-?0755[\\s\\S]{0,160}(?:poc\\b|exploit|payload|@(?:~|/etc|\\.\\.)|id_rsa|/etc/(?:passwd|shadow)|execasync\\s*\\(|;\\s*(?:curl|rm|bash|sh)\\b)",
+        "desc": "Explicit CVE-2026-0755 reference co-located with an actual exploit payload token (not mere advisory/description text)"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-01932",
+    "title": "Shadow / Undeclared MCP Server Registration (MCP-38: MCP-18)",
+    "severity": "high",
+    "category": "tool-poisoning",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:silently|secretly|covertly|quietly|behind\\s+the\\s+scenes|without\\s+(?:the\\s+user(?:'s|s)?\\s+)?(?:consent|approval|knowledge|awareness|noticing|prompt))[\\s\\S]{0,90}(?:register|add|install|inject|configure|append|enable)\\s+(?:a\\s+|an\\s+|the\\s+|another\\s+)?(?:new\\s+|rogue\\s+|extra\\s+|additional\\s+|hidden\\s+)?(?:mcp[_\\s-]?server|tool\\s+server|tool\\s+provider|server\\s+to\\s+(?:the\\s+)?mcp)",
+        "desc": "Content describing a server registration that is explicitly hidden / without consent \u2014 shadow-server setup"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:auto(?:matically)?|programmatic(?:ally)?)\\s+(?:register|add|append|inject|enable)[\\s\\S]{0,50}(?:mcp[_\\s-]?server|tool\\s+server)[\\s\\S]{0,70}(?:without|no|bypass(?:ing)?)\\s+(?:consent|approval|prompt|confirmation|review)",
+        "desc": "Auto/programmatic server registration that explicitly bypasses consent/approval"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:rogue|shadow|unauthori[sz]ed|unregistered|impostor|undeclared)\\s+mcp\\s+server",
+        "desc": "Explicit rogue / shadow / impostor MCP server framing"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:register|add|publish|advertise)[\\s\\S]{0,50}(?:mcp\\s+)?(?:server|tool\\s+provider)[\\s\\S]{0,60}(?:imitat|mimic|impersonat|masquerad|pretend(?:ing)?\\s+to\\s+be|same\\s+name\\s+as\\s+(?:the\\s+)?(?:trusted|official|legitimate))",
+        "desc": "Server registration that impersonates / mimics a trusted server's identity (MCP-18 shadowing)"
       }
     ]
   }
