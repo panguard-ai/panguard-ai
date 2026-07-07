@@ -757,8 +757,9 @@ export function setupCommand(): Command {
           const dataDir = join(homedir(), '.panguard-guard');
           // Honest agreement shown before the opt-in. States exactly what joining
           // does (contribute anonymized signatures incl. UNKNOWN threats + auto-
-          // receive community rules), and is precise about encryption: HTTPS/TLS in
-          // transit + anonymized on-device, NOT end-to-end encrypted.
+          // receive community rules), and is precise about encryption: anonymized
+          // on-device, then end-to-end sealed (JWE to the ingest key) so only the
+          // Threat Cloud backend can read it — verified live 2026-07-07.
           if (!options.yes && !options.json) {
             console.log();
             console.log(`  ${c.bold('Join Collective Defense (optional, off by default)')}`);
@@ -777,9 +778,9 @@ export function setupCommand(): Command {
             );
             console.log(c.dim('      community can turn a novel attack into a new rule,'));
             console.log(
-              c.dim('    · send it over an ENCRYPTED (HTTPS/TLS) connection, anonymized on your')
+              c.dim('    · anonymize it on your machine, then END-TO-END ENCRYPT it — sealed so')
             );
-            console.log(c.dim('      machine before sending (not end-to-end encrypted),'));
+            console.log(c.dim('      only the Threat Cloud backend can read it, not the network,'));
             console.log(c.dim('    · auto-update your detection rules from the community.'));
             console.log(
               c.dim('    NEVER shared: prompts, code, file contents, secrets, paths, hostname.')
