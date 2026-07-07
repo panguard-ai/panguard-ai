@@ -26,6 +26,9 @@ export default async function JsonLd({
           // eslint-disable-next-line react/no-array-index-key
           key={i}
           nonce={nonce}
+          // Browsers blank the DOM nonce attribute after CSP use, so the
+          // hydrated value legitimately differs from SSR — suppress the noise.
+          suppressHydrationWarning
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
         />
