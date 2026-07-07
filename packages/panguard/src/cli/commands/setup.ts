@@ -755,13 +755,40 @@ export function setupCommand(): Command {
         let tcUploadOptedIn = false;
         if (!options.remove && !options.skipGuard) {
           const dataDir = join(homedir(), '.panguard-guard');
+          // Honest agreement shown before the opt-in. States exactly what joining
+          // does (contribute anonymized signatures incl. UNKNOWN threats + auto-
+          // receive community rules), and is precise about encryption: HTTPS/TLS in
+          // transit + anonymized on-device, NOT end-to-end encrypted.
+          if (!options.yes && !options.json) {
+            console.log();
+            console.log(`  ${c.bold('Join Collective Defense (optional, off by default)')}`);
+            console.log(
+              c.dim('    If you agree, PanGuard connects to Threat Cloud and will:')
+            );
+            console.log(
+              c.dim('    · share minimal ANONYMIZED threat signatures — including UNKNOWN')
+            );
+            console.log(
+              c.dim('      suspicious behavior it cannot yet match to a rule (this is what lets')
+            );
+            console.log(c.dim('      the community turn a novel attack into a new rule),'));
+            console.log(
+              c.dim('    · send it over an ENCRYPTED (HTTPS/TLS) connection, anonymized on your')
+            );
+            console.log(c.dim('      machine before sending (not end-to-end encrypted),'));
+            console.log(c.dim('    · auto-update your detection rules from the community.'));
+            console.log(
+              c.dim('    NEVER shared: prompts, code, file contents, secrets, paths, hostname.')
+            );
+            console.log();
+          }
           const enableTC =
             !options.yes &&
             !options.json &&
             (await promptConfirm({
               message: {
-                en: 'Enable Threat Cloud collective defense? (optional, off by default)',
-                'zh-TW': '啟用 Threat Cloud 集體防禦？（選用，預設關閉）',
+                en: 'Agree and join Collective Defense? (auto-connect + auto-update rules)',
+                'zh-TW': '同意並加入集體防禦？（自動連線 + 規則自動更新）',
               },
               defaultValue: false,
               lang: L,
@@ -774,12 +801,14 @@ export function setupCommand(): Command {
             const guardConfig = loadConfig(tcConfigPath);
             const updatedConfig = {
               ...guardConfig,
-              // Both flags follow the one consent answer. The upload gate checks
-              // threatCloudUploadEnabled; telemetryEnabled is what
-              // ensureTelemetryConsent() reads back — keep them in lockstep so a
-              // single opt-in turns the whole collective-defense path on.
+              // One consent answer wires the whole collective-defense loop:
+              // contribute (upload + telemetry) AND receive (rule sync auto-updates).
+              // The upload gate checks threatCloudUploadEnabled; telemetryEnabled is
+              // what ensureTelemetryConsent() reads back; threatCloudRuleSyncEnabled
+              // turns on automatic community rule updates. All follow the one answer.
               threatCloudUploadEnabled: enableTC,
               telemetryEnabled: enableTC,
+              threatCloudRuleSyncEnabled: enableTC,
               threatCloudEndpoint: enableTC
                 ? (guardConfig.threatCloudEndpoint ?? 'https://tc.panguard.ai/api')
                 : guardConfig.threatCloudEndpoint,
@@ -796,10 +825,12 @@ export function setupCommand(): Command {
               if (enableTC) {
                 console.log(
                   c.green(
-                    `  ${symbols.pass} Threat Cloud enabled: ${updatedConfig.threatCloudEndpoint ?? 'https://tc.panguard.ai/api'}`
+                    `  ${symbols.pass} Connected to Threat Cloud: ${updatedConfig.threatCloudEndpoint ?? 'https://tc.panguard.ai/api'}`
                   )
                 );
-                console.log(c.dim('    Every scan strengthens the collective defense network.'));
+                console.log(
+                  c.dim('    Sharing anonymized signatures (incl. unknown threats); rules auto-update.')
+                );
               } else {
                 console.log(
                   c.dim(

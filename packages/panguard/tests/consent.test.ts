@@ -135,11 +135,12 @@ describe('askTelemetryConsent', () => {
 
     const result = await askTelemetryConsent();
     expect(result).toBe(true);
-    // The collective-defense disclosure enables both the usage-stats flag and
-    // the hash-only threat-sharing flag in one opt-in.
+    // One "I agree" wires the whole collective-defense loop: contribute
+    // (telemetry + upload) AND receive (rule sync auto-updates).
     expect(mockUpdateGuardConfig).toHaveBeenCalledWith({
       telemetryEnabled: true,
       threatCloudUploadEnabled: true,
+      threatCloudRuleSyncEnabled: true,
     });
   });
 
@@ -153,9 +154,25 @@ describe('askTelemetryConsent', () => {
 
     const result = await askTelemetryConsent();
     expect(result).toBe(false);
+    // Declining leaves every flag off — nothing connects, nothing syncs.
     expect(mockUpdateGuardConfig).toHaveBeenCalledWith({
       telemetryEnabled: false,
       threatCloudUploadEnabled: false,
+      threatCloudRuleSyncEnabled: false,
+    });
+  });
+
+  it('non-TTY leaves all three collective-defense flags OFF', async () => {
+    Object.defineProperty(process.stdin, 'isTTY', { value: false, writable: true });
+    mockLoadGuardConfig.mockReturnValue({});
+    mockExistsSync.mockReturnValue(true);
+
+    const result = await askTelemetryConsent();
+    expect(result).toBe(false);
+    expect(mockUpdateGuardConfig).toHaveBeenCalledWith({
+      telemetryEnabled: false,
+      threatCloudUploadEnabled: false,
+      threatCloudRuleSyncEnabled: false,
     });
   });
 });
