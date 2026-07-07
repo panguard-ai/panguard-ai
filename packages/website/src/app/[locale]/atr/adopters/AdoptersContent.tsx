@@ -91,22 +91,24 @@ const ADOPTERS: readonly Adopter[] = [
     category: 'standards',
     noteEn: 'Project Lead Mert Satilmaz merged with "Welcome to the team" greeting.',
     noteZh: 'Project Lead Mert Satilmaz 合併並以 "Welcome to the team" 致意。',
-    caveatEn: 'Third-party precize repo, NOT OWASP Foundation official.',
-    caveatZh: '第三方 precize repo，非 OWASP Foundation 官方 repo。',
+    caveatEn:
+      'PR #74 merged into the OWASP-org Agent Security Regression Harness project; PR #14 is a separate mapping in a third-party precize repo, not an OWASP Foundation publication.',
+    caveatZh:
+      'PR #74 併入 OWASP 組織的 Agent Security Regression Harness 專案;PR #14 是第三方 precize repo 的另一份對應,非 OWASP Foundation 官方出版。',
     prs: [
+      {
+        number: 74,
+        repo: 'OWASP/agent-security-regression-harness',
+        titleEn: 'Rule pack',
+        titleZh: '規則包',
+        date: '2026-05-11',
+      },
       {
         number: 14,
         repo: 'precize/Agentic-AI-Top10-Vulnerability',
         titleEn: 'OWASP Agentic mapping',
         titleZh: 'OWASP Agentic 對應',
         date: '2026-03-30',
-      },
-      {
-        number: 74,
-        repo: 'precize/Agent-Security-Regression-Harness',
-        titleEn: 'Rule pack',
-        titleZh: '規則包',
-        date: '2026-05-11',
       },
     ],
   },
