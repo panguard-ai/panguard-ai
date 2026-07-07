@@ -258,6 +258,52 @@ describe('installFor — data-loss safety (corrupt config is NEVER overwritten)'
     expect(installFor('claude-code')).toBe('already');
   });
 
+  it("REGRESSION: re-install with a DIFFERENT posture rewrites the hook ('updated'), never a silent 'already'", () => {
+    const h = sandbox();
+    const settings = join(h, '.claude', 'settings.json');
+
+    expect(installFor('claude-code')).toBe('installed'); // guarded (no flag)
+    // Posture change → the wired command must actually change.
+    expect(installFor('claude-code', 'enforce')).toBe('updated');
+    const wired = readFileSync(settings, 'utf-8');
+    expect(wired).toContain('pga hook run --platform claude-code --enforce');
+    // Same posture again → idempotent.
+    expect(installFor('claude-code', 'enforce')).toBe('already');
+    // Back to guarded strips the flag (advisory→guarded downgrades must land too).
+    expect(installFor('claude-code')).toBe('updated');
+    expect(readFileSync(settings, 'utf-8')).not.toContain('--enforce');
+  });
+
+  it('posture rewrite preserves user keys and any user-owned PreToolUse hooks', () => {
+    const h = sandbox();
+    const settings = join(h, '.claude', 'settings.json');
+    mkdirSync(join(h, '.claude'), { recursive: true });
+    writeFileSync(
+      settings,
+      JSON.stringify({
+        permissions: { allow: ['Bash(ls:*)'] },
+        hooks: {
+          PreToolUse: [{ matcher: 'Bash', hooks: [{ type: 'command', command: 'my-own' }] }],
+        },
+      })
+    );
+
+    expect(installFor('claude-code', 'advisory')).toBe('installed');
+    expect(installFor('claude-code', 'enforce')).toBe('updated');
+
+    const after = JSON.parse(readFileSync(settings, 'utf-8')) as {
+      permissions?: unknown;
+      hooks?: { PreToolUse?: Array<{ hooks?: Array<{ command?: string }> }> };
+    };
+    expect(after.permissions).toEqual({ allow: ['Bash(ls:*)'] });
+    const cmds = (after.hooks?.PreToolUse ?? []).flatMap((m) =>
+      (m.hooks ?? []).map((x) => x.command)
+    );
+    expect(cmds).toContain('my-own'); // user hook survived the rewrite
+    expect(cmds.some((cmd) => cmd?.endsWith('--enforce'))).toBe(true);
+    expect(cmds.some((cmd) => cmd?.includes('--advisory'))).toBe(false); // old posture gone
+  });
+
   it('aborts a corrupt config for every JSON round-trip platform', () => {
     const cases: Array<[Parameters<typeof installFor>[0], string[]]> = [
       ['codex', ['.codex', 'hooks.json']],

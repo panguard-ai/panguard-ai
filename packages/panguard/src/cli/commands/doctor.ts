@@ -488,7 +488,7 @@ function checkHookProtection(): CheckResult {
       detail: `Hook failed CLOSED (blocked a tool call) — ${status.reason} on host protocol "${
         status.platform || 'unknown'
       }"${status.at ? ` at ${status.at}` : ''}`,
-      fix: 'If PanGuard or the host agent was updated, re-register the hook with "pga guard install". A manual or test invocation also records this; the marker clears on the next healthy run',
+      fix: 'If PanGuard or the host agent was updated, re-register the hook with "pga hook install". A manual or test invocation also records this; the marker clears on the next healthy run',
     };
   }
   if (status.degraded) {

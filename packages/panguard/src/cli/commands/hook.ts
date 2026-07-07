@@ -647,6 +647,22 @@ const HOOK_CMD = (p: HookPlatform, posture: HookPosture = 'guarded'): string =>
 const TOOL_MATCHER = EVALUATED_TOOLS.join('|');
 
 /**
+ * The posture wired into an EXISTING serialized hook registration. The command
+ * is `pga hook run --platform <p>[ --enforce | --advisory]`, so the posture is
+ * recoverable from any serialization (a JSON.stringify'd settings object or a
+ * cline script body). installFor uses this to detect a posture CHANGE on
+ * re-install: the bare `pga hook run` prefix check alone would return 'already'
+ * and silently keep the OLD posture while the CLI claims the new one is active.
+ */
+function wiredPosture(serialized: string): HookPosture {
+  const m = serialized.match(/pga hook run[^"'\\\n]*/);
+  const cmd = m ? m[0] : '';
+  if (cmd.includes('--enforce')) return 'enforce';
+  if (cmd.includes('--advisory')) return 'advisory';
+  return 'guarded';
+}
+
+/**
  * Read an existing JSON config we are about to ROUND-TRIP (read → merge → write
  * back). The verdict MUST distinguish three cases, because conflating them
  * destroys user data:
@@ -787,7 +803,10 @@ export function withHookRemoved(settings: ClaudeSettings): ClaudeSettings {
 export function installFor(
   platform: HookPlatform,
   posture: HookPosture = 'guarded'
-): 'installed' | 'already' | 'error' {
+): 'installed' | 'updated' | 'already' | 'error' {
+  // 'already' means installed AND wired with the SAME posture. A posture change
+  // rewrites the entry and returns 'updated' — the old prefix-only idempotence
+  // check kept the previous posture while the CLI claimed the new one was live.
   lastInstallError = null;
   try {
     switch (platform) {
@@ -797,18 +816,28 @@ export function installFor(
         const settingsPath = claudeSettingsPath();
         const base = configOrAbort(settingsPath, 'Claude settings');
         if (base === null) return 'error';
-        const s = base as ClaudeSettings;
-        if (isHookInstalled(s)) return 'already';
+        let s = base as ClaudeSettings;
+        let updated = false;
+        if (isHookInstalled(s)) {
+          if (wiredPosture(JSON.stringify(s)) === posture) return 'already';
+          s = withHookRemoved(s);
+          updated = true;
+        }
         // withHookInstalled spreads `s`, preserving permissions/env/model/MCP keys.
         writeJson(settingsPath, withHookInstalled(s, HOOK_CMD('claude-code', posture)));
-        return 'installed';
+        return updated ? 'updated' : 'installed';
       }
       case 'codex': {
         const path = join(homedir(), '.codex', 'hooks.json');
         const base = configOrAbort(path, 'Codex hooks');
         if (base === null) return 'error';
-        const s = base as ClaudeSettings;
-        if (isHookInstalled(s)) return 'already';
+        let s = base as ClaudeSettings;
+        let updated = false;
+        if (isHookInstalled(s)) {
+          if (wiredPosture(JSON.stringify(s)) === posture) return 'already';
+          s = withHookRemoved(s);
+          updated = true;
+        }
         const hooks = { ...(s.hooks ?? {}) };
         const pre = Array.isArray(hooks.PreToolUse) ? [...hooks.PreToolUse] : [];
         pre.push({
@@ -816,17 +845,22 @@ export function installFor(
           hooks: [{ type: 'command', command: HOOK_CMD('codex', posture) }],
         });
         writeJson(path, { ...s, hooks: { ...hooks, PreToolUse: pre } });
-        return 'installed';
+        return updated ? 'updated' : 'installed';
       }
       case 'gemini': {
         const path = join(homedir(), '.gemini', 'settings.json');
         const base = configOrAbort(path, 'Gemini settings');
         if (base === null) return 'error';
         const s = base as { hooks?: { BeforeTool?: unknown[] }; [k: string]: unknown };
-        const before = Array.isArray(s.hooks?.BeforeTool)
+        let before = Array.isArray(s.hooks?.BeforeTool)
           ? [...(s.hooks!.BeforeTool as unknown[])]
           : [];
-        if (JSON.stringify(before).includes('pga hook run')) return 'already';
+        let updated = false;
+        if (JSON.stringify(before).includes('pga hook run')) {
+          if (wiredPosture(JSON.stringify(before)) === posture) return 'already';
+          before = before.filter((e) => !JSON.stringify(e ?? null).includes('pga hook run'));
+          updated = true;
+        }
         before.push({
           matcher: 'run_shell_command|write_file|replace',
           hooks: [
@@ -834,7 +868,7 @@ export function installFor(
           ],
         });
         writeJson(path, { ...s, hooks: { ...(s.hooks ?? {}), BeforeTool: before } });
-        return 'installed';
+        return updated ? 'updated' : 'installed';
       }
       case 'cursor': {
         const path = join(homedir(), '.cursor', 'hooks.json');
@@ -842,7 +876,16 @@ export function installFor(
         if (base === null) return 'error';
         const s = base as { version?: number; hooks?: Record<string, unknown[]> };
         const hooks = { ...(s.hooks ?? {}) };
-        if (JSON.stringify(hooks).includes('pga hook run')) return 'already';
+        let updated = false;
+        if (JSON.stringify(hooks).includes('pga hook run')) {
+          if (wiredPosture(JSON.stringify(hooks)) === posture) return 'already';
+          for (const ev of Object.keys(hooks)) {
+            const arr = hooks[ev];
+            if (Array.isArray(arr))
+              hooks[ev] = arr.filter((e) => !JSON.stringify(e ?? null).includes('pga hook run'));
+          }
+          updated = true;
+        }
         for (const ev of ['beforeShellExecution', 'beforeMCPExecution']) {
           const arr = Array.isArray(hooks[ev]) ? [...(hooks[ev] as unknown[])] : [];
           // failClosed must stay FALSE: if the `pga` binary is later removed
@@ -856,7 +899,7 @@ export function installFor(
           hooks[ev] = arr;
         }
         writeJson(path, { version: 1, ...s, hooks });
-        return 'installed';
+        return updated ? 'updated' : 'installed';
       }
       case 'windsurf': {
         const path = join(homedir(), '.codeium', 'windsurf', 'hooks.json');
@@ -864,29 +907,45 @@ export function installFor(
         if (base === null) return 'error';
         const s = base as { hooks?: Record<string, unknown[]> };
         const hooks = { ...(s.hooks ?? {}) };
-        if (JSON.stringify(hooks).includes('pga hook run')) return 'already';
+        let updated = false;
+        if (JSON.stringify(hooks).includes('pga hook run')) {
+          if (wiredPosture(JSON.stringify(hooks)) === posture) return 'already';
+          for (const ev of Object.keys(hooks)) {
+            const arr = hooks[ev];
+            if (Array.isArray(arr))
+              hooks[ev] = arr.filter((e) => !JSON.stringify(e ?? null).includes('pga hook run'));
+          }
+          updated = true;
+        }
         for (const ev of ['pre_run_command', 'pre_write_code', 'pre_mcp_tool_use']) {
           const arr = Array.isArray(hooks[ev]) ? [...(hooks[ev] as unknown[])] : [];
           arr.push({ command: HOOK_CMD('windsurf', posture), show_output: true });
           hooks[ev] = arr;
         }
         writeJson(path, { ...s, hooks });
-        return 'installed';
+        return updated ? 'updated' : 'installed';
       }
       case 'cline': {
         // Filename-based: an executable named after the event. macOS/Linux only.
         // Not a JSON round-trip — the file is our own script, so there is no user
-        // config to clobber; we only skip if it already references our hook.
+        // config to clobber; we only skip if it already references our hook with
+        // the SAME posture (a posture change rewrites our own script).
         const dir = join(homedir(), 'Documents', 'Cline', 'Rules', 'Hooks');
         const file = join(dir, 'PreToolUse');
-        if (existsSync(file) && readFileSync(file, 'utf-8').includes('pga hook run'))
-          return 'already';
+        let updated = false;
+        if (existsSync(file)) {
+          const body = readFileSync(file, 'utf-8');
+          if (body.includes('pga hook run')) {
+            if (wiredPosture(body) === posture) return 'already';
+            updated = true;
+          }
+        }
         mkdirSync(dir, { recursive: true });
         writeFileSync(file, `#!/usr/bin/env bash\nexec ${HOOK_CMD('cline', posture)}\n`, {
           mode: 0o755,
         });
         chmodSync(file, 0o755);
-        return 'installed';
+        return updated ? 'updated' : 'installed';
       }
     }
   } catch (err) {
@@ -898,7 +957,7 @@ export function installFor(
 /** Claude-only install, kept for `pga up` back-compat. */
 export function installHook(): 'installed' | 'already' {
   const r = installFor('claude-code');
-  return r === 'error' ? 'already' : r;
+  return r === 'installed' || r === 'updated' ? 'installed' : 'already';
 }
 
 /**
@@ -1085,14 +1144,18 @@ export function hookCommand(): Command {
         console.log(`  ${c.caution(`Unknown platform: ${opts.platform}`)}`);
         return;
       }
+      const results: string[] = [];
       for (const p of targets) {
         const r = installFor(p, posture);
+        results.push(r);
         const tag =
           r === 'installed'
             ? c.safe('installed')
-            : r === 'already'
-              ? c.dim('already')
-              : c.caution('error');
+            : r === 'updated'
+              ? c.safe('updated')
+              : r === 'already'
+                ? c.dim('already')
+                : c.caution('error');
         console.log(`  ${p.padEnd(12)} ${tag}`);
         // On error, surface WHY (e.g. corrupt config we refused to overwrite)
         // so the user can fix it — never silently skip a data-loss abort.
@@ -1102,14 +1165,20 @@ export function hookCommand(): Command {
       }
       // Be HONEST about the posture that was actually wired — never imply
       // blocking the user didn't opt into, nor hide that guarded blocks criticals.
-      const postureLine =
-        posture === 'enforce'
-          ? 'Posture: ENFORCE — every flagged tool call is blocked.'
-          : posture === 'advisory'
-            ? 'Posture: ADVISORY — threats are detected and logged, never blocked. Re-run with --enforce to block.'
-            : 'Posture: GUARDED — critical/high-confidence threats are BLOCKED; lower-confidence matches are advisory. Use --enforce to block those too, or --advisory for detect-only.';
-      console.log(`  ${c.dim(postureLine)}`);
-      console.log(`  ${c.dim('Restart the host agent for the hook to take effect.')}`);
+      // Accurate for every non-error result: 'installed'/'updated' just wrote
+      // this posture, and 'already' now means the SAME posture was verified
+      // (a posture change returns 'updated', never 'already'). All-error runs
+      // wired nothing, so claim nothing.
+      if (results.some((r) => r !== 'error')) {
+        const postureLine =
+          posture === 'enforce'
+            ? 'Posture: ENFORCE — every flagged tool call is blocked.'
+            : posture === 'advisory'
+              ? 'Posture: ADVISORY — threats are detected and logged, never blocked. Re-run with --enforce to block.'
+              : 'Posture: GUARDED — critical/high-confidence threats are BLOCKED; lower-confidence matches are advisory. Use --enforce to block those too, or --advisory for detect-only.';
+        console.log(`  ${c.dim(postureLine)}`);
+        console.log(`  ${c.dim('Restart the host agent for the hook to take effect.')}`);
+      }
     });
 
   cmd
