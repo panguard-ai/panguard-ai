@@ -51,13 +51,14 @@ export interface SealedEnvelope {
  * this file or anywhere in the open-source client.
  */
 export const INGEST_KEYS: readonly IngestKey[] = [
-  // Example (replace `x` with the real KMS-provisioned public key, then ship):
-  // {
-  //   kid: 'ingest-2026-07',
-  //   publicJwk: { kty: 'OKP', crv: 'X25519', x: '<base64url-public>' },
-  //   notBefore: '2026-07-01T00:00:00Z',
-  //   notAfter: '2027-07-01T00:00:00Z',
-  // },
+  {
+    kid: 'ingest-2026-07',
+    // X25519 PUBLIC key only (no `d`). The matching PRIVATE key lives solely in the
+    // backend env (TC_INGEST_PRIVATE_JWK) — never here. Provisioned 2026-07-07.
+    publicJwk: { kty: 'OKP', crv: 'X25519', x: '7I14BpE3_RLBf_2dvZVBNtFCRW5C8QYrLR_c7sPl1Ww' },
+    notBefore: '2026-07-01T00:00:00Z',
+    notAfter: '2027-07-01T00:00:00Z',
+  },
 ];
 
 /**
