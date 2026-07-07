@@ -20,7 +20,20 @@ export default function CountUp({
 
   useEffect(() => {
     const el = ref.current;
-    if (!el || hasAnimated.current) return;
+    // Target changed after the animation already ran (e.g. live stats
+    // resolved) — snap to the fresh value instead of freezing stale.
+    if (hasAnimated.current) {
+      setVal(target);
+      return;
+    }
+    if (!el) return;
+
+    // Reduced motion: show the final value immediately, no count animation.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      hasAnimated.current = true;
+      setVal(target);
+      return;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {

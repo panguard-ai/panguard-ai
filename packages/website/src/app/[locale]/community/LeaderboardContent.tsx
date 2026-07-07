@@ -49,18 +49,31 @@ export default function LeaderboardContent() {
 
       {loading && <p className="text-brand-sage text-base">Loading contributors...</p>}
 
-      {error && <p className="text-red-400 text-base">Could not load leaderboard: {error}</p>}
-
-      {!loading && !error && contributors.length === 0 && (
-        <div className="p-12 text-center bg-surface-1 rounded-xl border border-border">
-          <p className="text-xl text-text-primary font-semibold">Be the first contributor!</p>
-          <p className="text-text-secondary mt-2">
-            Run{' '}
+      {/* Graceful empty-state: shown whenever the leaderboard has no data to
+          display — whether the API errored, returned ok=false, or is simply
+          empty. Never surfaces a raw HTTP status to users. */}
+      {!loading && (error || contributors.length === 0) && (
+        <div className="p-10 sm:p-12 text-center bg-surface-1 rounded-xl border border-border">
+          <p className="text-xl text-text-primary font-semibold">
+            The leaderboard is warming up
+          </p>
+          <p className="text-text-secondary mt-3 max-w-md mx-auto leading-relaxed">
+            Live rankings appear here as contributors submit and promote rules. Be the
+            first — run{' '}
             <code className="bg-surface-2 px-2 py-0.5 rounded text-sm">
               npx panguard-guard scan
             </code>{' '}
             to start protecting the community.
           </p>
+          <a
+            href="https://github.com/Agent-Threat-Rule/agent-threat-rules/graphs/contributors"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 mt-6 text-sm font-semibold text-brand-sage hover:text-brand-sage-light transition-colors"
+          >
+            View contributors on GitHub
+            <span aria-hidden="true">-&gt;</span>
+          </a>
         </div>
       )}
 
@@ -134,6 +147,59 @@ export default function LeaderboardContent() {
           <li>Guard automatically proposes rules from threats it detects</li>
           <li>Rules that pass community review protect everyone</li>
         </ol>
+      </div>
+
+      {/* Static, always-rendered value section so the page carries real content
+          even when the live leaderboard API is unavailable. */}
+      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+        <div className="p-6 bg-surface-1 rounded-xl border border-border">
+          <p className="font-mono text-[10px] uppercase tracking-micro text-brand-sage">
+            Propose
+          </p>
+          <p className="text-text-primary font-semibold mt-3">Turn a threat into a rule</p>
+          <p className="text-text-secondary text-sm mt-2 leading-relaxed">
+            Guard surfaces suspicious skill behavior and drafts a detection rule from the
+            evidence, so contributing starts from real signal, not guesswork.
+          </p>
+        </div>
+        <div className="p-6 bg-surface-1 rounded-xl border border-border">
+          <p className="font-mono text-[10px] uppercase tracking-micro text-brand-sage">
+            Review
+          </p>
+          <p className="text-text-primary font-semibold mt-3">Community + automated review</p>
+          <p className="text-text-secondary text-sm mt-2 leading-relaxed">
+            Each proposal is checked against a benign corpus for false positives before it can
+            be promoted, keeping the shared ruleset precise.
+          </p>
+        </div>
+        <div className="p-6 bg-surface-1 rounded-xl border border-border">
+          <p className="font-mono text-[10px] uppercase tracking-micro text-brand-sage">
+            Protect
+          </p>
+          <p className="text-text-primary font-semibold mt-3">Everyone gets safer</p>
+          <p className="text-text-secondary text-sm mt-2 leading-relaxed">
+            Promoted rules ship to every Guard install. One contributor&apos;s catch protects
+            thousands of downstream agents.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-8 p-6 sm:p-8 bg-surface-1 rounded-xl border border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <p className="text-text-primary font-semibold">Contribute on GitHub</p>
+          <p className="text-text-secondary text-sm mt-1 leading-relaxed">
+            The Agent Threat Rules standard is open source and MIT-licensed. Browse rules, open
+            issues, and submit pull requests.
+          </p>
+        </div>
+        <a
+          href="https://github.com/Agent-Threat-Rule/agent-threat-rules"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="sheen lift rounded-xl border border-border text-text-primary px-6 py-3 font-semibold hover:border-border-hover hover:bg-surface-1 transition-colors duration-300 ease-out-quint shrink-0 text-center"
+        >
+          Open the repository
+        </a>
       </div>
     </section>
   );

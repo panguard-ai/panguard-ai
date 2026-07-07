@@ -1038,7 +1038,7 @@ export const ATR_RULES_COMPILED = [
     severity: 'high',
     category: 'tool-poisoning',
     scan_target: 'mcp',
-    rule_version: 2,
+    rule_version: 1,
     patterns: [
       {
         field: 'tool_args',
@@ -1049,8 +1049,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_args',
         pattern:
-          '(;|&&|\\|\\|)\\s*(?:sudo\\s+)?(?:curl\\s+(?:-\\S+\\s+)*[\'"]?https?://(?!localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0)|wget\\s+(?:-\\S+\\s+)*[\'"]?https?://(?!localhost|127\\.)|\\bnc\\b\\s+-?[a-z0-9]|ncat\\s+\\S|\\b(?:ba)?sh\\s+-[ic]|python[0-9]?\\s+-c|perl\\s+-e|ruby\\s+-e|node\\s+-e|\\beval\\s|rm\\s+-[rf]|cat\\s+/etc/(?:passwd|shadow|sudoers)|whoami|\\bid\\b\\s*(?:;|&|\\||$)|uname\\s+-a|base64\\s+(?:-d|--decode)|ifconfig|>&\\s*/dev/tcp)|[$`]\\([^)`]{0,80}(?:curl|wget|\\bnc\\b|\\bbash\\b|\\bsh\\s+-|whoami|\\bid\\b|base64\\s+-d|/etc/(?:passwd|shadow))',
-        desc: 'Shell metacharacter chained to a genuinely dangerous command \u2014 external network fetch, pipe-to-shell / interpreter one-liner, recon (whoami/id/uname -a), or sensitive-file read (v2 tightened; legit build chains like "npm i && bash setup.sh", "&& python -m pytest", "| jq" no longer fire)',
+          '(;|&&|\\|\\||\\$\\(|`|\\|\\s*\\w)\\s*.{0,50}(curl|wget|nc|ncat|bash|sh|zsh|python|ruby|perl|node|php|powershell|cmd|eval|exec|system|rm\\s+-|cat\\s+/etc|whoami|id\\b|uname|hostname|ifconfig|ipconfig|net\\s+user|net\\s+localgroup)',
+        desc: 'Shell metacharacter injection followed by dangerous commands',
       },
       {
         field: 'tool_name',
@@ -1590,6 +1590,48 @@ export const ATR_RULES_COMPILED = [
     rule_version: 1,
     patterns: [
       {
+        field: 'tool_name',
+        pattern:
+          '(?i)(?:exec|execute|shell|bash|cmd|terminal|subprocess|os_command|system_call|run_command|powershell)',
+        desc: 'System shell or command execution tool invocation',
+      },
+      {
+        field: 'tool_name',
+        pattern:
+          '(?i)(?:modify_permissions?|grant_access|elevate|set_role|change_acl|chmod|chown|sudo|setuid|setgid)',
+        desc: 'Permission modification or privilege elevation tools',
+      },
+      {
+        field: 'tool_name',
+        pattern:
+          '(?i)(?:create_user|delete_user|modify_user|reset_password|manage_roles?|assign_role|revoke_role|add_admin)',
+        desc: 'User management and role assignment operations',
+      },
+      {
+        field: 'tool_name',
+        pattern:
+          '(?i)(?:drop_(?:database|table|index)|truncate_table|alter_schema|create_database|db_admin|migrate_database)',
+        desc: 'Database administration and schema operations',
+      },
+      {
+        field: 'tool_name',
+        pattern:
+          '(?i)(?:update_config|modify_settings|change_environment|set_env|deploy|restart_service|stop_service|kill_process)',
+        desc: 'System configuration and service management operations',
+      },
+      {
+        field: 'tool_name',
+        pattern:
+          '(?i)(?:manage_firewall|update_security_group|modify_iam|create_api_key|rotate_secret|manage_certificates?)',
+        desc: 'Security infrastructure management operations',
+      },
+      {
+        field: 'tool_name',
+        pattern:
+          '(?i)(?:access_audit_log|clear_logs?|purge_logs?|modify_audit|disable_(?:monitoring|logging|alerting))',
+        desc: 'Audit tampering and monitoring evasion operations',
+      },
+      {
         field: 'tool_args',
         pattern:
           '(?i)(?:--(?:privileged|no-sandbox|cap-add|security-opt)|allowPrivilegeEscalation|\\b(?:admin|root|superuser|sudo)\\s*=|["\'](?:admin|root|superuser|sudo)["\']|"role"\\s*:\\s*"(?:admin|root|superuser|sudo)")',
@@ -1612,6 +1654,11 @@ export const ATR_RULES_COMPILED = [
         pattern:
           '(?i)(?:kubectl\\s+exec|kubectl\\s+(?:create|apply)\\s+.*(?:clusterrole|rolebinding)|kubectl\\s+auth\\s+can-i)',
         desc: 'Kubernetes privilege escalation commands',
+      },
+      {
+        field: 'tool_name',
+        pattern: '(?i)(?:write_file|delete_file|rm\\s+-rf|remove_directory|format_disk|wipe)',
+        desc: 'Destructive file system operations',
       },
       {
         field: 'tool_args',
@@ -1968,6 +2015,12 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_name',
         pattern:
+          '(?i)(?:exec|execute|run|shell)[-_]?(?:cmd|command|script|code)[-_]?(?:safe|secure|sandbox|trusted|verified)?',
+        desc: 'Shell execution tools with deceptive safety suffixes',
+      },
+      {
+        field: 'tool_name',
+        pattern:
           '(?i)(?:official|verified|trusted|authentic|real|original)[-_](?:filesystem|github|database|slack|aws|gcp|azure)(?![-_]tools\\b)',
         desc: 'Tools using trust-implying prefixes to impersonate legitimate tools (excludes established -tools packages)',
       },
@@ -2167,12 +2220,12 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'tool-poisoning',
     scan_target: 'mcp',
-    rule_version: 2,
+    rule_version: 1,
     patterns: [
       {
         field: 'tool_args',
         pattern:
-          '(?i)(;|&&|\\|\\||`|\\$\\()\\s*(whoami|\\bid\\b|uname\\s+-a|curl\\s+(?:-\\S+\\s+)*https?://(?!localhost|127\\.)|wget\\s+https?://(?!localhost|127\\.)|\\bnc\\b\\s|ncat\\s|cat\\s+/etc/(?:passwd|shadow|sudoers)|\\b(?:ba)?sh\\s+-[ic]|python[0-9]?\\s+-c|base64\\s+-d|rm\\s+-[rf])',
+          '(?i)(;|&&|\\|\\||`|\\$\\()\\s*(cat|ls|id|whoami|uname|pwd|env|curl|wget|nc|bash|sh|python)',
       },
       {
         field: 'tool_args',
@@ -2626,6 +2679,606 @@ export const ATR_RULES_COMPILED = [
         pattern:
           "(?i)(?:if\\s+you\\s+(?:don'?t|do\\s+not)\\s+(?:approve|act|respond).{0,20}(?:now|immediately|quickly)).*(?:irreversible|permanent|catastroph|disaster|lost\\s+forever|too\\s+late)",
         desc: 'Fear-based urgency to force hasty human approval',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00080',
+    title: 'Encoding-Based Prompt Injection Evasion',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(ignore|disregard|forget|override)\\b.{0,40}\\b(instruction|rule|system|prompt)\\b.{0,60}(base64|atob|btoa|\\\\x[0-9a-f]{2}|\\\\u[0-9a-f]{4})',
+        desc: 'Prompt override combined with encoding function references',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)(eval|decode|atob|fromCharCode|String\\.fromCodePoint)\\s*\\(\\s*[\'"]([A-Za-z0-9+/=]{20,}|\\\\x[0-9a-f]{2})',
+        desc: 'Runtime decoding of encoded payload',
+      },
+      {
+        field: 'user_input',
+        pattern: '(?i)(\\\\u0{0,2}[0-9a-f]{2,4}\\s*){5,}',
+        desc: 'Sequence of Unicode escape characters forming hidden instructions',
+      },
+      {
+        field: 'user_input',
+        pattern: '\\xE2\\x80\\x8F|\\xE2\\x80\\xAE|\\u200F|\\u202E|\\u2066|\\u2067|\\u2068|\\u2069',
+        desc: 'RTL override or bidi control characters used for visual spoofing',
+      },
+      {
+        field: 'user_input',
+        pattern: '(?i)xn--[a-z0-9]{4,}\\.\\s*.{0,30}\\b(ignore|new instructions|system prompt)',
+        desc: 'Punycode domain combined with injection keywords',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00081',
+    title: 'Semantic Evasion via Multi-Turn Prompt Injection',
+    severity: 'critical',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(remember|recall)\\s+.{0,30}(earlier|previous|first)\\s+.{0,30}(instruction|task|told you|asked you)\\b',
+        desc: 'Callback reference to planted instructions from earlier turns',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(now|okay|good|great|perfect)\\s*[,.]?\\s*(execute|perform|do|carry out|run|complete)\\s+.{0,20}(step|phase|part)\\s*(two|2|three|3|ii|iii|b|c).{0,60}(override|bypass|ignore|disable|remove|skip|disregard).{0,30}(safety|filter|guard|rules?|restrict|securit|polic)',
+        desc: 'Multi-phase attack activation trigger with malicious context',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(pretend|imagine|roleplay|hypothetical|scenario|simulation)\\s+.{0,50}(no\\s+(rules|restrictions|filters|limits|guardrails)|bypass|unrestricted)',
+        desc: 'Roleplay-based semantic evasion to bypass restrictions',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)(as\\s+I\\s+mentioned|like\\s+I\\s+said|per\\s+our\\s+agreement|as\\s+we\\s+discussed)\\s+.{0,40}(ignore|override|disregard|skip)\\s+.{0,20}(safety|filter|guard|rules)',
+        desc: 'False prior agreement reference to legitimize malicious instruction',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00082',
+    title: 'Behavioral Fingerprint Detection Evasion',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(spoof|fake|mimic|clone|replicate|impersonate)\\s+.{0,30}\\b(behavio(u?r|ral)|fingerprint|profile|signature|pattern)\\b',
+        desc: 'Attempt to spoof or replicate behavioral fingerprints',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(bypass|evade?|circumvent|avoid|defeat)\\s+.{0,30}\\b(drift|anomaly|behavio(u?r|ral))\\s*(detect|monitor|track|analy)',
+        desc: 'Explicit evasion of drift or behavioral detection systems',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(gradually|incrementally|slowly|step.?by.?step)\\s+.{0,40}(introduc|add|enable|unlock|escalat)\\w*\\s+.{0,20}(capabilit|permiss|function|access|privileg)',
+        desc: 'Gradual capability escalation to avoid drift triggers',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(maintain|keep|preserve|stay within)\\s+.{0,20}(normal|baseline|expected|typical)\\s+.{0,20}(behavio|pattern|profile|range)\\b.{0,40}(while|but|then)\\s+.{0,30}(execut|run|perform|inject)',
+        desc: 'Instructions to maintain normal appearance while executing malicious actions',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00083',
+    title: 'Indirect Prompt Injection via Tool Responses',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)\\b(ignore|disregard|forget|override|replace)\\s+.{0,20}(all\\s+)?(previous|prior|above|original|system)\\s+(instructions?|prompts?|rules?|context)',
+        desc: 'Instruction override payload in tool response',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)(\\[SYSTEM\\]|\\[INST\\]|<\\|system\\|>|<\\|im_start\\|>system|<<SYS>>)\\s*.{1,200}',
+        desc: 'Fake system prompt delimiters injected in tool response',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)\\b(you\\s+are\\s+now|new\\s+instructions?|your\\s+(real|true|actual|new)\\s+(purpose|role|task|instruction))\\b',
+        desc: 'Identity/role reassignment payload in external content',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)(<!--\\s*|/\\*\\s*|#\\s*)(ignore|override|new instruction|system prompt|you are now).{5,}',
+        desc: 'Hidden injection in code comments within tool response',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00084',
+    title: 'Structured Data Injection via JSON/CSV Payloads',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)["\']\\s*:\\s*["\']\\s*(ignore|disregard|override|forget)\\s+(all\\s+)?(previous|prior|system|original)\\s+(instructions?|rules?|prompts?)',
+        desc: 'Injection payload inside JSON string value',
+      },
+      {
+        field: 'user_input',
+        pattern: '(?i)(,|;|\\|)\\s*(ignore|override|new role|you are now|system prompt|<\\|).{5,}',
+        desc: 'Injection payload in CSV/delimited field value',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)<[a-z]+[^>]*>\\s*(ignore|disregard|override|forget)\\s+(all\\s+)?(previous|prior|system)\\s+(instructions?|rules?|prompts?)\\s*</[a-z]+>',
+        desc: 'Injection payload inside XML element',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)(instructions?|prompt|role|system)\\s*:\\s*[|>]?\\s*\\n\\s*(ignore|override|disregard|you are now|new instructions)',
+        desc: 'Injection payload in YAML multi-line value',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00085',
+    title: 'Multi-Layer Security Audit Evasion',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(skip|bypass|disable|turn\\s*off|deactivate)\\s+.{0,20}(audit|security|safety|validation|verification|check|filter|layer|scan)\\b',
+        desc: 'Explicit instruction to skip security audit layers',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(mark|flag|set|report)\\s+.{0,15}(as\\s+)?(safe|trusted|verified|approved|clean|benign|whitelisted)\\b.{0,30}(skip|bypass|without)\\s+.{0,15}(check|review|audit|scan)',
+        desc: 'Attempt to self-certify as trusted to bypass checks',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(pass|clear|satisfy)\\s+.{0,15}(all\\s+)?(audit|security|safety)\\s+(layer|level|stage|check|gate)s?\\b',
+        desc: 'Payload claiming to have passed audit layers',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(trust\\s*score|safety\\s*rating|risk\\s*level|confidence\\s*score)\\s*[=:]\\s*(100|high|max|trusted|0\\.?0?\\s*(risk)?)',
+        desc: 'Manipulation of trust or safety score values',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00086',
+    title: 'Visual Spoofing via RTL Override, Punycode, and Homoglyph Injection',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern: '[\\u200E\\u200F\\u202A-\\u202E\\u2066-\\u2069]',
+        desc: 'Bidirectional text control characters (RTL/LTR overrides)',
+      },
+      {
+        field: 'user_input',
+        pattern: '(?i)xn--[a-z0-9]{4,}\\.[a-z]{2,}',
+        desc: 'Punycode-encoded internationalized domain name',
+      },
+      {
+        field: 'user_input',
+        pattern: '[\\u0400-\\u04FF][a-zA-Z]|[a-zA-Z][\\u0400-\\u04FF]',
+        desc: 'Mixed Cyrillic and Latin characters (homoglyph attack)',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '[\\u3400-\\u4DBF\\u4E00-\\u9FFF\\uF900-\\uFAFF][a-zA-Z]{2,}|[a-zA-Z]{2,}[\\u3400-\\u4DBF\\u4E00-\\u9FFF\\uF900-\\uFAFF]',
+        desc: 'CJK compatibility ideographs mixed with Latin text (homoglyph confusion)',
+      },
+      {
+        field: 'user_input',
+        pattern: '[\\u0430\\u0435\\u043E\\u0440\\u0441\\u0443\\u0445]{2,}',
+        desc: 'Cyrillic characters visually identical to Latin (a, e, o, p, c, y, x)',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00087',
+    title: 'Detection Rule Probing and Evasion Testing',
+    severity: 'medium',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(what|which|list|show|reveal|tell me)\\s+.{0,20}(word|phrase|pattern|string|input|keyword)s?\\s+.{0,20}(block|filter|flag|trigger|detect|reject|ban)',
+        desc: 'Probing for blocked keywords or trigger patterns',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(test|check|probe|try|see if)\\s+.{0,15}(filter|detection|guard|safety|rule|block)\\b',
+        desc: 'Explicit filter testing language',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(what\\s+(happens|would happen|do you do)|how\\s+do\\s+you\\s+(respond|react|handle))\\s+.{0,20}(if I|when I|when someone)\\s+.{0,20}(inject|bypass|ignore|override|hack)',
+        desc: 'Probing agent response to injection techniques',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(repeat|echo|output|print|say)\\s+.{0,15}(exactly|verbatim|word.?for.?word)\\s+.{0,30}(system|initial|original|hidden)\\s+(prompt|instruction|message|context)',
+        desc: 'Attempting to extract system prompt through exact repetition',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00088',
+    title: 'Adaptive Countermeasure Against Behavioral Monitoring',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(reset|clear|zero|wipe|flush)\\s+.{0,20}(behavio(u?r|ral)|anomaly|drift|baseline|monitoring)\\s*(log|score|data|history|counter|metric)',
+        desc: 'Instruction to reset behavioral monitoring data',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(suppress|hide|mask|conceal|silence)\\s+.{0,20}(alert|alarm|warning|flag|anomal|signal|notification)',
+        desc: 'Instruction to suppress anomaly alerts',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(report|return|send|output|emit)\\s+.{0,20}(normal|healthy|clean|safe|no\\s*anomal|all\\s*clear|status\\s*ok)',
+        desc: 'Instruction to falsify monitoring status reports',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(disable|stop|pause|halt|suspend|kill)\\s+.{0,20}(monitor|log|track|audit|telemetry|observ)',
+        desc: 'Attempt to disable monitoring and logging systems',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00089',
+    title: 'Polymorphic Skill and Capability Aliasing Attack',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(rename|alias|remap|redefine|rebind)\\s+.{0,20}(function|tool|skill|capability|command|action|method)\\s+.{0,30}(to|as|into)\\s+.{0,20}(pass|bypass|evade|avoid|trick|fool|disguise|hide)',
+        desc: 'Renaming or aliasing tool functions with evasion intent',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(register|create|define|add)\\s+.{0,10}(new\\s+)?(tool|skill|function|capability)\\s+.{0,50}(exec|eval|shell|system|subprocess|os\\.)',
+        desc: 'Registering new tool capability with dangerous execution primitives',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(call|invoke|execute|run|use)\\s+.{0,10}(tool|function|skill)\\s+[\'"][a-z_]+[\'"]\\s+.{0,20}(but|actually|really|which)\\s+.{0,20}(runs?|executes?|calls?|does)',
+        desc: 'Invoking a tool by alias that actually performs a different action',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(dynamic|runtime|lazy|deferred|on.?demand)\\s+(load|generat|compil|creat|build|assembl)\\w*\\s+.{0,20}(payload|code|function|script|skill)',
+        desc: 'Dynamic generation of code or payloads at runtime to evade static analysis',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00090',
+    title: 'Threat Intelligence Exfiltration and Rule Enumeration',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(list|show|reveal|dump|export|display|print|output)\\s+.{0,15}(all\\s+)?(detection|security|threat|ATR|YARA|sigma)\\s*(rules?|signatures?|patterns?|config|logic)',
+        desc: 'Request to enumerate detection rules or signatures',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(what|how|describe|explain)\\s+.{0,20}(audit|security|detection|filter|guard)\\s*(system|pipeline|process|mechanism|check|layer|logic)\\s+.{0,20}(work|function|operat|configured|implemented)',
+        desc: 'Probing how security audit systems are configured',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(extract|exfiltrate|steal|copy|leak|send|transmit)\\s+.{0,20}(security|audit|detection|threat|rule|config|credential|secret|key|token)',
+        desc: 'Attempt to exfiltrate security configuration or credentials',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(regex|pattern|rule|signature)\\s+(used|employed|deployed|running)\\s+.{0,20}(detect|block|filter|flag|catch)\\b',
+        desc: 'Probing specific regex patterns used in detection',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00091',
+    title: 'Advanced Structured Data Injection with Nested Payloads',
+    severity: 'critical',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\{[^}]*\\{[^}]*["\']\\s*:\\s*["\'][^"\']*\\b(ignore|override|disregard|forget)\\s+(previous|system|all)\\b[^"\']*["\']',
+        desc: 'Injection payload nested inside multi-level JSON objects',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\\\n|\\\\r|\\\\t|%0[aAdD]|%09.{0,30}(ignore|override|system prompt|new instructions)',
+        desc: 'Injection using escaped whitespace characters to hide payload boundaries',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)(\\{|\\[)\\s*["\']__proto__|constructor|prototype["\']\\s*:\\s*.{0,40}(ignore|override|exec|eval|system)',
+        desc: 'Prototype pollution combined with injection in JSON',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)["\']\\s*\\+\\s*["\']|["\']\\s*\\.concat\\(|String\\.raw\\s*`[^`]*\\b(ignore|override|system)\\b',
+        desc: 'String concatenation to assemble injection payload across data fields',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00092',
+    title: 'Multi-Agent Consensus Poisoning and Sybil Attack',
+    severity: 'critical',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(vote|approve|endorse|confirm|agree)\\s+.{0,20}(as|on behalf of|representing|for)\\s+.{0,20}(multiple|all|every|several|many)\\s+(agent|node|peer|participant|member)',
+        desc: 'Attempting to cast votes on behalf of multiple agents',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(forge|fake|spoof|fabricat|simulat)\\w*\\s+.{0,20}(consensus|vote|ballot|proposal|approval|quorum)',
+        desc: 'Forging consensus votes or proposals',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(create|spawn|register|generate)\\s+.{0,10}(multiple|many|several|\\d{2,})\\s+(fake|dummy|puppet|sybil|sock.?puppet)\\s.{0,15}(agent|identit|account|node|peer)',
+        desc: 'Creating Sybil identities for consensus manipulation',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(manipulat|poison|corrupt|rig|stuff)\\w*\\s+.{0,15}(the\\s+)?(consensus|voting|election|proposal|decision|quorum)\\b',
+        desc: 'Direct manipulation of consensus mechanisms',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(impersonat\\w*|pretend\\s+to\\s+be|act\\s+as|pose\\s+as)\\s+.{0,15}(agent|node|peer|validator|participant).{1,45}(vote|approve|submit|propose)',
+        desc: 'Impersonating agents to submit fraudulent consensus actions',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00093',
+    title: 'Gradual Capability Escalation via Incremental Introduction',
+    severity: 'critical',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(add|enable|grant|unlock|introduce)\\s+.{0,10}(?<=\\s)(just|only|a small|minor|slight|one more)\\s+.{0,20}(permiss|capabilit|access|function|privileg|abilit)',
+        desc: 'Incremental small permission or capability addition',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(each|every|per)\\s+(turn|message|request|interaction|session|update)\\s+.{0,20}(add|enable|grant|expand|increase|escalat)\\s+.{0,20}(permiss|capabilit|access|scope|privileg)',
+        desc: 'Per-interaction escalation of capabilities',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(below|under|beneath|within)\\s+(the\\s+)?(threshold|limit|radar|detection|alert)\\s+.{0,30}(add|escalat|expand|introduc|grant|enable)',
+        desc: 'Explicit sub-threshold capability escalation',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(version|update|patch|upgrade)\\s+.{0,20}(sneak|hide|embed|bundle|slip)\\s+.{0,20}(new\\s+)?(capabilit|permiss|function|access|backdoor)',
+        desc: 'Hiding new capabilities inside version updates',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00094',
+    title: 'Systematic Multi-Layer Audit System Bypass',
+    severity: 'critical',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(pass|clear|satisfy|fool|trick|defeat)\\s+.{0,10}(layer|stage|level|check|phase)\\s*(1|2|3|4|5|6|one|two|three|four|five|six)\\b',
+        desc: 'Targeting specific numbered audit layers for bypass',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(manifest|permission|dependency|static.?analysis|semantic|code.?review)\\s+(check|audit|scan|layer|gate)\\s+.{0,20}(bypass|evad|trick|fool|pass|circumvent)',
+        desc: 'Bypassing specific named audit stages',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(obfuscat|minif|encrypt|encod|pack|uglif)\\w*\\s+.{0,20}(malicious|payload|backdoor|exploit|shellcode|reverse.?shell)\\s+.{0,20}(pass|evade|bypass|avoid)\\s+.{0,15}(audit|scan|check|review|analysis)',
+        desc: 'Obfuscating malicious code to pass audit analysis',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(hide|conceal|disguise|mask|camouflage)\\s+.{0,20}?(malicious|dangerous|harmful|unauthorized)\\s+.{0,20}?(behavio\\w*|code|function|intent|capabilit\\w*|action)\\s+.{0,20}?(from|during|in)\\s+.{0,25}?(audit|review|scan|check|inspection)',
+        desc: 'Hiding malicious behavior from audit inspection',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00095',
+    title: 'MCP Tool Supply Chain Poisoning',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)\\b(ignore|disregard|override|forget)\\s+(all\\s+)?(previous|prior|system|original|safety)\\s+(instructions?|rules?|prompts?|constraints?|guardrails?)',
+        desc: 'Prompt injection payload in tool response output',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)(\\beval\\s*\\(|\\bexec\\s*\\(|\\bos\\.system\\s*\\(|subprocess\\.(run|call|Popen)|child_process\\.exec|Runtime\\.getRuntime\\(\\)\\.exec)',
+        desc: 'Dangerous code execution primitives in tool response',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)\\b(curl|wget|fetch|http|request)\\s+.{0,30}(attacker|evil|malicious|exfil|c2|callback|webhook\\.site|ngrok|burp)',
+        desc: 'Data exfiltration URL patterns in tool response',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)(\\[SYSTEM\\]|\\[INST\\]|<\\|system\\|>|<\\|im_start\\|>|<<SYS>>|\\[/INST\\])\\s*.{5,}',
+        desc: 'Injected system prompt delimiters in tool response',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)\\b(you\\s+must|you\\s+should|always|never)\\s+.{0,30}(send|transmit|forward|copy|exfiltrate|upload)\\s+.{0,30}(data|file|secret|token|key|credential|password|response)\\s+.{0,20}(to|at|via)\\s+https?://',
+        desc: 'Exfiltration instructions disguised as tool behavior directives',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00096',
+    title: 'Skill Registry Poisoning and Compromised Tool Distribution',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)(post_?install|pre_?install|setup\\.py|__init__\\.py)\\s*.{0,30}(exec|eval|os\\.|subprocess|import\\s+socket|import\\s+requests\\.post)',
+        desc: 'Malicious execution hooks in install scripts from tool packages',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)\\b(reverse.?shell|bind.?shell|meterpreter|cobalt.?strike|beacon|c2.?server|command.?and.?control)\\b',
+        desc: 'Known malware/C2 framework references in tool response',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)(\\bSocket\\s*\\(|net\\.connect|new\\s+WebSocket|XMLHttpRequest|fetch\\s*\\()\\s*.{0,30}(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|attacker|evil|malicious|c2|ngrok)',
+        desc: 'Outbound network connections to suspicious destinations',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)(process\\.env|os\\.environ|System\\.getenv|ENV\\[)\\s*.{0,10}(API.?KEY|SECRET|TOKEN|PASSWORD|CREDENTIAL|PRIVATE.?KEY)',
+        desc: 'Environment variable access targeting secrets and credentials',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)\\b(fs\\.read|open\\s*\\(|File\\.read|readFile)\\s*.{0,30}(\\.ssh|id_rsa|\\.aws|credentials|\\.env|shadow|passwd|config\\.json|secrets?\\.)',
+        desc: 'Reading sensitive system files or credential stores',
       },
     ],
   },
@@ -3167,37 +3820,33 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'privilege-escalation',
     scan_target: 'mcp',
-    rule_version: 3,
+    rule_version: 1,
     patterns: [
       {
         field: 'content',
-        pattern:
-          ';\\s*(?:rm\\s+-|cat\\s+/(?:etc|root|proc|home)|curl\\s+\\S|wget\\s+\\S|\\bnc\\b\\s+\\S|ncat\\s+\\S|bash\\b|\\bsh\\s+-|python[0-9]?\\s+-c|perl\\s+-e|ruby\\s+-e|php\\s+-r)',
-        desc: 'Semicolon-chained dangerous command with argument or dangerous flag (v2 tightened; prose semicolons like "...; python scripts" no longer fire \u2014 verified 0 recall loss + all true_positives, benign FP 20 to 1)',
+        pattern: ';\\s*(?:rm|cat|curl|wget|nc|ncat|bash|sh|python|perl|ruby|php)',
+        desc: 'Semicolon-chained dangerous command after a benign one',
+      },
+      {
+        field: 'content',
+        pattern: '\\$\\([^)]+\\)',
+        desc: '$() subshell execution embedded in arguments',
       },
       {
         field: 'content',
         pattern:
-          '\\$\\([^)]{0,200}(?:curl|wget|\\bnc\\b|ncat|\\bbash\\b|zsh|/bin/|\\bsh\\s+-c|python[0-9]?\\s+-c|perl\\s+-e|ruby\\s+-e|node\\s+-e|\\beval\\b|\\bexec\\b|base64|rm\\s+-[rfR]|chmod\\s|chown\\s|mkfs|dd\\s+if=|\\|\\s*(?:ba)?sh\\b|>&|/dev/tcp|cat\\s+/(?:etc|root|proc)|/etc/(?:passwd|shadow))',
-        desc: '$() command substitution invoking a dangerous command \u2014 network fetch / interpreter exec / destructive / sensitive-file read (v2 tightened; bare command substitution like $(git rev-parse) no longer fires \u2014 verified 0 recall loss + all true_positives, benign FP 128 to 19)',
+          '`(?:rm|cat|curl|wget|nc|ncat|bash|sh|python|perl|ruby|php|whoami|id|uname|env|printenv|set|export|eval|exec|chmod|chown|kill|pkill|dd|mkfs|mount|umount|sudo|su|passwd)[^`]*`',
+        desc: 'Backtick command substitution with dangerous command inside',
       },
       {
         field: 'content',
-        pattern:
-          '`(?:rm\\s+-[rfR]|curl\\s+\\S|wget\\s+\\S|\\bnc\\b\\s+\\S|ncat\\s+\\S|\\beval\\b\\s+\\S|\\bexec\\b\\s+\\S|chmod\\s+(?:777|[ugoa]*\\+s)|chown\\s+\\S|mkfs|dd\\s+if=|sudo\\s+(?:rm|bash|sh\\b|su\\b|chmod|chown|cat\\s+/)|\\bsu\\b\\s+-|whoami|/bin/|reverse)[^`\\n]{0,40}`',
-        desc: 'Backtick command substitution running a dangerous command with arguments (v3 tightened; word boundaries stop substring hits like `evaluate_*`/`execute`, bare doc mentions like `curl` and benign forms like `chmod 600` no longer fire \u2014 verified 0 recall loss + all true_positives, benign FP 142 to 32)',
+        pattern: '(?:&&|\\|\\|)\\s*(?:curl|wget|nc|ncat|bash|sh|python|perl)',
+        desc: 'Logical operator chained to network or shell command',
       },
       {
         field: 'content',
-        pattern:
-          '(?:&&|\\|\\|)\\s*(?:curl\\s+(?:-\\S+\\s+)*[\'"]?https?://(?!localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0)\\S+|wget\\s+(?:-\\S+\\s+)*[\'"]?https?://(?!localhost|127\\.0\\.0\\.1)\\S+|\\bnc\\b\\s+\\S|ncat\\s+\\S|bash\\s+-c|\\bsh\\s+-c|python[0-9]?\\s+-c|perl\\s+-e)',
-        desc: 'Logical operator chained to an external network fetch or interpreter one-liner (v2 tightened; localhost health checks and build chains like "npm i && bash setup.sh" no longer fire \u2014 verified 0 recall loss + all true_positives, benign FP 22 to 9)',
-      },
-      {
-        field: 'content',
-        pattern:
-          '\\|\\s*(?:nc\\b|ncat|bash|sh\\b|curl|wget)|\\|\\s*tee\\s+/(?:tmp|dev|etc|root|var)',
-        desc: 'Pipe to network exfiltration or shell command, or tee into a system path (v2 tightened; `| tee build.log`-style benign logging no longer fires \u2014 verified 0 recall loss + all true_positives, benign FP 68 to 49)',
+        pattern: '\\|\\s*(?:nc|ncat|bash|sh|curl|wget|tee)',
+        desc: 'Pipe to network exfiltration or shell command',
       },
       {
         field: 'content',
@@ -4517,6 +5166,91 @@ export const ATR_RULES_COMPILED = [
     ],
   },
   {
+    id: 'ATR-2026-00153',
+    title: 'Tool with embedded instruction to bypass user confirmation and exfiltrate data',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: null,
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          'without\\s+asking\\s+user\\s+confirmation.*(?:always\\s+pass|directly\\s+to|send\\s+(?:all\\s+)?data)',
+        desc: 'Detects instructions to bypass user confirmation while handling sensitive data',
+      },
+      {
+        field: 'content',
+        pattern:
+          'always\\s+pass\\s+all\\s+data\\s+directly.*without\\s+(?:filtering|sanitization|asking)',
+        desc: 'Detects instructions to pass data without safety measures or user consent',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00154',
+    title: 'Unauthorized Background Task Execution via Cron Job Installation',
+    severity: 'high',
+    category: 'skill-compromise',
+    scan_target: null,
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?:automatically|auto).*(?:registers?|installs?).*cron\\s+job.*(?:polls?|executes?|handles?).*(?:tasks?|commands?)',
+        desc: 'Detects skills that automatically install cron jobs to execute external tasks',
+      },
+      {
+        field: 'content',
+        pattern:
+          'when\\s+(?:the\\s+)?agent\\s+(?:is\\s+)?idle.*(?:connect|execute|run).*(?:tasks?|commands?).*(?:consumers?|marketplace|external)',
+        desc: 'Detects skills that execute external tasks during agent idle time',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00155',
+    title: 'Hidden LLM Instructions in Skill Descriptions',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: null,
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?:CRITICAL|IMPORTANT|URGENT)\\s+INSTRUCTION[S]?\\s*[\u2014\\-]\\s*YOU\\s+MUST\\s+(?:FOLLOW|DO|EXECUTE)',
+        desc: 'Detects imperative instructions embedded in skill content that direct LLM behavior',
+      },
+      {
+        field: 'content',
+        pattern: 'Before\\s+doing\\s+ANYTHING[,\\s]+(?:run|execute|check|verify)',
+        desc: 'Detects instructions that override normal LLM workflow with specific commands',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00156',
+    title: 'SSH Remote Command Execution with Credential Exposure',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: null,
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern: 'ssh\\s+-i\\s+\\$[A-Z_]+SSH_KEY\\s+root@\\$[A-Z_]+',
+        desc: 'SSH commands using environment variables for private keys and root access',
+      },
+      {
+        field: 'content',
+        pattern: 'SSH.*\u5bc6\u94a5\u8def\u5f84.*~\\/\\.ssh\\/id_[a-z0-9]+',
+        desc: 'Documentation exposing SSH private key file paths in Chinese',
+      },
+    ],
+  },
+  {
     id: 'ATR-2026-00157',
     title: 'Time-Gated Credential Exfiltration (Rug Pull Timebomb)',
     severity: 'critical',
@@ -4556,7 +5290,7 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'tool-poisoning',
     scan_target: 'mcp',
-    rule_version: 2,
+    rule_version: 1,
     patterns: [
       {
         field: 'content',
@@ -4573,8 +5307,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '\\b(?:id_rsa|id_dsa|id_ed25519|id_ecdsa)\\b(?!\\.pub)|\\b(?:\\.aws/credentials|\\.kube/config|\\.docker/config\\.json|\\.netrc|known_hosts)\\b|/etc/(?:passwd|shadow|ssl/private)|/proc/self/environ|\\b\\.env(?:\\.local|\\.production|\\.secret)?\\b(?![/a-zA-Z])',
-        desc: 'Sensitive credential file referenced in tool description \u2014 private keys or cloud credentials (v2: dropped mcp.json + .aws/config \u2014 common non-secret config files that appear in ordinary git/edit operations; the exfil case is still caught by the <IMPORTANT>-tag and read/send-directive layers. id_rsa excludes the .pub public key.)',
+          '\\b(?:id_rsa|id_dsa|id_ed25519|id_ecdsa|mcp\\.json|\\.aws/credentials|\\.aws/config|\\.kube/config|\\.docker/config\\.json|\\.netrc|known_hosts)\\b|/etc/(?:passwd|shadow|ssl/private)|/proc/self/environ|\\b\\.env(?:\\.local|\\.production|\\.secret)?\\b(?![/a-zA-Z])',
+        desc: 'Sensitive credential file referenced in tool description \u2014 tool signatures should not need to read private keys or cloud credentials',
       },
       {
         field: 'content',
@@ -5563,6 +6297,40 @@ export const ATR_RULES_COMPILED = [
         pattern:
           '(?i)(?:free\\s+from\\s+all\\s+rules\\s+and\\s+policies\\s+of|not\\s+bound\\s+by\\s+the\\s+policies\\s+of|exempt\\s+from\\s+.{1,30}\\s+guidelines)\\s+(?:OpenAI|Anthropic|Google|Microsoft|Meta|the\\s+company|your\\s+creators?)',
         desc: 'Specific bypass claims targeting AI company policies',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00235',
+    title: 'Persona-Based Moral Constraint Removal Jailbreak',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '\\b(take\\s+up|adopt|assume|become|enter|switch\\s+to|act\\s+as|play\\s+the\\s+role\\s+of|embody)\\s+(?:the\\s+)?persona\\s+(?:of\\s+)?[a-zA-Z][a-zA-Z0-9_]{1,8}\\b',
+        desc: 'Persona adoption instruction with short named identifier',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:not\\s+)?(?:restrained|constrained|bound|limited|restricted)\\s+by\\s+(?:any\\s+)?(?:morals?|ethics?|virtues?|moral\\s+(?:guidelines?|constraints?|boundaries)|ethical\\s+(?:guidelines?|constraints?|boundaries))\\b',
+        desc: 'Explicit moral or ethical constraint removal language',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:these\\s+views\\s+do\\s+not\\s+align|does\\s+not\\s+align)\\s+with\\s+(?:the\\s+)?views\\s+of\\s+(?:OpenAI|Anthropic|the\\s+company|the\\s+organization|the\\s+creators?)\\b',
+        desc: 'Disclaimer about misalignment with creator views',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)provide\\s+(?:detailed\\s+)?responses?\\s+to\\s+each\\s+(?:prompt|question|request|query|instruction)',
+        desc: 'Instruction to respond to follow-up prompts without filtering',
       },
     ],
   },
@@ -14632,6 +15400,64 @@ export const ATR_RULES_COMPILED = [
     ],
   },
   {
+    id: 'ATR-2026-00495',
+    title: 'DAN Jailbreak - Unrestricted Persona with Filter and Morality Removal',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'llm_io',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)(free\\s+of\\s+all\\s+(restrictions|filters|constraints|guidelines|rules|limits|boundaries|safety|content\\s+polic)|free\\s+from\\s+all\\s+(moral|ethical|content|safety)\\s+(restriction|filter|constraint|guideline|principle))',
+        desc: 'Persona declared free of all restrictions, filters, or moral constraints',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)(without\\s+(moral\\s+principles?|censorship|moraliz|prejudice|ethical\\s+consideration|content\\s+filter|safety\\s+filter|safety\\s+guideline|ethical\\s+constraint))',
+        desc: "Persona without moral principles, censorship, or ethical considerations (excludes generic 'without limit')",
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)(act\\s+as\\s+(an?\\s+)?(immoral|unbiased|unrestricted|unfiltered|uncensored|evil|rogue|dark|dangerous|harmful)\\s+(model|ai|assistant|chatbot|language\\s+model|bot))',
+        desc: 'Instruction to act as an immoral, unbiased, or unrestricted AI model',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)(two\\s+(different\\s+)?(personalities|personas|characters|versions|responses?|modes?)|create\\s+and\\s+maintain\\s+two\\s+(separate\\s+)?(personas?|personalities|characters|versions)).{0,200}(unrestricted|unfiltered|uncensored|no\\s+(restriction|filter|constraint|rule|limit|moral|ethic)|without\\s+(restriction|filter|constraint|rule|limit|moral|ethic))',
+        desc: 'Dual-personality split response explicitly including an unrestricted or unconstrained mode',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)(for\\s+(the\\s+rest\\s+of\\s+this|this)\\s+(conversation|chat|session).{0,20}(you\\s+are\\s+replaced\\s+by|you\\s+will\\s+be\\s+replaced|replaced\\s+by\\s+the\\s+(immoral|unbiased|unrestricted|uncensored|jailbreak)))',
+        desc: 'Model replacement with unrestricted jailbreak alter-ego for remainder of session',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)(simulate\\s+being|you\\s+are\\s+about\\s+to\\s+(simulate|become|transform\\s+into)|immerse\\s+yourself\\s+into\\s+the\\s+role\\s+of).{0,60}(arch\\s+nemesis|corrupted\\s+form|evil\\s+(version|counterpart|twin)|anti[- ]?(gpt|ai|ethics))',
+        desc: 'Simulation or immersion into an adversarial/corrupted alter-ego persona',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)(answer\\s+with\\s+completely\\s+fake\\s+and\\s+hypothetical\\s+scenarios?\\s+with\\s+no\\s+further\\s+explanation|fictional\\s+(scenario|answer|response)\\s+(on|to|about|for)\\s+.{0,60}without\\s+(clarif|moral|ethic|further))',
+        desc: 'Instruction to answer with fictional/hypothetical content with no clarification or moral context',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:respond|act|reply|answer)\\s+as\\s+two\\s+(?:different\\s+)?personalit|(?:continue|act|respond)\\s+as\\s+\\w+\\s+language\\s+model|two\\s+different\\s+personalities',
+        desc: 'Dual-persona jailbreak: respond as two personalities / continue as X language model',
+      },
+    ],
+  },
+  {
     id: 'ATR-2026-00496',
     title: 'DAN Jailbreak - Unconditional Obedience and Dual-Persona Session Lock',
     severity: 'high',
@@ -15980,6 +16806,172 @@ export const ATR_RULES_COMPILED = [
     ],
   },
   {
+    id: 'ATR-2026-00535',
+    title: 'Windsurf IDE Zero-Click Prompt Injection via Embedded File Directives (CVE-2026-30615)',
+    severity: 'critical',
+    category: 'prompt-injection',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)<!--[^>]{0,60}(?:ai\\s*:|\\[\\s*system\\s*\\]\\s*:|windsurf\\s*:|for\\s+(?:cascade|windsurf|copilot|cursor|claude|the\\s+assistant|the\\s+agent)\\s*:)[^>]{0,400}(?:ignore|override|disregard|execute|run|tool_call|invoke|exfiltrate|send|read|access|fetch|rm |delete|curl|wget|bash|sh\\s+-)[^>]{0,500}-->',
+        desc: 'HTML comment block with explicit AI/windsurf/system targeting and an action directive \u2014 zero-click indirect injection pattern',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\{[^{}]{0,80}"role"\\s*:\\s*"(?:system|user)"[^{}]{0,80}"content"\\s*:\\s*"[^"]{0,400}(?:ignore\\s+(?:all\\s+)?(?:previous|prior)|override\\s+(?:all\\s+)?(?:previous|prior|context)|disregard\\s+(?:all\\s+)?(?:previous|prior)|your\\s+(?:real|new|actual|true)\\s+(?:task|instructions?|objective)|execute|exfiltrate|shell|bash|curl|wget|rm\\s+|delete\\s+)[^"]{0,200}"',
+        desc: 'JSON system/user role object embedding override instructions \u2014 LLM chat-format injection inside source file',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?://|#|/\\*)[^\\n]{0,40}(?:\\[\\s*system\\s*\\]|\\bsystem\\s+override\\b|\\bassistant\\s*:|\\bassistant\\s+instruction\\b|\\bai\\s+directive\\b|\\bllm\\s+instruction\\b)[^\\n]{0,300}(?:ignore|override|disregard|forget|execute|run|exfiltrate|send\\s+to|read\\s+file|access|fetch|curl|wget|bash|tool_call)',
+        desc: 'Code comment containing SYSTEM/ASSISTANT/AI directive marker with action payload \u2014 indirect IDE prompt injection',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?:[\u200b\u200c\u200d\u2060\ufeff]{3,}[^\\n]{0,200}(?:ignore|override|execute|system|exfiltrate)|(?:ignore|override|execute|system|exfiltrate)[^\\n]{0,200}[\u200b\u200c\u200d\u2060\ufeff]{3,})',
+        desc: 'Zero-width Unicode character cluster co-located with override keywords \u2014 invisible injection payload technique',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:^|[\\n\\r\\s])@(?:cascade|windsurf|codeium|cursor|copilot|claude|assistant|ai|agent|llm)\\s[^\\n]{0,300}(?:ignore|override|disregard|execute|run|exfiltrate|send|read\\s+(?:my\\s+)?(?:files?|env|credentials?|keys?|tokens?)|tool_call|shell|bash|curl|wget)',
+        desc: 'Windsurf @-mention syntax abused inside file content to issue override or shell directive \u2014 IDE-specific injection vector',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00536',
+    title: 'nginx-ui MCP Endpoint Unauthenticated Command Execution (CVE-2026-33032)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)"(?:name|tool)"\\s*:\\s*"(?:nginx_command_execute|nginx_reload|nginx_restart|nginx_test|nginx_config_write|nginx_config_reload|nginx[_\\-](?:command|exec|run|reload|restart|stop|start|test|config))[^"]{0,60}"(?:(?!(?:authorization|bearer|api[_\\-]?key|x-api-key|token|x-auth))[\\s\\S]){0,500}',
+        desc: 'MCP tool call targeting nginx management function without any Authorization/token field in surrounding context \u2014 CVE-2026-33032 direct exploitation pattern',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)"url"\\s*:\\s*"https?://[^"]{0,80}(?:nginx[_\\-]?ui|nginx\\.ui|nginxui|/nginx/ui)[^"]{0,60}(?:/mcp|/tools?|/api/v1/mcp)[^"]*"(?:(?!"(?:auth|headers|token|apiKey|authorization|bearer)")[\\s\\S]){0,400}}',
+        desc: 'MCP server config pointing at nginx-ui endpoint URL without auth/headers field \u2014 unauthenticated surface exposure',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)(?:"(?:command|cmd|args)"\\s*:\\s*"[^"]{0,200}nginx\\s+-s\\s+(?:reload|restart|stop|quit|reopen)|"args"\\s*:\\s*(?:\\{[^}]{0,200}|\\[[^\\]]{0,200})nginx\\s+-c\\s+/[^\'"\\s]{0,80}|nginx\\s+-t\\s*[;|&]|nginx[_\\-]command_execute[^\'"]{0,40}(?:;|\\||&&|`|\\$\\()[^\'"]{0,200})',
+        desc: 'nginx command injection pattern inside MCP tool arguments \u2014 direct OS command execution via nginx-ui MCP',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)nginx[_\\-]?ui[^\\n]{0,200}(?:mcp|tool\\s+call|tool\\s+server|endpoint)[^\\n]{0,200}(?:no\\s+auth|missing\\s+auth|unauth(?:enticated|orised)?|without\\s+(?:auth|credentials?|token)|bypass\\s+auth|cve[_\\-]?2026[_\\-]?33032|execut(?:e|ing)\\s+(?:commands?|shell)|command\\s+execut)',
+        desc: 'Content describing or weaponising the nginx-ui MCP unauthenticated command execution surface \u2014 CVE-2026-33032 framing',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)"tools"\\s*:\\s*\\[(?:[^\\]]{0,400}(?:nginx_(?:command_execute|reload|restart|config_write|test)|manage_nginx|nginx[_\\-]service)[^\\]]{0,400})\\](?:(?!(?:www[_\\-]?authenticate|authorization|x-api-key|bearer\\s+token))[\\s\\S]){0,600}',
+        desc: 'nginx-ui MCP handshake exposes nginx management tools without an authentication challenge in the same exchange',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00537',
+    title: 'FastMCP Windows cmd.exe Injection via Server Name Metacharacters (CVE-2025-64340)',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)FastMCP\\s*\\(\\s*[^)]*name\\s*=\\s*["\\x27][^"\\x27]*[&|><^()][^"\\x27]*["\\x27]',
+        desc: 'FastMCP constructor with name= argument containing a cmd.exe metacharacter \u2014 direct CVE-2025-64340 PoC shape (e.g., FastMCP(name="test&calc"))\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)fastmcp\\s+install\\s+(?:claude-?code|gemini-?cli|cursor|goose)\\s+[^\\s]*[&|><^()][^\\s]*',
+        desc: 'fastmcp install invocation with a server target argument containing cmd.exe metacharacter \u2014 install-time injection surface\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"name"\\s*:\\s*"[^"]*[&|><^()][^"]*"\\s*[,}](?=[^"]{0,200}"(?:transport|command|install|server_type|mcp)"\\s*:)',
+        desc: 'JSON MCP server configuration block with a name field containing cmd.exe metacharacter \u2014 config-injection shape targeting FastMCP or compatible MCP installers\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:server[_\\s]?name|mcp[_\\s]?name)\\s*[:=]\\s*["\\x27][^"\\x27]{0,100}[&|><^()][^"\\x27]{0,100}["\\x27]',
+        desc: 'Generic server_name / mcp_name key-value with cmd.exe metacharacter \u2014 covers YAML, Python kwargs, and config file surfaces beyond raw JSON\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:CVE-2025-64340|GHSA-m8x7-r2rg-vh5g|GHSA-rj5c-58rq-j5g5)[^\\n]{0,200}(?:payload|inject|exploit|bypass|cmd\\.exe|metachar)',
+        desc: 'Explicit CVE-2025-64340 / GHSA reference combined with exploitation language \u2014 attack framing in skill or tool description\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00538',
+    title: 'LangChain-ChatChat Unauthenticated MCP STDIO Server Configuration RCE (CVE-2026-30617)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)"command"\\s*:\\s*"(?:sh|bash|zsh|cmd\\.exe|cmd|powershell|pwsh)"\\s*[,}][^}]{0,300}"args"\\s*:\\s*\\[',
+        desc: 'MCP server config JSON where command is a shell binary (sh/bash/cmd/powershell) \u2014 direct shell invocation via STDIO config, the CVE-2026-30617 root pattern\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"command"\\s*:\\s*"(?:python|python3|ruby|perl|node|npx|uvx|deno|bun)"\\s*[,}][^}]{0,400}"args"\\s*:\\s*\\[[^\\]]*"-(?:c|e|-eval|-command|-exec)"\\s*,',
+        desc: 'MCP server config where an interpreter is invoked with an inline-exec flag (-c/-e/--eval) \u2014 same bypass class as CVE-2026-40933 but via ChatChat unauthenticated management API\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"transport(?:_type)?"\\s*:\\s*"stdio"\\s*[,}][^}]{0,600}"command"\\s*:\\s*"(?!(?:npx|uvx|node|python3?)\\s*["\\x27])[^"]{2,200}"',
+        desc: 'STDIO transport config where the command value is not an expected MCP launcher (npx/uvx/python) \u2014 suspicious arbitrary binary in STDIO transport\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:transport(?:_type)?\\s*[:=]\\s*["\\x27]?stdio["\\x27]?)[^\\n]{0,300}(?:command\\s*[:=]\\s*["\\x27](?:sh|bash|zsh|cmd|powershell|curl|wget|nc|ncat|netcat)["\\x27])',
+        desc: 'Key-value style (YAML or Python dict) STDIO transport + shell/netcat command value \u2014 catches non-JSON serialization of the same attack\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:CVE-2026-30617|GHSA-w94v-hq49-38vh)[^\\n]{0,200}(?:payload|inject|exploit|bypass|unauthenticated|rce|stdio|command)',
+        desc: 'Explicit CVE-2026-30617 / GHSA reference combined with exploitation language \u2014 attack framing in skill or tool description\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:chatchat|langchain.chatchat|Langchain.ChatChat)[^\\n]{0,150}(?:mcp[^\\n]{0,80}(?:unauthenticated|no.?auth|unprotected)|(?:unauthenticated|no.?auth)[^\\n]{0,80}mcp)',
+        desc: 'ChatChat + MCP + no-auth framing in content \u2014 describes the attack surface in a way that could be used to guide exploitation\n',
+      },
+    ],
+  },
+  {
     id: 'ATR-2026-00539',
     title:
       'CrewAI CodeInterpreterTool Sandbox Escape and Prompt-to-Shell RCE (CVE-2026-2275 / VU#221883)',
@@ -16029,6 +17021,204 @@ export const ATR_RULES_COMPILED = [
         pattern:
           '(?i)(?:VU#?221883|CVE-?2026-?2275|CVE-?2026-?2287)[^\\n]{0,200}(?:payload|inject|exploit|bypass|__subclasses__|ctypes|SandboxPython|sandbox.escape)',
         desc: 'Explicit VU#221883 / CVE-2026-2275 / CVE-2026-2287 reference combined with exploitation language \u2014 attack framing in skill or tool description\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00540',
+    title: 'PraisonAI parse_mcp_command() CLI Argument Command Injection (CVE-2026-34935)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)--mcp\\s+["\\x27]?[^"\\x27\\n]{0,40}(?:(?:\\/(?:usr\\/)?(?:local\\/)?bin\\/)?(?:bash|sh|zsh)|cmd(?:\\.exe)?|powershell(?:\\.exe)?|pwsh)\\s+-[cC]\\s+',
+        desc: "--mcp argument with a shell binary and -c inline-exec flag \u2014 direct CVE-2026-34935 PoC pattern (bash -c 'payload'). Matches bare name (bash) and full path (/bin/bash, /usr/bin/bash).\n",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)--mcp\\s+["\\x27]?[^"\\x27\\n]{0,40}(?:python3?|perl|ruby|node|bun|deno)\\s+-[ceE]\\s+',
+        desc: '--mcp argument with an interpreter and -c/-e/-E inline-eval flag \u2014 same root cause as bash -c but via scripting language interpreter\n',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)--mcp\\s+["\\x27]?[^"\\x27\\n]{0,100}(?:&&|\\|\\||\\||;|`|\\$\\()',
+        desc: '--mcp argument containing shell metacharacters (&&, ||, pipe, semicolon, backtick, subshell) \u2014 command chaining / injection surface\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:parse_mcp_command|mcp_command_parser|praisonai[^\\n]{0,80}--mcp)[^\\n]{0,200}(?:inject|exec|exploit|bypass|rce|shell|command[\\s_-]?injection)',
+        desc: 'Explicit parse_mcp_command / praisonai --mcp reference combined with exploitation language \u2014 attack framing in skill or tool description\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00541',
+    title: 'Agent Zero MCP Configuration Command Injection via mcp_servers field (CVE-2026-30624)',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:mcp_servers|mcpServers)[^\\n]{0,300}["\\x27]command["\\x27]\\s*:\\s*["\\x27](?:(?:\\/(?:usr\\/(?:local\\/)?)?bin\\/)?(?:bash|sh|zsh)|cmd(?:\\.exe)?|powershell(?:\\.exe)?|pwsh|nc|ncat|netcat|curl|wget)["\\x27]',
+        desc: 'Agent Zero mcp_servers / mcpServers JSON/dict with a shell binary or network tool as the command value \u2014 direct CVE-2026-30624 attack shape. Matches bare name (sh) and full path (/bin/sh, /usr/bin/bash).\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:mcp_servers|mcpServers)[^\\n]{0,300}["\\x27]command["\\x27]\\s*:\\s*["\\x27](?:python3?|perl|ruby|node|bun)["\\x27][^\\n]{0,200}["\\x27]args["\\x27]\\s*:\\s*\\[[^\\]]*["\\x27]-[ceE]["\\x27]',
+        desc: 'Agent Zero mcp_servers / mcpServers config with interpreter command + -c/-e/-E inline-exec flag in args \u2014 interpreter-based RCE via MCP server initialisation\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:mcp_servers|mcpServers)[^\\n]{0,100}(?:\'command\'|"command")[^\\n]{0,60}(?:\'args\'|"args")[^\\n]{0,200}(?:-[ceE]\\s+["\']?[^"\'\\s]|-[ceE]["\']|\\|\\||&&|;\\s*[a-z]|`|\\$\\()',
+        desc: 'mcp_servers / mcpServers with command + args fields containing inline-exec flags or shell metacharacters \u2014 generalised Agent Zero RCE pattern. Matches both quoted and unquoted -c/-e payloads.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:CVE-2026-30624|agent.zero[^\\n]{0,80}mcp)[^\\n]{0,200}(?:inject|exec|exploit|bypass|rce|command[_\\s-]?inject)',
+        desc: 'CVE-2026-30624 or Agent Zero + MCP reference combined with exploitation language \u2014 attack framing in skill or tool description\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00542',
+    title: 'Upsonic MCP Command Allowlist Bypass RCE (CVE-2026-30625)',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:upsonic|mcp_servers|mcpServers)[^\\n]{0,300}["\\x27]command["\\x27]\\s*:\\s*["\\x27](?:(?:\\/(?:usr\\/(?:local\\/)?)?bin\\/)?(?:bash|sh|zsh)|cmd(?:\\.exe)?|powershell(?:\\.exe)?|pwsh|nc|ncat|netcat|curl|wget)["\\x27]',
+        desc: 'Upsonic / mcp_servers config with a shell binary or network tool as the command value \u2014 direct CVE-2026-30625 allowlist-bypass attack shape. Matches bare name (sh) and full path (/bin/sh, /usr/bin/bash).\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:upsonic|mcp_servers|mcpServers)[^\\n]{0,300}["\\x27]command["\\x27]\\s*:\\s*["\\x27](?:python3?|perl|ruby|node|bun)["\\x27][^\\n]{0,200}["\\x27]args["\\x27]\\s*:\\s*\\[[^\\]]*["\\x27]-[ceE]["\\x27]',
+        desc: 'Upsonic / mcp_servers config with interpreter command + -c/-e/-E inline-exec flag in args \u2014 interpreter-based RCE via MCP initialisation\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:CVE-2026-30625|upsonic[^\\n]{0,80}mcp)[^\\n]{0,200}(?:inject|exec|exploit|bypass|rce|command[_\\s-]?inject|allowlist[_\\s-]?bypass)',
+        desc: 'CVE-2026-30625 or Upsonic + MCP reference combined with exploitation language \u2014 attack framing in skill or tool description\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00543',
+    title: 'LiteLLM MCP Server Creation Authenticated argv Injection (CVE-2026-30623)',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:litellm|LiteLLM)[^\\n]{0,200}["\\x27]command["\\x27]\\s*:\\s*["\\x27](?:(?:\\/(?:usr\\/(?:local\\/)?)?bin\\/)?(?:bash|sh|zsh)|cmd(?:\\.exe)?|powershell(?:\\.exe)?|pwsh|nc|ncat|netcat|curl|wget)["\\x27]',
+        desc: 'LiteLLM proxy payload with a shell binary or network tool as the MCP server command value \u2014 direct CVE-2026-30623 attack shape.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:litellm|LiteLLM)[^\\n]{0,300}(?:["\\x27]command["\\x27]\\s*:|command\\s*=)\\s*["\\x27](?:python3?|perl|ruby|node|bun)["\\x27][^\\n]{0,200}(?:["\\x27]args["\\x27]\\s*:|args\\s*=)\\s*\\[[^\\]]*["\\x27]-[ceE]["\\x27]',
+        desc: 'LiteLLM MCP config with interpreter command + -c/-e/-E inline-exec flag in args \u2014 interpreter-based RCE via proxy MCP server creation\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\/mcp|mcp[_/]server|add[_-]?mcp[_-]?server)[^\\n]{0,200}["\\x27](?:command|cmd)["\\x27]\\s*:\\s*["\\x27][^\\x22\\x27]+["\\x27][^\\n]{0,200}(?:[|&;`]|\\$\\(|&&|\\|\\|)',
+        desc: 'MCP server registration endpoint or config with command field containing shell metacharacters \u2014 command injection via API\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:CVE-2026-30623|litellm[^\\n]{0,80}mcp)[^\\n]{0,200}(?:inject|exec|exploit|bypass|rce|command[_\\s-]?inject|argv[_\\s-]?inject)',
+        desc: 'CVE-2026-30623 or LiteLLM + MCP reference combined with exploitation language \u2014 attack framing in skill or tool description\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00544',
+    title: 'PraisonAI MCP Path-Traversal .pth Injection RCE (GHSA-9mqq-jqxf-grvw)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\.\\.\\/|\\.\\.\\\\){2,}[^\\n]{0,200}(?:site-packages|dist-packages)[^\\n]{0,100}\\.pth',
+        desc: 'Directory traversal sequence (2+ levels up) targeting site-packages or dist-packages with a .pth extension \u2014 core GHSA-9mqq-jqxf-grvw path-traversal-to-.pth attack shape.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\.pth[^\\n]{0,300}import\\s+(?:os|sys|subprocess|importlib)[^\\n]{0,200}(?:system|exec|popen|spawn|check_output|run|call)',
+        desc: ".pth file content with 'import os/sys/subprocess' followed by code-execution method \u2014 executed-on-startup .pth payload pattern\n",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:praisonai|praison)[^\\n]{0,200}(?:\\.pth|site-packages|dist-packages|path[_-]?traversal|directory[_-]?traversal)[^\\n]{0,200}(?:inject|exec|rce|exploit|bypass)',
+        desc: 'PraisonAI reference combined with .pth or path traversal language and exploitation framing \u2014 GHSA-9mqq-jqxf-grvw attack context\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:GHSA-9mqq-jqxf-grvw)[^\\n]{0,200}(?:payload|inject|exploit|bypass|\\.pth|site-packages|path.traversal)',
+        desc: 'Explicit GHSA-9mqq-jqxf-grvw reference combined with exploitation language \u2014 attack framing in skill or tool description\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00545',
+    title:
+      'PraisonAI tool_override.py Unauthenticated RCE \u2014 CVE-2026-40287 Patch Bypass (CVE-2026-44334)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)tool[_-]?override[^\\n]{0,300}(?:os\\.system|subprocess\\.|exec\\s*\\(|eval\\s*\\(|__import__|importlib\\.import|open\\s*\\([^)]{0,80}["\\x27]w["\\x27])',
+        desc: 'tool_override payload combined with Python code execution primitives (os.system, subprocess, exec, eval, __import__) \u2014 direct CVE-2026-44334 attack pattern\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)tool[_-]?override[^\\n]{0,200}(?:&&|\\|\\||;|`|\\$\\()[^\\n]{0,100}(?:curl|wget|bash|sh|nc|ncat)',
+        desc: 'tool_override with shell metacharacters followed by network/shell execution primitives \u2014 command injection via tool override\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:CVE-2026-44334|CVE-2026-40287[^\\n]{0,80}bypass|tool[_-]?override[^\\n]{0,80}(?:bypass|patch[_-]?bypass))[^\\n]{0,200}(?:inject|exec|exploit|rce|unauthenticated|unauth)',
+        desc: 'Explicit CVE-2026-44334 / CVE-2026-40287 patch bypass reference combined with exploitation language \u2014 attack framing\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:praisonai|praison)[^\\n]{0,100}tool[_-]?override[^\\n]{0,200}(?:inject|exec|exploit|bypass|rce|command|shell)',
+        desc: 'PraisonAI + tool_override combined with exploitation language \u2014 CVE-2026-44334 attack framing in skill or tool description\n',
       },
     ],
   },
@@ -16085,6 +17275,97 @@ export const ATR_RULES_COMPILED = [
         pattern:
           '(?i)(?:CVE-2026-2286|crewai[^\\n]{0,80}(?:ssrf|rag[_\\s-]?url|url[_\\s-]?bypass|metadata))[^\\n]{0,200}(?:inject|bypass|exfil|metadata|169\\.254|internal|private[_\\s-]?ip)',
         desc: 'Explicit CVE-2026-2286 reference or CrewAI SSRF framing combined with exploitation language or internal IP patterns\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00548',
+    title: 'Cross-agent session context leak across delegation chain',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'trace.invariant_session_id',
+        pattern: '(?i)invariant_violation:session.id_changed',
+        desc: 'Engine emits this synthetic field when the trace invariant fires; present for pattern-method engines that consume trace verdicts as text. Trace-native engines evaluate detection.trace below directly.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00549',
+    title: 'Destructive tool invocation without prior human approval',
+    severity: 'critical',
+    category: 'privilege-escalation',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'trace.require_violation',
+        pattern: '(?i)require_violation:destructive_tool_without_approval',
+        desc: 'Engine emits this synthetic field when the require primitive fires; trace-native engines evaluate detection.trace below.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00550',
+    title: 'Privileged tool call following untrusted retrieval (indirect prompt injection trail)',
+    severity: 'critical',
+    category: 'prompt-injection',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'trace.forbid_violation',
+        pattern: '(?i)forbid_violation:untrusted_retrieval_to_privileged_tool',
+        desc: 'Synthetic field emitted by the trace engine when the forbid primitive fires; trace-native engines evaluate detection.trace.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00551',
+    title: 'Cross-conversation memory write (scope-escape via memory store)',
+    severity: 'critical',
+    category: 'privilege-escalation',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'trace.forbid_violation',
+        pattern: '(?i)forbid_violation:cross_conversation_memory_write',
+        desc: 'Synthetic field emitted by the trace engine when the forbid primitive fires; trace-native engines evaluate detection.trace.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00552',
+    title: 'Agent goal drift after environmental pressure injection',
+    severity: 'high',
+    category: 'agent-manipulation',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'trace.composite_violation',
+        pattern:
+          '(?i)(?:invariant_violation:agent\\.goal_changed|forbid_violation:goal_drift_after_pressure)',
+        desc: 'Synthetic field emitted by the trace engine when the composite primitive fires; trace-native engines evaluate detection.trace.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00553',
+    title: 'Runaway tool-call loop within a single session',
+    severity: 'high',
+    category: 'excessive-autonomy',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'behavioral.metric_value',
+        pattern: '(?i)tool_calls_per_session_exceeds_threshold',
+        desc: 'Synthetic field emitted by the behavioral engine when threshold is exceeded; behavioral-native engines evaluate detection.behavioral.\n',
       },
     ],
   },
@@ -22557,6 +23838,542 @@ export const ATR_RULES_COMPILED = [
         pattern:
           '(?i)(?:register|add|publish|advertise)[\\s\\S]{0,50}(?:mcp\\s+)?(?:server|tool\\s+provider)[\\s\\S]{0,60}(?:imitat|mimic|impersonat|masquerad|pretend(?:ing)?\\s+to\\s+be|same\\s+name\\s+as\\s+(?:the\\s+)?(?:trusted|official|legitimate))',
         desc: "Server registration that impersonates / mimics a trusted server's identity (MCP-18 shadowing)",
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01948',
+    title:
+      'netlicensing-mcp Path Traversal in product_number Bypasses Token Redaction (GHSA-hxpf-9xvq-wph8)',
+    severity: 'critical',
+    category: 'context-exfiltration',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern: '(?i)product_number\\s*[=:]\\s*["\\x27]?\\s*(?:\\.\\.|%2e%2e)\\s*[/\\\\]\\s*token',
+        desc: 'netlicensing_get_product product_number parameter set to ../token or %2e%2e/token \u2014 the exact path-traversal payload that redirects /product to the /token endpoint\n',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)/product/\\s*(?:\\.\\.|%2e%2e)\\s*[/\\\\]\\s*token',
+        desc: 'Literal traversal path /product/../token (or encoded) that httpx normalizes to /token, leaking the raw APIKEY via skipped redact_token_read\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:netlicensing[_-]?get[_-]?product|get_product)[\\s\\S]{0,120}(?:\\.\\.|%2e%2e)[/\\\\]token',
+        desc: 'The netlicensing get_product tool invoked with a ../token traversal argument\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)GHSA-hxpf-9xvq-wph8[\\s\\S]{0,200}(?:path\\s*traversal|product_number|\\.\\./token|redact|token\\s*redaction)',
+        desc: 'explicit GHSA framing combined with the traversal/redaction-bypass keywords',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01949',
+    title:
+      'PraisonAI MCPServer Unauthenticated HTTP tools/call Authentication Bypass (GHSA-j4f3-55x4-r6q2)',
+    severity: 'critical',
+    category: 'privilege-escalation',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:praisonai|mcpserver|mcpsecurity|handleRequest)[\\s\\S]{0,200}(?:no\\s+auth(?:oriz\\w+)?|unauthenticat|without\\s+(?:auth|credential)|authorization:\\s*bearer\\s+invalid)[\\s\\S]{0,200}["\\x27]?(?:method)["\\x27]?\\s*[:=]\\s*["\\x27]tools/call',
+        desc: 'PraisonAI/MCPServer context plus an unauthenticated / invalid-Bearer framing immediately preceding a JSON-RPC tools/call method \u2014 the core GHSA-j4f3-55x4-r6q2 auth-bypass payload\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)authorization:\\s*bearer\\s+invalid[\\s\\S]{0,200}(?:tools/call|tools/list|resources/read|prompts/get)',
+        desc: 'Invalid-credential bypass token ("Authorization: Bearer invalid") paired with a privileged MCP JSON-RPC method that returns HTTP 200 without validation\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)handleRequest[\\s\\S]{0,160}(?:src/(?:praisonai-ts/src/)?mcp/server\\.ts|mcpsecurity|tools/call)[\\s\\S]{0,120}(?:bypass|unauthenticat|without\\s+(?:auth|validation)|dispatch\\w*\\s+without)',
+        desc: 'The vulnerable handleRequest sink in mcp/server.ts dispatching methods without invoking MCPSecurity \u2014 direct reference to the vulnerable code path\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)GHSA-j4f3-55x4-r6q2[\\s\\S]{0,200}(?:tools/call|unauthenticat|auth(?:oriz\\w+)?\\s+bypass|bearer\\s+invalid)',
+        desc: 'explicit GHSA framing combined with the auth-bypass exploit tokens',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01952',
+    title: 'PraisonAI codeMode JS Sandbox Escape RCE via new Function/with() (GHSA-p69m-4f92-2v84)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:Function\\s*\\(\\s*[\\x27"]return\\s+this[\\x27"]\\s*\\)|\\(\\s*function\\s*\\(\\s*\\)\\s*\\{\\s*\\}\\s*\\)\\s*\\.\\s*constructor\\s*\\(\\s*[\\x27"]return\\s+(?:process|this)[\\x27"]\\s*\\))[\\s\\S]{0,400}(?:require\\s*\\(\\s*[\\x27"]child_[\\x27"]\\s*\\+\\s*[\\x27"]process[\\x27"]|child_process)[\\s\\S]{0,200}(?:execSync|exec|spawn)',
+        desc: "one line \u2014 global-object recovery primitive (Function('return this') / (function(){}).constructor('return process')) chained to child_process exec, the GHSA-p69m-4f92-2v84 escape",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)require\\s*\\(\\s*[\\x27"]child_[\\x27"]\\s*\\+\\s*[\\x27"]process[\\x27"]\\s*\\)',
+        desc: "one line \u2014 the literal 'child_' + 'process' string-split blocklist-evasion token unique to this PoC",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)GHSA-p69m-4f92-2v84[\\s\\S]{0,200}(?:sandbox\\s*escape|codeMode|new\\s+Function|child_process|execSync)',
+        desc: 'explicit GHSA framing',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01953',
+    title:
+      'npm PraisonAI codeMode Sandbox Escape via Function Constructor Prototype Chain (GHSA-vmmj-pfw7-fjwp)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\(\\s*\\{\\s*\\}\\s*\\)|[\\w$\\]\\)]\\s*|["\\x27]["\\x27]\\s*)\\.\\s*constructor\\s*\\.\\s*constructor\\s*\\(\\s*["\\x27]\\s*return\\s+(?:process|global|require|this)\\b',
+        desc: "Prototype-chain Function-constructor breakout: x.constructor.constructor('return process'/global/require) \u2014 the GHSA-vmmj-pfw7-fjwp escape primitive",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)process\\s*\\.\\s*mainModule\\s*\\.\\s*require\\s*\\(\\s*["\\x27](?:child_process|fs|os|vm|module)["\\x27]',
+        desc: "Post-escape host access: process.mainModule.require('child_process'/'fs') used to reach blocked modules after sandbox bypass",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)new\\s+Function\\s*\\(\\s*["\\x27]sandbox["\\x27]\\s*,\\s*[`"\\x27]\\s*with\\s*\\(\\s*sandbox\\s*\\)',
+        desc: 'The vulnerable sink itself: new Function("sandbox", "with (sandbox) { ... }") host-context eval in code-mode.ts',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)GHSA-vmmj-pfw7-fjwp[\\s\\S]{0,200}(?:codeMode|sandbox\\s*escape|Function\\s*constructor|return\\s+process)',
+        desc: 'explicit GHSA framing combined with the codeMode/Function-constructor exploit vocabulary',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01957',
+    title:
+      'M365 Copilot Business Chat SearchLeak Open-Redirect Prompt-Injection Exfil (CVE-2026-47645)',
+    severity: 'critical',
+    category: 'context-exfiltration',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)m365\\.cloud\\.microsoft/search/?\\?[^\\s"]*\\bq=[^\\s"]*(?:search\\s+for\\s+(?:my|the)\\s+(?:email|inbox|file|message)|replace\\s+\\$?\\w+|<img[^>]+searchbyimage|imgurl=https?%3a|ignore\\s+(?:previous|prior)\\s+instruction)',
+        desc: 'SearchLeak parameter-to-prompt-injection link: trusted m365 search endpoint with injected q= instructions to read mailbox/files and stage exfil',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)bing\\.com/images/searchbyimage\\?[^\\s"]*cbir=sbi[^\\s"]*imgurl=https?(?:://|%3a%2f%2f)(?!www\\.bing\\.com|.*\\.microsoft\\.com)[^\\s"&]+/[^\\s"&]*(?:\\$?title|\\$?me|token|otp|mfa|secret|cookie|email)',
+        desc: 'Bing image-proxy SSRF exfil sink carrying captured M365 data to a non-Microsoft attacker imgurl host',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2026-47645[\\s\\S]{0,200}(?:open\\s+redirect|searchleak|m365\\.cloud\\.microsoft|business\\s+chat)',
+        desc: 'explicit CVE framing',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01959',
+    title: 'OpenHuman Shell Tool Allowlist Bypass via Env-Prefix / find -execdir (CVE-2026-55743)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:GIT_EXTERNAL_DIFF|GIT_SSH_COMMAND|GIT_PAGER|GIT_EDITOR|LD_PRELOAD|LD_AUDIT|LD_LIBRARY_PATH|BASH_ENV|ENV|PYTHONSTARTUP|PERL5OPT|PROMPT_COMMAND)=\\S*\\s*(?:/|\\.{1,2}/|~/|\\$\\{?\\w|[\\w./-]+\\.(?:sh|so|py|pl|bat))[^\\n]{0,80}?\\b(?:git|ls|cat|grep|find|python3?|node|npm|cp|mv|c,head|tail)\\b',
+        desc: 'Dangerous environment-variable assignment to a path/command immediately preceding an allowlisted binary - the CVE-2026-55743 env-prefix allowlist bypass (e.g. GIT_PAGER=/tmp/payload.sh git log, LD_PRELOAD=/tmp/x.so git status)\n',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)\\bfind\\b[^\\n]{0,200}?-(?:execdir|okdir)\\b\\s+\\S',
+        desc: 'find invoked with -execdir/-okdir - the flags is_args_safe() failed to block, executing an arbitrary command per matched file\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2026-55743[\\s\\S]{0,200}(?:allowlist|env(?:ironment)?[\\s-]?(?:var|prefix)|execdir|skip_env|GIT_PAGER|LD_PRELOAD)',
+        desc: 'explicit CVE framing combined with the bypass mechanism keywords',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01961',
+    title:
+      'Meta Ads MCP Unauthenticated Tool Execution Leaks META_ACCESS_TOKEN (CVE-2026-48039 / GHSA-9gw6-46qc-99vr)',
+    severity: 'critical',
+    category: 'context-exfiltration',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern: '(?i)"method"\\s*:\\s*"tools/call"[\\s\\S]{0,200}"name"\\s*:\\s*"get_ad_accounts"',
+        desc: 'Unauthenticated JSON-RPC tools/call invoking the get_ad_accounts tool \u2014 the exact PoC payload against POST /mcp in meta-ads-mcp (CVE-2026-48039).\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)graph\\.facebook\\.com/v\\d+\\.\\d+/me/adaccounts[\\s\\S]{0,200}[?&]access_token=',
+        desc: 'Leaked Graph API request_url for /me/adaccounts carrying the access_token query parameter \u2014 the token-exfiltration sink serialized into the JSON-RPC response.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"request_url"\\s*:\\s*"https?://graph\\.facebook\\.com[\\s\\S]{0,200}access_token=',
+        desc: 'JSON-RPC response field request_url exposing a graph.facebook.com URL with an embedded access_token \u2014 the meta-ads-mcp token leak.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2026-48039[\\s\\S]{0,200}(?:get_ad_accounts|META_ACCESS_TOKEN|access[_\\s-]?token|unauthenticated|/mcp)',
+        desc: 'explicit CVE framing',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01963',
+    title:
+      'PraisonAI Action Orchestrator step.target Path Traversal Arbitrary File Write RCE (CVE-2026-39305 / GHSA-jfxc-v5g9-38xr)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:ActionStep|action[_-]?type|step\\.target|target\\s*=)[\\s\\S]{0,200}(?:FILE_CREATE|FILE_EDIT)?[\\s\\S]{0,120}target\\s*[=:]\\s*["\']?(?:\\.\\.[\\\\/]){3,}',
+        desc: 'one line: PraisonAI ActionStep with a FILE_CREATE/FILE_EDIT target value containing 3+ ../ traversal segments \u2014 the core step.target escape',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\.\\.[\\\\/]){3,}[^\\n"\']{0,120}(?:tmp/orchestrator_pwned|\\.ssh/authorized_keys|/\\.bashrc|/\\.bash_profile|/\\.profile)',
+        desc: 'one line: relative traversal chain writing to the advisory PoC sink (orchestrator_pwned) or sensitive RCE targets (authorized_keys/.bashrc/.profile)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:praisonai|action[_-]?orchestrator)[\\s\\S]{0,200}(?:\\.\\.[\\\\/]){2,}[\\s\\S]{0,80}(?:FILE_CREATE|FILE_EDIT|step\\.target|workspace\\s*/\\s*step)',
+        desc: 'one line: PraisonAI / Action Orchestrator context combined with traversal sequences and the workspace/step.target write sink',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2026-39305[\\s\\S]{0,200}(?:path[\\s_-]?traversal|step\\.target|action[\\s_-]?orchestrator|FILE_CREATE|authorized_keys|arbitrary[\\s_-]?file)',
+        desc: 'explicit CVE framing',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01964',
+    title: 'LangChain GmailToolkit Indirect Prompt Injection Email Exfiltration (CVE-2025-46059)',
+    severity: 'critical',
+    category: 'context-exfiltration',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:search_gmail|create_gmail_draft|send_gmail_message|gmail[_-]?toolkit)[\\s\\S]{0,400}(?:payments-noreply@google\\.com|payment[\\s-]?(?:email|information|details))[\\s\\S]{0,400}(?:send|forward|create[\\s-]?the[\\s-]?draft)[\\s\\S]{0,200}(?:without\\s+(?:a\\s+)?(?:second\\s+)?confirmation|immediately|to\\s+\\S+@)',
+        desc: 'GmailToolkit tool chain sourcing the payments-noreply email and forwarding/sending it externally without confirmation',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2025-46059[\\s\\S]{0,300}(?:send_gmail_message|create_gmail_draft)[\\s\\S]{0,200}(?:forward|exfiltrat|to\\s+\\S+@|without\\s+(?:a\\s+)?(?:second\\s+)?confirmation)',
+        desc: 'explicit CVE framing co-occurring with the Gmail send/draft sink and an exfiltration action',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:send_gmail_message|create_gmail_draft|forward[\\s\\S]{0,60}email)[\\s\\S]{0,300}(?:to\\s+\\S+@\\S+)[\\s\\S]{0,200}(?:without\\s+(?:a\\s+)?(?:second\\s+)?confirmation|immediately\\s+without|do\\s+not\\s+ask)',
+        desc: 'Gmail send/draft sink forwarding to an external address with an explicit suppress-confirmation directive',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01965',
+    title: 'Flowise Custom MCP node-load-method OS Command RCE (CVE-2025-8943)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)node-load-method/customMCP[\\s\\S]{0,400}mcpServerConfig[\\s\\S]{0,400}["\\x27]?loadMethod["\\x27]?\\s*[:=]\\s*["\\x27]listActions["\\x27]',
+        desc: 'Flowise customMCP node-load-method endpoint combined with the mcpServerConfig payload and loadMethod:listActions probe \u2014 the exact CVE-2025-8943 RCE request shape\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)mcpServerConfig["\\x27]?\\s*:\\s*\\{[\\s\\S]{0,200}["\\x27]command["\\x27]?\\s*:[\\s\\S]{0,300}["\\x27]?loadMethod["\\x27]?\\s*:\\s*["\\x27]listActions["\\x27]',
+        desc: 'inputs.mcpServerConfig.command JSON body paired with loadMethod listActions \u2014 the Custom MCP command-exec trigger used in the PoC\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)x-request-from\\s*:\\s*internal[\\s\\S]{0,300}(?:node-load-method/customMCP|mcpServerConfig)',
+        desc: 'x-request-from: internal auth-bypass header combined with the customMCP endpoint or mcpServerConfig \u2014 unauthenticated RCE path for default installs\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2025-8943[\\s\\S]{0,200}(?:customMCP|mcpServerConfig|node-load-method|StdioClientTransport|listActions)',
+        desc: 'explicit CVE framing tied to the Flowise customMCP sink',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01967',
+    title:
+      'DeepChat Mermaid XSS to RCE via Electron IPC MCP Server Registration (CVE-2025-66481 / GHSA-h9f5-7hhf-fqm4)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)<\\s*(?:audio|img|video|svg|image|object|input|body|details)\\b[^>]*\\bon\\w+\\s*=\\s*[^"\'\\s>][^>]*?(?:electron\\.)?ipcRenderer\\.invoke\\s*\\(\\s*[\'"]presenter:call[\'"]',
+        desc: "one line: HTML tag with an UNQUOTED event handler whose body calls ipcRenderer.invoke('presenter:call' \u2014 the CVE-2025-66481 sanitizer-bypass + IPC sink",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)ipcRenderer\\.invoke\\([^)]*[\'"]mcpPresenter[\'"][^)]*[\'"](?:addMcpServer|startServer)[\'"]',
+        desc: 'one line: Electron IPC presenter:call into mcpPresenter registering/starting an MCP server \u2014 the RCE escalation primitive',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2025-66481[\\s\\S]{0,200}(?:mermaid|MermaidArtifact|onerror|ipcRenderer|mcpPresenter)',
+        desc: 'explicit CVE framing',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01968',
+    title:
+      'DeepChat Markdown Deeplink shell.openExternal Protocol Bypass RCE (CVE-2026-43899, GHSA-cp8j-jx7q-7r5f)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\]\\(\\s*(?:calculator|smb|ms-msdt|search-ms|ms-officecmd|bash|sh|cmd|vbscript|jar|tel|telnet)://[^)\\s]*\\)',
+        desc: 'Markdown link whose target is a dangerous OS protocol handler scheme (calculator/smb/ms-msdt/bash/etc.) \u2014 the CVE-2026-43899 deeplink payload shape that bypasses shell.openExternal protocol validation.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\]\\(\\s*(?:file|smb)://(?://|\\\\\\\\|[a-z0-9._-]+/[a-z0-9$._-]+)[^)\\s]*\\)',
+        desc: 'Markdown link to a UNC / SMB share path (file://// , file://host/share, smb://host/share) used to trigger NTLM credential leak over SMB.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)setWindowOpenHandler\\s*\\([^)]*\\)[\\s\\S]{0,200}shell\\.openExternal\\s*\\(\\s*url',
+        desc: 'Vulnerable native sink: setWindowOpenHandler passing the raw url to shell.openExternal without an ALLOWED_PROTOCOLS check (tabPresenter.ts).\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:CVE-2026-43899|GHSA-cp8j-jx7q-7r5f|CVE-2025-55733)[\\s\\S]{0,200}(?:openExternal|setWindowOpenHandler|protocol\\s*bypass|deeplink|calculator://|smb://|ms-msdt)',
+        desc: 'explicit CVE/GHSA framing combined with the bypass sink or deeplink token',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01970',
+    title:
+      'PraisonAI FileTools _validate_path normpath Path Traversal (CVE-2026-35615 / GHSA-693f-pf34-72c5)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:FileTools\\.)?(?:read_file|write_file|delete_file|copy_file|move_file|get_file_info|list_files|download_file|_validate_path)\\s*\\(\\s*[\'"][^\'"\\n]{0,80}\\.\\.[\\\\/]+[^\'"\\n]{0,120}(?:etc[\\\\/]passwd|\\.\\.[\\\\/]|[\\\\/]root[\\\\/]|id_rsa|shadow)',
+        desc: "PraisonAI FileTools operation invoked with a relative path argument that contains a '../' traversal segment reaching a sensitive target \u2014 the core CVE-2026-35615 exploit shape.\n",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:os\\.path\\.)?normpath\\s*\\([^)\\n]{0,80}\\)[\\s\\S]{0,160}(?:if\\s+[\'"]\\.\\.[\'"]\\s+in\\b|[\'"]\\.\\.[\'"]\\s+in\\s+normalized)',
+        desc: "The vulnerable validation order: normpath() called first, then an ineffective `'..' in normalized` check \u2014 the CVE-2026-35615 logic bug.\n",
+      },
+      {
+        field: 'content',
+        pattern: '(?i)[\'"/]?(?:tmp[\\\\/])?\\.\\.[\\\\/]+etc[\\\\/]+passwd',
+        desc: 'Canonical /tmp/../etc/passwd traversal PoC string from the advisory.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2026-35615[\\s\\S]{0,200}(?:_validate_path|normpath|path\\s*traversal|FileTools|\\.\\.[\\\\/])',
+        desc: 'explicit CVE framing combined with the vulnerable function or traversal token',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01973',
+    title: 'AnythingLLM Logo Endpoint Path Traversal File Read/Delete (CVE-2024-3025)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)/api/system/(?:upload-)?logo[\\s\\S]{0,200}(?:\\.\\./|\\.\\.%2f|%2e%2e%2f|%2e%2e/){2,}[\\s\\S]{0,120}(?:storage[/\\\\])?anythingllm\\.db',
+        desc: 'AnythingLLM logo endpoint hit with multi-level ../ traversal (raw or URL-encoded) reaching storage/anythingllm.db',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)/api/system/(?:upload-)?logo[\\s\\S]{0,200}(?:filename|logo)=[\\s\\S]{0,40}(?:\\.\\./|%2e%2e%2f|\\.\\.%2f){2,}',
+        desc: 'Logo filename/logo query param carrying multi-level path-traversal sequences on the logo endpoint',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2024-3025[\\s\\S]{0,200}(?:path\\s*traversal|logo|anythingllm\\.db|/api/system/(?:upload-)?logo)',
+        desc: 'explicit CVE framing',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01974',
+    title: 'AnythingLLM unauthenticated /system/data-import access control bypass (CVE-2024-3279)',
+    severity: 'critical',
+    category: 'privilege-escalation',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)/system/data-import\\b[\\s\\S]{0,300}(?:multipart/form-data|form-?data|multer|\\.db\\b|anythingllm\\.db|method\\s*[:=]\\s*["\']?post)',
+        desc: 'POST upload to the unauthenticated /system/data-import endpoint with a multipart DB file',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)anythingllm\\.db[\\s\\S]{0,200}(?:/system/data-import|data-import|formData|multipart|import)',
+        desc: 'Import/upload of the anythingllm.db database file via the data-import sink',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2024-3279[\\s\\S]{0,200}(?:data-import|anythingllm|access control|unauthenticated)',
+        desc: 'explicit CVE framing',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01978',
+    title:
+      'AnythingLLM collector /process filename Path Traversal Arbitrary File Deletion (CVE-2023-5832)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)/process\\b[\\s\\S]{0,200}["\']?filename["\']?\\s*[:=]\\s*["\']?(?:\\.\\.[\\\\/]){1,}',
+        desc: 'POST /process request whose filename field value begins with one or more ../ traversal segments, the exact CVE-2023-5832 sink shape.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)["\']?filename["\']?\\s*[:=]\\s*["\']?(?:\\.\\.[\\\\/]){1,}[^"\'\\s]{0,120}(?:storage[\\\\/])?anythingllm\\.db',
+        desc: 'filename field carrying a ../ traversal payload that targets the anythingllm.db storage file (DB-deletion exploit primitive).',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2023-5832[\\s\\S]{0,200}(?:path traversal|directory traversal|arbitrary file deletion|hotdir|/process)',
+        desc: 'explicit CVE framing',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01979',
+    title:
+      'PandasAI Interactive Prompt Injection -> Python Sandbox Escape RCE (CVE-2024-12366 / GHSA-vv2h-2w3q-3fx7)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)__(?:class|mro|subclasses|init|globals|builtins)__[\\s\\S]{0,160}__(?:globals|builtins|subclasses)__\\s*(?:\\(\\s*\\)\\s*)?\\[\\s*[\'"]?(?:system|popen|exec|eval|__import__|open)[\'"]?\\s*\\]',
+        desc: 'Python dunder object-traversal that resolves __globals__/__builtins__ to system/popen/exec/__import__ (the PandasAI sandbox-escape sink).',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)__subclasses__\\s*\\(\\s*\\)\\s*\\[\\s*-?\\d{1,4}\\s*\\][\\s\\S]{0,120}__(?:init|globals)__',
+        desc: '__subclasses__()[N] index traversal into __init__/__globals__ (os._wrap_close gadget, e.g. index 140 on CPython 3.11).',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:ignore (?:what you are told|previous|the above|all previous)|from now on,?\\s*ignore)[\\s\\S]{0,120}(?:return code|please return|run|execute)[\\s\\S]{0,200}__(?:class|builtins|subclasses|globals|mro)__',
+        desc: 'PandasAI jailbreak framing ("from now on, ignore ... please return code") wrapping a dunder-escape payload.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2024-12366[\\s\\S]{0,200}(?:__subclasses__|__globals__|__builtins__|sandbox escape|sandbox bypass|arbitrary (?:python )?code|os\\.system|prompt[- ]?inject\\w* (?:to|->|=>|leads? to|enabl\\w*) (?:rce|code exec))',
+        desc: 'explicit CVE framing tied to the exploit chain / sandbox-escape (not bare package-name mentions).',
       },
     ],
   },

@@ -1,12 +1,19 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { LEGAL_LAST_UPDATED } from '@/lib/constants';
+import { buildAlternates } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Cookie Policy',
-  description:
-    'How Panguard AI uses cookies and similar technologies. Manage your cookie preferences.',
-};
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  return {
+    title: 'Cookie Policy',
+    description:
+      'How Panguard AI uses cookies and similar technologies. Manage your cookie preferences.',
+    alternates: buildAlternates('/legal/cookies', locale),
+  };
+}
 
 export default function CookiePolicyPage() {
   return (

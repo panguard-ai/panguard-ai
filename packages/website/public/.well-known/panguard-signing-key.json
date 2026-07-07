@@ -1,0 +1,16 @@
+{
+  "issuer": "PanGuard AI, Inc.",
+  "updated_at": "2026-07-04",
+  "policy": "Audit reports issued by PanGuard AI are signed with the active key below. Verify a report offline with: pga report sign verify <report.json> --expect-key <key_id>. A report signed by a key_id not listed here (or listed as revoked) must not be trusted.",
+  "keys": [
+    {
+      "key_id": "pgk1-621b5f58dbfa5e2c",
+      "status": "active",
+      "alg": "Ed25519",
+      "usage": "audit-report-signing",
+      "payload_format": "PGA-SIG-V1",
+      "created_at": "2026-07-04T09:38:55.797Z",
+      "public_key_pem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAE8yWwjJ9K3FUibtTZq640dHJVEGw26AM8NiM749fzqU=\n-----END PUBLIC KEY-----\n"
+    }
+  ]
+}

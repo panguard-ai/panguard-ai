@@ -2,6 +2,7 @@
 
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
+import { STATS } from '@/lib/stats';
 import { Link } from '@/navigation';
 import {
   ArrowRight,
@@ -94,7 +95,7 @@ const ATTACKS = [
 const STATS_GRID = [
   { value: '96,096', label: 'Skills scanned' },
   { value: '751', label: 'Confirmed malware' },
-  { value: '113', label: 'ATR detection rules' },
+  { value: STATS.totalRulesDisplay, label: 'ATR detection rules' },
   { value: '<4 min', label: 'Total scan time' },
 ];
 
@@ -327,8 +328,8 @@ dGFycmQzdHh3KSI=' | base64 -D | bash`}</code>
               ATR: The Open Detection Standard for AI Agent Security
             </h2>
             <p className="text-text-secondary leading-relaxed mb-6">
-              ATR (Agent Threat Rules) is the first open detection standard designed specifically
-              for AI agent threats. 650+ rules. 920+ patterns. 10 threat categories. MIT licensed.
+              ATR (Agent Threat Rules) is an open, executable detection standard designed specifically
+              for AI agent threats. {STATS.totalRulesDisplay} rules. {STATS.atrPatterns.toLocaleString()}+ patterns. 10 threat categories. MIT licensed.
               Like YARA for malware, Sigma for logs -- ATR for AI agents.
             </p>
           </FadeInUp>
@@ -351,7 +352,7 @@ dGFycmQzdHh3KSI=' | base64 -D | bash`}</code>
               <div className="bg-surface-2 rounded-xl border border-border p-5">
                 <p className="text-xs text-text-muted mb-1">Adopted by</p>
                 <p className="text-sm text-text-primary font-semibold mb-2">
-                  Cisco AI Defense (34 rules in production), OWASP Agentic Top 10
+                  Cisco AI Defense ({STATS.adoption.ciscoRulesMerged} ATR rules merged), OWASP Agentic Top 10
                 </p>
                 <a
                   href="https://github.com/cisco-ai-defense/skill-scanner/pull/79"
@@ -376,8 +377,8 @@ dGFycmQzdHh3KSI=' | base64 -D | bash`}</code>
               Scan Your AI Agent Skills. Now.
             </h2>
             <p className="text-text-secondary mb-8 max-w-lg mx-auto">
-              One command. Under 5 seconds per skill. Works with Claude Code, Cursor, OpenClaw, and
-              10 more platforms.
+              One command. Under 5 seconds per skill. Works with Claude Code, Cursor, OpenClaw,
+              Hermes, and 11 more platforms.
             </p>
           </FadeInUp>
           <FadeInUp delay={0.1}>

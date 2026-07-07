@@ -1,7 +1,7 @@
 # PanGuard AI
 
 > PanGuard AI is the open standard plus commercial platform for AI agent security.
-> ATR (Agent Threat Rules) is the open standard — 419 detection rules, MIT licensed,
+> ATR (Agent Threat Rules) is the open standard — 650+ detection rules, MIT licensed,
 > already in production at Microsoft AGT, Cisco AI Defense, and 4 more F500-adjacent
 > ecosystems. PanGuard is the commercial runtime, compliance, and migration tooling
 > built around it. Community is free forever; Pilot, Enterprise, and Sovereign tiers
@@ -15,12 +15,12 @@
 
 ## Core stats (verified 2026-05-12)
 
-- 419 ATR rules across 10 threat categories (v2.2.0, MIT)
-- 920 detection patterns compiled from YAML
+- 650+ ATR rules across 10 threat categories (v3.4.0, MIT)
+- 2,900+ detection patterns compiled from YAML
 - OWASP Agentic Top 10: 10/10 covered
-- Garak benchmark: 97.1% recall (666 samples)
+- Garak benchmark: 98% recall (650 samples)
 - SKILL.md benchmark: 100% recall, 97% precision, 0.2% FP (498 samples)
-- PINT benchmark: 62.5% recall, 99.6% precision (850 samples)
+- PINT benchmark: 63.2% recall, 99.65% precision (850 samples)
 - Wild scan: 67,799 skills scanned across 3 registries, 1,096 confirmed malicious
 - 13 external PRs merged across 6 external organizations
 - Tier-1 institutional engagement: Microsoft, Cisco, Gen Digital (Sage), MISP, OWASP, NVIDIA, IBM
@@ -30,22 +30,22 @@
 - [PanGuard product overview](https://panguard.ai/product): the security flywheel — audit, guard, respond, share, strengthen
 - [Skill Auditor](https://panguard.ai/product/skill-auditor): 8-layer pre-install security gate for AI agent skills
 - [PanGuard Scan](https://panguard.ai/product/scan): 60-second security audit, Sigma + YARA + ATR rule engines
-- [PanGuard Guard](https://panguard.ai/product/guard): 4-agent runtime pipeline — detect, analyze, respond, report — running 24/7 with 419 ATR rules
+- [PanGuard Guard](https://panguard.ai/product/guard): 4-agent runtime pipeline — detect, analyze, respond, report — running 24/7 with 650+ ATR rules
 - [PanGuard Migrator](https://panguard.ai/migrator): converts legacy Sigma/YARA detections into ATR YAML with five-framework compliance metadata (EU AI Act, OWASP Agentic, OWASP LLM, NIST AI RMF, ISO/IEC 42001)
 - [PanGuard MCP Server](https://panguard.ai/product/mcp): 12 panguard_* tools for Claude Code, Cursor, OpenClaw, and any MCP-compatible AI assistant
-- [ATR Standard](https://panguard.ai/atr): the 419-rule open detection standard
+- [ATR Standard](https://panguard.ai/atr): the 650+-rule open detection standard
 - [Threat Cloud](https://panguard.ai/threat-cloud): collective intelligence — every PanGuard install becomes a sensor, novel attacks crystallize into ATR rules within hours
 
 ## Pricing tiers
 
-- Community ($0 forever): MIT-licensed, 419 ATR rules, unlimited self-host. Source: github.com/panguard-ai/panguard-ai.
+- Community ($0 forever): MIT-licensed, 650+ ATR rules, unlimited self-host. Source: github.com/panguard-ai/panguard-ai.
 - Pilot ($25K / 90 days): F500 procurement test drive. IT director can approve. Full credit toward Y1 Enterprise.
 - Enterprise ($150K-500K / year): Migrator Pro, 5-framework signed compliance evidence packs, airgap deployment, SLA, dedicated CSM.
 - Sovereign ($5M-20M / nation): nation-scale airgap, multi-tenant, custom compliance, Cisco/AMD/NVIDIA JV pre-integrated.
 
 ## Benchmarks and research
 
-- [PINT benchmark results](https://panguard.ai/research/96k-scan): 62.5% recall on Invariant Labs adversarial corpus
+- [PINT benchmark results](https://panguard.ai/research/96k-scan): 63.2% recall on a self-built PINT-format corpus (deepset + Lakera Gandalf)
 - [Wild scan report](https://panguard.ai/research/mcp-ecosystem-scan): 96,096 skills crawled across ClawHub, OpenClaw, Skills.sh; 1,096 confirmed malicious; methodology + raw data published
 - ATR Research Paper — Zenodo DOI 10.5281/zenodo.19178002
 
@@ -66,9 +66,9 @@
 - Repo: https://github.com/Agent-Threat-Rule/agent-threat-rules
 - npm: `agent-threat-rules` (latest 2.2.0)
 - License: MIT
-- 419 YAML rules across 10 categories: prompt-injection (172), agent-manipulation (105), skill-compromise (40), context-exfiltration (40), tool-poisoning (27), privilege-escalation (12), model-abuse (10), excessive-autonomy (8), model-security (3), data-poisoning (2)
+- 650+ YAML rules across 10 categories: prompt-injection (223), agent-manipulation (106), context-exfiltration (104), tool-poisoning (65), skill-compromise (45), model-abuse (37), privilege-escalation (35), excessive-autonomy (29), data-poisoning (5), model-security (3)
 - OWASP Agentic Top 10 mapping: docs/OWASP-MAPPING.md
-- Already merged into: microsoft/agent-governance-toolkit (PR #1277), cisco-ai-defense/skill-scanner (PR #99, full 419-rule pack via v2.2.0 auto-sync), MISP/misp-galaxy (PR #1207), MISP/misp-taxonomies (PR #323), OWASP A-S-R-H (PR #74), Gen Digital Sage (PR #33)
+- Already merged into: microsoft/agent-governance-toolkit (PR #1277), cisco-ai-defense/skill-scanner (PR #99, full 650+-rule pack via v3.4.0 auto-sync), MISP/misp-galaxy (PR #1207), MISP/misp-taxonomies (PR #323), OWASP A-S-R-H (PR #74), Gen Digital Sage (PR #33)
 
 ## Company
 

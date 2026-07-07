@@ -3,7 +3,7 @@
  *
  * Direct link sent to CISO / compliance buyer prospects (Birdman, Tang,
  * HUMAIN, Sage, NEXUS). They can open this on a phone and see:
- *  - 3 framework-mapped compliance PDFs (EU AI Act / NIST AI RMF / ISO/IEC 42001)
+ *  - 3 framework-mapped compliance PDFs (ISO 27001 / SOC 2 / Taiwan CSA)
  *  - JSON + HTML variants
  *  - manifest.json with SHA-256 + HMAC for tamper detection
  *  - The "0% LLM in detection path" claim made auditable
@@ -18,12 +18,13 @@ import { Link } from '@/navigation';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import { Check, Download, ShieldCheck, FileText, Code, Lock } from 'lucide-react';
+import { STATS } from '@/lib/stats';
 import manifest from '../../../../public/samples/evidence-pack-2026-05/manifest.json';
 
 export const metadata: Metadata = {
-  title: 'Sample Compliance Evidence Pack | PanGuard AI',
+  title: 'Sample Compliance Evidence Pack',
   description:
-    'Open a real PanGuard compliance evidence pack — EU AI Act, NIST AI RMF, ISO/IEC 42001 — with SHA-256 + HMAC integrity proofs. Synthetic data, real format.',
+    'Open a real PanGuard compliance evidence pack — ISO 27001, SOC 2, Taiwan CSA — with SHA-256 + HMAC integrity proofs. Synthetic data, real format.',
   robots: { index: false, follow: true },
 };
 
@@ -148,18 +149,22 @@ export default async function EvidencePackPage({
           <div className="mt-12 max-w-4xl mx-auto grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Stat
               label={isZh ? 'ATR 規則數' : 'ATR rules'}
-              value={String(manifest.atr_rule_count)}
+              value={STATS.totalRulesDisplay}
               caption={isZh ? '純 deterministic' : 'fully deterministic'}
             />
             <Stat
               label={isZh ? 'Garak recall' : 'Garak recall'}
-              value={`${manifest.detection_recall_pct}%`}
-              caption={isZh ? '498 SKILL.md 樣本' : '498 SKILL.md samples'}
+              value={`${STATS.benchmark.garak.recall}%`}
+              caption={isZh ? `${STATS.benchmark.garak.samples} Garak 樣本` : `${STATS.benchmark.garak.samples} Garak samples`}
             />
             <Stat
               label={isZh ? 'False positive' : 'False positive'}
-              value={`${manifest.detection_fp_rate_pct}%`}
-              caption={isZh ? '同一基準上' : 'on the same benchmark'}
+              value={`${STATS.benchmark.skill.fp}%`}
+              caption={
+                isZh
+                  ? `${STATS.benchmark.skill.samples} 樣本 SKILL.md 語料;65K benign-gate 為 lane 制 ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt`
+                  : `${STATS.benchmark.skill.samples}-sample SKILL.md corpus; 65K benign-gate FP is lane-based ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt`
+              }
             />
             <Stat
               label={isZh ? '偵測層 LLM 使用' : 'LLM in detection'}
@@ -178,8 +183,8 @@ export default async function EvidencePackPage({
             <ul className="space-y-2.5 text-sm text-text-secondary leading-relaxed">
               <Bullet>
                 {isZh
-                  ? '偵測:純 deterministic ATR 規則 + Garak ~97.2% recall · SKILL.md 語料庫 0.20% FP——LLM 0 個 token'
-                  : 'Detection: deterministic ATR rules with ~97.2% Garak recall / 0.20% FP on the SKILL.md corpus — zero LLM tokens'}
+                  ? `偵測:${STATS.totalRulesDisplay} 條 ATR 規則 + Garak ${STATS.benchmark.garak.recall}% recall(${STATS.benchmark.garak.samples} 樣本);${STATS.benchmark.skill.fp}% FP 於 ${STATS.benchmark.skill.samples} 樣本 SKILL.md 語料,65K benign-gate 為 lane 制 ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt——LLM 0 個 token`
+                  : `Detection: ${STATS.totalRulesDisplay} ATR rules with ${STATS.benchmark.garak.recall}% Garak recall (${STATS.benchmark.garak.samples} samples); ${STATS.benchmark.skill.fp}% FP on the ${STATS.benchmark.skill.samples}-sample SKILL.md corpus, and lane-based benign-gate FP of ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt — zero LLM tokens`}
               </Bullet>
               <Bullet>
                 {isZh

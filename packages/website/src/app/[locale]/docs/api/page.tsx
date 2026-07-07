@@ -1,11 +1,18 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { buildAlternates } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'API Reference | Panguard AI',
-  description:
-    'Panguard AI REST API documentation for integrating automated security scanning, threat intelligence, and compliance reporting into your workflow.',
-};
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  return {
+    title: 'API Reference | Panguard AI',
+    description:
+      'Panguard AI REST API documentation for integrating automated security scanning, threat intelligence, and compliance reporting into your workflow.',
+    alternates: buildAlternates('/docs/api', locale),
+  };
+}
 
 const API_SECTIONS = [
   {
@@ -72,7 +79,7 @@ const METHOD_COLORS: Record<string, string> = {
 };
 
 export default function ApiDocsPage() {
-  const apiBaseUrl = process.env['NEXT_PUBLIC_API_URL'] ?? '';
+  const apiBaseUrl = process.env['NEXT_PUBLIC_API_URL'] || 'https://api.panguard.ai';
 
   return (
     <div className="min-h-screen bg-[#1A1614] text-[#F5F1E8]">

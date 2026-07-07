@@ -30,7 +30,7 @@ export default function ScanReportPage() {
           datasetSchema({
             name: 'PanGuard 96K AI Agent Skill Wild Scan (2026-04)',
             description:
-              'Full ecosystem audit of AI agent skills. Crawled 96,096 entries across OpenClaw (56,503), ClawHub (36,378), Skills.sh (3,115), and a Hermes-protocol sample (100). Scanned 67,799 with parseable content. Result: 1,096 confirmed malicious skills, 11,324 total threats detected, 249 triple-threat packages (shell + network + filesystem access).',
+              'Full ecosystem audit of AI agent skills. Crawled and scanned 96,096 skills across OpenClaw (56,503), ClawHub (36,378), Skills.sh (3,115), and a Hermes-protocol sample (100). Result: 751 confirmed malicious skills, 249 triple-threat packages (shell + network + filesystem access).',
             url: 'https://panguard.ai/research/96k-scan',
             datePublished: '2026-04-14',
             variableMeasured: [

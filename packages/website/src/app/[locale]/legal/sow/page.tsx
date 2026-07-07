@@ -1,15 +1,22 @@
 import type { Metadata } from 'next';
+import { buildAlternates } from '@/lib/seo';
 
 const SOW_LAST_UPDATED_EN = 'May 20, 2026';
 const SOW_LAST_UPDATED_ZH = '2026年5月20日';
 const SOW_VERSION = 'v1.0';
 const SOW_PDF_URL = '/legal/02-Pilot-SOW.pdf';
 
-export const metadata: Metadata = {
-  title: 'Pilot Statement of Work — Template',
-  description:
-    'PanGuard AI Pilot SOW template. 90-day scope, $25,000 fee, 6 deliverables. Founding Customer pricing (first 3 only).',
-};
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  return {
+    title: 'Pilot Statement of Work — Template',
+    description:
+      'PanGuard AI Pilot SOW template. 90-day scope, $25,000 fee, 6 deliverables. Founding Customer pricing (first 3 only).',
+    alternates: buildAlternates('/legal/sow', locale),
+  };
+}
 
 export default async function SOWPage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;

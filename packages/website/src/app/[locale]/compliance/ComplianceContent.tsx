@@ -46,7 +46,7 @@ export default function ComplianceContent() {
                 <span className="text-sm text-text-secondary">{t('hero.badge')}</span>
               </div>
               <div className="inline-flex items-center gap-2 bg-surface-2 border border-border rounded-full px-6 py-2.5">
-                <span className="text-sm font-bold text-text-primary">{STATS.atrRulesDisplay}</span>
+                <span className="text-sm font-bold text-text-primary">{STATS.atrRules}</span>
                 <span className="text-sm text-text-secondary">{t('hero.rulesBadge')}</span>
               </div>
             </div>
@@ -186,9 +186,9 @@ export default function ComplianceContent() {
       {/* -- 4 Framework Coverage (Layer 7 Govern roadmap) -- */}
       <SectionWrapper>
         <SectionTitle
-          overline="COMPLIANCE ROADMAP · LAYER 7 GOVERN"
-          title="5-framework mapping shipped · reporting + AIAM next"
-          subtitle="Per-rule mapping across 5 frameworks ships today (ATR v3.2.0, 100% coverage, CI-validated). Auditor-grade reports + AIAM land Q2/Q3 2026 on the public timeline. No fake checkmarks."
+          overline={t('roadmap.overline')}
+          title={t('roadmap.title')}
+          subtitle={t('roadmap.subtitle', { version: STATS.atrVersion })}
         />
 
         {/* Today vs Coming Soon honest split */}
@@ -198,43 +198,16 @@ export default function ComplianceContent() {
               <div className="flex items-center gap-2 mb-4">
                 <span className="w-2 h-2 rounded-full bg-brand-sage" />
                 <p className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage">
-                  Today · Shipped
+                  {t('roadmap.todayLabel')}
                 </p>
               </div>
               <ul className="space-y-2 text-sm text-text-secondary">
-                <li className="flex items-start gap-2">
-                  <span className="text-brand-sage shrink-0">✓</span>
-                  <span>
-                    EU AI Act · NIST AI RMF · ISO/IEC 42001 — 100% per-rule compliance mapping on
-                    every bundled rule, validated in CI (ATR v3.2.0)
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-brand-sage shrink-0">✓</span>
-                  <span>
-                    OWASP LLM Top 10 · OWASP Agentic Top 10 · MITRE ATLAS — 100% per-rule references
-                    (ATR v3.2.0)
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-brand-sage shrink-0">✓</span>
-                  <span>
-                    Downloadable mapping pack — per-rule framework evidence, MIT-licensed (detection
-                    evidence, not a compliance guarantee)
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-brand-sage shrink-0">✓</span>
-                  <span>Audit log — admin actions, actor, IP, timestamp (Threat Cloud)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-brand-sage shrink-0">✓</span>
-                  <span>Admin dashboard — pagination, filter by actor / action</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-brand-sage shrink-0">✓</span>
-                  <span>Client key registration + revocation (API-key AAM lite)</span>
-                </li>
+                {(['item1', 'item2', 'item3', 'item4', 'item5', 'item6'] as const).map((key) => (
+                  <li key={key} className="flex items-start gap-2">
+                    <span className="text-brand-sage shrink-0">✓</span>
+                    <span>{t(`roadmap.today.${key}`, { version: STATS.atrVersion })}</span>
+                  </li>
+                ))}
               </ul>
             </div>
           </FadeInUp>
@@ -244,29 +217,24 @@ export default function ComplianceContent() {
               <div className="flex items-center gap-2 mb-4">
                 <span className="w-2 h-2 rounded-full bg-amber-400" />
                 <p className="text-[11px] uppercase tracking-wider font-semibold text-amber-400">
-                  Q2 / Q3 2026 · Coming Soon
+                  {t('roadmap.comingLabel')}
                 </p>
               </div>
               <ul className="space-y-2 text-sm text-text-secondary">
                 <li className="flex items-start gap-2">
                   <span className="text-amber-400 shrink-0">○</span>
                   <span>
-                    <code className="font-mono text-xs">pga report --framework &lt;name&gt;</code> —
-                    Markdown + PDF reports with per-rule mapping (Q2 2026)
+                    <code className="font-mono text-xs">pga report --framework &lt;name&gt;</code>
+                    {t('roadmap.coming.item1suffix')}
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-amber-400 shrink-0">○</span>
-                  <span>
-                    AIAM — agent identity + scope + policy evaluator + OAuth 2.0 device flow (Q3
-                    2026)
-                  </span>
+                  <span>{t('roadmap.coming.item2')}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-amber-400 shrink-0">○</span>
-                  <span>
-                    SOC2 Type 1 via Vanta — vendor selection Q3 2026, attestation Q4 2026/Q1 2027
-                  </span>
+                  <span>{t('roadmap.coming.item3')}</span>
                 </li>
               </ul>
             </div>
@@ -276,48 +244,28 @@ export default function ComplianceContent() {
         {/* Per-framework cards with context */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-12 max-w-5xl mx-auto">
           {[
-            {
-              name: 'NIST AI RMF',
-              scope: 'Govern / Map / Measure / Manage',
-              date: 'Voluntary · F500 RFP standard',
-              status: 'shipped' as const,
-              statusLabel: '100% mapped · v3.2.0',
-            },
-            {
-              name: 'EU AI Act',
-              scope: 'Articles 9, 10, 12, 13, 14, 15 (high-risk)',
-              date: 'High-risk obligations as the EU AI Act phases in',
-              status: 'shipped' as const,
-              statusLabel: '100% mapped · v3.2.0',
-            },
-            {
-              name: 'ISO / IEC 42001',
-              scope: 'AIMS clauses 6.2 / 8.1–8.4 / 9.1',
-              date: 'Certification pathway',
-              status: 'shipped' as const,
-              statusLabel: '100% mapped · v3.2.0',
-            },
-            {
-              name: 'Colorado AI Act',
-              scope: 'SB24-205 algorithmic discrimination',
-              date: 'Enforcement phasing in',
-              status: 'planned' as const,
-              statusLabel: 'Mapping Q2 2026',
-            },
+            { name: 'NIST AI RMF', key: 'nist' as const, status: 'shipped' as const },
+            { name: 'EU AI Act', key: 'eu' as const, status: 'shipped' as const },
+            { name: 'ISO / IEC 42001', key: 'iso' as const, status: 'shipped' as const },
+            { name: 'Colorado AI Act', key: 'colorado' as const, status: 'planned' as const },
           ].map((framework, i) => (
             <FadeInUp key={framework.name} delay={i * 0.06}>
               <div className="bg-surface-2 rounded-xl border border-border p-5">
                 <p className="text-sm font-bold text-text-primary">{framework.name}</p>
                 <p className="text-xs text-text-secondary mt-2 leading-relaxed">
-                  {framework.scope}
+                  {t(`roadmap.frameworks.${framework.key}.scope`)}
                 </p>
-                <p className="text-[10px] text-text-muted mt-3 font-mono">{framework.date}</p>
+                <p className="text-[10px] text-text-muted mt-3 font-mono">
+                  {t(`roadmap.frameworks.${framework.key}.date`)}
+                </p>
                 <p
                   className={`text-[10px] mt-1 font-semibold ${
                     framework.status === 'shipped' ? 'text-brand-sage' : 'text-amber-400'
                   }`}
                 >
-                  {framework.statusLabel}
+                  {t(`roadmap.frameworks.${framework.key}.statusLabel`, {
+                    version: STATS.atrVersion,
+                  })}
                 </p>
               </div>
             </FadeInUp>
@@ -326,11 +274,9 @@ export default function ComplianceContent() {
 
         <FadeInUp delay={0.4}>
           <div className="mt-12 max-w-2xl mx-auto bg-surface-2 rounded-xl border border-border p-6">
-            <p className="text-sm font-semibold text-text-primary">Why honest timelines</p>
+            <p className="text-sm font-semibold text-text-primary">{t('roadmap.honestTitle')}</p>
             <p className="text-xs text-text-secondary mt-2 leading-relaxed">
-              Compliance reporting that claims coverage before shipping code is the fastest way to
-              lose CISO trust. We publish dates. You can hold us to them. If Q2 2026 slips, we post
-              the reason on the panguard.ai changelog before auditors find out from you.
+              {t('roadmap.honestDesc')}
             </p>
           </div>
         </FadeInUp>
@@ -400,7 +346,7 @@ export default function ComplianceContent() {
           <FadeInUp delay={0.1}>
             <div className="mt-8 bg-surface-2 rounded-xl border border-border p-4 max-w-md mx-auto">
               <code className="text-sm text-brand-sage font-mono">
-                npm install -g panguard && pga up
+                npm install -g @panguard-ai/panguard && pga up
               </code>
             </div>
           </FadeInUp>

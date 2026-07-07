@@ -1,36 +1,107 @@
 'use client';
 
-import { Suspense, useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
-import { motion } from 'framer-motion';
-import { Terminal, Copy, Check, ArrowRight } from 'lucide-react';
+import { Suspense, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
+import { AnimatePresence, motion, useReducedMotion, type Variants } from 'framer-motion';
 import BrandLogo from '@/components/ui/BrandLogo';
-import { Link } from '@/navigation';
-import { INSTALL_COMMAND } from './CTARoadmap';
+import { ShieldIcon, ScanIcon } from '@/components/ui/BrandIcons';
+import { useSkillScan } from '@/hooks/useSkillScan';
+import { useEcosystemStats } from '@/hooks/useEcosystemStats';
+import { STATS } from '@/lib/stats';
+import ScanAnimation from './ScanAnimation';
+import ScanResultCard from './ScanResultCard';
 
+// The 15 verified agent runtimes PanGuard auto-detects and registers into.
+// VS Code Copilot and Zed are in preview (different config structures) and are
+// deliberately excluded from the public count — keep this list at 15 to match
+// STATS.adoption.platformsSupported.
 const PLATFORM_NAMES = [
   'Claude Code',
   'Claude Desktop',
   'Cursor',
+  'Hermes Agent',
   'OpenClaw',
   'Codex CLI',
   'WorkBuddy',
+  'NemoClaw',
+  'ArkClaw',
   'Windsurf',
+  'QClaw',
   'Cline',
-  'VS Code Copilot',
-  'Zed',
   'Gemini CLI',
   'Continue',
   'Roo Code',
 ] as const;
+
+/* ─── Layer C: entrance choreography ───
+   logo → headline → sub → ticker → scan card → badges.
+   delayChildren 0.1 + stagger 0.07 keeps the full run under ~0.9s
+   (badges, the last child, use a 0.45s duration to close the budget). */
+const EASE_OUT_QUINT: readonly [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+interface HeroVariants {
+  readonly container: Variants;
+  readonly child: Variants;
+  readonly childLast: Variants;
+  readonly headline: Variants;
+  readonly card: Variants;
+}
+
+function buildHeroVariants(reduced: boolean): HeroVariants {
+  if (reduced) {
+    const fade: Variants = {
+      hidden: { opacity: 0 },
+      show: { opacity: 1, transition: { duration: 0.2, ease: 'easeOut' } },
+    };
+    return {
+      container: { hidden: {}, show: {} },
+      child: fade,
+      childLast: fade,
+      headline: {
+        hidden: { opacity: 0.6 },
+        show: { opacity: 1, transition: { duration: 0.2, ease: 'easeOut' } },
+      },
+      card: fade,
+    };
+  }
+  const show = { opacity: 1, y: 0, filter: 'blur(0px)' };
+  return {
+    container: {
+      hidden: {},
+      show: { transition: { staggerChildren: 0.07, delayChildren: 0.1 } },
+    },
+    child: {
+      hidden: { opacity: 0, y: 14, filter: 'blur(5px)' },
+      show: { ...show, transition: { duration: 0.55, ease: EASE_OUT_QUINT } },
+    },
+    childLast: {
+      hidden: { opacity: 0, y: 14, filter: 'blur(5px)' },
+      show: { ...show, transition: { duration: 0.45, ease: EASE_OUT_QUINT } },
+    },
+    // h1 stays readable for LCP: opacity only dips to 0.6, motion is y + blur.
+    headline: {
+      hidden: { opacity: 0.6, y: 14, filter: 'blur(5px)' },
+      show: { ...show, transition: { duration: 0.55, ease: EASE_OUT_QUINT } },
+    },
+    card: {
+      hidden: { opacity: 0, y: 14, scale: 0.985, filter: 'blur(5px)' },
+      show: { ...show, scale: 1, transition: { duration: 0.55, ease: EASE_OUT_QUINT } },
+    },
+  };
+}
+
+/* ─── Layer B: event radar ping colors ─── */
+const PING_IDLE_SAGE = 'rgba(139, 154, 142, 0.25)';
+const PING_CLEAN_EMERALD = 'rgba(52, 211, 153, 0.35)';
+const PING_THREAT_RED = 'rgba(248, 113, 113, 0.4)';
 
 /** Infinite scrolling ticker for threat incidents */
 function ThreatTicker({ items }: { readonly items: readonly string[] }) {
   const doubled = [...items, ...items];
   return (
     <div className="relative overflow-hidden w-full py-3">
-      <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#0C0A09] to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#0C0A09] to-transparent z-10 pointer-events-none" />
+      <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-surface-hero to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-surface-hero to-transparent z-10 pointer-events-none" />
       <motion.div
         className="flex gap-8 whitespace-nowrap"
         animate={{ x: ['0%', '-50%'] }}
@@ -55,8 +126,8 @@ function PlatformTicker({ names }: { readonly names: readonly string[] }) {
   const doubled = [...names, ...names];
   return (
     <div className="relative overflow-hidden w-full py-2">
-      <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#0C0A09] to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#0C0A09] to-transparent z-10 pointer-events-none" />
+      <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-surface-hero to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-surface-hero to-transparent z-10 pointer-events-none" />
       <motion.div
         className="flex gap-6 whitespace-nowrap"
         animate={{ x: ['0%', '-50%'] }}
@@ -78,26 +149,55 @@ function PlatformTicker({ names }: { readonly names: readonly string[] }) {
 
 function ScannerHeroInner() {
   const t = useTranslations('home.scannerHero');
-  const locale = useLocale();
-  const isZh = locale === 'zh-TW';
-  const [copied, setCopied] = useState(false);
+  const eco = useEcosystemStats();
+  const {
+    url,
+    setUrl,
+    pasteContent,
+    setPasteContent,
+    pasteContentType,
+    setPasteContentType,
+    scanMode,
+    setScanMode,
+    loading,
+    result,
+    report,
+    meta,
+    expanded,
+    setExpanded,
+    handleScan,
+    animationPhase,
+    history,
+  } = useSkillScan();
 
   const tickerItems = [t('ticker1'), t('ticker2'), t('ticker3'), t('ticker4'), t('ticker5')];
 
-  function copyInstall() {
-    navigator.clipboard
-      .writeText(INSTALL_COMMAND)
-      .then(() => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      })
-      .catch(() => {
-        // Clipboard API unavailable
-      });
-  }
+  const prefersReducedMotion = useReducedMotion() ?? false;
+  const heroVariants = useMemo(() => buildHeroVariants(prefersReducedMotion), [prefersReducedMotion]);
+
+  /* Layer B: one semantic radar ping per completed scan. Keyed on the scan
+     identity so a new result remounts the ping and replays it exactly once. */
+  const scanPulse = useMemo(() => {
+    if (!report || !meta) return null;
+    const clean = report.riskLevel === 'LOW';
+    return {
+      key: `${meta.contentHash}-${meta.scannedAt}`,
+      color: clean ? PING_CLEAN_EMERALD : PING_THREAT_RED,
+      clean,
+    };
+  }, [report, meta]);
+
+  /* Reduced motion: event feedback degrades to a card border-color transition
+     (the card already carries transition-colors duration-300). */
+  const cardBorderClass =
+    prefersReducedMotion && scanPulse
+      ? scanPulse.clean
+        ? 'border-emerald-400/60'
+        : 'border-red-400/60'
+      : 'border-border hover:border-border-hover';
 
   return (
-    <section className="relative min-h-[100svh] flex items-start sm:items-center justify-center overflow-hidden bg-surface-hero">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-surface-hero">
       <div
         className="absolute inset-0 pointer-events-none opacity-[0.015]"
         style={{
@@ -106,140 +206,322 @@ function ScannerHeroInner() {
           backgroundSize: '120px 120px',
         }}
       />
+      {/* Layer A: scan-beam grid reveal (pure CSS, transform-only) */}
+      <div className="scan-reveal" aria-hidden="true">
+        <div className="scan-reveal-layer" />
+      </div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(700px,200vw)] h-[min(700px,200vw)] rounded-full pointer-events-none hero-orb" />
 
-      <div className="relative z-10 text-center px-4 sm:px-6 pt-28 pb-16 max-w-3xl mx-auto overflow-hidden">
+      <motion.div
+        variants={heroVariants.container}
+        initial="hidden"
+        animate="show"
+        className="relative z-10 text-center px-4 sm:px-6 pt-28 sm:pt-36 pb-16 max-w-3xl mx-auto overflow-hidden"
+      >
         {/* Logo */}
-        <div className="mb-8 animate-[fadeIn_0.5s_ease_both]">
+        <motion.div variants={heroVariants.child} className="mb-8">
           <BrandLogo size={36} className="text-panguard-green mx-auto sm:w-12 sm:h-12" />
+        </motion.div>
+
+        {/* Title */}
+        <div className="mb-6">
+          <motion.h1
+            variants={heroVariants.headline}
+            className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-text-primary break-words"
+          >
+            {t('titleLine1')}{' '}
+            <span className="text-brand-sage">{t('titleLine2')}</span>
+          </motion.h1>
+          <motion.p
+            variants={heroVariants.child}
+            className="mt-5 text-base sm:text-lg text-text-secondary leading-relaxed max-w-xl mx-auto"
+          >
+            {t('subtitle', { count: eco.skillsScanned.toLocaleString() })}
+          </motion.p>
         </div>
 
-        {/* Title — product value leads; the open standard rides above as overline */}
-        <div className="mb-5 animate-[fadeUp_0.6s_0.1s_ease_both]">
-          <p className="text-[11px] sm:text-xs uppercase tracking-[0.18em] text-brand-sage font-semibold mb-3">
-            {t('overline')}
-          </p>
-          <h1 className="text-[clamp(22px,5vw,48px)] font-bold leading-[1.2] tracking-tight text-text-primary break-words">
-            {t('titleLine1')} <span className="text-panguard-green">{t('titleLine2')}</span>
-          </h1>
-          <p className="mt-4 text-base sm:text-lg text-text-secondary leading-relaxed max-w-xl mx-auto">
-            {t('subtitle')}
-          </p>
-          <p className="mt-3 text-sm font-medium text-panguard-green">
-            {isZh
-              ? '永久免費 · MIT 授權 · 免註冊 · 100% 跑在你自己的機器上'
-              : 'Free forever · MIT-licensed · no account · runs 100% on your machine'}
-          </p>
-        </div>
-
-        {/* Threat ticker — real attacks happening now */}
-        <div className="mb-6 animate-[fadeIn_0.5s_0.2s_ease_both]">
+        {/* Threat ticker */}
+        <motion.div variants={heroVariants.child} className="mb-8">
           <ThreatTicker items={tickerItems} />
-        </div>
+        </motion.div>
 
-        {/* Install-first CTA */}
-        <div className="max-w-xl mx-auto animate-[fadeUp_0.5s_0.3s_ease_both]">
-          <p className="text-[11px] uppercase tracking-[0.15em] text-panguard-green font-semibold mb-3">
-            {isZh ? '一行裝起來,幾秒就跑' : 'Install free — running in seconds'}
-          </p>
+        {/* Scanner */}
+        <motion.div variants={heroVariants.card} className="max-w-xl mx-auto">
+          <div className="relative">
+            {/* Layer B: idle radar ping (sage) — suppressed for reduced motion */}
+            {!prefersReducedMotion && (
+              <motion.div
+                aria-hidden="true"
+                className="absolute -inset-8 -z-10 rounded-3xl border border-current pointer-events-none"
+                style={{ color: PING_IDLE_SAGE }}
+                animate={{ scale: [0.92, 1.12], opacity: [0.3, 0] }}
+                transition={{ duration: 2.4, repeat: Infinity, repeatDelay: 5, ease: 'easeOut' }}
+              />
+            )}
+            {/* Layer B: one semantic ping per scan result (emerald clean / red threats) */}
+            {!prefersReducedMotion && scanPulse && (
+              <motion.div
+                key={scanPulse.key}
+                aria-hidden="true"
+                className="absolute -inset-8 -z-10 rounded-3xl border border-current pointer-events-none"
+                style={{ color: scanPulse.color }}
+                initial={{ scale: 0.9, opacity: 0.5 }}
+                animate={{ scale: 1.25, opacity: 0 }}
+                transition={{ duration: 1.2, ease: 'easeOut' }}
+              />
+            )}
+            <div
+              className={`rounded-2xl border ${cardBorderClass} bg-surface-1 p-4 sm:p-5 text-left transition-colors duration-300 ease-out-quint`}
+            >
+            <p className="mb-3 font-mono text-[11px] uppercase tracking-micro text-brand-sage">
+              {t('scanLabel')}
+            </p>
 
-          <div className="bg-surface-1/80 backdrop-blur-sm border border-border rounded-xl p-4 font-mono text-left">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <Terminal className="w-4 h-4 text-text-muted flex-shrink-0" />
-                <code className="text-sm text-brand-sage select-all truncate">
-                  {INSTALL_COMMAND}
-                </code>
-              </div>
+            {/* Mode tabs */}
+            <div className="flex gap-1 mb-3 bg-surface-hero/60 rounded-lg p-1 border border-border/60">
               <button
-                onClick={copyInstall}
-                className="flex-shrink-0 p-2 rounded-lg hover:bg-surface-2 transition-colors duration-200"
-                aria-label={isZh ? '複製安裝指令' : 'Copy install command'}
+                type="button"
+                onClick={() => setScanMode('url')}
+                className={`flex-1 text-xs font-semibold py-2 rounded-md transition-all ${
+                  scanMode === 'url'
+                    ? 'bg-brand-sage/15 text-brand-sage border border-brand-sage/30'
+                    : 'text-text-muted hover:text-text-secondary'
+                }`}
               >
-                {copied ? (
-                  <Check className="w-4 h-4 text-panguard-green" />
-                ) : (
-                  <Copy className="w-4 h-4 text-text-muted" />
-                )}
+                {t('tabUrl')}
               </button>
+              <button
+                type="button"
+                onClick={() => setScanMode('paste')}
+                className={`flex-1 text-xs font-semibold py-2 rounded-md transition-all ${
+                  scanMode === 'paste'
+                    ? 'bg-brand-sage/15 text-brand-sage border border-brand-sage/30'
+                    : 'text-text-muted hover:text-text-secondary'
+                }`}
+              >
+                {t('tabPaste')}
+              </button>
+            </div>
+
+            {scanMode === 'url' ? (
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <ScanIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                  <input
+                    type="text"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleScan()}
+                    placeholder="github.com/modelcontextprotocol/servers"
+                    className="w-full bg-surface-hero border border-border rounded-xl pl-10 pr-4 py-4 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-sage focus:ring-1 focus:ring-brand-sage/30 transition-all"
+                    disabled={loading}
+                  />
+                </div>
+                <button
+                  onClick={handleScan}
+                  disabled={loading || !url.trim()}
+                  className="sheen lift shrink-0 flex items-center gap-2 rounded-xl bg-panguard-green px-7 py-4 text-sm font-semibold text-surface-hero transition-colors duration-300 ease-out-quint hover:bg-panguard-green-light disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? (
+                    <span className="inline-block w-4 h-4 border-2 border-surface-hero/30 border-t-surface-hero rounded-full animate-spin" />
+                  ) : (
+                    <ShieldIcon className="w-4 h-4" />
+                  )}
+                  {t('scanBtn')}
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {/* Content type selector */}
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPasteContentType('skill')}
+                    className={`font-mono text-[11px] font-semibold px-3 py-1.5 rounded-lg border transition-all ${
+                      pasteContentType === 'skill'
+                        ? 'border-brand-sage/50 bg-brand-sage/10 text-brand-sage'
+                        : 'border-border text-text-muted hover:text-text-secondary'
+                    }`}
+                  >
+                    SKILL.md
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPasteContentType('mcp-config')}
+                    className={`font-mono text-[11px] font-semibold px-3 py-1.5 rounded-lg border transition-all ${
+                      pasteContentType === 'mcp-config'
+                        ? 'border-brand-sage/50 bg-brand-sage/10 text-brand-sage'
+                        : 'border-border text-text-muted hover:text-text-secondary'
+                    }`}
+                  >
+                    MCP Config
+                  </button>
+                </div>
+                {/* Textarea */}
+                <textarea
+                  value={pasteContent}
+                  onChange={(e) => setPasteContent(e.target.value)}
+                  placeholder={
+                    pasteContentType === 'skill' ? t('placeholderSkill') : t('placeholderMcp')
+                  }
+                  className="w-full bg-surface-hero border border-border rounded-xl p-4 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-sage focus:ring-1 focus:ring-brand-sage/30 transition-all font-mono resize-none"
+                  rows={6}
+                  disabled={loading}
+                />
+                <button
+                  onClick={handleScan}
+                  disabled={loading || !pasteContent.trim()}
+                  className="sheen lift w-full flex items-center justify-center gap-2 rounded-xl bg-panguard-green px-7 py-4 text-sm font-semibold text-surface-hero transition-colors duration-300 ease-out-quint hover:bg-panguard-green-light disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? (
+                    <span className="inline-block w-4 h-4 border-2 border-surface-hero/30 border-t-surface-hero rounded-full animate-spin" />
+                  ) : (
+                    <ShieldIcon className="w-4 h-4" />
+                  )}
+                  {t('scanBtn')}
+                </button>
+              </div>
+            )}
             </div>
           </div>
 
-          <p className="mt-3 text-xs text-text-secondary/90 font-medium">{t('microPreview')}</p>
+          <AnimatePresence>{loading && <ScanAnimation phase={animationPhase} />}</AnimatePresence>
 
-          <div className="mt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <a
-              href="https://docs.panguard.ai/quickstart"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-panguard-green text-white font-semibold rounded-xl px-7 py-3 text-sm hover:bg-panguard-green-light transition-all duration-200 active:scale-[0.98]"
+          {result && !result.ok && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4 bg-red-400/10 border border-red-400/30 rounded-xl p-4 text-sm text-red-400 text-left"
             >
-              {isZh ? '開始使用 — 免費' : 'Get started — free'}
-              <ArrowRight className="w-4 h-4" />
-            </a>
-            <Link
-              href="/scan"
-              className="text-sm text-text-muted hover:text-text-secondary transition-colors"
-            >
-              {isZh ? '只想查一個 skill?在瀏覽器掃它 →' : 'Just want to check one skill? Scan it →'}
-            </Link>
-          </div>
+              {result.error}
+            </motion.div>
+          )}
 
-          <p className="text-[11px] text-text-muted mt-4">{t('trustNote')}</p>
-        </div>
+          <AnimatePresence>
+            {report && meta && (
+              <ScanResultCard
+                report={report}
+                meta={meta}
+                expanded={expanded}
+                setExpanded={setExpanded}
+                url={url}
+              />
+            )}
+          </AnimatePresence>
+
+          <p className="text-[11px] text-text-muted mt-3">{t('trustNote')}</p>
+        </motion.div>
 
         {/* Trust badges — 4 strongest signals only */}
-        <div className="mt-8 animate-[fadeUp_0.5s_0.5s_ease_both]">
+        <motion.div variants={heroVariants.childLast} className="mt-8">
           <div className="flex flex-wrap justify-center gap-2">
-            {[t('badgeRules'), t('badgeRecall'), t('badgeCisco'), t('badgeLicense')].map(
-              (badge) => (
-                <span
-                  key={badge}
-                  className="text-[11px] text-text-muted border border-border/40 rounded-full px-3 py-1 bg-surface-1/20"
-                >
-                  {badge}
-                </span>
-              )
-            )}
+            {[
+              t('badgeRules', { count: eco.atrRules }),
+              t('badgeRecall'),
+              t('badgeCisco'),
+              t('badgeLicense'),
+            ].map((badge) => (
+              <span
+                key={badge}
+                className="rounded-full border border-border bg-surface-1 px-3 py-1 font-mono text-[10px] uppercase tracking-micro text-text-muted"
+              >
+                {badge}
+              </span>
+            ))}
           </div>
-        </div>
+        </motion.div>
+
+        {/* Scan history */}
+        {history.length > 0 && (
+          <div className="mt-6 animate-[fadeIn_0.5s_0.5s_ease_both]">
+            <p className="mb-2 font-mono text-[10px] uppercase tracking-micro text-text-muted">
+              {t('historyLabel')}
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {history.slice(0, 5).map((h) => (
+                <button
+                  key={h.url + h.scannedAt}
+                  type="button"
+                  onClick={() => {
+                    if (!h.url.startsWith('paste:')) {
+                      setUrl(h.url);
+                      setScanMode('url');
+                    }
+                  }}
+                  className="font-mono text-[10px] px-2.5 py-1 rounded-full border border-border bg-surface-1 text-text-muted hover:border-border-hover hover:text-text-secondary transition-all flex items-center gap-1.5"
+                >
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                      h.riskLevel === 'CRITICAL'
+                        ? 'bg-red-400'
+                        : h.riskLevel === 'HIGH'
+                          ? 'bg-orange-400'
+                          : h.riskLevel === 'MEDIUM'
+                            ? 'bg-yellow-400'
+                            : 'bg-emerald-400'
+                    }`}
+                  />
+                  {h.skillName ?? h.url.replace('github.com/', '')}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Platform ticker */}
         <div className="mt-6 animate-[fadeIn_0.5s_0.6s_ease_both]">
-          <p className="text-xs text-text-muted mb-2">{t('platformLabel')}</p>
+          <p className="mb-2 font-mono text-[10px] uppercase tracking-micro text-text-muted">
+            {t('platformLabel')}
+          </p>
           <PlatformTicker names={PLATFORM_NAMES} />
         </div>
-      </div>
+      </motion.div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0C0A09] to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-surface-hero to-transparent pointer-events-none" />
     </section>
   );
 }
 
 /**
- * Static SSR skeleton shown BEFORE client hydration. Mirrors the install-first
- * hero so the first paint already shows the positioning + free-install line
- * instead of a blank dark grid.
+ * Static SSR skeleton shown BEFORE client hydration. Used as the Suspense
+ * fallback so visitors see real PanGuard product framing during the first
+ * ~200ms of paint instead of a blank dark grid. The interactive scanner form
+ * boots underneath this and replaces it on hydration.
  */
 function ScannerHeroSkeleton() {
   return (
-    <section className="relative min-h-[100svh] bg-surface-hero flex flex-col items-center justify-center px-5 sm:px-6 py-24">
-      <div className="max-w-3xl w-full text-center space-y-5">
-        <p className="text-sm font-medium text-brand-sage uppercase tracking-wider">
-          Built on ATR — the open detection standard for AI agents
+    <section className="relative min-h-screen bg-surface-hero flex flex-col items-center justify-center overflow-hidden px-5 sm:px-6 pt-28 sm:pt-36 pb-16">
+      {/* Layer A also runs pre-hydration (pure CSS) so the backdrop is
+          consistent when the interactive hero swaps in. */}
+      <div className="scan-reveal" aria-hidden="true">
+        <div className="scan-reveal-layer" />
+      </div>
+      <div className="relative max-w-3xl w-full text-center space-y-6">
+        <p className="font-mono text-[11px] uppercase tracking-micro text-brand-sage">
+          Scan your AI agent stack
         </p>
-        <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-text-primary leading-tight">
-          Free, on-device security for <span className="text-panguard-green">your AI agents.</span>
+        <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-text-primary">
+          The open security standard
+          <br />
+          <span className="text-brand-sage">for the age of AI agents.</span>
         </h1>
         <p className="text-base sm:text-lg text-text-secondary max-w-2xl mx-auto leading-relaxed">
-          Scan every installed skill against 650+ open ATR rules, watch your agents at runtime, and
-          see it all in a local dashboard — nothing leaves your machine.
+          Drop in a GitHub URL or paste a SKILL/MCP manifest. PanGuard runs {STATS.totalRulesDisplay} ATR rules
+          against it and tells you if it&apos;s safe to install.
         </p>
-        <p className="text-sm font-medium text-panguard-green">
-          Free forever · MIT-licensed · no account · runs 100% on your machine
-        </p>
-        <div className="max-w-xl mx-auto bg-surface-1 border border-border-default rounded-xl p-4 font-mono text-left">
-          <code className="text-sm text-brand-sage">{INSTALL_COMMAND}</code>
+        <div className="flex flex-wrap justify-center gap-2 pt-4">
+          <span className="rounded-full border border-border bg-surface-1 px-3 py-1 font-mono text-[10px] uppercase tracking-micro text-text-muted">
+            {STATS.totalRulesDisplay} ATR rules
+          </span>
+          <span className="rounded-full border border-border bg-surface-1 px-3 py-1 font-mono text-[10px] uppercase tracking-micro text-text-muted">
+            Garak {STATS.benchmark.garak.recall}% recall
+          </span>
+          <span className="rounded-full border border-border bg-surface-1 px-3 py-1 font-mono text-[10px] uppercase tracking-micro text-text-muted">
+            Microsoft + Cisco merged
+          </span>
+          <span className="rounded-full border border-border bg-surface-1 px-3 py-1 font-mono text-[10px] uppercase tracking-micro text-text-muted">
+            MIT licensed
+          </span>
         </div>
       </div>
     </section>

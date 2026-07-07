@@ -1,12 +1,19 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { LEGAL_LAST_UPDATED } from '@/lib/constants';
+import { buildAlternates } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Acceptable Use Policy',
-  description:
-    'Panguard AI Acceptable Use Policy. Guidelines for proper use of our security platform.',
-};
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  return {
+    title: 'Acceptable Use Policy',
+    description:
+      'Panguard AI Acceptable Use Policy. Guidelines for proper use of our security platform.',
+    alternates: buildAlternates('/legal/acceptable-use', locale),
+  };
+}
 
 export default function AcceptableUsePolicyPage() {
   return (
