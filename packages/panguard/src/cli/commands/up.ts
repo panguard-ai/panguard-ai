@@ -835,9 +835,11 @@ export function upCommand(): Command {
             `  ${c.dim('1.')} ${t(lang, 'Open dashboard', '開啟儀表板')}     ${c.sage(dashboardUrl)}`
           );
         } else {
-          // No live token: point at re-running `pga up` rather than a dead URL.
+          // No live token yet (daemon still writing it). Point at `pga status`,
+          // which prints the authenticated dashboard link once it lands — never
+          // back at `pga up` (the command they just ran → a confusing loop).
           console.log(
-            `  ${c.dim('1.')} ${t(lang, 'Open dashboard', '開啟儀表板')}     ${c.dim(t(lang, 'run "pga up" to open the dashboard', '執行「pga up」開啟儀表板'))}`
+            `  ${c.dim('1.')} ${t(lang, 'Open dashboard', '開啟儀表板')}     ${c.dim(t(lang, 'run "pga status" for the dashboard link', '執行「pga status」取得儀表板連結'))}`
           );
         }
         if (threatCount > 0) {
