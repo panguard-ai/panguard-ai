@@ -22,6 +22,7 @@ import {
 } from './setup-skill-scan.js';
 import { markInitialized } from '../first-run.js';
 import { readAuthenticatedDashboardUrl, dashboardBaseUrl } from '../dashboard-url.js';
+import { recordScanResults, type RiskLevel } from '../flagged-skills.js';
 
 /** Open URL in the default browser (cross-platform) */
 function openBrowser(url: string): void {
@@ -124,6 +125,7 @@ export function setupCommand(): Command {
     .option('--yes', 'Skip confirmation prompts', false)
     .option('--skip-scan', 'Skip skill scanning', false)
     .option('--skip-guard', 'Skip guard start prompt', false)
+    .option('--skip-service', 'Do not install the reboot-surviving system service', false)
     .option('--lang <lang>', 'UI language: en or zh-TW (auto-detect if omitted)')
     .action(
       async (options: {
@@ -133,6 +135,7 @@ export function setupCommand(): Command {
         yes: boolean;
         skipScan: boolean;
         skipGuard: boolean;
+        skipService: boolean;
         lang?: string;
       }) => {
         // Detect UI language: --lang flag > system locale > default zh-TW
@@ -393,6 +396,19 @@ export function setupCommand(): Command {
                 })),
               };
 
+              // Persist the scan verdict so `pga status` / `pga doctor` show real
+              // severities, and so `pga up` can skip a redundant re-scan on first
+              // run (setup owns the first-run scan).
+              recordScanResults({
+                scannedNames: scanResults.map((r) => r.entry.name),
+                flagged: flaggedResults.map((r) => ({
+                  name: r.entry.name,
+                  platform: r.entry.platformId,
+                  riskLevel: (r.audit?.riskLevel ?? 'HIGH') as RiskLevel,
+                })),
+                scannedAt: new Date().toISOString(),
+              });
+
               // Whitelist only safe (LOW risk) skills — caution (MEDIUM) needs review
               const safeOnly = scanResults
                 .filter((r) => r.status === 'safe')
@@ -445,9 +461,21 @@ export function setupCommand(): Command {
                         )
                       );
                     } else {
+                      // We flag but never delete a user's files. Give a concrete,
+                      // safe removal path instead of a dead-end "manually disable".
                       console.log(
                         c.red(
-                          `  ${symbols.fail} CRITICAL: ${c.bold(result.entry.name)} -- could not auto-remove. Manually disable this skill.`
+                          `  ${symbols.fail} CRITICAL: ${c.bold(result.entry.name)} (${result.entry.platformId}) is dangerous.`
+                        )
+                      );
+                      console.log(
+                        c.dim(
+                          `    PanGuard does not delete your files. Inspect it: pga audit skill ${result.entry.name}`
+                        )
+                      );
+                      console.log(
+                        c.dim(
+                          `    Then remove the skill folder from ${result.entry.platformId} to disable it.`
                         )
                       );
                     }
@@ -496,7 +524,8 @@ export function setupCommand(): Command {
         if (!options.remove && !options.skipGuard) {
           if (!options.json) console.log();
           const installGuard =
-            options.yes ||
+            !options.skipService &&
+            (options.yes ||
             options.json ||
             (await promptConfirm({
               message: {
@@ -505,7 +534,7 @@ export function setupCommand(): Command {
               },
               defaultValue: true,
               lang: L,
-            }));
+            })));
 
           if (installGuard) {
             if (!options.json) {
