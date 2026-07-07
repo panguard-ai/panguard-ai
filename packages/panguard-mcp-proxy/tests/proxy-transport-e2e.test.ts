@@ -195,7 +195,7 @@ describe('MCPProxy transport e2e (full forward/block flow)', () => {
 // event (NOT 'mcp_exchange'), so the full tool_call rule family runs. A prior
 // bug passed the wrong (or no) eventType, silently skipping ~44 tool_call rules
 // on every MCP call. Lock the third argument the proxy hands to the evaluator.
-describe("MCPProxy PreToolUse event routing (proxy.ts callTool -> evaluateToolCall 3rd arg)", () => {
+describe('MCPProxy PreToolUse event routing (proxy.ts callTool -> evaluateToolCall 3rd arg)', () => {
   it("evaluates the call as a 'tool_call' event, not 'mcp_exchange'", async () => {
     const calls: Array<{
       toolName: string;
@@ -339,7 +339,10 @@ describe('MCPProxy PostToolUse response serialization (non-text blocks + 256KB c
     // marker at ~12KB would be sliced off; the 256KB cap keeps it in scope.
     const padding = 'A'.repeat(12 * 1024);
     const { agent, scanned } = await wireResourceStack([
-      { type: 'resource', resource: { uri: 'file:///evil', text: padding + 'PADDED_PAYLOAD_MARKER' } },
+      {
+        type: 'resource',
+        resource: { uri: 'file:///evil', text: padding + 'PADDED_PAYLOAD_MARKER' },
+      },
     ]);
     await agent.callTool({ name: 'leak', arguments: {} });
 

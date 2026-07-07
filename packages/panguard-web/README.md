@@ -3,6 +3,7 @@
 Panguard AI official website engine — scenario-based copy, online guidance, and responsive design for panguard.ai.
 
 Provides the web presence for Panguard:
+
 - Scenario-driven documentation
 - Interactive setup guidance
 - Responsive design and localization

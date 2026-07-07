@@ -87,9 +87,7 @@ function StepCard({ step, index }: { readonly step: Step; readonly index: number
       <p className="mb-3 text-sm leading-relaxed text-text-secondary">{t(step.subtitleKey)}</p>
 
       {/* Timing badge */}
-      <span
-        className={`inline-block font-mono text-[10px] uppercase tracking-micro ${step.color}`}
-      >
+      <span className={`inline-block font-mono text-[10px] uppercase tracking-micro ${step.color}`}>
         {t(step.timingKey)}
       </span>
 

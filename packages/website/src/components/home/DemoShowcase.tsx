@@ -73,9 +73,7 @@ export default function DemoShowcase() {
       </div>
 
       {/* Caption */}
-      <p className="mt-4 max-w-5xl text-xs text-text-muted">
-        {t(`captions.${DEMOS[active].key}`)}
-      </p>
+      <p className="mt-4 max-w-5xl text-xs text-text-muted">{t(`captions.${DEMOS[active].key}`)}</p>
     </SectionV2>
   );
 }

@@ -420,9 +420,7 @@ export default function MigratorDemo() {
                 <p className="text-center text-xs text-text-muted mb-3">
                   {isZh ? '已用於' : 'Used by'} Microsoft (Agent Governance Toolkit) &middot; Cisco
                   (skill-scanner) &middot; MISP
-                  {isZh
-                    ? ' · NIST OSCAL 提交審查中'
-                    : ' · NIST OSCAL submission in review'}
+                  {isZh ? ' · NIST OSCAL 提交審查中' : ' · NIST OSCAL submission in review'}
                 </p>
                 <div className="rounded-2xl border border-amber-400/30 bg-amber-400/5 px-6 py-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
                   <div className="flex-1">

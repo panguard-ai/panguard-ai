@@ -3,6 +3,7 @@
 Smart honeypot for attacker profiling — trap malicious agents and collect forensic evidence.
 
 Deploy deception primitives:
+
 - Honeypot tool decoys
 - Attacker behavior profiling
 - Evidence collection and logging

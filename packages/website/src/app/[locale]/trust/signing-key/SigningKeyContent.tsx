@@ -24,7 +24,15 @@ const VERIFY_COMMAND = `pga report sign verify report.json --expect-key ${SIGNIN
 const WELL_KNOWN_PATH = '/.well-known/panguard-signing-key.json';
 
 /* ─── One-click copy for key material / commands ─── */
-function CopyButton({ text, label, copiedLabel }: { text: string; label: string; copiedLabel: string }) {
+function CopyButton({
+  text,
+  label,
+  copiedLabel,
+}: {
+  text: string;
+  label: string;
+  copiedLabel: string;
+}) {
   const [copied, setCopied] = useState(false);
 
   async function copy() {

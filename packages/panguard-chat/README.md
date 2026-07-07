@@ -3,6 +3,7 @@
 AI security assistant delivery via messaging platforms — manage threats and alerts through Slack, Teams, Discord, and other channels.
 
 Send security alerts to your preferred chat platform:
+
 - Real-time threat notifications
 - Alert channel configuration
 - Integration with Panguard Guard

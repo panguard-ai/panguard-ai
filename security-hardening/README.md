@@ -3,6 +3,7 @@
 Security hardening library for Panguard — WebSocket security, credential management, sandbox isolation, and audit logging.
 
 Secure your deployment:
+
 - WebSocket and credential handling
 - Sandbox execution primitives
 - Permission and capability enforcement

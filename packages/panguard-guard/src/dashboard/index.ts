@@ -952,7 +952,10 @@ export class DashboardServer {
     // detect anything, so an active/report posture would be a fake-green claim.
     // Downgrade to 'degraded' (matches the CLI TUI, which gates on rule count).
     const ruleCount = this.status.atrRuleCount ?? 0;
-    if (ruleCount <= 0 && (posture === 'protected' || posture === 'monitoring' || posture === 'report-only')) {
+    if (
+      ruleCount <= 0 &&
+      (posture === 'protected' || posture === 'monitoring' || posture === 'report-only')
+    ) {
       posture = 'degraded';
     }
 

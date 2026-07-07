@@ -7,7 +7,7 @@ All notable changes to Panguard AI will be documented in this file.
 GA security-hardening release. A 31-finding adversarial audit of the free
 Community product drove this batch; the fixes below are the confirmed and
 verified ones, each shipped with a regression test. The theme is closing the
-worst failure mode a security tool can have — protection that *looks* installed
+worst failure mode a security tool can have — protection that _looks_ installed
 but silently does nothing. Full suite green (PanGuard 3621 tests, bundled ATR
 engine 565 tests). Requires re-syncing the bundled `@panguard-ai/atr` engine
 from agent-threat-rules (ReDoS + indirect-injection + hook-contract fixes).
