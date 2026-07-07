@@ -16,6 +16,7 @@ import { execFileSync } from 'node:child_process';
 import { c, symbols, box, header } from '@panguard-ai/core';
 import { PANGUARD_VERSION } from '../../index.js';
 import { readHookProtectionStatus } from './hook.js';
+import { lastScanAt, readFlaggedSkills } from '../flagged-skills.js';
 import { SERVICE_PLIST_BASENAME } from './persist.js';
 import { verifyConfigIntegrity, checkSelfState } from '@panguard-ai/panguard-guard';
 
@@ -336,7 +337,21 @@ function checkNotificationChannels(): CheckResult {
 }
 
 function checkLastScan(): CheckResult {
-  if (!existsSync(LAST_SCAN_PATH)) {
+  // Authoritative source: the flagged-skills store, which `pga up` / `pga scan`
+  // write on every scan (the legacy LAST_SCAN_PATH was never populated, so this
+  // check always said "No scan result found" — even right after a scan flagged a
+  // CRITICAL skill). Fall back to LAST_SCAN_PATH only for older installs.
+  let scannedAtIso = lastScanAt();
+  if (!scannedAtIso && existsSync(LAST_SCAN_PATH)) {
+    try {
+      scannedAtIso = (JSON.parse(readFileSync(LAST_SCAN_PATH, 'utf-8')) as { scannedAt?: string })
+        .scannedAt ?? null;
+    } catch {
+      /* fall through to the no-scan branch */
+    }
+  }
+
+  if (!scannedAtIso) {
     return {
       status: 'warn',
       label: 'Last scan',
@@ -345,44 +360,43 @@ function checkLastScan(): CheckResult {
     };
   }
 
-  try {
-    const raw = readFileSync(LAST_SCAN_PATH, 'utf-8');
-    const data = JSON.parse(raw) as { scannedAt?: string };
-    const scannedAt = data.scannedAt ? new Date(data.scannedAt) : null;
-
-    if (!scannedAt || isNaN(scannedAt.getTime())) {
-      return {
-        status: 'warn',
-        label: 'Last scan',
-        detail: 'Scan record found but timestamp is invalid',
-        fix: 'Run "pga scan" to perform a fresh scan',
-      };
-    }
-
-    const diffDays = Math.floor((Date.now() - scannedAt.getTime()) / 86_400_000);
-
-    if (diffDays > 7) {
-      return {
-        status: 'warn',
-        label: 'Last scan',
-        detail: `${diffDays} days ago (recommend weekly)`,
-        fix: 'Run "pga scan" to perform a fresh scan',
-      };
-    }
-
-    return {
-      status: 'pass',
-      label: 'Last scan',
-      detail: diffDays === 0 ? 'Today' : `${diffDays} day${diffDays === 1 ? '' : 's'} ago`,
-    };
-  } catch {
+  const scannedAt = new Date(scannedAtIso);
+  if (isNaN(scannedAt.getTime())) {
     return {
       status: 'warn',
       label: 'Last scan',
-      detail: 'Could not read last scan record',
-      fix: 'Run "pga scan" to generate a fresh scan result',
+      detail: 'Scan record found but timestamp is invalid',
+      fix: 'Run "pga scan" to perform a fresh scan',
     };
   }
+
+  const flaggedCount = readFlaggedSkills().length;
+  const threatNote =
+    flaggedCount > 0
+      ? ` — ${flaggedCount} skill(s) flagged: run "pga status" or "pga scan"`
+      : ' — all scanned skills clean';
+  const diffDays = Math.floor((Date.now() - scannedAt.getTime()) / 86_400_000);
+
+  if (diffDays > 7) {
+    return {
+      status: 'warn',
+      label: 'Last scan',
+      detail: `${diffDays} days ago (recommend weekly)${threatNote}`,
+      fix: 'Run "pga scan" to perform a fresh scan',
+    };
+  }
+
+  const when = diffDays === 0 ? 'Today' : `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+  // A fresh scan that FOUND threats is not a clean bill of health — warn so the
+  // flagged skills are not lost in a sea of green checks.
+  return {
+    status: flaggedCount > 0 ? 'warn' : 'pass',
+    label: 'Last scan',
+    detail: `${when}${threatNote}`,
+    ...(flaggedCount > 0
+      ? { fix: 'Review flagged skills: "pga status" (or remove them)' }
+      : {}),
+  };
 }
 
 const DEFAULT_TC_ENDPOINT = 'https://tc.panguard.ai';

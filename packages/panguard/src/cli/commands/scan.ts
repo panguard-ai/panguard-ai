@@ -30,6 +30,7 @@ import {
   discoverLocalSkillCount,
   getLocalPlatform,
 } from '../telemetry.js';
+import { recordScanResults } from '../flagged-skills.js';
 
 /**
  * Count threats in the bundled ATR CLI's `--json` output. ATR's schema is
@@ -189,6 +190,15 @@ export function scanCommand(): Command {
           let threats = 0;
           let clean = 0;
           let errors = 0;
+          // Names flagged this run, so status/doctor show their real state instead
+          // of "UNKNOWN". The batch path has a finding COUNT, not a per-finding
+          // severity, so flagged skills are recorded at HIGH (they cleared the
+          // --severity threshold) — never understated to UNKNOWN, never overstated
+          // to CRITICAL. `pga up` / `pga audit` record the precise level.
+          // `scannedOkNames` excludes scan errors so a skill we could NOT scan
+          // never has its prior flag wrongly cleared.
+          const flaggedNames: string[] = [];
+          const scannedOkNames: string[] = [];
           for (const skill of skills) {
             const skillPath = join(skillsDir, skill.name);
             try {
@@ -209,8 +219,10 @@ export function scanCommand(): Command {
               // NOT a `findings` array. Use the shared parser so a malicious
               // skill can never be silently counted clean here.
               const n = countAtrThreats(result.toString());
+              scannedOkNames.push(skill.name);
               if (n > 0) {
                 threats++;
+                flaggedNames.push(skill.name);
                 console.log(`  ${c.critical('!!')} ${c.bold(skill.name)} — ${n} finding(s)`);
               } else {
                 clean++;
@@ -220,13 +232,16 @@ export function scanCommand(): Command {
               if (e.status === 1 && e.stdout && e.stdout.length > 0) {
                 // ATR exits 1 when findings exist — parse them
                 const n = countAtrThreats(e.stdout.toString());
+                scannedOkNames.push(skill.name);
                 if (n !== 0) {
                   threats++;
+                  flaggedNames.push(skill.name);
                   console.log(
                     `  ${c.critical('!!')} ${c.bold(skill.name)} — ${n > 0 ? n : '?'} finding(s)`
                   );
                 } else {
                   threats++;
+                  flaggedNames.push(skill.name);
                   console.log(`  ${c.caution('!')} ${c.bold(skill.name)} — flagged`);
                 }
               } else {
@@ -235,6 +250,17 @@ export function scanCommand(): Command {
               }
             }
           }
+
+          // Persist verdicts so `pga status` / `pga doctor` reflect this scan.
+          recordScanResults({
+            scannedNames: scannedOkNames,
+            flagged: flaggedNames.map((name) => ({
+              name,
+              platform: 'claude-code',
+              riskLevel: 'HIGH' as const,
+            })),
+            scannedAt: new Date().toISOString(),
+          });
 
           console.log(
             `\n  ${c.safe(String(clean))} clean  |  ${threats > 0 ? c.critical(String(threats)) : '0'} flagged${errors > 0 ? `  |  ${c.caution(String(errors))} errors` : ''}`

@@ -24,6 +24,7 @@ import type { StatusItem, TableColumn } from '@panguard-ai/core';
 import { readConfig } from '../../init/config-writer.js';
 import { loadGuardConfig } from '../guard-config.js';
 import { readAuthenticatedDashboardUrl, dashboardBaseUrl } from '../dashboard-url.js';
+import { readFlaggedSkills } from '../flagged-skills.js';
 import type { Lang } from '../../init/types.js';
 
 const GUARD_CONFIG_PATH = join(homedir(), '.panguard-guard', 'config.json');
@@ -321,6 +322,14 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
       }
     }
 
+    // Load flagged-skill verdicts so a scanned-dangerous skill shows its real
+    // severity (CRITICAL/HIGH), not "UNKNOWN". A flag wins over the whitelist:
+    // a just-flagged CRITICAL skill is auto-revoked from the whitelist anyway.
+    const flaggedByName = new Map<string, string>();
+    for (const f of readFlaggedSkills()) {
+      flaggedByName.set(f.normalizedName, f.riskLevel);
+    }
+
     console.log(
       divider(
         lang === 'zh-TW'
@@ -352,20 +361,28 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
       ];
 
       const skillRows = installedSkills.map((s, i) => {
+        const flaggedLevel = flaggedByName.get(s.name.toLowerCase());
         const isSafe = whitelistNames.has(s.name.toLowerCase());
+        // Precedence: a scan flag (dangerous) beats SAFE beats UNKNOWN.
+        const status = flaggedLevel ?? (isSafe ? 'SAFE' : 'UNKNOWN');
         return {
           num: String(i + 1),
           name: s.name.length > 28 ? s.name.slice(0, 26) + '..' : s.name,
           platform: s.platformId,
-          status: isSafe ? 'SAFE' : 'UNKNOWN',
+          status,
         };
       });
 
-      // Show summary first
+      // Show summary first. Flagged skills are NOT "unscanned" — they were
+      // scanned and found dangerous; count them separately so status never
+      // understates a known threat as merely unchecked.
       const safeCount = skillRows.filter((r) => r.status === 'SAFE').length;
+      const flaggedCount = skillRows.filter(
+        (r) => r.status !== 'SAFE' && r.status !== 'UNKNOWN'
+      ).length;
       const unknownCount = skillRows.filter((r) => r.status === 'UNKNOWN').length;
       console.log(
-        `  ${c.safe(String(safeCount))} safe  ${c.dim('|')}  ${unknownCount > 0 ? c.caution(String(unknownCount)) : c.dim('0')} unscanned`
+        `  ${c.safe(String(safeCount))} safe  ${c.dim('|')}  ${flaggedCount > 0 ? c.critical(`${flaggedCount} flagged`) : c.dim('0 flagged')}  ${c.dim('|')}  ${unknownCount > 0 ? c.caution(String(unknownCount)) : c.dim('0')} unscanned`
       );
       console.log(
         `  ${c.dim(lang === 'zh-TW' ? '\u57F7\u884C pga scan \u6383\u63CF\u5168\u90E8 skill' : 'Run pga scan to scan all skills')}`
