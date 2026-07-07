@@ -95,10 +95,10 @@ export async function askTelemetryConsent(): Promise<boolean> {
   );
   console.log(`  ${c.dim('     truncated IP (last two octets zeroed).')}`);
   console.log(
-    `  ${c.dim('  2. Send it over an ENCRYPTED connection (HTTPS/TLS). Data is anonymized')}`
+    `  ${c.dim('  2. Anonymize it on your machine, then END-TO-END ENCRYPT it — sealed so')}`
   );
   console.log(
-    `  ${c.dim('     on your machine BEFORE it is sent (not end-to-end encrypted).')}`
+    `  ${c.dim('     only the Threat Cloud backend can read it, not the network or a relay.')}`
   );
   console.log(`  ${c.dim('  3. Auto-update your detection rules from the community.')}`);
   console.log('');
