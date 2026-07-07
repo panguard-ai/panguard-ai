@@ -97,6 +97,12 @@ export interface ThreatVerdict {
   mitreTechnique?: string;
   /** Investigation steps taken / 執行的調查步驟 */
   investigationSteps?: InvestigationStep[];
+  /**
+   * Carried from an advisory-only detection (behavioral anomaly, no rule/intel match).
+   * When true, respond-agent MUST NOT auto-block — only log/notify/report. This is the
+   * enforcement half of the unknown-attack flywheel: surface & report, never enforce.
+   */
+  adviseOnly?: boolean;
 }
 
 // ===== Confidence Scoring / Action Policy =====
@@ -265,6 +271,15 @@ export interface DetectionResult {
     /** ATR match confidence score (0-1) */
     confidence?: number;
   }>;
+  /**
+   * ADVISORY-ONLY detection: a behavioral/anomaly signal with NO rule, threat-intel,
+   * or correlation match. It exists so an UNKNOWN attack (nothing in the ruleset yet)
+   * can still be analyzed, surfaced, and — with consent — reported to Threat Cloud so
+   * the community can crystallize a rule. It MUST NEVER auto-block (respond-agent
+   * hard-gates adviseOnly to log_only), preserving the invariant that only
+   * deterministic rule/intel evidence enforces.
+   */
+  adviseOnly?: boolean;
 }
 
 // ===== Response =====

@@ -56,55 +56,86 @@ export async function askTelemetryConsent(): Promise<boolean> {
   // upload gate blocks. Opt in by setting the flags in config for headless use.
   if (!process.stdin.isTTY) {
     const config = loadGuardConfig();
-    updateGuardConfig({ ...config, telemetryEnabled: false, threatCloudUploadEnabled: false });
+    updateGuardConfig({
+      ...config,
+      telemetryEnabled: false,
+      threatCloudUploadEnabled: false,
+      threatCloudRuleSyncEnabled: false,
+    });
     markConsentAsked();
     return false;
   }
 
   console.log('');
-  console.log(`  ${symbols.info} ${c.bold('Collective defense (optional, off by default)')}`);
+  console.log(`  ${symbols.info} ${c.bold('Join Collective Defense (optional, off by default)')}`);
   console.log('');
   console.log(
-    `  ${c.dim('Why turn it on: every attack PanGuard blocks on your machine can become')}`
+    `  ${c.dim('Why join: PanGuard also reports UNKNOWN suspicious behavior it cannot yet')}`
   );
-  console.log(`  ${c.dim('a new ATR rule that protects everyone — and you get those community')}`);
   console.log(
-    `  ${c.dim('rules back faster. More sensors means faster detection for all of us.')}`
+    `  ${c.dim('match to a rule. Those reports let the community turn a novel attack into')}`
   );
+  console.log(
+    `  ${c.dim('a new ATR rule — and you get every community rule back automatically. This')}`
+  );
+  console.log(`  ${c.dim('is how the free tier catches tomorrow’s attacks, not just today’s.')}`);
+  console.log('');
+  console.log(`  ${c.bold('If you agree, PanGuard will:')}`);
+  console.log(
+    `  ${c.dim('  1. Connect to Threat Cloud and share minimal, ANONYMIZED threat')}`
+  );
+  console.log(
+    `  ${c.dim('     signatures — the matched rule ID(s) (or “none” for unknown threats),')}`
+  );
+  console.log(
+    `  ${c.dim('     attack category + MITRE technique, a coarse country region, and a')}`
+  );
+  console.log(`  ${c.dim('     truncated IP (last two octets zeroed).')}`);
+  console.log(
+    `  ${c.dim('  2. Send it over an ENCRYPTED connection (HTTPS/TLS). Data is anonymized')}`
+  );
+  console.log(
+    `  ${c.dim('     on your machine BEFORE it is sent (not end-to-end encrypted).')}`
+  );
+  console.log(`  ${c.dim('  3. Auto-update your detection rules from the community.')}`);
   console.log('');
   console.log(
-    `  ${c.dim('What is shared: the matched rule ID(s), attack category + MITRE technique,')}`
+    `  ${c.dim('NEVER shared: your prompts, code, file contents, secrets, file paths,')}`
   );
   console.log(
-    `  ${c.dim('a coarse country region, and a truncated IP (last two octets zeroed).')}`
+    `  ${c.dim('hostname, or username. Raw samples are never sent. A stable random install')}`
   );
-  console.log(
-    `  ${c.dim('Never your prompts, code, file contents, secrets, file paths, hostname,')}`
-  );
-  console.log(
-    `  ${c.dim('or username. Raw samples are never sent. A stable random install ID links')}`
-  );
-  console.log(`  ${c.dim('your own submissions (pseudonymous, not fully anonymous).')}`);
+  console.log(`  ${c.dim('ID links your own submissions (pseudonymous, not fully anonymous).')}`);
   console.log('');
   console.log(
-    `  ${c.dim('Stays off unless you opt in. Change anytime: pga config set telemetry true/false')}`
+    `  ${c.dim('Turn off anytime: pga config set telemetry false (upload) /')}`
   );
+  console.log(`  ${c.dim('pga config set threat-cloud false (rule sync).')}`);
   console.log('');
 
   // Opt-in: default is NO. Pressing Enter declines (default OFF).
   const answer = await promptYesNo(
-    '  Join collective defense and share minimal threat signatures? [y/N] ',
+    '  Agree and join Collective Defense? [y/N] ',
     false
   );
 
   const config = loadGuardConfig();
-  updateGuardConfig({ ...config, telemetryEnabled: answer, threatCloudUploadEnabled: answer });
+  // A single "I agree" wires the whole loop: contribute (upload) AND receive
+  // (rule sync). Declining leaves every flag off — nothing connects, nothing syncs.
+  updateGuardConfig({
+    ...config,
+    telemetryEnabled: answer,
+    threatCloudUploadEnabled: answer,
+    threatCloudRuleSyncEnabled: answer,
+  });
   markConsentAsked();
 
   if (answer) {
-    console.log(`  ${c.safe('Thank you — you are helping defend the commons.')}`);
+    console.log(
+      `  ${c.safe('Connected to Threat Cloud. Rules will auto-update; you are defending the commons.')}`
+    );
   } else {
-    console.log(`  ${c.dim('No problem. Nothing leaves your machine.')}`);
+    console.log(`  ${c.dim('No problem. Nothing connects and nothing leaves your machine.')}`);
   }
   console.log('');
 

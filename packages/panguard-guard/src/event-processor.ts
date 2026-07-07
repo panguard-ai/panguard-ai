@@ -64,6 +64,41 @@ export interface EventProcessorDeps {
 }
 
 /**
+ * Minimum baseline-deviation confidence for an unknown event to be worth analyzing
+ * and reporting as a community rule candidate. Conservative so ordinary new
+ * processes/connections don't flood the flywheel; the analyze-agent's benign gate
+ * and Threat Cloud's 0-FP-on-benign-corpus safety gate are the downstream filters.
+ */
+const ADVISORY_REPORT_MIN_CONFIDENCE = 65;
+
+/**
+ * For an event with NO deterministic detection (no rule / threat-intel / correlation
+ * match), decide whether a behavioral anomaly is notable enough to analyze and — with
+ * consent — report as an UNKNOWN threat candidate. Returns an ADVISORY-ONLY
+ * DetectionResult (adviseOnly: true, empty ruleMatches) or null when the event looks
+ * normal. adviseOnly guarantees the downstream respond-agent can never auto-block it,
+ * so this widens what we LEARN FROM without widening what we ENFORCE.
+ */
+async function maybeAdvisoryDetection(
+  event: SecurityEvent,
+  state: EventProcessorState
+): Promise<DetectionResult | null> {
+  try {
+    const { checkDeviation } = await import('./memory/baseline.js');
+    const dev = checkDeviation(state.baseline, event);
+    if (!dev.isDeviation || dev.confidence < ADVISORY_REPORT_MIN_CONFIDENCE) return null;
+    return {
+      event,
+      ruleMatches: [],
+      timestamp: new Date().toISOString(),
+      adviseOnly: true,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Evaluate ATR rules and merge matches into the detection result.
  */
 function evaluateATR(
@@ -323,15 +358,31 @@ export async function processEvent(
     detection = evaluateATR(event, detection, deps.atrEngine);
 
     if (!detection) {
-      // No threat detected - update baseline based on mode
-      if (state.mode === 'learning') {
-        const { updateBaseline } = await import('./memory/baseline.js');
-        state.baseline = updateBaseline(state.baseline, event);
-      } else {
-        const { continuousBaselineUpdate } = await import('./memory/baseline.js');
-        state.baseline = continuousBaselineUpdate(state.baseline, event, 'benign');
+      // No rule / threat-intel / correlation match. Give the behavioral layer ONE
+      // chance to surface an UNKNOWN attack as an ADVISORY detection so it can be
+      // analyzed and — with consent — reported to Threat Cloud for community rule
+      // crystallization. This is the fix for the flywheel's structural blind spot:
+      // a novel attack with no existing rule used to be dropped here and never
+      // learned from. adviseOnly is hard-gated to log_only downstream, so this can
+      // NEVER auto-block — it only surfaces + reports. Gated on upload consent so a
+      // non-contributing user's hot path is untouched, and off during learning
+      // (the baseline isn't trustworthy yet).
+      const advisory =
+        state.mode !== 'learning' && state.config.threatCloudUploadEnabled === true
+          ? await maybeAdvisoryDetection(event, state)
+          : null;
+      if (!advisory) {
+        // Genuinely benign — update baseline based on mode.
+        if (state.mode === 'learning') {
+          const { updateBaseline } = await import('./memory/baseline.js');
+          state.baseline = updateBaseline(state.baseline, event);
+        } else {
+          const { continuousBaselineUpdate } = await import('./memory/baseline.js');
+          state.baseline = continuousBaselineUpdate(state.baseline, event, 'benign');
+        }
+        return;
       }
-      return;
+      detection = advisory;
     }
 
     state.threatsDetected++;
