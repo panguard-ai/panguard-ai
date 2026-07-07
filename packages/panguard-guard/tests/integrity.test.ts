@@ -14,6 +14,7 @@ import {
   manifestPath,
   collectSelfState,
   mergeSelfState,
+  forgetSelfState,
   readSelfStateRefs,
   type SelfStateRef,
 } from '../src/integrity.js';
@@ -187,5 +188,85 @@ describe('self-state discovery + merge (finding #20 — dead self-removal wiring
     for (const ref of collectSelfState()) {
       expect(existsSync(ref.path)).toBe(true);
     }
+  });
+});
+
+describe('forgetSelfState — legitimate self-removal rebuilds trust (inverse of merge)', () => {
+  it('drops ONLY the named kind, keeps the rest', () => {
+    const refs: SelfStateRef[] = [
+      { kind: 'launchagent', path: '/p', marker: 'm' },
+      { kind: 'hook', path: '/h', marker: 'm2' },
+    ];
+    expect(forgetSelfState(refs, ['launchagent'])).toEqual([
+      { kind: 'hook', path: '/h', marker: 'm2' },
+    ]);
+  });
+
+  it('empty recorded list → empty (nothing to forget)', () => {
+    expect(forgetSelfState([], ['launchagent'])).toEqual([]);
+  });
+
+  it('kind not present → returns every ref unchanged', () => {
+    const refs: SelfStateRef[] = [
+      { kind: 'hook', path: '/h', marker: 'm2' },
+      { kind: 'proxy', path: '/x' },
+    ];
+    expect(forgetSelfState(refs, ['launchagent'])).toEqual(refs);
+  });
+
+  it('drops EVERY ref of a kind (not just the first) when duplicated', () => {
+    const refs: SelfStateRef[] = [
+      { kind: 'launchagent', path: '/p1' },
+      { kind: 'launchagent', path: '/p2' },
+      { kind: 'hook', path: '/h' },
+    ];
+    expect(forgetSelfState(refs, ['launchagent'])).toEqual([{ kind: 'hook', path: '/h' }]);
+  });
+
+  it('accepts multiple kinds at once', () => {
+    const refs: SelfStateRef[] = [
+      { kind: 'launchagent', path: '/p' },
+      { kind: 'hook', path: '/h' },
+      { kind: 'proxy', path: '/x' },
+    ];
+    expect(forgetSelfState(refs, ['launchagent', 'proxy'])).toEqual([{ kind: 'hook', path: '/h' }]);
+  });
+
+  it('does not mutate the input array (immutable — returns a new list)', () => {
+    const refs: SelfStateRef[] = [
+      { kind: 'launchagent', path: '/p' },
+      { kind: 'hook', path: '/h' },
+    ];
+    const out = forgetSelfState(refs, ['launchagent']);
+    expect(refs).toHaveLength(2); // original untouched
+    expect(out).not.toBe(refs);
+  });
+
+  it('END-TO-END: a legitimate uninstall re-seal clears the forever-TAMPERED trap', () => {
+    // Record a LaunchAgent, then delete the file WITHOUT forgetting it: the guard
+    // now flags a permanent "missing" (the trap forgetSelfState exists to break).
+    const plist = join(dir, 'com.panguard.panguard-guard.plist');
+    writeFileSync(plist, '<plist/>');
+    sealConfigManifest(
+      baseConfig(),
+      [{ kind: 'launchagent', path: plist, marker: 'x' }],
+      dir
+    );
+    rmSync(plist); // uninstall removes the persistence service file
+
+    // Baseline: without forgetting, checkSelfState reports the removed artifact missing.
+    const before = checkSelfState(dir);
+    expect(before.ok).toBe(false);
+    expect(before.findings[0]).toMatchObject({ kind: 'launchagent', reason: 'missing' });
+
+    // Legitimate-uninstall re-seal path: forget the kind we deliberately removed,
+    // then re-seal. Trust must be rebuilt — no lingering "missing".
+    const pruned = forgetSelfState(readSelfStateRefs(dir), ['launchagent']);
+    sealConfigManifest(baseConfig(), pruned, dir);
+
+    // The manifest no longer records the launchagent ref...
+    expect(readSelfStateRefs(dir).some((r) => r.kind === 'launchagent')).toBe(false);
+    // ...and checkSelfState no longer flags the removed artifact.
+    expect(checkSelfState(dir)).toEqual({ ok: true, findings: [] });
   });
 });

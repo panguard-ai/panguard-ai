@@ -102,7 +102,7 @@ export async function runCLI(args: string[]): Promise<void> {
       await commandInstall(dataDir);
       break;
     case 'uninstall':
-      await commandUninstall();
+      await commandUninstall(dataDir);
       break;
     case 'config':
       commandConfig(dataDir);
@@ -1014,10 +1014,12 @@ async function commandInstall(dataDir: string): Promise<void> {
 }
 
 /** Uninstall system service / 解除安裝系統服務 */
-async function commandUninstall(): Promise<void> {
+async function commandUninstall(dataDir: string): Promise<void> {
   const sp = spinner('Uninstalling PanguardGuard service...');
+  let removed = false;
   try {
     const result = await uninstallService();
+    removed = true;
     sp.succeed(`Service uninstalled: ${c.sage(result)}`);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
@@ -1026,6 +1028,24 @@ async function commandUninstall(): Promise<void> {
   // Remove the persisted dashboard launch token so the secret never lingers
   // after the service is gone.
   removeDashboardToken();
+  // A LEGITIMATE removal must rebuild trust: drop the LaunchAgent ref from the
+  // sealed manifest and re-seal, or the next `guard start` warns forever and the
+  // dashboard shows TAMPERED with no natural recovery (self-state never drops on
+  // merge). Best-effort + only when the manifest was already sealed — never
+  // create a seal here, and never let a re-seal failure mask the uninstall.
+  if (removed) {
+    try {
+      const { wasInitialized, readSelfStateRefs, forgetSelfState, sealConfigManifest } =
+        await import('../integrity.js');
+      if (wasInitialized(dataDir)) {
+        const kept = forgetSelfState(readSelfStateRefs(dataDir), ['launchagent']);
+        const config = loadConfig(join(dataDir, 'config.json'));
+        sealConfigManifest(config as unknown as Record<string, unknown>, kept, dataDir);
+      }
+    } catch {
+      /* re-seal is best-effort — the service is already uninstalled */
+    }
+  }
 }
 
 /** Show current configuration / 顯示當前配置 */

@@ -482,12 +482,23 @@ function checkHookProtection(): CheckResult {
     };
   }
   if (status.degraded && status.reason) {
+    // A contract/protocol failure. Word from the ACTUAL disposition: a
+    // fail-closed marker blocked the call; under advisory posture the same
+    // unrecognized outcome is ALLOWED (advisory blocks nothing) — reporting
+    // "blocked" there would be a false claim in the opposite direction.
+    const allowed = status.disposition === 'allowed';
     return {
       status: 'fail',
       label: 'Built-in-tool hook',
-      detail: `Hook failed CLOSED (blocked a tool call) — ${status.reason} on host protocol "${
-        status.platform || 'unknown'
-      }"${status.at ? ` at ${status.at}` : ''}`,
+      detail: allowed
+        ? `Hook could not trust its verdict and ALLOWED a tool call (advisory posture) — ${
+            status.reason
+          } on host protocol "${status.platform || 'unknown'}"${
+            status.at ? ` at ${status.at}` : ''
+          }`
+        : `Hook failed CLOSED (blocked a tool call) — ${status.reason} on host protocol "${
+            status.platform || 'unknown'
+          }"${status.at ? ` at ${status.at}` : ''}`,
       fix: 'If PanGuard or the host agent was updated, re-register the hook with "pga hook install". A manual or test invocation also records this; the marker clears on the next healthy run',
     };
   }

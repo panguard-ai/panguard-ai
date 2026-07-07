@@ -334,3 +334,20 @@ export function mergeSelfState(
   }
   return [...byPath.values()];
 }
+
+/**
+ * Drop recorded refs by kind — the deliberate inverse of mergeSelfState, used
+ * ONLY when the guard removes its own artifact on purpose (e.g. `pga guard
+ * uninstall` removing the LaunchAgent). A LEGITIMATE removal must rebuild trust,
+ * not leave a permanent "missing" that makes checkSelfState flag tamper forever.
+ * Without this, once you uninstall the reboot service the manifest keeps its ref
+ * (merge never drops), so every subsequent start warns and the dashboard shows
+ * TAMPERED with no natural recovery. Callers pass the kind(s) they just removed.
+ */
+export function forgetSelfState(
+  recorded: readonly SelfStateRef[],
+  kinds: readonly SelfStateRef['kind'][]
+): SelfStateRef[] {
+  const drop = new Set(kinds);
+  return recorded.filter((r) => r && typeof r.kind === 'string' && !drop.has(r.kind));
+}

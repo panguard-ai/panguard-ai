@@ -92,8 +92,20 @@ function contentFromArgs(toolName: string, input: ToolInput): string {
   // file write / edit / patch — extract EVERY content-bearing field so no write
   // payload is ever dropped: Claude new_string/content, Codex apply_patch `input`,
   // generic patch/diff. Dropping the content here = malicious writes ship blind.
-  if (t.includes('write') || t.includes('edit') || t.includes('replace') || t.includes('patch'))
-    return `${str(i['file_path'] ?? i['path'] ?? i['filePath'])} ${str(
+  if (t.includes('write') || t.includes('edit') || t.includes('replace') || t.includes('patch')) {
+    const head = str(i['file_path'] ?? i['path'] ?? i['filePath']);
+    // MultiEdit carries an `edits: [{ new_string, ... }]` ARRAY — the single
+    // scalar fields below are all undefined for it, so without this the entire
+    // batched write payload ships unscanned. Concatenate every edit's content.
+    const editsArr = Array.isArray(i['edits']) ? (i['edits'] as unknown[]) : [];
+    const editsContent = editsArr
+      .map((e) => {
+        const eo = (e ?? {}) as ToolInput;
+        return str(eo['new_string'] ?? eo['content'] ?? eo['new_str'] ?? eo['value']);
+      })
+      .filter(Boolean)
+      .join(' ');
+    const scalar = str(
       i['new_string'] ??
         i['content'] ??
         i['new_str'] ??
@@ -101,7 +113,9 @@ function contentFromArgs(toolName: string, input: ToolInput): string {
         i['input'] ??
         i['patch'] ??
         i['diff']
-    )}`.trim();
+    );
+    return `${head} ${scalar} ${editsContent}`.trim().replace(/\s+/g, ' ');
+  }
   if (t.includes('read')) return str(i['file_path'] ?? i['path'] ?? i['filePath']);
   // web
   if (t.includes('fetch') || t.includes('web'))
@@ -360,14 +374,25 @@ function signalZeroRulesFailOpen(): void {
  * Record a contract/protocol fail-CLOSED event in the same status file doctor and
  * the dashboard already read, so a silent-non-enforcement risk becomes visible.
  */
-function writeContractMarker(platform: string, reason: string): void {
+function writeContractMarker(
+  platform: string,
+  reason: string,
+  disposition: 'blocked' | 'allowed' = 'blocked'
+): void {
   try {
     const path = hookStatusPath();
     mkdirSync(dirname(path), { recursive: true });
     writeFileSync(
       path,
       JSON.stringify(
-        { degraded: true, ruleCount: 0, reason, platform, at: new Date().toISOString() },
+        {
+          degraded: true,
+          ruleCount: 0,
+          reason,
+          platform,
+          disposition,
+          at: new Date().toISOString(),
+        },
         null,
         2
       ),
@@ -443,6 +468,7 @@ export function readHookProtectionStatus(): {
   at: string;
   reason?: string;
   platform?: string;
+  disposition?: 'blocked' | 'allowed';
 } | null {
   try {
     const path = hookStatusPath();
@@ -453,6 +479,7 @@ export function readHookProtectionStatus(): {
       at?: string;
       reason?: string;
       platform?: string;
+      disposition?: string;
     };
     return {
       degraded: parsed.degraded === true,
@@ -461,6 +488,9 @@ export function readHookProtectionStatus(): {
       ...(typeof parsed.reason === 'string' && parsed.reason ? { reason: parsed.reason } : {}),
       ...(typeof parsed.platform === 'string' && parsed.platform
         ? { platform: parsed.platform }
+        : {}),
+      ...(parsed.disposition === 'allowed' || parsed.disposition === 'blocked'
+        ? { disposition: parsed.disposition }
         : {}),
     };
   } catch {
@@ -592,10 +622,21 @@ export async function runHook(
       rawOutcome === 'allow' || rawOutcome === 'ask' || rawOutcome === 'deny' ? rawOutcome : 'deny';
     if (outcome === 'allow') process.exit(0);
     if (outcome !== rawOutcome) {
+      // Record the marker with the disposition this posture will ACTUALLY apply:
+      // advisory blocks nothing, so an unrecognized outcome is coerced to 'deny'
+      // yet still ALLOWED — the marker must not claim it was blocked (doctor and
+      // the dashboard word their message from `disposition`).
+      const willAllow = posture === 'advisory';
       process.stderr.write(
-        `[panguard-hook] WARNING: unrecognized evaluator outcome "${String(rawOutcome)}" — denying (fail-closed).\n`
+        `[panguard-hook] WARNING: unrecognized evaluator outcome "${String(rawOutcome)}" — ${
+          willAllow ? 'advisory posture: NOT blocking' : 'denying (fail-closed)'
+        }.\n`
       );
-      writeContractMarker(platform, 'unrecognized-evaluator-outcome');
+      writeContractMarker(
+        platform,
+        'unrecognized-evaluator-outcome',
+        willAllow ? 'allowed' : 'blocked'
+      );
     }
 
     const rules = result.matchedRules?.length
@@ -605,7 +646,7 @@ export async function runHook(
 
     // POSTURE gate. `outcome` is a real 'deny' (hard-deny: critical / high-stable)
     // or 'ask' (lower-confidence) verdict here (allow already exited; an
-    // unrecognized outcome already failed closed above).
+    // unrecognized outcome was coerced to 'deny' above and is gated here too).
     //   guarded (default) → block 'deny', advise 'ask'
     //   enforce           → block both
     //   advisory          → block neither
