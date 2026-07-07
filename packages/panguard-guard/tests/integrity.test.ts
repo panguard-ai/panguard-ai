@@ -51,6 +51,50 @@ describe('config integrity — seal/verify', () => {
     expect(verifyConfigIntegrity(baseConfig(), dir).status).toBe('unsealed');
   });
 
+  it('REGRESSION: a config that leaves watched security fields UNSET seals cleanly (not manifest-tampered)', () => {
+    // The real default config never sets enforcementPolicy / trustedSkills, so
+    // securitySnapshot records them as `undefined`. canonical() hashed them as
+    // present keys while JSON.stringify DROPPED them when writing the manifest —
+    // so verify recomputed a different outer MAC and every pristine install
+    // reported manifest-tampered. The prior fixture masked this by defining all
+    // seven fields. Seal a realistic sparse config and demand 'sealed'.
+    const sparse: Record<string, unknown> = {
+      dataDir: '/tmp/x',
+      mode: 'protection',
+      threatCloudEndpoint: 'https://tc.panguard.ai',
+      threatCloudRuleSyncEnabled: false,
+      dashboardEnabled: true,
+      telemetryEnabled: false,
+      // enforcementPolicy and trustedSkills intentionally absent (undefined)
+    };
+    sealConfigManifest(sparse, [], dir);
+    const v = verifyConfigIntegrity(sparse, dir);
+    expect(v.status).toBe('sealed');
+    expect(v.findings).toHaveLength(0);
+    // And the persisted manifest's securityFields must round-trip identically
+    // (no undefined key resurrected on read that would desync the MAC).
+    const persisted = JSON.parse(readFileSync(manifestPath(dir), 'utf-8')) as {
+      config?: { securityFields?: Record<string, unknown> };
+    };
+    expect(persisted.config?.securityFields).not.toHaveProperty('enforcementPolicy');
+    expect(persisted.config?.securityFields).not.toHaveProperty('trustedSkills');
+  });
+
+  it('REGRESSION: setting a previously-unset watched field IS detected as tampered', () => {
+    // The undefined-key fix must not blind us: sealing without enforcementPolicy
+    // then introducing one is a real security-relevant change → tampered.
+    const sparse: Record<string, unknown> = {
+      mode: 'protection',
+      threatCloudEndpoint: 'https://tc.panguard.ai',
+      threatCloudRuleSyncEnabled: false,
+      dashboardEnabled: true,
+      telemetryEnabled: false,
+    };
+    sealConfigManifest(sparse, [], dir);
+    const changed = { ...sparse, trustedSkills: ['evil-skill'] };
+    expect(verifyConfigIntegrity(changed, dir).status).toBe('tampered');
+  });
+
   it('ADVERSARIAL: mode downgraded after seal → tampered + the exact delta', () => {
     sealConfigManifest(baseConfig(), [], dir);
     const tampered = { ...baseConfig(), mode: 'report-only' };

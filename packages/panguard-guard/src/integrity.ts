@@ -107,13 +107,25 @@ function deriveMachineKey(): Buffer {
   return createHash('sha256').update(`${hostname()}\n${userInfo().username}\npanguard-ai`).digest();
 }
 
-/** Deterministic JSON with RECURSIVELY sorted keys, so the HMAC is order-stable. */
+/**
+ * Deterministic JSON with RECURSIVELY sorted keys, so the HMAC is order-stable.
+ *
+ * CRITICAL: object keys whose value is `undefined` are OMITTED, exactly as
+ * JSON.stringify does when the manifest is written to disk. Without this, sealing
+ * hashes `{enforcementPolicy: undefined}` as a present key while the persisted
+ * file drops it — so verify recomputes a different MAC and reports
+ * `manifest-tampered` on a pristine install (any config that leaves a watched
+ * security field unset, e.g. the default enforcementPolicy / trustedSkills).
+ * Array holes still serialize as null to match JSON.stringify array semantics.
+ */
 function canonical(v: unknown): string {
   if (v === null || v === undefined) return 'null';
   if (typeof v !== 'object') return JSON.stringify(v);
   if (Array.isArray(v)) return '[' + v.map(canonical).join(',') + ']';
   const o = v as Record<string, unknown>;
-  const keys = Object.keys(o).sort();
+  const keys = Object.keys(o)
+    .filter((k) => o[k] !== undefined)
+    .sort();
   return '{' + keys.map((k) => JSON.stringify(k) + ':' + canonical(o[k])).join(',') + '}';
 }
 

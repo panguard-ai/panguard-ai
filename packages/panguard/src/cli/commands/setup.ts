@@ -171,7 +171,7 @@ export function setupCommand(): Command {
             openBrowser(url);
           } else {
             console.log(
-              c.yellow(`  ${symbols.warn} Dashboard is still starting. Open it with: pga up`)
+              c.yellow(`  ${symbols.warn} Dashboard is still starting. Run "pga status" for the link.`)
             );
             console.log(c.dim(`    It will be served at ${dashboardBaseUrl()}`));
           }
