@@ -14,11 +14,9 @@ export default function WhitelistContent() {
   const t = useTranslations('whitelistPage');
   const stats = useEcosystemStats();
 
-  const trustScore =
-    stats.skillsScanned > 0
-      ? (((stats.skillsScanned - stats.blacklistedSkills) / stats.skillsScanned) * 100).toFixed(1)
-      : '99.4';
-
+  // Funnel: Total Scanned -> Community-Verified Safe -> Confirmed Malicious.
+  // Three distinct counts that reconcile against each other (no derived
+  // percentage disconnected from the visible numbers).
   const STAT_CARDS = [
     {
       key: 'totalScanned' as const,
@@ -29,8 +27,8 @@ export default function WhitelistContent() {
       value: stats.whitelistedSkills.toLocaleString(),
     },
     {
-      key: 'trustScore' as const,
-      value: `${trustScore}%`,
+      key: 'confirmedMalicious' as const,
+      value: stats.blacklistedSkills.toLocaleString(),
     },
   ];
 

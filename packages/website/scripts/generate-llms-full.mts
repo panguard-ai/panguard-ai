@@ -27,9 +27,13 @@ const OUT = join(ROOT, 'public', 'llms-full.txt');
 // synced with src/lib/stats.ts (it is the single most-changed-together pair).
 const STATS = {
   cliVersion: '1.5.6',
-  atrRules: 419,
-  atrPatterns: 920,
-  totalRulesDisplay: '419',
+  // NOTE: keep these values in sync with src/lib/stats.ts (single source of
+  // truth). atrRules is the standard total (data/stats.json); the compiled
+  // bundle is 651.
+  atrVersion: '3.4.0',
+  atrRules: 651,
+  atrPatterns: 2_949,
+  totalRulesDisplay: '650+',
   promotionIntervalMinutes: 2,
   testsPassing: 3528,
   detectionLayers: 3,
@@ -38,18 +42,23 @@ const STATS = {
   mcpTools: 12,
   skillAuditChecks: 8,
   benchmark: {
-    pint: { recall: 62.5, precision: 99.6, samples: 850 },
+    // PINT here is a self-built 850-sample corpus (deepset prompt-injections +
+    // Lakera Gandalf), NOT Lakera's official PINT benchmark or any third party.
+    pint: { recall: 63.2, precision: 99.65, samples: 850 },
     skill: { recall: 100, precision: 97, fp: 0.2, samples: 498 },
-    garak: { recall: 97.1, samples: 666 },
+    garak: { recall: 98, samples: 650 },
+    hackaprompt: { recall: 66.2, samples: 4_780 },
   },
   ecosystem: {
     skillsScanned: 67_799,
-    maliciousFound: 11_324,
+    confirmedMalware: 751,
+    blacklistedSkills: 1_096,
+    suspiciousPlusConfirmed: 11_324,
     packagesWithFindings: 2_322,
     tripleThreat: 249,
   },
   adoption: {
-    ciscoRulesMerged: 419,
+    ciscoRulesMerged: 651,
     microsoftRulesMerged: 287,
     externalPRMerges: 13,
     externalOrgs: 6,
@@ -97,7 +106,7 @@ Self-taught engineer. Based in Taiwan, shipping globally. Founded Panguard AI,
 Inc. (Delaware C-Corp) on 2026-05-12.
 
 ### Product tiers (locked 2026-04-22)
-- Community: $0 forever, MIT licensed, 419 ATR rules, unlimited self-host.
+- Community: $0 forever, MIT licensed, ${STATS.totalRulesDisplay} ATR rules, unlimited self-host.
 - Pilot: $25K / 90 days. F500 procurement test drive. IT director can approve.
   Full credit toward Y1 Enterprise.
 - Enterprise: $150K-500K / year. Migrator Pro, 5-framework signed compliance
@@ -124,8 +133,8 @@ cost, insufficient differentiation, vendor death spiral).
 const STATS_SECTION = `## Section 2 — Core stats (verified ${new Date().toISOString().split('T')[0]})
 
 ### Rule corpus
-- ${STATS.atrRules} ATR rules in v2.2.0
-- ${STATS.atrPatterns} compiled detection patterns across all rules
+- ${STATS.totalRulesDisplay} ATR rules (${STATS.atrRules} exact) in v${STATS.atrVersion}
+- ${STATS.atrPatterns.toLocaleString()} compiled detection patterns across all rules
 - 10 threat categories (prompt-injection, agent-manipulation, skill-compromise,
   context-exfiltration, tool-poisoning, privilege-escalation, model-abuse,
   excessive-autonomy, model-security, data-poisoning)
@@ -136,8 +145,9 @@ const STATS_SECTION = `## Section 2 — Core stats (verified ${new Date().toISOS
 - Garak (NVIDIA jailbreak corpus): ${STATS.benchmark.garak.recall}% recall on ${STATS.benchmark.garak.samples} samples
 - SKILL.md (real-world skill corpus): ${STATS.benchmark.skill.recall}% recall,
   ${STATS.benchmark.skill.precision}% precision, ${STATS.benchmark.skill.fp}% false positive rate on ${STATS.benchmark.skill.samples} samples
-- PINT (Invariant Labs adversarial corpus): ${STATS.benchmark.pint.recall}% recall, ${STATS.benchmark.pint.precision}% precision on ${STATS.benchmark.pint.samples} samples
-- Wild scan: ${STATS.ecosystem.skillsScanned.toLocaleString()} AI agent skills scanned, ${STATS.ecosystem.maliciousFound.toLocaleString()} threats detected,
+- PINT (self-built PINT-format corpus: deepset prompt-injections + Lakera Gandalf, NOT Lakera's official PINT benchmark): ${STATS.benchmark.pint.recall}% recall, ${STATS.benchmark.pint.precision}% precision on ${STATS.benchmark.pint.samples} samples
+- HackAPrompt (EMNLP 2023 competition corpus): ${STATS.benchmark.hackaprompt.recall}% recall on ${STATS.benchmark.hackaprompt.samples.toLocaleString()} samples
+- Wild scan: ${STATS.ecosystem.skillsScanned.toLocaleString()} AI agent skills scanned, ${STATS.ecosystem.confirmedMalware} confirmed malware (${STATS.ecosystem.suspiciousPlusConfirmed.toLocaleString()} suspicious + confirmed),
   ${STATS.ecosystem.tripleThreat} triple-threat packages (shell + network + filesystem access)
 
 ### Ecosystem adoption
@@ -159,7 +169,7 @@ const STATS_SECTION = `## Section 2 — Core stats (verified ${new Date().toISOS
 
 ### Maturity
 - License: MIT (both ATR and PanGuard CLI)
-- ATR semantic version: 2.2.0
+- ATR semantic version: ${STATS.atrVersion}
 - PanGuard CLI version: ${STATS.cliVersion}
 - Threat Cloud sync interval: every hour
 - Rule promotion interval: ${STATS.promotionIntervalMinutes} minutes (community-validated to production)
@@ -221,7 +231,7 @@ const PRODUCTS_SECTION = `## Section 4 — Product surface (what each piece does
 
 ### PanGuard Scan
 Static + dynamic analysis on AI agent skill packages before install. Pipeline:
-content fingerprint, regex match against 419 ATR rules, optional LLM second
+content fingerprint, regex match against ${STATS.totalRulesDisplay} ATR rules, optional LLM second
 opinion. Outputs SARIF 2.1.0 (industry-standard threat export) and signed
 JSON evidence packs. CLI: \`panguard scan <path>\`. 60 seconds end-to-end on
 a typical npm package.
@@ -287,9 +297,9 @@ NIST AI RMF. Pulls from Guard event log and PanGuard's own audit trail.
 const BENCHMARKS_SECTION = `## Section 5 — Benchmark methodology
 
 ### Garak (NVIDIA jailbreak corpus)
-Source: github.com/NVIDIA/garak. 666 adversarial prompts spanning prompt
-injection, jailbreaking, encoding tricks, persona attacks. Result: 97.1%
-recall. Methodology: ATR v2.1.2 loaded with all 419 rules, prompts fed
+Source: github.com/NVIDIA/garak. ${STATS.benchmark.garak.samples} adversarial prompts spanning prompt
+injection, jailbreaking, encoding tricks, persona attacks. Result: ${STATS.benchmark.garak.recall}%
+recall. Methodology: ATR loaded with the full ${STATS.totalRulesDisplay}-rule bundle, prompts fed
 through detect-only mode (no LLM second opinion), recall = (true positives) /
 (true positives + false negatives). Reproducibility: agent-threat-rules
 repo, \`pnpm bench:garak\`.
@@ -301,29 +311,33 @@ manually labeled as malicious (252) or benign (246). Result: 100% recall,
 mode, full pipeline (regex + fingerprint + content checks). The 0.2% FP rate
 is the 1 false positive out of 432 clean skills in the held-out test set.
 
-### PINT (Invariant Labs adversarial corpus)
-Source: github.com/invariantlabs-ai/invariant. 850 samples covering Sigma-style
-detection scenarios adapted for AI agents. Result: 62.5% recall, 99.6%
-precision. Methodology: ATR v2.1.2 regex layer only (no LLM). The lower
+### PINT (self-built PINT-format corpus)
+Source: self-built ${STATS.benchmark.pint.samples}-sample corpus in PINT format,
+assembled from deepset/prompt-injections + Lakera Gandalf. This is NOT Lakera's
+official private PINT benchmark and is not attributable to any third party.
+Result: ${STATS.benchmark.pint.recall}% recall, ${STATS.benchmark.pint.precision}%
+precision. Methodology: ATR regex layer only (no LLM). The lower
 recall vs Garak/SKILL.md reflects the corpus being designed for SIEM
 detection patterns, not agent-context patterns — Sigma migration via Migrator
 is in active development to close the gap.
 
 ### Wild scan (live ecosystem audit)
 Crawled 96,096 AI agent skill entries from ClawHub (36,378), OpenClaw (56,503),
-Skills.sh (3,115), plus a small Hermes-protocol sample (100). Scanned 67,799
-that had parseable content. Result: 1,096 confirmed malicious skills, 11,324
-total threats detected (confirmed + suspicious), 249 triple-threat packages
-(combined shell + network + filesystem access), 122 packages with
+Skills.sh (3,115), plus a small Hermes-protocol sample (100). Result:
+${STATS.ecosystem.confirmedMalware} confirmed malware skills. Separately, the cumulative
+Threat Cloud blacklist stands at ${STATS.ecosystem.blacklistedSkills.toLocaleString()} skills, and
+${STATS.ecosystem.suspiciousPlusConfirmed.toLocaleString()} skills carry at least one suspicious-or-confirmed
+threat signal (these are distinct metrics, not interchangeable). ${STATS.ecosystem.tripleThreat}
+triple-threat packages (combined shell + network + filesystem access), 122 packages with
 postinstall scripts.
 
-### HackAPrompt cluster mining (engineering update 2026-05-11)
-Source: HackAPrompt 600K corpus. Ran ATR v2.1.2 baseline (61.6% PINT,
-16.0% HackAPrompt recall), clustered 4,016-sample miss space, wrote 6 new
-rules covering dominant attack families, tightened to zero false positives
-on a 431-sample benign corpus, re-ran. Result: HackAPrompt recall 29.5%,
-PINT recall 62.5%, zero new false positives, 6.91ms p50 latency. The 29.5%
-is honest. Below closed-source ML detectors claim. The number is not the
+### HackAPrompt cluster mining
+Source: HackAPrompt EMNLP 2023 competition corpus
+(${STATS.benchmark.hackaprompt.samples.toLocaleString()} deterministic samples). Clustered the miss space,
+wrote new rules covering dominant attack families, tightened to zero false
+positives on a benign corpus, re-ran. Result: HackAPrompt recall ${STATS.benchmark.hackaprompt.recall}%,
+PINT recall ${STATS.benchmark.pint.recall}%, zero new false positives. The number is
+honest and below closed-source ML detector claims. The number is not the
 point — the methodology is.
 
 ---
@@ -339,7 +353,8 @@ agent-governance-toolkit issue #1981 with regression-test fixtures presuming
 ATR detection — a bidirectional integration loop is now operational.
 
 ### Cisco AI Defense (skill-scanner)
-PR #79 (PoC, 34 rules) → PR #99 (full 419-rule library merged in production via v2.2.0 auto-sync,
+PR #79 (PoC, 34 rules) → PR #99 (full rule library merged in production with
+auto-sync to the latest ATR release, currently ${STATS.totalRulesDisplay} rules,
 2026-04-22). skill-scanner is Cisco's commercial scanner; ATR is the rule
 engine underneath.
 
@@ -358,15 +373,15 @@ OWASP-official.
 PR #33 (Norton / Avast / AVG parent company). 2026-04-18. Open and tracked.
 
 ### Other open PRs
-NVIDIA garak #1676 (v2.1.0, 419 rules, 2 review rounds passed), safe-agentic-
+NVIDIA garak #1676 (full ATR rule pack, 2 review rounds passed), safe-agentic-
 framework/safe-mcp #187, IBM mcp-context-forge #4109, meta-llama/PurpleLlama
 #206, promptfoo/promptfoo #8529, cisco-ai-defense/mcp-scanner #151,
 agentcontrol/agent-control #170.
 
 ### npm + PyPI packages (October 2025 onwards)
 13 packages combined cross-ecosystem, 10K+ monthly downloads in aggregate.
-Notable: agent-threat-rules (npm, 2.2.0), @panguard-ai/migrator-community
-(npm, 0.1.0), panguard (npm, will be 1.5.6 once npm publish lands).
+Notable: agent-threat-rules (npm, ${STATS.atrVersion}), @panguard-ai/migrator-community
+(npm, 0.1.0), panguard (npm, ${STATS.cliVersion}).
 
 ---
 

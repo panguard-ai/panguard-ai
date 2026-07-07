@@ -20,6 +20,7 @@ function buildCspHeader(nonce: string): string {
     `script-src 'self' 'nonce-${nonce}'${isDev ? " 'unsafe-eval'" : ''} https://plausible.io https://static.cloudflareinsights.com`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https:",
+    "object-src 'none'",
     "font-src 'self' data:",
     "connect-src 'self' https://api.panguard.ai https://docs.panguard.ai https://tc.panguard.ai https://api.npmjs.org https://*.vercel-insights.com https://*.vercel-analytics.com https://plausible.io",
     "frame-ancestors 'none'",

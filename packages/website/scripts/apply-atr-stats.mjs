@@ -70,6 +70,9 @@ const ruleTotal = get(upstream, 'rules.total');
 const pintBench = findBenchmark('pint');
 const skillBench = findBenchmark('skill-benchmark');
 
+/** Convert an upstream fraction (0-1) to a stats.ts percentage (0-100). */
+const pct = (frac) => (typeof frac === 'number' ? +(frac * 100).toFixed(2) : 0);
+
 const candidates = [
   {
     re: /atrVersion:\s*'[^']+'/,
@@ -180,18 +183,20 @@ const candidates = [
       typeof upstream.generatedAt === 'string' ||
       typeof upstream.benchmarks_generated_at === 'string',
   },
-  // Benchmark blocks read from the new benchmarks[] array.
+  // Benchmark blocks read from the new benchmarks[] array. Upstream values are
+  // fractions (0-1); stats.ts stores PERCENTAGES (0-100) for a single unit
+  // across the site, so convert here.
   {
     re: /pint:\s*\{\s*recall:\s*[\d.]+,\s*precision:\s*[\d.]+,\s*fp:\s*[\d.]+,\s*samples:\s*[\d_]+\s*\}/,
     val: () =>
-      `pint: { recall: ${pintBench.recall}, precision: ${pintBench.precision}, fp: ${pintBench.fp_rate}, samples: ${pintBench.samples} }`,
+      `pint: { recall: ${pct(pintBench.recall)}, precision: ${pct(pintBench.precision)}, fp: ${pct(pintBench.fp_rate)}, samples: ${pintBench.samples} }`,
     needs: 'benchmarks[source=pint]',
     have: !!pintBench,
   },
   {
     re: /skill:\s*\{\s*recall:\s*[\d.]+,\s*precision:\s*[\d.]+,\s*fp:\s*[\d.]+,\s*samples:\s*[\d_]+\s*\}/,
     val: () =>
-      `skill: { recall: ${skillBench.recall}, precision: ${skillBench.precision}, fp: ${skillBench.fp_rate}, samples: ${skillBench.samples} }`,
+      `skill: { recall: ${pct(skillBench.recall)}, precision: ${pct(skillBench.precision)}, fp: ${pct(skillBench.fp_rate)}, samples: ${skillBench.samples} }`,
     needs: 'benchmarks[source=skill-benchmark]',
     have: !!skillBench,
   },

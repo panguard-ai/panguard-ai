@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 import { blogPosts } from '@/data/blog-posts';
 import { GLOSSARY } from '@/data/glossary';
 import { COMPARE } from '@/data/compare';
+import { LAYERS } from '@/lib/layers';
 
 const locales = ['en', 'zh-TW'] as const;
 
@@ -10,12 +11,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Use a stable date for static pages instead of current build time
   const stableDate = '2026-03-01T00:00:00Z';
 
+  // Every path here must return a 200 in BOTH locales. Routes that redirect
+  // (see next.config.mjs `redirects()`) are intentionally excluded so the
+  // sitemap never advertises a non-canonical URL:
+  //   hidden -> '/' : /customers(/*), /partners, /solutions/enterprise,
+  //                   /solutions/smb, /careers, /product/manager, /legal/sla
+  //   merged product/docs : /product/{trap,chat,report},
+  //                         /docs/{trap,chat,report}
   const pages = [
     '/',
+    // product
     '/product',
     '/product/scan',
     '/product/guard',
     '/product/skill-auditor',
+    '/product/mcp',
+    // platform / marketing
     '/integrations',
     '/security',
     '/technology',
@@ -26,6 +37,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/company',
     '/contact',
     '/solutions/developers',
+    '/migrator',
+    '/pricing',
+    // NOTE: /customers, /partners, /solutions/{enterprise,smb}, /careers,
+    // /product/manager, /legal/sla all redirect to '/' (see next.config.mjs)
+    // and are deliberately absent.
+    '/layers',
+    '/community',
+    '/evidence-pack',
+    '/demo',
+    '/early-access',
+    '/scoping',
+    '/scan',
+    '/pilot/welcome',
+    '/blacklist',
+    '/whitelist',
+    // blog + docs hubs
     '/blog',
     '/docs',
     '/docs/api',
@@ -37,29 +64,39 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/docs/guard',
     '/docs/cli',
     '/docs/benchmark',
-    '/compare',
-    '/product/mcp',
-    '/migrator',
-    '/pricing',
+    // ATR standard
     '/atr',
     '/atr/spec',
     '/atr/governance',
     '/atr/crosswalks',
     '/atr/adopters',
     '/atr/cite',
-    '/glossary',
-    '/compare',
+    // research + resources
     '/research/benchmarks',
+    '/research/96k-scan',
+    '/research/mcp-ecosystem-scan',
     '/compliance',
     '/resources',
     '/press',
     '/trust',
+    '/status',
+    '/sub-processors',
+    '/changelog',
+    // reference / comparison
+    '/glossary',
+    '/compare',
+    '/faq',
+    // legal
     '/legal/privacy',
     '/legal/terms',
     '/legal/cookies',
     '/legal/acceptable-use',
     '/legal/responsible-disclosure',
-    '/faq',
+    '/legal/security',
+    '/legal/dpa',
+    '/legal/msa',
+    '/legal/refund',
+    '/legal/sow',
   ];
 
   const getFrequency = (path: string): 'weekly' | 'monthly' => {
@@ -83,27 +120,37 @@ export default function sitemap(): MetadataRoute.Sitemap {
     return locale === 'en' ? `${base}${suffix}` : `${base}/${locale}${suffix}`;
   };
 
+  // hreflang alternates: en, zh-TW, and x-default (-> the English URL, matching
+  // lib/seo.ts buildAlternates so page <head> and sitemap agree).
+  const alternatesFor = (path: string) => ({
+    languages: {
+      ...Object.fromEntries(locales.map((l) => [l, localeUrl(l, path)])),
+      'x-default': localeUrl('en', path),
+    },
+  });
+
   const staticEntries = locales.flatMap((locale) =>
     pages.map((path) => ({
       url: localeUrl(locale, path),
       lastModified: stableDate,
       changeFrequency: getFrequency(path),
       priority: getPriority(path),
-      alternates: {
-        languages: Object.fromEntries(locales.map((l) => [l, localeUrl(l, path)])),
-      },
+      alternates: alternatesFor(path),
     }))
   );
 
+  // Blog: the Chinese version of a post is served at /zh-TW/blog/<base-slug>
+  // via a language toggle; "<slug>-zh" entries are duplicate/redirecting URLs
+  // (blog/[slug] strips the -zh suffix), so they are excluded here. Emit one
+  // canonical entry per base slug across both locales.
+  const canonicalPosts = blogPosts.filter((post) => !post.slug.endsWith('-zh'));
   const blogEntries = locales.flatMap((locale) =>
-    blogPosts.map((post) => ({
+    canonicalPosts.map((post) => ({
       url: localeUrl(locale, `/blog/${post.slug}`),
       lastModified: post.date,
       changeFrequency: 'monthly' as const,
       priority: 0.6,
-      alternates: {
-        languages: Object.fromEntries(locales.map((l) => [l, localeUrl(l, `/blog/${post.slug}`)])),
-      },
+      alternates: alternatesFor(`/blog/${post.slug}`),
     }))
   );
 
@@ -113,11 +160,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: entry.lastReviewed,
       changeFrequency: 'monthly' as const,
       priority: 0.8,
-      alternates: {
-        languages: Object.fromEntries(
-          locales.map((l) => [l, localeUrl(l, `/glossary/${entry.slug}`)])
-        ),
-      },
+      alternates: alternatesFor(`/glossary/${entry.slug}`),
     }))
   );
 
@@ -127,11 +170,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: c.lastReviewed,
       changeFrequency: 'monthly' as const,
       priority: 0.8,
-      alternates: {
-        languages: Object.fromEntries(locales.map((l) => [l, localeUrl(l, `/compare/${c.slug}`)])),
-      },
+      alternates: alternatesFor(`/compare/${c.slug}`),
     }))
   );
 
-  return [...staticEntries, ...blogEntries, ...glossaryEntries, ...compareEntries];
+  const layerEntries = locales.flatMap((locale) =>
+    LAYERS.map((layer) => ({
+      url: localeUrl(locale, `/layers/${layer.slug}`),
+      lastModified: stableDate,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+      alternates: alternatesFor(`/layers/${layer.slug}`),
+    }))
+  );
+
+  return [
+    ...staticEntries,
+    ...blogEntries,
+    ...glossaryEntries,
+    ...compareEntries,
+    ...layerEntries,
+  ];
 }

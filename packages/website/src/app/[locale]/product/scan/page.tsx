@@ -4,6 +4,7 @@ import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import JsonLd from '@/components/seo/JsonLd';
 import { softwareApplicationSchema } from '@/lib/schema';
+import { STATS } from '@/lib/stats';
 import ProductScanContent from './ProductScanContent';
 
 export async function generateMetadata(props: { params: Promise<{ locale: string }> }) {
@@ -27,8 +28,7 @@ export default function ProductScanPage() {
       <JsonLd
         data={softwareApplicationSchema({
           name: 'PanGuard Scan',
-          description:
-            '60-second security audit for AI agent skills and MCP packages. Sigma + YARA + 650+ ATR rules. SARIF 2.1.0 export. Static plus optional LLM second opinion.',
+          description: `60-second security audit for AI agent skills and MCP packages. Sigma + YARA + ${STATS.totalRulesDisplay} ATR rules. SARIF 2.1.0 export. Static plus optional LLM second opinion.`,
           url: 'https://panguard.ai/product/scan',
           category: 'SecurityApplication',
           applicationSubCategory: 'AI Skill Auditor',

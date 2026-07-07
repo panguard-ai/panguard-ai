@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { LEGAL_LAST_UPDATED } from '@/lib/constants';
+import { buildAlternates } from '@/lib/seo';
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;
@@ -12,6 +13,7 @@ export async function generateMetadata(props: {
   return {
     title: locale === 'zh-TW' ? '隱私權政策' : 'Privacy Policy',
     description: 'Panguard AI Privacy Policy. How we collect, use, and protect your personal data.',
+    alternates: buildAlternates('/legal/privacy', locale),
   };
 }
 

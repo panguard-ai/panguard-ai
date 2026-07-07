@@ -12,19 +12,19 @@ type Lang = 'en' | 'zh';
 
 const COPY = {
   en: {
-    overline: 'TEAM TIER · Q2 2026',
+    overline: 'TEAM TIER · WAITLIST',
     title: 'Hosted Threat Cloud for teams that ship agents in production.',
     subtitle:
-      '$500/month, launching Q2 2026. While you wait, the Community edition is already live on npm — same detection engine, just self-hosted. Waitlist gets first access + founding-team pricing lock.',
+      'Team is a future paid tier — no launch date or price is committed yet. Everything PanGuard ships today is free and open source. The Community edition is already live on npm — same detection engine, just self-hosted. The waitlist gets first access when Team opens.',
     ctaInstallCommunity: 'Install Community now (free)',
-    whatYouGet: 'What Team tier adds on top of Community',
+    whatYouGet: 'What Team tier will add on top of Community',
     features: [
       'Hosted Threat Cloud dashboard — no self-host, no DevOps',
       'Up to 5 team seats + SSO-lite',
       'Centralized fleet view across every agent install in your org',
       'Priority rule updates from TC crystallization (<1h vs 24h)',
       'Email support with 48h response',
-      'Founding Team pricing locked: $500/mo for 12 months regardless of list price',
+      'Founding-member pricing lock for early waitlist members once pricing is announced',
     ],
     formTitle: 'Join the waitlist',
     emailLabel: 'Work email',
@@ -38,31 +38,31 @@ const COPY = {
       'We only use your email to reach out about Team tier. No marketing drip. Unsubscribe anytime.',
     successTitle: "You're on the list",
     successMessage:
-      "We'll email you when Team tier opens (Q2 2026). Meanwhile, install Community and you're already a Threat Cloud sensor.",
+      "We'll email you when Team tier opens — no date committed yet. Meanwhile, install Community and you're already a Threat Cloud sensor.",
     successHint: 'Questions? Reply to our email or contact enterprise@panguard.ai',
     alreadyShipping: 'Already shipping today · Community tier',
     todayList: [
-      { en: `${STATS.atrRules} ATR detection rules (MIT licensed)`, zh: '' },
+      { en: `${STATS.totalRulesDisplay} ATR detection rules (MIT licensed)`, zh: '' },
       { en: 'pga CLI + Guard daemon (11 response actions)', zh: '' },
       { en: 'Honeypot integrated in Guard (trap-bridge.ts)', zh: '' },
       { en: 'Threat Cloud sensor registration on pga up', zh: '' },
-      { en: '13 platforms detected (Claude Code, Cursor, Windsurf, ...)', zh: '' },
+      { en: '15 agent runtimes auto-detected (Claude Code, Cursor, Windsurf, ...)', zh: '' },
     ],
   },
   zh: {
-    overline: 'TEAM 團隊版 · 2026 Q2',
+    overline: 'TEAM 團隊版 · WAITLIST',
     title: '給在 production 出 agent 的團隊的託管 Threat Cloud。',
     subtitle:
-      '$500/月,2026 Q2 上線。在那之前 Community 版 npm 上已可安裝 — 同一套偵測引擎,自架版。Waitlist 前期可享創始團隊鎖定價。',
+      'Team 是未來的付費版本 — 尚未承諾上線日期與定價。PanGuard 今天出貨的一切都免費開源。Community 版 npm 上已可安裝 — 同一套偵測引擎,自架版。加入 waitlist,Team 版開放時第一批取得。',
     ctaInstallCommunity: '立即安裝 Community(免費)',
-    whatYouGet: 'Team 版在 Community 之上多的東西',
+    whatYouGet: 'Team 版未來將在 Community 之上新增的東西',
     features: [
       '託管 Threat Cloud 儀表板 — 免自架、免 DevOps',
       '最多 5 個團隊席次 + 輕量 SSO',
       '全組織 agent 安裝的集中式艦隊視圖',
       '優先 TC 結晶規則更新(<1 小時 vs 24 小時)',
       'Email 支援,48 小時內回',
-      '創始團隊鎖定價:$500/月 連續 12 個月,不受未來調價影響',
+      '定價公布後,早期 waitlist 成員享創始成員鎖定價',
     ],
     formTitle: '加入 waitlist',
     emailLabel: '公司 Email',
@@ -75,15 +75,15 @@ const COPY = {
     privacyNote: '我們只用你的 email 通知 Team 版上線。無行銷廣告。隨時可退訂。',
     successTitle: '你在名單上了',
     successMessage:
-      'Team 版 2026 Q2 開放時會 email 通知你。在此之前安裝 Community — 你已經是 Threat Cloud 感測器。',
+      'Team 版開放時會 email 通知你(尚未承諾日期)。在此之前安裝 Community — 你已經是 Threat Cloud 感測器。',
     successHint: '有問題?回覆我們的 email,或寫 enterprise@panguard.ai',
     alreadyShipping: '今天已可用 · Community 版',
     todayList: [
-      { en: '', zh: `${STATS.atrRules} 條 ATR 偵測規則（MIT 授權）` },
+      { en: '', zh: `${STATS.totalRulesDisplay} 條 ATR 偵測規則（MIT 授權）` },
       { en: '', zh: 'pga CLI + Guard daemon(11 種反應動作)' },
       { en: '', zh: '整合在 Guard 內的蜜罐(trap-bridge.ts)' },
       { en: '', zh: 'pga up 時自動註冊為 Threat Cloud 感測器' },
-      { en: '', zh: '偵測 13 個平台(Claude Code、Cursor、Windsurf…)' },
+      { en: '', zh: '自動偵測 15 種 agent runtime(Claude Code、Cursor、Windsurf…)' },
     ],
   },
 };
@@ -266,7 +266,7 @@ export default function EarlyAccessContent() {
           <FadeInUp delay={0.15}>
             <div className="mt-10 bg-surface-2 border border-border rounded-xl p-6">
               <code className="block text-sm text-brand-sage font-mono mb-6">
-                npm install -g panguard && pga up
+                npm install -g @panguard-ai/panguard && pga up
               </code>
               <ul className="space-y-2.5">
                 {copy.todayList.map((item) => {

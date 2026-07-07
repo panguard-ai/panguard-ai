@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { buildAlternates } from '@/lib/seo';
 import { getNonce } from '@/lib/nonce';
+import { STATS } from '@/lib/stats';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import HowItWorksContent from './HowItWorksContent';
@@ -25,19 +26,19 @@ const howToJsonLd = {
   '@type': 'HowTo',
   name: 'How Panguard AI Protects Your Servers',
   description:
-    'Panguard uses a three-stage security pipeline with deterministic, on-device detection to detect, analyze, and respond to threats in real time.',
+    'Panguard uses a three-stage security pipeline with a three-tier AI funnel to detect, analyze, and respond to threats in real time.',
   step: [
     {
       '@type': 'HowToStep',
       position: 1,
       name: 'Detect',
-      text: 'Rule-based scanning with hundreds of ATR (Agent Threat Rules), a base that grows daily, catches known AI agent threats locally -- prompt injection, tool poisoning, credential exfiltration.',
+      text: `Rule-based scanning with ${STATS.totalRulesDisplay} ATR (Agent Threat Rules) catches known AI agent threats locally -- prompt injection, tool poisoning, credential exfiltration.`,
     },
     {
       '@type': 'HowToStep',
       position: 2,
       name: 'Analyze',
-      text: 'Behavioral baselines and on-device correlation analyze suspicious patterns deterministically -- AST static analysis plus temporal correlation, with no LLM in the detection path.',
+      text: 'Behavioral AI analyzes suspicious patterns using local models (Ollama) or cloud AI for advanced correlation.',
     },
     {
       '@type': 'HowToStep',
@@ -55,6 +56,7 @@ export default async function HowItWorksPage() {
     <>
       <script
         nonce={nonce}
+        suppressHydrationWarning
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }}
       />

@@ -1,11 +1,19 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { LEGAL_LAST_UPDATED } from '@/lib/constants';
+import { buildAlternates } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Service Level Agreement',
-  description: 'Panguard AI Service Level Agreement. Uptime commitments for the Panguard platform.',
-};
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  return {
+    title: 'Service Level Agreement',
+    description:
+      'Panguard AI Service Level Agreement. Uptime commitments for the Panguard platform.',
+    alternates: buildAlternates('/legal/sla', locale),
+  };
+}
 
 export default function SLAPage() {
   return (

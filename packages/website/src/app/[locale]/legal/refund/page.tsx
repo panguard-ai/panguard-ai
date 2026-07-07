@@ -1,15 +1,22 @@
 import type { Metadata } from 'next';
+import { buildAlternates } from '@/lib/seo';
 
 const REFUND_LAST_UPDATED_EN = 'May 20, 2026';
 const REFUND_LAST_UPDATED_ZH = '2026年5月20日';
 const REFUND_VERSION = 'v1.0';
 const REFUND_PDF_URL = '/legal/03-Refund-Policy.pdf';
 
-export const metadata: Metadata = {
-  title: 'Refund Policy',
-  description:
-    'PanGuard AI Pilot refund policy. 7-day no-questions refund, then service-credit options. Founding Customer protections.',
-};
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  return {
+    title: 'Refund Policy',
+    description:
+      'PanGuard AI Pilot refund policy. 7-day no-questions refund, then service-credit options. Founding Customer protections.',
+    alternates: buildAlternates('/legal/refund', locale),
+  };
+}
 
 export default async function RefundPage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;

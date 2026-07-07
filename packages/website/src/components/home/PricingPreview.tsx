@@ -2,10 +2,10 @@
 
 import { useLocale } from 'next-intl';
 import FadeInUp from '@/components/FadeInUp';
-import SectionWrapper from '@/components/ui/SectionWrapper';
-import SectionTitle from '@/components/ui/SectionTitle';
 import { Link } from '@/navigation';
 import { ArrowRight } from 'lucide-react';
+import { STATS } from '@/lib/stats';
+import { Eyebrow, SectionTitleV2, SectionV2, CardV2, SectionKicker } from './v2/primitives';
 
 // Pricing v4 (LOCKED 2026-04-22): Community + Pilot + Enterprise + ATR governance.
 // NO middle tier (Team/Business). The /pricing page explains why.
@@ -16,7 +16,7 @@ const TIERS_EN = [
     name: 'Community',
     price: '$0',
     period: ' forever',
-    desc: 'Open source · protects 13 agent platforms · 650+ ATR rules · MIT · self-host · unlimited',
+    desc: `Open source · ${STATS.totalRulesDisplay} ATR rules · MIT · self-host · unlimited`,
     cta: 'Get Started',
     href: 'https://github.com/panguard-ai/panguard-ai',
     external: true,
@@ -33,8 +33,8 @@ const TIERS_EN = [
   {
     id: 'enterprise',
     name: 'Enterprise',
-    price: "Let's talk",
-    period: '',
+    price: '$150-500K',
+    period: ' / yr',
     desc: 'Migrator Pro · 5-framework signed evidence · airgap · SLA · CSM',
     cta: 'Contact Sales',
     href: '/contact?tier=enterprise',
@@ -42,9 +42,9 @@ const TIERS_EN = [
   {
     id: 'sovereign',
     name: 'Sovereign',
-    price: "Let's talk",
-    period: '',
-    desc: 'Nation-state airgap · multi-tenant · custom compliance · dedicated integration support',
+    price: '$5-20M',
+    period: ' / nation',
+    desc: 'Nation-state airgap · multi-tenant · custom compliance · on-prem, per-nation',
     cta: 'Sovereign Desk',
     href: '/contact?tier=sovereign',
   },
@@ -56,7 +56,7 @@ const TIERS_ZH = [
     name: 'Community 社群版',
     price: '$0',
     period: ' 永久',
-    desc: '開源 · 防護 13 個 agent 平台 · 650+ 條 ATR 規則 · MIT · 自架 · 無上限',
+    desc: `開源 · ${STATS.totalRulesDisplay} 條 ATR 規則 · MIT · 自架 · 無上限`,
     cta: '立即使用',
     href: 'https://github.com/panguard-ai/panguard-ai',
     external: true,
@@ -73,8 +73,8 @@ const TIERS_ZH = [
   {
     id: 'enterprise',
     name: 'Enterprise 企業版',
-    price: '洽談定價',
-    period: '',
+    price: '$150-500K',
+    period: ' / 年',
     desc: 'Migrator Pro · 5 框架 signed evidence · 離網 · SLA · 專屬 CSM',
     cta: '洽詢業務',
     href: '/contact?tier=enterprise',
@@ -82,13 +82,19 @@ const TIERS_ZH = [
   {
     id: 'sovereign',
     name: 'Sovereign 主權級',
-    price: '洽談定價',
-    period: '',
-    desc: '主權國家 airgap · 多 tenant · 客製化合規 · Cisco/AMD/NVIDIA JV 預整合',
+    price: '$5-20M',
+    period: ' / 國家',
+    desc: '主權國家 airgap · 多 tenant · 客製化合規 · 地端部署 · 按國家授權',
     cta: '主權團隊洽詢',
     href: '/contact?tier=sovereign',
   },
 ];
+
+// Button recipes (v2 language): emerald strictly for the primary action.
+const PRIMARY_CTA =
+  'sheen lift mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-panguard-green px-6 py-3 text-sm font-semibold text-surface-hero transition-colors duration-300 ease-out-quint hover:bg-panguard-green-light';
+const SECONDARY_CTA =
+  'lift mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border px-6 py-3 text-sm font-semibold text-text-primary transition-colors duration-300 ease-out-quint hover:border-border-hover hover:bg-surface-1';
 
 export default function PricingPreview() {
   const locale = useLocale();
@@ -96,57 +102,77 @@ export default function PricingPreview() {
   const tiers = isZh ? TIERS_ZH : TIERS_EN;
 
   return (
-    <SectionWrapper>
-      <SectionTitle
-        overline={isZh ? '定價' : 'PRICING'}
-        title={isZh ? '開放核心 · 不做中間 tier' : 'Open-core · No middle tier'}
-        subtitle={
-          isZh
+    <SectionV2>
+      <FadeInUp>
+        <Eyebrow>{isZh ? '定價' : 'PRICING'}</Eyebrow>
+        <SectionTitleV2>
+          {isZh ? '開放核心 · 不做中間 tier' : 'Open-core · No middle tier'}
+        </SectionTitleV2>
+        <p className="mt-6 max-w-2xl text-base leading-relaxed text-text-secondary sm:text-lg">
+          {isZh
             ? 'Community 永久免費開源(餵感測網路)。Enterprise 拿到平台 + 5 框架合規證據包。中間 tier 是陷阱 — /pricing 解釋為什麼。'
-            : 'Community is free and open source forever (feeds the sensor network). Enterprise gets the platform + 5-framework compliance evidence kit. The middle tier is a trap — /pricing explains why.'
-        }
-      />
-      <div className="max-w-7xl mx-auto mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {tiers.map((tier, i) => (
-          <FadeInUp key={tier.id} delay={i * 0.06}>
-            <div className="bg-surface-2 rounded-xl border border-border p-6 flex flex-col h-full hover:border-brand-sage/50 transition-colors">
-              <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider">
-                {tier.name}
-              </h3>
-              <div className="mt-4 flex items-baseline gap-1">
-                <span className="text-3xl font-extrabold text-text-primary">{tier.price}</span>
-                {tier.period && <span className="text-xs text-text-muted">{tier.period}</span>}
-              </div>
-              <p className="text-xs text-text-muted mt-3 min-h-[2.5rem]">{tier.desc}</p>
-              <div className="flex-1" />
-              {tier.external ? (
-                <a
-                  href={tier.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-6 inline-flex items-center justify-center gap-2 w-full bg-brand-sage text-surface-0 font-semibold rounded-lg py-2.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98] text-sm"
+            : 'Community is free and open source forever (feeds the sensor network). Enterprise gets the platform + 5-framework compliance evidence kit. The middle tier is a trap — /pricing explains why.'}
+        </p>
+      </FadeInUp>
+
+      <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {tiers.map((tier, i) => {
+          const emphasized = tier.id === 'community';
+          const ctaClass = emphasized ? PRIMARY_CTA : SECONDARY_CTA;
+          return (
+            <FadeInUp key={tier.id} delay={i * 0.06} className="h-full">
+              <CardV2
+                emphasized={emphasized}
+                className={`flex h-full flex-col ${emphasized ? '' : 'hover:border-border-hover'}`}
+              >
+                <p
+                  className={`font-mono text-[10px] uppercase tracking-micro ${
+                    emphasized ? 'text-brand-sage' : 'text-text-muted'
+                  }`}
                 >
-                  {tier.cta} <ArrowRight className="w-3.5 h-3.5" />
-                </a>
-              ) : (
-                <Link
-                  href={tier.href}
-                  className="mt-6 inline-flex items-center justify-center gap-2 w-full bg-brand-sage text-surface-0 font-semibold rounded-lg py-2.5 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98] text-sm"
-                >
-                  {tier.cta} <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              )}
-            </div>
-          </FadeInUp>
-        ))}
+                  {tier.name}
+                </p>
+                <div className="mt-4 flex items-baseline gap-1">
+                  <span className="font-mono text-3xl font-medium text-text-primary">
+                    {tier.price}
+                  </span>
+                  {tier.period && (
+                    <span className="font-mono text-[10px] uppercase tracking-micro text-text-muted">
+                      {tier.period}
+                    </span>
+                  )}
+                </div>
+                <p className="mt-3 min-h-[2.5rem] text-xs leading-relaxed text-text-muted">
+                  {tier.desc}
+                </p>
+                <div className="flex-1" />
+                {tier.external ? (
+                  <a
+                    href={tier.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={ctaClass}
+                  >
+                    {tier.cta} <ArrowRight className="h-3.5 w-3.5" />
+                  </a>
+                ) : (
+                  <Link href={tier.href} className={ctaClass}>
+                    {tier.cta} <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                )}
+              </CardV2>
+            </FadeInUp>
+          );
+        })}
       </div>
+
       <FadeInUp delay={0.3}>
-        <p className="text-center text-xs text-text-muted mt-8">
+        <SectionKicker>
           {isZh
             ? '完整功能比較、ATR Enterprise Member ($10K/年) 治理層、與 FAQ 請見 /pricing'
             : 'Full feature comparison, ATR Enterprise Member tier ($10K/yr governance), and FAQ at /pricing'}
-        </p>
+        </SectionKicker>
       </FadeInUp>
-    </SectionWrapper>
+    </SectionV2>
   );
 }

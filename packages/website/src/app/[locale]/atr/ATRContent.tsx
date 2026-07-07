@@ -549,38 +549,36 @@ export default function ATRContent() {
       </SectionWrapper>
 
       {/* -- OWASP Mapping -- */}
-      <SectionWrapper>
+      <SectionWrapper spacing="tight">
         <SectionTitle
           overline={t('owasp.overline')}
           title={t('owasp.title')}
           subtitle={t('owasp.subtitle')}
         />
         <FadeInUp delay={0.1}>
-          <div className="max-w-2xl mx-auto mt-14">
-            <div className="bg-surface-1 rounded-xl border border-border overflow-hidden">
+          <div className="max-w-3xl mx-auto mt-10">
+            <div className="grid sm:grid-cols-2 gap-3">
               {(
                 t.raw('owasp.items') as Array<{
                   id: string;
                   name: string;
                   covered: boolean;
                 }>
-              ).map((item, i) => (
+              ).map((item) => (
                 <div
                   key={item.id}
-                  className={`flex items-center justify-between px-5 py-3.5 ${
-                    i < 9 ? 'border-b border-border/50' : ''
-                  }`}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-border bg-surface-1 px-5 py-3.5"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-mono font-semibold text-text-muted w-14">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-xs font-mono font-semibold text-text-muted w-14 shrink-0">
                       {item.id}
                     </span>
-                    <span className="text-sm text-text-primary">{item.name}</span>
+                    <span className="text-sm text-text-primary truncate">{item.name}</span>
                   </div>
                   {item.covered ? (
-                    <CheckIcon className="w-4 h-4 text-status-safe" />
+                    <CheckIcon className="w-4 h-4 text-status-safe shrink-0" />
                   ) : (
-                    <span className="text-[10px] text-text-muted bg-surface-1 px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] text-text-muted bg-surface-2 px-2 py-0.5 rounded-full shrink-0">
                       Roadmap
                     </span>
                   )}

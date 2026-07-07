@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, X, Minus } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import SectionTitle from '@/components/ui/SectionTitle';
@@ -11,103 +11,6 @@ import { STATS } from '@/lib/stats';
 /*  Data                                                               */
 /* ------------------------------------------------------------------ */
 
-type CellValue = 'yes' | 'no' | 'partial' | string;
-
-interface ComparisonRow {
-  readonly feature: string;
-  readonly panguard: CellValue;
-  readonly crowdstrike: CellValue;
-  readonly snyk: CellValue;
-  readonly lakera: CellValue;
-}
-
-const COMPARISON_ROWS: readonly ComparisonRow[] = [
-  {
-    feature: 'AI agent threat detection',
-    panguard: 'yes',
-    crowdstrike: 'no',
-    snyk: 'no',
-    lakera: 'partial',
-  },
-  {
-    feature: 'MCP skill pre-install audit',
-    panguard: 'yes',
-    crowdstrike: 'no',
-    snyk: 'no',
-    lakera: 'no',
-  },
-  {
-    feature: 'Prompt injection detection',
-    panguard: '21 ATR rules',
-    crowdstrike: 'no',
-    snyk: 'no',
-    lakera: 'yes',
-  },
-  {
-    feature: 'Tool poisoning detection',
-    panguard: '6 ATR rules',
-    crowdstrike: 'no',
-    snyk: 'no',
-    lakera: 'no',
-  },
-  {
-    feature: 'Credential exfiltration via agent',
-    panguard: 'yes',
-    crowdstrike: 'partial',
-    snyk: 'no',
-    lakera: 'no',
-  },
-  {
-    feature: 'Runtime agent monitoring (EDR)',
-    panguard: '24/7 daemon',
-    crowdstrike: 'yes (endpoints)',
-    snyk: 'no',
-    lakera: 'no',
-  },
-  {
-    feature: 'Dependency / supply chain scanning',
-    panguard: 'yes',
-    crowdstrike: 'no',
-    snyk: 'yes',
-    lakera: 'no',
-  },
-  {
-    feature: 'Community threat intelligence',
-    panguard: 'Threat Cloud (auto)',
-    crowdstrike: 'Falcon X (paid)',
-    snyk: 'Vulnerability DB',
-    lakera: 'no',
-  },
-  {
-    feature: 'Detection rules',
-    panguard: `${STATS.totalRulesDisplay} ATR rules`,
-    crowdstrike: 'Proprietary',
-    snyk: 'Vulnerability DB',
-    lakera: 'Proprietary',
-  },
-  {
-    feature: 'Open source',
-    panguard: 'yes (MIT)',
-    crowdstrike: 'no',
-    snyk: 'partial',
-    lakera: 'no',
-  },
-  {
-    feature: 'Cost',
-    panguard: '$0 (MIT License)',
-    crowdstrike: '$25\u2013$60/endpoint/mo',
-    snyk: 'Free tier + paid',
-    lakera: 'Paid',
-  },
-  {
-    feature: 'Setup time',
-    panguard: '1 command, 5 minutes',
-    crowdstrike: 'Enterprise deployment',
-    snyk: 'CI/CD integration',
-    lakera: 'API integration',
-  },
-] as const;
-
 interface ComparisonCard {
   readonly title: string;
   readonly tagline: string;
@@ -116,53 +19,53 @@ interface ComparisonCard {
 
 const COMPARISON_CARDS: readonly ComparisonCard[] = [
   {
-    title: 'vs CrowdStrike / Traditional EDR',
-    tagline: 'They protect your endpoints. We protect your AI agents.',
+    title: 'vs Endpoint Security (EDR)',
+    tagline: 'Endpoint tools watch the OS. PanGuard watches the AI agent.',
     bullets: [
-      'CrowdStrike monitors OS-level processes, network, and files. It has no visibility into prompt flows, MCP tool calls, or agent behavior.',
+      'Endpoint detection and response (EDR) tools monitor OS-level processes, network connections, and files. That surface is essential \u2014 and it sits below the AI agent layer.',
+      'Prompt flows, MCP tool calls, and skill installations do not surface as OS events, so an agent-layer threat can be invisible to an endpoint sensor.',
       'PanGuard Guard is purpose-built for the AI agent layer \u2014 it understands skill installations, prompt injection patterns, and tool poisoning.',
-      'CrowdStrike costs $25\u201360/endpoint/month. PanGuard is $0, MIT licensed.',
-      'They complement each other: CrowdStrike for OS, PanGuard for AI.',
+      'Endpoint security and PanGuard cover different layers and complement each other: EDR for the host, PanGuard for the AI agent.',
     ],
   },
   {
-    title: 'vs Snyk / Developer Security',
-    tagline: 'Snyk scans your code. We scan what your AI agent installs.',
+    title: 'vs Code & Dependency Scanners',
+    tagline: 'Dependency scanners secure your code. PanGuard secures what your agent installs.',
     bullets: [
-      'Snyk excels at finding vulnerabilities in your dependencies and container images. But it has no concept of MCP skills or AI agent tools.',
-      "A malicious MCP skill doesn't have a CVE \u2014 it's a new class of threat that Snyk's vulnerability database doesn't cover.",
-      `PanGuard's Skill Auditor is Snyk for the AI agent era: pre-install scanning with ${STATS.atrRules} ATR rules.`,
-      "Use Snyk for your code, PanGuard for your agent's tools.",
+      'Software composition and dependency scanners are excellent at finding known vulnerabilities in packages and container images \u2014 a mature, necessary practice.',
+      "A malicious MCP skill usually has no CVE: it's a newer class of threat that classic vulnerability databases were not built to describe.",
+      `PanGuard's Skill Auditor adds pre-install scanning for the AI agent era, with ${STATS.totalRulesDisplay} ATR rules covering skill and tool behavior.`,
+      "The two are complementary: dependency scanners for your code, PanGuard for your agent's tools.",
     ],
   },
   {
-    title: 'vs Lakera / LLM Firewalls',
-    tagline: 'They filter prompts. We secure the entire agent.',
+    title: 'vs Prompt Firewalls',
+    tagline: 'Prompt firewalls filter inputs and outputs. PanGuard secures the whole agent.',
     bullets: [
-      'Lakera focuses on prompt-level filtering \u2014 blocking injection attacks in LLM inputs and outputs.',
-      `PanGuard covers the full attack surface: prompt injection + skill compromise + context exfiltration + agent manipulation + tool poisoning + privilege escalation + 3 more categories. ${STATS.atrRules} rules total.`,
-      'Lakera is a firewall (input/output filter). PanGuard is an EDR (continuous monitoring + response).',
-      'Lakera requires API integration. PanGuard is one command: pga setup.',
+      'Prompt firewalls do input/output filtering \u2014 blocking injection attacks in LLM prompts and responses \u2014 which is valuable at the model boundary.',
+      `PanGuard covers the broader agent attack surface: prompt injection plus skill compromise, context exfiltration, agent manipulation, tool poisoning, privilege escalation and more \u2014 ${STATS.totalRulesDisplay} ATR rules across 9 threat categories.`,
+      'A firewall filters the prompt boundary; PanGuard adds continuous runtime monitoring and response across the agent lifecycle.',
+      'They fit together: a prompt firewall at the model edge, PanGuard across skills, tools, and runtime.',
     ],
   },
   {
-    title: 'vs Geordie AI / Agent Governance',
-    tagline: 'They govern agent behavior. We detect the threats.',
+    title: 'vs Agent Governance Platforms',
+    tagline: 'Governance platforms set the policy. PanGuard supplies the detections.',
     bullets: [
-      'Geordie AI (RSAC 2026 Innovation Sandbox winner) provides agent governance \u2014 policy enforcement and compliance dashboards.',
-      `PanGuard provides the detection layer that governance platforms need: ${STATS.atrRules} ATR rules that identify prompt injection, tool poisoning, and supply chain attacks in real time.`,
-      'Governance without detection is blind. Detection without governance is noisy. They complement each other.',
-      'Geordie is enterprise SaaS. PanGuard is open-source, MIT licensed, and free.',
+      'Agent governance platforms provide policy enforcement and compliance dashboards \u2014 the control plane for how agents are allowed to behave.',
+      `PanGuard provides the detection layer those platforms can build on: ${STATS.totalRulesDisplay} ATR rules that identify prompt injection, tool poisoning, and supply chain attacks in real time.`,
+      'Governance answers what is allowed; detection answers what is actually happening. Each is stronger with the other.',
+      'ATR is an open standard and PanGuard is MIT-licensed and free, so governance platforms can adopt the detections directly.',
     ],
   },
   {
-    title: 'vs Snyk Invariant / mcp-scan',
-    tagline: 'They scan MCP configs. We scan the entire AI agent attack surface.',
+    title: 'vs MCP Config Scanners',
+    tagline: 'Config scanners validate MCP setup. PanGuard covers the full agent surface.',
     bullets: [
-      'Snyk acquired Invariant Labs (mcp-scan) in 2026. mcp-scan checks MCP server configurations for known issues.',
-      `PanGuard scans SKILL.md files, MCP configs, tool descriptions, and runtime behavior \u2014 ${STATS.atrRules} rules across 8 threat categories, not just config validation.`,
-      'ATR achieves 100% recall on real-world SKILL.md threats with 97% precision and 0.20% FP rate (498 samples). mcp-scan focuses on configuration, not behavioral threats.',
-      "PanGuard is free. Snyk Invariant is part of Snyk's commercial platform.",
+      'MCP configuration scanners check MCP server configs for known misconfigurations and issues \u2014 a useful first line at setup time.',
+      `PanGuard also scans SKILL.md files, tool descriptions, and runtime behavior \u2014 ${STATS.totalRulesDisplay} ATR rules across 9 threat categories, going beyond static config validation.`,
+      'On the real-world SKILL.md corpus (498 samples, Layer-1 deterministic rules) ATR reaches 100% recall; benign false positives are reported per detection lane, never as a single blended number.',
+      'Config validation and behavioral detection are complementary layers of the same defense.',
     ],
   },
 ] as const;
@@ -194,15 +97,6 @@ const REAL_FINDINGS = [
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
-function CellContent({ value }: { value: CellValue }) {
-  if (value === 'yes')
-    return <Check className="w-5 h-5 text-brand-sage mx-auto" aria-label="Yes" />;
-  if (value === 'no') return <X className="w-5 h-5 text-text-muted mx-auto" aria-label="No" />;
-  if (value === 'partial')
-    return <Minus className="w-5 h-5 text-text-tertiary mx-auto" aria-label="Partial" />;
-  return <span>{value}</span>;
-}
-
 /* ------------------------------------------------------------------ */
 /*  Sections                                                           */
 /* ------------------------------------------------------------------ */
@@ -215,13 +109,14 @@ function HeroSection() {
           WHY PANGUARD
         </p>
         <h1 className="text-[clamp(30px,5vw,56px)] font-bold text-text-primary leading-[1.08] max-w-4xl mx-auto">
-          Traditional security tools don&apos;t see AI agent threats
+          Where PanGuard fits in your security stack
         </h1>
         <p className="text-text-secondary mt-4 text-lg max-w-2xl mx-auto leading-relaxed">
-          CrowdStrike protects your OS. Snyk protects your code. Lakera filters prompts.
+          Endpoint tools secure the OS. Dependency scanners secure your code. Prompt firewalls filter
+          the model boundary.
           <br />
           <span className="text-brand-sage font-semibold">
-            Nobody protects your AI agent. Until now.
+            PanGuard adds the AI agent layer — and complements the tools you already run.
           </span>
         </p>
       </FadeInUp>
@@ -328,92 +223,13 @@ function EvidenceSection() {
   );
 }
 
-function ComparisonTable() {
-  const columns = ['PanGuard', 'CrowdStrike', 'Snyk', 'Lakera'] as const;
-  const colKeys = ['panguard', 'crowdstrike', 'snyk', 'lakera'] as const;
-
-  return (
-    <SectionWrapper>
-      <SectionTitle
-        overline="Feature comparison"
-        title="PanGuard vs Industry Leaders"
-        subtitle="PanGuard fills the gap that traditional security tools leave open."
-      />
-
-      <FadeInUp>
-        <div className="mt-10 overflow-x-auto max-w-full hidden md:block">
-          <table className="w-full text-sm border-collapse">
-            <thead>
-              <tr>
-                <th className="text-left py-3 px-4 text-text-tertiary font-medium border-b border-border w-[220px]">
-                  Capability
-                </th>
-                {columns.map((col, i) => (
-                  <th
-                    key={col}
-                    className={`py-3 px-4 font-semibold border-b text-center ${
-                      i === 0
-                        ? 'text-brand-sage border-brand-sage/40'
-                        : 'text-text-secondary border-border'
-                    }`}
-                  >
-                    {col}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {COMPARISON_ROWS.map((row) => (
-                <tr
-                  key={row.feature}
-                  className="border-b border-border/50 hover:bg-surface-2/30 transition-colors"
-                >
-                  <td className="py-3 px-4 text-text-primary font-medium">{row.feature}</td>
-                  {colKeys.map((key, i) => (
-                    <td
-                      key={key}
-                      className={`py-3 px-4 text-center text-text-secondary ${i === 0 ? 'bg-brand-sage/5' : ''}`}
-                    >
-                      <CellContent value={row[key]} />
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Mobile cards */}
-        <div className="mt-10 space-y-4 md:hidden">
-          {COMPARISON_ROWS.map((row) => (
-            <div key={row.feature} className="bg-surface-2 rounded-xl border border-border p-4">
-              <p className="text-text-primary font-semibold text-sm mb-3">{row.feature}</p>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                {colKeys.map((key, i) => (
-                  <div
-                    key={key}
-                    className={`flex flex-col gap-1 ${i === 0 ? 'text-brand-sage' : 'text-text-secondary'}`}
-                  >
-                    <span className="text-text-tertiary font-medium">{columns[i]}</span>
-                    <CellContent value={row[key]} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </FadeInUp>
-    </SectionWrapper>
-  );
-}
-
 function ComparisonCards() {
   return (
     <SectionWrapper dark>
       <SectionTitle
-        overline="Deep dive"
-        title="Head-to-Head"
-        subtitle="Detailed comparison with each category leader."
+        overline="How the layers fit"
+        title="PanGuard alongside adjacent categories"
+        subtitle="Where PanGuard fits next to the security categories you already run — and how they complement each other."
       />
 
       <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -535,7 +351,6 @@ export default function CompareContent() {
       <HeroSection />
       <BlindSpotSection />
       <EvidenceSection />
-      <ComparisonTable />
       <ComparisonCards />
       <DetailedComparisons />
       <CTASection />

@@ -37,6 +37,8 @@ export default function JsonLdBreadcrumb({
   return (
     <script
       nonce={nonce}
+      // DOM nonce is blanked by the browser post-CSP; SSR value differs on purpose.
+      suppressHydrationWarning
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
     />

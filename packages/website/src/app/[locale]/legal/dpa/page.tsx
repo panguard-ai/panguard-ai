@@ -1,13 +1,20 @@
 import type { Metadata } from 'next';
+import { buildAlternates } from '@/lib/seo';
 
 const DPA_LAST_UPDATED_EN = 'May 19, 2026';
 const DPA_LAST_UPDATED_ZH = '2026年5月19日';
 
-export const metadata: Metadata = {
-  title: 'Data Processing Agreement',
-  description:
-    'Panguard AI Data Processing Agreement. GDPR-compliant data handling terms for enterprise customers.',
-};
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  return {
+    title: 'Data Processing Agreement',
+    description:
+      'Panguard AI Data Processing Agreement. GDPR-compliant data handling terms for enterprise customers.',
+    alternates: buildAlternates('/legal/dpa', locale),
+  };
+}
 
 export default async function DPAPage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;

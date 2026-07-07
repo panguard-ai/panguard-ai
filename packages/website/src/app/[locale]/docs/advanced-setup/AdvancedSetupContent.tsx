@@ -65,11 +65,13 @@ export default function AdvancedSetupContent() {
         </div>
       </SectionWrapper>
 
-      <SectionWrapper>
+      <SectionWrapper spacing="tight">
         <div className="max-w-3xl mx-auto">
           <FadeInUp>
-            <p className="text-sm text-brand-sage font-semibold mb-2">{t('degradeNote')}</p>
-            <p className="text-text-secondary text-sm leading-relaxed mb-8">{t('degradeDesc')}</p>
+            <h2 className="text-xl font-bold text-text-primary mb-2">{t('degradeNote')}</h2>
+            <div className="bg-surface-1 border border-border rounded-xl px-5 py-4">
+              <p className="text-text-secondary text-sm leading-relaxed">{t('degradeDesc')}</p>
+            </div>
           </FadeInUp>
         </div>
       </SectionWrapper>

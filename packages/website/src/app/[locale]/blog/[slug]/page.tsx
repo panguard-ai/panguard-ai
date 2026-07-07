@@ -88,12 +88,24 @@ export default async function BlogPostPage(props: {
 
   const postUrl = `https://panguard.ai/blog/${post.slug}`;
 
-  // Author resolution: posts authored by "Adam Lin" or "Panguard AI" or "ATR Research"
-  // get the Person schema; everything else falls back to Organization.
-  const authorIsAdam = /adam|panguard|atr research/i.test(post.author);
+  // Author resolution: a personal byline (Adam Lin) links to the Person
+  // schema; a team/research byline is attributed to the Organization.
+  const authorIsAdam = /adam/i.test(post.author);
   const authorBlock = authorIsAdam
     ? { '@id': 'https://panguard.ai/#person-adam' }
-    : { '@type': 'Person', name: post.author };
+    : { '@id': 'https://panguard.ai/#org' };
+
+  // articleBody / wordCount give answer engines a citable snippet + length
+  // signal. Strip markdown from the prose blocks (skip headings, code, tables).
+  const proseBlocks = (post.content ?? []).filter(
+    (b) => !/^(#{1,6}\s|```|\||-\s|\*\s|---$)/.test(b.trim())
+  );
+  const articleBody = proseBlocks
+    .join(' ')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/[*`_]/g, '')
+    .trim();
+  const wordCount = articleBody ? articleBody.split(/\s+/).length : undefined;
 
   const blogPostJsonLd = {
     '@context': 'https://schema.org',
@@ -110,12 +122,15 @@ export default async function BlogPostPage(props: {
     mainEntityOfPage: { '@type': 'WebPage', '@id': postUrl },
     keywords: post.category,
     inLanguage: params.locale === 'zh-TW' ? 'zh-TW' : 'en',
+    ...(articleBody ? { articleBody: articleBody.slice(0, 2000) } : {}),
+    ...(wordCount ? { wordCount } : {}),
   };
 
   return (
     <>
       <script
         nonce={nonce}
+        suppressHydrationWarning
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostJsonLd) }}
       />

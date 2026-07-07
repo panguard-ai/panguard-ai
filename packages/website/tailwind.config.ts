@@ -47,11 +47,27 @@ const config: Config = {
           danger: '#EF4444',
           info: '#3B82F6',
         },
+        paper: {
+          DEFAULT: '#F5F1E8',
+          2: '#EFE9DC',
+          ink: '#161210',
+          line: '#DDD5C6',
+          muted: '#6B655C',
+        },
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'var(--font-cjk)', 'system-ui', 'sans-serif'],
         display: ['var(--font-display)', 'var(--font-sans)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-mono)', 'monospace'],
+        serif: ['var(--font-serif)', 'Georgia', 'serif'],
+      },
+      transitionTimingFunction: {
+        'out-quint': 'cubic-bezier(0.22, 1, 0.36, 1)',
+        'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+      },
+      letterSpacing: {
+        micro: '0.16em',
       },
       borderColor: {
         DEFAULT: '#2E2A27',

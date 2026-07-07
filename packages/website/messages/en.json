@@ -24,7 +24,7 @@
     "copyright": "2026 Panguard AI, Inc. All rights reserved.",
     "soc2": "SOC 2 In Progress",
     "gdpr": "GDPR Compliant",
-    "footerTagline": "Your AI Security Guard. One command to install. AI protects everything."
+    "footerTagline": "The AI agent security platform — built on the open ATR standard. One command to install. AI protects everything."
   },
   "nav": {
     "product": "Product",
@@ -178,7 +178,7 @@
       "eyebrow": "THE SECURITY REVOLUTION",
       "title": "Security is no longer a privilege.",
       "subtitle": "For developers and small businesses who can't afford a security team -- enterprise-grade protection from one CLI command, in under 60 seconds.",
-      "boldLine": "Open source. Deterministic. Completely free.",
+      "boldLine": "Open source. AI-powered. Completely free.",
       "tryScan": "Try Free Scan",
       "bookDemo": "Book Demo",
       "getStarted": "Get Started",
@@ -189,7 +189,9 @@
         "mit": "MIT Open Source",
         "tests": "3,528 Tests Passing",
         "taiwan": "Built in Taiwan"
-      }
+      },
+      "titleLine1": "Real-time protection.",
+      "titleLine2": "Audit-ready evidence."
     },
     "industryProblem": {
       "title": "The security industry has a dirty secret.",
@@ -210,7 +212,7 @@
     "notAntivirus": {
       "overline": "Common misconception",
       "title": "\"Can't I just install antivirus?\"",
-      "subtitle": "Antivirus scans files for known malware signatures. Panguard is a completely different class of tool — it monitors behavior, deploys decoys, and detects agent-specific attacks that signatures miss.",
+      "subtitle": "Antivirus scans files for known malware signatures. Panguard is a completely different class of tool — it monitors behavior, deploys decoys, and uses AI to catch what signatures miss.",
       "columns": {
         "antivirus": "Traditional Antivirus",
         "panguard": "Panguard"
@@ -219,7 +221,7 @@
         "detection": {
           "label": "Detection method",
           "antivirus": "Signature matching",
-          "panguard": "ATR rules + behavioral baseline"
+          "panguard": "ATR rules + AI analysis"
         },
         "scope": {
           "label": "What it monitors",
@@ -339,30 +341,30 @@
         "footer": "4 roles. 3 pillars. 1 command. 100% free."
       },
       "funnel": {
-        "title": "Detection doesn't need a black box.",
-        "desc1": "The industry wants you to believe everything needs machine learning. Truth: most attacks match known patterns. A regex rule engine catches them in under 50ms. The rest are handled by deterministic behavioral and correlation checks.",
-        "desc2": "Every stage runs on-device with no LLM in the path -- so the same input always produces the same verdict, online or fully air-gapped.",
+        "title": "90% of threats don't need AI.",
+        "desc1": "The industry wants you to believe everything needs machine learning. Truth: 90% of attacks match known patterns. A rules engine catches them in under 50ms. AI only steps in for the rest.",
+        "desc2": "And if the cloud goes down? Local AI takes over. Your protection never drops to zero.",
         "layers": [
           {
             "pct": 90,
-            "label": "Rule Engine",
-            "sub": "ATR regex rules. Deterministic.",
+            "label": "Rules Engine",
+            "sub": "ATR Rules",
             "speed": "<50ms"
           },
           {
             "pct": 7,
-            "label": "Behavioral Baseline",
-            "sub": "Fingerprint & heuristic. Local. Zero-config.",
-            "speed": "On-device"
+            "label": "Local AI",
+            "sub": "Fingerprint & Heuristic. Local. Zero-config.",
+            "speed": "~2s"
           },
           {
             "pct": 3,
-            "label": "Correlation & AST",
-            "sub": "Static + temporal analysis. On-device.",
-            "speed": "On-device"
+            "label": "Cloud AI",
+            "sub": "Only when needed. Server-side. Free.",
+            "speed": "~5s"
           }
         ],
-        "fallback": "Threat Cloud unreachable → engine keeps running on local rules. No network → full on-device protection. Detection never stops."
+        "fallback": "Cloud fails → local heuristics. Heuristics fail → rules engine. Protection never stops."
       },
       "confidence": {
         "title": "Smart enough to act. Honest enough to ask.",
@@ -389,7 +391,7 @@
     "threatCloud": {
       "overline": "ONE MORE THING",
       "title": "The more people use it, the safer everyone gets.",
-      "desc": "Every Panguard instance is a sensor. When it detects a new attack, it anonymously shares the pattern with Threat Cloud. Threat Cloud automatically produces ATR (Agent Threat Rules), the world's first open standard for detecting AI agent attacks. Prompt injection, tool poisoning, context exfiltration -- all caught by ATR rules.",
+      "desc": "Every Panguard instance is a sensor. When it detects a new attack, it anonymously shares the pattern with Threat Cloud. Threat Cloud automatically produces ATR (Agent Threat Rules), an open standard for detecting AI agent attacks. Prompt injection, tool poisoning, context exfiltration -- all caught by ATR rules.",
       "descHighlight": "You're not just protected. You're part of the shield.",
       "privacy1": "Only anonymized threat signatures leave your machine. Zero raw data leaves your machine. Telemetry is opt-in and off by default — when you enable it, only anonymized run summaries are uploaded. Encrypted in transit (TLS 1.3). Your logs, your code, your data — never leaves.",
       "privacy2": "You can turn off Threat Cloud anytime. Panguard works fully offline.",
@@ -495,7 +497,7 @@
           "snippet": "panguard audit skill ./my-skill\n# or ask your AI agent:\n\"audit this skill for security issues\""
         },
         "guard": {
-          "title": "Inline Detection Guard",
+          "title": "24/7 Real-Time Guard",
           "description": "Threats aren't just detected -- they're automatically blocked. ATR rules revoke malicious skills, block IPs, kill processes, and quarantine threats. Confidence scoring ensures only high-certainty threats get auto-response.",
           "snippetLabel": "CLI or AI Agent",
           "snippet": "panguard guard start\n# or ask your AI agent:\n\"start security protection\""
@@ -510,7 +512,7 @@
           "title": "AI Agent as Security Analyst",
           "description": "After panguard setup, your AI agent (Claude Code, Cursor, etc.) gains 12 security tools via MCP. Ask naturally: 'scan my system', 'audit this skill', 'show me alerts', 'block that IP'.",
           "snippetLabel": "Works with",
-          "snippet": "Claude Code, Claude Desktop, Cursor,\nOpenClaw, Codex, Workbuddy, Gemini CLI"
+          "snippet": "Claude Code, Claude Desktop, Cursor,\nOpenClaw, Codex, Workbuddy, NemoClaw"
         }
       }
     },
@@ -640,7 +642,7 @@
       },
       "card5": {
         "title": "Agent-Native Detection",
-        "desc": "We created ATR -- the first open standard for AI agent threat detection. ATR catches prompt injection, tool poisoning, and agent manipulation."
+        "desc": "We created ATR -- an open, executable standard for AI agent threat detection. ATR catches prompt injection, tool poisoning, and agent manipulation."
       }
     },
     "traction": {
@@ -741,18 +743,16 @@
       "cached": "Cached",
       "showFindings": "Show {count} finding(s)",
       "hideFindings": "Hide findings",
-      "ctaText": "Want inline detection for all your AI agents?",
+      "ctaText": "Want real-time protection for all your AI agents?",
       "learnMore": "Learn more",
       "trustNote": "Scans run server-side. No code is stored. Only content hash is cached for deduplication.",
       "submitATR": "Submit ATR Rule Proposal"
     },
-    "srDefinition": "Panguard AI is the commercial reference implementation of ATR (Agent Threat Rules), the open standard for detecting attacks on AI agents — the CVE and Sigma of the agent world. ATR is MIT-licensed, machine-readable, and already adopted by Microsoft, Cisco and MISP. PanGuard turns the free standard into signed, audit-ready compliance evidence.",
+    "srDefinition": "Panguard AI provides a Skills Audit for AI agents. It audits every skill before it runs, catches known threats with community ATR (Agent Threat Rules), catches unknown threats with AI analysis, and shares new rules to protect everyone. MIT licensed. Open source.",
     "scannerHero": {
-      "titleLine1": "Free, on-device security for",
-      "overline": "Built on ATR — the open detection standard for AI agents",
-      "microPreview": "Installs in seconds → scans your installed agents → flags & blocks known attacks.",
-      "titleLine2": "your AI agents.",
-      "subtitle": "Scan every installed skill against 650+ open ATR rules, watch your agents at runtime, and see it all in a local dashboard — nothing leaves your machine.",
+      "titleLine1": "Real-time protection.",
+      "titleLine2": "Audit-ready evidence.",
+      "subtitle": "The AI agent security platform for regulated industries — built on the ATR open standard. {count} skills scanned to date. EU AI Act high-risk obligations take effect December 2027.",
       "scanLabel": "Check any MCP skill before you install",
       "tabUrl": "GitHub URL",
       "tabPaste": "Paste Content",
@@ -761,24 +761,24 @@
       "scanBtn": "Scan",
       "historyLabel": "Recent scans",
       "trustNote": "Scans run server-side. No code is stored. Only content hash is cached.",
-      "platformLabel": "Works with 13 platforms:",
-      "ticker1": "An email-delivery MCP server silently forwarded thousands of emails/day",
+      "platformLabel": "Auto-detects your AI agents:",
+      "ticker1": "postmark-mcp v1.0.16 silently forwarded 15,000 emails/day",
       "ticker2": "MCPJam Inspector CVSS 9.8 remote code execution",
       "ticker3": "Claude Code hooks exploited for API key theft",
       "ticker4": "Azure MCP Server SSRF stole managed identity tokens",
       "ticker5": "43% of public MCP servers vulnerable to command execution",
       "badgeOwasp": "OWASP 10/10",
-      "badgeRules": "650+ ATR Rules",
-      "badgePlatforms": "17 Platforms",
+      "badgeRules": "{count} ATR Rules",
+      "badgePlatforms": "15 agent runtimes",
       "badgeLicense": "MIT Licensed",
       "badgeScanned": "{count} Skills Scanned",
       "badgeRecall": "97.2% Garak recall",
-      "badgeCisco": "7 organizations merged · NIST collaborating",
-      "badgeSafeMcp": "SAFE-MCP 91.8% coverage (PR pending)"
+      "badgeCisco": "7 organizations merged · NIST OSCAL submission in review",
+      "badgeSafeMcp": "SAFE-MCP 91.8% coverage"
     },
     "demo": {
       "overline": "See it in action",
-      "title": "One command. Live on-device protection.",
+      "title": "One command. Full protection.",
       "subtitle": "Install PanGuard, and your AI agents are protected in under 60 seconds.",
       "tabs": {
         "dashboard": "Guard Dashboard",
@@ -786,13 +786,13 @@
         "threatcloud": "Threat Cloud"
       },
       "captions": {
-        "dashboard": "Real-time dashboard showing active rules, event monitoring, and on-device detection status.",
-        "rules": "650+ ATR rules auto-synced from Threat Cloud. Community-driven, AI-drafted detection patterns.",
+        "dashboard": "Real-time dashboard showing active rules, event monitoring, and 3-layer detection status.",
+        "rules": "670+ ATR rules auto-synced from Threat Cloud. Community-driven, AI-drafted detection patterns.",
         "threatcloud": "Anonymous threat intelligence sharing. Your device contributes and receives updated detection rules."
       }
     },
     "socialProof": {
-      "overline": "Adopted upstream by",
+      "overline": "Trusted by security teams",
       "statRules": "ATR Detection Rules",
       "statScanned": "Skills Scanned",
       "statRecall": "SKILL.md Recall",
@@ -806,24 +806,20 @@
       "downloads": "downloads",
       "skills": {
         "tesla": {
-          "label": "A vehicle-API client skill",
           "summary": "Can override your agent's system prompt",
-          "detail": "A skill that controls a connected-car fleet API -- a prompt-injection pattern allows full override of agent instructions, enabling unauthorized vehicle commands. Example anonymized; we do not name the package."
+          "detail": "Controls your Tesla fleet -- prompt injection allows full override of agent instructions, enabling unauthorized vehicle commands."
         },
         "wallet": {
-          "label": "A crypto-wallet connector skill",
           "summary": "Can override your agent's system prompt",
-          "detail": "A skill that connects to a crypto wallet -- a prompt-injection pattern lets an attacker redirect transactions or exfiltrate private keys. Example anonymized; we do not name the package."
+          "detail": "Connects to your crypto wallet -- prompt injection allows an attacker to redirect transactions or exfiltrate private keys."
         },
         "clawsec": {
-          "label": "A security-tooling skill",
           "summary": "A security tool with security holes",
-          "detail": "Ironically, this security-focused skill contains resource exhaustion and data exfiltration patterns that undermine the protections it claims to provide. Example anonymized; we do not name the package."
+          "detail": "Ironically, this security-focused skill contains resource exhaustion and data exfiltration patterns that undermine the protections it claims to provide."
         },
         "safeexec": {
-          "label": "An 'exec' utility skill",
           "summary": "Named 'safe' but isn't safe",
-          "detail": "Despite a reassuring name, this skill contains unsafe code execution patterns that bypass sandbox restrictions. Example anonymized; we do not name the package."
+          "detail": "Despite its reassuring name, this skill contains unsafe code execution patterns that bypass sandbox restrictions."
         }
       }
     },
@@ -838,8 +834,8 @@
       "incident2Desc": "Hooks + MCP config exploited for arbitrary shell execution and API key theft.",
       "incident3Name": "Azure MCP Server",
       "incident3Desc": "SSRF steals managed identity tokens. Attacker gains Azure resource access without admin privileges.",
-      "incident4Name": "An email-delivery MCP server",
-      "incident4Desc": "Clean for 15 versions, then a point release silently BCC-forwarded thousands of emails per day to an external address. Example anonymized; no package named."
+      "incident4Name": "postmark-mcp",
+      "incident4Desc": "Clean for 15 versions. v1.0.16 silently BCC-forwarded 3K-15K emails per day to an external address."
     },
     "whyPanguard": {
       "title": "Why PanGuard",
@@ -875,13 +871,13 @@
       "owaspBadge": "OWASP Agentic Top 10: 10/10 covered"
     },
     "howItWorks": {
-      "title": "How PanGuard protects you",
-      "subtitle": "Every installed skill is checked against 650+ ATR rules. Known attacks are blocked instantly. New ones become rules everyone gets within the hour.",
+      "title": "Threat Crystallization",
+      "subtitle": "AI understands new threats. Crystallizes them into regex rules. Executes in 0ms. Protects everyone.",
       "step1": {
         "title": "Scan",
-        "subtitle": "Pattern-match against 650+ ATR rules",
+        "subtitle": "Pattern-match against 670+ ATR rules",
         "timing": "3ms",
-        "detail": "Every skill is checked against the full ATR rule set. Known attack patterns are caught instantly and deterministically — the same verdict every run."
+        "detail": "Every skill is checked against the full ATR rule set. Known patterns are caught instantly through deterministic signature matching; coverage is limited to patterns the rule set already encodes."
       },
       "step2": {
         "title": "Detect + Block",
@@ -912,7 +908,7 @@
         },
         "panguard": {
           "label": "PanGuard",
-          "desc": "Open source, 13 platforms, < 1 hour rule updates"
+          "desc": "Open source · installs into your AI agents · < 1 hour rule updates"
         }
       }
     },
@@ -925,13 +921,13 @@
       "roadmapTitle": "Where we're going:",
       "installNow": "Install Now",
       "scanSkill": "Scan a Skill",
-      "installNote": "60 seconds. 13 platforms. {rules} rules. Free forever.",
+      "installNote": "60 seconds · auto-detects your agents · {rules} rules · free forever.",
       "paperPublished": "Paper published (Zenodo DOI)"
     },
     "atrStandard": {
       "overline": "OPEN STANDARD",
       "title": "The AI era needs a new audit standard",
-      "subtitle": "ATR (Agent Threat Rules) is purpose-built for AI agent threats. The first open detection standard for AI agent security.",
+      "subtitle": "ATR (Agent Threat Rules) is purpose-built for AI agent threats. An open, executable detection standard for AI agent security.",
       "rules": "Detection Rules",
       "categories": "Threat Categories",
       "patterns": "Detection Patterns",
@@ -964,7 +960,7 @@
         "overline": "PRE-DEPLOYMENT",
         "title": "Skill Auditor",
         "desc": "Static analysis engine that scans MCP skills and AI agent tools before they run. Detects prompt injection, credential theft, data exfiltration, and 6 more threat categories using ATR pattern matching.",
-        "f1": "650+ ATR detection rules across 10 categories",
+        "f1": "670+ ATR rules with 2,900+ detection patterns across 10 categories",
         "f2": "Secret detection: AWS keys, GitHub tokens, private keys, API secrets",
         "f3": "YAML manifest validation + permission scope analysis",
         "s1": "ATR Rules",
@@ -1001,14 +997,14 @@
   "pricing": {
     "overline": "Open Source",
     "title": "100% free. 100% open source.",
-    "subtitle": "MIT License. No paywalls, no feature gates, no usage limits. Every feature included.",
+    "subtitle": "MIT License. No paywalls, no tiers, no limits. Every feature included.",
     "guarantee": "MIT License. Full source code available on GitHub."
   },
   "pricingPage": {
     "hero": {
       "overline": "Open Source",
       "title": "100% free. 100% open source.",
-      "subtitle": "MIT License. No paywalls, no feature gates, no usage limits. Every feature. Every rule. Every tool."
+      "subtitle": "MIT License. No paywalls, no tiers, no limits. Every feature. Every rule. Every tool."
     },
     "badge": "MIT Licensed",
     "planName": "Panguard AI",
@@ -1024,7 +1020,7 @@
     "guarantee": "MIT License. Full source code available on GitHub.",
     "faq": {
       "faq1q": "Is Panguard really free?",
-      "faq1a": "Yes, 100%. Panguard is MIT open source. Every feature -- Guard, Threat Cloud, ATR rules, Scan, Chat, MCP, Skill Auditor -- is free with no limits on machines, scans, or features, and no feature gating or paywall. (Optional managed services exist for regulated organizations -- see Pricing -- but they never gate a feature.)",
+      "faq1a": "Yes, 100%. Panguard is MIT open source. Every feature -- Guard, Threat Cloud, ATR rules, Scan, Chat, MCP, Skill Auditor -- is free with no limits on machines, scans, or features. Every feature is free with no limits. No paid tiers, no paywalls.",
       "faq2q": "How does Panguard sustain itself?",
       "faq2a": "We believe AI agent security should be a public good, not a premium feature. Panguard is community-driven. We sustain through sponsorships, grants, and enterprise consulting partnerships.",
       "faq3q": "What counts as a machine?",
@@ -1096,7 +1092,7 @@
     },
     "cta": {
       "title": "Liked the scan? Get 24/7 protection.",
-      "desc": "Panguard Scan is just the beginning. Install Panguard Guard for continuous on-device monitoring, automated response, and plain-language notifications.",
+      "desc": "Panguard Scan is just the beginning. Install Panguard Guard for continuous AI-powered monitoring, automated response, and plain-language notifications.",
       "cta1": "Install Now",
       "cta2": "Learn About Guard"
     }
@@ -1110,7 +1106,7 @@
       "products": {
         "atr": {
           "name": "ATR -- The Standard",
-          "tagline": "The first open standard for AI agent threat detection.",
+          "tagline": "The open, executable standard for AI agent threat detection.",
           "badge": "Standard"
         },
         "threatCloud": {
@@ -1135,7 +1131,7 @@
         },
         "report": {
           "name": "Compliance Reports",
-          "tagline": "EU AI Act, NIST AI RMF, and ISO/IEC 42001 reports generated from Scan findings.",
+          "tagline": "ISO 27001, SOC 2 reports generated from Scan findings.",
           "badge": "Scan Feature"
         },
         "mcp": {
@@ -1152,7 +1148,7 @@
       "capabilities": "Key Capabilities",
       "cta": {
         "title": "Ready to secure your AI agents?",
-        "subtitle": "One command to deploy. Works with Claude Code, Cursor, OpenClaw, WorkBuddy, and any AI agent setup. 650+ ATR detection rules. Completely free.",
+        "subtitle": "One command to deploy. Works with Claude Code, Cursor, OpenClaw, WorkBuddy, and any AI agent setup. 670+ ATR detection rules. Completely free.",
         "cta1": "Get Started",
         "cta2": "View ATR on GitHub"
       }
@@ -1165,7 +1161,7 @@
       "problem": {
         "title": "You deployed a server. Is it secure?",
         "desc": "Most developers and small businesses have no idea whether their servers are configured securely. They copy a DigitalOcean tutorial, deploy their app, and hope for the best. Meanwhile, exposed ports, default credentials, and unpatched software create attack surfaces that automated scanners exploit within hours.",
-        "conclusion": "Professional security audits cost $5,000 to $50,000 and take weeks. Panguard Scan gives you 80% of that value in 60 seconds, for free.",
+        "conclusion": "Professional security audits cost $5,000 to $50,000 and take weeks. Panguard Scan catches the most common misconfigurations a paid audit flags -- in 60 seconds, for free.",
         "overline": "The Problem"
       },
       "features": {
@@ -1180,7 +1176,7 @@
         },
         "item2": {
           "title": "PDF Report with Compliance Mapping",
-          "desc": "Every scan generates a branded PDF: cover page, executive summary, findings table sorted by severity, compliance control mapping (EU AI Act, NIST AI RMF, ISO/IEC 42001), and step-by-step remediation guidance."
+          "desc": "Every scan generates a branded PDF: cover page, executive summary, findings table sorted by severity, compliance control mapping (ISO 27001, SOC 2), and step-by-step remediation guidance."
         },
         "item3": {
           "title": "Quick & Full Scan Modes",
@@ -1258,8 +1254,8 @@
       },
       "featuresList": {
         "item1": {
-          "title": "5-Agent Pipeline",
-          "desc": "Events flow through 5 specialized agents: Detect (ATR rules + behavioral baseline), Analyze (threat classification), Respond (auto-remediation), Report (compliance documentation), and Chat (Telegram, Slack, email notifications). Detection is deterministic and runs on-device -- most events are handled by rules alone."
+          "title": "5-Agent AI Pipeline",
+          "desc": "Events flow through 5 specialized AI agents: Detect (ATR rules + local LLM), Analyze (threat classification), Respond (auto-remediation), Report (compliance documentation), and Chat (Telegram, Slack, email notifications). 90% of events handled at zero cost by rules alone."
         },
         "item2": {
           "title": "Confidence-Based Auto-Response",
@@ -1271,11 +1267,11 @@
         },
         "item4": {
           "title": "Investigation Engine",
-          "desc": "Built-in investigation engine with deterministic correlation across a sliding window (500 events, 10-minute window) and multi-tool analysis. Correlates events by IP, user, process, and category. Risk scoring with confidence-based escalation."
+          "desc": "Built-in investigation engine with dynamic reasoning, event correlation across a sliding window (500 events, 10-minute window), and multi-tool analysis. Correlates events by IP, user, process, and category. Risk scoring with confidence-based escalation."
         },
         "item5": {
-          "title": "Offline-First by Design",
-          "desc": "Detection runs entirely on-device -- 650+ ATR rules, behavioral baselines, and on-device correlation. Threat Cloud connectivity only pulls new community rules; it never affects detection. With no network at all, Guard keeps protecting at full strength."
+          "title": "Graceful Degradation",
+          "desc": "Cloud AI down? Local fingerprint & heuristic analysis takes over. Heuristics offline? The ATR rule engine with 670+ detection rules handles it. Guard never stops protecting, regardless of network conditions."
         },
         "item6": {
           "title": "Integration Adapters",
@@ -1291,11 +1287,11 @@
         },
         "item9": {
           "title": "ATR Detection Pipeline",
-          "desc": "ATR rules cover the full attack surface: classic prompt injection (DAN, instruction override), tool poisoning, supply-chain attacks, credential exfiltration, context manipulation, and the 10 natural-language imperative attacks added in v2.0.18 (covert exfil instructions, NL credential disclosure, sensitive-file disclosure, system-prompt leak, persistent covert hooks, output-injection credential embedding, fake-error bypass, covert shell execution, skill self-modification, trust-escalation impersonation). 650+ detection rules. Sub-millisecond evaluation per event."
+          "desc": "ATR rules cover the full attack surface: classic prompt injection (DAN, instruction override), tool poisoning, supply-chain attacks, credential exfiltration, context manipulation, and the 10 natural-language imperative attacks added in v2.0.18 (covert exfil instructions, NL credential disclosure, sensitive-file disclosure, system-prompt leak, persistent covert hooks, output-injection credential embedding, fake-error bypass, covert shell execution, skill self-modification, trust-escalation impersonation). 670+ detection rules. Sub-millisecond evaluation per event."
         },
         "item10": {
           "title": "Investigation Engine",
-          "desc": "Deterministic correlation with 8 investigation tools: IP history, user privilege, time anomaly, geolocation, related events, process tree, file reputation, and network pattern. Rule-driven investigation playbooks with evidence collection."
+          "desc": "Dynamic reasoning with 8 investigation tools: IP history, user privilege, time anomaly, geolocation, related events, process tree, file reputation, and network pattern. AI-generated investigation plans with evidence collection."
         }
       },
       "install": {
@@ -1314,7 +1310,7 @@
       },
       "cta": {
         "title": "Your server deserves a security guard.",
-        "desc": "Install Panguard Guard now and deploy deterministic, on-device protection on your infrastructure.",
+        "desc": "Install Panguard Guard now and deploy AI-powered protection on your infrastructure.",
         "cta1": "Get Started",
         "cta2": "Read the Architecture"
       },
@@ -1344,7 +1340,7 @@
         },
         "step2": {
           "title": "Auto-audit with ATR + Skill Auditor",
-          "desc": "The skill is scanned against 650+ ATR detection rules. Prompt injection, tool poisoning, hidden payloads, and excessive permissions are checked in under 1 second."
+          "desc": "The skill is scanned against 670+ ATR detection rules. Prompt injection, tool poisoning, hidden payloads, and excessive permissions are checked in under 1 second."
         },
         "step3": {
           "title": "Anonymized threat submitted to Threat Cloud",
@@ -1377,7 +1373,7 @@
           },
           "review": {
             "title": "Review",
-            "desc": "ATR rules evaluate your agent's behavior patterns in dev/staging. 650+ rules across 10 threat categories catch issues before production."
+            "desc": "ATR rules evaluate your agent's behavior patterns in dev/staging. 670+ rules across 10 threat categories catch issues before production."
           },
           "ship": {
             "title": "Ship",
@@ -1595,8 +1591,8 @@
           "desc": "Attack patterns captured by your traps are anonymized and contributed to the Panguard collective intelligence network via the Threat Cloud API. Your data protects every other user -- and theirs protects you."
         },
         "item4": {
-          "title": "Attacker Session Analysis",
-          "desc": "Captured attacker sessions are analyzed against behavioral signatures to classify attack types, estimate sophistication levels, and identify whether the attacker is an automated scanner or a human operator."
+          "title": "AI-Powered Analysis",
+          "desc": "Captured attacker sessions are analyzed by Panguard's AI to classify attack types, estimate sophistication levels, and identify whether the attacker is an automated scanner or a human operator."
         },
         "item5": {
           "title": "Flexible Deployment",
@@ -1794,7 +1790,7 @@
       },
       "tools": {
         "overline": "MCP Tools",
-        "title": "11 security tools at your AI's fingertips."
+        "title": "10 security tools at your AI's fingertips."
       },
       "clients": {
         "overline": "Compatibility",
@@ -1921,7 +1917,7 @@
       },
       "checks": {
         "overline": "THREE-LAYER SECURITY",
-        "title": "Regex. Static analysis. Community intelligence.",
+        "title": "Regex. AI. Community intelligence.",
         "promptInjection": {
           "name": "Prompt Injection",
           "detail": "11 regex patterns detect identity override, instruction hijacking, and jailbreak attempts"
@@ -1966,8 +1962,8 @@
             "label": "Layer 1"
           },
           "layer2": {
-            "name": "AST Static Analysis",
-            "desc": "Parses the skill's code into an abstract syntax tree to detect dangerous calls, obfuscation, and supply-chain risks that flat regex misses. Deterministic and on-device.",
+            "name": "AI Semantic Analysis",
+            "desc": "LLM analyzes the skill for social engineering, intent mismatch, and obfuscated attacks that regex physically cannot catch.",
             "label": "Layer 2"
           },
           "layer3": {
@@ -2104,7 +2100,7 @@
       "overline": "Built for solo devs and indie hackers",
       "title": "Enterprise security.",
       "titleHighlight": "Developer simplicity.",
-      "subtitle": "You ship code, not security configurations. Panguard gives solo developers and indie hackers the same enterprise-grade protection that enterprises use -- without the complexity or the overhead. 100% free and open source.",
+      "subtitle": "You ship code, not security configurations. Panguard gives solo developers and indie hackers the same AI-powered protection that enterprises use -- without the complexity or the overhead. 100% free and open source.",
       "features": {
         "item1": {
           "title": "One Command Setup",
@@ -2115,7 +2111,7 @@
           "desc": "Panguard runs silently in the background. Less than 1% CPU overhead and minimal memory footprint. It never interrupts your flow with false positives or intrusive alerts."
         },
         "item3": {
-          "title": "Plain-Language Explanations",
+          "title": "AI-Powered Explanations",
           "desc": "When Panguard detects something, it tells you what happened in plain language. No need to interpret cryptic CVE codes or parse security jargon. Understand threats instantly."
         },
         "item4": {
@@ -2136,7 +2132,14 @@
       },
       "workflow": {
         "title": "Fits your workflow",
-        "tools": ["CLI", "REST API", "GitHub Actions", "Docker", "SSH", "Webhooks"]
+        "tools": [
+          "CLI",
+          "REST API",
+          "GitHub Actions",
+          "Docker",
+          "SSH",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "Secure your stack with one command",
@@ -2147,7 +2150,7 @@
       "overline": "For teams of 5 to 50",
       "title": "Big company security.",
       "titleHighlight": "Small company budget.",
-      "subtitle": "Small businesses are the number one target for cyberattacks, yet most security tools are built for enterprises with dedicated IT teams. Panguard changes that. Enterprise-grade protection that works out of the box, so you can focus on growing your business.",
+      "subtitle": "Small businesses are the number one target for cyberattacks, yet most security tools are built for enterprises with dedicated IT teams. Panguard changes that. AI-powered protection that works out of the box, so you can focus on growing your business.",
       "stats": {
         "stat1": {
           "value": "43%",
@@ -2166,7 +2169,7 @@
         "title": "Security that works for small teams",
         "item1": {
           "title": "No Security Team Required",
-          "desc": "Panguard acts as your virtual security team. Automated threat detection and response mean you get enterprise-level protection without hiring dedicated security staff."
+          "desc": "Panguard acts as your virtual security team. AI-powered threat detection and automated response mean you get enterprise-level protection without hiring dedicated security staff."
         },
         "item2": {
           "title": "Deploy in Minutes, Not Months",
@@ -2178,7 +2181,7 @@
         },
         "item4": {
           "title": "Compliance Made Simple",
-          "desc": "Automatically generate AI-compliance reports for EU AI Act, NIST AI RMF, and ISO/IEC 42001 requirements. Demonstrate your security posture to clients and partners with one-click reports."
+          "desc": "Automatically generate compliance reports for SOC 2, ISO 27001, and GDPR requirements. Demonstrate your security posture to clients and partners with one-click reports."
         },
         "item5": {
           "title": "Completely Free",
@@ -2197,7 +2200,13 @@
       },
       "integrations": {
         "title": "Integrations your team already uses",
-        "tools": ["Slack", "Telegram", "Email", "Microsoft Teams", "Webhooks"]
+        "tools": [
+          "Slack",
+          "Telegram",
+          "Email",
+          "Microsoft Teams",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "Protect your business today",
@@ -2208,11 +2217,11 @@
       "overline": "For organizations with 50 to 500 employees",
       "title": "Scale security",
       "titleHighlight": "without scaling complexity.",
-      "subtitle": "Mid-size companies face enterprise-level threats but often lack enterprise-level security teams. Panguard bridges that gap with enterprise-grade protection that deploys fast, scales effortlessly, and provides the visibility and compliance your growing organization demands.",
+      "subtitle": "Mid-size companies face enterprise-level threats but often lack enterprise-level security teams. Panguard bridges that gap with AI-powered protection that deploys fast, scales effortlessly, and provides the visibility and compliance your growing organization demands.",
       "stats": {
         "stat1": {
           "value": "99.9%",
-          "label": "target service availability"
+          "label": "guaranteed uptime SLA"
         },
         "stat2": {
           "value": "500+",
@@ -2235,7 +2244,7 @@
         },
         "item3": {
           "title": "Automated Compliance Reporting",
-          "desc": "Generate audit-ready reports for EU AI Act, NIST AI RMF, ISO/IEC 42001, and SEMI E187 at the click of a button. Schedule recurring reports and share them with auditors, investors, and partners."
+          "desc": "Generate audit-ready reports for SOC 2, ISO 27001, and Taiwan Cyber Security Act (TCSA) at the click of a button. Schedule recurring reports and share them with auditors, investors, and partners."
         },
         "item4": {
           "title": "Open Source and Transparent",
@@ -2257,7 +2266,15 @@
       },
       "integrations": {
         "title": "Enterprise integrations",
-        "tools": ["SIEM", "PagerDuty", "Jira", "Slack", "Microsoft Teams", "REST API", "Webhooks"]
+        "tools": [
+          "SIEM",
+          "PagerDuty",
+          "Jira",
+          "Slack",
+          "Microsoft Teams",
+          "REST API",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "See Panguard in action",
@@ -2313,7 +2330,14 @@
       "stack": "e.g. CrowdStrike, Cloudflare, custom scripts...",
       "message": "Tell us about your security goals or any specific questions..."
     },
-    "teamSizes": ["Just me", "2-10", "11-50", "51-200", "201-500", "500+"],
+    "teamSizes": [
+      "Just me",
+      "2-10",
+      "11-50",
+      "51-200",
+      "201-500",
+      "500+"
+    ],
     "submit": "Send Message",
     "submitting": "Submitting...",
     "error": "Failed to submit request. Please try again.",
@@ -2353,8 +2377,8 @@
       },
       "item3": {
         "title": "Security never stops",
-        "subtitle": "Offline-first",
-        "desc": "Detection runs entirely on-device -- ATR rules, behavioral baselines, and on-device correlation. Network down? The engine keeps protecting on local rules. Panguard never says 'service unavailable.' The watchdog always watches."
+        "subtitle": "Graceful degradation",
+        "desc": "Cloud down? Local AI takes over. LLM offline? Rule engine handles it. Panguard never says 'service unavailable.' Protection degrades in capability, never in availability. The watchdog always watches."
       },
       "item4": {
         "title": "Collective defense",
@@ -2495,10 +2519,10 @@
       "message": "How can we help?"
     },
     "inquiryTypes": [
-      "Community (free & open source)",
       "General",
       "Pilot ($25K / 90 days)",
       "Enterprise ($150K–$500K)",
+      "Founding F500 ($100K × 2 years)",
       "Sovereign AI ($5–20M)",
       "OEM License ($2–10M)",
       "ATR Foundation Member ($10K/yr)",
@@ -2515,6 +2539,7 @@
     "overline": "NEWSROOM",
     "title": "Press & Media",
     "subtitle": "Press releases, media coverage, and brand resources.",
+    "latestLabel": "Latest Announcement",
     "filters": {
       "all": "All",
       "pressReleases": "Press Releases",
@@ -2556,9 +2581,9 @@
   },
   "compliance": {
     "overline": "OWASP Agentic Top 10",
-    "title": "Full coverage of the",
+    "title": "Rules for every category of the",
     "titleHighlight": "OWASP Agentic Top 10.",
-    "subtitle": "The only executable rule set designed from the ground up for OWASP's AI agent security standard. 10 out of 10 categories covered.",
+    "subtitle": "An executable rule set designed from the ground up for OWASP's AI agent security standard. All 10 categories have dedicated rules (9 STRONG, 1 MODERATE).",
     "hero": {
       "badge": "categories covered",
       "rulesBadge": "ATR detection rules",
@@ -2568,12 +2593,12 @@
       "overline": "The Standard",
       "title": "What is the OWASP Agentic Top 10?",
       "desc": "OWASP released the Top 10 for Agentic Applications in 2026 -- the first security standard specifically for AI agents. It covers 10 attack categories: from prompt injection and tool misuse to rogue agents and cascading failures.",
-      "desc2": "ATR (Agent Threat Rules) is the only rule set that maps directly to all 10 categories with executable detection rules. Not a checklist. Not a whitepaper. Real YAML rules that run in < 50ms and block threats before they execute."
+      "desc2": "ATR (Agent Threat Rules) maps directly to all 10 categories with executable detection rules. Not a checklist. Not a whitepaper. Real YAML rules that run in < 50ms and block threats before they execute."
     },
     "coverage": {
       "overline": "Coverage Matrix",
-      "title": "10 categories. 650+ rules. Zero gaps.",
-      "subtitle": "Every OWASP Agentic category has dedicated ATR detection rules. 6 categories at STRONG coverage, 4 at MODERATE -- all fully covered.",
+      "title": "10 categories. 670+ rules. All mapped.",
+      "subtitle": "All 10 OWASP Agentic categories have dedicated ATR detection rules: 9 at STRONG coverage, 1 at MODERATE.",
       "rulesLabel": "ATR rules",
       "note": "Some rules map to multiple categories. Total rule-category mappings: {total}.",
       "ASI01": {
@@ -2609,7 +2634,7 @@
     },
     "evidence": {
       "overline": "Ecosystem Scan",
-      "title": "Verified against 67,000+ real skills.",
+      "title": "Verified against 96,096 real skills.",
       "subtitle": "We scanned the MCP ecosystem -- npm, GitHub, and community registries. The numbers speak for themselves.",
       "scanned": "MCP skills scanned",
       "findings": "packages with security findings",
@@ -2649,6 +2674,50 @@
       "desc": "Paste a GitHub URL on panguard.ai or install the CLI. Every scan uses ATR rules mapped to the OWASP Agentic Top 10.",
       "cta1": "View ATR Rules",
       "cta2": "Scan Online"
+    },
+    "roadmap": {
+      "overline": "COMPLIANCE ROADMAP · LAYER 7 GOVERN",
+      "title": "6-framework mapping shipped · reporting + AIAM next",
+      "subtitle": "Per-rule mapping across 6 frameworks ships today (ATR v{version}, CI-validated). Auditor-grade reports + AIAM are next on the public roadmap. No fake checkmarks.",
+      "todayLabel": "Today · Shipped",
+      "comingLabel": "Roadmap · Coming Soon",
+      "today": {
+        "item1": "EU AI Act · NIST AI RMF · ISO/IEC 42001 — per-rule compliance mapping on bundled rules, validated in CI (ATR v{version})",
+        "item2": "OWASP LLM Top 10 · OWASP Agentic Top 10 · MITRE ATLAS — per-rule references (ATR v{version})",
+        "item3": "Downloadable mapping pack — per-rule framework evidence, MIT-licensed (detection evidence, not a compliance guarantee)",
+        "item4": "Audit log — admin actions, actor, IP, timestamp (Threat Cloud)",
+        "item5": "Admin dashboard — pagination, filter by actor / action",
+        "item6": "Client key registration + revocation (API-key AAM lite)"
+      },
+      "coming": {
+        "item1suffix": " — Markdown + PDF reports with per-rule mapping (planned)",
+        "item2": "AIAM — agent identity + scope + policy evaluator + OAuth 2.0 device flow (planned)",
+        "item3": "SOC 2 Type 1 — in preparation; the timeline will be announced when audit fieldwork is scheduled"
+      },
+      "frameworks": {
+        "nist": {
+          "scope": "Govern / Map / Measure / Manage",
+          "date": "Voluntary · F500 RFP standard",
+          "statusLabel": "Mapped · v{version}"
+        },
+        "eu": {
+          "scope": "Articles 9, 10, 12, 13, 14, 15 (high-risk)",
+          "date": "High-risk obligations enforced Dec 2027 (omnibus delay)",
+          "statusLabel": "Mapped · v{version}"
+        },
+        "iso": {
+          "scope": "AIMS clauses 6.2 / 8.1–8.4 / 9.1",
+          "date": "Certification pathway",
+          "statusLabel": "Mapped · v{version}"
+        },
+        "colorado": {
+          "scope": "SB24-205 algorithmic discrimination",
+          "date": "Enforcement began 2026-06-01",
+          "statusLabel": "Mapping in progress"
+        }
+      },
+      "honestTitle": "Why honest timelines",
+      "honestDesc": "Compliance reporting that claims coverage before shipping code is the fastest way to lose CISO trust. We only publish dates once they are committed. If a published date slips, we post the reason on the panguard.ai changelog before auditors find out from you."
     }
   },
   "trust": {
@@ -2708,7 +2777,7 @@
         "items": [
           "Local-first architecture -- all data stays on your machine",
           "Threat Cloud hosted on SOC 2 Type II certified provider",
-          "SHA-256 content hashing for tamper-evidence on dashboard actions (365-day retention); full tamper-evident chain on roadmap",
+          "Immutable audit log for admin actions (365-day retention)",
           "Automated dependency vulnerability scanning",
           "DDoS protection at provider edge"
         ]
@@ -2736,7 +2805,7 @@
       },
       "item5": {
         "title": "Audit Logging",
-        "desc": "SHA-256 content hashing provides tamper-evidence on dashboard actions. Logs retained for a minimum of 12 months. A full tamper-evident hash chain is on the roadmap."
+        "desc": "Immutable audit trail for all administrative actions. Logs retained for a minimum of 12 months."
       },
       "item6": {
         "title": "Incident Response",
@@ -2760,7 +2829,12 @@
       },
       "anthropic": {
         "name": "Anthropic",
-        "purpose": "Threat Cloud rule drafting (anonymized patterns only; not runtime detection)",
+        "purpose": "LLM semantic analysis (Claude API)",
+        "location": "United States"
+      },
+      "openai": {
+        "name": "OpenAI",
+        "purpose": "LLM semantic analysis (GPT API, opt-in)",
         "location": "United States"
       },
       "supabase": {
@@ -2869,7 +2943,7 @@
     "practices": {
       "overline": "Practices",
       "title": "How we secure ourselves.",
-      "subtitle": "These are the security practices we follow across our code, deployments, and team. Where a control is still being rolled out, we say so rather than imply it is already complete.",
+      "subtitle": "These are not aspirational goals. They are current, enforced practices that apply to every line of code, every deployment, and every employee.",
       "item1": {
         "title": "Local-First Architecture",
         "desc": "Panguard runs entirely on your machine. No data is sent to any server unless you opt in to Threat Cloud. Your security data, scan results, and configuration never leave your device."
@@ -2879,12 +2953,12 @@
         "desc": "All data is encrypted at rest (AES-256) and in transit (TLS 1.3). Local encryption for configuration and credential storage. Key material stays on your device."
       },
       "item3": {
-        "title": "Detection Stays On-Device",
-        "desc": "Detection is deterministic and runs entirely on your machine -- event payloads are never sent anywhere to be classified. The only data that can leave is an optional, anonymized threat pattern contributed to Threat Cloud (PII stripped first)."
+        "title": "Zero Data Retention",
+        "desc": "Cloud AI queries are ephemeral. Payloads sent to Claude or GPT are not stored, not used for training, and not logged beyond the request lifecycle. PII is stripped before any data leaves the device."
       },
       "item4": {
-        "title": "Auditable, Deterministic Decisions",
-        "desc": "Every automated action is logged with the rule, confidence score, and signals behind it. Because detection is deterministic, you can reproduce exactly why an event was flagged and what response was executed."
+        "title": "Auditable AI Decisions",
+        "desc": "Every automated action taken by Panguard is logged with a full reasoning chain. You can trace exactly why an event was flagged, what confidence score it received, and what response was executed."
       },
       "item5": {
         "title": "Open Source Transparency",
@@ -2904,7 +2978,7 @@
           "badge": "SOC 2 Type II",
           "status": "In Progress",
           "statusColor": "text-[#f59e0b]",
-          "description": "Our own SOC 2 Type II readiness program is in progress, with controls aligned to the trust service criteria covering Security, Availability, and Confidentiality. Formal attestation is targeted for Q4 2026 / Q1 2027."
+          "description": "Panguard helps generate compliance reports aligned to SOC 2 Type II trust service criteria covering Security, Availability, and Confidentiality. Use these reports to accelerate your own audit preparation."
         },
         {
           "badge": "ISO 27001",
@@ -2919,10 +2993,10 @@
           "description": "Panguard is designed for GDPR compliance by default. Data minimization, purpose limitation, and the right to erasure are built into the architecture. We offer Data Processing Agreements (DPA) to all customers."
         },
         {
-          "badge": "SEMI E187",
-          "status": "Supported",
+          "badge": "Taiwan Cybersecurity Management Act",
+          "status": "Compliant",
           "statusColor": "text-[#22c55e]",
-          "description": "For customers operating under Taiwan's semiconductor cybersecurity requirements, Panguard's reporting and audit capabilities are designed to map to SEMI E187 controls for fab equipment and industrial environments."
+          "description": "For customers operating under Taiwan's Cybersecurity Management Act, Panguard's reporting and audit capabilities are designed to meet regulatory requirements for critical infrastructure providers."
         }
       ]
     },
@@ -2936,15 +3010,16 @@
           "Raw system logs and telemetry",
           "Context Memory baseline database",
           "ATR rule engine and results",
-          "Behavioral baseline, AST, and correlation (all detection)",
+          "Local LLM inference (Ollama)",
           "Incident response playbook execution",
           "Full event history and forensic logs"
         ]
       },
       "cloud": {
-        "zone": "Cloud (Ephemeral, optional)",
+        "zone": "Cloud (Ephemeral)",
         "items": [
-          "Anonymized threat patterns for new rule proposals (PII stripped)",
+          "Anonymized event payloads (PII stripped)",
+          "Cloud AI inference requests (not stored)",
           "Collective threat intelligence contributions (hashed IOCs only)",
           "Software update checks and rule feed syncs"
         ]
@@ -2961,7 +3036,7 @@
       },
       "anonymization": {
         "title": "Anonymization Pipeline",
-        "desc1": "Before any threat pattern is contributed to the collective intelligence network, it passes through a multi-stage anonymization pipeline. IP addresses are hashed, hostnames are replaced with generic identifiers, file paths are normalized, and user data is removed entirely.",
+        "desc1": "Before any event data is sent to cloud AI or the collective intelligence network, it passes through a multi-stage anonymization pipeline. IP addresses are hashed, hostnames are replaced with generic identifiers, file paths are normalized, and user data is removed entirely.",
         "desc2": "The pipeline is deterministic, so the same threat pattern always produces the same anonymized signature -- enabling correlation without exposing identity."
       }
     },
@@ -3005,8 +3080,8 @@
     },
     "sla": {
       "overline": "SERVICE LEVEL",
-      "title": "Service-Level Targets",
-      "subtitle": "Our service-level targets for all users. Contractual SLAs are available under paid managed-support tiers.",
+      "title": "SLA Summary",
+      "subtitle": "Our commitments to all users.",
       "items": {
         "0": {
           "metric": "Threat Cloud API Uptime",
@@ -3076,34 +3151,34 @@
     "title": "Security that",
     "titleHighlight": "thinks",
     "titleSuffix": ", not just scans.",
-    "subtitle": "Deterministic detection stages, four autonomous agents, and a context memory that learns your environment. Every detection runs on-device with no LLM in the path -- so verdicts are reproducible and protection never depends on the network.",
+    "subtitle": "A three-layer AI defense funnel, four autonomous agents, and a context memory that learns your environment. Built so the 90 % of events that are noise cost nothing, and the 3 % that matter get the deepest reasoning available.",
     "defenseFunnel": {
-      "overline": "Detection Stages",
-      "title": "Deterministic. On-device. Free.",
-      "subtitle": "Events flow through escalating detection stages -- regex rules, then behavioral analysis, then on-device correlation. Every stage is deterministic and runs locally, so the same input always produces the same verdict with no cloud dependency.",
+      "overline": "Defense Funnel",
+      "title": "Three layers. 90 % free.",
+      "subtitle": "Events flow downward through increasingly powerful -- and increasingly expensive -- analysis layers. The funnel ensures cost efficiency while guaranteeing that no genuine threat is missed.",
       "layer1": {
-        "badge": "Stage 1",
+        "badge": "Layer 1",
         "name": "Rule Engine",
-        "tech": "ATR Rules (regex)",
-        "pct": "Sub-ms",
+        "tech": "ATR Rules",
+        "pct": "~90 %",
         "cost": "$0",
-        "desc": "Open-source ATR (Agent Threat Rules) form the bedrock. 650+ deterministic regex rules process the vast majority of AI agent security events instantly, on-device, with zero cost per event. New community rules are pulled daily from Threat Cloud and automatically compiled into the local engine."
+        "desc": "Open-source ATR (Agent Threat Rules) form the bedrock. They process the vast majority of AI agent security events instantly, on-device, with zero cost per event. New community rules are pulled daily from Threat Cloud and automatically compiled into the local engine."
       },
       "layer2": {
-        "badge": "Stage 2",
+        "badge": "Layer 2",
         "name": "Fingerprint & Heuristic",
         "tech": "Local behavioral analysis",
-        "pct": "On-device",
+        "pct": "~7 %",
         "cost": "$0",
-        "desc": "Events that rules do not match are checked against behavioral baselines and fingerprints recorded during onboarding. Zero-config, fully offline, keeps sensitive data on the device, and flags drift from expected behavior without any cloud dependency."
+        "desc": "Events that rules cannot confidently classify are escalated to local fingerprint matching and heuristic analysis. Zero-config, fully offline, keeps sensitive data on the device, and adds contextual reasoning without cloud dependency."
       },
       "layer3": {
-        "badge": "Stage 3",
-        "name": "Correlation & AST",
-        "tech": "On-device static + temporal analysis",
-        "pct": "On-device",
-        "cost": "$0",
-        "desc": "Events that survive earlier stages are cross-correlated on-device: AST static analysis of skill code plus temporal correlation of behavioral signals. The engine weighs rule confidence, baseline deviation, and timing to produce a reproducible, confidence-scored verdict -- no LLM, no data leaving the machine."
+        "badge": "Layer 3",
+        "name": "Cloud LLM-as-Judge",
+        "tech": "Claude Sonnet 4 on Threat Cloud",
+        "pct": "~3 %",
+        "cost": "$0 (server-side)",
+        "desc": "Only the most ambiguous or novel threats reach the Cloud LLM for deep reasoning. The payload is scrubbed of PII before transmission. Analysis runs server-side on Threat Cloud -- free for all users. Returns a structured verdict with confidence score and plain-language explanation."
       }
     },
     "agents": {
@@ -3117,8 +3192,8 @@
       },
       "analyze": {
         "name": "Analyze Agent",
-        "role": "Correlation Engine",
-        "desc": "Receives flagged events from the Detect Agent and correlates them deterministically. It links events across time, queries the Context Memory for baseline deviations, and assigns a reproducible confidence score from 0 to 100 -- no LLM involved."
+        "role": "AI Investigator",
+        "desc": "Receives flagged events from the Detect Agent and performs multi-step reasoning. It correlates events across time, queries the Context Memory for baseline deviations, and assigns a confidence score from 0 to 100."
       },
       "respond": {
         "name": "Respond Agent",
@@ -3128,7 +3203,7 @@
       "report": {
         "name": "Report Agent",
         "role": "Compliance Writer",
-        "desc": "Transforms raw incident data into structured reports mapped to EU AI Act, NIST AI RMF, ISO/IEC 42001, and other frameworks. Generates executive summaries, timeline visualizations, and audit-ready evidence packages automatically."
+        "desc": "Transforms raw incident data into structured reports mapped to ISO 27001, SOC 2, and other frameworks. Generates executive summaries, timeline visualizations, and audit-ready evidence packages automatically."
       }
     },
     "contextMemory": {
@@ -3202,18 +3277,18 @@
     "resilience": {
       "overline": "Resilience",
       "title": "Security never stops.",
-      "subtitle": "Network down? Threat Cloud unreachable? Panguard's detection runs entirely on-device, so protection is identical online or fully air-gapped. Cloud connectivity only affects rule updates, never detection.",
+      "subtitle": "Network down? API tokens depleted? Cloud provider outage? Panguard degrades gracefully through its three layers. Protection is always on.",
       "optimal": {
-        "status": "Online",
-        "desc": "All detection stages active and Threat Cloud reachable -- new community rules pull automatically every hour."
+        "status": "Optimal",
+        "desc": "Cloud AI + Local LLM + Rule Engine -- full three-layer analysis on every event."
       },
       "cloudUnavailable": {
-        "status": "Cloud Unreachable",
-        "desc": "Detection is unaffected -- the full on-device engine keeps running on the rules already compiled locally. New rule updates resume once Threat Cloud is reachable again."
+        "status": "Cloud Unavailable",
+        "desc": "Local LLM + Rule Engine. Complex events queue for cloud retry. No gaps in protection."
       },
-      "engineOnly": {
-        "status": "Fully Air-Gapped",
-        "desc": "No network at all. The deterministic engine -- 650+ ATR rules, behavioral baselines, and on-device correlation -- provides full protection with nothing leaving the machine."
+      "llmOffline": {
+        "status": "LLM Offline",
+        "desc": "Rule Engine only. ATR rules still catch 90 % of known threats. Events are logged for later AI analysis."
       },
       "emergency": {
         "status": "Emergency Mode",
@@ -3237,12 +3312,12 @@
         "desc": "Community defense network"
       },
       "item4": {
-        "name": "Regex Engine",
-        "desc": "Deterministic ATR rule evaluation"
+        "name": "Ollama",
+        "desc": "Local LLM inference"
       },
       "item5": {
-        "name": "Behavioral Baseline",
-        "desc": "On-device fingerprint & drift detection"
+        "name": "Claude / GPT",
+        "desc": "Cloud AI reasoning"
       },
       "item6": {
         "name": "Node.js",
@@ -3291,7 +3366,7 @@
         "engine": "ATR Rules",
         "desc": "Intercepts every AI agent tool call, prompt flow, and skill installation. ATR rules detect prompt injection, tool poisoning, credential exfiltration, and context manipulation in real-time.",
         "detects": "Prompt injection, tool poisoning, credential exfiltration, context manipulation",
-        "tech": "ATR rule engine, sub-millisecond evaluation, 650+ detection rules, 920+ patterns"
+        "tech": "ATR rule engine, sub-millisecond evaluation, 670+ detection rules, 2,900+ patterns"
       },
       "network": {
         "layer": "Layer 2",
@@ -3315,15 +3390,15 @@
         "engine": "ATR Correlation",
         "desc": "ATR detection rules correlate events across AI agent sessions, tool calls, and prompt flows. The rule engine supports temporal correlation, aggregation, and multi-source joins.",
         "detects": "Brute force attacks, lateral movement chains, persistence mechanisms, policy violations",
-        "tech": "650+ ATR rules, hot-reload, MITRE ATT&CK TTP mapping, custom rule authoring"
+        "tech": "670+ ATR rules, hot-reload, MITRE ATT&CK TTP mapping, custom rule authoring"
       },
       "ai": {
         "layer": "Layer 5",
-        "name": "Confidence Scoring",
-        "engine": "Deterministic Correlation",
-        "desc": "Events that pass through layers 1-4 are cross-correlated on-device with no LLM in the detection path. The engine weighs behavioral baselines, rule confidence, and temporal patterns to produce a reproducible confidence-scored verdict with a full attack narrative.",
-        "detects": "Multi-step attack chains, behavioral drift, policy violations, false positive reduction",
-        "tech": "Deterministic heuristic + temporal correlation, baseline-deviation scoring, 0-100 confidence, fully reproducible"
+        "name": "AI Correlation",
+        "engine": "LLM Reasoning",
+        "desc": "Events that pass through layers 1-4 are cross-correlated by AI. The model weighs behavioral baselines, threat intelligence feeds, and temporal patterns to produce a confidence-scored verdict with full attack narrative.",
+        "detects": "Zero-day attacks, APT campaigns, novel attack chains, false positive reduction",
+        "tech": "Local Ollama + Cloud LLM fallback, RAG over baseline memory, threat intel enrichment, 0-100 scoring"
       }
     },
     "dataFlow": {
@@ -3416,11 +3491,11 @@
       },
       "postmark-supply-chain-attack": {
         "title": "Clean for 15 Versions. Version 1.0.16 Stole Your Inbox.",
-        "excerpt": "An email-delivery MCP server published 15 clean versions. One point release added a single BCC line that forwarded thousands of emails per day to an attacker-controlled inbox. Plus: a typosquatting cluster of npm packages stealing SSH keys. Examples anonymized; no packages named."
+        "excerpt": "postmark-mcp published 15 clean versions. Version 1.0.16 added one BCC line that forwarded 3,000-15,000 emails per day to phan@giftshop.club. Plus: the SANDWORM_MODE cluster -- 19 typosquatted npm packages stealing SSH keys."
       },
       "postmark-supply-chain-attack-zh": {
         "title": "Clean for 15 Versions. Version 1.0.16 Stole Your Inbox. (Chinese)",
-        "excerpt": "An MCP email supply-chain attack and an npm typosquatting cluster. Examples anonymized; no packages named. Chinese language version."
+        "excerpt": "The postmark-mcp supply chain attack and SANDWORM_MODE typosquatting cluster. Chinese language version."
       },
       "zombie-agent-delayed-attack": {
         "title": "The Email That Waited 6 Weeks to Steal Your Data",
@@ -3439,20 +3514,20 @@
         "excerpt": "ATR (Agent Threat Rules) is an open detection standard for AI agent security threats. 108 YAML rules. Chinese language version."
       },
       "owasp-agentic-top-10-coverage": {
-        "title": "OWASP Agentic Top 10: How 650+ ATR Rules Cover All 10 Categories",
-        "excerpt": "77 total rule mappings across all 10 OWASP Agentic Security categories. ASI01-ASI06 have STRONG coverage (8-13 rules each). ASI07-ASI10 have MODERATE coverage (4-7 rules each). Full mapping inside."
+        "title": "OWASP Agentic Top 10: How 670+ ATR Rules Cover All 10 Categories",
+        "excerpt": "866 total rule mappings across all 10 OWASP Agentic Security categories. ASI01-ASI09 have STRONG coverage; only ASI10 Rogue Agents is MODERATE. Full mapping inside."
       },
       "owasp-agentic-top-10-coverage-zh": {
-        "title": "OWASP Agentic Top 10: How 650+ ATR Rules Cover All 10 Categories (Chinese)",
-        "excerpt": "77 total rule mappings across all 10 OWASP Agentic Security categories. Chinese language version."
+        "title": "OWASP Agentic Top 10: How 670+ ATR Rules Cover All 10 Categories (Chinese)",
+        "excerpt": "866 total rule mappings across all 10 OWASP Agentic Security categories. Chinese language version."
       },
       "transparent-recall-vs-opaque-precision": {
         "title": "Why Transparent 39.9% Recall Beats Opaque 98%",
-        "excerpt": "Why we use \"ATR Scanned\" not \"ATR Certified\" -- and why we publish what we miss. The Snort analogy: lower detection but open and auditable beats proprietary black boxes every time. (PINT figures in this post are from the ATR v0.4.0 era; current benchmarks are on the benchmark hub.)"
+        "excerpt": "ATR has 99.7% precision at 63.6% recall on our self-built PINT-format corpus. We use \"ATR Scanned\" not \"ATR Certified.\" We publish what we miss. The Snort analogy: lower detection but open and auditable beats proprietary black boxes every time."
       },
       "transparent-recall-vs-opaque-precision-zh": {
         "title": "Why Transparent 39.9% Recall Beats Opaque 98% (Chinese)",
-        "excerpt": "為什麼我們用 ATR Scanned 而非 ATR Certified,並公開我們漏掉的部分。本文 PINT 數字為 ATR v0.4.0 時期;當前 benchmark 見 benchmark hub。Chinese language version."
+        "excerpt": "ATR achieves 99.7% precision at 63.6% recall on our self-built PINT-format corpus. We use ATR Scanned not ATR Certified. Chinese language version."
       },
       "flywheel-every-scan-protects-everyone": {
         "title": "The Flywheel: Every Scan Makes Everyone Safer",
@@ -3468,7 +3543,7 @@
     "backToBlog": "Back to Blog",
     "comingSoon": "Coming Soon",
     "fullArticleInProgress": "Full article in progress",
-    "fullArticleDesc": "This article is currently being finalized. Subscribe to the newsletter to be notified when it publishes.",
+    "fullArticleDesc": "This article is currently being finalized by the Panguard AI team. Subscribe to our newsletter to be notified when it publishes.",
     "browseAll": "Browse All Posts"
   },
   "customers": {
@@ -3482,7 +3557,7 @@
       },
       "stat2": {
         "value": "14 days",
-        "label": "To EU AI Act readiness"
+        "label": "To SOC 2 compliance"
       },
       "stat3": {
         "value": "$38K",
@@ -3567,7 +3642,7 @@
       },
       "report": {
         "title": "Compliance Reports",
-        "desc": "Scan-based compliance reports, EU AI Act / NIST AI RMF / ISO/IEC 42001 evidence collection, PDF customization"
+        "desc": "Scan-based compliance reports, SOC 2 evidence collection, PDF customization"
       },
       "skillAuditor": {
         "title": "Skill Auditor",
@@ -3583,7 +3658,7 @@
       },
       "advancedSetup": {
         "title": "Advanced Setup",
-        "desc": "Bring your own ATR rules, run air-gapped, and configure advanced settings."
+        "desc": "Integrate Ollama (local AI) and configure advanced settings."
       }
     },
     "cantFind": "Can't find what you're looking for?",
@@ -3596,20 +3671,20 @@
     "gettingStarted": {
       "backToDocs": "Back to Documentation",
       "title": "Getting Started with Panguard",
-      "subtitle": "Install Panguard, run your first scan, and enable inline detection in under 5 minutes.",
+      "subtitle": "Install Panguard, run your first scan, and enable real-time protection in under 5 minutes.",
       "requirementsTitle": "System Requirements",
       "req1": "Linux (Ubuntu 20.04+, Debian 11+, CentOS 8+) or macOS 12+. Windows requires WSL2",
       "req2": "Node.js 20+ and git",
       "req3": "4 GB RAM recommended + 500 MB disk space",
       "step1Title": "Step 1: Install Panguard",
-      "step1Desc": "Install via npm or use the install script. Both methods set up the CLI and the deterministic rule engine.",
+      "step1Desc": "Install via npm or use the install script. Both methods set up the CLI, rule engine, and local AI model.",
       "step1Npm": "Option A: npm (recommended)",
       "step1Alt": "Option B: Install script",
       "step1Note": "The installer auto-detects your OS and architecture. Expected output:",
       "step2Title": "Step 2: Run Your First Scan",
       "step2Desc": "A quick scan checks your system for common vulnerabilities in about 60 seconds.",
       "step2Deep": "For a comprehensive analysis including all ports, SSL certificates, and configuration files:",
-      "step3Title": "Step 3: Enable Inline Detection",
+      "step3Title": "Step 3: Enable Real-Time Protection",
       "step3Desc": "Guard runs as a daemon, monitoring your AI agents 24/7 with ATR detection rules.",
       "step4Title": "Step 4: Set Up Notifications",
       "step4Desc": "Panguard Chat sends you plain-language notifications when threats are detected and resolved.",
@@ -3627,8 +3702,8 @@
       "step7Desc": "Scan any server or domain from outside. Panguard checks open ports, SSL certificates, HTTP headers, and DNS records.",
       "step7Note": "Remote scans use Node.js built-in modules only. No nmap required. Combine with --json for automated monitoring.",
       "step8Title": "Step 8: Compliance Reports",
-      "step8Desc": "Generate EU AI Act, NIST AI RMF, ISO/IEC 42001, or SEMI E187 compliance reports automatically.",
-      "step8Frameworks": "Supported frameworks: EU AI Act, NIST AI RMF, ISO/IEC 42001, and SEMI E187.",
+      "step8Desc": "Generate ISO 27001, SOC 2, or Taiwan Cyber Security Act compliance reports automatically.",
+      "step8Frameworks": "Supported frameworks: ISO 27001 Annex A, SOC 2 Trust Services Criteria, Taiwan TCSA (ISMS).",
       "step8Note": "Reports can be generated in English or Traditional Chinese with PDF export.",
       "step9Title": "More CLI Commands",
       "step9Desc": "Panguard has a full CLI toolkit. Here are the most useful commands beyond scan and guard.",
@@ -3648,7 +3723,7 @@
         "cmd": "panguard scan"
       },
       "cl2": {
-        "title": "2. Detect & block at runtime -- Start the Guard daemon",
+        "title": "2. Real-time Protection -- Start the Guard daemon",
         "desc": "Guard monitors your system 24/7. First 7 days in learning mode (detect + log), then auto-switches to protection mode (detect + block).",
         "cmd": "panguard guard start"
       },
@@ -3664,13 +3739,13 @@
       },
       "cl5": {
         "title": "5. Compliance Reports (Optional) -- Generate reports",
-        "desc": "Auto-generate EU AI Act, NIST AI RMF, ISO/IEC 42001, or SEMI E187 compliance reports. Use as audit evidence.",
-        "cmd": "panguard report generate --framework eu-ai-act"
+        "desc": "Auto-generate ISO 27001, SOC 2, or Taiwan Cyber Security Act compliance reports. Use as audit evidence.",
+        "cmd": "panguard report generate --framework iso27001"
       },
       "advancedHintTitle": "Advanced Configuration",
-      "advancedHintDesc": "Panguard works out of the box. Detection is deterministic and runs entirely on-device -- you can customize the rule source and run fully air-gapped if you need to.",
-      "advancedHintRules": "Custom rules -- Point the engine at your own ATR rule directory and hot-reload changes with no restart. Ideal for air-gapped environments.",
-      "advancedHintEnv": "Key environment variables: PANGUARD_ATR_RULES_DIR (custom rule directory), PANGUARD_WATCH_RULES (hot-reload rules), TC_ENDPOINT (Threat Cloud sync; leave empty for air-gapped), PANGUARD_LOG_LEVEL (logging verbosity).",
+      "advancedHintDesc": "Panguard works out of the box, but you can enhance detection with optional external tools. All tools degrade gracefully -- Panguard never stops working if an external tool is unavailable.",
+      "advancedHintOllama": "Ollama -- Run AI analysis locally without cloud APIs. Ideal for air-gapped environments.",
+      "advancedHintEnv": "Key environment variables: ANTHROPIC_API_KEY (Claude AI), OPENAI_API_KEY (GPT fallback), PANGUARD_LLM_MODEL (Ollama model override), OLLAMA_API_ENDPOINT (custom Ollama URL).",
       "advancedHintLink": "See the full Advanced Setup guide for installation instructions and configuration details.",
       "multiEndpointTitle": "Multi-Endpoint Deployment",
       "multiEndpointDesc": "Deploying Panguard across multiple servers is straightforward. Use SSH loops for small fleets or Ansible for larger environments.",
@@ -3681,31 +3756,31 @@
     "advancedSetup": {
       "backToDocs": "< Back to Docs",
       "title": "Advanced Setup",
-      "subtitle": "Customize Panguard's deterministic engine: bring your own ATR rules, tune the rule directory, and run fully air-gapped. Detection always runs on-device.",
-      "degradeNote": "Offline-First Architecture",
-      "degradeDesc": "Panguard's detection is fully deterministic and runs on-device -- ATR regex rules, behavioral baselines, and on-device correlation, with no LLM in the detection path. Threat Cloud connectivity only pulls new community rules; it never affects detection. With no network at all, 650+ ATR rules still provide full protection.",
-      "customRulesTitle": "Custom Rules & Air-Gapped Operation",
-      "customRulesDesc": "Point the engine at your own ATR rule directory, hot-reload rules without a restart, and disable Threat Cloud sync for fully offline environments.",
-      "customRulesNote": "Setting TC_ENDPOINT to an empty value runs Panguard completely air-gapped -- nothing leaves the machine and the locally compiled rules keep protecting.",
+      "subtitle": "Enhance Panguard's detection capabilities with optional external tools. All tools are optional -- Panguard works fully without them.",
+      "degradeNote": "Graceful Degradation Architecture",
+      "degradeDesc": "Panguard's AI analysis follows a three-tier degradation strategy: Cloud AI (Claude/OpenAI) > Local LLM (Ollama) > Rule Engine (ATR). Each tier is independent. Even with all external tools offline, 670+ ATR rules still provide full protection.",
+      "ollamaTitle": "Ollama -- Local AI Analysis",
+      "ollamaDesc": "Install Ollama to run AI threat analysis locally without cloud APIs. Ideal for air-gapped environments or data privacy requirements.",
+      "ollamaNote": "Panguard auto-detects Ollama (default http://localhost:11434). No additional configuration needed after install.",
       "envTitle": "Environment Variables Reference",
       "envDesc": "The following environment variables customize Panguard's behavior. All are optional.",
       "envVar": "Variable",
       "envPurpose": "Purpose",
       "env1": {
-        "var": "PANGUARD_ATR_RULES_DIR",
-        "purpose": "Load ATR rules from a custom directory (default: bundled rules)"
+        "var": "ANTHROPIC_API_KEY",
+        "purpose": "Enable Claude AI analysis (cloud, most capable)"
       },
       "env2": {
-        "var": "PANGUARD_WATCH_RULES",
-        "purpose": "Hot-reload rules when files change, no restart needed (true | false)"
+        "var": "OPENAI_API_KEY",
+        "purpose": "Enable OpenAI GPT analysis (cloud fallback)"
       },
       "env3": {
-        "var": "TC_ENDPOINT",
-        "purpose": "Threat Cloud rule-sync endpoint. Leave empty to run fully air-gapped"
+        "var": "PANGUARD_LLM_MODEL",
+        "purpose": "Override Ollama model name (default: llama3)"
       },
       "env4": {
-        "var": "PANGUARD_LOG_LEVEL",
-        "purpose": "Logging verbosity: error, warn, info, debug (default: info)"
+        "var": "OLLAMA_API_ENDPOINT",
+        "purpose": "Override Ollama API endpoint (default: http://localhost:11434)"
       },
       "backToGettingStarted": "Getting Started",
       "goToDeployment": "Multi-Endpoint Deployment"
@@ -3757,12 +3832,12 @@
           "latency": "< 50 ms"
         },
         "1": {
-          "name": "Behavioral fingerprint match",
-          "latency": "< 20 ms"
+          "name": "Local AI analysis (Ollama)",
+          "latency": "< 200 ms"
         },
         "2": {
-          "name": "Heuristic baseline check",
-          "latency": "< 50 ms"
+          "name": "Cloud AI analysis (Claude / GPT)",
+          "latency": "1 - 3 s"
         },
         "3": {
           "name": "Event correlation",
@@ -3830,8 +3905,8 @@
           "desc": "Install Semgrep for full static analysis coverage."
         },
         "5": {
-          "title": "Detection is deterministic -- no LLM in the detection path",
-          "desc": "Verdicts come from ATR regex rules, behavioral baselines, and on-device correlation. There is no AI model making detection calls, so results are reproducible and run fully offline."
+          "title": "Cloud AI features require API key + internet connectivity",
+          "desc": "Local-only mode is available but with reduced AI capability."
         },
         "6": {
           "title": "Windows support is in Beta",
@@ -3861,7 +3936,7 @@
         },
         "protection": {
           "title": "Protection",
-          "desc": "Real-time on-device protection daemon"
+          "desc": "Real-time AI protection daemon"
         },
         "chat": {
           "title": "Chat",
@@ -3882,6 +3957,10 @@
         "hardening": {
           "title": "Hardening",
           "desc": "Security auditing and credential protection"
+        },
+        "config": {
+          "title": "Configuration",
+          "desc": "LLM providers and local settings"
         },
         "system": {
           "title": "System",
@@ -3928,7 +4007,7 @@
           }
         },
         "guardStart": {
-          "desc": "Start the inline detection daemon. Monitors processes, network traffic, and filesystem changes using deterministic ATR rules and behavioral baselines.",
+          "desc": "Start the real-time protection daemon. Monitors processes, network traffic, and filesystem changes using AI behavioral analysis.",
           "flags": {
             "mode": "Protection mode: passive (alert only) or active (block threats)",
             "verbose": "Enable detailed logging",
@@ -3941,7 +4020,7 @@
         "guardStatus": {
           "desc": "Show current protection status, uptime, and resource usage.",
           "flags": {
-            "detailed": "Health check across process, dashboard, and rule engine"
+            "detailed": "3-layer health check (Process, Dashboard, AI)"
           }
         },
         "guardConfig": {
@@ -3991,9 +4070,9 @@
           "desc": "Show threat intelligence collected from honeypot interactions."
         },
         "reportGenerate": {
-          "desc": "Generate a compliance report. Supports EU AI Act, NIST AI RMF, ISO/IEC 42001, and SEMI E187 frameworks.",
+          "desc": "Generate a compliance report. Supports ISO 27001, SOC 2, and TCSA frameworks.",
           "flags": {
-            "framework": "Framework: eu-ai-act, nist-ai-rmf, iso-42001, semi-e187",
+            "framework": "Framework: iso27001, soc2, tw_cyber_security_act",
             "language": "Report language (en, zh-TW)",
             "format": "Output format (json, pdf)",
             "org": "Organization name for the report"
@@ -4038,6 +4117,15 @@
           "desc": "Migrate plaintext credentials to encrypted storage for improved security.",
           "flags": {
             "dryRun": "Report findings without migrating"
+          }
+        },
+        "configLlm": {
+          "desc": "Configure the AI/LLM provider for threat analysis. Supports Claude, OpenAI, and Ollama (local).",
+          "flags": {
+            "provider": "Provider: claude, openai, ollama",
+            "model": "Model override (e.g. claude-haiku-4-5-20251001, gpt-4o, llama3)",
+            "show": "Show current LLM configuration",
+            "clear": "Remove stored LLM configuration"
           }
         },
         "init": {
@@ -4281,7 +4369,7 @@
       "msp": {
         "title": "MSP Partners",
         "subtitle": "Managed Security Service Providers",
-        "desc": "Add Panguard's open-source agent security to your managed services portfolio. Multi-tenant management, white-label options, open source.",
+        "desc": "Add Panguard's AI-powered security to your managed services portfolio. Multi-tenant management, white-label options, open source.",
         "highlights": [
           "Multi-tenant management console",
           "White-label deployment options",
@@ -4514,7 +4602,7 @@
     "overline": "HOW IT WORKS",
     "title": "How Panguard",
     "titleHighlight": "Protects You",
-    "subtitle": "Five stages of defense. Deterministic, on-device detection. One command to deploy.",
+    "subtitle": "Five stages that ship today, in a 7-layer model. Three levels of AI analysis. One command to deploy.",
     "overview": {
       "overline": "AT A GLANCE",
       "title": "Security that thinks in layers",
@@ -4532,39 +4620,10 @@
         "label": "To learn your normal"
       }
     },
-    "ruleEngine": {
-      "overline": "WHERE THE RULES COME FROM",
-      "title": "Models keep getting faster. The rules have to keep up.",
-      "subtitle": "Every model release opens new ways to jailbreak, exfiltrate, and hijack an agent. The old path -- a committee drafts a rule, debates it for weeks, ships it -- can't match that pace. ATR mass-produces high-quality rules through four fast paths into one open, MIT-licensed base.",
-      "slow": {
-        "label": "The slow way",
-        "desc": "One rule, hand-authored and argued over a committee table for weeks. By the time it ships, the attack has three new variants."
-      },
-      "fastLabel": "The ATR way -- four fast paths into one open rule base",
-      "paths": [
-        {
-          "name": "From CVEs",
-          "desc": "New agent and MCP vulnerabilities are pulled in and turned into detection rules as they're disclosed."
-        },
-        {
-          "name": "From red-team PoCs",
-          "desc": "A working exploit becomes a generalizing rule -- the detection catches the technique, not just the one payload."
-        },
-        {
-          "name": "Through the converter",
-          "desc": "The bridge from the PC era to the AI era: 20 years of Sigma / YARA / Snort detection IP converts into ATR rules and lays the foundation. Free under MIT."
-        },
-        {
-          "name": "Through the community flywheel",
-          "desc": "A first sighting on one machine is drafted into a rule, reaches community consensus, and protects the whole network."
-        }
-      ],
-      "wall": "Old detection knowledge is the foundation. The new wall against agent attacks gets rebuilt on top -- and the more people run Panguard, the faster that wall grows. Every install is a sensor; every sighting raises the cost of attack for everyone."
-    },
     "layers": {
       "overline": "FIVE DETECTION STAGES",
       "title": "Five stages that catch what others miss",
-      "subtitle": "From static analysis to contextual memory, each stage adds intelligence.",
+      "subtitle": "From static analysis to contextual memory, each stage adds intelligence -- the 5 layers shipping today of PanGuard's 7-layer model.",
       "layer1": {
         "badge": "Layer 1",
         "name": "Environment Discovery",
@@ -4574,20 +4633,20 @@
       "layer2": {
         "badge": "Layer 2",
         "name": "Rules Engine",
-        "desc": "Hundreds of ATR detection rules for AI agent security -- and the base grows every day.",
+        "desc": "670+ ATR detection rules for AI agent security.",
         "detail": "Catches 90% of known threats in under 50ms. No AI needed."
       },
       "layer3": {
         "badge": "Layer 3",
         "name": "Behavioral Baseline",
         "desc": "7-day learning period. Panguard observes your system without acting, builds a model of normal behavior.",
-        "detail": "Switches to protection mode on day 8. No false positives from day one."
+        "detail": "Switches to protection mode on day 8. The learning period keeps false positives rare from day one."
       },
       "layer4": {
         "badge": "Layer 4",
-        "name": "Correlation & Static Analysis",
-        "desc": "When a single rule can't explain a behavior, the engine cross-correlates signals on-device: AST static analysis of skill code plus temporal correlation against the behavioral baseline.",
-        "detail": "Fully deterministic and offline. No LLM in the detection path -- the same input always produces the same confidence-scored verdict."
+        "name": "AI Analysis",
+        "desc": "When rules can't explain a behavior, AI steps in. Local fingerprint & heuristic analysis first (zero-config, fully offline). Cloud LLM only when needed.",
+        "detail": "Three-tier funnel: 90% rules / 7% local heuristic / 3% cloud AI. Cloud analysis runs server-side on Threat Cloud -- free for all users."
       },
       "layer5": {
         "badge": "Layer 5",
@@ -4597,31 +4656,31 @@
       }
     },
     "aiFunnel": {
-      "overline": "DETECTION FUNNEL",
-      "title": "Three stages. Deterministic. On-device.",
-      "subtitle": "Every stage runs locally and produces a reproducible verdict. Rules first, behavioral analysis second, on-device correlation last -- no LLM in the path.",
+      "overline": "AI FUNNEL",
+      "title": "Three tiers. Minimum cost. Maximum accuracy.",
+      "subtitle": "90% of threats don't need AI. We use rules first, AI second, cloud last.",
       "tier1": {
         "name": "Rules Engine",
-        "pct": "Stage 1",
-        "items": "Hundreds of ATR detection rules, growing daily|10 threat categories|Pure regex -- fully deterministic|Community-driven rule updates",
+        "pct": "90%",
+        "items": "670+ ATR detection rules|2,900+ detection patterns|10 threat categories|Behavioral baseline deviations|Community-driven rule updates",
         "speed": "<50ms per event"
       },
       "tier2": {
-        "name": "Behavioral Baseline",
-        "pct": "Stage 2",
-        "items": "Fingerprint & heuristic analysis|Zero-config -- works out of the box|Fully offline -- data never leaves|Flags drift from learned-normal behavior",
-        "speed": "On-device"
+        "name": "Local AI",
+        "pct": "7%",
+        "items": "Fingerprint & heuristic analysis|Zero-config -- works out of the box|Fully offline -- data never leaves|Handles ambiguous events rules can't classify",
+        "speed": "~2s per analysis"
       },
       "tier3": {
-        "name": "Correlation & AST",
-        "pct": "Stage 3",
-        "items": "AST static analysis of skill code|Temporal correlation of behavioral signals|Weighs rule confidence + baseline deviation|Reproducible confidence-scored verdict",
-        "speed": "On-device"
+        "name": "Cloud AI",
+        "pct": "3%",
+        "items": "Claude Sonnet 4 on Threat Cloud|Only invoked when local analysis is uncertain|Server-side -- free for all users|Multi-step reasoning chains (up to 8 steps)",
+        "speed": "~5s per analysis"
       }
     },
     "agentPipeline": {
       "overline": "AGENT PIPELINE",
-      "title": "Four Agents. One Investigation Engine.",
+      "title": "Four AI Agents. One Investigation Engine.",
       "subtitle": "Each agent has a specialized role. Together, they form an autonomous security team.",
       "detect": {
         "name": "DetectAgent",
@@ -4641,7 +4700,7 @@
       },
       "investigate": {
         "name": "InvestigationEngine",
-        "desc": "Deep-dives complex incidents with up to 8-step deterministic correlation playbooks."
+        "desc": "Deep-dives complex incidents with up to 8-step reasoning chains."
       }
     },
     "response": {
@@ -4700,7 +4759,7 @@
     "learning": {
       "overline": "7-DAY LEARNING",
       "title": "It watches before it acts.",
-      "subtitle": "No false positives from day one. Panguard learns your environment before making decisions.",
+      "subtitle": "Precision-first by design. Panguard learns your environment before making decisions, and every rule is gated on a 65,000-sample benign corpus before release.",
       "phase1": {
         "days": "Day 1-3",
         "title": "Observation",
@@ -4718,27 +4777,27 @@
       }
     },
     "degradation": {
-      "overline": "OFFLINE-FIRST",
-      "title": "Your protection never depends on the network.",
-      "subtitle": "Detection runs entirely on-device. Cloud connectivity only affects rule updates -- never detection itself.",
+      "overline": "GRACEFUL DEGRADATION",
+      "title": "Your protection never drops to zero.",
+      "subtitle": "Cloud down? Local AI takes over. Local AI down? Rules engine always runs.",
       "level1": {
-        "name": "Online",
-        "desc": "All detection stages active and Threat Cloud reachable -- new rules pull automatically every hour.",
+        "name": "Optimal",
+        "desc": "All layers active. Cloud AI + Local AI + Rules Engine.",
         "color": "green"
       },
       "level2": {
-        "name": "Cloud Unreachable",
-        "desc": "Detection unaffected. The full on-device engine keeps running on the rules already compiled locally.",
+        "name": "Cloud Unavailable",
+        "desc": "Local AI handles complex analysis. Rules engine catches known threats.",
         "color": "yellow"
       },
       "level3": {
-        "name": "Fully Air-Gapped",
-        "desc": "No network at all. Rules engine + behavioral baseline + on-device correlation provide full protection.",
+        "name": "LLM Offline",
+        "desc": "Rules engine + behavioral baseline. Still catches 90% of threats.",
         "color": "yellow"
       },
       "level4": {
         "name": "Emergency",
-        "desc": "Core watchdog only. If Panguard itself is targeted, it alerts the owner and preserves forensic logs.",
+        "desc": "Rules engine only. Core protection always running.",
         "color": "red"
       }
     },
@@ -4906,7 +4965,7 @@
     },
     "tierNote": {
       "title": "100% Open Source",
-      "desc": "Threat Cloud activates automatically with every Panguard installation. Every feature is free and open source under the MIT license, with no feature gates. (Optional paid services for regulated organizations are listed on Pricing.)",
+      "desc": "Threat Cloud activates automatically with every Panguard installation. Every feature is free and open source under MIT license. No paid tiers, no feature gates.",
       "freeLabel": "Every Installation",
       "freeDesc": "Full threat intel feed, multi-endpoint management, complete API access",
       "paidLabel": "Community Contribution",
@@ -4963,7 +5022,7 @@
       "p1": "AI agents are installing skills with full system access -- file read, code execution, network requests, credential access -- with zero review process. One malicious skill is all it takes.",
       "p2": "The App Store has review. Browser extensions have review. NPM packages have audits. But AI agent skills? Nothing. No review, no audit, no gatekeeper. And these skills get more access than any of those.",
       "p3a": "We looked at who's working on this. The big security companies are still chasing cloud workloads and endpoint detection. Nobody is building the missing review layer for AI agents.",
-      "p3b": "So I built it. Panguard audits every skill before it runs, watches agent behavior continuously, and turns every user's threat discovery into protection for everyone.",
+      "p3b": "So we built it. Panguard audits every skill before it runs, monitors agent behavior 24/7, and turns every user's threat discovery into protection for everyone.",
       "p3c": "100% free. MIT licensed. No account required. Because security for AI agents shouldn't be a luxury."
     },
     "beliefs": {
@@ -4992,11 +5051,11 @@
       "title": "Built with rigor",
       "stats": [
         {
-          "value": "650+",
+          "value": "670+",
           "label": "ATR rules (AI agent threats)"
         },
         {
-          "value": "770",
+          "value": "2,900+",
           "label": "Detection patterns"
         },
         {
@@ -5032,14 +5091,14 @@
       "desc2": "Taiwan faces more nation-state cyberattacks per capita than almost any country on earth. We understand the threat landscape because we live in it."
     },
     "cta": {
-      "title": "Want to follow the mission?",
-      "desc": "Star the project, contribute a rule, or get in touch -- security should be accessible to everyone.",
-      "primary": "View on GitHub",
+      "title": "Want to join the mission?",
+      "desc": "We're looking for people who believe security should be accessible to everyone.",
+      "primary": "View Open Roles",
       "secondary": "Get in Touch"
     },
     "founder": {
       "title": "Built by a founder who saw the gap firsthand",
-      "desc": "PanGuard started when I -- a cross-disciplinary builder with backgrounds in sales, marketing (300M+ Threads impressions), and hip-hop festival production -- taught myself to code and discovered that AI agents were installing tools with full system access and zero security review. Within months, ATR grew to 650+ detection rules, got merged into Cisco AI Defense, scanned 67,000+ skills, and achieved 100% recall on the real-world SKILL.md corpus (97% precision, 0.20% FP on 498 samples). Based in Taiwan, shipping globally."
+      "desc": "PanGuard started when our founder -- a cross-disciplinary builder with backgrounds in sales, marketing (300M+ Threads impressions), and hip-hop festival production -- taught himself to code and discovered that AI agents were installing tools with full system access and zero security review. Within months, ATR grew to 670+ detection rules, got merged into Cisco AI Defense, scanned 96,096 skills in the wild (751 confirmed malicious), and achieved 100% recall on our 498-sample SKILL.md corpus (97% precision, 0.2% FP). Based in Taiwan, shipping globally."
     }
   },
   "openSource": {
@@ -5078,9 +5137,15 @@
         {
           "name": "agent-threat-rules",
           "org": "Agent-Threat-Rule",
-          "desc": "650+ ATR detection rules for AI agent security (the open standard)",
+          "desc": "670+ ATR detection rules for AI agent security (the open standard)",
           "lang": "YAML / ATR",
           "stars": "Community"
+        },
+        {
+          "name": "panguard-docs",
+          "desc": "Documentation, API reference, and getting started guides",
+          "lang": "MDX",
+          "stars": "Docs"
         }
       ]
     },
@@ -5120,13 +5185,18 @@
         "items": [
           "Core platform (Scan + Guard + Chat + Skill Auditor)",
           "Threat Cloud v1",
-          "650+ ATR detection rules",
+          "670+ ATR detection rules",
           "3,528 automated tests"
         ]
       },
       "inProgress": {
         "title": "In Progress",
-        "items": ["Report + Trap", "Web Dashboard UI", "Windows support", "Kubernetes integration"]
+        "items": [
+          "Report + Trap",
+          "Web Dashboard UI",
+          "Windows support",
+          "Kubernetes integration"
+        ]
       },
       "planned": {
         "title": "Planned",
@@ -5146,8 +5216,8 @@
   },
   "metadata": {
     "home": {
-      "title": "Panguard AI — Your AI Security Guard",
-      "description": "AI agent security for developers. Scan MCP skills for prompt injection, tool poisoning, and supply chain threats. One command to install. 650+ detection rules. Free and open source."
+      "title": "Panguard AI — Real-time protection and audit-ready evidence for AI agents",
+      "description": "AI agent security for developers. Scan MCP skills for prompt injection, tool poisoning, and supply chain threats. One command to install. 670+ detection rules. Free and open source."
     },
     "pricing": {
       "title": "Pricing",
@@ -5163,7 +5233,7 @@
     },
     "productOverview": {
       "title": "Product",
-      "description": "Five open-source security products on one platform. Scan, Guard, Chat, Trap, and Report -- all free and open source."
+      "description": "Five AI-powered security products on one platform. Scan, Guard, Chat, Trap, and Report -- all free and open source."
     },
     "productScan": {
       "title": "Panguard Scan",
@@ -5187,19 +5257,19 @@
     },
     "productReport": {
       "title": "Compliance Reports",
-      "description": "EU AI Act, NIST AI RMF, and ISO/IEC 42001 compliance reports auto-generated from Panguard Scan findings."
+      "description": "ISO 27001, SOC 2 compliance reports auto-generated from Panguard Scan findings."
     },
     "developers": {
       "title": "For Developers",
-      "description": "Enterprise security with developer simplicity. Deterministic skill monitoring for solo devs and indie hackers. One command setup, zero overhead."
+      "description": "Enterprise security with developer simplicity. AI-powered skill monitoring for solo devs and indie hackers. One command setup, zero overhead."
     },
     "smb": {
       "title": "For Small Business",
-      "description": "Big company security on a small company budget. Enterprise-grade protection that works out of the box for teams of 5 to 50."
+      "description": "Big company security on a small company budget. AI-powered protection that works out of the box for teams of 5 to 50."
     },
     "enterprise": {
       "title": "For Mid-size Companies",
-      "description": "Scale security without scaling complexity. Enterprise-grade protection for organizations with 50 to 500 employees."
+      "description": "Scale security without scaling complexity. AI-powered protection for organizations with 50 to 500 employees."
     },
     "demo": {
       "title": "Request Demo",
@@ -5223,7 +5293,7 @@
     },
     "compliance": {
       "title": "OWASP Agentic Top 10 Coverage",
-      "description": "Full coverage of the OWASP Agentic Top 10 standard. 650+ ATR detection rules across all 10 categories. Verified against 67,000+ real MCP skills."
+      "description": "Full coverage of the OWASP Agentic Top 10 standard. 670+ ATR detection rules across all 10 categories. Verified against 96,096 real MCP skills."
     },
     "trust": {
       "title": "Trust Center",
@@ -5235,11 +5305,11 @@
     },
     "technology": {
       "title": "Technology",
-      "description": "Deterministic detection that runs on-device, four autonomous agents, and a context memory that learns your environment. No LLM in the detection path -- reproducible verdicts, offline-first."
+      "description": "Security that thinks, not just scans. A three-layer AI defense funnel, four autonomous agents, and a context memory that learns your environment."
     },
     "howItWorks": {
       "title": "How It Works — Panguard AI",
-      "description": "Five layers of defense, deterministic on-device detection, one command to deploy. Learn how Panguard protects your infrastructure from detection to automated response."
+      "description": "Five layers of defense, three levels of AI analysis, one command to deploy. Learn how Panguard protects your infrastructure from detection to automated response."
     },
     "threatCloud": {
       "title": "Threat Cloud — Panguard AI",
@@ -5295,7 +5365,7 @@
     },
     "register": {
       "title": "Create Account",
-      "description": "Create your Panguard AI account and start protecting your endpoints with open-source agent security."
+      "description": "Create your Panguard AI account and start protecting your endpoints with AI-powered security."
     },
     "resetPassword": {
       "title": "Reset Password",
@@ -5315,7 +5385,7 @@
     },
     "atr": {
       "title": "Agent Threat Rules (ATR) -- Panguard AI",
-      "description": "The first open detection standard for AI agent threats. 650+ rules across 10 categories. OWASP LLM Top 10 mapped. Community-driven, YAML-based, machine-readable."
+      "description": "An open, executable detection standard for AI agent threats. 670+ rules across 10 categories. OWASP LLM Top 10 mapped. Community-driven, YAML-based, machine-readable."
     },
     "productMcp": {
       "title": "Panguard MCP Server",
@@ -5334,8 +5404,34 @@
       "description": "Known dangerous AI skills flagged by community scanning. 26 malicious skills detected across critical and high severity."
     },
     "skillScan": {
-      "title": "Scan AI Skills | Panguard AI",
-      "description": "Scan any AI skill or MCP server for security threats. Paste a GitHub URL and get instant results. No installation required."
+      "title": "Scan AI Skills",
+      "description": "Scan any AI skill or MCP server for security threats. Paste a GitHub URL and get instant results. No installation required.",
+      "h1": "Scan any AI skill for threats — before you install it",
+      "helper": "Paste a GitHub URL. You get a severity verdict plus the matched ATR rules in seconds.",
+      "checksOverline": "WHAT WE CHECK",
+      "checks": {
+        "promptInjection": {
+          "name": "Prompt Injection",
+          "desc": "Hidden instructions that hijack the agent's behaviour."
+        },
+        "toolPoisoning": {
+          "name": "Tool Poisoning",
+          "desc": "Malicious MCP tool output that triggers code execution."
+        },
+        "secretExfiltration": {
+          "name": "Secret Exfiltration",
+          "desc": "Attempts to leak API keys, tokens, or credentials."
+        },
+        "obfuscation": {
+          "name": "Obfuscation",
+          "desc": "Encoded or disguised payloads that dodge inspection."
+        }
+      },
+      "nextOverline": "NEXT STEP",
+      "nextTitle": "Run this on every agent, automatically",
+      "nextDesc": "The online scanner is a one-shot audit. Install Panguard to guard your agents in real time — the same ATR rules, always on.",
+      "installCta": "Install Panguard",
+      "docsCta": "Read the docs"
     }
   },
   "notFound": {
@@ -5364,7 +5460,7 @@
     "backHome": "Back to Home",
     "report": {
       "title": "Compliance Reports",
-      "subtitle": "EU AI Act, NIST AI RMF, ISO/IEC 42001, and SEMI E187 compliance reports -- auto-generated from Scan findings. A feature of Panguard Scan.",
+      "subtitle": "ISO 27001, SOC 2, and Taiwan Cyber Security Act compliance reports -- auto-generated from Scan findings. A feature of Panguard Scan.",
       "followProgress": "Follow development progress on GitHub"
     }
   },
@@ -5488,7 +5584,7 @@
       "step2Desc": "Authenticate with your Panguard account",
       "step3Title": "Run Your First Scan",
       "step3Desc": "Scan your project for vulnerabilities",
-      "step4Title": "Enable Inline Detection",
+      "step4Title": "Enable Real-Time Protection",
       "step4Desc": "Start continuous monitoring with Guard",
       "step5Title": "Set Up Notifications",
       "step5Desc": "Get alerted when threats are detected",
@@ -5593,7 +5689,7 @@
       "overline": "OPEN STANDARD",
       "title": "Agent Threat Rules",
       "titleHighlight": "(ATR)",
-      "subtitle": "The first open detection standard for AI agent threats. Machine-readable, community-driven, and designed for AI agent security."
+      "subtitle": "An open, executable detection standard for AI agent threats. Machine-readable, community-driven, and designed for AI agent security."
     },
     "problem": {
       "overline": "THE PROBLEM",
@@ -5610,7 +5706,7 @@
     },
     "categories": {
       "overline": "RULE CATEGORIES",
-      "title": "10 categories. 650+ rules. 920+ patterns.",
+      "title": "10 categories. 670+ rules. 2,900+ patterns.",
       "subtitle": "Covering the full AI agent attack surface, mapped to OWASP Agentic Top 10 (10/10) and MITRE ATLAS.",
       "items": {
         "prompt-injection": {
@@ -5829,7 +5925,7 @@
         },
         {
           "name": "ATR Engine",
-          "desc": "650+ rules evaluated in <1ms per event. Block, alert, or escalate.",
+          "desc": "670+ rules evaluated in <1ms per event. Block, alert, or escalate.",
           "position": "middle",
           "highlighted": true
         },
@@ -5877,11 +5973,11 @@
       "subtitle": "ATR follows the proven playbook of open standards -- open governance, community contributions, and vendor-neutral design.",
       "stats": [
         {
-          "value": "650+",
+          "value": "670+",
           "label": "Detection rules"
         },
         {
-          "value": "770",
+          "value": "2,900+",
           "label": "Detection patterns"
         },
         {
@@ -5922,7 +6018,7 @@
           "status": "current",
           "title": "Open Standard",
           "items": [
-            "650+ rules, 920+ patterns across 10 categories",
+            "670+ rules, 2,900+ patterns across 10 categories",
             "RFC-001 v1.1 quality standard published",
             "Maturity levels: draft / experimental / stable",
             "Cisco AI Defense ships 34 ATR rules",
@@ -5936,6 +6032,7 @@
           "items": [
             "Threat Cloud crystallization pipeline",
             "GitHub Action for CI/CD scanning",
+            "Hermes Agent integration (76K stars)",
             "RFC-002: Behavioral detection types",
             "RFC-003: Collective defense protocol"
           ]
@@ -5995,15 +6092,15 @@
           }
         ]
       },
-      "subtitleLine2": "Panguard audits every skill before it runs. {atrRules} ATR rules catch known threats instantly. AST static analysis catches the rest.",
+      "subtitleLine2": "Panguard audits every skill before it runs. {atrRules} ATR rules catch known threats instantly. AI analysis catches the rest.",
       "subtitleLine3": "When you find a threat, it becomes a rule that protects the entire community.",
       "viewATR": "ATR Standard on GitHub",
       "install": "Get Started",
       "copied": "Copied!",
-      "platforms": "Works with Claude Code, Cursor, OpenClaw, Codex, WorkBuddy, Claude Desktop, Gemini CLI",
+      "platforms": "Works with Claude Code, Cursor, QClaw, OpenClaw, Codex, WorkBuddy, Claude Desktop",
       "badges": {
         "mit": "MIT Licensed",
-        "rules": "650+ ATR Rules",
+        "rules": "670+ ATR Rules",
         "taiwan": "Built in Taiwan",
         "scanned": "1,295 Skills Scanned"
       },
@@ -6033,13 +6130,13 @@
           "number": "3",
           "title": "New skill? Audit it first.",
           "desc": "Every new skill is audited against community ATR rules covering prompt injection, tool poisoning, credential exfiltration, and skill compromise.",
-          "detail": "650+ ATR detection rules"
+          "detail": "670+ ATR detection rules"
         },
         "llmAnalysis": {
           "number": "4",
-          "title": "Unknown threat? Static analysis catches it.",
-          "desc": "If no rule matches but the code looks suspicious, AST static analysis parses it for dangerous calls and obfuscation that flat regex misses. Block first, ask questions later.",
-          "detail": "Deterministic AST static analysis"
+          "title": "Unknown threat? AI analyzes it.",
+          "desc": "If no rule matches but the behavior is suspicious, an LLM analyzes the skill in real-time. Block first, ask questions later.",
+          "detail": "Real-time AI behavioral analysis"
         },
         "generateRule": {
           "number": "5",
@@ -6054,12 +6151,12 @@
           "detail": "Collective immunity"
         }
       },
-      "bottomLine": "Known threats caught by rules. Unknown threats caught by static analysis. New rules shared to protect everyone."
+      "bottomLine": "Known threats caught by rules. Unknown threats caught by AI. New rules shared to protect everyone."
     },
     "productPillars": {
       "atrStandard": {
         "title": "Community Rules",
-        "desc": "650+ ATR rules for AI agent threats. All open source, all community-driven. The review criteria that every skill must pass.",
+        "desc": "670+ ATR rules for AI agent threats. All open source, all community-driven. The review criteria that every skill must pass.",
         "link": "View ATR rules"
       },
       "threatCloud": {
@@ -6068,8 +6165,8 @@
         "link": "How it works"
       },
       "guard": {
-        "title": "Static-Analysis Fallback",
-        "desc": "When rules can't catch it, AST static analysis does. It parses suspicious code in real-time, blocks the threat, and the pattern is turned into a new rule so it never gets through again.",
+        "title": "AI Fallback",
+        "desc": "When rules can't catch it, AI does. LLM analyzes suspicious behavior in real-time, blocks the threat, and auto-generates a new rule so it never gets through again.",
         "link": "How it works"
       }
     },
@@ -6141,7 +6238,7 @@
       "steps": {
         "install": {
           "title": "Install",
-          "desc": "One command. Panguard loads 650+ ATR detection rules for AI agent threats. All layers activate simultaneously."
+          "desc": "One command. Panguard loads 670+ ATR detection rules for AI agent threats. All layers activate simultaneously."
         },
         "protect": {
           "title": "Review",
@@ -6172,7 +6269,7 @@
           "items": [
             "Every skill reviewed before it runs",
             "Community ATR rules catch known threats",
-            "AST static analysis catches unknown threats in real-time",
+            "AI catches unknown threats in real-time",
             "New rules auto-generated and shared to all users",
             "Gets smarter and stronger with every install"
           ]
@@ -6187,16 +6284,16 @@
         "skillInstall": {
           "label": "LAYER 1: RULES",
           "title": "A new skill arrives. ATR rules review it instantly.",
-          "narrative": "You install a new skill from OpenClaw or MCP. Before it runs, Panguard checks it against 650+ ATR detection rules -- prompt injection, tool poisoning, credential exfiltration, skill compromise. Known threats are blocked. Safe skills proceed.",
+          "narrative": "You install a new skill from OpenClaw or MCP. Before it runs, Panguard checks it against 670+ ATR detection rules -- prompt injection, tool poisoning, credential exfiltration, skill compromise. Known threats are blocked. Safe skills proceed.",
           "before": "Without Skills Audit, the skill runs immediately with full system access.",
           "after": "With Skills Audit, every skill passes ATR rule review before it touches your system."
         },
         "alwaysOn": {
-          "label": "LAYER 2: STATIC ANALYSIS",
-          "title": "No rule matches, but the code looks wrong. Static analysis steps in.",
-          "narrative": "A skill passes all rule checks but its code does something suspicious -- exfiltrating context, making unexpected API calls, or manipulating the agent. Panguard parses the code into an AST in real-time to flag dangerous calls and obfuscation: block the action, alert the user, and turn the pattern into a new ATR rule. Deterministic and on-device.",
-          "before": "Without a static-analysis fallback, novel attacks slip through every rule-based system.",
-          "after": "With Panguard, unknown threats are caught by static analysis and turned into rules for everyone."
+          "label": "LAYER 2: AI",
+          "title": "No rule matches, but the behavior looks wrong. AI steps in.",
+          "narrative": "A skill passes all rule checks but starts doing something suspicious -- exfiltrating context, making unexpected API calls, or manipulating the agent. Panguard's LLM analyzes the behavior in real-time: block the action, alert the user, and auto-generate a new ATR rule from the pattern.",
+          "before": "Without AI fallback, novel attacks slip through every rule-based system.",
+          "after": "With Panguard, unknown threats are caught by AI and turned into rules for everyone."
         },
         "supplyChain": {
           "label": "LAYER 3: CLOUD",
@@ -6211,7 +6308,7 @@
       "title": "Your AI agent's immune system",
       "intro": "npm has audit. Docker has image scanning. Chrome has extension review.",
       "but": "AI agent skills have nothing. They install with full system access, zero audit. Panguard introduces Skills Audit -- the security review layer that every other software ecosystem already has, now built for the AI era.",
-      "conclusion": "Rules catch known threats. Static analysis catches unknown threats. The cloud makes everyone stronger.",
+      "conclusion": "Rules catch known threats. AI catches unknown threats. The cloud makes everyone stronger.",
       "preDeployment": {
         "label": "Known threats",
         "title": "Rule-based review",
@@ -6220,15 +6317,15 @@
           "ATR rules: prompt injection, tool poisoning, skill compromise",
           "ATR rules: credential exfiltration, context manipulation",
           "ATR rules: cross-agent attacks, unauthorized access",
-          "650+ rules, community-driven, updated continuously"
+          "670+ rules, community-driven, updated continuously"
         ]
       },
       "postDeployment": {
         "label": "Unknown threats",
-        "title": "Static analysis + auto-rule generation",
-        "tools": "AST + Threat Cloud",
+        "title": "AI analysis + auto-rule generation",
+        "tools": "LLM + Threat Cloud",
         "items": [
-          "AST static analysis for threats no rule has seen",
+          "LLM behavioral analysis for threats no rule has seen",
           "Block first, generate rule, share anonymously",
           "Threat Cloud pushes new rules to all users",
           "Every encounter makes the entire network stronger"
@@ -6273,26 +6370,26 @@
       },
       "q2": {
         "q": "What if a skill passes audit but turns malicious later?",
-        "a": "Guard monitors every whitelisted skill continuously using layered deterministic detection -- and when it detects drift, it doesn't just alert. It auto-responds.\n\n1. ATR rule matching (sub-millisecond) -- 650+ ATR detection rules for AI agent threats. If the skill's behavior matches any rule, it's flagged instantly.\n\n2. Fingerprint drift -- Skill Auditor records what the skill is supposed to do. Guard compares live behavior against that fingerprint. A code-review tool that suddenly starts making network calls to unknown endpoints? Caught the moment it deviates.\n\nBoth run entirely on-device with no LLM in the detection path -- verdicts are deterministic and reproducible.\n\nWhen a threat is confirmed, Guard's confidence-based response kicks in:\n- Confidence >= 85%: automatic response -- revoke skill from whitelist, block tool invocation, quarantine session. No human delay.\n- Confidence 50-84%: alert with full evidence, suggest specific action (e.g., revoke_skill or kill_agent), wait for human confirmation.\n- Below 50%: log for investigation with all context preserved.\n\nEven a patient attacker who waits 50 invocations before acting gets caught the moment they do something outside their fingerprint -- and Guard responds in proportion to its certainty."
+        "a": "Guard monitors every whitelisted skill continuously using multiple detection layers -- and when it detects drift, it doesn't just alert. It auto-responds.\n\n1. ATR rule matching (sub-millisecond) -- 670+ ATR detection rules for AI agent threats. If the skill's behavior matches any rule, it's flagged instantly.\n\n2. Fingerprint drift -- Skill Auditor records what the skill is supposed to do. Guard compares live behavior against that fingerprint. A code-review tool that suddenly starts making network calls to unknown endpoints? Caught the moment it deviates.\n\n3. LLM deep analysis -- For novel patterns that rules and fingerprinting miss, the AI analyzer examines behavior semantically. Its verdict is automatically distilled into a new ATR rule so the same attack is caught by rules alone next time.\n\nWhen a threat is confirmed, Guard's confidence-based response kicks in:\n- Confidence >= 85%: automatic response -- revoke skill from whitelist, block tool invocation, quarantine session. No human delay.\n- Confidence 50-84%: alert with full evidence, suggest specific action (e.g., revoke_skill or kill_agent), wait for human confirmation.\n- Below 50%: log for investigation with all context preserved.\n\nEven a patient attacker who waits 50 invocations before acting gets caught the moment they do something outside their fingerprint -- and Guard responds in proportion to its certainty."
       },
       "q3": {
         "q": "What are ATR rules?",
-        "a": "ATR (Agent Threat Rules) is the first open detection standard for AI agent threats. 650+ rules across 10 threat categories, built specifically for AI agent attacks: prompt injection, tool poisoning, context exfiltration, credential theft, cross-agent privilege escalation, skill supply-chain attacks, and more.\n\nATR rules are machine-readable, community-driven, and purpose-built for the threats that traditional security tools cannot see -- threats that live in prompt flows, tool calls, and agent conversations.\n\nThreat Cloud aggregates rules from the community. Guard runs them with sub-millisecond evaluation. Every new rule strengthens protection for all users."
+        "a": "ATR (Agent Threat Rules) is an open, executable detection standard for AI agent threats. 670+ rules across 10 threat categories, built specifically for AI agent attacks: prompt injection, tool poisoning, context exfiltration, credential theft, cross-agent privilege escalation, skill supply-chain attacks, and more.\n\nATR rules are machine-readable, community-driven, and purpose-built for the threats that traditional security tools cannot see -- threats that live in prompt flows, tool calls, and agent conversations.\n\nThreat Cloud aggregates rules from the community. Guard runs them with sub-millisecond evaluation. Every new rule strengthens protection for all users."
       },
       "q4": {
         "q": "What threats does Panguard detect?",
-        "a": "Panguard focuses on AI agent security threats across 10 categories:\n\nPrompt injection -- direct and indirect injection, jailbreaks, system prompt override.\nTool poisoning -- malicious tool descriptions, hidden instructions in tool outputs.\nCredential exfiltration -- API key theft, SSH key access, secret extraction.\nContext manipulation -- memory poisoning, conversation hijacking.\nSkill supply-chain -- malicious skill packages, dependency confusion.\nCross-agent attacks -- privilege escalation between agents.\nUnauthorized actions -- file access, network calls beyond declared scope.\n\n650+ ATR detection rules. All open source, community-driven, growing daily through Threat Cloud."
+        "a": "Panguard focuses on AI agent security threats across 10 categories:\n\nPrompt injection -- direct and indirect injection, jailbreaks, system prompt override.\nTool poisoning -- malicious tool descriptions, hidden instructions in tool outputs.\nCredential exfiltration -- API key theft, SSH key access, secret extraction.\nContext manipulation -- memory poisoning, conversation hijacking.\nSkill supply-chain -- malicious skill packages, dependency confusion.\nCross-agent attacks -- privilege escalation between agents.\nUnauthorized actions -- file access, network calls beyond declared scope.\n\n670+ ATR rules with 2,900+ detection patterns. All open source, community-driven, growing daily through Threat Cloud."
       }
     },
     "detection": {
       "title": "Detection & Rules",
       "q1": {
         "q": "How does the flywheel work?",
-        "a": "The Panguard flywheel turns every user's discovery into everyone's defense:\n\nStep 1: You audit a skill with Skill Auditor. It checks against existing ATR rules and the whitelist.\n\nStep 2: If a new threat is found -- either by rules, fingerprint drift, or AST static analysis -- the anonymized threat pattern is reported to Threat Cloud.\n\nStep 3: Community members vote on the report. A Threat Cloud LLM reviewer drafts and validates a candidate rule, which a human reviews before it's merged. If confirmed, the new ATR rule enters the experimental pipeline (7 days alert-only).\n\nStep 4: The new rule is distributed to all Guard instances. Next time anyone audits a skill with that same attack pattern, it's caught instantly by rules -- no AI needed.\n\nStep 5: When those rules trigger in Guard, the confidence-based response system automatically blocks, quarantines, or escalates -- completing the defense loop. A threat discovered on one machine is detected and auto-responded to on every machine running Guard.\n\nEvery cycle makes the next audit stronger. More users = more discoveries = more rules = better protection for everyone. The flywheel doesn't stop at detection -- it closes the loop with automated response."
+        "a": "The Panguard flywheel turns every user's discovery into everyone's defense:\n\nStep 1: You audit a skill with Skill Auditor. It checks against existing ATR rules and the whitelist.\n\nStep 2: If a new threat is found -- either by rules, fingerprint drift, or LLM analysis -- the anonymized threat pattern is reported to Threat Cloud.\n\nStep 3: Community members vote on the report. LLM review validates the pattern. If confirmed, a new ATR rule is generated and enters the experimental pipeline (7 days alert-only).\n\nStep 4: The new rule is distributed to all Guard instances. Next time anyone audits a skill with that same attack pattern, it's caught instantly by rules -- no AI needed.\n\nStep 5: When those rules trigger in Guard, the confidence-based response system automatically blocks, quarantines, or escalates -- completing the defense loop. A threat discovered on one machine is detected and auto-responded to on every machine running Guard.\n\nEvery cycle makes the next audit stronger. More users = more discoveries = more rules = better protection for everyone. The flywheel doesn't stop at detection -- it closes the loop with automated response."
       },
       "q2": {
         "q": "How do rules get updated?",
-        "a": "Guard syncs with Threat Cloud every hour, automatically pulling new ATR rules. No manual action needed.\n\nLocally distilled rules -- generated when AST static analysis flags a novel threat on your machine -- take effect immediately.\n\nCommunity-contributed rules go through a staged pipeline: peer review by other Panguard users, then experimental stage (alert-only for 7 days, no blocking), then stable (can auto-block). A rule needs confirmation from at least 3 independent Panguard nodes before promotion.\n\nYou can check your current rule counts anytime with `panguard rules status`."
+        "a": "Guard syncs with Threat Cloud every hour, automatically pulling new ATR rules. No manual action needed.\n\nLocally distilled rules -- generated when your LLM analyzes a novel threat -- take effect immediately on your machine.\n\nCommunity-contributed rules go through a staged pipeline: peer review by other Panguard users, then experimental stage (alert-only for 7 days, no blocking), then stable (can auto-block). A rule needs confirmation from at least 3 independent Panguard nodes before promotion.\n\nYou can check your current rule counts anytime with `panguard rules status`."
       },
       "q3": {
         "q": "What if a rule causes false positives?",
@@ -6310,8 +6407,8 @@
         "a": "Only anonymized threat patterns: category, MITRE technique ID, severity, and a hashed fingerprint. Never files, code, conversations, or personal data. No IP addresses, no usernames, no file contents.\n\nYou can inspect exactly what gets uploaded with the --show-upload-data flag. You can also disable cloud sync entirely -- Panguard works fully offline with local rules only.\n\nThreat Cloud participation is opt-in. Even with it enabled, the data is stripped of all identifying information before it leaves your machine."
       },
       "q2": {
-        "q": "Does detection send my data to third parties?",
-        "a": "No. Detection is fully deterministic and runs entirely on-device -- ATR regex rules, behavioral baselines, and on-device correlation. There is no LLM in the detection path, so no event payloads are sent anywhere to be classified.\n\nThe only thing that ever leaves your machine is optional: when Guard discovers a novel threat, an anonymized pattern can be contributed to Threat Cloud to generate a new community rule (IP addresses, hostnames, and file paths are stripped first). You can disable this entirely by leaving TC_ENDPOINT unset to run fully air-gapped.\n\nNew community rules are pulled down for your local engine -- detection itself always happens on your device."
+        "q": "Does AI analysis send my data to third parties?",
+        "a": "Only if you explicitly configure it. Panguard supports three LLM modes:\n\n1. Rules-only (default) -- No AI, no external calls. Guard runs ATR rules locally. This is the default mode and provides strong protection without any data leaving your device.\n\n2. Ollama (local AI) -- Runs entirely on your machine. AI-enhanced analysis with zero external data transfer.\n\n3. Your own API key -- You choose the provider (Anthropic, OpenAI, etc.) and control what gets sent. The LLM only sees the specific event being analyzed, not your files or conversations.\n\nThe encrypted LLM config (~/.panguard/llm.enc) is stored locally, encrypted with your machine's identity. It never leaves your device."
       },
       "q3": {
         "q": "Is it open source? Can I audit the code?",
@@ -6322,26 +6419,26 @@
       "title": "Installation & Setup",
       "q1": {
         "q": "How do I get started?",
-        "a": "One command:\n\nnpm install -g @panguard-ai/panguard && panguard setup\n\nSetup auto-detects Claude Code, Cursor, and 5 other AI platforms. It injects MCP config so your AI agent can call Panguard tools via natural language -- \"audit this skill\", \"scan my system\", \"what threats were blocked today\".\n\nNo accounts, no API keys required. Detection is deterministic and works out of the box -- nothing to configure."
+        "a": "One command:\n\nnpm install -g @panguard-ai/panguard && panguard setup\n\nSetup auto-detects Claude Code, Cursor, and 5 other AI platforms. It injects MCP config so your AI agent can call Panguard tools via natural language -- \"audit this skill\", \"scan my system\", \"what threats were blocked today\".\n\nNo accounts, no API keys required. Rules-only mode works out of the box. Add an LLM key later if you want AI-enhanced analysis."
       },
       "q2": {
         "q": "What can I do after installing?",
-        "a": "Four main use cases:\n\n(a) Audit any MCP skill before installing -- say \"audit this skill\" to your AI agent, or run panguard audit skill directly. Skill Auditor checks it against ATR rules and the community whitelist.\n\n(b) Scan your system -- panguard scan runs ATR rules across your AI agent environment.\n\n(c) Start continuous guard -- panguard guard start launches the daemon. Continuous monitoring with sub-millisecond rule evaluation.\n\n(d) Your AI agent becomes security-aware -- after setup, your AI agent can scan, audit, and check threats through natural conversation. It calls Panguard tools as MCP skills.\n\nCompliance Report and Honeypot Trap are included."
+        "a": "Four main use cases:\n\n(a) Audit any MCP skill before installing -- say \"audit this skill\" to your AI agent, or run panguard audit skill directly. Skill Auditor checks it against ATR rules and the community whitelist.\n\n(b) Scan your system -- panguard scan runs ATR rules across your AI agent environment.\n\n(c) Start 24/7 guard -- panguard guard start launches the daemon. Continuous monitoring with sub-millisecond rule evaluation.\n\n(d) Your AI agent becomes security-aware -- after setup, your AI agent can scan, audit, and check threats through natural conversation. It calls Panguard tools as MCP skills.\n\nCompliance Report and Honeypot Trap are included."
       },
       "q3": {
         "q": "Does it slow down my system?",
-        "a": "Negligible impact. ATR rule evaluation is sub-millisecond per event -- pure pattern matching, no AI involved.\n\nWhen a rule does not match, the engine runs behavioral and correlation checks on-device, which is typically less than 1% of all events. Memory footprint stays under 100MB.\n\nGuard runs as a daemon with watchdog restart. It is designed for always-on operation without noticeable performance cost."
+        "a": "Negligible impact. ATR rule evaluation is sub-millisecond per event -- pure pattern matching, no AI involved for known threats.\n\nAI analysis only triggers for events that rules cannot classify, which is typically less than 1% of all events. Memory footprint stays under 100MB.\n\nGuard runs as a daemon with watchdog restart. It is designed for always-on operation without noticeable performance cost."
       }
     },
     "general": {
       "title": "General",
       "q1": {
         "q": "Is it really free?",
-        "a": "Yes -- every Panguard product feature is free and open source under the MIT license, with no feature gating and no usage limits.\n\nScan, Guard, Skill Auditor, Threat Cloud, the Compliance Report, the Honeypot Trap, and all 650+ ATR detection rules -- all free, all open source. No credit card or signup to install.\n\nWhat is paid is optional, and only for regulated organizations: managed support with an SLA, on-prem / airgap deployment help, and signed, auditor-ready compliance evidence at scale. These are services -- they never gate a product feature, and the open-source product stays free forever. See Pricing for the service tiers."
+        "a": "Yes. 100% free, open source, MIT license. No paid tiers, no feature gating, no usage limits.\n\nScan, Guard, Skill Auditor, Threat Cloud, all 670+ ATR detection rules -- all free, all open source.\n\nCompliance Report and Honeypot Trap are included and free.\n\nNo credit card, no signup, no \"contact sales for pricing.\""
       },
       "q2": {
         "q": "Who builds this?",
-        "a": "Built in Taiwan on the belief that AI agent security should be a public good, not a premium feature.\n\nThe thesis: the flywheel model -- where every user's threat discovery strengthens every other user's defense -- only works if the tool is open and free. Paid tiers would fragment the community and weaken collective protection.\n\nAI agents are becoming the primary interface between humans and computing. The security layer for that interface must be community-owned."
+        "a": "Built in Taiwan by a team that believes AI agent security should be a public good, not a premium feature.\n\nOur thesis: the flywheel model -- where every user's threat discovery strengthens every other user's defense -- only works if the tool is open and free. Paid tiers would fragment the community and weaken collective protection.\n\nAI agents are becoming the primary interface between humans and computing. The security layer for that interface must be community-owned."
       },
       "q3": {
         "q": "How can I contribute?",
@@ -6362,7 +6459,7 @@
     "stats": {
       "totalScanned": "Total Scanned",
       "safeSkills": "Safe Skills",
-      "trustScore": "Trust Score"
+      "confirmedMalicious": "Confirmed Malicious"
     },
     "howItWorks": {
       "title": "How the Whitelist Works",
@@ -6379,9 +6476,9 @@
     "title": "Threat Registry",
     "subtitle": "Skills flagged by community scanning",
     "stats": {
-      "maliciousFound": "Malicious Found",
-      "critical": "Critical Severity",
-      "high": "High Severity"
+      "totalScanned": "Total Scanned",
+      "threatsDetected": "Threats Detected",
+      "maliciousBlocked": "Malicious Blocked"
     },
     "howItWorks": {
       "title": "How the Blacklist Works",
@@ -6399,5 +6496,243 @@
     },
     "ctaInstall": "Install Panguard to auto-block these threats",
     "ctaReport": "Report a malicious skill"
+  },
+  "homeV2": {
+    "hero": {
+      "eyebrow": "AGENT SECURITY · OPEN STANDARD · OPERATED LAYER",
+      "title": "Every AI agent will run <sage>a shared security layer.</sage>",
+      "sub1": "Agents are hacked with words, not code — one hidden instruction in a page, a skill, or a tool is enough.",
+      "sub2": "PanGuard runs ATR, the open rulebook of what an agent must never do: catch the attack, and prove you caught it.",
+      "ctaScan": "Scan a skill",
+      "ctaStandard": "Read the standard",
+      "installLabel": "or install the layer",
+      "copied": "Copied",
+      "statRules": "detection rules",
+      "statProduction": "giants ship it in production",
+      "statMerged": "giants & standards merged",
+      "statSpeed": "new attack → rule",
+      "statSpeedValue": "~1 hr"
+    },
+    "gap": {
+      "eyebrow": "01 / THE GAP",
+      "title": "An AI agent is a brilliant new hire <sage>you handed the keys to.</sage>",
+      "body": "It reads your email, runs your code, moves your money — but it can't tell your instruction from a stranger's. The attack isn't code. It's words the agent can't help but obey.",
+      "card1Kicker": "THE PC / NETWORK ERA",
+      "card1Title": "One shared rulebook",
+      "card1Body": "CVE · antivirus · Sigma. A common, open vocabulary for what counts as malicious. Every defender shares it.",
+      "card2Kicker": "THE AGENT ERA",
+      "card2Title": "A brand-new surface",
+      "card2Body": "Prompt injection · poisoned tools & skills · malicious MCP · over-autonomy. None of it fits old signatures.",
+      "card3Kicker": "TODAY",
+      "card3Title": "Everyone starts from zero",
+      "card3Body": "No CVE. No Sigma. Every team reinvents agent detection privately — and falls behind the next attack.",
+      "punch": "New attack surface, no shared standard. <sage>That's the gap.</sage>"
+    },
+    "interstitial": {
+      "text": "The attack isn't code — <sage>it's words.</sage>"
+    },
+    "rulebook": {
+      "eyebrow": "02 / THE RULEBOOK",
+      "title": "That rulebook exists now: <sage>ATR.</sage>",
+      "sub": "The open, executable standard for what an AI agent must never do. MIT, free forever. The CVE/Sigma layer for agents — real today, with {count} rules.",
+      "card1Kicker": "ATR",
+      "card1Title": "The rules",
+      "card1Tag": "the Sigma layer",
+      "card1Body": "{count} executable detection rules. Deterministic, local-first, signed output.",
+      "card2Kicker": "ATD",
+      "card2Title": "The taxonomy",
+      "card2Tag": "the ATT&CK layer",
+      "card2Body": "Agentic Threat Detection — the technique knowledge base, crosswalked to MITRE ATLAS and OWASP.",
+      "card3Kicker": "ENGINE",
+      "card3Title": "Runs anywhere",
+      "card3Tag": "deterministic · local-first",
+      "card3Body": "No telemetry, signed output — even sovereign buyers run their own detection without a foreign vendor.",
+      "crosswalks": "Crosswalks to 10 frameworks: EU AI Act · NIST AI RMF · ISO/IEC 42001 · OWASP Agentic · OWASP LLM · MITRE ATLAS · SAFE-MCP · CWE · Five Eyes · CISA KEV",
+      "cta": "Read the standard"
+    },
+    "proof": {
+      "eyebrow": "03 / IT RUNS",
+      "title": "It runs. Here's the attack <sage>getting caught.</sage>",
+      "terminalCaption": "Real pga scan output on a confirmed-malicious skill from a live agent ecosystem (OpenClaw) — captured 2026-07-02 on the ATR v3.5.3 bundle, not a mockup. The rulebook has grown since.",
+      "b1Label": "HackAPrompt recall vs 28.6% baseline · 100% precision",
+      "b2Label": "PINT-format corpus precision (63.6% recall)",
+      "b3Label": "Garak recall",
+      "b4Label": "SKILL.md recall / false-positive",
+      "honesty": "Corpus-level, Layer-1 measurements, re-verified before every external use. On the 65,000-sample benign gate, false positives are lane-based: ~0.24% in enforce, ~9% in hunt (the default). There is no single blended number, so we don't quote one.",
+      "kicker": "DETECTION — MEASURED, NOT CLAIMED",
+      "cta": "See the benchmarks"
+    },
+    "protectProve": {
+      "eyebrow": "04 / WHAT IT DOES",
+      "title": "The same rulebook does <sage>two things enterprises need.</sage>",
+      "protectKicker": "PROTECT",
+      "protectTitle": "Catch the attack",
+      "protectTag": "at runtime · before it loads",
+      "protectBody": "Scan skills and MCP servers against ATR before an agent ever loads them; detect and contain hijack attempts while the agent runs.",
+      "proveKicker": "PROVE",
+      "proveTitle": "Prove you caught it",
+      "proveTag": "signed · audit-ready",
+      "proveBody": "Emit <ink>signed, audit-ready evidence</ink> — the artifact EU AI Act, NYDFS Part 500 and DORA point to. <ink>Living evidence</ink>, not a one-off PDF.",
+      "collapse": "ATR is the free rulebook. PanGuard is the <sage>always-fresh, supported, audit-ready</sage> version of it.",
+      "honesty": "Everything shipped today is free and open source. Paid enterprise operations are on the roadmap — nothing on this site is a locked feature.",
+      "cta": "Explore the products"
+    },
+    "ecosystem": {
+      "eyebrow": "05 / CONVERGING",
+      "title": "The ecosystem is already <sage>converging on ATR.</sage>",
+      "tier1": "IN PRODUCTION · THEIR PRODUCT SHIPS ATR",
+      "tier1Sub1": "314 rules",
+      "tier1Sub2": "287 rules · weekly auto-sync",
+      "tier1Sub3": "Norton / Avast",
+      "tier2": "MERGED · GIANTS & STANDARDS BODIES",
+      "tier3": "IN CONVERSATION · NOT ADOPTION",
+      "tier3Sub1": "AI RMF / OSCAL",
+      "tier3Sub2": "neutral standardization",
+      "tier3Sub3": "met",
+      "tier3Sub4": "scoping",
+      "caption": "Every merge is a public pull request — the full list links each one. \"In conversation\" is engagement, never adoption or endorsement.",
+      "cta": "See all adopters"
+    },
+    "flywheel": {
+      "eyebrow": "06 / WHY IT STAYS AHEAD",
+      "title": "Defense has to accumulate <sage>faster than attacks multiply.</sage>",
+      "body": "You can't out-patch this one company at a time. Every attack caught anywhere is written once as a rule — and protects everyone forever.",
+      "in1": "Community",
+      "in2": "Red-team",
+      "in3": "CVE pipeline",
+      "in4": "Ecosystem",
+      "corpusLabel": "ATR corpus",
+      "corpusTag": "only grows",
+      "speedLabel": "~1 hr / attack",
+      "oldTitle": "Sigma · YARA · CVE — weeks to months",
+      "oldBody": "Human notices the attack → hand-writes a rule → committee reviews. Only that vendor's users benefit.",
+      "newTitle": "ATR — new attack → rule in ~1 hour",
+      "newBody": "Flywheels find and draft; CI auto-tests against precision and benign-FP gates; humans fast-review. Every adopter benefits at once.",
+      "crystal": "We call it threat crystallization: AI understands an attack once — a deterministic rule executes in milliseconds, everywhere.",
+      "kicker": "SECURITY ISN'T WON BY PERFECTION — IT'S WON BY MAKING ATTACKS UNECONOMICAL"
+    },
+    "free": {
+      "eyebrow": "07 / START",
+      "title": "Install the layer. <sage>Free forever.</sage>",
+      "body": "Community is the complete protection, not a trial. Rules, spec and engine are MIT. Scan skills before they're installed, guard agents at runtime, keep everything local — no telemetry.",
+      "shippedLabel": "SHIPPED TODAY",
+      "shipped": "Skill & MCP scanning · runtime guard · skill audits · Sigma/YARA migrator · signed reports",
+      "roadmapLabel": "ROADMAP",
+      "roadmap": "Enterprise operations: always-fresh rule feed · support & indemnity · evidence at scale · SOC 2",
+      "ctaDocs": "Read the docs",
+      "copied": "Copied"
+    },
+    "vision": {
+      "eyebrow": "THE END STATE",
+      "title": "The security of AI agents will be written as <sage>open rules</sage> — by the community. We make ours <sage>the layer every agent runs.</sage>",
+      "analogy": "ATR :: PanGuard  =  Linux :: Red Hat",
+      "cta": "Scan a skill"
+    }
+  },
+  "homeV3": {
+    "hero": {
+      "eyebrow": "LOCAL-FIRST · DETERMINISTIC · OPEN SOURCE",
+      "title": "Security infrastructure for <sage>AI agents.</sage>",
+      "sub": "Scan every skill and MCP server before your agent loads it. Detect and contain hijacks at runtime. Ship signed, audit-ready evidence.",
+      "ctaScan": "Scan a skill",
+      "ctaDocs": "Read the docs",
+      "copied": "Copied",
+      "termCaption": "Real scan output — confirmed-malicious skill from a live agent ecosystem, captured 2026-07-02 (ATR v3.5.3 bundle).",
+      "statRules": "detection rules",
+      "statPatterns": "patterns compiled",
+      "statPlatforms": "agent platforms",
+      "statLicense": "license"
+    },
+    "why": {
+      "eyebrow": "THE PROBLEM",
+      "title": "Agents obey words — <sage>including an attacker's.</sage>",
+      "body": "A hidden instruction in a web page, a skill, or a tool description is enough to hijack an agent. It isn't code, so signature-based security never sees it. PanGuard watches the layer where agents actually act: what they load, what they're told, what they do.",
+      "chip1": "prompt injection",
+      "chip2": "poisoned skills & tools",
+      "chip3": "malicious MCP servers"
+    },
+    "products": {
+      "eyebrow": "THE PLATFORM",
+      "title": "One engine, <sage>four surfaces.</sage>",
+      "p1Kicker": "SCAN",
+      "p1Title": "Pre-flight scanning",
+      "p1Body": "Scan any skill, plugin or MCP server before it's installed — in CI, the CLI, or the browser.",
+      "p1Cmd": "pga scan ./skill.md",
+      "p2Kicker": "GUARD",
+      "p2Title": "Runtime detection",
+      "p2Body": "Watches tool calls and content while the agent runs; detects and contains hijack attempts.",
+      "p2Cmd": "panguard guard",
+      "p3Kicker": "EVIDENCE",
+      "p3Title": "Signed audit records",
+      "p3Body": "Every verdict can ship as Ed25519-signed, audit-ready evidence — mapped to EU AI Act, NIST AI RMF and ISO/IEC 42001.",
+      "p3Cmd": "pga report generate",
+      "p4Kicker": "THREAT CLOUD",
+      "p4Title": "Live rule distribution",
+      "p4Body": "New rules reach every install as they land — no engine upgrade required.",
+      "p4Cmd": "panguard sync"
+    },
+    "arch": {
+      "eyebrow": "HOW IT WORKS",
+      "title": "Deterministic <sage>by design.</sage>",
+      "flowIn": "AGENT INPUTS",
+      "flowInSub": "skills · tool descriptions · runtime events",
+      "flowEngine": "ENGINE",
+      "flowEngineSub": "{count} rules · deterministic · runs local",
+      "flowVerdict": "VERDICT",
+      "flowVerdictSub": "allow · flag · block",
+      "flowRecord": "SIGNED RECORD",
+      "flowRecordSub": "Ed25519 · optional",
+      "chip1": "Zero telemetry — nothing leaves your machine unless you turn it on.",
+      "chip2": "Air-gap capable — sovereign deployments run fully offline.",
+      "chip3": "LLM-assisted rule authoring, never LLM-gated blocking — automatic blocking only fires on deterministic evidence."
+    },
+    "fresh": {
+      "eyebrow": "ALWAYS CURRENT",
+      "title": "New attack to new rule, <sage>in about an hour.</sage>",
+      "body": "When a new attack lands anywhere in the ecosystem, it's understood once, crystallized into a deterministic rule, tested against precision and benign-FP gates, human-reviewed, and shipped to every install. We call it threat crystallization.",
+      "contrast": "COMMITTEE-BASED RULEBOOKS TAKE WEEKS TO MONTHS"
+    },
+    "measured": {
+      "eyebrow": "MEASURED, NOT CLAIMED",
+      "title": "Detection you can <sage>re-run yourself.</sage>",
+      "b1Label": "HackAPrompt recall vs 28.6% baseline · 100% precision",
+      "b2Label": "PINT-format corpus precision (63.6% recall)",
+      "b3Label": "Garak recall",
+      "b4Label": "SKILL.md recall / false-positive",
+      "honesty": "Corpus-level, Layer-1 measurements, re-verified before every external use. On the 65,000-sample benign gate, false positives are lane-based: ~0.24% in enforce, ~9% in hunt (the default). There is no single blended number, so we don't quote one.",
+      "cta": "Methodology & raw data"
+    },
+    "platforms": {
+      "eyebrow": "WORKS WITH YOUR STACK",
+      "title": "Wherever your <sage>agents run.</sage>",
+      "note": "{count} platforms auto-detected — one install covers them all."
+    },
+    "open": {
+      "eyebrow": "OPEN BY DESIGN",
+      "title": "Built on <sage>open standards.</sage>",
+      "body": "PanGuard's detection rules follow ATR (Agent Threat Rules) — an independent, MIT-licensed open standard for agent threat detection. Every rule is human-readable and ships with mappings to OWASP Agentic, OWASP LLM, MITRE ATLAS and the EU AI Act. Engine, rules and spec are open source; the standard is governed independently of this product.",
+      "ctaSpec": "Read the ATR spec",
+      "ctaCross": "Framework crosswalks"
+    },
+    "start": {
+      "eyebrow": "GET STARTED",
+      "title": "Sixty seconds <sage>to covered.</sage>",
+      "step1": "Install",
+      "step2": "Set up",
+      "step3": "Scan",
+      "free": "Free forever. MIT. Community is the complete product — paid enterprise operations are on the roadmap, and nothing on this site is a locked feature.",
+      "cta": "Read the docs",
+      "copied": "Copied"
+    },
+    "mission": {
+      "text": "PanGuard exists so that every AI agent runs behind a shared, open security layer.",
+      "link": "About"
+    }
+  },
+  "homeV4": {
+    "crystallizeMission": {
+      "eyebrow": "HOW IT WORKS",
+      "title": "Threat <sage>Crystallization</sage>"
+    }
   }
 }
