@@ -70,15 +70,18 @@ export async function askTelemetryConsent(): Promise<boolean> {
   console.log(`  ${symbols.info} ${c.bold('Join Collective Defense (optional, off by default)')}`);
   console.log('');
   console.log(
-    `  ${c.dim('Why join: PanGuard also reports UNKNOWN suspicious behavior it cannot yet')}`
+    `  ${c.dim('Why join: every rule-matched attack you see can become a community rule,')}`
   );
   console.log(
-    `  ${c.dim('match to a rule. Those reports let the community turn a novel attack into')}`
+    `  ${c.dim('and you get every community rule back automatically. With the local AI')}`
   );
   console.log(
-    `  ${c.dim('a new ATR rule — and you get every community rule back automatically. This')}`
+    `  ${c.dim('layer on (free — pga guard setup-ai), PanGuard ALSO reports UNKNOWN')}`
   );
-  console.log(`  ${c.dim('is how the free tier catches tomorrow’s attacks, not just today’s.')}`);
+  console.log(
+    `  ${c.dim('suspicious behavior it can’t yet match to a rule — so novel attacks the')}`
+  );
+  console.log(`  ${c.dim('AI flags become new rules too. Reporting an unknown never blocks it.')}`);
   console.log('');
   console.log(`  ${c.bold('If you agree, PanGuard will:')}`);
   console.log(

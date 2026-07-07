@@ -78,6 +78,13 @@ const ADVISORY_REPORT_MIN_CONFIDENCE = 65;
  * DetectionResult (adviseOnly: true, empty ruleMatches) or null when the event looks
  * normal. adviseOnly guarantees the downstream respond-agent can never auto-block it,
  * so this widens what we LEARN FROM without widening what we ENFORCE.
+ *
+ * MEASURED (2026-07-07, 45 benign dev events + 3 attack controls): a lone baseline
+ * deviation scores ~26-28 in analyze — below the 40 "suspicious" bar — so with Layer C
+ * (AI) OFF this yields 0% FP AND 0% TP (nothing is reported). With Layer C ON, the AI
+ * verdict raises malicious behavior to ~47-48 (reported) while ordinary dev activity
+ * stays benign (0% FP). So the unknown-attack flywheel is effectively AI-gated by
+ * design: the semantic judge is what separates a novel attack from a new dev tool.
  */
 async function maybeAdvisoryDetection(
   event: SecurityEvent,

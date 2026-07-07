@@ -766,12 +766,16 @@ export function setupCommand(): Command {
               c.dim('    If you agree, PanGuard connects to Threat Cloud and will:')
             );
             console.log(
-              c.dim('    · share minimal ANONYMIZED threat signatures — including UNKNOWN')
+              c.dim('    · share minimal ANONYMIZED threat signatures (matched rule ID, attack')
+            );
+            console.log(c.dim('      category + MITRE, coarse region, truncated IP),'));
+            console.log(
+              c.dim('    · with the local AI layer on (free — pga guard setup-ai), ALSO report')
             );
             console.log(
-              c.dim('      suspicious behavior it cannot yet match to a rule (this is what lets')
+              c.dim('      UNKNOWN suspicious behavior it can’t yet match to a rule, so the')
             );
-            console.log(c.dim('      the community turn a novel attack into a new rule),'));
+            console.log(c.dim('      community can turn a novel attack into a new rule,'));
             console.log(
               c.dim('    · send it over an ENCRYPTED (HTTPS/TLS) connection, anonymized on your')
             );
