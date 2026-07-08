@@ -63,10 +63,22 @@ describe('seal — adversarial', () => {
     await expect(compactDecrypt(env.jwe, other.privateKey)).rejects.toBeTruthy();
   });
 
-  it('no configured ingest key => sealForIngest returns null (caller must NOT upload plaintext)', async () => {
-    // The bundled INGEST_KEYS is empty until a KMS key is provisioned.
-    expect(sealingAvailable()).toBe(false);
-    expect(await sealForIngest({ any: 'payload' })).toBeNull();
+  it('a bundled ingest key is active => E2E sealing is ON by default', async () => {
+    // A real ingest public key is now provisioned in INGEST_KEYS (valid 2026-07 →
+    // 2027-07), so uploads seal by default.
+    const now = new Date('2026-07-07T00:00:00Z');
+    expect(sealingAvailable(now)).toBe(true);
+    const env = await sealForIngest({ any: 'payload' }, now);
+    expect(env).not.toBeNull();
+    expect(env?.alg).toBe('ECDH-ES+A256GCM');
+  });
+
+  it('outside every key validity window => sealForIngest returns null (caller must NOT upload plaintext)', async () => {
+    // Past the bundled key's notAfter → no active key → the null-safety holds so a
+    // key-expiry can never silently downgrade to plaintext.
+    const future = new Date('2030-01-01T00:00:00Z');
+    expect(sealingAvailable(future)).toBe(false);
+    expect(await sealForIngest({ any: 'payload' }, future)).toBeNull();
   });
 
   it('ephemeral key per message: two seals of the same payload differ (no deterministic linkage)', async () => {

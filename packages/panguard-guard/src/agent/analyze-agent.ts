@@ -239,6 +239,9 @@ export class AnalyzeAgent {
       evidence: evidenceList,
       recommendedAction,
       mitreTechnique: aiClassification?.technique,
+      // Carry the advisory-only flag so respond-agent hard-gates it to log_only:
+      // an unknown-attack candidate (behavioral anomaly, no rule) is reported, never enforced.
+      ...(detection.adviseOnly ? { adviseOnly: true } : {}),
     };
 
     logger.info(

@@ -24,6 +24,10 @@ export {
   sealConfigManifest,
   manifestPath,
   wasInitialized,
+  collectSelfState,
+  mergeSelfState,
+  readSelfStateRefs,
+  GUARD_SERVICE_LABEL,
 } from './integrity.js';
 export type {
   IntegrityVerdict,

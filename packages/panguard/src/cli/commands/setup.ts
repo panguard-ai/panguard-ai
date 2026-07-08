@@ -9,7 +9,7 @@
 
 import { Command } from 'commander';
 import { execFile, spawn } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, chmodSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir, platform } from 'node:os';
 import { createRequire } from 'node:module';
@@ -22,6 +22,7 @@ import {
 } from './setup-skill-scan.js';
 import { markInitialized } from '../first-run.js';
 import { readAuthenticatedDashboardUrl, dashboardBaseUrl } from '../dashboard-url.js';
+import { recordScanResults, type RiskLevel } from '../flagged-skills.js';
 
 /** Open URL in the default browser (cross-platform) */
 function openBrowser(url: string): void {
@@ -42,8 +43,16 @@ function persistToWhitelist(skillNames: readonly string[], source: 'manual' | 's
   const guardDir = join(homedir(), '.panguard-guard');
   const whitelistPath = join(guardDir, 'skill-whitelist.json');
 
+  // Trust-critical store: the whitelist decides which skills are ALLOWED, so it
+  // must be owner-only (0700 dir / 0600 file). A world-readable trust store is an
+  // information leak and inconsistent with the rest of ~/.panguard-guard.
   if (!existsSync(guardDir)) {
-    mkdirSync(guardDir, { recursive: true });
+    mkdirSync(guardDir, { recursive: true, mode: 0o700 });
+  }
+  try {
+    chmodSync(guardDir, 0o700);
+  } catch {
+    /* best-effort: non-POSIX filesystems (e.g. Windows) ignore modes */
   }
 
   // Load existing whitelist if present
@@ -85,7 +94,16 @@ function persistToWhitelist(skillNames: readonly string[], source: 'manual' | 's
     existingNames.add(normalized);
   }
 
-  writeFileSync(whitelistPath, JSON.stringify(existing, null, 2), 'utf-8');
+  writeFileSync(whitelistPath, JSON.stringify(existing, null, 2), {
+    encoding: 'utf-8',
+    mode: 0o600,
+  });
+  try {
+    // writeFileSync's mode only applies on CREATE; chmod an existing file too.
+    chmodSync(whitelistPath, 0o600);
+  } catch {
+    /* best-effort */
+  }
 }
 
 /** Platform-specific restart instructions */
@@ -110,6 +128,7 @@ export function setupCommand(): Command {
     .option('--yes', 'Skip confirmation prompts', false)
     .option('--skip-scan', 'Skip skill scanning', false)
     .option('--skip-guard', 'Skip guard start prompt', false)
+    .option('--skip-service', 'Do not install the reboot-surviving system service', false)
     .option('--lang <lang>', 'UI language: en or zh-TW (auto-detect if omitted)')
     .action(
       async (options: {
@@ -119,6 +138,7 @@ export function setupCommand(): Command {
         yes: boolean;
         skipScan: boolean;
         skipGuard: boolean;
+        skipService: boolean;
         lang?: string;
       }) => {
         // Detect UI language: --lang flag > system locale > default zh-TW
@@ -157,7 +177,9 @@ export function setupCommand(): Command {
             openBrowser(url);
           } else {
             console.log(
-              c.yellow(`  ${symbols.warn} Dashboard is still starting. Open it with: pga up`)
+              c.yellow(
+                `  ${symbols.warn} Dashboard is still starting. Run "pga status" for the link.`
+              )
             );
             console.log(c.dim(`    It will be served at ${dashboardBaseUrl()}`));
           }
@@ -379,6 +401,19 @@ export function setupCommand(): Command {
                 })),
               };
 
+              // Persist the scan verdict so `pga status` / `pga doctor` show real
+              // severities, and so `pga up` can skip a redundant re-scan on first
+              // run (setup owns the first-run scan).
+              recordScanResults({
+                scannedNames: scanResults.map((r) => r.entry.name),
+                flagged: flaggedResults.map((r) => ({
+                  name: r.entry.name,
+                  platform: r.entry.platformId,
+                  riskLevel: (r.audit?.riskLevel ?? 'HIGH') as RiskLevel,
+                })),
+                scannedAt: new Date().toISOString(),
+              });
+
               // Whitelist only safe (LOW risk) skills — caution (MEDIUM) needs review
               const safeOnly = scanResults
                 .filter((r) => r.status === 'safe')
@@ -431,9 +466,21 @@ export function setupCommand(): Command {
                         )
                       );
                     } else {
+                      // We flag but never delete a user's files. Give a concrete,
+                      // safe removal path instead of a dead-end "manually disable".
                       console.log(
                         c.red(
-                          `  ${symbols.fail} CRITICAL: ${c.bold(result.entry.name)} -- could not auto-remove. Manually disable this skill.`
+                          `  ${symbols.fail} CRITICAL: ${c.bold(result.entry.name)} (${result.entry.platformId}) is dangerous.`
+                        )
+                      );
+                      console.log(
+                        c.dim(
+                          `    PanGuard does not delete your files. Inspect it: pga audit skill ${result.entry.name}`
+                        )
+                      );
+                      console.log(
+                        c.dim(
+                          `    Then remove the skill folder from ${result.entry.platformId} to disable it.`
                         )
                       );
                     }
@@ -482,16 +529,17 @@ export function setupCommand(): Command {
         if (!options.remove && !options.skipGuard) {
           if (!options.json) console.log();
           const installGuard =
-            options.yes ||
-            options.json ||
-            (await promptConfirm({
-              message: {
-                en: 'Install Panguard Guard as system service? (recommended, auto-start on boot)',
-                'zh-TW': '安裝 Panguard Guard 為系統服務？（建議安裝，開機自動啟動）',
-              },
-              defaultValue: true,
-              lang: L,
-            }));
+            !options.skipService &&
+            (options.yes ||
+              options.json ||
+              (await promptConfirm({
+                message: {
+                  en: 'Install Panguard Guard as system service? (recommended, auto-start on boot)',
+                  'zh-TW': '安裝 Panguard Guard 為系統服務？（建議安裝，開機自動啟動）',
+                },
+                defaultValue: true,
+                lang: L,
+              })));
 
           if (installGuard) {
             if (!options.json) {
@@ -712,13 +760,43 @@ export function setupCommand(): Command {
         let tcUploadOptedIn = false;
         if (!options.remove && !options.skipGuard) {
           const dataDir = join(homedir(), '.panguard-guard');
+          // Honest agreement shown before the opt-in. States exactly what joining
+          // does (contribute anonymized signatures incl. UNKNOWN threats + auto-
+          // receive community rules), and is precise about encryption: anonymized
+          // on-device, then end-to-end sealed (JWE to the ingest key) so only the
+          // Threat Cloud backend can read it — verified live 2026-07-07.
+          if (!options.yes && !options.json) {
+            console.log();
+            console.log(`  ${c.bold('Join Collective Defense (optional, off by default)')}`);
+            console.log(c.dim('    If you agree, PanGuard connects to Threat Cloud and will:'));
+            console.log(
+              c.dim('    · share minimal ANONYMIZED threat signatures (matched rule ID, attack')
+            );
+            console.log(c.dim('      category + MITRE, coarse region, truncated IP),'));
+            console.log(
+              c.dim('    · with the local AI layer on (free — pga guard setup-ai), ALSO report')
+            );
+            console.log(
+              c.dim('      UNKNOWN suspicious behavior it can’t yet match to a rule, so the')
+            );
+            console.log(c.dim('      community can turn a novel attack into a new rule,'));
+            console.log(
+              c.dim('    · anonymize it on your machine, then END-TO-END ENCRYPT it — sealed so')
+            );
+            console.log(c.dim('      only the Threat Cloud backend can read it, not the network,'));
+            console.log(c.dim('    · auto-update your detection rules from the community.'));
+            console.log(
+              c.dim('    NEVER shared: prompts, code, file contents, secrets, paths, hostname.')
+            );
+            console.log();
+          }
           const enableTC =
             !options.yes &&
             !options.json &&
             (await promptConfirm({
               message: {
-                en: 'Enable Threat Cloud collective defense? (optional, off by default)',
-                'zh-TW': '啟用 Threat Cloud 集體防禦？（選用，預設關閉）',
+                en: 'Agree and join Collective Defense? (auto-connect + auto-update rules)',
+                'zh-TW': '同意並加入集體防禦？（自動連線 + 規則自動更新）',
               },
               defaultValue: false,
               lang: L,
@@ -731,12 +809,14 @@ export function setupCommand(): Command {
             const guardConfig = loadConfig(tcConfigPath);
             const updatedConfig = {
               ...guardConfig,
-              // Both flags follow the one consent answer. The upload gate checks
-              // threatCloudUploadEnabled; telemetryEnabled is what
-              // ensureTelemetryConsent() reads back — keep them in lockstep so a
-              // single opt-in turns the whole collective-defense path on.
+              // One consent answer wires the whole collective-defense loop:
+              // contribute (upload + telemetry) AND receive (rule sync auto-updates).
+              // The upload gate checks threatCloudUploadEnabled; telemetryEnabled is
+              // what ensureTelemetryConsent() reads back; threatCloudRuleSyncEnabled
+              // turns on automatic community rule updates. All follow the one answer.
               threatCloudUploadEnabled: enableTC,
               telemetryEnabled: enableTC,
+              threatCloudRuleSyncEnabled: enableTC,
               threatCloudEndpoint: enableTC
                 ? (guardConfig.threatCloudEndpoint ?? 'https://tc.panguard.ai/api')
                 : guardConfig.threatCloudEndpoint,
@@ -753,10 +833,14 @@ export function setupCommand(): Command {
               if (enableTC) {
                 console.log(
                   c.green(
-                    `  ${symbols.pass} Threat Cloud enabled: ${updatedConfig.threatCloudEndpoint ?? 'https://tc.panguard.ai/api'}`
+                    `  ${symbols.pass} Connected to Threat Cloud: ${updatedConfig.threatCloudEndpoint ?? 'https://tc.panguard.ai/api'}`
                   )
                 );
-                console.log(c.dim('    Every scan strengthens the collective defense network.'));
+                console.log(
+                  c.dim(
+                    '    Sharing anonymized signatures (incl. unknown threats); rules auto-update.'
+                  )
+                );
               } else {
                 console.log(
                   c.dim(

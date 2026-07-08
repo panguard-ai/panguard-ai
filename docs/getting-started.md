@@ -25,7 +25,7 @@
 
 > macOS and Linux are primary platforms. Windows supports core features; some OS-level detection is limited.
 
-### Available Binaries (v1.4.1)
+### Available Binaries (v1.7.3)
 
 | Platform | Architecture          | Install Method                  |
 | -------- | --------------------- | ------------------------------- |
@@ -74,7 +74,7 @@ pnpm build
 
 ```bash
 panguard --version
-# Expected: 1.4.13
+# Expected: 1.7.3
 ```
 
 ---
@@ -143,7 +143,7 @@ panguard guard start
 
   Mode:       Learning (Day 1/7)
   Monitoring: processes, network, files
-  Rules:      71 ATR rules loaded
+  Rules:      675 ATR rules loaded
   Score:      --/100 (building baseline)
 
   Guard is now protecting your system.
@@ -218,6 +218,8 @@ All fully isolated from production. Zero risk to real data.
 ```bash
 panguard report --framework iso27001 --output iso-report.pdf
 ```
+
+**Note:** Compliance Report generation is an Enterprise feature. The underlying security detection is available in Community; only the formatted compliance report output is gated to Enterprise.
 
 Available frameworks:
 

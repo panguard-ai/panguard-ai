@@ -54,9 +54,7 @@ export default function MigratorBeat() {
               </div>
               <div className="whitespace-nowrap">
                 <span className="select-none text-brand-sage">$ </span>
-                <span className="text-text-secondary">
-                  panguard-migrate sigma/ --output atr/
-                </span>
+                <span className="text-text-secondary">panguard-migrate sigma/ --output atr/</span>
               </div>
             </div>
           </div>
@@ -117,7 +115,9 @@ export default function MigratorBeat() {
             </p>
             <p>
               <strong className="text-text-primary">
-                {isZh ? 'Migrator Pro(PanGuard Enterprise):' : 'Migrator Pro (PanGuard Enterprise):'}
+                {isZh
+                  ? 'Migrator Pro(PanGuard Enterprise):'
+                  : 'Migrator Pro (PanGuard Enterprise):'}
               </strong>{' '}
               {isZh
                 ? '規則手工調到 Cisco merge PR 等級 · 5 框架合規自動對照 · SHA-256 簽章的稽核證據包 · Threat Cloud 整合 · 地端部署。'

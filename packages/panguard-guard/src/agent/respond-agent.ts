@@ -319,6 +319,19 @@ export class RespondAgent {
 
   private async respondWithPolicy(verdict: ThreatVerdict): Promise<ResponseResult> {
     const { confidence } = verdict;
+    // Advisory-only invariant (unknown-attack flywheel): a verdict derived from a
+    // behavioral anomaly with no deterministic rule/intel match may be surfaced and
+    // reported to Threat Cloud, but MUST NEVER auto-block. Short-circuit to log_only
+    // BEFORE any enforcement gate — this widens what we LEARN FROM without widening
+    // what we ENFORCE, independent of the confidence math below.
+    if (verdict.adviseOnly) {
+      return {
+        action: 'log_only',
+        success: true,
+        details: `Advisory (unknown-threat candidate): ${verdict.conclusion} — reported, not enforced`,
+        timestamp: new Date().toISOString(),
+      };
+    }
     // Advisory invariant: auto-execution (block/revoke/etc.) gates on deterministic confidence
     // only. The bring-your-own LLM can raise `confidence` to notify/flag, never auto-block alone.
     const enforcementConfidence = verdict.enforcementConfidence ?? confidence;

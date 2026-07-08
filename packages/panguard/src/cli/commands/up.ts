@@ -19,6 +19,7 @@ import { installFor, toHookPlatform } from './hook.js';
 import { ensurePersistentService, type PersistResult } from './persist.js';
 import { isFirstRun, markInitialized } from '../first-run.js';
 import { readAuthenticatedDashboardUrl, dashboardBaseUrl } from '../dashboard-url.js';
+import { recordScanResults, readFlaggedSkills, type RiskLevel } from '../flagged-skills.js';
 
 type Lang = 'en' | 'zh-TW';
 
@@ -240,7 +241,14 @@ export function upCommand(): Command {
           console.log('');
           const { execFileSync } = await import('node:child_process');
           try {
-            execFileSync(process.execPath, [process.argv[1] ?? 'panguard', 'setup'], {
+            // Forward the flags that must not be lost across the shell boundary:
+            // --yes keeps it non-interactive, and --no-persist must reach setup's
+            // service install (otherwise setup installs a launchd service the user
+            // explicitly opted out of).
+            const setupArgs = [process.argv[1] ?? 'panguard', 'setup'];
+            if (opts.yes) setupArgs.push('--yes');
+            if (opts.persist === false) setupArgs.push('--skip-service');
+            execFileSync(process.execPath, setupArgs, {
               stdio: 'inherit',
             });
           } catch (err) {
@@ -339,7 +347,25 @@ export function upCommand(): Command {
         }
 
         // ── Step 2: Scan installed skills (BEFORE deploying protection) ──
-        if (!opts.skipScan) {
+        // On first run `pga setup` (shelled above) already scanned every skill and
+        // recorded verdicts — re-scanning here would double the work (~2x wall
+        // clock) and print the same threats twice under a second UI. Reuse setup's
+        // verdict from the flagged store instead.
+        if (firstRun && !opts.skipScan) {
+          threatCount = readFlaggedSkills().length;
+          if (threatCount > 0) {
+            console.log(
+              `  ${warn()} ${c.bold(
+                t(
+                  lang,
+                  `${threatCount} skill(s) flagged during setup (shown above) — review with "pga status".`,
+                  `設定時標記了 ${threatCount} 個技能(如上）— 用「pga status」檢視。`
+                )
+              )}\n`
+            );
+          }
+        }
+        if (!opts.skipScan && !firstRun) {
           console.log(
             `\n  ${arrow()} ${c.bold(t(lang, 'Scanning installed skills...', '掃描已安裝技能...'))}\n`
           );
@@ -456,8 +482,19 @@ export function upCommand(): Command {
                 process.stdout.write('\r' + ' '.repeat(80) + '\r');
 
                 threatCount = threats.length;
+                // Persist the scan verdict so `pga status` / `pga doctor` show the
+                // real severity of a flagged skill (not "UNKNOWN"/"No scan result").
+                recordScanResults({
+                  scannedNames: unknown.map((s) => s.name),
+                  flagged: threats.map((t) => ({
+                    name: t.name,
+                    platform: t.platform,
+                    riskLevel: t.riskLevel as RiskLevel,
+                  })),
+                  scannedAt: new Date().toISOString(),
+                });
                 if (threats.length > 0) {
-                  console.log(`  ${c.critical(c.bold(`${threats.length} threat(s) detected:`))}\n`);
+                  console.log(`  ${c.critical(c.bold(`${threats.length} skill(s) flagged:`))}\n`);
                   for (const threat of threats) {
                     const icon =
                       threat.riskLevel === 'CRITICAL' ? c.critical('!!') : c.caution('!');
@@ -508,6 +545,13 @@ export function upCommand(): Command {
                 }
               } else {
                 console.log(`  ${c.safe(`${ok()} All ${skills.length} skills verified safe.`)}\n`);
+                // Every installed skill is whitelisted-safe: record a clean scan so
+                // doctor shows a real timestamp and any stale flag is cleared.
+                recordScanResults({
+                  scannedNames: skills.map((s) => s.name),
+                  flagged: [],
+                  scannedAt: new Date().toISOString(),
+                });
               }
             }
           } catch {
@@ -582,6 +626,9 @@ export function upCommand(): Command {
                 console.log(
                   `    ${c.safe(`Built-in tools guarded on ${done.length} platform(s)`)} ` +
                     `${c.dim(`(${done.join(', ')} — restart the agent to activate)`)}`
+                );
+                console.log(
+                  `    ${c.dim('Guarded = critical/high-confidence threats blocked, the rest advisory. `pga hook install --enforce` blocks everything.')}`
                 );
               }
             }
@@ -799,7 +846,7 @@ export function upCommand(): Command {
         }
         if (threatCount > 0) {
           console.log(
-            `  ${c.sage(t(lang, 'Threats', '威脅'))}       ${c.critical(`${threatCount} ${t(lang, 'found', '個發現')}`)}`
+            `  ${c.sage(t(lang, 'Threats', '威脅'))}       ${c.critical(`${threatCount} ${t(lang, 'flagged', '個標記')}`)}`
           );
         }
         const tcStatusLine =
@@ -832,9 +879,11 @@ export function upCommand(): Command {
             `  ${c.dim('1.')} ${t(lang, 'Open dashboard', '開啟儀表板')}     ${c.sage(dashboardUrl)}`
           );
         } else {
-          // No live token: point at re-running `pga up` rather than a dead URL.
+          // No live token yet (daemon still writing it). Point at `pga status`,
+          // which prints the authenticated dashboard link once it lands — never
+          // back at `pga up` (the command they just ran → a confusing loop).
           console.log(
-            `  ${c.dim('1.')} ${t(lang, 'Open dashboard', '開啟儀表板')}     ${c.dim(t(lang, 'run "pga up" to open the dashboard', '執行「pga up」開啟儀表板'))}`
+            `  ${c.dim('1.')} ${t(lang, 'Open dashboard', '開啟儀表板')}     ${c.dim(t(lang, 'run "pga status" for the dashboard link', '執行「pga status」取得儀表板連結'))}`
           );
         }
         if (threatCount > 0) {

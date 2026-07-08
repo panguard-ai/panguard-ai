@@ -17,7 +17,7 @@
     "@sentry/nextjs": "^8.0.0",
     "@supabase/ssr": "0.5.2",
     "@supabase/supabase-js": "2.45.6",
-    "agent-threat-rules": "^3.5.0",
+    "agent-threat-rules": "^3.5.6",
     "jose": "^5.9.0",
     "js-yaml": "^4.1.0",
     "lucide-react": "^0.460.0",

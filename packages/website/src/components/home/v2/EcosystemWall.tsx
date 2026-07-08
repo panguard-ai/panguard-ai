@@ -14,12 +14,7 @@ import { sageRich, Eyebrow, SectionTitleV2, SectionV2, CardV2 } from './primitiv
 // Proper nouns stay hardcoded; the sub-lines (prose claims, rule-pack sizes
 // as merged at the time of each PR) come from homeV2.ecosystem messages so
 // zh-TW gets real translations. Full list with PR links lives at /atr/adopters.
-const TIER2_MERGES = [
-  'Microsoft PyRIT',
-  'OWASP A-S-R-H',
-  'MISP / CIRCL',
-  'SigmaHQ',
-] as const;
+const TIER2_MERGES = ['Microsoft PyRIT', 'OWASP A-S-R-H', 'MISP / CIRCL', 'SigmaHQ'] as const;
 
 function TierLabel({ children }: { children: ReactNode }) {
   return (

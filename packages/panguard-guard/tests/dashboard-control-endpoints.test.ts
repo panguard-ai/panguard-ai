@@ -301,10 +301,18 @@ describe('DashboardServer — 1.7 control endpoints', () => {
 
   describe('enforcement posture — PROTECTED only when it will actually act', () => {
     it('protection mode with NO armed response = monitoring, not protected', async () => {
-      dashboard.updateStatus({ mode: 'protection' });
+      dashboard.updateStatus({ mode: 'protection', atrRuleCount: 100 });
       const d = await (await get('/api/status')).json();
       expect(d.enforcement.posture).toBe('monitoring');
       expect(d.enforcement.osActionsArmed).toBe(false);
+    });
+
+    it('zero rules loaded = degraded, never a green protected/monitoring claim', async () => {
+      // Fake-green guard: a detection engine with 0 rules cannot detect anything,
+      // so an active posture would overclaim. Must downgrade to 'degraded'.
+      dashboard.updateStatus({ mode: 'protection', atrRuleCount: 0 });
+      const d = await (await get('/api/status')).json();
+      expect(d.enforcement.posture).toBe('degraded');
     });
 
     it('protection mode WITH an armed response = protected', async () => {
@@ -320,14 +328,14 @@ describe('DashboardServer — 1.7 control endpoints', () => {
             },
           }) as unknown as GuardConfig
       );
-      dashboard.updateStatus({ mode: 'protection' });
+      dashboard.updateStatus({ mode: 'protection', atrRuleCount: 100 });
       const d = await (await get('/api/status')).json();
       expect(d.enforcement.posture).toBe('protected');
       expect(d.enforcement.armedActions).toContain('block IPs');
     });
 
     it('report-only mode reports report-only', async () => {
-      dashboard.updateStatus({ mode: 'report-only' });
+      dashboard.updateStatus({ mode: 'report-only', atrRuleCount: 100 });
       const d = await (await get('/api/status')).json();
       expect(d.enforcement.posture).toBe('report-only');
     });

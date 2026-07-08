@@ -23,6 +23,9 @@ export default defineConfig({
     },
     include: [
       'packages/**/tests/**/*.test.ts',
+      // scan-core keeps its tests in src/__tests__/ — without this pattern the
+      // root (CI) run silently skips them and release.sh trusts a green CI.
+      'packages/**/src/__tests__/**/*.test.ts',
       'tests/**/*.test.ts',
       'security-hardening/tests/**/*.test.ts',
       'scripts/__tests__/**/*.test.ts',

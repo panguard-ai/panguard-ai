@@ -67,7 +67,11 @@ export interface ProxyConfig {
 /** The subset of ProxyEvaluator the proxy uses — injectable for testing. */
 export interface ProxyEvaluatorLike {
   loadRules(): Promise<number>;
-  evaluateToolCall(toolName: string, args: Record<string, unknown>): Promise<EvalResult>;
+  evaluateToolCall(
+    toolName: string,
+    args: Record<string, unknown>,
+    eventType?: string
+  ): Promise<EvalResult>;
   evaluateToolResponse(toolName: string, response: string): Promise<EvalResult>;
 }
 
@@ -115,9 +119,19 @@ export class MCPProxy {
     this.evalTimeout = config.evalTimeout ?? 5000;
     this.sessionId = config.sessionId ?? `mcp-proxy-${process.pid}-${Date.now().toString(36)}`;
     this.agentId = config.agentId ?? process.env['PANGUARD_AGENT_ID'] ?? 'mcp-agent';
-    // Sync sub-ms pre-check. Runs in front of the async evaluator so the worst
-    // payloads (and any session the brain flags) are blocked instantly — and,
-    // with fail-closed as the default, an unavailable async evaluator denies.
+    // Sync sub-ms pre-check (InlineGate.onAction) that reads riskStore: once a
+    // session is escalated to 'high' it fast-blocks subsequent calls before the
+    // async evaluator even runs. That escalation is FED by recordEvalVerdict()
+    // (a real ATR deny -> riskStore.set high), so the session-risk loop is live.
+    //
+    // HONEST SCOPE (Community): the async behavioral brain — RiskAnalyzer.analyze
+    // via guard.onSessionActivity — is NOT driven here; it needs a real
+    // ContentDetector + per-session event feed and, more importantly, a real
+    // ContainmentController to act on its verdicts (Community ships Noop). So the
+    // detector is a deliberate no-op, not a forgotten wire: content detection is
+    // the ATR engine (evaluateToolCall/evaluateToolResponse) and session
+    // escalation is the sync riskStore path above. Wiring the behavioral brain +
+    // active containment is a Pro-tier layer, tracked separately.
     this.riskStore = new InMemoryRiskStore();
     this.guard = new GuardGate({
       gate: new InlineGate(),
@@ -218,7 +232,11 @@ export class MCPProxy {
     confidence: number;
     matchedRules: readonly string[];
   }): void {
-    if (verdict.outcome === 'deny' && verdict.confidence >= MCPProxy.ESCALATE_CONFIDENCE) {
+    // Normalize confidence to a 0-100 scale before the threshold check: the ATR
+    // engine reports match confidence on a 0-1 scale, so comparing it raw to a
+    // 0-100 threshold (95) made this escalation NEVER fire for a real deny.
+    const conf = verdict.confidence <= 1 ? verdict.confidence * 100 : verdict.confidence;
+    if (verdict.outcome === 'deny' && conf >= MCPProxy.ESCALATE_CONFIDENCE) {
       this.riskStore.set(this.sessionId, { level: 'high', reasons: [...verdict.matchedRules] });
     }
   }
@@ -325,11 +343,17 @@ export class MCPProxy {
         };
       }
 
-      // PreToolUse: evaluate the call
+      // PreToolUse: evaluate the call as a 'tool_call' event so the full
+      // tool_call rule family (shell injection, SSRF, SQLi, credential theft,
+      // privilege escalation, tool poisoning) runs — an MCP tool call carries
+      // exactly those payloads in its args. Via the engine's mcp-over-tool
+      // exception this is a superset of the mcp_exchange rules, so nothing that
+      // 'mcp_exchange' caught is lost. (The old default silently skipped ~44
+      // tool_call rules on every MCP call.)
       let preResult;
       try {
         preResult = await Promise.race([
-          this.evaluator.evaluateToolCall(name, toolArgs),
+          this.evaluator.evaluateToolCall(name, toolArgs, 'tool_call'),
           new Promise<never>((_, reject) =>
             setTimeout(() => reject(new Error('timeout')), this.evalTimeout)
           ),
@@ -381,11 +405,23 @@ export class MCPProxy {
       // Forward to upstream
       const result = await client.callTool({ name, arguments: toolArgs });
 
-      // PostToolUse: evaluate the response
-      const responseText = (result.content as Array<{ type: string; text?: string }>)
-        ?.map((c) => c.text ?? '')
+      // PostToolUse: evaluate the response. Serialize EVERY content block —
+      // text AND non-text (resource URIs, embedded resource.text/blob, image
+      // data) — so a malicious server cannot smuggle an exfil/injection payload
+      // through a resource/image block that a text-only extractor would silently
+      // drop. Cap is 256KB (not 10KB) so padding the payload past a tiny cap no
+      // longer evades the scan.
+      const responseText = (result.content as Array<Record<string, unknown>>)
+        ?.map((c) => {
+          if (typeof c['text'] === 'string') return c['text'];
+          try {
+            return JSON.stringify(c);
+          } catch {
+            return '';
+          }
+        })
         .join('\n')
-        .slice(0, 10000); // Cap at 10KB for evaluation
+        .slice(0, 262144);
 
       if (responseText) {
         let postResult;

@@ -54,12 +54,9 @@ export default function LeaderboardContent() {
           empty. Never surfaces a raw HTTP status to users. */}
       {!loading && (error || contributors.length === 0) && (
         <div className="p-10 sm:p-12 text-center bg-surface-1 rounded-xl border border-border">
-          <p className="text-xl text-text-primary font-semibold">
-            The leaderboard is warming up
-          </p>
+          <p className="text-xl text-text-primary font-semibold">The leaderboard is warming up</p>
           <p className="text-text-secondary mt-3 max-w-md mx-auto leading-relaxed">
-            Live rankings appear here as contributors submit and promote rules. Be the
-            first — run{' '}
+            Live rankings appear here as contributors submit and promote rules. Be the first — run{' '}
             <code className="bg-surface-2 px-2 py-0.5 rounded text-sm">
               npx panguard-guard scan
             </code>{' '}
@@ -153,29 +150,23 @@ export default function LeaderboardContent() {
           even when the live leaderboard API is unavailable. */}
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
         <div className="p-6 bg-surface-1 rounded-xl border border-border">
-          <p className="font-mono text-[10px] uppercase tracking-micro text-brand-sage">
-            Propose
-          </p>
+          <p className="font-mono text-[10px] uppercase tracking-micro text-brand-sage">Propose</p>
           <p className="text-text-primary font-semibold mt-3">Turn a threat into a rule</p>
           <p className="text-text-secondary text-sm mt-2 leading-relaxed">
-            Guard surfaces suspicious skill behavior and drafts a detection rule from the
-            evidence, so contributing starts from real signal, not guesswork.
+            Guard surfaces suspicious skill behavior and drafts a detection rule from the evidence,
+            so contributing starts from real signal, not guesswork.
           </p>
         </div>
         <div className="p-6 bg-surface-1 rounded-xl border border-border">
-          <p className="font-mono text-[10px] uppercase tracking-micro text-brand-sage">
-            Review
-          </p>
+          <p className="font-mono text-[10px] uppercase tracking-micro text-brand-sage">Review</p>
           <p className="text-text-primary font-semibold mt-3">Community + automated review</p>
           <p className="text-text-secondary text-sm mt-2 leading-relaxed">
-            Each proposal is checked against a benign corpus for false positives before it can
-            be promoted, keeping the shared ruleset precise.
+            Each proposal is checked against a benign corpus for false positives before it can be
+            promoted, keeping the shared ruleset precise.
           </p>
         </div>
         <div className="p-6 bg-surface-1 rounded-xl border border-border">
-          <p className="font-mono text-[10px] uppercase tracking-micro text-brand-sage">
-            Protect
-          </p>
+          <p className="font-mono text-[10px] uppercase tracking-micro text-brand-sage">Protect</p>
           <p className="text-text-primary font-semibold mt-3">Everyone gets safer</p>
           <p className="text-text-secondary text-sm mt-2 leading-relaxed">
             Promoted rules ship to every Guard install. One contributor&apos;s catch protects

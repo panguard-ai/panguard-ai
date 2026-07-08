@@ -153,7 +153,7 @@ export function scanWithATR(
         const matchesStripped = compiled.regex.test(strippedContent);
         compiled.regex.lastIndex = 0;
 
-        if (matchesRaw) {
+        if (matchesRaw || matchesStripped) {
           matchedRuleIds.add(rule.id);
           const baseSeverity = (
             ['critical', 'high', 'medium', 'low', 'info'].includes(rule.severity)
@@ -164,8 +164,11 @@ export function scanWithATR(
           let severity = baseSeverity;
           const desc = compiled.desc || '';
 
-          // Matched in stripped too = visible text = apply context downgrades
-          if (matchesStripped) {
+          // Matched in raw AND stripped = visible prose = apply context downgrades.
+          // (A stripped-ONLY match is markdown-obfuscated — handled below with NO
+          // downgrade, because hiding an attack pattern behind formatting is an
+          // aggravating signal, not a mitigating one.)
+          if (matchesStripped && matchesRaw) {
             if (isReadme) severity = downgradeSeverity(severity);
             if (isRuleSafeInstall(`${rule.title} ${desc}`, content)) {
               severity = 'low';
@@ -204,7 +207,9 @@ export function scanWithATR(
               ? `${rule.title} (known-safe install script)`
               : !matchesStripped && matchesRaw
                 ? `${rule.title} (hidden in markup)`
-                : rule.title,
+                : matchesStripped && !matchesRaw
+                  ? `${rule.title} (markdown-obfuscated)`
+                  : rule.title,
             description: compiled.desc || `Matched ATR rule ${rule.id}`,
             severity,
             category: rule.category || 'atr',

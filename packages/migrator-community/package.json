@@ -9,6 +9,9 @@
     "url": "https://github.com/panguard-ai/panguard-ai",
     "directory": "packages/migrator-community"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "homepage": "https://panguard.ai/migrator",
   "keywords": [
     "sigma",
@@ -63,7 +66,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "agent-threat-rules": "^3.5.0",
+    "agent-threat-rules": "^3.5.6",
     "commander": "^12.1.0",
     "js-yaml": "^4.1.0"
   },
