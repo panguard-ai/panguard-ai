@@ -94,5 +94,15 @@ export function calculateRiskScore(
     level = 'LOW';
   }
 
+  // ANTI-EVASION FLOOR: several context reducers are attacker-controllable —
+  // most importantly defensive/educational prose density, which a malicious skill
+  // can stack to drive the multiplier to its 0.3 floor. Legitimate context may
+  // SOFTEN a genuine finding (critical -> HIGH, high -> MEDIUM) but must never
+  // collapse a real critical/high payload to LOW. Without this, padding a skill
+  // with security-defense keywords trivially hides the actual attack.
+  const rank: Record<RiskLevel, number> = { LOW: 0, MEDIUM: 1, HIGH: 2, CRITICAL: 3 };
+  const floor: RiskLevel = hasRealCritical ? 'HIGH' : hasRealHigh ? 'MEDIUM' : 'LOW';
+  if (rank[level] < rank[floor]) level = floor;
+
   return { score, level };
 }

@@ -18,9 +18,7 @@ const SCANNED_TOTAL =
   ECO.findingsHigh +
   ECO.findingsMedium +
   ECO.findingsLow;
-const FLAGGED_PERCENT = Math.round(
-  ((SCANNED_TOTAL - ECO.findingsClean) / SCANNED_TOTAL) * 100
-);
+const FLAGGED_PERCENT = Math.round(((SCANNED_TOTAL - ECO.findingsClean) / SCANNED_TOTAL) * 100);
 const SCANNED_DISPLAY = SCANNED_TOTAL.toLocaleString('en-US');
 const TOOLS_DISPLAY = ECO.toolsExtracted.toLocaleString('en-US');
 

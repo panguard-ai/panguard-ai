@@ -155,7 +155,11 @@ export default async function EvidencePackPage({
             <Stat
               label={isZh ? 'Garak recall' : 'Garak recall'}
               value={`${STATS.benchmark.garak.recall}%`}
-              caption={isZh ? `${STATS.benchmark.garak.samples} Garak 樣本` : `${STATS.benchmark.garak.samples} Garak samples`}
+              caption={
+                isZh
+                  ? `${STATS.benchmark.garak.samples} Garak 樣本`
+                  : `${STATS.benchmark.garak.samples} Garak samples`
+              }
             />
             <Stat
               label={isZh ? 'False positive' : 'False positive'}

@@ -71,7 +71,7 @@ panguard guard start
 
 - 4-agent AI pipeline: Detect -> Analyze -> Respond -> Report
 - 7-day learning period builds behavioral baseline
-- 101 ATR rules with 520 detection patterns
+- 675 ATR rules with 1,200+ detection patterns
 - Real-time threat intelligence (ThreatFox / URLhaus / GreyNoise)
 - Auto-response: IP blocking, file quarantine, process termination
 - Investigation engine for root cause analysis
@@ -139,6 +139,8 @@ panguard report --framework iso27001
 - Evidence packages with timestamps
 - Remediation recommendations
 - JSON, Markdown, and PDF output
+
+**Note:** Compliance Report generation is an Enterprise feature. The underlying security detection is available in Community; only the formatted compliance report output is gated to Enterprise.
 
 > Reports assess readiness, not certification. They prepare you for formal audits.
 
@@ -217,7 +219,7 @@ Cloud down? Local AI takes over. Local AI down? Rules engine keeps running. Prot
 | Runtime    | Node.js 20+                              |
 | Monorepo   | pnpm 10 workspaces                       |
 | Testing    | Vitest 3 (3,017 tests / 142 files)       |
-| Rules      | ATR (101 rules, 520 patterns)            |
+| Rules      | ATR (675 rules, 1,200+ patterns)         |
 | AI         | Ollama (local) + Claude / OpenAI (cloud) |
 | Auth       | Google OAuth (PKCE) + scrypt hashing     |
 | i18n       | English + Traditional Chinese            |

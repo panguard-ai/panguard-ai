@@ -28,6 +28,7 @@ import {
 } from 'node:fs';
 import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import { homedir } from 'node:os';
 import { WebSocketServer, type WebSocket as WS } from 'ws';
 import { createLogger } from '@panguard-ai/core';
@@ -58,6 +59,13 @@ import type { ReportRecord } from '../agent/report-agent.js';
 const HERE: string =
   (import.meta as unknown as { dirname?: string }).dirname ??
   dirname(fileURLToPath(import.meta.url));
+
+// Package version, read live from package.json (same pattern as src/index.ts
+// and src/cli/index.ts) so SARIF/evidence-pack exports never carry a stale
+// hardcoded version literal.
+const _require = createRequire(import.meta.url);
+const _pkg = _require('../../package.json') as { version: string };
+const PANGUARD_VERSION: string = _pkg.version;
 
 /**
  * Dashboard HTML lives in a sibling file (`dashboard.html`) and is read at
@@ -176,7 +184,14 @@ interface LayerHealth {
  */
 interface EnforcementStatus {
   readonly mode: string;
-  readonly posture: 'protected' | 'monitoring' | 'report-only' | 'learning' | 'off' | 'tampered';
+  readonly posture:
+    | 'protected'
+    | 'monitoring'
+    | 'report-only'
+    | 'learning'
+    | 'off'
+    | 'tampered'
+    | 'degraded';
   readonly osActionsArmed: boolean;
   readonly armedActions: string[];
   /** S5: config-integrity + self-removal verdict surfaced to the cockpit. */
@@ -933,6 +948,17 @@ export class DashboardServer {
     else if (mode === 'learning') posture = 'learning';
     else posture = 'off';
 
+    // Detection engine is a no-op with zero rules loaded — the guard cannot
+    // detect anything, so an active/report posture would be a fake-green claim.
+    // Downgrade to 'degraded' (matches the CLI TUI, which gates on rule count).
+    const ruleCount = this.status.atrRuleCount ?? 0;
+    if (
+      ruleCount <= 0 &&
+      (posture === 'protected' || posture === 'monitoring' || posture === 'report-only')
+    ) {
+      posture = 'degraded';
+    }
+
     // S5: config integrity + self-removal override the posture. Never claim
     // PROTECTED/MONITORING when the config was changed outside the guard or a
     // hook/LaunchAgent/proxy was removed — the cockpit must stay honest (S2).
@@ -1198,7 +1224,7 @@ export class DashboardServer {
           tool: {
             driver: {
               name: 'PanGuard Guard',
-              version: '1.5.6',
+              version: PANGUARD_VERSION,
               informationUri: 'https://panguard.ai',
               rules: rules.map((r) => ({
                 id: r.id,
@@ -1226,7 +1252,7 @@ export class DashboardServer {
           properties: {
             workspace_id: workspaceId,
             generated_at: generatedAt,
-            panguard_version: '1.5.6',
+            panguard_version: PANGUARD_VERSION,
             mode: this.status.mode,
             rules_loaded: rules.length,
             threats_detected: this.status.threatsDetected,
@@ -1299,7 +1325,7 @@ export class DashboardServer {
       version: '1.1',
       workspace_id: workspaceId,
       generated_at: generatedAt,
-      panguard_version: '1.5.6',
+      panguard_version: PANGUARD_VERSION,
       mode: this.status.mode,
       // Top-level integrity verdict over the durable audit log.
       integrity,

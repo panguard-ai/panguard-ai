@@ -102,7 +102,7 @@ export async function runCLI(args: string[]): Promise<void> {
       await commandInstall(dataDir);
       break;
     case 'uninstall':
-      await commandUninstall();
+      await commandUninstall(dataDir);
       break;
     case 'config':
       commandConfig(dataDir);
@@ -268,14 +268,35 @@ async function commandStart(
   // first run, establish the seal. On tamper / self-removal, start anyway but warn
   // LOUDLY — never silently honor a weakened config as if PROTECTED (the S2 invariant).
   try {
-    const { verifyConfigIntegrity, checkSelfState, sealConfigManifest, wasInitialized } =
-      await import('../integrity.js');
+    const {
+      verifyConfigIntegrity,
+      checkSelfState,
+      sealConfigManifest,
+      wasInitialized,
+      collectSelfState,
+      mergeSelfState,
+      readSelfStateRefs,
+    } = await import('../integrity.js');
     const cfgRecord = config as unknown as Record<string, unknown>;
     let verdict = verifyConfigIntegrity(cfgRecord, dataDir);
     const selfState = checkSelfState(dataDir);
     if (verdict.status === 'unsealed' && !wasInitialized(dataDir)) {
-      sealConfigManifest(cfgRecord, [], dataDir); // true first run — establish trust
+      // True first run — establish trust AND record the guard's own artifacts so
+      // their later removal is detectable. Sealing empty refs (the old behavior)
+      // left checkSelfState iterating nothing → self-removal detection was dead.
+      sealConfigManifest(cfgRecord, collectSelfState(), dataDir);
       verdict = { status: 'sealed', findings: [], checkedAt: verdict.checkedAt };
+    } else if (verdict.status === 'sealed' && selfState.ok) {
+      // Config trust intact and nothing currently missing: fold in any newly-present
+      // artifacts (LaunchAgent installed after the first seal, or an in-place upgrade
+      // from a build that sealed empty refs). Merge never drops a recorded ref, and
+      // we only re-seal an already-verified config when the inventory actually grew —
+      // so this never masks a tamper nor rewrites the manifest needlessly.
+      const recorded = readSelfStateRefs(dataDir);
+      const merged = mergeSelfState(recorded, collectSelfState());
+      if (merged.length > recorded.length) {
+        sealConfigManifest(cfgRecord, merged, dataDir);
+      }
     }
     if (verdict.status !== 'sealed' || !selfState.ok) {
       process.stderr.write(
@@ -993,10 +1014,12 @@ async function commandInstall(dataDir: string): Promise<void> {
 }
 
 /** Uninstall system service / 解除安裝系統服務 */
-async function commandUninstall(): Promise<void> {
+async function commandUninstall(dataDir: string): Promise<void> {
   const sp = spinner('Uninstalling PanguardGuard service...');
+  let removed = false;
   try {
     const result = await uninstallService();
+    removed = true;
     sp.succeed(`Service uninstalled: ${c.sage(result)}`);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
@@ -1005,6 +1028,24 @@ async function commandUninstall(): Promise<void> {
   // Remove the persisted dashboard launch token so the secret never lingers
   // after the service is gone.
   removeDashboardToken();
+  // A LEGITIMATE removal must rebuild trust: drop the LaunchAgent ref from the
+  // sealed manifest and re-seal, or the next `guard start` warns forever and the
+  // dashboard shows TAMPERED with no natural recovery (self-state never drops on
+  // merge). Best-effort + only when the manifest was already sealed — never
+  // create a seal here, and never let a re-seal failure mask the uninstall.
+  if (removed) {
+    try {
+      const { wasInitialized, readSelfStateRefs, forgetSelfState, sealConfigManifest } =
+        await import('../integrity.js');
+      if (wasInitialized(dataDir)) {
+        const kept = forgetSelfState(readSelfStateRefs(dataDir), ['launchagent']);
+        const config = loadConfig(join(dataDir, 'config.json'));
+        sealConfigManifest(config as unknown as Record<string, unknown>, kept, dataDir);
+      }
+    } catch {
+      /* re-seal is best-effort — the service is already uninstalled */
+    }
+  }
 }
 
 /** Show current configuration / 顯示當前配置 */

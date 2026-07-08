@@ -48,13 +48,13 @@ const COMMUNITY_FEATURES: ReadonlyArray<string> = [
   'auto_respond',
   'threat_cloud_upload',
   'dashboard',
+  'sarif_export',
+  'evidence_pack',
 ];
 
 const PILOT_FEATURES: ReadonlyArray<string> = [
   ...COMMUNITY_FEATURES,
   'threat_cloud_live',
-  'sarif_export',
-  'evidence_pack',
   'ai_analysis',
   'auto_fix',
   'notifications',

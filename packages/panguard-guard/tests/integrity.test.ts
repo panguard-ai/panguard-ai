@@ -12,6 +12,10 @@ import {
   verifyConfigIntegrity,
   checkSelfState,
   manifestPath,
+  collectSelfState,
+  mergeSelfState,
+  forgetSelfState,
+  readSelfStateRefs,
   type SelfStateRef,
 } from '../src/integrity.js';
 
@@ -45,6 +49,50 @@ describe('config integrity — seal/verify', () => {
 
   it('no manifest → unsealed', () => {
     expect(verifyConfigIntegrity(baseConfig(), dir).status).toBe('unsealed');
+  });
+
+  it('REGRESSION: a config that leaves watched security fields UNSET seals cleanly (not manifest-tampered)', () => {
+    // The real default config never sets enforcementPolicy / trustedSkills, so
+    // securitySnapshot records them as `undefined`. canonical() hashed them as
+    // present keys while JSON.stringify DROPPED them when writing the manifest —
+    // so verify recomputed a different outer MAC and every pristine install
+    // reported manifest-tampered. The prior fixture masked this by defining all
+    // seven fields. Seal a realistic sparse config and demand 'sealed'.
+    const sparse: Record<string, unknown> = {
+      dataDir: '/tmp/x',
+      mode: 'protection',
+      threatCloudEndpoint: 'https://tc.panguard.ai',
+      threatCloudRuleSyncEnabled: false,
+      dashboardEnabled: true,
+      telemetryEnabled: false,
+      // enforcementPolicy and trustedSkills intentionally absent (undefined)
+    };
+    sealConfigManifest(sparse, [], dir);
+    const v = verifyConfigIntegrity(sparse, dir);
+    expect(v.status).toBe('sealed');
+    expect(v.findings).toHaveLength(0);
+    // And the persisted manifest's securityFields must round-trip identically
+    // (no undefined key resurrected on read that would desync the MAC).
+    const persisted = JSON.parse(readFileSync(manifestPath(dir), 'utf-8')) as {
+      config?: { securityFields?: Record<string, unknown> };
+    };
+    expect(persisted.config?.securityFields).not.toHaveProperty('enforcementPolicy');
+    expect(persisted.config?.securityFields).not.toHaveProperty('trustedSkills');
+  });
+
+  it('REGRESSION: setting a previously-unset watched field IS detected as tampered', () => {
+    // The undefined-key fix must not blind us: sealing without enforcementPolicy
+    // then introducing one is a real security-relevant change → tampered.
+    const sparse: Record<string, unknown> = {
+      mode: 'protection',
+      threatCloudEndpoint: 'https://tc.panguard.ai',
+      threatCloudRuleSyncEnabled: false,
+      dashboardEnabled: true,
+      telemetryEnabled: false,
+    };
+    sealConfigManifest(sparse, [], dir);
+    const changed = { ...sparse, trustedSkills: ['evil-skill'] };
+    expect(verifyConfigIntegrity(changed, dir).status).toBe('tampered');
   });
 
   it('ADVERSARIAL: mode downgraded after seal → tampered + the exact delta', () => {
@@ -141,6 +189,124 @@ describe('self-removal detection', () => {
 
   it('unsealed (no manifest) → self-state check is ok (nothing recorded yet)', () => {
     expect(existsSync(manifestPath(dir))).toBe(false);
+    expect(checkSelfState(dir)).toEqual({ ok: true, findings: [] });
+  });
+});
+
+describe('self-state discovery + merge (finding #20 — dead self-removal wiring)', () => {
+  it('mergeSelfState never DROPS a recorded ref — a removed artifact stays detectable', () => {
+    // This is the safety property: re-sealing with a bare collectSelfState() (which
+    // omits anything currently absent) would erase the very removal we detect.
+    const plistRef: SelfStateRef = { kind: 'launchagent', path: '/x/plist', marker: 'L' };
+    expect(mergeSelfState([plistRef], [])).toEqual([plistRef]);
+  });
+
+  it('mergeSelfState adds a newly-present artifact', () => {
+    const a: SelfStateRef = { kind: 'launchagent', path: '/x/a' };
+    const b: SelfStateRef = { kind: 'hook', path: '/x/b' };
+    const merged = mergeSelfState([a], [b]);
+    expect(merged.map((r) => r.path).sort()).toEqual(['/x/a', '/x/b']);
+  });
+
+  it('mergeSelfState: recorded wins on a path conflict (keeps the original marker)', () => {
+    const rec: SelfStateRef = { kind: 'launchagent', path: '/x/p', marker: 'ORIG' };
+    const disc: SelfStateRef = { kind: 'launchagent', path: '/x/p', marker: 'NEW' };
+    expect(mergeSelfState([rec], [disc])).toEqual([rec]);
+  });
+
+  it('END-TO-END: a re-seal with merge keeps a removed LaunchAgent flagged as missing', () => {
+    const plist = join(dir, 'com.panguard.panguard-guard.plist');
+    writeFileSync(plist, '<plist/>');
+    sealConfigManifest(baseConfig(), [{ kind: 'launchagent', path: plist, marker: 'x' }], dir);
+    rmSync(plist); // attacker removes the persistence service
+    // Config-save re-seal path: merge recorded refs with freshly discovered ones
+    // (which no longer include the deleted plist). The removal must survive.
+    const merged = mergeSelfState(readSelfStateRefs(dir), collectSelfState());
+    sealConfigManifest(baseConfig(), merged, dir);
+    const v = checkSelfState(dir);
+    expect(v.ok).toBe(false);
+    expect(v.findings[0]).toMatchObject({ kind: 'launchagent', reason: 'missing' });
+  });
+
+  it('collectSelfState records only currently-present artifacts (no false "missing")', () => {
+    for (const ref of collectSelfState()) {
+      expect(existsSync(ref.path)).toBe(true);
+    }
+  });
+});
+
+describe('forgetSelfState — legitimate self-removal rebuilds trust (inverse of merge)', () => {
+  it('drops ONLY the named kind, keeps the rest', () => {
+    const refs: SelfStateRef[] = [
+      { kind: 'launchagent', path: '/p', marker: 'm' },
+      { kind: 'hook', path: '/h', marker: 'm2' },
+    ];
+    expect(forgetSelfState(refs, ['launchagent'])).toEqual([
+      { kind: 'hook', path: '/h', marker: 'm2' },
+    ]);
+  });
+
+  it('empty recorded list → empty (nothing to forget)', () => {
+    expect(forgetSelfState([], ['launchagent'])).toEqual([]);
+  });
+
+  it('kind not present → returns every ref unchanged', () => {
+    const refs: SelfStateRef[] = [
+      { kind: 'hook', path: '/h', marker: 'm2' },
+      { kind: 'proxy', path: '/x' },
+    ];
+    expect(forgetSelfState(refs, ['launchagent'])).toEqual(refs);
+  });
+
+  it('drops EVERY ref of a kind (not just the first) when duplicated', () => {
+    const refs: SelfStateRef[] = [
+      { kind: 'launchagent', path: '/p1' },
+      { kind: 'launchagent', path: '/p2' },
+      { kind: 'hook', path: '/h' },
+    ];
+    expect(forgetSelfState(refs, ['launchagent'])).toEqual([{ kind: 'hook', path: '/h' }]);
+  });
+
+  it('accepts multiple kinds at once', () => {
+    const refs: SelfStateRef[] = [
+      { kind: 'launchagent', path: '/p' },
+      { kind: 'hook', path: '/h' },
+      { kind: 'proxy', path: '/x' },
+    ];
+    expect(forgetSelfState(refs, ['launchagent', 'proxy'])).toEqual([{ kind: 'hook', path: '/h' }]);
+  });
+
+  it('does not mutate the input array (immutable — returns a new list)', () => {
+    const refs: SelfStateRef[] = [
+      { kind: 'launchagent', path: '/p' },
+      { kind: 'hook', path: '/h' },
+    ];
+    const out = forgetSelfState(refs, ['launchagent']);
+    expect(refs).toHaveLength(2); // original untouched
+    expect(out).not.toBe(refs);
+  });
+
+  it('END-TO-END: a legitimate uninstall re-seal clears the forever-TAMPERED trap', () => {
+    // Record a LaunchAgent, then delete the file WITHOUT forgetting it: the guard
+    // now flags a permanent "missing" (the trap forgetSelfState exists to break).
+    const plist = join(dir, 'com.panguard.panguard-guard.plist');
+    writeFileSync(plist, '<plist/>');
+    sealConfigManifest(baseConfig(), [{ kind: 'launchagent', path: plist, marker: 'x' }], dir);
+    rmSync(plist); // uninstall removes the persistence service file
+
+    // Baseline: without forgetting, checkSelfState reports the removed artifact missing.
+    const before = checkSelfState(dir);
+    expect(before.ok).toBe(false);
+    expect(before.findings[0]).toMatchObject({ kind: 'launchagent', reason: 'missing' });
+
+    // Legitimate-uninstall re-seal path: forget the kind we deliberately removed,
+    // then re-seal. Trust must be rebuilt — no lingering "missing".
+    const pruned = forgetSelfState(readSelfStateRefs(dir), ['launchagent']);
+    sealConfigManifest(baseConfig(), pruned, dir);
+
+    // The manifest no longer records the launchagent ref...
+    expect(readSelfStateRefs(dir).some((r) => r.kind === 'launchagent')).toBe(false);
+    // ...and checkSelfState no longer flags the removed artifact.
     expect(checkSelfState(dir)).toEqual({ ok: true, findings: [] });
   });
 });

@@ -78,6 +78,8 @@ PACKAGES=(
   "packages/panguard-mcp/package.json"
   "packages/panguard-guard/package.json"
   "packages/panguard/package.json"
+  "packages/panguard-cli/package.json"
+  "packages/website/package.json"
 )
 
 for pkg in "${PACKAGES[@]}"; do

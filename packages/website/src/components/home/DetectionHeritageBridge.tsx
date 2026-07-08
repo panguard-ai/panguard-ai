@@ -187,8 +187,8 @@ export default function DetectionHeritageBridge() {
             <>
               <p>
                 Banks, hospitals, government agencies, and semiconductor SOCs have accumulated two
-                decades of detection IP — SIEM queries, malware signatures, IDS rules, CVE
-                mappings, static analysis.
+                decades of detection IP — SIEM queries, malware signatures, IDS rules, CVE mappings,
+                static analysis.
               </p>
               <p>
                 In the AI agent era, those rules themselves no longer catch prompt injection, but
@@ -196,8 +196,8 @@ export default function DetectionHeritageBridge() {
                 moved into tool calls. Command injection did not vanish; it changed substrate.
               </p>
               <p>
-                Migrator automatically translates 15 source formats into ATR behavioral rules. Not
-                a single line of accumulated detection knowledge is wasted.
+                Migrator automatically translates 15 source formats into ATR behavioral rules. Not a
+                single line of accumulated detection knowledge is wasted.
               </p>
             </>
           )}
@@ -246,8 +246,8 @@ export default function DetectionHeritageBridge() {
               {isZh ? '輸入：15 種舊時代格式' : 'Input: 15 legacy formats'}
             </p>
             <p className="font-mono text-xs leading-relaxed text-text-secondary">
-              Sigma · Splunk SPL · Elastic EQL · YARA · Snort · Falco · Semgrep · CodeQL · CVE-NVD
-              · GHSA · OSV · CISA KEV · garak · PyRIT · promptfoo
+              Sigma · Splunk SPL · Elastic EQL · YARA · Snort · Falco · Semgrep · CodeQL · CVE-NVD ·
+              GHSA · OSV · CISA KEV · garak · PyRIT · promptfoo
             </p>
           </div>
           <ArrowRight className="mx-auto h-8 w-8 rotate-90 text-brand-sage lg:rotate-0" />

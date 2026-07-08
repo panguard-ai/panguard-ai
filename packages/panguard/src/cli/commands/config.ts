@@ -61,7 +61,20 @@ export function configCommand(): Command {
         console.log(`  ${c.safe('lang')} set to ${c.bold(value)}`);
         return;
       }
-      const boolValue = value === 'true' || value === '1' || value === 'yes';
+      // Validate the boolean value instead of silently treating anything that
+      // is not exactly true/1/yes as FALSE — a mistyped 'on'/'True'/'enable'
+      // would otherwise silently DISABLE telemetry/threat-cloud, the opposite of
+      // what the user asked. Reject unrecognized values loudly.
+      const v = value.toLowerCase();
+      const truthy = ['true', '1', 'yes', 'on', 'enable', 'enabled'];
+      const falsy = ['false', '0', 'no', 'off', 'disable', 'disabled'];
+      if (!truthy.includes(v) && !falsy.includes(v)) {
+        console.log(
+          `  ${c.caution(`Invalid value "${value}" for ${key}. Use: true / false (also on/off, yes/no).`)}`
+        );
+        process.exit(1);
+      }
+      const boolValue = truthy.includes(v);
       if (key === 'telemetry') {
         updateGuardConfig({ ...config, telemetryEnabled: boolValue });
         console.log(`  ${c.safe('telemetryEnabled')} set to ${c.bold(String(boolValue))}`);

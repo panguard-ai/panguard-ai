@@ -105,9 +105,7 @@ export default function RegulatedIndustriesPositioning() {
                   ? '攻擊當下擋下、隔離、封鎖。L3 輸入/輸出守門 · L4 行為偵測 · L6 阻擋 + 隔離,通通已上線。'
                   : 'Detect, contain, block at the moment of attack. L3 input/output guardrails · L4 behavioral detection · L6 block + quarantine — all shipped.'}
               </p>
-              <CardKicker>
-                {isZh ? '資安部門的採購窗口' : 'CISO / SOC procurement gate'}
-              </CardKicker>
+              <CardKicker>{isZh ? '資安部門的採購窗口' : 'CISO / SOC procurement gate'}</CardKicker>
             </CardV2>
           </FadeInUp>
           <FadeInUp delay={0.1}>

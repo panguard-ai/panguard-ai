@@ -152,9 +152,9 @@ export default function TechnologyContent() {
   return (
     <>
       <p id="definition" className="sr-only">
-        Panguard&apos;s detection engine uses ATR (Agent Threat Rules) -- an open, executable standard
-        for AI agent threat detection -- across multiple detection stages with graceful degradation
-        from cloud to fully offline operation.
+        Panguard&apos;s detection engine uses ATR (Agent Threat Rules) -- an open, executable
+        standard for AI agent threat detection -- across multiple detection stages with graceful
+        degradation from cloud to fully offline operation.
       </p>
 
       {/* -- Hero -- */}

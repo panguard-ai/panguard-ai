@@ -13,6 +13,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { request as httpsRequest } from 'node:https';
+import { sealForIngest, sealingAvailable } from './seal.js';
 import { request as httpRequest } from 'node:http';
 import { createLogger } from '@panguard-ai/core';
 import type { AnonymizedThreatData, ThreatCloudUpdate, ThreatCloudStatus } from '../types.js';
@@ -144,6 +145,27 @@ export class ThreatCloudClient {
   }
 
   /**
+   * POST threat telemetry to `/api/threats`, END-TO-END SEALED when an ingest key is
+   * bundled (seal.ts INGEST_KEYS). When sealing is active the payload is JWE-wrapped
+   * to the ingest public key so only the KMS private-key holder can read it — not the
+   * relay, a TLS middlebox, or a self-hosted relay operator. If sealing is active but
+   * produces no envelope (key expired mid-flight) we THROW rather than fall back to
+   * plaintext, so a key misconfiguration can never leak cleartext. With no key bundled
+   * (current default), sends the anonymized payload over HTTPS as before.
+   */
+  private async postThreats(payload: Record<string, unknown>): Promise<void> {
+    if (sealingAvailable()) {
+      const sealed = await sealForIngest(payload);
+      if (!sealed) {
+        throw new Error('E2E sealing unavailable — refusing to send plaintext threat telemetry');
+      }
+      await this.httpPost(`${this.endpoint}/api/threats`, { sealed });
+      return;
+    }
+    await this.httpPost(`${this.endpoint}/api/threats`, payload);
+  }
+
+  /**
    * Flush the upload buffer (batch POST to cloud).
    * 清空上傳緩衝區（批次 POST 至雲端）。
    */
@@ -155,7 +177,7 @@ export class ThreatCloudClient {
     this.uploadBuffer = [];
 
     try {
-      await this.httpPost(`${this.endpoint}/api/threats`, { events: batch });
+      await this.postThreats({ events: batch });
       this.cache.stats.totalUploaded += batch.length;
       this.saveCache();
       this.status = 'connected';
@@ -252,7 +274,7 @@ export class ThreatCloudClient {
 
     for (const data of this.uploadQueue) {
       try {
-        await this.httpPost(`${this.endpoint}/api/threats`, data);
+        await this.postThreats(data as unknown as Record<string, unknown>);
         uploaded++;
         this.cache.stats.totalUploaded++;
       } catch {

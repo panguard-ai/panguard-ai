@@ -2,6 +2,67 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.0] - 2026-07-03
+
+GA security-hardening release. A 31-finding adversarial audit of the free
+Community product drove this batch; the fixes below are the confirmed and
+verified ones, each shipped with a regression test. The theme is closing the
+worst failure mode a security tool can have — protection that _looks_ installed
+but silently does nothing. Full suite green (PanGuard 3621 tests, bundled ATR
+engine 565 tests). Requires re-syncing the bundled `@panguard-ai/atr` engine
+from agent-threat-rules (ReDoS + indirect-injection + hook-contract fixes).
+
+### Fixed — silent non-enforcement (the "fake protection" class)
+
+- **The `atr guard` hook silently never blocked in Claude Code.** It emitted a
+  generic `{ decision: "deny" }`, but Claude Code only honors a block when it
+  reads `hookSpecificOutput.permissionDecision`. Unknown field → ignored → the
+  tool ran anyway. The guard now emits the exact host contract per hook type
+  (PreToolUse → `permissionDecision`; PostToolUse → `decision: "block"`).
+- **Self-removal detection was dead.** The integrity manifest re-check iterated
+  an always-empty artifact list (every seal recorded `[]`), so removing the
+  guard's own reboot-persistence LaunchAgent — protection never starts again
+  after login — went unnoticed. Real install artifacts are now recorded at seal
+  time and a merge that never drops a recorded ref keeps a later removal
+  detectable.
+- **Indirect prompt injection via tool output went undetected.** `tool_response`
+  events mapped to `mcp_exchange`, which filtered out the entire prompt-injection
+  rule family — so a poisoned tool / MCP / RAG response (the primary
+  indirect-injection channel) was never scanned. Those rules now run on tool
+  responses, with the tool output routed into the fields they inspect.
+- **The Guard dashboard could report a green posture with zero rules loaded.**
+  A 0-rule engine now surfaces a `degraded` posture instead of a false "protected".
+
+### Fixed — evasion & robustness
+
+- **ReDoS-unsafe rule patterns are rejected at compile time.** A synchronous
+  regex cannot be interrupted, so an evaluation timeout can never abort a
+  catastrophic-backtracking rule; disk/bundled rules previously had no
+  backtracking check at all. A precise single-atom-nesting gate now refuses to
+  compile the exponential shape (verified: zero false rejections across the
+  full 655-rule / 2965-pattern corpus, which an empirical fuzz confirms is clean).
+- **Attacker prose could no longer hide a real payload.** scan-core now applies
+  an anti-evasion severity floor, detects markdown-obfuscated matches, and
+  defeats whitespace/URL/percent-encoded payload chunking.
+- **PreToolUse hook content extraction across platforms.** Write/Edit/Notebook/
+  Codex/Windsurf tool inputs are now fully read (previously some content fields
+  were dropped, so a threat in them was invisible); oversized/unparseable stdin
+  fails closed under a blocking posture.
+- **MCP proxy correctness.** Tool-call rules now route on `tool_call` events (a
+  whole rule family was skipped under the old default); PostToolUse serializes
+  every content block (not just `.text`, 256 KB cap); deny-confidence is
+  normalized before escalation.
+
+### Changed
+
+- **Default hook posture is `guarded`** — block only hard-deny verdicts
+  (critical, or high-confidence with a stable rule), advisory on lower-confidence
+  `ask` matches. `--enforce` blocks every deny/ask; `--advisory` never blocks.
+- **Trust-store hardening.** The whitelist directory/file are created `0700`/`0600`.
+- **`pga config set` rejects an unrecognized boolean value loudly** instead of
+  silently treating anything that is not `true`/`1`/`yes` as false (which could
+  quietly disable telemetry/threat-cloud).
+
 ## [1.7.0] - 2026-06-20
 
 GA hardening of the free Community product — the full path from website to

@@ -310,7 +310,9 @@ function AdopterCard({ a, isZh }: { a: Adopter; isZh: boolean }) {
         </div>
         <CategoryPill category={a.category} isZh={isZh} />
       </div>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">{isZh ? a.noteZh : a.noteEn}</p>
+      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+        {isZh ? a.noteZh : a.noteEn}
+      </p>
       <div className="space-y-2">
         {a.prs.map((pr) => {
           const repo = pr.repo ?? inferRepoFromOrg(a.org);
