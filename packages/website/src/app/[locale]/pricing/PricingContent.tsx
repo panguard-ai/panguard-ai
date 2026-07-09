@@ -204,75 +204,8 @@ export default function PricingContent() {
             </div>
           </FadeInUp>
 
-          {/* Migrator Pro — deck v11 flagship / cash engine */}
-          <FadeInUp delay={0.08}>
-            <div className="bg-gradient-to-b from-surface-2 to-surface-1 rounded-xl border border-brand-sage/40 p-7 flex flex-col h-full ring-1 ring-brand-sage/10">
-              <div className="flex items-center justify-between gap-2">
-                <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider">
-                  Migrator Pro
-                </h3>
-                <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-brand-sage bg-brand-sage/10 border border-brand-sage/30 rounded-full px-2.5 py-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-brand-sage" />
-                  {isZh ? '旗艦' : 'Flagship'}
-                </span>
-              </div>
-
-              <div className="mt-5 flex items-baseline gap-1.5">
-                <span className="text-3xl font-extrabold text-text-primary">$500K–2M</span>
-                <span className="text-xs text-text-muted">{isZh ? '/ 年' : '/ yr'}</span>
-              </div>
-              <p className="text-[11px] text-text-muted mt-1">
-                {isZh ? '合規證據引擎 · 現金引擎' : 'Compliance evidence engine · cash engine'}
-              </p>
-
-              <p className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage mt-4 mb-1">
-                {isZh ? '給誰' : "Who it's for"}
-              </p>
-              <p className="text-sm text-text-secondary leading-[1.85]">
-                {isZh
-                  ? 'AI 廠商卡在銀行的 AI 安全審查、以及需要「活的」稽核證據的受監管企業。買的是一份持續重掃、持續更新的簽章證據,不是一次性 PDF。'
-                  : "AI vendors stuck in a bank's AI-security review, and regulated enterprises that need living audit evidence — a continuously re-scanned, signed artefact, not a one-off PDF."}
-              </p>
-
-              <div className="my-7 flex-1">
-                <ul className="space-y-2.5">
-                  {(isZh
-                    ? [
-                        '簽章、持續重掃的合規證據(SHA-256 + Merkle tree)',
-                        '每筆偵測 → ATR 規則 → 五框架條文(EU AI Act / NIST AI RMF / ISO 42001 / OWASP Agentic / OWASP LLM)',
-                        '把 15 種舊格式(Sigma、YARA、Splunk、CVE…)自動轉成 ATR 行為規則',
-                        '季度證據包,可直接送稽核(PDF + JSON)',
-                        'EU AI Act、NYDFS Part 500、DORA 即將要求的那份文件',
-                        `偵測 0% 依賴 LLM——${STATS.totalRulesDisplay} 條 deterministic rules @ ${STATS.benchmark.garak.recall}% recall`,
-                      ]
-                    : [
-                        'Signed, continuously re-scanned compliance evidence (SHA-256 + Merkle tree)',
-                        'Each detection → ATR rule → 5-framework articles (EU AI Act / NIST AI RMF / ISO 42001 / OWASP Agentic / OWASP LLM)',
-                        'Migrates 15 legacy formats (Sigma, YARA, Splunk, CVE…) into ATR behavioral rules',
-                        'Quarterly evidence packs, auditor-ready (PDF + JSON)',
-                        'The artefact EU AI Act, NYDFS Part 500 & DORA are about to require',
-                        `Detection runs 0% on LLM — ${STATS.totalRulesDisplay} deterministic rules @ ${STATS.benchmark.garak.recall}% recall`,
-                      ]
-                  ).map((f) => (
-                    <li key={f} className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" />
-                      <span className="text-[13px] text-text-secondary leading-snug">{f}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <Link
-                href="/contact?tier=migrator"
-                className="inline-flex items-center justify-center gap-2 w-full bg-brand-sage text-surface-0 font-semibold rounded-lg py-3 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98] text-sm"
-              >
-                {isZh ? '洽詢業務' : 'Contact sales'} <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </FadeInUp>
-
           {/* Enterprise */}
-          <FadeInUp delay={0.16}>
+          <FadeInUp delay={0.08}>
             <div className="bg-gradient-to-b from-surface-2 to-surface-1 rounded-xl border border-brand-sage/40 p-7 flex flex-col h-full ring-1 ring-brand-sage/10">
               <div className="flex items-center justify-between gap-2">
                 <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider">
@@ -348,6 +281,73 @@ export default function PricingContent() {
 
               <Link
                 href="/contact?tier=enterprise"
+                className="inline-flex items-center justify-center gap-2 w-full bg-brand-sage text-surface-0 font-semibold rounded-lg py-3 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98] text-sm"
+              >
+                {isZh ? '洽詢業務' : 'Contact sales'} <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </FadeInUp>
+
+          {/* Migrator Pro — deck v11 flagship / cash engine */}
+          <FadeInUp delay={0.16}>
+            <div className="bg-gradient-to-b from-surface-2 to-surface-1 rounded-xl border border-brand-sage/40 p-7 flex flex-col h-full ring-1 ring-brand-sage/10">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider">
+                  Migrator Pro
+                </h3>
+                <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-brand-sage bg-brand-sage/10 border border-brand-sage/30 rounded-full px-2.5 py-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand-sage" />
+                  {isZh ? '旗艦' : 'Flagship'}
+                </span>
+              </div>
+
+              <div className="mt-5 flex items-baseline gap-1.5">
+                <span className="text-3xl font-extrabold text-text-primary">$500K–2M</span>
+                <span className="text-xs text-text-muted">{isZh ? '/ 年' : '/ yr'}</span>
+              </div>
+              <p className="text-[11px] text-text-muted mt-1">
+                {isZh ? '合規證據引擎 · 現金引擎' : 'Compliance evidence engine · cash engine'}
+              </p>
+
+              <p className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage mt-4 mb-1">
+                {isZh ? '給誰' : "Who it's for"}
+              </p>
+              <p className="text-sm text-text-secondary leading-[1.85]">
+                {isZh
+                  ? 'AI 廠商卡在銀行的 AI 安全審查、以及需要「活的」稽核證據的受監管企業。買的是一份持續重掃、持續更新的簽章證據,不是一次性 PDF。'
+                  : "AI vendors stuck in a bank's AI-security review, and regulated enterprises that need living audit evidence — a continuously re-scanned, signed artefact, not a one-off PDF."}
+              </p>
+
+              <div className="my-7 flex-1">
+                <ul className="space-y-2.5">
+                  {(isZh
+                    ? [
+                        '簽章、持續重掃的合規證據(SHA-256 + Merkle tree)',
+                        '每筆偵測 → ATR 規則 → 五框架條文(EU AI Act / NIST AI RMF / ISO 42001 / OWASP Agentic / OWASP LLM)',
+                        '把 15 種舊格式(Sigma、YARA、Splunk、CVE…)自動轉成 ATR 行為規則',
+                        '季度證據包,可直接送稽核(PDF + JSON)',
+                        'EU AI Act、NYDFS Part 500、DORA 即將要求的那份文件',
+                        `偵測 0% 依賴 LLM——${STATS.totalRulesDisplay} 條 deterministic rules @ ${STATS.benchmark.garak.recall}% recall`,
+                      ]
+                    : [
+                        'Signed, continuously re-scanned compliance evidence (SHA-256 + Merkle tree)',
+                        'Each detection → ATR rule → 5-framework articles (EU AI Act / NIST AI RMF / ISO 42001 / OWASP Agentic / OWASP LLM)',
+                        'Migrates 15 legacy formats (Sigma, YARA, Splunk, CVE…) into ATR behavioral rules',
+                        'Quarterly evidence packs, auditor-ready (PDF + JSON)',
+                        'The artefact EU AI Act, NYDFS Part 500 & DORA are about to require',
+                        `Detection runs 0% on LLM — ${STATS.totalRulesDisplay} deterministic rules @ ${STATS.benchmark.garak.recall}% recall`,
+                      ]
+                  ).map((f) => (
+                    <li key={f} className="flex items-start gap-2.5">
+                      <Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" />
+                      <span className="text-[13px] text-text-secondary leading-snug">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <Link
+                href="/contact?tier=migrator"
                 className="inline-flex items-center justify-center gap-2 w-full bg-brand-sage text-surface-0 font-semibold rounded-lg py-3 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98] text-sm"
               >
                 {isZh ? '洽詢業務' : 'Contact sales'} <ArrowRight className="w-4 h-4" />
