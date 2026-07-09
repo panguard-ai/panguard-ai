@@ -114,9 +114,52 @@ export async function runCLI(args: string[]): Promise<void> {
       break;
     }
     case 'install-script': {
-      const licenseKey = extractOption(args, '--license-key');
+      // The license key is a secret. Prefer PANGUARD_LICENSE_KEY (env) over the
+      // legacy --license-key flag, which is visible in `ps`/`ps aux` argv and
+      // captured in shell history. This restores the project's own secret-input
+      // hierarchy (env > stdin > file > argv, never) for the installer itself.
+      const envKey = process.env['PANGUARD_LICENSE_KEY'];
+      const argvKey = extractOption(args, '--license-key');
+      if (argvKey && !envKey) {
+        process.stderr.write(
+          `  ${symbols.warn} --license-key on the command line is visible via \`ps\` and lands in ` +
+            `shell history. Prefer: PANGUARD_LICENSE_KEY=... pga install-script\n`
+        );
+      }
+      const licenseKey = envKey ?? argvKey;
+      // Constrain the key charset so it can never inject into the generated
+      // bash/PowerShell config it is interpolated into.
+      if (licenseKey && !/^[A-Za-z0-9._-]+$/.test(licenseKey)) {
+        process.stderr.write(
+          `  ${symbols.fail} License key contains unexpected characters; refusing to embed it.\n`
+        );
+        break;
+      }
       const script = generateInstallScript({ dataDir, licenseKey });
-      console.log(script);
+      if (licenseKey) {
+        // Never echo a script that embeds a secret to stdout (terminal scrollback,
+        // pipes, CI logs). Write it 0600 and print the path instead.
+        const { writeFileSync, chmodSync, mkdirSync, existsSync } = await import('node:fs');
+        const { join } = await import('node:path');
+        const { homedir, platform } = await import('node:os');
+        const dir = join(homedir(), '.panguard');
+        if (!existsSync(dir)) mkdirSync(dir, { recursive: true, mode: 0o700 });
+        const outPath = join(dir, `install-panguard.${platform() === 'win32' ? 'ps1' : 'sh'}`);
+        writeFileSync(outPath, script, { encoding: 'utf-8', mode: 0o600 });
+        try {
+          chmodSync(outPath, 0o600);
+        } catch {
+          /* best effort — platforms without POSIX perms */
+        }
+        console.log(
+          `  ${symbols.pass} Install script written to ${c.sage(outPath)} ${c.dim('(0600 — contains your license key)')}`
+        );
+        console.log(
+          `  ${c.dim('Run it on the target machine, then delete it. Do not commit, pipe, or share it.')}`
+        );
+      } else {
+        console.log(script);
+      }
       break;
     }
     case 'scan':

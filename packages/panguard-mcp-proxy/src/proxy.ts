@@ -98,6 +98,8 @@ export class MCPProxy {
   private readonly agentId: string;
   /** Upstream tool names = the Layer 0 capability scope (populated in start()). */
   private upstreamToolNames = new Set<string>();
+  /** True when listTools() failed → Layer-0 scope is unknown (fail-open, observable). */
+  private capabilityScopeDegraded = false;
   /** Tamper-evident chain over proxy-verdicts.jsonl (lazily keyed in connect()). */
   private chain: AuditChain | null = null;
 
@@ -175,7 +177,18 @@ export class MCPProxy {
       const upstream = await this.client.listTools();
       this.upstreamToolNames = new Set(upstream.tools.map((t) => t.name));
     } catch {
-      /* leave empty; per-call fallback allows the requested tool */
+      // listTools failed → the Layer-0 capability scope is UNKNOWN. Do NOT let
+      // that pass silently (it was indistinguishable from a real allow in logs).
+      // We loudly flag the degradation here; every call still runs through the
+      // Layer-1 inline gate AND the async ATR evaluator (fail-closed), so the
+      // real block does not depend on this scope check. Full deny-by-default at
+      // Layer 0 would break availability (a capability miss can DENY, so an empty
+      // scope would block every call on a transient list failure) — hence
+      // observability + defence-in-depth rather than block-all.
+      this.capabilityScopeDegraded = true;
+      process.stderr.write(
+        '[panguard-proxy] WARNING: upstream listTools() failed — Layer-0 capability-scope enforcement is DEGRADED. ATR rules + inline gate still enforce every call.\n'
+      );
     }
 
     this.server = new Server(
@@ -211,12 +224,22 @@ export class MCPProxy {
    * only adds block-on-sight + risk gating. Exposed so the wiring is testable.
    */
   gateCheck(name: string, toolArgs: Record<string, unknown>): McpGateVerdict {
+    const scopeKnown = this.upstreamToolNames.size > 0;
+    if (!scopeKnown && this.capabilityScopeDegraded) {
+      // Layer-0 scope is unknown (listTools failed) — surface it on every gated
+      // call so the degraded state is auditable, not a silent auto-allow. The
+      // requested tool's own name is passed so availability is preserved; the
+      // async ATR evaluator (fail-closed) + block-on-sight remain the real gate.
+      process.stderr.write(
+        `[panguard-proxy] scope-degraded: '${name}' passes Layer-0 by fallback (upstream tool list unavailable); ATR rules still evaluate it.\n`
+      );
+    }
     return applyMcpGate(this.guard, {
       name,
       args: toolArgs,
       sessionId: this.sessionId,
       agentId: this.agentId,
-      capabilities: this.upstreamToolNames.size > 0 ? this.upstreamToolNames : new Set([name]),
+      capabilities: scopeKnown ? this.upstreamToolNames : new Set([name]),
     });
   }
 

@@ -29,6 +29,14 @@ vi.mock('../src/threat-cloud/client-id.js', () => ({
   getAnonymousClientId: () => 'test-client-uuid-1234',
 }));
 
+// Mock the key provisioner so we can assert whether the pre-consent phone-home
+// (registration POST) fires. create() dynamically imports this module.
+const mockProvision = vi.fn(async () => 'provisioned-key-abc');
+vi.mock('../src/threat-cloud/tc-key-provisioner.js', () => ({
+  loadOrProvisionTCKey: (...args: unknown[]) => mockProvision(...args),
+  getTCKeyPath: () => '/tmp/test-tc-key',
+}));
+
 // We need to mock the https.request for HTTP calls
 const mockRequestWrite = vi.fn();
 const mockRequestEnd = vi.fn();
@@ -90,6 +98,48 @@ describe('ThreatCloudClient', () => {
     } catch {
       // ignore
     }
+  });
+
+  describe('create() — consent-gated auto-provisioning (privacy invariant)', () => {
+    let savedTcApiKey: string | undefined;
+
+    beforeEach(() => {
+      // The provisioning branch short-circuits on TC_API_KEY; isolate the env so
+      // these assertions measure the allowProvision gate, not an ambient key.
+      savedTcApiKey = process.env['TC_API_KEY'];
+      delete process.env['TC_API_KEY'];
+    });
+
+    afterEach(() => {
+      if (savedTcApiKey === undefined) delete process.env['TC_API_KEY'];
+      else process.env['TC_API_KEY'] = savedTcApiKey;
+    });
+
+    it('does NOT provision a key (no phone-home) when allowProvision is false and no key exists', async () => {
+      await ThreatCloudClient.create('https://cloud.example.com', tempDir, undefined, {
+        allowProvision: false,
+      });
+      expect(mockProvision).not.toHaveBeenCalled();
+    });
+
+    it('provisions a key when the user opted in (allowProvision true) and no key exists', async () => {
+      await ThreatCloudClient.create('https://cloud.example.com', tempDir, undefined, {
+        allowProvision: true,
+      });
+      expect(mockProvision).toHaveBeenCalledTimes(1);
+    });
+
+    it('defaults to provisioning when opts is omitted (preserves existing callers)', async () => {
+      await ThreatCloudClient.create('https://cloud.example.com', tempDir, undefined);
+      expect(mockProvision).toHaveBeenCalledTimes(1);
+    });
+
+    it('never provisions when an explicit key is supplied, regardless of allowProvision', async () => {
+      await ThreatCloudClient.create('https://cloud.example.com', tempDir, 'explicit-key', {
+        allowProvision: true,
+      });
+      expect(mockProvision).not.toHaveBeenCalled();
+    });
   });
 
   describe('constructor', () => {

@@ -116,7 +116,7 @@ if [ ! -f "$CONFIG_FILE" ]; then
     "processPollInterval": 10000
   },
   "watchdogEnabled": true,
-  "watchdogInterval": 30000${options.licenseKey ? `,\n  "licenseKey": "${options.licenseKey}"` : ''}
+  "watchdogInterval": 30000${options.licenseKey ? `,\n  "licenseKey": ${JSON.stringify(options.licenseKey)}` : ''}
 }
 CONFIGEOF
   echo "Default config created: $CONFIG_FILE"

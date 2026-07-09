@@ -219,13 +219,17 @@ export async function initEngines(
   );
   const investigationEngine = new InvestigationEngine(baseline);
 
-  // Auto-provision TC client key so a fresh `pga up` becomes a Threat Cloud sensor
-  // without requiring the user to pre-configure an API key. If the endpoint is
-  // unreachable or opt-out env vars are set, create() falls back to offline mode.
+  // Auto-provision a TC client key ONLY when the user has opted into collective
+  // defense (=== true, default OFF). Provisioning is an OUTBOUND registration POST
+  // (a phone-home), so without consent create() builds an offline client — no key
+  // minted, no TC call — and bundled ATR rules still protect the host. An
+  // explicitly-configured key is honored regardless. If the endpoint is
+  // unreachable, create() also falls back to offline mode.
   const threatCloud = await ThreatCloudClient.create(
     config.threatCloudEndpoint,
     config.dataDir,
-    config.threatCloudApiKey
+    config.threatCloudApiKey,
+    { allowProvision: config.threatCloudUploadEnabled === true }
   );
 
   const feedManager = new ThreatIntelFeedManager({
