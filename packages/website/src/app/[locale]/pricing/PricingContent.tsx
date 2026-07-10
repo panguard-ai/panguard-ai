@@ -1,6 +1,5 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
 import { useLocale } from 'next-intl';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
@@ -10,164 +9,18 @@ import { ArrowRight, Check } from 'lucide-react';
 import { STATS } from '@/lib/stats';
 
 /**
- * Resolve the app origin once, in a way that survives a static export and a
- * Vercel preview deployment. Prefers `NEXT_PUBLIC_APP_URL` (set by the env)
- * and falls back to `https://app.panguard.ai` (production) so the link
- * still works for a user who somehow lands on the marketing site with no
- * env injected (e.g. a stale CDN cache).
- */
-const APP_ORIGIN: string =
-  (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_APP_URL) || 'https://app.panguard.ai';
-
-interface MeResponse {
-  workspace?: { id?: string };
-}
-
-/**
- * Founding-customer slot badge. Polls /api/pilot/intent?slots=1 (cached
- * 60s) on mount to render "X / 3 slots remaining" next to the Pilot
- * tier title. When exhausted, swaps to a "Slots claimed" warning style.
- */
-function FoundingSlotBadge({ isZh }: { isZh: boolean }) {
-  const [state, setState] = useState<
-    { kind: 'loading' } | { kind: 'ready'; remaining: number; total: number; exhausted: boolean }
-  >({ kind: 'loading' });
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch(`${APP_ORIGIN}/api/pilot/intent?slots=1`, {
-          headers: { accept: 'application/json' },
-        });
-        if (!res.ok) return;
-        const body = (await res.json()) as {
-          slots_remaining: number;
-          total_slots: number;
-          exhausted: boolean;
-        };
-        if (!cancelled) {
-          setState({
-            kind: 'ready',
-            remaining: body.slots_remaining,
-            total: body.total_slots,
-            exhausted: body.exhausted,
-          });
-        }
-      } catch {
-        /* leave badge as loading — graceful */
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  if (state.kind === 'loading') {
-    return (
-      <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-amber-400 bg-amber-400/10 border border-amber-400/30 rounded-full px-2.5 py-0.5">
-        {isZh ? 'F500 試水' : 'F500 bridge'}
-      </span>
-    );
-  }
-
-  if (state.exhausted) {
-    return (
-      <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-red-400 bg-red-400/10 border border-red-400/40 rounded-full px-2.5 py-0.5">
-        {isZh ? '名額已滿' : 'Slots claimed'}
-      </span>
-    );
-  }
-
-  return (
-    <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-amber-400 bg-amber-400/10 border border-amber-400/30 rounded-full px-2.5 py-0.5">
-      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-      {state.remaining} / {state.total} {isZh ? '剩餘' : 'left'}
-    </span>
-  );
-}
-
-/**
- * Light-weight auth probe. Asks the app's `/api/me` endpoint (cookie-based
- * session) whether the visitor is signed in and which workspace to bill.
- *
- * Returns `null` while loading so the button can render in a neutral state
- * (no flicker between "Sign in" and "Pay"). On 401 or fetch failure we
- * resolve to `{ authed: false }` and the click handler routes to /login.
- *
- * The app domain is cross-origin from the marketing site, so the fetch
- * must include `credentials: 'include'` to send Supabase's session cookie.
- */
-function useAppAuth() {
-  const [state, setState] = useState<
-    { status: 'loading' } | { status: 'guest' } | { status: 'authed'; workspaceId: string | null }
-  >({ status: 'loading' });
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        // `/api/me/session` is the cookie-based companion to `/api/me`
-        // (which is api_key-only and serves the CLI). The session endpoint
-        // returns the user's primary workspace_id from RLS-scoped reads.
-        const res = await fetch(`${APP_ORIGIN}/api/me/session`, {
-          credentials: 'include',
-          headers: { accept: 'application/json' },
-        });
-        if (cancelled) return;
-        if (!res.ok) {
-          setState({ status: 'guest' });
-          return;
-        }
-        const body = (await res.json()) as MeResponse;
-        const workspaceId = body.workspace?.id ?? null;
-        setState({ status: 'authed', workspaceId });
-      } catch {
-        if (!cancelled) setState({ status: 'guest' });
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  return state;
-}
-
-/**
- * Pricing page — 2-tier + Standards governance (no middle tier).
- *
- * Strategic choice: solo-founder + AI agent security + ATR moat means
- * classic Team/Business tiers are a trap. We ship:
- *   - Community $0 unlimited (sensor network)
- *   - Pilot $25K / 90d (F500 bridge)
- *   - Enterprise $150K-500K/yr (real revenue)
- *   - ATR Standards Organization (independent governance)
+ * Pricing page — Red Hat model per deck v11 (2026-07-02): free standard, paid
+ * operated layer. Four tiers, no middle tier:
+ *   - Community $0 forever (MIT · self-host · our distribution)
+ *   - Enterprise $150-500K/yr (Scan + Guard + support)
+ *   - Migrator Pro $500K-2M/yr (signed, continuously re-scanned evidence — flagship)
+ *   - Sovereign / OEM $5-20M (on-prem, air-gapped, per-nation)
  * Middle tier is intentionally absent — explained in the "Why no middle tier" section.
  */
 
 export default function PricingContent() {
   const locale = useLocale();
   const isZh = locale === 'zh-TW';
-  const auth = useAppAuth();
-
-  // Pilot CTA — sends ALL visitors (signed-in or not) to the scoping form
-  // at /scoping. F500 procurement is conservative: every Pilot buyer must
-  // submit scoping answers + accept MSA/DPA/Refund first, then sign up via
-  // magic link, THEN reach Stripe Checkout. Founding Customer cap (3) is
-  // enforced at both the scoping POST and the checkout-session creation.
-  const [pilotBusy, setPilotBusy] = useState(false);
-  const [pilotError, setPilotError] = useState<string | null>(null);
-
-  const onPilotClick = useCallback(() => {
-    setPilotError(null);
-    setPilotBusy(true);
-    // Marketing site is the host — relative path keeps us on the same
-    // origin, no CORS, no auth round-trip. The scoping page handles
-    // founding-3 cap display + form + magic-link signup before any
-    // Stripe interaction.
-    window.location.href = '/scoping';
-  }, []);
 
   return (
     <>
@@ -199,25 +52,23 @@ export default function PricingContent() {
             <div className="text-base sm:text-lg text-text-secondary max-w-3xl mx-auto mt-6 leading-[1.85] space-y-3">
               {isZh ? (
                 <>
-                  <p>四條商業軌道，對應四種不同的客戶與付費理由。</p>
+                  <p>Red Hat 模型 —— 免費標準,付費營運層。四個 tier,對應四種客戶與付費理由。</p>
                   <ul className="space-y-2 text-left max-w-2xl mx-auto">
                     <li>
-                      <span className="text-text-primary font-semibold">Community（永久免費）</span>
-                      ——做為全球 sensor 網路與標準擴散管道，不是收入來源。
+                      <span className="text-text-primary font-semibold">Community(永久免費)</span>
+                      ——開放標準、規格與引擎。MIT。是散佈管道與全球感測網,不是收入來源。
                     </li>
                     <li>
-                      <span className="text-text-primary font-semibold">Enterprise SaaS</span>
-                      ——解決受監管產業的合規證據缺口與既有規則資產升級。
+                      <span className="text-text-primary font-semibold">Enterprise</span>
+                      ——受監管客戶 production agent 的 Scan + Guard + 支援。
                     </li>
                     <li>
-                      <span className="text-text-primary font-semibold">
-                        Sovereign AI 國家級 reference
-                      </span>
-                      ——回應國家層級的 detection IP 主權需求。
+                      <span className="text-text-primary font-semibold">Migrator Pro(旗艦)</span>
+                      ——簽章、持續重掃的合規證據 —— 活的證明,不是一次性 PDF。
                     </li>
                     <li>
-                      <span className="text-text-primary font-semibold">Vendor OEM 授權</span>
-                      ——給已經把 ATR 規則出貨進自家產品的平台廠商。
+                      <span className="text-text-primary font-semibold">Sovereign / OEM</span>
+                      ——地端、離網、按國家部署;Sigma 從未有過的天花板。
                     </li>
                   </ul>
                   <p className="text-sm text-text-muted pt-2">
@@ -227,29 +78,29 @@ export default function PricingContent() {
               ) : (
                 <>
                   <p>
-                    Four revenue tracks, mapped to four distinct customer types and reasons to pay.
+                    Red Hat model — a free standard, a paid operated layer. Four tiers, mapped to
+                    four distinct customer types and reasons to pay.
                   </p>
                   <ul className="space-y-2 text-left max-w-2xl mx-auto">
                     <li>
                       <span className="text-text-primary font-semibold">
                         Community (free forever)
                       </span>{' '}
-                      — global sensor network and standard adoption pipeline, not a revenue stream.
+                      — the open standard, spec & engine. MIT. Our distribution and global sensor
+                      network, not a revenue stream.
                     </li>
                     <li>
-                      <span className="text-text-primary font-semibold">Enterprise SaaS</span> —
-                      closes the compliance-evidence gap for regulated industries and migrates their
-                      existing rule assets into the AI agent era.
+                      <span className="text-text-primary font-semibold">Enterprise</span> — Scan +
+                      Guard + support for production agents in regulated buyers.
                     </li>
                     <li>
-                      <span className="text-text-primary font-semibold">
-                        Sovereign AI national reference
-                      </span>{' '}
-                      — addresses the detection-IP sovereignty gap at the nation-state level.
+                      <span className="text-text-primary font-semibold">Migrator Pro (flagship)</span>{' '}
+                      — signed, continuously re-scanned compliance evidence — living proof, not a
+                      one-off PDF.
                     </li>
                     <li>
-                      <span className="text-text-primary font-semibold">Vendor OEM license</span> —
-                      for platform vendors already shipping ATR rules inside their own products.
+                      <span className="text-text-primary font-semibold">Sovereign / OEM</span> —
+                      on-prem, air-gapped, per-nation; the ceiling beyond Sigma.
                     </li>
                   </ul>
                   <p className="text-sm text-text-muted pt-2">
@@ -278,7 +129,7 @@ export default function PricingContent() {
         </div>
       </section>
 
-      {/* ─── 4 tiers (per pitch v5 — Community / Pilot / Enterprise / Sovereign) ─── */}
+      {/* ─── 4 tiers (deck v11 — Community / Enterprise / Migrator Pro / Sovereign) ─── */}
       <SectionWrapper>
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Community */}
@@ -353,97 +204,8 @@ export default function PricingContent() {
             </div>
           </FadeInUp>
 
-          {/* Pilot */}
-          <FadeInUp delay={0.08}>
-            <div className="bg-surface-2 rounded-xl border border-amber-400/30 p-7 flex flex-col h-full">
-              <div className="flex items-center justify-between gap-2">
-                <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider">
-                  {isZh ? 'Pilot 試點' : 'Pilot'}
-                </h3>
-                <FoundingSlotBadge isZh={isZh} />
-              </div>
-
-              <div className="mt-5 flex items-baseline gap-2">
-                <span className="text-4xl font-extrabold text-text-primary">$25K</span>
-                <span className="text-xs text-text-muted">{isZh ? '/ 90 天' : '/ 90 days'}</span>
-              </div>
-
-              <p className="text-[11px] uppercase tracking-wider font-semibold text-amber-400 mt-4 mb-1">
-                {isZh
-                  ? '給誰 · Founding Customer 限前 3 名'
-                  : "Who it's for · Founding Customers (first 3 only)"}
-              </p>
-              <p className="text-sm text-text-secondary leading-[1.85]">
-                {isZh
-                  ? 'F500 採購流程前的試水合約。IT Director 層級可審核通過，不需要進到 CFO 議程。試點結束後可全額抵入 Y1 Enterprise 年約。$25K 僅前 3 個 Founding Customer 適用,第 4 個起 Enterprise $250K 起跳 (sales-led)。'
-                  : 'A pre-procurement pilot contract for F500. IT Director can approve without reaching CFO. The full $25K credits toward Y1 Enterprise. $25K applies to the first 3 Founding Customers only — after that, all engagements move to Enterprise $250K base (sales-led).'}
-              </p>
-
-              <div className="my-7 flex-1">
-                <ul className="space-y-2.5">
-                  {(isZh
-                    ? [
-                        'On-prem / VPC / airgap 部署協助',
-                        '每週 6 小時資深工程支援',
-                        '樣本季度合規證據報告(EU AI Act / NIST AI RMF / ISO 42001 / OWASP Agentic 對應)',
-                        '自訂 ATR rule pack 試做',
-                        'SIEM webhook 整合樣板',
-                        'LLM 額度全包(crystallization + 規則 enrichment ~$200/月,我們吃 token 成本)',
-                        `偵測 0% 依賴 LLM——${STATS.totalRulesDisplay} 條 deterministic rules @ ${STATS.benchmark.garak.recall}% recall`,
-                        '90 天後升級 Enterprise 或乾淨結束',
-                        '可 credit 全額 $25K 到 Y1 Enterprise 年約',
-                      ]
-                    : [
-                        'On-prem / VPC / airgap deployment help',
-                        '6 hours/week of senior engineering support',
-                        'Sample quarterly compliance evidence report (EU AI Act / NIST AI RMF / ISO 42001 / OWASP Agentic mapping)',
-                        'Custom ATR rule pack trial',
-                        'SIEM webhook integration template',
-                        'LLM credits included (crystallization + rule enrichment ~$200/mo, we eat the token cost)',
-                        `Detection runs 0% on LLM — ${STATS.totalRulesDisplay} deterministic rules @ ${STATS.benchmark.garak.recall}% recall`,
-                        'Clean exit or upgrade to Enterprise at day 90',
-                        'Full $25K credit to Y1 Enterprise contract on upgrade',
-                      ]
-                  ).map((f) => (
-                    <li key={f} className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                      <span className="text-[13px] text-text-secondary leading-snug">{f}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <button
-                type="button"
-                onClick={onPilotClick}
-                disabled={pilotBusy || auth.status === 'loading'}
-                className="inline-flex items-center justify-center gap-2 w-full bg-amber-400/10 border border-amber-400/40 text-amber-400 hover:bg-amber-400/20 font-semibold rounded-lg py-3 transition-all duration-200 active:scale-[0.98] text-sm disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {pilotBusy
-                  ? isZh
-                    ? '前往 Stripe...'
-                    : 'Redirecting to Stripe...'
-                  : isZh
-                    ? 'Start Pilot ($25K / 90 天)'
-                    : 'Start Pilot ($25K / 90d)'}{' '}
-                <ArrowRight className="w-4 h-4" />
-              </button>
-              {pilotError ? (
-                <p className="mt-2 text-[11px] text-red-400 text-center">
-                  {isZh ? '結帳失敗:' : 'Checkout failed:'} {pilotError}
-                </p>
-              ) : null}
-              <p className="mt-2 text-[11px] text-text-muted text-center">
-                {isZh ? '需要客製合約？' : 'Need a custom contract instead?'}{' '}
-                <Link href="/contact?tier=pilot" className="text-amber-400 hover:underline">
-                  {isZh ? '改寄信洽詢' : 'Email sales'}
-                </Link>
-              </p>
-            </div>
-          </FadeInUp>
-
           {/* Enterprise */}
-          <FadeInUp delay={0.16}>
+          <FadeInUp delay={0.08}>
             <div className="bg-gradient-to-b from-surface-2 to-surface-1 rounded-xl border border-brand-sage/40 p-7 flex flex-col h-full ring-1 ring-brand-sage/10">
               <div className="flex items-center justify-between gap-2">
                 <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider">
@@ -475,57 +237,38 @@ export default function PricingContent() {
 
               <div className="my-7 flex-1">
                 <p className="text-[11px] uppercase tracking-wider font-semibold text-text-muted mb-3">
-                  {isZh ? '三大核心模組' : 'Three core modules'}
+                  {isZh ? 'Protect + 支援' : 'Protect + support'}
                 </p>
-                <ul className="space-y-3 mb-5">
+                <ul className="space-y-2.5 mb-5">
                   {(isZh
                     ? [
-                        {
-                          title: 'Migrator Pro',
-                          line: '把過去 SOC 累積的 Sigma、YARA、Splunk 等舊規則，自動轉換成 AI Agent 規則。',
-                        },
-                        {
-                          title: 'AI Compliance Audit Evidence Module',
-                          line: '產出可直接送進稽核流程的合規證據包（NIST AI RMF、EU AI Act 等五大框架）。',
-                        },
-                        {
-                          title: 'ATR 標準直線關係',
-                          line: '提早取得 draft 規則，客戶規則可回流到上游、被 Cisco、Microsoft 等廠商採用。',
-                        },
+                        '安裝前先對 ATR 掃描 skill 與 MCP server',
+                        'Guard:runtime 偵測並圍堵挾持企圖',
+                        'agents / tenants / seats / sites 完全無上限',
+                        '地端 / VPC / 離網 · SAML SSO · SCIM · SIEM webhook',
+                        '專屬 Customer Success Manager · 優先支援 SLA',
+                        'SOC 2 Type 1 進行中(目標 2026 Q3)',
                       ]
                     : [
-                        {
-                          title: 'Migrator Pro',
-                          line: 'Automatically converts legacy Sigma, YARA, and Splunk rules from your SOC into AI agent rules.',
-                        },
-                        {
-                          title: 'AI Compliance Audit Evidence Module',
-                          line: 'Produces compliance evidence packs ready for auditors (NIST AI RMF, EU AI Act, plus three more frameworks).',
-                        },
-                        {
-                          title: 'Direct line to the ATR standard',
-                          line: 'Early access to draft rules; customer-contributed rules can flow upstream and be adopted by Cisco, Microsoft, and others.',
-                        },
+                        'Scan skills & MCP servers against ATR before any agent loads them',
+                        'Guard: detect & contain hijack attempts at runtime',
+                        'Unlimited agents / tenants / seats / sites',
+                        'On-prem / VPC / airgap · SAML SSO · SCIM · SIEM webhook',
+                        'Dedicated Customer Success Manager · priority support SLA',
+                        'SOC 2 Type 1 in flight (target Q3 2026)',
                       ]
-                  ).map((m) => (
-                    <li key={m.title} className="flex items-start gap-2.5">
-                      <Check className="w-4 h-4 text-brand-sage shrink-0 mt-1" />
-                      <div>
-                        <p className="text-[13px] font-semibold text-text-primary leading-snug">
-                          {m.title}
-                        </p>
-                        <p className="text-[12px] text-text-secondary mt-1 leading-[1.75]">
-                          {m.line}
-                        </p>
-                      </div>
+                  ).map((f) => (
+                    <li key={f} className="flex items-start gap-2.5">
+                      <Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" />
+                      <span className="text-[13px] text-text-secondary leading-snug">{f}</span>
                     </li>
                   ))}
                 </ul>
 
                 <p className="text-[12px] text-text-muted leading-[1.85] mb-4">
                   {isZh
-                    ? '一併提供：unlimited agents/tenants、on-prem 部署、SAML SSO、SCIM、SIEM webhook、AIAM（2026 Q3 上線）、SOC 2 Type 1 認證進行中（目標 2026 Q3）、專屬 Customer Success Manager、LLM token 額度全包（含 enrichment + crystallization；偵測本身 0% 依賴 LLM）。'
-                    : 'Also included: unlimited agents/tenants, on-prem deployment, SAML SSO, SCIM, SIEM webhook, AIAM (target Q3 2026), SOC 2 Type 1 in flight (target Q3 2026), a dedicated Customer Success Manager, and LLM tokens fully included (enrichment + crystallization; detection itself runs 0% on LLM).'}
+                    ? '需要簽章、可稽核、持續重掃的合規證據(Migrator + Evidence 引擎)?見 Migrator Pro。'
+                    : 'For signed, audit-ready, continuously re-scanned compliance evidence (Migrator + Evidence engine), see Migrator Pro.'}
                 </p>
 
                 <a
@@ -538,6 +281,73 @@ export default function PricingContent() {
 
               <Link
                 href="/contact?tier=enterprise"
+                className="inline-flex items-center justify-center gap-2 w-full bg-brand-sage text-surface-0 font-semibold rounded-lg py-3 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98] text-sm"
+              >
+                {isZh ? '洽詢業務' : 'Contact sales'} <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </FadeInUp>
+
+          {/* Migrator Pro — deck v11 flagship / cash engine */}
+          <FadeInUp delay={0.16}>
+            <div className="bg-gradient-to-b from-surface-2 to-surface-1 rounded-xl border border-brand-sage/40 p-7 flex flex-col h-full ring-1 ring-brand-sage/10">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider">
+                  Migrator Pro
+                </h3>
+                <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-semibold text-brand-sage bg-brand-sage/10 border border-brand-sage/30 rounded-full px-2.5 py-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand-sage" />
+                  {isZh ? '旗艦' : 'Flagship'}
+                </span>
+              </div>
+
+              <div className="mt-5 flex items-baseline gap-1.5">
+                <span className="text-3xl font-extrabold text-text-primary">$500K–2M</span>
+                <span className="text-xs text-text-muted">{isZh ? '/ 年' : '/ yr'}</span>
+              </div>
+              <p className="text-[11px] text-text-muted mt-1">
+                {isZh ? '合規證據引擎 · 現金引擎' : 'Compliance evidence engine · cash engine'}
+              </p>
+
+              <p className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage mt-4 mb-1">
+                {isZh ? '給誰' : "Who it's for"}
+              </p>
+              <p className="text-sm text-text-secondary leading-[1.85]">
+                {isZh
+                  ? 'AI 廠商卡在銀行的 AI 安全審查、以及需要「活的」稽核證據的受監管企業。買的是一份持續重掃、持續更新的簽章證據,不是一次性 PDF。'
+                  : "AI vendors stuck in a bank's AI-security review, and regulated enterprises that need living audit evidence — a continuously re-scanned, signed artefact, not a one-off PDF."}
+              </p>
+
+              <div className="my-7 flex-1">
+                <ul className="space-y-2.5">
+                  {(isZh
+                    ? [
+                        '簽章、持續重掃的合規證據(SHA-256 + Merkle tree)',
+                        '每筆偵測 → ATR 規則 → 五框架條文(EU AI Act / NIST AI RMF / ISO 42001 / OWASP Agentic / OWASP LLM)',
+                        '把 15 種舊格式(Sigma、YARA、Splunk、CVE…)自動轉成 ATR 行為規則',
+                        '季度證據包,可直接送稽核(PDF + JSON)',
+                        'EU AI Act、NYDFS Part 500、DORA 即將要求的那份文件',
+                        `偵測 0% 依賴 LLM——${STATS.totalRulesDisplay} 條 deterministic rules @ ${STATS.benchmark.garak.recall}% recall`,
+                      ]
+                    : [
+                        'Signed, continuously re-scanned compliance evidence (SHA-256 + Merkle tree)',
+                        'Each detection → ATR rule → 5-framework articles (EU AI Act / NIST AI RMF / ISO 42001 / OWASP Agentic / OWASP LLM)',
+                        'Migrates 15 legacy formats (Sigma, YARA, Splunk, CVE…) into ATR behavioral rules',
+                        'Quarterly evidence packs, auditor-ready (PDF + JSON)',
+                        'The artefact EU AI Act, NYDFS Part 500 & DORA are about to require',
+                        `Detection runs 0% on LLM — ${STATS.totalRulesDisplay} deterministic rules @ ${STATS.benchmark.garak.recall}% recall`,
+                      ]
+                  ).map((f) => (
+                    <li key={f} className="flex items-start gap-2.5">
+                      <Check className="w-4 h-4 text-brand-sage shrink-0 mt-0.5" />
+                      <span className="text-[13px] text-text-secondary leading-snug">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <Link
+                href="/contact?tier=migrator"
                 className="inline-flex items-center justify-center gap-2 w-full bg-brand-sage text-surface-0 font-semibold rounded-lg py-3 hover:bg-brand-sage-light transition-all duration-200 active:scale-[0.98] text-sm"
               >
                 {isZh ? '洽詢業務' : 'Contact sales'} <ArrowRight className="w-4 h-4" />
@@ -1329,16 +1139,17 @@ Auditor-ready artefacts
                   <>
                     <strong className="text-text-primary">F500 不需要中間 tier 當橋樑。</strong>
                     F500 security team 本來就用免費 Community 試水 90 天,要合規 + SOC2 + airgap 時跳
-                    Pilot → Enterprise。這是 F500 實際的採購行為,不是付費 Team tier。
+                    Enterprise 或 Migrator Pro。這是 F500 實際的採購行為,不是付費 Team tier。
                   </>
                 ) : (
                   <>
                     <strong className="text-text-primary">
                       F500 does not need a middle tier as a bridge.
                     </strong>{' '}
-                    F500 security teams naturally pilot on free Community for 90 days, then jump to
-                    Pilot → Enterprise when they need compliance, SOC2, and airgap. That matches
-                    real F500 procurement behaviour — a paid Team tier sits in nobody&apos;s way.
+                    F500 security teams naturally trial free Community for 90 days, then jump to
+                    Enterprise or Migrator Pro when they need compliance, SOC2, and airgap. That
+                    matches real F500 procurement behaviour — a paid Team tier sits in nobody&apos;s
+                    way.
                   </>
                 )}
               </p>
