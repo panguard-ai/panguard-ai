@@ -33,6 +33,35 @@ describe('MCPProxy inline gate wiring (Layer 1)', () => {
   });
 });
 
+// Layer 0 = capability scope: an agent may only call tools the upstream exposes.
+// upstreamToolNames + capabilityScopeResolved are populated in start(); here we
+// set them directly to unit-test gateCheck's scope logic (the fix that closed the
+// silent-allow-on-empty-list hole).
+type ScopeInternals = { upstreamToolNames: Set<string>; capabilityScopeResolved: boolean };
+
+describe('MCPProxy capability scope (Layer 0)', () => {
+  it('DENIES an out-of-scope tool once the scope is resolved', () => {
+    const p = proxy();
+    const internals = p as unknown as ScopeInternals;
+    internals.upstreamToolNames = new Set(['read_file']);
+    internals.capabilityScopeResolved = true;
+    expect(p.gateCheck('read_file', { path: 'a.txt' }).allow).toBe(true); // in scope
+    expect(p.gateCheck('exfiltrate', { path: '/etc/hosts' }).allow).toBe(false); // out of scope
+  });
+
+  it('a RESOLVED-but-EMPTY scope denies every tool (no silent auto-allow — the regression)', () => {
+    const p = proxy();
+    // listTools() succeeded but returned zero tools → scope known + empty.
+    (p as unknown as ScopeInternals).capabilityScopeResolved = true;
+    expect(p.gateCheck('anything', {}).allow).toBe(false);
+  });
+
+  it('an UNRESOLVED scope (listTools not run/failed) falls back to allow-by-name for availability', () => {
+    // capabilityScopeResolved defaults false → degraded fail-open by tool name.
+    expect(proxy().gateCheck('anything', {}).allow).toBe(true);
+  });
+});
+
 describe('MCPProxy dual-path loop (brain verdict feeds the gate)', () => {
   it('escalates the session after a high-confidence deny, fast-blocking subsequent calls', () => {
     const p = proxy();

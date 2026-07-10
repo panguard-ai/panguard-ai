@@ -63,10 +63,19 @@ export class ThreatCloudClient {
   static async create(
     endpoint: string | undefined,
     dataDir: string,
-    apiKey?: string
+    apiKey?: string,
+    opts?: { allowProvision?: boolean }
   ): Promise<ThreatCloudClient> {
     let resolvedKey = apiKey ?? process.env['TC_API_KEY'];
-    if (!resolvedKey && endpoint) {
+    // Auto-provisioning a client key registers this install with Threat Cloud —
+    // an OUTBOUND POST keyed to a stable anonymous clientId. That is a network
+    // phone-home, so it runs ONLY when the caller signals the user has opted into
+    // collective defense (allowProvision). Without consent we stay fully local:
+    // no key is minted, no TC call is made, and bundled ATR rules still protect
+    // the host. An explicitly-configured key (apiKey / TC_API_KEY) is honored
+    // regardless — allowProvision only governs the auto-registration path.
+    const allowProvision = opts?.allowProvision !== false;
+    if (!resolvedKey && endpoint && allowProvision) {
       const { loadOrProvisionTCKey } = await import('./tc-key-provisioner.js');
       const clientId = getAnonymousClientId();
       resolvedKey = await loadOrProvisionTCKey(endpoint, clientId);

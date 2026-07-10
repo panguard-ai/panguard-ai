@@ -29,14 +29,25 @@ vi.mock('../src/threat-cloud/client-id.js', () => ({
   getAnonymousClientId: () => 'test-client-uuid-1234',
 }));
 
-// We need to mock the https.request for HTTP calls
-const mockRequestWrite = vi.fn();
-const mockRequestEnd = vi.fn();
-const mockRequestDestroy = vi.fn();
-const mockRequestOn = vi.fn();
+// Mock the key provisioner so we can assert whether the pre-consent phone-home
+// (registration POST) fires. create() dynamically imports this module.
+const mockProvision = vi.fn(async () => 'provisioned-key-abc');
+vi.mock('../src/threat-cloud/tc-key-provisioner.js', () => ({
+  loadOrProvisionTCKey: (...args: unknown[]) => mockProvision(...args),
+  getTCKeyPath: () => '/tmp/test-tc-key',
+}));
 
-vi.mock('node:https', () => ({
-  request: vi.fn((_opts: unknown, cb: (res: unknown) => void) => {
+// We mock https.request for HTTP calls. These are declared via vi.hoisted so the
+// (hoisted) vi.mock factory can reference mockHttpsRequest EAGERLY — a plain
+// top-level const would be in the temporal dead zone when the factory runs.
+// mockHttpsRequest is named so tests can assert whether ANY https request was
+// issued (the privacy invariant: an offline / no-consent client makes zero calls).
+const { mockHttpsRequest } = vi.hoisted(() => {
+  const mockRequestWrite = vi.fn();
+  const mockRequestEnd = vi.fn();
+  const mockRequestDestroy = vi.fn();
+  const mockRequestOn = vi.fn();
+  const mockHttpsRequest = vi.fn((_opts: unknown, cb: (res: unknown) => void) => {
     // Default: simulate a successful 200 response
     const mockRes = {
       statusCode: 200,
@@ -49,17 +60,20 @@ vi.mock('node:https', () => ({
         }
       }),
     };
-
     // Defer the callback so the caller can set up event handlers first
     setTimeout(() => cb(mockRes), 0);
-
     return {
       write: mockRequestWrite,
       end: mockRequestEnd,
       destroy: mockRequestDestroy,
       on: mockRequestOn,
     };
-  }),
+  });
+  return { mockHttpsRequest };
+});
+
+vi.mock('node:https', () => ({
+  request: mockHttpsRequest,
 }));
 
 import { ThreatCloudClient } from '../src/threat-cloud/index.js';
@@ -90,6 +104,92 @@ describe('ThreatCloudClient', () => {
     } catch {
       // ignore
     }
+  });
+
+  describe('create() — consent-gated auto-provisioning (privacy invariant)', () => {
+    let savedTcApiKey: string | undefined;
+
+    beforeEach(() => {
+      // The provisioning branch short-circuits on TC_API_KEY; isolate the env so
+      // these assertions measure the allowProvision gate, not an ambient key.
+      savedTcApiKey = process.env['TC_API_KEY'];
+      delete process.env['TC_API_KEY'];
+    });
+
+    afterEach(() => {
+      if (savedTcApiKey === undefined) delete process.env['TC_API_KEY'];
+      else process.env['TC_API_KEY'] = savedTcApiKey;
+    });
+
+    it('does NOT provision a key (no phone-home) when allowProvision is false and no key exists', async () => {
+      await ThreatCloudClient.create('https://cloud.example.com', tempDir, undefined, {
+        allowProvision: false,
+      });
+      expect(mockProvision).not.toHaveBeenCalled();
+    });
+
+    it('provisions a key when the user opted in (allowProvision true) and no key exists', async () => {
+      await ThreatCloudClient.create('https://cloud.example.com', tempDir, undefined, {
+        allowProvision: true,
+      });
+      expect(mockProvision).toHaveBeenCalledTimes(1);
+    });
+
+    it('defaults to provisioning when opts is omitted (preserves existing callers)', async () => {
+      await ThreatCloudClient.create('https://cloud.example.com', tempDir, undefined);
+      expect(mockProvision).toHaveBeenCalledTimes(1);
+    });
+
+    it('never provisions when an explicit key is supplied, regardless of allowProvision', async () => {
+      await ThreatCloudClient.create('https://cloud.example.com', tempDir, 'explicit-key', {
+        allowProvision: true,
+      });
+      expect(mockProvision).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('offline (no-consent) client — ZERO inbound network (privacy invariant)', () => {
+    let savedTcApiKey: string | undefined;
+
+    beforeEach(() => {
+      savedTcApiKey = process.env['TC_API_KEY'];
+      delete process.env['TC_API_KEY'];
+    });
+
+    afterEach(() => {
+      if (savedTcApiKey === undefined) delete process.env['TC_API_KEY'];
+      else process.env['TC_API_KEY'] = savedTcApiKey;
+    });
+
+    it('an endpoint=undefined client is offline and its inbound fetches issue NO https request', async () => {
+      const client = await ThreatCloudClient.create(undefined, tempDir, undefined, {
+        allowProvision: false,
+      });
+      expect(client.getStatus()).toBe('offline');
+
+      const ips = await client.fetchBlocklist();
+      const domains = await client.fetchDomainBlocklist();
+      const whitelist = await client.fetchSkillWhitelist();
+      const blacklist = await client.fetchSkillBlacklist();
+
+      expect(ips).toEqual([]);
+      expect(domains).toEqual([]);
+      expect(whitelist).toEqual([]);
+      expect(blacklist).toEqual([]);
+      // The core invariant: nothing left the host.
+      expect(mockHttpsRequest).not.toHaveBeenCalled();
+      expect(mockProvision).not.toHaveBeenCalled();
+    });
+
+    it('a stray TC_API_KEY does NOT make an offline client phone home', async () => {
+      process.env['TC_API_KEY'] = 'stray-ambient-key';
+      const client = await ThreatCloudClient.create(undefined, tempDir, undefined, {
+        allowProvision: false,
+      });
+      expect(client.getStatus()).toBe('offline');
+      await client.fetchBlocklist();
+      expect(mockHttpsRequest).not.toHaveBeenCalled();
+    });
   });
 
   describe('constructor', () => {

@@ -228,6 +228,14 @@ export class DashboardServer {
   private rateLimits: Map<string, RateLimitEntry> = new Map();
   private relayClient: DashboardRelayClient | null = null;
   private readonly relayConfig: DashboardRelayOptions | undefined;
+  /**
+   * Cached @panguard-ai/panguard-mcp/config module. Resolved ONCE (first use)
+   * and reused, so the long-running daemon does not re-resolve/re-read a module
+   * path on every API request — closing a per-request module-planting window.
+   * `null` = not yet attempted; a settled promise resolving to `null` = the
+   * optional module is unavailable in this install.
+   */
+  private mcpConfigModulePromise: Promise<Record<string, unknown> | null> | null = null;
 
   constructor(port: number, relayConfig?: DashboardRelayOptions) {
     this.port = port;
@@ -1820,10 +1828,8 @@ export class DashboardServer {
 
     try {
       // Dynamic import — module may not be installed in all configurations
-      const mcpConfig: Record<string, unknown> = await import(
-        '@panguard-ai/panguard-mcp/config' as string
-      );
-      const discover = mcpConfig['discoverAllSkills'] as
+      const mcpConfig = await this.loadMcpConfigModule();
+      const discover = mcpConfig?.['discoverAllSkills'] as
         | (() => Promise<
             Array<{ name: string; platformId?: string; platform?: string; command?: string }>
           >)
@@ -2138,6 +2144,22 @@ export class DashboardServer {
     }
   }
 
+  /**
+   * Load the optional @panguard-ai/panguard-mcp/config module once and cache it.
+   * The bare specifier resolves relative to this compiled module (not an
+   * attacker-controlled cwd), and we resolve it a single time so no per-request
+   * disk re-resolution happens in the daemon. Returns `null` when the optional
+   * module is not installed in this configuration.
+   */
+  private loadMcpConfigModule(): Promise<Record<string, unknown> | null> {
+    if (this.mcpConfigModulePromise === null) {
+      this.mcpConfigModulePromise = import('@panguard-ai/panguard-mcp/config' as string)
+        .then((m) => m as Record<string, unknown>)
+        .catch(() => null);
+    }
+    return this.mcpConfigModulePromise;
+  }
+
   private async handleAgentsApi(res: ServerResponse): Promise<void> {
     type AgentInfo = {
       id: string;
@@ -2147,10 +2169,8 @@ export class DashboardServer {
     };
     let agents: AgentInfo[] = [];
     try {
-      const mcpConfig: Record<string, unknown> = await import(
-        '@panguard-ai/panguard-mcp/config' as string
-      );
-      const detect = mcpConfig['detectPlatforms'] as
+      const mcpConfig = await this.loadMcpConfigModule();
+      const detect = mcpConfig?.['detectPlatforms'] as
         | (() => Promise<
             Array<{
               id: string;
