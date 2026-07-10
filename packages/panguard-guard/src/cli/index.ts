@@ -503,7 +503,8 @@ async function commandStart(
         process.stderr.write(`  - ${f.kind} ${f.reason}${f.label ? ` (${f.label})` : ''}\n`);
       }
       process.stderr.write(
-        '  Run "pga doctor" to review. If you made this change, re-run "pga up" to re-seal.\n\n'
+        '  Review the changes above. If you made this change intentionally, re-run ' +
+          '"panguard-guard start" to re-seal the integrity manifest.\n\n'
       );
     }
   } catch {
@@ -1046,11 +1047,15 @@ async function showFirstRunWelcome(dashboardPort: number): Promise<void> {
   console.log(`    ${c.underline(`http://localhost:${dashboardPort}`)}`);
   console.log('');
   console.log(`  ${c.bold('Quick commands / :')}`);
-  console.log(`    ${c.sage('pga')}              Open interactive menu /`);
-  console.log(`    ${c.sage('pga up')}           Start protection + dashboard /  + `);
-  console.log(`    ${c.sage('pga status')}       Check protection status / `);
-  console.log(`    ${c.sage('pga scan')}         Scan all installed skills / `);
-  console.log(`    ${c.sage('pga audit <dir>')}  Audit a skill before installing / `);
+  console.log(`    ${c.sage('panguard-guard start')}    Start protection + dashboard`);
+  console.log(`    ${c.sage('panguard-guard status')}   Check protection status`);
+  console.log(`    ${c.sage('panguard-guard scan')}     Scan all installed skills`);
+  console.log(`    ${c.sage('panguard-guard help')}     List all commands`);
+  console.log('');
+  console.log(
+    `  ${c.dim('Tip: for the full experience (the')} ${c.sage('pga')} ${c.dim('command, interactive menu, audits),')}`
+  );
+  console.log(`  ${c.dim('install the CLI:')} ${c.sage('npm install -g @panguard-ai/panguard')}`);
   console.log('');
   console.log(`  ${c.bold('What Guard does / Guard :')}`);
   console.log(`    ${symbols.pass} Monitors new skill installations in real-time`);
@@ -1312,7 +1317,17 @@ async function commandUninstall(dataDir: string): Promise<void> {
 function commandConfig(dataDir: string): void {
   console.log(header('Configuration'));
   try {
-    const config = loadConfig(join(dataDir, 'config.json'));
+    const configPath = join(dataDir, 'config.json');
+    const saved = existsSyncSafe(configPath);
+    const config = loadConfig(configPath);
+    if (!saved) {
+      // No config.json at this --data-dir yet: loadConfig returned in-memory
+      // defaults whose own dataDir field points at the DEFAULT dir, which would
+      // contradict the --data-dir the user just passed. Reflect the requested
+      // path and flag that these are unsaved defaults, not a persisted config.
+      (config as { dataDir?: string }).dataDir = dataDir;
+      console.log(`  ${c.caution('(unsaved defaults — no config.json at this data dir yet)')}\n`);
+    }
     // Redact secret-bearing fields (ai.apiKey, threatCloudApiKey, license key,
     // notification botToken / webhook secret / smtp pass) before printing —
     // a plaintext config dump must never expose a stored secret to the terminal
@@ -1321,6 +1336,15 @@ function commandConfig(dataDir: string): void {
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error(`  ${symbols.fail} Failed to load config: ${msg}`);
+  }
+}
+
+/** Best-effort existsSync via the module's existing createRequire helper. */
+function existsSyncSafe(p: string): boolean {
+  try {
+    return (_require('node:fs') as typeof import('node:fs')).existsSync(p);
+  } catch {
+    return false;
   }
 }
 
