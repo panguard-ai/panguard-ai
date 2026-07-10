@@ -459,15 +459,15 @@ export default function MigratorContent() {
         <FadeInUp>
           <SectionTitle
             overline={isZh ? 'MIGRATOR 定價' : 'MIGRATOR PRICING'}
-            title={isZh ? 'Migrator 的四種採用路徑' : 'Four ways to use Migrator'}
+            title={isZh ? 'Migrator 的三種採用路徑' : 'Three ways to use Migrator'}
             subtitle={
               isZh
-                ? 'Community 免費，給個人開發者；Pilot 給單一團隊試用；Standalone 給只需要規則遷移、暫時不導入完整 runtime 的組織；Sovereign 為國家級 SOC 知識遷移而設計。Migrator Pro 也已內建於 PanGuard Enterprise 方案中。'
-                : 'Free for individual developers. Pilot for one-team trials. Standalone for organisations that only need the conversion layer. Sovereign for nation-scale SOC bridges. Migrator Pro is also bundled inside PanGuard Enterprise.'
+                ? 'Community 免費，給個人開發者；Migrator Pro 給只需要規則遷移、暫時不導入完整 runtime 的組織；Sovereign 為國家級 SOC 知識遷移而設計。Migrator Pro 也已內建於 PanGuard Enterprise 方案中。'
+                : 'Free for individual developers. Migrator Pro for organisations that need the conversion layer without the full runtime. Sovereign for nation-scale SOC bridges. Migrator Pro is also bundled inside PanGuard Enterprise.'
             }
           />
         </FadeInUp>
-        <div className="max-w-6xl mx-auto mt-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="max-w-5xl mx-auto mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {/* Tier 1: Community */}
           <FadeInUp delay={0.05}>
             <div className="bg-surface-2 rounded-xl border border-brand-sage/30 p-6 flex flex-col h-full">
@@ -507,37 +507,11 @@ export default function MigratorContent() {
             </div>
           </FadeInUp>
 
-          {/* Tier 2: Pilot */}
+          {/* Tier 2: Migrator Pro (deck v11 flagship — $500K-2M) */}
           <FadeInUp delay={0.1}>
-            <div className="bg-surface-2 rounded-xl border border-amber-400/30 p-6 flex flex-col h-full">
-              <p className="text-[11px] uppercase tracking-wider font-semibold text-amber-400 mb-3">
-                {isZh ? 'Pilot · 90 天' : 'Pilot · 90 days'}
-              </p>
-              <div className="flex items-baseline gap-2 mb-3">
-                <span className="text-3xl font-extrabold text-text-primary">$25K</span>
-                <span className="text-xs text-text-muted">
-                  {isZh ? '可全額抵 Y1 合約' : 'credited Y1'}
-                </span>
-              </div>
-              <p className="text-[13px] text-text-secondary leading-[1.85] mb-3 flex-1">
-                {isZh
-                  ? '針對單一團隊與單一規則語料庫。將最多 100 條 Sigma 或 YARA 規則精修到 Cisco 已合併 PR 的品質水準，附五大框架合規 metadata，以及一份範例稽核證據包。費用可全額抵入 Migrator Standalone 或 PanGuard Enterprise 年約。'
-                  : 'One team, one rule corpus. Refines up to 100 Sigma or YARA rules to the quality level of Cisco-merged PRs, with five-framework compliance metadata and a sample audit evidence pack. The full fee credits toward Migrator Standalone or PanGuard Enterprise.'}
-              </p>
-              <a
-                href="mailto:adam@agentthreatrule.org?subject=Migrator%20pilot"
-                className="text-[13px] text-amber-400 font-semibold inline-flex items-center gap-1 hover:underline"
-              >
-                {isZh ? '申請 Pilot' : 'Request pilot'} <ArrowRight className="w-3 h-3" />
-              </a>
-            </div>
-          </FadeInUp>
-
-          {/* Tier 3: Standalone */}
-          <FadeInUp delay={0.15}>
             <div className="bg-gradient-to-b from-surface-2 to-surface-1 rounded-xl border border-brand-sage/40 p-6 flex flex-col h-full ring-1 ring-brand-sage/10">
               <p className="text-[11px] uppercase tracking-wider font-semibold text-brand-sage mb-3">
-                {isZh ? 'Standalone · 年約' : 'Standalone · annual'}
+                {isZh ? 'Migrator Pro · 年約' : 'Migrator Pro · annual'}
               </p>
               <div className="flex items-baseline gap-2 mb-1">
                 <span className="text-3xl font-extrabold text-text-primary">
@@ -553,7 +527,7 @@ export default function MigratorContent() {
                   : 'For organisations that need the legacy bridge but are not yet adopting the full PanGuard runtime. Includes all 15 source-format adapters, the strict 0-FP quality pipeline, five-framework compliance evidence packs, the 6-tab web dashboard, on-prem deployment, and the ATR upstream contribution pipeline. Designed for compliance teams or red teams evaluating the standard before runtime adoption.'}
               </p>
               <a
-                href="mailto:adam@agentthreatrule.org?subject=Migrator%20Standalone"
+                href="mailto:adam@agentthreatrule.org?subject=Migrator%20Pro"
                 className="text-[13px] text-brand-sage font-semibold inline-flex items-center gap-1 hover:underline"
               >
                 {isZh ? '與創辦人洽談' : 'Talk to founder'} <ArrowRight className="w-3 h-3" />
@@ -600,8 +574,8 @@ export default function MigratorContent() {
             </p>
             <p className="text-sm text-text-secondary leading-[1.85]">
               {isZh
-                ? 'Migrator Pro 已內建於 PanGuard Enterprise 方案（業務洽談定價）。Standalone 與 Sovereign 兩種 tier 是為「只想採用 Migrator、暫不導入完整 runtime」的客戶所設。'
-                : 'Migrator Pro is bundled inside PanGuard Enterprise (sales-led pricing). The Standalone and Sovereign tiers are for customers who want Migrator without the full runtime.'}
+                ? 'Migrator Pro 已內建於 PanGuard Enterprise 方案（業務洽談定價）。獨立的 Migrator Pro 與 Sovereign 兩種 tier 是為「只想採用 Migrator、暫不導入完整 runtime」的客戶所設。'
+                : 'Migrator Pro is bundled inside PanGuard Enterprise (sales-led pricing). The standalone Migrator Pro and Sovereign tiers are for customers who want Migrator without the full runtime.'}
             </p>
             <Link
               href="/pricing"
@@ -627,14 +601,14 @@ export default function MigratorContent() {
               (Sigma + YARA wired to runtime today; 13 additional adapters — Snort, Splunk SPL,
               Elastic EQL, Falco, Semgrep, CodeQL, CVE-NVD, GHSA, OSV, KEV, garak, PyRIT, promptfoo
               — v0.2 enterprise release), 5-framework compliance auto-mapping, 6-tab web dashboard,
-              and audit evidence packs. 90-day pilot available. v1.0.0 GA target Q1 2027.
+              and audit evidence packs. v1.0.0 GA target Q1 2027.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <a
-                href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Migrator%20pilot"
+                href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Migrator%20Pro"
                 className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-panguard-green text-white font-semibold text-sm hover:bg-panguard-green-light transition-colors"
               >
-                Request pilot access
+                Request Migrator Pro access
                 <ArrowRight className="w-4 h-4" />
               </a>
               <a

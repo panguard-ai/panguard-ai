@@ -13,8 +13,8 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
     ? 'Sigma / YARA → ATR YAML 轉換器 — 開源、免費、瀏覽器即用'
     : 'Sigma to ATR YAML converter — open source, free';
   const description = isZh
-    ? '貼上一條 Sigma 或 YARA 規則，立刻拿到 schema-valid 的 ATR YAML。免註冊，瀏覽器即時轉換。Community 永久免費；Pilot 加上 13 種來源格式與 EU AI Act 證據包。'
-    : 'Paste a Sigma or YARA rule and get schema-valid ATR YAML back. No signup, runs in your browser. Community is free forever; Pilot adds 13 more input formats and an EU AI Act evidence pack.';
+    ? '貼上一條 Sigma 或 YARA 規則，立刻拿到 schema-valid 的 ATR YAML。免註冊，瀏覽器即時轉換。Community 永久免費；Migrator Pro 加上 13 種來源格式與 EU AI Act 證據包。'
+    : 'Paste a Sigma or YARA rule and get schema-valid ATR YAML back. No signup, runs in your browser. Community is free forever; Migrator Pro adds 13 more input formats and an EU AI Act evidence pack.';
   return {
     title,
     description,

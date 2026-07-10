@@ -429,15 +429,15 @@ export default function MigratorDemo() {
                     </p>
                     <p className="text-xs text-text-secondary leading-relaxed">
                       {isZh
-                        ? `Community 支援 Sigma 與 YARA。再加上 13 種來源格式（promptfoo、pyrit、splunk、garak …）以及 EU AI Act 證據包：Pilot $25K / 90 天。`
-                        : `Community covers Sigma and YARA. Convert 13 more formats (promptfoo, pyrit, splunk, garak, …) and get an EU AI Act evidence pack: Start Pilot ($25K / 90d).`}
+                        ? `Community 支援 Sigma 與 YARA。再加上 13 種來源格式（promptfoo、pyrit、splunk、garak …）以及 EU AI Act 證據包：就是 Migrator Pro。`
+                        : `Community covers Sigma and YARA. Convert 13 more formats (promptfoo, pyrit, splunk, garak, …) and get an EU AI Act evidence pack — that's Migrator Pro.`}
                     </p>
                   </div>
                   <a
-                    href="/pricing?intent=pilot#pilot"
-                    className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-amber-400 text-surface-0 font-semibold text-xs hover:bg-amber-300 transition-colors whitespace-nowrap"
+                    href="/pricing"
+                    className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-brand-sage text-surface-0 font-semibold text-xs hover:bg-brand-sage-light transition-colors whitespace-nowrap"
                   >
-                    {isZh ? 'Pilot $25K / 90d' : 'Start Pilot $25K / 90d'}
+                    {isZh ? '看 Migrator Pro' : 'See Migrator Pro'}
                     <ArrowRight className="w-3 h-3" />
                   </a>
                 </div>
@@ -447,16 +447,16 @@ export default function MigratorDemo() {
         </FadeInUp>
       </SectionWrapper>
 
-      {/* COMPARISON TABLE — Community vs Pilot */}
+      {/* COMPARISON TABLE — Community vs Migrator Pro */}
       <SectionWrapper className="py-16 bg-surface-1/30">
         <FadeInUp>
           <SectionTitle
-            overline={isZh ? 'COMMUNITY vs PILOT' : 'COMMUNITY vs PILOT'}
+            overline={isZh ? 'COMMUNITY vs MIGRATOR PRO' : 'COMMUNITY vs MIGRATOR PRO'}
             title={isZh ? '哪一條軌道符合你的需求？' : 'Which tier matches your scope?'}
             subtitle={
               isZh
-                ? 'Community 免費永久。Pilot 加上 13 種來源格式、LLM enrichment、EU AI Act 證據包、Threat Cloud 貢獻管線。'
-                : 'Community is free forever. Pilot adds 13 more input formats, LLM enrichment, an EU AI Act evidence pack, and the Threat Cloud contribute pipeline.'
+                ? 'Community 免費永久。Migrator Pro 加上 13 種來源格式、LLM enrichment、EU AI Act 證據包、Threat Cloud 貢獻管線。'
+                : 'Community is free forever. Migrator Pro adds 13 more input formats, LLM enrichment, an EU AI Act evidence pack, and the Threat Cloud contribute pipeline.'
             }
           />
         </FadeInUp>
@@ -494,17 +494,17 @@ export default function MigratorDemo() {
             </div>
           </FadeInUp>
 
-          {/* Pilot card */}
+          {/* Migrator Pro card */}
           <FadeInUp delay={0.1}>
-            <div className="rounded-2xl border border-amber-400/30 bg-surface-1 p-6 h-full flex flex-col">
+            <div className="rounded-2xl border border-brand-sage/40 bg-surface-1 p-6 h-full flex flex-col ring-1 ring-brand-sage/10">
               <div className="flex items-baseline justify-between mb-3">
-                <p className="text-[11px] uppercase tracking-[0.15em] text-amber-400 font-semibold">
-                  Pilot &middot; 90 days
+                <p className="text-[11px] uppercase tracking-[0.15em] text-brand-sage font-semibold">
+                  Migrator Pro
                 </p>
-                <span className="text-2xl font-extrabold text-text-primary">$25K</span>
+                <span className="text-2xl font-extrabold text-text-primary">$500K&ndash;2M</span>
               </div>
               <p className="text-xs text-text-muted mb-4">
-                {isZh ? '一個團隊 · 一份規則語料庫' : 'One team · one rule corpus'}
+                {isZh ? '年約 · 旗艦' : 'annual · flagship'}
               </p>
               <ul className="space-y-2 text-sm text-text-secondary flex-1">
                 <ComparisonRow ok pilot>
@@ -527,14 +527,14 @@ export default function MigratorDemo() {
                   {isZh ? 'Threat Cloud 貢獻管線' : 'Threat Cloud contribute pipeline'}
                 </ComparisonRow>
                 <ComparisonRow ok pilot>
-                  {isZh ? '可全額抵入 Y1 合約' : 'Credits 100% toward Year 1 contract'}
+                  {isZh ? '簽章、持續重掃的合規證據' : 'Signed, continuously re-scanned evidence'}
                 </ComparisonRow>
               </ul>
               <a
-                href="/pricing?intent=pilot#pilot"
-                className="mt-5 inline-flex items-center gap-1.5 text-xs text-amber-400 font-semibold hover:underline"
+                href="/contact?tier=migrator"
+                className="mt-5 inline-flex items-center gap-1.5 text-xs text-brand-sage font-semibold hover:underline"
               >
-                {isZh ? '開啟 Pilot' : 'Start Pilot'} <ArrowRight className="w-3 h-3" />
+                {isZh ? '洽詢 Migrator Pro' : 'Contact sales'} <ArrowRight className="w-3 h-3" />
               </a>
             </div>
           </FadeInUp>
@@ -544,17 +544,17 @@ export default function MigratorDemo() {
         <FadeInUp delay={0.15}>
           <div className="max-w-3xl mx-auto mt-10 flex flex-wrap items-center justify-center gap-3">
             <a
-              href="/pricing?intent=pilot#pilot"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-400 text-surface-0 font-semibold text-sm hover:bg-amber-300 transition-colors"
+              href="/contact?tier=migrator"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-sage text-surface-0 font-semibold text-sm hover:bg-brand-sage-light transition-colors"
             >
               <Lock className="w-4 h-4" />
-              {isZh ? 'Pilot 解鎖 — $25K / 90d' : 'Unlock Pilot — $25K / 90d'}
+              {isZh ? '洽詢 Migrator Pro' : 'Unlock Migrator Pro'}
             </a>
             <a
-              href="/contact?tier=pilot"
+              href="/pricing"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-border text-text-secondary text-sm hover:border-brand-sage hover:text-text-primary transition-colors"
             >
-              {isZh ? '與業務洽談' : 'Talk to sales'}
+              {isZh ? '查看完整定價' : 'See full pricing'}
               <ArrowRight className="w-4 h-4" />
             </a>
           </div>
@@ -581,15 +581,15 @@ function ComparisonRow({
     <li className="flex items-start gap-2 text-sm">
       <Check
         className={`w-4 h-4 flex-shrink-0 mt-0.5 ${
-          pilot ? 'text-amber-400' : 'text-panguard-green'
+          pilot ? 'text-brand-sage' : 'text-panguard-green'
         }`}
         aria-hidden
       />
       <div className="flex-1 leading-relaxed">
         {children}
         {pilot ? (
-          <span className="ml-2 inline-block text-[9px] font-semibold uppercase tracking-wider text-amber-400 bg-amber-400/10 rounded-full px-2 py-0.5 align-middle">
-            {ok ? 'Pilot only' : 'Pilot'}
+          <span className="ml-2 inline-block text-[9px] font-semibold uppercase tracking-wider text-brand-sage bg-brand-sage/10 rounded-full px-2 py-0.5 align-middle">
+            {ok ? 'Pro only' : 'Pro'}
           </span>
         ) : null}
       </div>

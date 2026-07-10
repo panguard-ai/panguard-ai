@@ -137,13 +137,6 @@ export function softwareApplicationSchema(opts: {
         ? [
             {
               '@type': 'Offer',
-              price: '25000',
-              priceCurrency: 'USD',
-              name: 'Pilot (90 days)',
-              url: 'https://panguard.ai/contact?tier=pilot',
-            },
-            {
-              '@type': 'Offer',
               priceSpecification: {
                 '@type': 'PriceSpecification',
                 priceCurrency: 'USD',
@@ -152,6 +145,17 @@ export function softwareApplicationSchema(opts: {
               },
               name: 'Enterprise (annual)',
               url: 'https://panguard.ai/contact?tier=enterprise',
+            },
+            {
+              '@type': 'Offer',
+              priceSpecification: {
+                '@type': 'PriceSpecification',
+                priceCurrency: 'USD',
+                minPrice: '500000',
+                maxPrice: '2000000',
+              },
+              name: 'Migrator Pro (annual)',
+              url: 'https://panguard.ai/contact?tier=migrator',
             },
           ]
         : [
@@ -192,8 +196,8 @@ export function softwareApplicationSchema(opts: {
 
 /**
  * Pricing-page schema. Emits a SoftwareApplication whose offers mirror the
- * three canonical tiers on /pricing (Community $0, Pilot $25K / 90 days,
- * Enterprise $150K-500K/yr). Google treats SoftwareApplication offers as a
+ * four canonical tiers on /pricing (Community $0, Enterprise $150K-500K/yr,
+ * Migrator Pro $500K-2M/yr, Sovereign $5-20M). Google treats SoftwareApplication offers as a
  * pricing-eligible product, so this is what makes the pricing rich result
  * eligible.
  *
@@ -208,7 +212,7 @@ export function pricingApplicationSchema() {
     '@id': 'https://panguard.ai/pricing#software',
     name: 'PanGuard AI',
     description:
-      'AI agent security platform built on the open ATR detection standard. Community tier is free and open source; Pilot and Enterprise add hosted compliance, evidence packs, and managed runtime guard.',
+      'AI agent security platform built on the open ATR detection standard. Community tier is free and open source; Enterprise, Migrator Pro and Sovereign add hosted compliance, evidence packs, and managed runtime guard.',
     url: 'https://panguard.ai/pricing',
     applicationCategory: 'SecurityApplication',
     applicationSubCategory: 'AI Agent Security',
@@ -233,15 +237,6 @@ export function pricingApplicationSchema() {
       },
       {
         '@type': 'Offer',
-        name: 'Pilot (90 days)',
-        description: 'Fixed-scope 90-day pilot with hosted compliance evidence and onboarding.',
-        price: '25000',
-        priceCurrency: 'USD',
-        availability: 'https://schema.org/InStock',
-        url: 'https://panguard.ai/scoping',
-      },
-      {
-        '@type': 'Offer',
         name: 'Enterprise (annual)',
         description:
           'Annual platform license: managed runtime guard, compliance reporting, and evidence packs.',
@@ -253,6 +248,33 @@ export function pricingApplicationSchema() {
         },
         availability: 'https://schema.org/InStock',
         url: 'https://panguard.ai/contact?tier=enterprise',
+      },
+      {
+        '@type': 'Offer',
+        name: 'Migrator Pro (annual)',
+        description:
+          'Signed, continuously re-scanned compliance evidence — the flagship migration + evidence engine.',
+        priceSpecification: {
+          '@type': 'PriceSpecification',
+          priceCurrency: 'USD',
+          minPrice: '500000',
+          maxPrice: '2000000',
+        },
+        availability: 'https://schema.org/InStock',
+        url: 'https://panguard.ai/contact?tier=migrator',
+      },
+      {
+        '@type': 'Offer',
+        name: 'Sovereign / OEM',
+        description: 'On-prem, air-gapped, per-nation deployment. The ceiling beyond Sigma.',
+        priceSpecification: {
+          '@type': 'PriceSpecification',
+          priceCurrency: 'USD',
+          minPrice: '5000000',
+          maxPrice: '20000000',
+        },
+        availability: 'https://schema.org/InStock',
+        url: 'https://panguard.ai/contact?tier=sovereign',
       },
     ],
   } as Record<string, unknown>;

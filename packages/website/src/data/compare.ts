@@ -406,7 +406,7 @@ export const COMPARE: ComparisonEntry[] = [
       },
       {
         feature: 'Pricing',
-        atr: 'Community $0, Pilot $25K, Enterprise $150-500K, Sovereign $5-20M',
+        atr: 'Community $0, Enterprise $150-500K, Migrator Pro $500K-2M, Sovereign $5-20M',
         other: 'Enterprise contracts, custom pricing',
         winner: 'context',
       },

@@ -114,7 +114,7 @@ export default function DemoContent() {
                 See it before you book
               </p>
               <h2 className="text-[clamp(24px,3vw,32px)] font-bold text-text-primary leading-[1.1] text-center">
-                Real artifacts a Pilot customer receives
+                Real artifacts a Migrator Pro customer receives
               </h2>
               <p className="text-text-secondary mt-3 text-base max-w-2xl mx-auto text-center leading-relaxed">
                 No form required. Open these on your phone.
