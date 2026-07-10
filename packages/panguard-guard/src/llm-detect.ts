@@ -346,27 +346,54 @@ export async function autoDetectLLM(): Promise<AnalyzeLLM | null> {
 
     logger.info(`Semantic layer: '${resolved.label}' (model: ${resolved.model}) connected`);
 
+    // Live Layer C health: report each advisory-call outcome so the dashboard can
+    // downgrade to 'degraded' when a configured model actually stops responding
+    // (expired key / dead Ollama), instead of reporting config-presence as green.
+    let outcomeSink: ((ok: boolean, error?: string) => void) | undefined;
+    const report = (ok: boolean, error?: string): void => {
+      try {
+        outcomeSink?.(ok, error);
+      } catch {
+        /* health reporting must never break detection */
+      }
+    };
+
     const adapter: AnalyzeLLM = {
       async analyze(prompt: string, context?: string): Promise<LLMAnalysisResult> {
-        const result = await llmProvider.analyze(prompt, context);
-        return {
-          summary: result.summary,
-          severity: result.severity,
-          confidence: result.confidence,
-          recommendations: result.recommendations,
-        };
+        try {
+          const result = await llmProvider.analyze(prompt, context);
+          report(true);
+          return {
+            summary: result.summary,
+            severity: result.severity,
+            confidence: result.confidence,
+            recommendations: result.recommendations,
+          };
+        } catch (err) {
+          report(false, err instanceof Error ? err.message : String(err));
+          throw err;
+        }
       },
       async classify(event: SecurityEvent): Promise<LLMClassificationResult> {
-        const result = await llmProvider.classify(event);
-        return {
-          technique: result.technique,
-          severity: result.severity,
-          confidence: result.confidence,
-          description: result.description,
-        };
+        try {
+          const result = await llmProvider.classify(event);
+          report(true);
+          return {
+            technique: result.technique,
+            severity: result.severity,
+            confidence: result.confidence,
+            description: result.description,
+          };
+        } catch (err) {
+          report(false, err instanceof Error ? err.message : String(err));
+          throw err;
+        }
       },
       async isAvailable(): Promise<boolean> {
         return llmProvider.isAvailable();
+      },
+      setLayerCOutcomeSink(sink): void {
+        outcomeSink = sink;
       },
     };
 

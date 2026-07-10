@@ -384,6 +384,12 @@ export class GuardEngine {
       // serving the stale launch-time config (which made the UI snap back).
       this.dashboard.setConfigApplier((cfg) => this.applyConfig(cfg));
       this.dashboard.setRulesProvider(() => this.engines.atrEngine.getAllRules());
+      // Feed live Layer C (semantic LLM) call outcomes into the dashboard so it
+      // reports 'degraded' when a configured model stops responding, rather than
+      // a config-only green. No-ops for LLM adapters that don't expose the sink.
+      this.llm?.setLayerCOutcomeSink?.((ok, error) =>
+        this.dashboard?.reportLayerCOutcome(ok, error)
+      );
       await this.dashboard.start();
 
       // Set startTime early so the immediate status push shows valid uptime

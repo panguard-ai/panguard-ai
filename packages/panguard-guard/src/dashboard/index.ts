@@ -44,6 +44,7 @@ import type {
 import { saveConfig, loadConfig } from '../config.js';
 import { verifyConfigIntegrity, checkSelfState } from '../integrity.js';
 import { redactSecrets, SECRET_KEY_RE, SECRET_VALUE_RE, REDACTED } from '../redact.js';
+import { scrubSecretValues } from '../agent/scrub-secrets.js';
 import { DashboardRelayClient, type RelayClientConfig } from './relay-client.js';
 import {
   AuditChain,
@@ -1024,6 +1025,7 @@ export class DashboardServer {
     license: { tier: 'community' | 'pilot' | 'enterprise' | 'free' | 'pro' };
     layers: LayerHealth;
     enforcement: EnforcementStatus;
+    hostPlatform: NodeJS.Platform;
   } {
     const cfg = this.getConfig?.();
     const rawTier = cfg?.cliTier ?? this.status.licenseTier ?? 'community';
@@ -1034,6 +1036,11 @@ export class DashboardServer {
       license: { tier },
       layers: this.computeLayers(),
       enforcement: this.computeEnforcement(),
+      // The GUARD HOST's platform (not the browser's). Key-storage copy that
+      // claims POSIX 0600 must reflect the machine the file actually lives on —
+      // a Windows host viewed from a Mac browser (or vice-versa) would otherwise
+      // show the wrong permissions claim.
+      hostPlatform: process.platform,
     };
   }
 
@@ -1496,7 +1503,11 @@ export class DashboardServer {
             integrity,
             attestation: { chain: attestationChain },
           },
-          results,
+          // Defence-in-depth: scrub any secret that slipped into event-derived
+          // text before it reaches the auditor's file. The attestation chain is
+          // hashed over the durable records independently, so scrubbing this
+          // human-readable projection does not affect integrity verification.
+          results: scrubSecretValues(results),
         },
       ],
     };
@@ -1588,19 +1599,25 @@ export class DashboardServer {
         severity: r.severity,
         category: r.category,
       })),
-      verdicts: durable.records.map((rec, idx) => ({
-        index: idx,
-        conclusion: rec.verdict.conclusion,
-        confidence: rec.verdict.confidence,
-        reasoning: rec.verdict.reasoning,
-        recommendedAction: rec.verdict.recommendedAction,
-        mitreTechnique: rec.verdict.mitreTechnique,
-        evidence_sources: (rec.verdict.evidence ?? []).map((e) => e.source),
-        rule: rec.rule,
-        decisionId: rec.decisionId,
-        // Username-anonymized actor — never leak OS usernames into the auditor doc.
-        actor: anonymizeActorForExport(rec.actor),
-      })),
+      // Scrub secret values out of the free-text verdict fields before they are
+      // written into the auditor doc (and before the self-SHA is computed over
+      // it, so the hash stays consistent). Covers records that predate the
+      // write-path scrubber or carry a secret shape it did not catch.
+      verdicts: scrubSecretValues(
+        durable.records.map((rec, idx) => ({
+          index: idx,
+          conclusion: rec.verdict.conclusion,
+          confidence: rec.verdict.confidence,
+          reasoning: rec.verdict.reasoning,
+          recommendedAction: rec.verdict.recommendedAction,
+          mitreTechnique: rec.verdict.mitreTechnique,
+          evidence_sources: (rec.verdict.evidence ?? []).map((e) => e.source),
+          rule: rec.rule,
+          decisionId: rec.decisionId,
+          // Username-anonymized actor — never leak OS usernames into the auditor doc.
+          actor: anonymizeActorForExport(rec.actor),
+        }))
+      ),
       attestation: {
         method: 'sha256',
         note: 'SHA-256 below is over the canonical JSON of this document with this field set to null. Verify by recomputing the hash with attestation.sha256 = null and comparing.',
@@ -1810,9 +1827,14 @@ export class DashboardServer {
       parsed.username = '';
       parsed.password = '';
     }
-    // Redact secret-ish query-param values by key name (shared SECRET_KEY_RE).
+    // Redact secret-ish query-param values by key name. SECRET_KEY_RE catches
+    // *_key/*_token/etc., but common LLM providers pass credentials as bare
+    // `?key=` (Google Gemini) or `?access_key=` which it does not match — cover
+    // those explicit credential-bearing param names too.
+    const CRED_QUERY_KEY =
+      /^(key|apikey|api[-_]?key|access[-_]?key|access[-_]?token|auth[-_]?token|token|secret|password|pwd)$/i;
     for (const k of [...parsed.searchParams.keys()]) {
-      if (SECRET_KEY_RE.test(k)) parsed.searchParams.set(k, REDACTED);
+      if (SECRET_KEY_RE.test(k) || CRED_QUERY_KEY.test(k)) parsed.searchParams.set(k, REDACTED);
     }
     return parsed.toString();
   }
