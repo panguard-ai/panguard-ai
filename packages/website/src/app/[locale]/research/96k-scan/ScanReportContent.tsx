@@ -328,8 +328,9 @@ dGFycmQzdHh3KSI=' | base64 -D | bash`}</code>
               ATR: The Open Detection Standard for AI Agent Security
             </h2>
             <p className="text-text-secondary leading-relaxed mb-6">
-              ATR (Agent Threat Rules) is an open, executable detection standard designed specifically
-              for AI agent threats. {STATS.totalRulesDisplay} rules. {STATS.atrPatterns.toLocaleString()}+ patterns. 10 threat categories. MIT licensed.
+              ATR (Agent Threat Rules) is an open, executable detection standard designed
+              specifically for AI agent threats. {STATS.totalRulesDisplay} rules.{' '}
+              {STATS.atrPatterns.toLocaleString()}+ patterns. 10 threat categories. MIT licensed.
               Like YARA for malware, Sigma for logs -- ATR for AI agents.
             </p>
           </FadeInUp>
@@ -352,7 +353,8 @@ dGFycmQzdHh3KSI=' | base64 -D | bash`}</code>
               <div className="bg-surface-2 rounded-xl border border-border p-5">
                 <p className="text-xs text-text-muted mb-1">Adopted by</p>
                 <p className="text-sm text-text-primary font-semibold mb-2">
-                  Cisco AI Defense ({STATS.adoption.ciscoRulesMerged} ATR rules merged), OWASP Agentic Top 10
+                  Cisco AI Defense ({STATS.adoption.ciscoRulesMerged} ATR rules merged), OWASP
+                  Agentic Top 10
                 </p>
                 <a
                   href="https://github.com/cisco-ai-defense/skill-scanner/pull/79"
