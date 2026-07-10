@@ -101,7 +101,8 @@ function useTerminalPlayback(script: readonly TermLine[], reduced: boolean) {
     return () => clearTimeout(t);
   }, [reduced]);
 
-  if (!started) return { lines: [] as TermLine[], current: null as TermLine | null, typed: 0, done: false };
+  if (!started)
+    return { lines: [] as TermLine[], current: null as TermLine | null, typed: 0, done: false };
   const lines = script.slice(0, lineIdx);
   const current = script[lineIdx] ?? null;
   const done = lineIdx >= script.length;
@@ -120,7 +121,15 @@ function ToneText({ line }: { readonly line: TermLine }) {
   return <span className={cls}>{line.text}</span>;
 }
 
-function Terminal({ reduced, copyLabel, copiedLabel }: { readonly reduced: boolean; readonly copyLabel: string; readonly copiedLabel: string }) {
+function Terminal({
+  reduced,
+  copyLabel,
+  copiedLabel,
+}: {
+  readonly reduced: boolean;
+  readonly copyLabel: string;
+  readonly copiedLabel: string;
+}) {
   const script = useMemo(() => buildScript(), []);
   const { lines, current, typed, done } = useTerminalPlayback(script, reduced);
   const [copied, setCopied] = useState(false);
@@ -135,7 +144,10 @@ function Terminal({ reduced, copyLabel, copiedLabel }: { readonly reduced: boole
   return (
     <div className="relative text-left">
       {/* glow bloom behind the window */}
-      <div className="absolute -inset-6 rounded-[28px] bg-brand-sage/[0.07] blur-2xl pointer-events-none" aria-hidden="true" />
+      <div
+        className="absolute -inset-6 rounded-[28px] bg-brand-sage/[0.07] blur-2xl pointer-events-none"
+        aria-hidden="true"
+      />
 
       <div className="relative rounded-2xl border border-border bg-[#131010]/95 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.8)] overflow-hidden backdrop-blur">
         {/* sheen sweep */}
@@ -155,7 +167,9 @@ function Terminal({ reduced, copyLabel, copiedLabel }: { readonly reduced: boole
             <span className="w-3 h-3 rounded-full bg-[#FF5F57]/80" />
             <span className="w-3 h-3 rounded-full bg-[#FEBC2E]/80" />
             <span className="w-3 h-3 rounded-full bg-[#28C840]/80" />
-            <span className="ml-3 font-mono text-[11px] text-text-muted tracking-wide">panguard — zsh</span>
+            <span className="ml-3 font-mono text-[11px] text-text-muted tracking-wide">
+              panguard — zsh
+            </span>
           </div>
           <button
             type="button"
@@ -169,7 +183,10 @@ function Terminal({ reduced, copyLabel, copiedLabel }: { readonly reduced: boole
         </div>
 
         {/* transcript */}
-        <div className="px-4 sm:px-5 py-4 font-mono text-[12.5px] sm:text-[13.5px] leading-[1.9] min-h-[218px] sm:min-h-[236px]" aria-live="off">
+        <div
+          className="px-4 sm:px-5 py-4 font-mono text-[12.5px] sm:text-[13.5px] leading-[1.9] min-h-[218px] sm:min-h-[236px]"
+          aria-live="off"
+        >
           {lines.map((l, i) =>
             l.type === 'cmd' ? (
               <div key={i} className="whitespace-pre-wrap break-all">
@@ -208,7 +225,10 @@ function Terminal({ reduced, copyLabel, copiedLabel }: { readonly reduced: boole
             <div className="whitespace-pre-wrap break-all">
               <span className="text-brand-sage select-none">$ </span>
               <span className="text-text-primary">{current.text.slice(0, typed)}</span>
-              <span className="inline-block w-[7px] h-[15px] translate-y-[2px] bg-brand-sage/80 animate-pulse" aria-hidden="true" />
+              <span
+                className="inline-block w-[7px] h-[15px] translate-y-[2px] bg-brand-sage/80 animate-pulse"
+                aria-hidden="true"
+              />
             </div>
           )}
 
@@ -216,7 +236,10 @@ function Terminal({ reduced, copyLabel, copiedLabel }: { readonly reduced: boole
           {done && (
             <div>
               <span className="text-brand-sage select-none">$ </span>
-              <span className="inline-block w-[7px] h-[15px] translate-y-[2px] bg-brand-sage/80 animate-pulse" aria-hidden="true" />
+              <span
+                className="inline-block w-[7px] h-[15px] translate-y-[2px] bg-brand-sage/80 animate-pulse"
+                aria-hidden="true"
+              />
             </div>
           )}
         </div>
@@ -370,7 +393,8 @@ export default function InstallHero() {
             variants={variants.child}
             className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.1] tracking-tight text-text-primary [text-wrap:balance]"
           >
-            {t('titleLine1')}<span className="text-brand-sage">{t('titleLine2')}</span>
+            {t('titleLine1')}
+            <span className="text-brand-sage">{t('titleLine2')}</span>
           </motion.h1>
           <motion.p
             variants={variants.child}
@@ -396,7 +420,11 @@ export default function InstallHero() {
               transition={{ duration: 2.4, repeat: Infinity, repeatDelay: 5, ease: 'easeOut' }}
             />
           )}
-          <Terminal reduced={prefersReducedMotion} copyLabel={t('copy')} copiedLabel={t('copied')} />
+          <Terminal
+            reduced={prefersReducedMotion}
+            copyLabel={t('copy')}
+            copiedLabel={t('copied')}
+          />
 
           {/* install note + secondary paths */}
           <p className="mt-4 font-mono text-[11px] uppercase tracking-micro text-text-muted">

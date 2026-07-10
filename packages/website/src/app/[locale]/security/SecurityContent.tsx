@@ -72,7 +72,8 @@ export default function SecurityContent() {
             <h1 className="text-[clamp(40px,5vw,64px)] font-extrabold leading-[1.08] tracking-tight text-text-primary max-w-3xl">
               {t('title')}
               <br className="hidden sm:block" />
-              <span className="text-brand-sage">{t('titleHighlight')}</span>{t('titleSuffix')}
+              <span className="text-brand-sage">{t('titleHighlight')}</span>
+              {t('titleSuffix')}
             </h1>
           </FadeInUp>
           <FadeInUp delay={0.1}>

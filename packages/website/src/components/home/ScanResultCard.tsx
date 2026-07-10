@@ -487,7 +487,9 @@ export default function ScanResultCard({
           {isZh ? (
             <>
               你的掃描協助訓練社群防禦網路。僅匿名規則 ID 與攻擊類型，不含內容。停用：
-              <code className="text-[10px] font-mono">scanner-no-telemetry</code> cookie。隱私：{' '}
+              <code className="text-[10px] font-mono">
+                scanner-no-telemetry
+              </code> cookie。隱私：{' '}
               <Link href="/legal/privacy" className="underline hover:text-text-secondary">
                 panguard.ai/privacy
               </Link>

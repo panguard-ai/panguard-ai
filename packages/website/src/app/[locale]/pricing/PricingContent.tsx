@@ -1140,8 +1140,8 @@ Auditor-ready artefacts
                 {isZh ? (
                   <>
                     <strong className="text-text-primary">F500 不需要中間 tier 當橋樑。</strong>
-                    F500 security team 本來就用免費 Community 試水 90 天，要合規 + SOC2 + airgap 時跳
-                    Enterprise 或 Migrator Pro。這是 F500 實際的採購行為，不是付費 Team tier。
+                    F500 security team 本來就用免費 Community 試水 90 天，要合規 + SOC2 + airgap
+                    時跳 Enterprise 或 Migrator Pro。這是 F500 實際的採購行為，不是付費 Team tier。
                   </>
                 ) : (
                   <>

@@ -76,8 +76,7 @@ const STEPS = [
     title: 'Drop your Sigma/YARA rules',
     titleZh: '丟進你的 Sigma/YARA 規則',
     body: 'Upload a directory or zip of legacy detection rules. The migrator parses Sigma YAML and YARA text without external dependencies.',
-    bodyZh:
-      '上傳既有偵測規則的目錄或 zip。Migrator 直接解析 Sigma YAML 與 YARA 文字、零外部相依。',
+    bodyZh: '上傳既有偵測規則的目錄或 zip。Migrator 直接解析 Sigma YAML 與 YARA 文字、零外部相依。',
   },
   {
     icon: Cpu,
@@ -227,11 +226,16 @@ export default function MigratorContent() {
               </span>
             </div>
             <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight mb-6 text-text-primary">
-              {isZh ? '轉換器背後的 Enterprise 流水線' : 'The Enterprise pipeline behind the converter'}
+              {isZh
+                ? '轉換器背後的 Enterprise 流水線'
+                : 'The Enterprise pipeline behind the converter'}
             </h2>
             <p className="text-xl md:text-2xl text-text-secondary leading-relaxed">
               {isZh ? (
-                <>一道指令，把既有偵測規則轉換成 AI agent 語境的 ATR YAML。自動對應 EU AI Act 條文、OWASP Agentic Top 10、NIST AI RMF、ISO/IEC 42001。</>
+                <>
+                  一道指令，把既有偵測規則轉換成 AI agent 語境的 ATR YAML。自動對應 EU AI Act
+                  條文、OWASP Agentic Top 10、NIST AI RMF、ISO/IEC 42001。
+                </>
               ) : (
                 <>
                   Convert legacy detection rules into AI-agent-context ATR YAML in one command.
@@ -280,7 +284,9 @@ export default function MigratorContent() {
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-3 text-text-muted text-xs hover:text-text-primary transition-colors"
                 title={
-                  isZh ? 'SHA-256 manifest 與驗證說明' : 'SHA-256 manifest + verification instructions'
+                  isZh
+                    ? 'SHA-256 manifest 與驗證說明'
+                    : 'SHA-256 manifest + verification instructions'
                 }
               >
                 {isZh ? '驗證完整性 (MANIFEST.txt)' : 'Verify integrity (MANIFEST.txt)'}
@@ -402,7 +408,10 @@ export default function MigratorContent() {
           <div className="text-center mt-8 text-sm text-text-muted">
             <ArrowDown className="w-4 h-4 inline-block mr-2" />
             {isZh ? (
-              <>Migrator 把偵測欄位從端點 Sysmon 改寫成 AI agent 遙測。同一個威脅，改用 runtime engine 真正看得懂的語言。</>
+              <>
+                Migrator 把偵測欄位從端點 Sysmon 改寫成 AI agent 遙測。同一個威脅，改用 runtime
+                engine 真正看得懂的語言。
+              </>
             ) : (
               <>
                 The migrator reauthors detection fields from endpoint Sysmon to AI-agent telemetry.
@@ -419,7 +428,9 @@ export default function MigratorContent() {
           <SectionTitle
             title={isZh ? '你會拿到什麼' : 'What you get'}
             subtitle={
-              isZh ? '每次遷移執行、一次 CLI 呼叫的完整產出。' : 'Per migration run, in one CLI invocation.'
+              isZh
+                ? '每次遷移執行、一次 CLI 呼叫的完整產出。'
+                : 'Per migration run, in one CLI invocation.'
             }
           />
         </FadeInUp>
@@ -455,9 +466,11 @@ export default function MigratorContent() {
             <p className="text-text-secondary leading-relaxed">
               {isZh ? (
                 <>
-                  一次 EU AI Act 高風險系統稽核大約需要 12 份文件（Annex IV 加第 9&ndash;15、17、50、72 條）。Migrator 以高品質交付其中{' '}
+                  一次 EU AI Act 高風險系統稽核大約需要 12 份文件（Annex IV 加第
+                  9&ndash;15、17、50、72 條）。Migrator 以高品質交付其中{' '}
                   <strong className="text-panguard-green">2&ndash;3</strong>{' '}
-                  份——技術控制證據層。其餘 9&ndash;10 份屬客戶責任，但我們的證據包會交叉引用它們，讓你的稽核員不必維護五份各自獨立的試算表。
+                  份——技術控制證據層。其餘 9&ndash;10
+                  份屬客戶責任，但我們的證據包會交叉引用它們，讓你的稽核員不必維護五份各自獨立的試算表。
                 </>
               ) : (
                 <>
@@ -516,7 +529,8 @@ export default function MigratorContent() {
               <>
                 定價反映範圍：這是一個{' '}
                 <strong className="text-text-primary">$50&ndash;150K 的偵測證據模組</strong>
-                ，不是一站式 EU AI Act 合規套餐。這個證據包的價值，在於把 6 個月的偵測工程顧問壓縮成 1 週的建置——而不是取代法務 / 合規卷宗本身。
+                ，不是一站式 EU AI Act 合規套餐。這個證據包的價值，在於把 6 個月的偵測工程顧問壓縮成
+                1 週的建置——而不是取代法務 / 合規卷宗本身。
               </>
             ) : (
               <>
@@ -721,7 +735,13 @@ export default function MigratorContent() {
             <p className="text-text-secondary mb-8 leading-relaxed">
               {isZh ? (
                 <>
-                  Migrator Community v0.1.0 已以 MIT 授權上線 npm——含 Sigma / YARA 解析器、IR、transformers 與 CLI。Migrator Enterprise v0.1.0 出貨完整品質流水線（Sigma + YARA 現已接上 runtime；另外 13 種 adapter——Snort、Splunk SPL、Elastic EQL、Falco、Semgrep、CodeQL、CVE-NVD、GHSA、OSV、KEV、garak、PyRIT、promptfoo——隨 v0.2 enterprise release 推出）、五大框架合規自動對應、六分頁 Web dashboard 與稽核證據包。v1.0.0 GA 目標 2027 年 Q1。
+                  Migrator Community v0.1.0 已以 MIT 授權上線 npm——含 Sigma / YARA
+                  解析器、IR、transformers 與 CLI。Migrator Enterprise v0.1.0
+                  出貨完整品質流水線（Sigma + YARA 現已接上 runtime；另外 13 種
+                  adapter——Snort、Splunk SPL、Elastic
+                  EQL、Falco、Semgrep、CodeQL、CVE-NVD、GHSA、OSV、KEV、garak、PyRIT、promptfoo——隨
+                  v0.2 enterprise release 推出）、五大框架合規自動對應、六分頁 Web dashboard
+                  與稽核證據包。v1.0.0 GA 目標 2027 年 Q1。
                 </>
               ) : (
                 <>
