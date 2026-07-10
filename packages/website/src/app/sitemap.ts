@@ -182,5 +182,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }))
   );
 
-  return [...staticEntries, ...blogEntries, ...glossaryEntries, ...compareEntries, ...layerEntries];
+  return [
+    ...staticEntries,
+    ...blogEntries,
+    ...glossaryEntries,
+    ...compareEntries,
+    ...layerEntries,
+  ];
 }

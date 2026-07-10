@@ -222,7 +222,7 @@ export default function ProductGuardContent() {
                 {STATS.totalRulesDisplay} ATR rules)
               </p>
               <p className="text-text-secondary">
-                <span className="text-[#22c55e]">[OK]</span> Behavioral baseline initialized
+                <span className="text-[#22c55e]">[OK]</span> Local LLM ready (Ollama)
               </p>
               <p className="text-text-secondary">
                 <span className="text-[#22c55e]">[OK]</span> Monitoring started. Learning period: 7

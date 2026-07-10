@@ -28,7 +28,7 @@ export default function ProductMcpPage() {
         data={softwareApplicationSchema({
           name: 'PanGuard MCP Server',
           description:
-            '12 panguard_* tools exposed over Model Context Protocol (MCP) for Claude Code, Cursor, OpenClaw, and any MCP-compatible AI agent. Scan, audit, guard, alert, block — all callable as MCP tools.',
+            '12 panguard_* tools exposed over Model Context Protocol (MCP) for Claude Code, Cursor, OpenClaw, NemoClaw, and any MCP-compatible AI agent. Scan, audit, guard, alert, block — all callable as MCP tools.',
           url: 'https://panguard.ai/product/mcp',
           category: 'DeveloperApplication',
           applicationSubCategory: 'MCP Security Tools',

@@ -10,21 +10,21 @@ const DEMOS: readonly { key: string; image: string; alt: string; width: number; 
     {
       key: 'dashboard',
       image: '/demo/guard-dashboard.png',
-      alt: 'PanGuard Guard Dashboard — live ATR rules active, real-time protection status, deterministic on-device detection',
+      alt: 'PanGuard Guard Dashboard — 188 rules active, real-time protection status, 3-layer detection',
       width: 1440,
       height: 900,
     },
     {
       key: 'rules',
       image: '/demo/guard-rules.png',
-      alt: 'PanGuard Detection Rules — ATR rules auto-synced from Threat Cloud, community contribution',
+      alt: 'PanGuard Detection Rules — 188 ATR rules, auto-sync from Threat Cloud, community contribution',
       width: 1440,
       height: 900,
     },
     {
       key: 'threatcloud',
       image: '/demo/guard-threat-cloud.png',
-      alt: 'PanGuard Threat Cloud — anonymous threat intelligence sharing, detection rules received',
+      alt: 'PanGuard Threat Cloud — anonymous threat intelligence sharing, 176 rules received',
       width: 1440,
       height: 900,
     },
@@ -73,7 +73,9 @@ export default function DemoShowcase() {
       </div>
 
       {/* Caption */}
-      <p className="mt-4 max-w-5xl text-xs text-text-muted">{t(`captions.${DEMOS[active].key}`)}</p>
+      <p className="mt-4 max-w-5xl text-xs text-text-muted">
+        {t(`captions.${DEMOS[active].key}`)}
+      </p>
     </SectionV2>
   );
 }

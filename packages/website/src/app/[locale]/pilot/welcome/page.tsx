@@ -6,11 +6,7 @@ import { redirect } from 'next/navigation';
  * to pricing. File retained (not deleted) so it can be restored if the Pilot
  * flow is ever revived.
  */
-export default async function PilotWelcomePage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function PilotWelcomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   redirect(locale === 'en' ? '/pricing' : `/${locale}/pricing`);
 }

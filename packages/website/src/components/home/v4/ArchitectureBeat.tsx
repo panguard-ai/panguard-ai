@@ -4,13 +4,7 @@ import { useLocale } from 'next-intl';
 import FadeInUp from '@/components/FadeInUp';
 import { Link } from '@/navigation';
 import { ArrowRight } from 'lucide-react';
-import {
-  LAYERS,
-  getLayersShipped,
-  type Layer,
-  type LayerStatus,
-  type Bilingual,
-} from '@/lib/layers';
+import { LAYERS, getLayersShipped, type Layer, type LayerStatus, type Bilingual } from '@/lib/layers';
 import { STATS } from '@/lib/stats';
 import { CardKicker, CardV2, Eyebrow, SectionTitleV2, SectionV2 } from '../v2/primitives';
 
@@ -194,9 +188,7 @@ export default function ArchitectureBeat() {
             {isZh ? (
               <>
                 點工具各守一層。
-                <span className="text-brand-sage">
-                  我們出貨 {TOTAL_LAYERS} 層中的 {shippedCount} 層
-                </span>
+                <span className="text-brand-sage">我們出貨 {TOTAL_LAYERS} 層中的 {shippedCount} 層</span>
                 ,缺口照標,不假打勾。
               </>
             ) : (
