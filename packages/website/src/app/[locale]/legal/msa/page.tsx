@@ -37,8 +37,8 @@ export default async function MSAPage(props: { params: Promise<{ locale: string 
 
       <p>
         {isZh
-          ? '此頁面為 PanGuard AI 主服務協議的網頁摘要。完整文件為下方 PDF。Pilot 結帳流程要求 Customer 接受此 MSA。'
-          : 'This page summarises the PanGuard AI Master Services Agreement. The authoritative document is the PDF linked below. Pilot checkout requires Customer to accept this MSA.'}
+          ? '此頁面為 PanGuard AI 主服務協議的網頁摘要。完整文件為下方 PDF。所有付費合約的結帳流程都要求 Customer 接受此 MSA。'
+          : 'This page summarises the PanGuard AI Master Services Agreement. The authoritative document is the PDF linked below. Checkout for any paid engagement requires Customer to accept this MSA.'}
       </p>
 
       <div className="my-6 p-6 bg-surface-1 border border-brand-sage/40 rounded-xl">
@@ -122,7 +122,7 @@ export default async function MSAPage(props: { params: Promise<{ locale: string 
       <h2>{isZh ? '電子接受' : 'Electronic acceptance'}</h2>
       <p>
         {isZh
-          ? 'Customer 在 panguard.ai/pilot 完成結帳並完成付款即構成有約束力的接受。文件 Section 13.9 涵蓋此條款。'
+          ? 'Customer 在 panguard.ai 完成結帳並完成付款即構成有約束力的接受。文件 Section 13.9 涵蓋此條款。'
           : 'Customer\'s click of "I accept" at checkout, together with completion of payment, constitutes binding acceptance per MSA Section 13.9.'}
       </p>
 
@@ -141,7 +141,7 @@ export default async function MSAPage(props: { params: Promise<{ locale: string 
           <a href="/legal/refund">{isZh ? '退費政策' : 'Refund Policy'}</a>
         </li>
         <li>
-          <a href="/legal/sow">{isZh ? 'Pilot SOW 範本' : 'Pilot SOW template'}</a>
+          <a href="/legal/sow">{isZh ? 'Migrator Pro SOW 範本' : 'Migrator Pro SOW template'}</a>
         </li>
         <li>
           <a href="/legal/responsible-disclosure">
