@@ -356,6 +356,25 @@ export const CATEGORIES: CommandCategory[] = [
     ],
   },
   {
+    id: 'config',
+    commands: [
+      {
+        id: 'configLlm',
+        command: 'panguard config llm',
+        descKey: 'cli.commands.configLlm.desc',
+        flags: [
+          { name: '--provider <name>', descKey: 'cli.commands.configLlm.flags.provider' },
+          { name: '--model <model>', descKey: 'cli.commands.configLlm.flags.model' },
+          { name: '--show', descKey: 'cli.commands.configLlm.flags.show' },
+          { name: '--clear', descKey: 'cli.commands.configLlm.flags.clear' },
+        ],
+        example: 'panguard config llm --provider ollama --model llama3',
+        tier: 'Free',
+        maturity: 'GA',
+      },
+    ],
+  },
+  {
     id: 'system',
     commands: [
       {

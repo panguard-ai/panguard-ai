@@ -40,12 +40,12 @@ export default function ContactForm() {
     const prefilledType =
       idx !== undefined && inquiryTypes[idx] !== undefined ? inquiryTypes[idx] : '';
     const tierLabel: Record<string, string> = {
-      migrator: 'Migrator Pro',
-      enterprise: 'Enterprise',
-      'founding-f500': 'Founding F500 program',
-      sovereign: 'Sovereign AI',
-      oem: 'Vendor OEM License',
-      'atr-member': 'ATR Foundation Member',
+      migrator: 'Migrator Pro ($500K-2M/year)',
+      enterprise: 'Enterprise ($150K-$500K)',
+      'founding-f500': 'Founding F500 program ($100K/year × 2)',
+      sovereign: 'Sovereign AI ($5-20M)',
+      oem: 'Vendor OEM License ($2-10M/year)',
+      'atr-member': 'ATR Foundation Member ($10K/year)',
     };
     const label = tierLabel[tier];
     const sovereignPath = tier === 'sovereign' ? searchParams?.get('path') : null;

@@ -197,5 +197,3 @@ export default function CookiePolicyPage() {
     </article>
   );
 }
-
-// force fresh rebuild: clear stale i18n build-cache artifact (2026-07-10)

@@ -124,12 +124,7 @@ const BENCHMARKS: Benchmark[] = [
         value: `${STATS.benchmark.pint.samples} samples`,
         zhValue: `${STATS.benchmark.pint.samples} 個樣本`,
       },
-      {
-        label: 'Layer',
-        zhLabel: '層級',
-        value: 'Layer 1 — regex only',
-        zhValue: 'Layer 1 — 僅 regex',
-      },
+      { label: 'Layer', zhLabel: '層級', value: 'Layer 1 — regex only', zhValue: 'Layer 1 — 僅 regex' },
     ],
     reproduce: 'pnpm bench:pint (in agent-threat-rules repo)',
     externalLink:
@@ -171,8 +166,10 @@ const BENCHMARKS: Benchmark[] = [
     slug: 'hackaprompt',
     name: 'HackAPrompt cluster mining',
     zhName: 'HackAPrompt 叢集探勘',
-    description: `ATR run against the HackAPrompt EMNLP 2023 competition corpus (4,780 deterministic samples). Result: ${STATS.benchmark.hackaprompt.recall}% recall, 0 new false positives. The number is honest and below closed-source ML detector claims. Methodology and rule additions documented in the public engineering blog.`,
-    zhDescription: `ATR 對 HackAPrompt EMNLP 2023 競賽語料庫（4,780 個確定性樣本）的實測。結果：${STATS.benchmark.hackaprompt.recall}% recall，0 個新誤報。數字誠實，低於閉源 ML 偵測器的宣稱。方法論與規則更新公開於工程部落格。`,
+    description:
+      `ATR run against the HackAPrompt EMNLP 2023 competition corpus (4,780 deterministic samples). Result: ${STATS.benchmark.hackaprompt.recall}% recall, 0 new false positives. The number is honest and below closed-source ML detector claims. Methodology and rule additions documented in the public engineering blog.`,
+    zhDescription:
+      `ATR 對 HackAPrompt EMNLP 2023 競賽語料庫（4,780 個確定性樣本）的實測。結果：${STATS.benchmark.hackaprompt.recall}% recall，0 個新誤報。數字誠實，低於閉源 ML 偵測器的宣稱。方法論與規則更新公開於工程部落格。`,
     date: '2026-05-11',
     source: {
       label: 'HackAPrompt corpus',

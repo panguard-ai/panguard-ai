@@ -178,9 +178,7 @@ export default function SpecContent() {
               <div className="mb-2 font-mono text-lg font-semibold text-text-primary">
                 {lvl.level}
               </div>
-              <p className="text-sm leading-relaxed text-text-secondary">
-                {isZh ? lvl.zh : lvl.en}
-              </p>
+              <p className="text-sm leading-relaxed text-text-secondary">{isZh ? lvl.zh : lvl.en}</p>
             </div>
           ))}
         </div>

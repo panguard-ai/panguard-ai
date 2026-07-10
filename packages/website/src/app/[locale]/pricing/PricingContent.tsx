@@ -94,9 +94,7 @@ export default function PricingContent() {
                       Guard + support for production agents in regulated buyers.
                     </li>
                     <li>
-                      <span className="text-text-primary font-semibold">
-                        Migrator Pro (flagship)
-                      </span>{' '}
+                      <span className="text-text-primary font-semibold">Migrator Pro (flagship)</span>{' '}
                       — signed, continuously re-scanned compliance evidence — living proof, not a
                       one-off PDF.
                     </li>
@@ -409,7 +407,7 @@ export default function PricingContent() {
                         'Custom compliance evidence (national regs + EU AI Act + NIST AI RMF + ISO 42001 + OWASP Agentic)',
                         'Sovereign-level ATR contribution channel · national red-team feedback',
                         'Dedicated SLA · 24/7 nation-state support',
-                        'ATR merged into Cisco AI Defense skill-scanner (PR #99)',
+                        "ATR merged into Cisco AI Defense skill-scanner (PR #99)",
                         'Optional: ATR national namespace (rule namespacing)',
                       ]
                   ).map((f) => (

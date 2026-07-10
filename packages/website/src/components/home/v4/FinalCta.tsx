@@ -96,12 +96,7 @@ export default function FinalCta() {
                 {tCta('scanSkill')}
               </button>
 
-              <a
-                href={GITHUB_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={SECONDARY_CTA}
-              >
+              <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className={SECONDARY_CTA}>
                 <Star className="h-4 w-4" />
                 GitHub
               </a>

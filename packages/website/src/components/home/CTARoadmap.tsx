@@ -6,7 +6,7 @@ import { Terminal, Copy, Check, ArrowUp, Star, ExternalLink } from 'lucide-react
 import FadeInUp from '@/components/FadeInUp';
 import { STATS } from '@/lib/stats';
 
-export const INSTALL_COMMAND = 'npm install -g panguard && pga up';
+const INSTALL_COMMAND = 'npm install -g @panguard-ai/panguard && pga up';
 
 // Button recipes (v2 language): emerald strictly for the primary action.
 const PRIMARY_CTA =

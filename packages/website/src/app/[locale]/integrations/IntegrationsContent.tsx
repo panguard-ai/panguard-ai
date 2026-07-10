@@ -116,62 +116,6 @@ const integrations: Integration[] = [
   },
 ];
 
-/* ──────────────────────  Agent platforms (honest coverage)  ────────────── */
-
-type Coverage = 'full' | 'mcp';
-interface AgentPlatform {
-  name: string;
-  coverage: Coverage;
-  note: string;
-}
-
-// Coverage tiers are deliberately honest (verified per platform, 2026-06-16):
-//   full = MCP proxy + a built-in-tool hook (Bash/Edit/Write/WebFetch evaluated)
-//   mcp  = MCP proxy only — the host exposes no third-party pre-tool hook for its
-//          built-in tools (or, for Claude Desktop, has no local built-in tools).
-const agentPlatforms: AgentPlatform[] = [
-  {
-    name: 'Claude Code',
-    coverage: 'full',
-    note: 'MCP + native PreToolUse hook (reference integration)',
-  },
-  { name: 'Cursor', coverage: 'full', note: 'MCP + Agent Hooks (shell + MCP, fail-closed)' },
-  { name: 'Gemini CLI', coverage: 'full', note: 'MCP + BeforeTool hook' },
-  { name: 'Codex CLI', coverage: 'full', note: 'MCP + PreToolUse hook (shell + apply_patch)' },
-  { name: 'Cline', coverage: 'full', note: 'MCP + tool-call hook' },
-  { name: 'Continue', coverage: 'full', note: 'MCP + tool-call hook' },
-  { name: 'Windsurf', coverage: 'full', note: 'MCP + Cascade pre-hooks' },
-  { name: 'Claude Desktop', coverage: 'mcp', note: 'MCP proxy — no local built-in tools to miss' },
-  {
-    name: 'GitHub Copilot',
-    coverage: 'mcp',
-    note: 'MCP proxy — host has no third-party tool hook yet',
-  },
-  {
-    name: 'Zed',
-    coverage: 'mcp',
-    note: 'MCP proxy — built-in tools not interceptable by third parties',
-  },
-  {
-    name: 'Roo Code',
-    coverage: 'mcp',
-    note: 'MCP proxy — built-in tools not interceptable by third parties',
-  },
-];
-
-function CoverageBadge({ coverage }: { coverage: Coverage }) {
-  const full = coverage === 'full';
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full ${
-        full ? 'bg-emerald-500/10 text-emerald-400' : 'bg-brand-sage/10 text-brand-sage'
-      }`}
-    >
-      {full ? 'MCP + built-in tools' : 'MCP proxy'}
-    </span>
-  );
-}
-
 /* ────────────────────────────  Helpers  ────────────────────────── */
 
 function StatusBadge({ status, label }: { status: Status; label: string }) {
@@ -227,64 +171,6 @@ export default function IntegrationsContent() {
       {/* -- Hero -- */}
       <SectionWrapper spacing="spacious">
         <SectionTitle overline={t('overline')} title={t('title')} subtitle={t('subtitle')} />
-      </SectionWrapper>
-
-      {/* -- Agent platforms (what PanGuard protects, one command) -- */}
-      <SectionWrapper>
-        <FadeInUp>
-          <div className="text-center max-w-2xl mx-auto mb-4">
-            <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold mb-3">
-              Agent platforms
-            </p>
-            <h2 className="text-[clamp(20px,3.5vw,36px)] font-bold text-text-primary leading-[1.1]">
-              Protect every agent on your machine in one command
-            </h2>
-            <p className="text-text-secondary mt-4 leading-relaxed">
-              <code className="text-brand-sage">pga up</code> detects your AI coding agents and
-              turns on protection for each — the MCP proxy for tool servers, plus a built-in-tool
-              hook (Bash / Edit / Write / WebFetch) where the host supports one.
-            </p>
-          </div>
-        </FadeInUp>
-
-        <FadeInUp delay={0.05}>
-          <div className="max-w-xl mx-auto mb-10 bg-surface-1 border border-border rounded-2xl p-5">
-            <div className="flex items-center gap-2 mb-3">
-              <TerminalIcon size={15} className="text-emerald-400" />
-              <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">
-                One command, every detected platform
-              </span>
-            </div>
-            <pre className="text-sm text-text-secondary font-mono leading-relaxed overflow-x-auto">
-              <code>{`$ pga up
-  Scanned 24 skills · 0 threats
-  MCP proxy active on 4 platform(s)
-  Built-in tools guarded on 4 platform(s)
-    (claude-code, cursor, gemini, codex — restart the agent)`}</code>
-            </pre>
-          </div>
-        </FadeInUp>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {agentPlatforms.map((p, i) => (
-            <FadeInUp key={p.name} delay={i * 0.03}>
-              <div className="bg-surface-1 border border-border rounded-2xl p-5 h-full flex flex-col">
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <h3 className="text-base font-semibold text-text-primary">{p.name}</h3>
-                  <CoverageBadge coverage={p.coverage} />
-                </div>
-                <p className="text-xs text-text-secondary leading-relaxed flex-1">{p.note}</p>
-              </div>
-            </FadeInUp>
-          ))}
-        </div>
-        <FadeInUp>
-          <p className="text-center text-xs text-text-muted mt-6 max-w-xl mx-auto leading-relaxed">
-            &ldquo;MCP + built-in tools&rdquo; evaluates the agent&rsquo;s own shell / file / fetch
-            tools before they run. &ldquo;MCP proxy&rdquo; covers MCP tool servers; those hosts
-            don&rsquo;t yet expose a third-party hook for their built-in tools.
-          </p>
-        </FadeInUp>
       </SectionWrapper>
 
       {/* -- Search + Filter + Grid -- */}

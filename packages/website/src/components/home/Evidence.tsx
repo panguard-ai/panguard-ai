@@ -10,22 +10,17 @@ import { useEcosystemStats } from '@/hooks/useEcosystemStats';
 type Severity = 'CRITICAL' | 'HIGH';
 
 interface NotableSkill {
-  /**
-   * Anonymized category label, NOT a real package name. We never name a real
-   * third-party package as malicious without a reproducible public CVE/advisory
-   * link -- doing so would be trade libel. The findings below are real scan
-   * results, described by capability category instead of by package name.
-   */
+  name: string;
   downloads: number;
   severity: Severity;
   i18nKey: string;
 }
 
 const NOTABLE_SKILLS: readonly NotableSkill[] = [
-  { downloads: 2839, severity: 'CRITICAL', i18nKey: 'tesla' },
-  { downloads: 2206, severity: 'CRITICAL', i18nKey: 'wallet' },
-  { downloads: 9491, severity: 'HIGH', i18nKey: 'clawsec' },
-  { downloads: 2142, severity: 'HIGH', i18nKey: 'safeexec' },
+  { name: 'tesla-fleet-api', downloads: 2839, severity: 'CRITICAL', i18nKey: 'tesla' },
+  { name: 'walletconnect-agent', downloads: 2206, severity: 'CRITICAL', i18nKey: 'wallet' },
+  { name: 'clawsec', downloads: 9491, severity: 'HIGH', i18nKey: 'clawsec' },
+  { name: 'safe-exec', downloads: 2142, severity: 'HIGH', i18nKey: 'safeexec' },
 ] as const;
 
 const SEVERITY_STYLES: Record<Severity, { text: string; bg: string; border: string }> = {
@@ -79,7 +74,7 @@ export default function Evidence() {
             const styles = SEVERITY_STYLES[skill.severity];
 
             return (
-              <FadeInUp key={skill.i18nKey} delay={0.1 * index}>
+              <FadeInUp key={skill.name} delay={0.1 * index}>
                 <button
                   type="button"
                   onClick={() => handleToggle(index)}
@@ -95,8 +90,8 @@ export default function Evidence() {
                       )}
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-sm font-semibold text-text-primary">
-                            {t(`skills.${skill.i18nKey}.label`)}
+                          <span className="text-sm font-mono font-semibold text-text-primary">
+                            {skill.name}
                           </span>
                           <span
                             className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${styles.text} ${styles.bg}`}

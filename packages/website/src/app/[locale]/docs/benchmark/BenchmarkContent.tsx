@@ -48,9 +48,6 @@ export default function BenchmarkContent() {
               {t('title')}
             </h1>
             <p className="text-text-secondary mt-4 text-lg leading-relaxed">{t('subtitle')}</p>
-            <p className="text-sm text-text-muted mt-3">
-              Free and open source under the MIT license. No account required.
-            </p>
           </FadeInUp>
         </div>
       </SectionWrapper>
