@@ -58,9 +58,6 @@ export default function AdvancedSetupContent() {
               {t('title')}
             </h1>
             <p className="text-text-secondary mt-4 text-lg leading-relaxed">{t('subtitle')}</p>
-            <p className="text-sm text-text-muted mt-3">
-              Free and open source under the MIT license. No account required.
-            </p>
           </FadeInUp>
         </div>
       </SectionWrapper>
@@ -76,17 +73,17 @@ export default function AdvancedSetupContent() {
         </div>
       </SectionWrapper>
 
-      {/* Custom rules & Threat Cloud */}
+      {/* Ollama */}
       <SectionWrapper dark>
         <div className="max-w-3xl mx-auto">
           <FadeInUp>
-            <h2 className="text-xl font-bold text-text-primary mb-2">{t('customRulesTitle')}</h2>
-            <p className="text-text-secondary mb-6">{t('customRulesDesc')}</p>
+            <h2 className="text-xl font-bold text-text-primary mb-2">{t('ollamaTitle')}</h2>
+            <p className="text-text-secondary mb-6">{t('ollamaDesc')}</p>
             <CodeBlock
-              code={`# Point the engine at your own ATR rules directory\nexport PANGUARD_ATR_RULES_DIR=/etc/panguard/rules\n\n# Auto-reload rules when files change (no restart)\nexport PANGUARD_WATCH_RULES=true\n\n# Run fully air-gapped (skip Threat Cloud sync)\nexport TC_ENDPOINT=`}
+              code={`# Install Ollama\ncurl -fsSL https://ollama.ai/install.sh | sh\n\n# Pull a model\nollama pull llama3\n\n# Verify it's running\ncurl http://localhost:11434/api/tags`}
               label="Terminal"
             />
-            <p className="text-xs text-text-muted mt-3">{t('customRulesNote')}</p>
+            <p className="text-xs text-text-muted mt-3">{t('ollamaNote')}</p>
           </FadeInUp>
         </div>
       </SectionWrapper>
