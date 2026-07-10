@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { buildAlternates } from '@/lib/seo';
 
-const SOW_LAST_UPDATED_EN = 'May 20, 2026';
-const SOW_LAST_UPDATED_ZH = '2026年5月20日';
-const SOW_VERSION = 'v1.0';
-const SOW_PDF_URL = '/legal/02-Pilot-SOW.pdf';
+const SOW_LAST_UPDATED_EN = 'July 10, 2026';
+const SOW_LAST_UPDATED_ZH = '2026年7月10日';
+const SOW_VERSION = 'v2.0';
+const SOW_PDF_URL = '/legal/02-Migrator-Pro-SOW.pdf';
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;
@@ -50,7 +50,7 @@ export default async function SOWPage(props: { params: Promise<{ locale: string 
           download
           className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold rounded-lg px-5 py-2.5 text-sm hover:bg-brand-sage-light transition-colors"
         >
-          {isZh ? '下載 SOW PDF 範本 (332 KB)' : 'Download SOW PDF template (332 KB)'}
+          {isZh ? '下載 Migrator Pro SOW PDF (166 KB)' : 'Download Migrator Pro SOW PDF (166 KB)'}
         </a>
       </div>
 
