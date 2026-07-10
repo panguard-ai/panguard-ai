@@ -35,7 +35,7 @@ export default function PricingContent() {
             <h1 className="text-[clamp(28px,5vw,56px)] font-extrabold leading-[1.06] tracking-tight text-text-primary max-w-3xl mx-auto">
               {isZh ? (
                 <>
-                  <span className="text-brand-sage">免費</span>給社群,
+                  <span className="text-brand-sage">免費</span>給社群，
                   <br className="sm:hidden" />
                   <span className="text-brand-sage">認真</span>給 F500
                 </>
@@ -52,23 +52,23 @@ export default function PricingContent() {
             <div className="text-base sm:text-lg text-text-secondary max-w-3xl mx-auto mt-6 leading-[1.85] space-y-3">
               {isZh ? (
                 <>
-                  <p>Red Hat 模型 —— 免費標準,付費營運層。四個 tier,對應四種客戶與付費理由。</p>
+                  <p>Red Hat 模型——免費標準，付費營運層。四個 tier，對應四種客戶與付費理由。</p>
                   <ul className="space-y-2 text-left max-w-2xl mx-auto">
                     <li>
-                      <span className="text-text-primary font-semibold">Community(永久免費)</span>
-                      ——開放標準、規格與引擎。MIT。是散佈管道與全球感測網,不是收入來源。
+                      <span className="text-text-primary font-semibold">Community（永久免費）</span>
+                      ——開放標準、規格與引擎。MIT。是散佈管道與全球感測網，不是收入來源。
                     </li>
                     <li>
                       <span className="text-text-primary font-semibold">Enterprise</span>
                       ——受監管客戶 production agent 的 Scan + Guard + 支援。
                     </li>
                     <li>
-                      <span className="text-text-primary font-semibold">Migrator Pro(旗艦)</span>
-                      ——簽章、持續重掃的合規證據 —— 活的證明,不是一次性 PDF。
+                      <span className="text-text-primary font-semibold">Migrator Pro（旗艦）</span>
+                      ——簽章、持續重掃的合規證據——活的證明，不是一次性 PDF。
                     </li>
                     <li>
                       <span className="text-text-primary font-semibold">Sovereign / OEM</span>
-                      ——地端、離網、按國家部署;Sigma 從未有過的天花板。
+                      ——地端、離網、按國家部署；Sigma 從未有過的天花板。
                     </li>
                   </ul>
                   <p className="text-sm text-text-muted pt-2">
@@ -167,12 +167,12 @@ export default function PricingContent() {
                 <ul className="space-y-2.5">
                   {(isZh
                     ? [
-                        `${STATS.atrRules} 條 ATR 偵測規則(MIT 授權)`,
+                        `${STATS.atrRules} 條 ATR 偵測規則（MIT 授權）`,
                         '無 agent / endpoint / tenant 數量上限',
-                        '5 層今天已上線:L2 稽核 · L3 防護 · L4 偵測 · L5 誘捕 · L6 反應',
-                        '2 層 2026 Q2/Q3 補:L1 探索 · L7 治理',
-                        'Threat Cloud 感測器自動註冊 · 匿名遙測(可隨時停用)',
-                        'Threat Cloud 規則更新(< 24 小時)',
+                        '5 層今天已上線：L2 稽核 · L3 防護 · L4 偵測 · L5 誘捕 · L6 反應',
+                        '2 層 2026 Q2/Q3 補：L1 探索 · L7 治理',
+                        'Threat Cloud 感測器自動註冊 · 匿名遙測（可隨時停用）',
+                        'Threat Cloud 規則更新（< 24 小時）',
                         'GitHub Issues + Discord 社群支援',
                         'pga CLI:scan · audit · up · guard · status · sensor',
                       ]
@@ -249,7 +249,7 @@ export default function PricingContent() {
                         'agents / tenants / seats / sites 完全無上限',
                         '地端 / VPC / 離網 · SAML SSO · SCIM · SIEM webhook',
                         '專屬 Customer Success Manager · 優先支援 SLA',
-                        'SOC 2 Type 1 進行中(目標 2026 Q3)',
+                        'SOC 2 Type 1 進行中（目標 2026 Q3）',
                       ]
                     : [
                         'Scan skills & MCP servers against ATR before any agent loads them',
@@ -269,7 +269,7 @@ export default function PricingContent() {
 
                 <p className="text-[12px] text-text-muted leading-[1.85] mb-4">
                   {isZh
-                    ? '需要簽章、可稽核、持續重掃的合規證據(Migrator + Evidence 引擎)?見 Migrator Pro。'
+                    ? '需要簽章、可稽核、持續重掃的合規證據（Migrator + Evidence 引擎）？見 Migrator Pro。'
                     : 'For signed, audit-ready, continuously re-scanned compliance evidence (Migrator + Evidence engine), see Migrator Pro.'}
                 </p>
 
@@ -316,7 +316,7 @@ export default function PricingContent() {
               </p>
               <p className="text-sm text-text-secondary leading-[1.85]">
                 {isZh
-                  ? 'AI 廠商卡在銀行的 AI 安全審查、以及需要「活的」稽核證據的受監管企業。買的是一份持續重掃、持續更新的簽章證據,不是一次性 PDF。'
+                  ? 'AI 廠商卡在銀行的 AI 安全審查、以及需要「活的」稽核證據的受監管企業。買的是一份持續重掃、持續更新的簽章證據，不是一次性 PDF。'
                   : "AI vendors stuck in a bank's AI-security review, and regulated enterprises that need living audit evidence — a continuously re-scanned, signed artefact, not a one-off PDF."}
               </p>
 
@@ -326,8 +326,8 @@ export default function PricingContent() {
                     ? [
                         '簽章、持續重掃的合規證據(SHA-256 + Merkle tree)',
                         '每筆偵測 → ATR 規則 → 五框架條文(EU AI Act / NIST AI RMF / ISO 42001 / OWASP Agentic / OWASP LLM)',
-                        '把 15 種舊格式(Sigma、YARA、Splunk、CVE…)自動轉成 ATR 行為規則',
-                        '季度證據包,可直接送稽核(PDF + JSON)',
+                        '把 15 種舊格式（Sigma、YARA、Splunk、CVE…）自動轉成 ATR 行為規則',
+                        '季度證據包，可直接送稽核(PDF + JSON)',
                         'EU AI Act、NYDFS Part 500、DORA 即將要求的那份文件',
                         `偵測 0% 依賴 LLM——${STATS.totalRulesDisplay} 條 deterministic rules @ ${STATS.benchmark.garak.recall}% recall`,
                       ]
@@ -384,7 +384,7 @@ export default function PricingContent() {
               </p>
               <p className="text-sm text-text-secondary leading-[1.85]">
                 {isZh
-                  ? '主權國家 AI 基礎建設、央行、國防、跨部會合規平台。ATR 已 merge 進 Cisco AI Defense 的 skill-scanner(PR #99),導入零新供應商風險。'
+                  ? '主權國家 AI 基礎建設、央行、國防、跨部會合規平台。ATR 已 merge 進 Cisco AI Defense 的 skill-scanner(PR #99)，導入零新供應商風險。'
                   : "Sovereign AI infrastructure, central banks, defense, cross-ministry compliance platforms. ATR is already merged into Cisco AI Defense's skill-scanner (PR #99) — no new-vendor risk."}
               </p>
 
@@ -401,7 +401,7 @@ export default function PricingContent() {
                         '主權級 ATR 規則貢獻通道 · 國家紅隊回傳',
                         '專屬 SLA · 24/7 國家級支援',
                         'ATR 已 merge 進 Cisco AI Defense skill-scanner(PR #99)',
-                        '可選: ATR 國家代碼空間(rule namespacing)',
+                        '可選： ATR 國家代碼空間(rule namespacing)',
                       ]
                     : [
                         'Full airgap deployment · multi-tenant isolation',
@@ -1015,7 +1015,7 @@ Auditor-ready artefacts
             }
             subtitle={
               isZh
-                ? 'ATR 是 MIT 授權的開源偵測協定,治理獨立於 PanGuard。任何人、任何產品免費使用。Skill 認證由社群志願者免費審核(類 MITRE ATT&CK 模式)。唯一付費層是 Enterprise Member(類 Apache Software Foundation Platinum Sponsor)。'
+                ? 'ATR 是 MIT 授權的開源偵測協定，治理獨立於 PanGuard。任何人、任何產品免費使用。Skill 認證由社群志願者免費審核（類 MITRE ATT&CK 模式）。唯一付費層是 Enterprise Member(類 Apache Software Foundation Platinum Sponsor)。'
                 : 'ATR is an MIT-licensed open detection protocol with governance independent of PanGuard. Anyone, any product, can use it freely. Skill certification is run by community reviewers at no cost (MITRE ATT&CK model). The only paid surface is Enterprise Membership — modeled on the Apache Software Foundation Platinum Sponsor pattern.'
             }
           />
@@ -1037,7 +1037,7 @@ Auditor-ready artefacts
                 </div>
                 <p className="text-[13px] text-text-secondary mt-4 leading-relaxed">
                   {isZh
-                    ? "Skill 作者免費 submit PR 到 ATR repo · 社群志願 reviewer 透明審核(類 MITRE ATT&CK / Let's Encrypt 模式)· 通過後獲得徽章 + 自動上架 ATR registry + PanGuard Community 白名單。PanGuard 不收錢、不決定結果 — authority 靠透明度,不靠付費。"
+                    ? "Skill 作者免費 submit PR 到 ATR repo · 社群志願 reviewer 透明審核(類 MITRE ATT&CK / Let's Encrypt 模式)· 通過後獲得徽章 + 自動上架 ATR registry + PanGuard Community 白名單。PanGuard 不收錢、不決定結果 — authority 靠透明度，不靠付費。"
                     : "Skill authors submit a PR free of charge to the ATR repo. Community volunteer reviewers audit transparently (MITRE ATT&CK / Let's Encrypt model). Certified skills get the badge, ATR registry listing, and PanGuard Community whitelist. PanGuard does not charge and does not decide outcomes — authority lives in transparency, not paywalls."}
                 </p>
                 <a
@@ -1094,10 +1094,10 @@ Auditor-ready artefacts
                 {isZh ? (
                   <>
                     <strong className="text-text-primary">
-                      個人開發者 & SMB 的 value 是 sensor,不是 subscription。
+                      個人開發者 & SMB 的 value 是 sensor，不是 subscription。
                     </strong>
-                    Agent security 的 runtime 本質對個人 dev value 有限 — 你跑 2 個 Claude
-                    Code,不需要付月費 monitor。反而,每個 Community 安裝都是感測器,把威脅資訊餵回
+                    Agent security 的 runtime 本質對個人 dev value 有限——你跑 2 個 Claude
+                    Code，不需要付月費 monitor。反而，每個 Community 安裝都是感測器，把威脅資訊餵回
                     Threat Cloud → 結晶成新 ATR 規則 → 所有人得益。這個 flywheel 用 paywall 會打破。
                   </>
                 ) : (
@@ -1140,8 +1140,8 @@ Auditor-ready artefacts
                 {isZh ? (
                   <>
                     <strong className="text-text-primary">F500 不需要中間 tier 當橋樑。</strong>
-                    F500 security team 本來就用免費 Community 試水 90 天,要合規 + SOC2 + airgap 時跳
-                    Enterprise 或 Migrator Pro。這是 F500 實際的採購行為,不是付費 Team tier。
+                    F500 security team 本來就用免費 Community 試水 90 天，要合規 + SOC2 + airgap 時跳
+                    Enterprise 或 Migrator Pro。這是 F500 實際的採購行為，不是付費 Team tier。
                   </>
                 ) : (
                   <>
@@ -1157,7 +1157,7 @@ Auditor-ready artefacts
               </p>
               <p className="text-text-muted italic">
                 {isZh
-                  ? '如果 Y2 資料顯示中間有真實需求,我們會重新評估。今天的資料說:不要建。'
+                  ? '如果 Y2 資料顯示中間有真實需求，我們會重新評估。今天的資料說：不要建。'
                   : "If Y2 data shows a real middle-tier demand, we will reevaluate. Today's data says: do not build it."}
               </p>
             </div>
@@ -1170,13 +1170,13 @@ Auditor-ready artefacts
         <div className="max-w-3xl mx-auto text-center">
           <FadeInUp>
             <h2 className="text-[clamp(20px,3vw,40px)] font-bold text-text-primary leading-[1.1]">
-              {isZh ? '還在評估?' : 'Still evaluating?'}
+              {isZh ? '還在評估？' : 'Still evaluating?'}
             </h2>
           </FadeInUp>
           <FadeInUp delay={0.1}>
             <p className="text-text-secondary mt-4 leading-relaxed">
               {isZh
-                ? 'GRC 採購問題 · on-prem 架構 · 合規 mapping 細節 · F500 logo 計畫 — 直接寫信,48 小時內回。'
+                ? 'GRC 採購問題 · on-prem 架構 · 合規 mapping 細節 · F500 logo 計畫——直接寫信，48 小時內回。'
                 : 'GRC procurement questions · on-prem architecture · compliance mapping specifics · F500 logo program — email us, 48h response.'}
             </p>
           </FadeInUp>

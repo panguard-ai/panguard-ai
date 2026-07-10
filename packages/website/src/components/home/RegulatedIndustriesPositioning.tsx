@@ -38,7 +38,7 @@ export default function RegulatedIndustriesPositioning() {
           <SectionTitleV2>
             {isZh ? (
               <>
-                Cisco 跟 Microsoft 已經放進產品的,
+                Cisco 跟 Microsoft 已經放進產品的，
                 <span className="text-brand-sage">就是這套規則。</span>
               </>
             ) : (
@@ -50,7 +50,7 @@ export default function RegulatedIndustriesPositioning() {
           </SectionTitleV2>
           <p className="mt-6 max-w-3xl text-base leading-relaxed text-text-secondary sm:text-lg">
             {isZh
-              ? 'PanGuard 是 ATR 開放標準的商業實作版本。ATR 是 MIT 永久免費的偵測標準,由 ATR 社群維護;PanGuard 把它包成受監管產業會買的整套平台——即時防護 + 可稽核合規證據 + 地端部署 + SLA。'
+              ? 'PanGuard 是 ATR 開放標準的商業實作版本。ATR 是 MIT 永久免費的偵測標準，由 ATR 社群維護；PanGuard 把它包成受監管產業會買的整套平台——即時防護 + 可稽核合規證據 + 地端部署 + SLA。'
               : 'PanGuard is the commercial reference implementation of the ATR open standard. ATR is the MIT-licensed detection standard maintained by the ATR Community; PanGuard wraps it into the platform regulated industries need — real-time protection + audit-ready compliance evidence + on-prem + SLA.'}
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm">
@@ -79,7 +79,7 @@ export default function RegulatedIndustriesPositioning() {
           <SectionTitleV2>
             {isZh ? (
               <>
-                一套平台,<span className="text-brand-sage">兩個採購窗口一次過。</span>
+                一套平台，<span className="text-brand-sage">兩個採購窗口一次過。</span>
               </>
             ) : (
               <>
@@ -89,7 +89,7 @@ export default function RegulatedIndustriesPositioning() {
           </SectionTitleV2>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-text-muted">
             {isZh
-              ? '銀行、保險、醫療的資安團隊跟合規團隊,不用各買各的廠商。'
+              ? '銀行、保險、醫療的資安團隊跟合規團隊，不用各買各的廠商。'
               : 'Bank / insurance / healthcare CISO and GRC do not need to buy two vendors.'}
           </p>
         </FadeInUp>
@@ -102,7 +102,7 @@ export default function RegulatedIndustriesPositioning() {
               </h3>
               <p className="mb-4 text-sm leading-relaxed text-text-secondary">
                 {isZh
-                  ? '攻擊當下擋下、隔離、封鎖。L3 輸入/輸出守門 · L4 行為偵測 · L6 阻擋 + 隔離,通通已上線。'
+                  ? '攻擊當下擋下、隔離、封鎖。L3 輸入/輸出守門 · L4 行為偵測 · L6 阻擋 + 隔離，通通已上線。'
                   : 'Detect, contain, block at the moment of attack. L3 input/output guardrails · L4 behavioral detection · L6 block + quarantine — all shipped.'}
               </p>
               <CardKicker>{isZh ? '資安部門的採購窗口' : 'CISO / SOC procurement gate'}</CardKicker>
@@ -116,7 +116,7 @@ export default function RegulatedIndustriesPositioning() {
               </h3>
               <p className="mb-4 text-sm leading-relaxed text-text-secondary">
                 {isZh
-                  ? '攻擊擋下之後,自動產出可稽核證據:每筆偵測都對到 ATR 規則 ID + 5 個合規框架條文。格式化為稽核級證據 —— 規則 ID + 框架條文 + SHA-256 + Ed25519 簽章。'
+                  ? '攻擊擋下之後，自動產出可稽核證據：每筆偵測都對到 ATR 規則 ID + 5 個合規框架條文。格式化為稽核級證據——規則 ID + 框架條文 + SHA-256 + Ed25519 簽章。'
                   : 'After an attack is blocked, the platform produces audit-ready evidence automatically: every detection links to ATR rule ID + clauses across 5 compliance frameworks. Formatted as auditor-ready evidence — rule ID + framework clause + SHA-256 + Ed25519 signature.'}
               </p>
               <CardKicker>
@@ -151,7 +151,7 @@ export default function RegulatedIndustriesPositioning() {
             </h2>
             <p className="mt-6 text-base leading-relaxed text-text-secondary">
               {isZh
-                ? '銀行、保險、醫療這幾年累積了上千條 Sigma 跟 YARA 規則。EU AI Act 高風險義務 2027 年 12 月上路,這些規則完全管不到 AI Agent 的行為。手寫遷移要 6-12 個月,Migrator 一週搞定,還自動對照 5 個合規框架。'
+                ? '銀行、保險、醫療這幾年累積了上千條 Sigma 跟 YARA 規則。EU AI Act 高風險義務 2027 年 12 月上路，這些規則完全管不到 AI Agent 的行為。手寫遷移要 6-12 個月，Migrator 一週搞定，還自動對照 5 個合規框架。'
                 : 'F500 banks, insurance, and healthcare have accumulated thousands of Sigma and YARA detection rules. When EU AI Act high-risk obligations take effect in December 2027, those rules cannot cover AI agent behavior. Manual migration: 6-12 months. Migrator: under a week, with 5-framework compliance auto-mapping.'}
             </p>
             <div className="mt-6 rounded-xl border border-border bg-surface-hero p-4 font-mono text-xs sm:text-sm">
@@ -216,7 +216,7 @@ export default function RegulatedIndustriesPositioning() {
                   <CardKicker>{isZh ? 'Migrator 產出' : 'Migrator output'}</CardKicker>
                   <p className="mt-1.5 text-text-secondary">
                     {isZh
-                      ? 'ATR YAML(行為層)+ 5 框架 metadata + 測試案例 + 稽核軌跡'
+                      ? 'ATR YAML（行為層）+ 5 框架 metadata + 測試案例 + 稽核軌跡'
                       : 'ATR YAML (behavioral layer) + 5-framework metadata + test cases + audit trail'}
                   </p>
                 </div>
@@ -243,7 +243,7 @@ export default function RegulatedIndustriesPositioning() {
           <SectionTitleV2>
             {isZh ? (
               <>
-                5 個框架,<span className="text-brand-sage">一份證據包。</span>
+                5 個框架，<span className="text-brand-sage">一份證據包。</span>
               </>
             ) : (
               <>
@@ -253,7 +253,7 @@ export default function RegulatedIndustriesPositioning() {
           </SectionTitleV2>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-text-secondary">
             {isZh
-              ? '每條 ATR 規則自動對到 5 個合規框架的條文。每筆偵測產出 PDF + JSON + HTML 證據,SHA-256 + ed25519 簽章保證不能竄改。Vanta、Drata、Lakera 架構上做不到這件事。'
+              ? '每條 ATR 規則自動對到 5 個合規框架的條文。每筆偵測產出 PDF + JSON + HTML 證據，SHA-256 + ed25519 簽章保證不能竄改。Vanta、Drata、Lakera 架構上做不到這件事。'
               : 'Every ATR rule auto-maps to clauses across 5 compliance frameworks. Every detection produces PDF + JSON + HTML evidence with SHA-256 + ed25519 signature. Architecturally impossible for Vanta / Drata / Lakera.'}
           </p>
         </FadeInUp>

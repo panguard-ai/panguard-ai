@@ -10,7 +10,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
   const params = await props.params;
   const isZh = params.locale === 'zh-TW';
   const title = isZh
-    ? 'Sigma / YARA → ATR YAML 轉換器 — 開源、免費、瀏覽器即用'
+    ? 'Sigma / YARA → ATR YAML 轉換器——開源、免費、瀏覽器即用'
     : 'Sigma to ATR YAML converter — open source, free';
   const description = isZh
     ? '貼上一條 Sigma 或 YARA 規則，立刻拿到 schema-valid 的 ATR YAML。免註冊，瀏覽器即時轉換。Community 永久免費；Migrator Pro 加上 13 種來源格式與 EU AI Act 證據包。'

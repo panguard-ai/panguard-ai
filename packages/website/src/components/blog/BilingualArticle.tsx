@@ -194,7 +194,7 @@ function AsOfNote({ lang }: { lang: 'en' | 'zh' }) {
     <div className="rounded-xl border border-border bg-surface-1 px-4 py-3 text-xs text-text-muted mb-8">
       {lang === 'zh' ? (
         <>
-          本文中的數字(規則數、benchmark)以發文當日為準。最新數字請見{' '}
+          本文中的數字（規則數、benchmark）以發文當日為準。最新數字請見{' '}
           <a href="/research/benchmarks" className={linkClass}>
             /research/benchmarks
           </a>

@@ -19,7 +19,7 @@ export async function generateMetadata(props: {
       ? 'ATR Benchmark 結果 — Garak, SKILL.md, PINT, Wild Scan'
       : 'ATR Benchmark Results — Garak, SKILL.md, PINT, Wild Scan',
     description: isZh
-      ? `${STATS.totalRulesDisplay} 條 ATR 規則在公開對抗式語料庫上的實測結果。Garak ${STATS.benchmark.garak.recall}% recall, SKILL.md ${STATS.benchmark.skill.recall}% recall + ${STATS.benchmark.skill.precision}% precision, PINT ${STATS.benchmark.pint.recall}% recall（自建 PINT 格式語料庫）, Wild Scan 96,096 個 skill 中 751 個確認惡意。可重現方法、原始資料、Zenodo DOI。Benign-gate 誤報採 lane 化統計:65K 樣本上 enforce lane 約 ${STATS.benchmark.benignLanes.enforceFp}%、hunt lane 約 ${STATS.benchmark.benignLanes.huntFp}%。`
+      ? `${STATS.totalRulesDisplay} 條 ATR 規則在公開對抗式語料庫上的實測結果。Garak ${STATS.benchmark.garak.recall}% recall, SKILL.md ${STATS.benchmark.skill.recall}% recall + ${STATS.benchmark.skill.precision}% precision, PINT ${STATS.benchmark.pint.recall}% recall（自建 PINT 格式語料庫）， Wild Scan 96,096 個 skill 中 751 個確認惡意。可重現方法、原始資料、Zenodo DOI。Benign-gate 誤報採 lane 化統計：65K 樣本上 enforce lane 約 ${STATS.benchmark.benignLanes.enforceFp}%、hunt lane 約 ${STATS.benchmark.benignLanes.huntFp}%。`
       : `Public benchmark results for ${STATS.totalRulesDisplay} ATR rules against adversarial corpora. Garak ${STATS.benchmark.garak.recall}% recall, SKILL.md ${STATS.benchmark.skill.recall}% recall + ${STATS.benchmark.skill.precision}% precision, PINT ${STATS.benchmark.pint.recall}% recall (self-built PINT-format corpus), Wild Scan 751 confirmed malware of 96,096 skills. Reproducible methodology, raw data, Zenodo DOI. Benign-gate false positives are lane-based: ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt on 65K samples.`,
     alternates: buildAlternates('/research/benchmarks', params.locale),
   };
@@ -317,7 +317,7 @@ export default async function BenchmarkHubPage(props: { params: Promise<{ locale
                     </p>
                     <p className="text-xs text-text-secondary leading-relaxed">
                       {isZh
-                        ? `Precision / FP 為此語料庫的 Layer 1(確定性規則）量測,非全引擎數字。實務誤報採 lane 化:${STATS.benchmark.benignLanes.samples.toLocaleString()} 個 benign 樣本上 enforce lane 約 ${STATS.benchmark.benignLanes.enforceFp}%、hunt lane(預設)約 ${STATS.benchmark.benignLanes.huntFp}%。`
+                        ? `Precision / FP 為此語料庫的 Layer 1(確定性規則）量測，非全引擎數字。實務誤報採 lane 化：${STATS.benchmark.benignLanes.samples.toLocaleString()} 個 benign 樣本上 enforce lane 約 ${STATS.benchmark.benignLanes.enforceFp}%、hunt lane（預設）約 ${STATS.benchmark.benignLanes.huntFp}%。`
                         : `Precision / FP here are Layer 1 (deterministic-rule) measurements on this specific corpus, not an engine-wide figure. Real-world false positives are lane-based: ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt (default) on ${STATS.benchmark.benignLanes.samples.toLocaleString()} benign samples.`}
                     </p>
                   </div>
@@ -372,11 +372,11 @@ export default async function BenchmarkHubPage(props: { params: Promise<{ locale
                 Agent-Threat-Rule/agent-threat-rules
               </a>
               {isZh
-                ? '。我們把你的 benchmark 加入本頁,完整署名。'
+                ? '。我們把你的 benchmark 加入本頁，完整署名。'
                 : '. We add your benchmark to this page with full attribution.'}
             </p>
             <p className="text-xs text-text-muted mt-4 italic">
-              {isZh ? '審稿:' : 'Reviewed by '}
+              {isZh ? '審稿：' : 'Reviewed by '}
               <Link href="/about" rel="author" className="text-brand-sage hover:underline">
                 Adam Lin
               </Link>

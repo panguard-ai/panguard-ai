@@ -121,24 +121,24 @@ export default async function ComparePage(props: {
                     className={`grid grid-cols-[1.4fr_1fr_1fr] gap-0 ${i < c.rows.length - 1 ? 'border-b border-border/50' : ''}`}
                   >
                     <div className="px-5 py-3 text-sm text-text-primary font-medium">
-                      {row.feature}
+                      {isZh ? (row.featureZh ?? row.feature) : row.feature}
                     </div>
                     <div
                       className={`px-5 py-3 text-xs text-center ${winnerCellClass[row.winner === 'atr' ? 'atr' : row.winner === 'tie' ? 'tie' : 'other']}`}
                     >
-                      {row.atr}
+                      {isZh ? (row.atrZh ?? row.atr) : row.atr}
                     </div>
                     <div
                       className={`px-5 py-3 text-xs text-center ${winnerCellClass[row.winner === 'other' ? 'atr' : row.winner === 'tie' ? 'tie' : 'other']}`}
                     >
-                      {row.other}
+                      {isZh ? (row.otherZh ?? row.other) : row.other}
                     </div>
                   </div>
                 ))}
               </div>
               <p className="text-[11px] text-text-muted mt-3 italic">
                 {isZh
-                  ? '綠色標示哪一方在該面向較強。「context」(琥珀色) 表示「依情境而定,兩者皆可」。'
+                  ? '綠色標示哪一方在該面向較強。「context」（琥珀色） 表示「依情境而定，兩者皆可」。'
                   : 'Green highlights which side is stronger for that feature. "context" (amber) means "depends on use case, neither wins overall".'}
               </p>
             </div>

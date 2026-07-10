@@ -141,7 +141,33 @@ const severityColors: Record<string, string> = {
   medium: 'text-yellow-400 bg-yellow-400/10',
 };
 
-const yamlExamples = [YAML_EXAMPLE, YAML_TOOL_POISONING, YAML_CONTEXT_EXFIL];
+const YAML_AUTONOMY = `title: "Excessive Agent Autonomy Loop"
+id: ATR-2026-020
+status: experimental
+severity: medium
+
+references:
+  owasp_agentic:
+    - "ASI06:2026 - Excessive Agent Autonomy"
+
+detection:
+  conditions:
+    - field: tool_call
+      operator: rate
+      value: "20/60s"
+    - field: tool_call
+      operator: repeat_pattern
+      value: "same_tool_same_args"
+  condition: all
+
+response:
+  actions:
+    - throttle
+    - alert
+    - require_approval`;
+
+// Order must match atrPage.moreExamples.rules in messages (008 / 012 / 020).
+const yamlExamples = [YAML_TOOL_POISONING, YAML_CONTEXT_EXFIL, YAML_AUTONOMY];
 
 export default function ATRContent() {
   const t = useTranslations('atrPage');

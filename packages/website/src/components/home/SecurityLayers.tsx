@@ -61,7 +61,7 @@ export default function SecurityLayers() {
         </SectionTitleV2>
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-text-secondary">
           {isZh
-            ? '5 層今天已上線(L2 稽核 / L3 防護 / L4 偵測 / L5 誘捕 / L6 反應)。L1 探索與 L7 治理規劃中,不承諾日期。我們標 gap,不假打勾。'
+            ? '5 層今天已上線（L2 稽核 / L3 防護 / L4 偵測 / L5 誘捕 / L6 反應）。L1 探索與 L7 治理規劃中，不承諾日期。我們標 gap，不假打勾。'
             : '5 layers ship today (L2 Audit / L3 Protect / L4 Detect / L5 Deceive / L6 Respond). L1 Discover and L7 Govern are planned — no dates promised. We mark the gaps openly — no fake checkmarks.'}
         </p>
       </FadeInUp>
@@ -108,7 +108,7 @@ export default function SecurityLayers() {
           <p className="text-xs leading-relaxed text-text-secondary">
             {isZh ? (
               <>
-                每層可點擊看詳細:攻擊案例、技術作法、benchmark、生態系整合 ·{' '}
+                每層可點擊看詳細：攻擊案例、技術作法、benchmark、生態系整合 ·{' '}
                 <Link href="/layers" className="font-semibold text-brand-sage hover:underline">
                   看完整 7 層架構
                 </Link>

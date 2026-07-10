@@ -2,7 +2,7 @@ import dynamic from 'next/dynamic';
 import { getTranslations } from 'next-intl/server';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
-import ScannerHero from '@/components/home/ScannerHero';
+import InstallHero from '@/components/home/InstallHero';
 import { RuleStatsProvider } from '@/contexts/RuleStatsContext';
 
 const RealIncidents = dynamic(() => import('@/components/home/RealIncidents'));
@@ -32,7 +32,7 @@ export default async function Home() {
             {t('srDefinition')}
           </p>
           {/* 1. Hero — the scanner, with scan-beam / radar-ping / entrance FX */}
-          <ScannerHero />
+          <InstallHero />
           {/* 2. Why now — real incidents, full-bleed accent band */}
           <RealIncidents />
           {/* 3. Positioning — one platform, both procurement gates (two-col) */}

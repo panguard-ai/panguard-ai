@@ -6,7 +6,7 @@ import { useScrollReveal } from '@/hooks/useScrollReveal';
 const CJK_RE = /[　-〿一-鿿豈-﫿＀-￯]/;
 // Full-width closers must never start a segment (avoids dangling punctuation
 // wrapping to a new line as its own inline-block).
-const CJK_TRAILING = /^[。,、!?;:」』)……——~]/;
+const CJK_TRAILING = /^[。，、！？；：」』)……——~]/;
 
 /**
  * Segment a text run for word-by-word reveal.

@@ -265,7 +265,7 @@ function FadeHeader({ isZh }: { isZh: boolean }) {
       </h1>
       <p className="text-lg leading-relaxed text-text-secondary">
         {isZh
-          ? '定義 ATR 規則的格式、識別碼、偵測語意、一致性等級與 IANA 媒體類型。此規範為實作者撰寫，不是行銷文件 — 採 IETF RFC 風格，使用 BCP 14 的 MUST/SHOULD/MAY 規範性語言，並承諾 SemVer 版本契約。'
+          ? '定義 ATR 規則的格式、識別碼、偵測語意、一致性等級與 IANA 媒體類型。此規範為實作者撰寫，不是行銷文件——採 IETF RFC 風格，使用 BCP 14 的 MUST/SHOULD/MAY 規範性語言，並承諾 SemVer 版本契約。'
           : 'The normative wire format, identifier scheme, evaluation semantics, conformance levels, and IANA media types for ATR rules. Written for implementers, not marketing — IETF RFC style, BCP 14 normative language, SemVer contract.'}
       </p>
     </div>

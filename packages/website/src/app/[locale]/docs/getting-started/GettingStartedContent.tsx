@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Copy, Check, Terminal, Monitor, Server } from 'lucide-react';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
@@ -28,10 +28,12 @@ const PLATFORM_META: Record<Platform, { label: string; icon: typeof Terminal }> 
 interface InstallOption {
   method: InstallMethod;
   label: string;
+  labelZh?: string;
   recommended?: boolean;
   prereq?: string;
   command: string;
   note?: string;
+  noteZh?: string;
 }
 
 const INSTALL_OPTIONS: Record<Platform, InstallOption[]> = {
@@ -39,24 +41,29 @@ const INSTALL_OPTIONS: Record<Platform, InstallOption[]> = {
     {
       method: 'curl',
       label: 'One-line Install',
+      labelZh: '一行指令安裝',
       recommended: true,
       command: 'curl -fsSL https://get.panguard.ai | bash',
       note: 'Apple Silicon (ARM64) native binary. Intel Mac users: install via npm, or enable Rosetta 2 first.',
+      noteZh: 'Apple Silicon（ARM64）原生 binary。Intel Mac 使用者：請改用 npm 安裝，或先啟用 Rosetta 2。',
     },
     {
       method: 'npm',
       label: 'npm',
       command: 'npm install -g @panguard-ai/panguard && pga up',
       note: 'Requires Node.js 20+. Works on both Apple Silicon and Intel Mac.',
+      noteZh: '需要 Node.js 20+。Apple Silicon 與 Intel Mac 皆可使用。',
     },
   ],
   linux: [
     {
       method: 'curl',
       label: 'One-line Install',
+      labelZh: '一行指令安裝',
       recommended: true,
       command: 'curl -fsSL https://get.panguard.ai | bash',
       note: 'Supports x64 and ARM64 architectures. Requires Node.js 20+.',
+      noteZh: '支援 x64 與 ARM64 架構。需要 Node.js 20+。',
     },
     {
       method: 'npm',
@@ -70,6 +77,7 @@ const INSTALL_OPTIONS: Record<Platform, InstallOption[]> = {
     {
       method: 'npm',
       label: 'npm (Recommended)',
+      labelZh: 'npm（推薦）',
       recommended: true,
       prereq:
         '# Install Node.js first (pick one):\nwinget install OpenJS.NodeJS.LTS\n# Or download from https://nodejs.org (v20+ LTS)',
@@ -81,6 +89,7 @@ const INSTALL_OPTIONS: Record<Platform, InstallOption[]> = {
       command:
         'powershell -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"',
       note: 'If using PowerShell 7+: pwsh -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"',
+      noteZh: '若使用 PowerShell 7+：pwsh -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"',
     },
   ],
 };
@@ -182,6 +191,7 @@ function MethodTabs({
   selected: InstallMethod;
   onChange: (m: InstallMethod) => void;
 }) {
+  const isZh = useLocale() === 'zh-TW';
   return (
     <div className="flex gap-1 bg-surface-1/50 border border-border/60 rounded-lg p-0.5 w-fit">
       {options.map((opt) => (
@@ -194,7 +204,7 @@ function MethodTabs({
               : 'text-text-muted hover:text-text-secondary border border-transparent'
           }`}
         >
-          {opt.label}
+          {isZh && opt.labelZh ? opt.labelZh : opt.label}
         </button>
       ))}
     </div>
@@ -222,6 +232,7 @@ function TerminalOutput({ lines }: { lines: string[] }) {
 
 export default function GettingStartedContent() {
   const t = useTranslations('docs.gettingStarted');
+  const isZh = useLocale() === 'zh-TW';
   const detectedPlatform = useDetectedPlatform();
   const [platform, setPlatform] = useState<Platform>('macos');
   const [method, setMethod] = useState<InstallMethod>('curl');
@@ -286,12 +297,16 @@ export default function GettingStartedContent() {
 
             {/* Note */}
             {activeOption.note && (
-              <p className="text-xs text-text-muted mt-2">{activeOption.note}</p>
+              <p className="text-xs text-text-muted mt-2">
+                {isZh && activeOption.noteZh ? activeOption.noteZh : activeOption.note}
+              </p>
             )}
 
             {/* Verify */}
             <div className="mt-6 pt-6 border-t border-border/40">
-              <p className="text-sm text-text-secondary mb-3">Verify the installation:</p>
+              <p className="text-sm text-text-secondary mb-3">
+                {isZh ? '驗證安裝：' : 'Verify the installation:'}
+              </p>
               <CodeBlock
                 code={`panguard --version\n# Expected: ${STATS.cliVersion}`}
                 label="Terminal"
@@ -301,21 +316,30 @@ export default function GettingStartedContent() {
             {/* Setup step */}
             <div className="mt-4">
               <p className="text-sm text-text-secondary mb-3">
-                Run setup to auto-configure all detected AI platforms (Claude Code, Claude Desktop,
-                Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS
-                Code Copilot, Zed, Gemini CLI, Continue, Roo Code):
+                {isZh
+                  ? '執行 setup 自動設定所有偵測到的 AI 平台（Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw、ArkClaw、Windsurf、QClaw、Cline、VS Code Copilot、Zed、Gemini CLI、Continue、Roo Code）：'
+                  : 'Run setup to auto-configure all detected AI platforms (Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS Code Copilot, Zed, Gemini CLI, Continue, Roo Code):'}
               </p>
               <CodeBlock code="pga setup" label="Terminal" />
               <p className="text-xs text-text-muted mt-1">
-                Tip: <code className="text-panguard-green">pga</code> is a shortcut for{' '}
-                <code className="text-text-muted">panguard</code>. Both work.
+                {isZh ? (
+                  <>
+                    提示：<code className="text-panguard-green">pga</code> 是{' '}
+                    <code className="text-text-muted">panguard</code> 的縮寫，兩者皆可使用。
+                  </>
+                ) : (
+                  <>
+                    Tip: <code className="text-panguard-green">pga</code> is a shortcut for{' '}
+                    <code className="text-text-muted">panguard</code>. Both work.
+                  </>
+                )}
               </p>
             </div>
 
             {/* Then start */}
             <div className="mt-4">
               <p className="text-sm text-text-secondary mb-3">
-                Then start Panguard in any project:
+                {isZh ? '接著在任何專案中啟動 Panguard：' : 'Then start Panguard in any project:'}
               </p>
               <CodeBlock code={`cd your-project\npga scan`} label="Terminal" />
             </div>
@@ -337,9 +361,13 @@ export default function GettingStartedContent() {
       <SectionWrapper dark>
         <div className="max-w-3xl mx-auto">
           <FadeInUp>
-            <h2 className="text-xl font-bold text-text-primary mb-2">Platform Quick Start</h2>
+            <h2 className="text-xl font-bold text-text-primary mb-2">
+              {isZh ? '平台快速上手' : 'Platform Quick Start'}
+            </h2>
             <p className="text-sm text-text-secondary mb-6">
-              Step-by-step for each AI platform. Pick yours.
+              {isZh
+                ? '各 AI 平台的逐步指南。選擇你用的平台。'
+                : 'Step-by-step for each AI platform. Pick yours.'}
             </p>
           </FadeInUp>
 
@@ -355,20 +383,23 @@ export default function GettingStartedContent() {
                 </h3>
                 <div className="space-y-3 text-sm text-text-secondary">
                   <p>
-                    <strong className="text-text-primary">Step 1:</strong> Open your terminal
+                    <strong className="text-text-primary">{isZh ? '步驟 1：' : 'Step 1:'}</strong>
+                    {isZh ? '打開終端機' : ' Open your terminal'}
                   </p>
                   <CodeBlock
                     code="npm install -g @panguard-ai/panguard && pga up"
                     label="Install"
                   />
                   <p>
-                    <strong className="text-text-primary">Step 2:</strong> Auto-configure Claude
-                    Code
+                    <strong className="text-text-primary">{isZh ? '步驟 2：' : 'Step 2:'}</strong>
+                    {isZh ? '自動設定 Claude Code' : ' Auto-configure Claude Code'}
                   </p>
                   <CodeBlock code="pga setup --platform claude-code" label="Setup" />
                   <p>
-                    <strong className="text-text-primary">Step 3:</strong> Restart Claude Code, then
-                    try:
+                    <strong className="text-text-primary">{isZh ? '步驟 3：' : 'Step 3:'}</strong>
+                    {isZh
+                      ? '重新啟動 Claude Code，然後試試：'
+                      : ' Restart Claude Code, then try:'}
                   </p>
                   <CodeBlock
                     code={
@@ -377,12 +408,14 @@ export default function GettingStartedContent() {
                     label="Claude Code"
                   />
                   <p>
-                    <strong className="text-text-primary">Step 4:</strong> Start 24/7 protection
+                    <strong className="text-text-primary">{isZh ? '步驟 4：' : 'Step 4:'}</strong>
+                    {isZh ? '啟動 24/7 防護' : ' Start 24/7 protection'}
                   </p>
                   <CodeBlock code="pga guard start --dashboard" label="Terminal" />
                   <p className="text-xs text-panguard-green">
-                    Done! Claude Code now has 11 security tools via MCP. Guard monitors everything
-                    24/7.
+                    {isZh
+                      ? '完成！Claude Code 現在透過 MCP 擁有 11 個安全工具，Guard 24/7 監控一切。'
+                      : 'Done! Claude Code now has 11 security tools via MCP. Guard monitors everything 24/7.'}
                   </p>
                 </div>
               </div>
@@ -399,22 +432,27 @@ export default function GettingStartedContent() {
                 </h3>
                 <div className="space-y-3 text-sm text-text-secondary">
                   <p>
-                    <strong className="text-text-primary">Step 1:</strong> Install PanGuard
+                    <strong className="text-text-primary">{isZh ? '步驟 1：' : 'Step 1:'}</strong>
+                    {isZh ? '安裝 PanGuard' : ' Install PanGuard'}
                   </p>
                   <CodeBlock
                     code="npm install -g @panguard-ai/panguard && pga up"
                     label="Install"
                   />
                   <p>
-                    <strong className="text-text-primary">Step 2:</strong> Auto-configure OpenClaw
+                    <strong className="text-text-primary">{isZh ? '步驟 2：' : 'Step 2:'}</strong>
+                    {isZh ? '自動設定 OpenClaw' : ' Auto-configure OpenClaw'}
                   </p>
                   <CodeBlock code="pga setup --platform openclaw" label="Setup" />
                   <p>
-                    <strong className="text-text-primary">Step 3:</strong> Close and reopen OpenClaw
+                    <strong className="text-text-primary">{isZh ? '步驟 3：' : 'Step 3:'}</strong>
+                    {isZh ? '關閉並重新開啟 OpenClaw' : ' Close and reopen OpenClaw'}
                   </p>
                   <p>
-                    <strong className="text-text-primary">Step 4:</strong> In OpenClaw, PanGuard
-                    tools are now available. Try:
+                    <strong className="text-text-primary">{isZh ? '步驟 4：' : 'Step 4:'}</strong>
+                    {isZh
+                      ? 'PanGuard 工具現在已可在 OpenClaw 中使用。試試：'
+                      : ' In OpenClaw, PanGuard tools are now available. Try:'}
                   </p>
                   <CodeBlock
                     code={
@@ -423,12 +461,14 @@ export default function GettingStartedContent() {
                     label="OpenClaw"
                   />
                   <p>
-                    <strong className="text-text-primary">Step 5:</strong> Start Guard for
-                    continuous protection
+                    <strong className="text-text-primary">{isZh ? '步驟 5：' : 'Step 5:'}</strong>
+                    {isZh ? '啟動 Guard 提供持續防護' : ' Start Guard for continuous protection'}
                   </p>
                   <CodeBlock code="pga guard start --dashboard" label="Terminal" />
                   <p className="text-xs text-panguard-green">
-                    Done! Every skill OpenClaw installs will be automatically audited.
+                    {isZh
+                      ? '完成！OpenClaw 之後安裝的每一個 skill 都會自動接受審計。'
+                      : 'Done! Every skill OpenClaw installs will be automatically audited.'}
                   </p>
                 </div>
               </div>
@@ -438,13 +478,13 @@ export default function GettingStartedContent() {
             <FadeInUp delay={0.15}>
               <div className="bg-surface-2/30 border border-border rounded-xl p-5 text-center">
                 <p className="text-sm text-text-secondary mb-2">
-                  Or auto-detect all platforms at once:
+                  {isZh ? '或者，一次自動偵測所有平台：' : 'Or auto-detect all platforms at once:'}
                 </p>
                 <CodeBlock code="pga setup" label="Terminal" />
                 <p className="text-xs text-text-muted mt-2">
-                  Auto-detects 15 agent runtimes — Claude Code, Claude Desktop, Cursor, OpenClaw,
-                  Codex, Windsurf, Gemini CLI, and more — and registers PanGuard&apos;s MCP
-                  protection into each (VS Code Copilot and Zed are in preview, not counted).
+                  {isZh
+                    ? '自動偵測 15 種 agent runtime——Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、Windsurf、Gemini CLI 等——並將 PanGuard 的 MCP 防護註冊進每一個（VS Code Copilot 與 Zed 為預覽版，不計入）。'
+                    : "Auto-detects 15 agent runtimes — Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, Windsurf, Gemini CLI, and more — and registers PanGuard's MCP protection into each (VS Code Copilot and Zed are in preview, not counted)."}
                 </p>
               </div>
             </FadeInUp>
@@ -458,13 +498,16 @@ export default function GettingStartedContent() {
           <FadeInUp>
             <h2 className="text-xl font-bold text-text-primary mb-2">GitHub Action (CI/CD)</h2>
             <p className="text-text-secondary mb-6">
-              Block malicious MCP skills and SKILL.md files before they reach production. One line
-              in your workflow. Results appear in the GitHub Security tab.
+              {isZh
+                ? '在惡意 MCP skill 與 SKILL.md 檔案進入 production 之前就攔下。workflow 只需加一行，結果會顯示在 GitHub Security 分頁。'
+                : 'Block malicious MCP skills and SKILL.md files before they reach production. One line in your workflow. Results appear in the GitHub Security tab.'}
             </p>
 
             <div className="bg-surface-1 border border-border rounded-xl p-5">
               <p className="text-sm font-semibold text-text-primary mb-3">
-                Add to your workflow (.github/workflows/atr-scan.yml):
+                {isZh
+                  ? '加入你的 workflow（.github/workflows/atr-scan.yml）：'
+                  : 'Add to your workflow (.github/workflows/atr-scan.yml):'}
               </p>
               <CodeBlock
                 code={`name: ATR Security Scan
@@ -485,25 +528,53 @@ jobs:
 
               <div className="mt-4 space-y-2 text-sm text-text-secondary">
                 <p>
-                  <strong className="text-text-primary">What it does:</strong> Scans your repo for
-                  MCP config files and SKILL.md files using {STATS.atrRules} ATR detection rules.
-                  Outputs SARIF to the GitHub Security tab.
+                  <strong className="text-text-primary">
+                    {isZh ? '它做什麼：' : 'What it does:'}
+                  </strong>
+                  {isZh ? (
+                    <>
+                      使用 {STATS.atrRules} 條 ATR 偵測規則掃描 repo 中的 MCP 設定檔與 SKILL.md
+                      檔案，並將 SARIF 結果輸出到 GitHub Security 分頁。
+                    </>
+                  ) : (
+                    <>
+                      {' '}
+                      Scans your repo for MCP config files and SKILL.md files using{' '}
+                      {STATS.atrRules} ATR detection rules. Outputs SARIF to the GitHub Security
+                      tab.
+                    </>
+                  )}
                 </p>
                 <p>
-                  <strong className="text-text-primary">Options:</strong>
+                  <strong className="text-text-primary">{isZh ? '選項：' : 'Options:'}</strong>
                 </p>
                 <ul className="list-disc list-inside space-y-1 text-text-muted text-xs">
                   <li>
-                    <code className="text-text-secondary">severity</code> — minimum level to report:
-                    informational, low, medium (default), high, critical
+                    <code className="text-text-secondary">severity</code>
+                    {isZh
+                      ? '——回報的最低等級：informational、low、medium（預設）、high、critical'
+                      : ' — minimum level to report: informational, low, medium (default), high, critical'}
                   </li>
                   <li>
-                    <code className="text-text-secondary">fail-on-finding</code> — set{' '}
-                    <code className="text-text-secondary">false</code> to warn without blocking
+                    <code className="text-text-secondary">fail-on-finding</code>
+                    {isZh ? (
+                      <>
+                        ——設為 <code className="text-text-secondary">false</code>{' '}
+                        時只警告、不阻擋
+                      </>
+                    ) : (
+                      <>
+                        {' '}
+                        — set <code className="text-text-secondary">false</code> to warn without
+                        blocking
+                      </>
+                    )}
                   </li>
                   <li>
-                    <code className="text-text-secondary">path</code> — scan a specific directory
-                    (default: entire repo)
+                    <code className="text-text-secondary">path</code>
+                    {isZh
+                      ? '——掃描特定目錄（預設：整個 repo）'
+                      : ' — scan a specific directory (default: entire repo)'}
                   </li>
                 </ul>
               </div>
@@ -575,9 +646,13 @@ jobs:
 
               {/* SAST code scanning */}
               <div className="bg-surface-1 border border-border rounded-xl p-5">
-                <p className="text-sm font-semibold text-text-primary mb-2">SAST Code Scanning</p>
+                <p className="text-sm font-semibold text-text-primary mb-2">
+                  {isZh ? 'SAST 程式碼掃描' : 'SAST Code Scanning'}
+                </p>
                 <p className="text-text-secondary text-sm mb-3">
-                  Scan your source code for SQL injection, XSS, hardcoded secrets, and more.
+                  {isZh
+                    ? '掃描你的原始碼，找出 SQL injection、XSS、寫死的 secret 等問題。'
+                    : 'Scan your source code for SQL injection, XSS, hardcoded secrets, and more.'}
                 </p>
                 <CodeBlock code="pga scan code --dir ./my-app --json" label="Terminal" />
                 <div className="mt-3">
@@ -634,21 +709,23 @@ jobs:
               </div>
               <div className="p-4 font-mono text-sm space-y-2">
                 {[
-                  { cmd: 'pga', desc: 'Open interactive menu' },
-                  { cmd: 'pga up', desc: 'Start protection + dashboard' },
-                  { cmd: 'pga setup', desc: 'Auto-configure AI platforms' },
-                  { cmd: 'pga scan', desc: 'Run security scan' },
-                  { cmd: 'pga scan --deep', desc: 'Deep scan with all engines' },
-                  { cmd: 'pga audit skill <dir>', desc: 'Audit a skill before installing' },
-                  { cmd: 'pga guard start', desc: 'Start real-time protection' },
-                  { cmd: 'pga status', desc: 'Check protection status' },
-                  { cmd: 'pga doctor', desc: 'Diagnose installation' },
-                  { cmd: 'pga --help', desc: 'Show all commands' },
-                ].map(({ cmd, desc }) => (
+                  { cmd: 'pga', desc: 'Open interactive menu', descZh: '開啟互動式選單' },
+                  { cmd: 'pga up', desc: 'Start protection + dashboard', descZh: '啟動防護 + dashboard' },
+                  { cmd: 'pga setup', desc: 'Auto-configure AI platforms', descZh: '自動設定 AI 平台' },
+                  { cmd: 'pga scan', desc: 'Run security scan', descZh: '執行安全掃描' },
+                  { cmd: 'pga scan --deep', desc: 'Deep scan with all engines', descZh: '啟用所有引擎深度掃描' },
+                  { cmd: 'pga audit skill <dir>', desc: 'Audit a skill before installing', descZh: '安裝前先審計 skill' },
+                  { cmd: 'pga guard start', desc: 'Start real-time protection', descZh: '啟動即時防護' },
+                  { cmd: 'pga status', desc: 'Check protection status', descZh: '查看防護狀態' },
+                  { cmd: 'pga doctor', desc: 'Diagnose installation', descZh: '診斷安裝問題' },
+                  { cmd: 'pga --help', desc: 'Show all commands', descZh: '顯示所有指令' },
+                ].map(({ cmd, desc, descZh }) => (
                   <div key={cmd} className="flex items-baseline gap-3">
                     <code className="text-text-primary whitespace-nowrap">{cmd}</code>
                     <span className="text-text-muted text-xs hidden sm:inline">{'—'}</span>
-                    <span className="text-text-muted text-xs hidden sm:inline">{desc}</span>
+                    <span className="text-text-muted text-xs hidden sm:inline">
+                      {isZh ? descZh : desc}
+                    </span>
                   </div>
                 ))}
               </div>

@@ -227,7 +227,7 @@ function OverallBanner({
         </div>
         {lastChecked && (
           <p className="text-text-tertiary text-sm">
-            {locale === 'zh-TW' ? '最後探測: ' : 'Last probe: '}
+            {locale === 'zh-TW' ? '最後探測： ' : 'Last probe: '}
             {lastChecked}
           </p>
         )}
@@ -381,8 +381,8 @@ export default function StatusContent() {
         <p className="text-center text-sm text-text-secondary bg-surface-1 border border-border rounded-lg px-4 py-3 max-w-xl mx-auto">
           {locale === 'zh-TW' ? (
             <>
-              本頁是即時 liveness probe(每 30 秒探測一次,顯示當下狀態)。歷史 uptime 趨勢 + SLA-grade
-              監控 由 Better Uptime / Statuspage.io 接管,正在處理中。重要事件或 outage 通報請聯絡{' '}
+              本頁是即時 liveness probe（每 30 秒探測一次，顯示當下狀態）。歷史 uptime 趨勢 + SLA-grade
+              監控 由 Better Uptime / Statuspage.io 接管，正在處理中。重要事件或 outage 通報請聯絡{' '}
               <a href="mailto:security@panguard.ai" className="text-brand-sage hover:underline">
                 security@panguard.ai
               </a>

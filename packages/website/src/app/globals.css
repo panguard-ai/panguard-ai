@@ -1008,3 +1008,13 @@ body::before {
     animation-delay: 0ms !important;
   }
 }
+
+/* CJK typography: Latin tracking utilities look stretched on Chinese text.
+   Clamp wide letter-spacing on the zh locale (labels keep a hint of air). */
+html[lang='zh-TW'] .tracking-micro,
+html[lang='zh-TW'] .tracking-wide,
+html[lang='zh-TW'] .tracking-wider,
+html[lang='zh-TW'] .tracking-widest,
+html[lang='zh-TW'] [class*='tracking-['] {
+  letter-spacing: 0.03em;
+}

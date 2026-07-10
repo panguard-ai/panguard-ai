@@ -15,7 +15,7 @@ export async function generateMetadata(props: {
   return {
     title: isZh ? 'AI Agent 安全術語表 — PanGuard AI' : 'AI Agent Security Glossary — PanGuard AI',
     description: isZh
-      ? '什麼是 ATR? 什麼是 prompt injection? 什麼是 tool poisoning? AI agent 安全領域的核心術語,以技術精確、跨來源引用的方式定義。'
+      ? '什麼是 ATR? 什麼是 prompt injection? 什麼是 tool poisoning? AI agent 安全領域的核心術語，以技術精確、跨來源引用的方式定義。'
       : 'What is an ATR rule? What is prompt injection? What is tool poisoning? The core vocabulary of AI agent security, defined precisely and with cross-source citations.',
     alternates: buildAlternates('/glossary', params.locale),
   };

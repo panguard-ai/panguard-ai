@@ -22,7 +22,7 @@ const FOUNDING_THREE: readonly Seat[] = [
   {
     role: 'Maintainer Seat',
     roleZh: '維護者席',
-    holder: 'Adam Lin (林冠辛)',
+    holder: 'Adam Lin （林冠辛）',
     org: 'ATR project',
     status: 'confirmed',
     noteEn: 'BDFL transitional authority until TSC seated.',
@@ -123,7 +123,7 @@ export default function GovernanceContent() {
 
       <p className="mt-6 max-w-3xl text-sm leading-relaxed text-text-secondary">
         {isZh
-          ? '席-3 (社群／威脅情資席) 辭職時，由 TSC 三席全體同意決定接任者。任一席次不得單獨否決。公開會議每兩週一次，會議記錄存於 repo。'
+          ? '席-3 （社群／威脅情資席） 辭職時，由 TSC 三席全體同意決定接任者。任一席次不得單獨否決。公開會議每兩週一次，會議記錄存於 repo。'
           : 'Seat-3 (community / threat-intel) succession requires TSC supermajority (3-of-3); no single seat may veto. Bi-weekly open meetings; minutes posted to the repo.'}
       </p>
 

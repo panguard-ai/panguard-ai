@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import SectionTitle from '@/components/ui/SectionTitle';
@@ -21,6 +21,7 @@ const beliefKeys = ['tenet1', 'tenet2', 'tenet3', 'tenet4'] as const;
 
 export default function AboutContent() {
   const t = useTranslations('about');
+  const isZh = useLocale() === 'zh-TW';
 
   return (
     <>
@@ -35,12 +36,14 @@ export default function AboutContent() {
           </FadeInUp>
           <FadeInUp delay={0.05}>
             <h1 className="text-[clamp(24px,4.5vw,56px)] font-extrabold leading-[1.1] tracking-tight text-text-primary max-w-4xl">
-              {t('title')} <span className="text-brand-sage">{t('titleHighlight')}</span>
+              {t('title')}<span className="text-brand-sage">{t('titleHighlight')}</span>
             </h1>
           </FadeInUp>
           <FadeInUp delay={0.1}>
-            <p className="text-2xl text-text-secondary max-w-3xl mt-8 leading-relaxed italic">
-              &ldquo;{t('oneLiner')}&rdquo;
+            <p
+              className={`text-2xl text-text-secondary max-w-3xl mt-8 leading-relaxed ${isZh ? '' : 'italic'}`}
+            >
+              {isZh ? <>「{t('oneLiner')}」</> : <>&ldquo;{t('oneLiner')}&rdquo;</>}
             </p>
           </FadeInUp>
         </div>

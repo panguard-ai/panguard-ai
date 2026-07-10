@@ -25,7 +25,7 @@ export default function CoverageComparison() {
         <SectionTitleV2>
           {isZh ? (
             <>
-              別人做單層,<span className="text-brand-sage">我們做整個堆疊</span>
+              別人做單層，<span className="text-brand-sage">我們做整個堆疊</span>
             </>
           ) : (
             <>
@@ -99,7 +99,7 @@ export default function CoverageComparison() {
       <FadeInUp delay={0.3}>
         <p className="mt-8 max-w-3xl text-xs leading-relaxed text-text-muted">
           {isZh
-            ? 'L1 Discover · L2 Audit · L3 Protect · L4 Detect · L5 Deceive · L6 Respond · L7 Govern。來源:各家官方文件與產品頁,2026-04 盤點。'
+            ? 'L1 Discover · L2 Audit · L3 Protect · L4 Detect · L5 Deceive · L6 Respond · L7 Govern。來源：各家官方文件與產品頁，2026-04 盤點。'
             : 'L1 Discover · L2 Audit · L3 Protect · L4 Detect · L5 Deceive · L6 Respond · L7 Govern. Source: official product docs, audited 2026-04.'}
         </p>
       </FadeInUp>

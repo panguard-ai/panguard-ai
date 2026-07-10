@@ -21,7 +21,7 @@ export async function generateMetadata(props: {
 export default async function SOWPage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;
   const isZh = params.locale === 'zh-TW';
-  const lastUpdatedLabel = isZh ? '最後更新:' : 'Last updated:';
+  const lastUpdatedLabel = isZh ? '最後更新：' : 'Last updated:';
   const lastUpdatedValue = isZh ? SOW_LAST_UPDATED_ZH : SOW_LAST_UPDATED_EN;
 
   return (
@@ -67,13 +67,13 @@ export default async function SOWPage(props: { params: Promise<{ locale: string 
         <li>
           <strong>{isZh ? '客製 ATR 規則包' : 'Custom ATR rule pack'}</strong>{' '}
           {isZh
-            ? '50-100 條規則,目標部署環境量身製作 (Day 21)'
+            ? '50-100 條規則，目標部署環境量身製作 (Day 21)'
             : '50-100 rules tagged for the target deployment (Day 21)'}
         </li>
         <li>
           <strong>{isZh ? '範例合規證據包' : 'Sample compliance evidence pack'}</strong>{' '}
           {isZh
-            ? 'EU AI Act / NIST AI RMF / ISO 42001 / OWASP Agentic / OWASP LLM 擇一 (Day 35 草稿 → Day 75 最終)'
+            ? 'EU AI Act / NIST AI RMF / ISO 42001 / OWASP Agentic / OWASP LLM 擇一 （Day 35 草稿 → Day 75 最終）'
             : 'one of EU AI Act / NIST AI RMF / ISO 42001 / OWASP Agentic / OWASP LLM (Day 35 draft → Day 75 final)'}
         </li>
         <li>
@@ -84,7 +84,7 @@ export default async function SOWPage(props: { params: Promise<{ locale: string 
         </li>
         <li>
           <strong>{isZh ? '資深工程辦公時間' : 'Senior engineering office hours'}</strong>{' '}
-          {isZh ? '6 小時 / 週 (導入期)' : '6 hrs / wk (onboarding phase)'}
+          {isZh ? '6 小時 / 週 （導入期）' : '6 hrs / wk (onboarding phase)'}
         </li>
         <li>
           <strong>{isZh ? '續約包' : 'Renewal packet'}</strong>{' '}
@@ -97,7 +97,7 @@ export default async function SOWPage(props: { params: Promise<{ locale: string 
       <h2>{isZh ? 'Migrator Pro 定價' : 'Migrator Pro pricing'}</h2>
       <p>
         {isZh
-          ? 'Migrator Pro 為年約制,$500K–2M / 年(業務洽談定價)。也已內建於 PanGuard Enterprise 方案中。'
+          ? 'Migrator Pro 為年約制，$500K–2M / 年（業務洽談定價）。也已內建於 PanGuard Enterprise 方案中。'
           : 'Migrator Pro is an annual engagement, $500K–2M / year (sales-led pricing). It is also bundled inside PanGuard Enterprise.'}
       </p>
 
@@ -107,7 +107,7 @@ export default async function SOWPage(props: { params: Promise<{ locale: string 
           <strong>
             {isZh ? '路徑 A — 信用卡 (Stripe)' : 'Path A — Credit/debit card (Stripe)'}
           </strong>
-          : {isZh ? '100% 預付,服務從付款日起算' : '100% upfront, service starts on charge'}
+          : {isZh ? '100% 預付，服務從付款日起算' : '100% upfront, service starts on charge'}
         </li>
         <li>
           <strong>
@@ -115,7 +115,7 @@ export default async function SOWPage(props: { params: Promise<{ locale: string 
           </strong>
           :{' '}
           {isZh
-            ? 'Stripe 開立發票,30 天內電匯 (適合 F500 採購流程,P-card 上限不足以支付六位數費用)'
+            ? 'Stripe 開立發票，30 天內電匯 （適合 F500 採購流程，P-card 上限不足以支付六位數費用）'
             : 'Stripe-generated invoice, wire within 30 days (suits F500 procurement where P-card limits exclude six-figure fees)'}
         </li>
         <li>

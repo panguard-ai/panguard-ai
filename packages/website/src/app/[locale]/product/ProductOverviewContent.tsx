@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Link } from '@/navigation';
 import { ArrowRight } from 'lucide-react';
 import { ShieldIcon, AnalyticsIcon, GlobalIcon } from '@/components/ui/BrandIcons';
@@ -18,6 +18,7 @@ const productConfigs = [
     icon: AnalyticsIcon,
     badgeColor: 'bg-brand-sage/10 text-brand-sage border-brand-sage/20',
     description: `ATR (Agent Threat Rules) is an open, executable standard for detecting AI agent threats. YAML-based rules across 10 categories cover prompt injection, tool poisoning, skill compromise, unauthorized access, data exfiltration, and more. ATR gives the security community a shared language for AI agent threats. Rules are open-source, human-readable, and machine-enforceable.`,
+    descriptionZh: `ATR（Agent Threat Rules）是偵測 AI Agent 威脅的開放、可執行標準。以 YAML 為基礎的規則橫跨 10 大威脅類別，涵蓋 prompt injection、tool poisoning、skill compromise、未授權存取、資料外洩等。ATR 讓資安社群擁有一套描述 AI Agent 威脅的共同語言。規則開源、人類可讀、且可由機器強制執行。`,
     features: [
       'Rules across 10 threat categories, growing continuously',
       'YAML-based, human-readable rule format',
@@ -26,6 +27,14 @@ const productConfigs = [
       'Machine-enforceable by Guard and any compatible engine',
       'Versioned rule lifecycle: draft, experimental, stable, deprecated',
     ],
+    featuresZh: [
+      '規則橫跨 10 大威脅類別，持續增長',
+      '以 YAML 為基礎、人類可讀的規則格式',
+      '涵蓋 prompt injection、tool poisoning、skill compromise、資料外洩',
+      '開源——由社群貢獻並審核',
+      '可由 Guard 及任何相容引擎強制執行',
+      '版本化的規則生命週期：draft、experimental、stable、deprecated',
+    ],
     href: '/atr',
   },
   {
@@ -33,6 +42,7 @@ const productConfigs = [
     icon: GlobalIcon,
     badgeColor: 'bg-brand-sage/10 text-brand-sage border-brand-sage/20',
     description: `Threat Cloud is a self-hosted collective intelligence network. Every Panguard install contributes anonymized threat signals; the pipeline auto-generates ATR rules from real-world attacks. ${STATS.threatIntel.sources} threat intel sources, ${STATS.threatIntel.validatedRecords.toLocaleString()} validated IoC records, and ${STATS.threatIntel.promotedRules} community-promoted rules -- all synced every hour. The more nodes participate, the stronger everyone's defense.`,
+    descriptionZh: `Threat Cloud 是可自架的集體威脅情報網路。每一個 Panguard 安裝都會貢獻匿名化的威脅訊號；pipeline 再從真實世界的攻擊自動產生 ATR 規則。${STATS.threatIntel.sources} 個威脅情報來源、${STATS.threatIntel.validatedRecords.toLocaleString()} 筆已驗證 IoC 記錄、${STATS.threatIntel.promotedRules} 條社群晉升規則——全部每小時同步。參與的節點越多，所有人的防禦就越強。`,
     features: [
       `${STATS.threatIntel.sources} threat intel sources with ${STATS.threatIntel.validatedRecords.toLocaleString()} validated records`,
       'Auto-generates ATR rules from collective data',
@@ -41,6 +51,14 @@ const productConfigs = [
       'Anomaly signals from Guard and Scan deployments worldwide',
       'Confidence scoring and rule lifecycle management',
     ],
+    featuresZh: [
+      `${STATS.threatIntel.sources} 個威脅情報來源，${STATS.threatIntel.validatedRecords.toLocaleString()} 筆已驗證記錄`,
+      '從集體資料自動產生 ATR 規則',
+      `${STATS.threatIntel.promotedRules} 條社群晉升規則，每 ${STATS.threatIntel.syncInterval} 同步一次`,
+      '可自架——你的資料永不離開自己的基礎設施',
+      '匯集全球 Guard 與 Scan 部署的異常訊號',
+      '信心評分與規則生命週期管理',
+    ],
     href: '/threat-cloud',
   },
   {
@@ -48,6 +66,7 @@ const productConfigs = [
     icon: ShieldIcon,
     badgeColor: 'bg-brand-sage/10 text-brand-sage border-brand-sage/20',
     description: `Panguard Guard is the enforcement engine. A 4-agent pipeline (Detect, Analyze, Respond, Report) processes AI agent events through ${STATS.totalRulesDisplay} ATR detection rules. Built-in Skill Auditor runs ${STATS.skillAuditChecks} checks before any AI skill is installed. Three response modules auto-block IPs, kill processes, and quarantine files.`,
+    descriptionZh: `Panguard Guard 是強制執行引擎。4-agent pipeline（Detect、Analyze、Respond、Report）以 ${STATS.totalRulesDisplay} 條 ATR 偵測規則處理 AI Agent 事件。內建的 Skill Auditor 會在任何 AI skill 安裝前執行 ${STATS.skillAuditChecks} 項檢查。三個回應模組可自動封鎖 IP、終止程序、隔離檔案。`,
     features: [
       '4-agent AI pipeline: Detect, Analyze, Respond, Report',
       `${STATS.totalRulesDisplay} ATR detection rules`,
@@ -55,6 +74,14 @@ const productConfigs = [
       '3 auto-response modules: IP Blocker, Process Killer, File Quarantine',
       'Works with Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS Code Copilot, Zed, Gemini CLI, Continue, Roo Code, and any MCP-compatible AI agent',
       'Supports Linux, macOS, Windows, Docker, Kubernetes',
+    ],
+    featuresZh: [
+      '4-agent AI pipeline：Detect、Analyze、Respond、Report',
+      `${STATS.totalRulesDisplay} 條 ATR 偵測規則`,
+      `Skill Auditor：${STATS.skillAuditChecks} 層安裝前安全閘門`,
+      '3 個自動回應模組：IP Blocker、Process Killer、File Quarantine',
+      '可搭配 Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw、ArkClaw、Windsurf、QClaw、Cline、VS Code Copilot、Zed、Gemini CLI、Continue、Roo Code 及任何相容 MCP 的 AI Agent',
+      '支援 Linux、macOS、Windows、Docker、Kubernetes',
     ],
     href: '/product/guard',
   },
@@ -64,6 +91,7 @@ const productConfigs = [
 
 export default function ProductOverviewContent() {
   const t = useTranslations('product.overview');
+  const isZh = useLocale() === 'zh-TW';
 
   return (
     <>
@@ -170,13 +198,16 @@ export default function ProductOverviewContent() {
                   {t(`products.${product.key}.tagline`)}
                 </p>
 
-                <p className="text-text-secondary leading-relaxed">{product.description}</p>
+                <p className="text-text-secondary leading-relaxed">
+                  {isZh ? product.descriptionZh : product.description}
+                </p>
 
                 <Link
                   href={product.href}
                   className="inline-flex items-center gap-2 mt-6 text-brand-sage hover:text-brand-sage-light font-medium transition-colors group"
                 >
-                  Learn more about {t(`products.${product.key}.name`)}
+                  {isZh ? '深入了解 ' : 'Learn more about '}
+                  {t(`products.${product.key}.name`)}
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
@@ -189,7 +220,7 @@ export default function ProductOverviewContent() {
                   {t('capabilities')}
                 </p>
                 <ul className="space-y-4">
-                  {product.features.map((feature) => (
+                  {(isZh ? product.featuresZh : product.features).map((feature) => (
                     <li
                       key={feature}
                       className="flex items-start gap-3 text-sm text-text-secondary"
