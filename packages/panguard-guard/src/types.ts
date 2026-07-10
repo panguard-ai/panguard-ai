@@ -439,6 +439,13 @@ export interface AnalyzeLLM {
   analyze(prompt: string, context?: string): Promise<LLMAnalysisResult>;
   classify(event: SecurityEvent): Promise<LLMClassificationResult>;
   isAvailable(): Promise<boolean>;
+  /**
+   * Optional: register a sink notified of each live advisory-call outcome
+   * (true = a real model call succeeded, false + message = it failed). Lets the
+   * dashboard downgrade Layer C to 'degraded' when a configured model has gone
+   * dark (expired key / dead Ollama) instead of showing a config-only green.
+   */
+  setLayerCOutcomeSink?(sink: (ok: boolean, error?: string) => void): void;
 }
 
 // ===== Dashboard =====

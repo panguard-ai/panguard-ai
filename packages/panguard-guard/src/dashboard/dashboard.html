@@ -27,12 +27,7 @@
         box-sizing: border-box;
       }
       body {
-        font-family:
-          -apple-system,
-          BlinkMacSystemFont,
-          'Segoe UI',
-          system-ui,
-          sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
         background: var(--bg-base);
         color: var(--text-primary);
         display: flex;
@@ -1454,8 +1449,20 @@
       <!-- Connection guidance: hidden unless Guard is unreachable. Replaces the
            old dead end where everything sat on a stale green "CONNECTING…". -->
       <div class="conn-banner" id="conn-banner" style="display: none">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="var(--danger)"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path
+            d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+          />
           <line x1="12" y1="9" x2="12" y2="13" />
           <line x1="12" y1="17" x2="12.01" y2="17" />
         </svg>
@@ -1517,10 +1524,12 @@
                 <div class="welcome-step-h">Add a second opinion (Layer C)</div>
                 <div class="welcome-step-b">
                   Optionally connect your own LLM for an advisory read on anything Layers A and B
-                  flag. It only ever <strong>flags for review — it can never block on its own</strong>.
-                  Runs on already-flagged events only, so a cloud key is a few cents a month; a local
-                  model (Ollama) is free. <strong>Your key is entered in the terminal, never here</strong>,
-                  and is stored encrypted on this machine.
+                  flag. It only ever
+                  <strong>flags for review — it can never block on its own</strong>. Runs on
+                  already-flagged events only, so a cloud key is a few cents a month; a local model
+                  (Ollama) is free.
+                  <strong>Your key is entered in the terminal, never here</strong>, and is stored
+                  encrypted on this machine.
                 </div>
                 <div class="cmd-box">
                   <code id="welcome-ai-cmd">pga guard ai</code>
@@ -1533,10 +1542,11 @@
               <div class="welcome-step">
                 <div class="welcome-step-h">Join collective defense</div>
                 <div class="welcome-step-b">
-                  Optionally let the attacks Guard blocks here help draft new open rules for everyone —
-                  and get the community's new rules back sooner. Shares only the matched rule ID(s),
-                  attack category, a coarse region, and a truncated IP; <strong>never your prompts,
-                  code, files, secrets, paths, or hostname</strong>. Off until you turn it on.
+                  Optionally let the attacks Guard blocks here help draft new open rules for
+                  everyone — and get the community's new rules back sooner. Shares only the matched
+                  rule ID(s), attack category, a coarse region, and a truncated IP;
+                  <strong>never your prompts, code, files, secrets, paths, or hostname</strong>. Off
+                  until you turn it on.
                 </div>
                 <button type="button" class="btn btn-secondary btn-sm" data-goto="tcloud">
                   Open Threat Cloud &rarr;
@@ -1583,7 +1593,10 @@
 
         <!-- 4 KPI cards -->
         <div class="cg">
-          <div class="cd" title="Total ATR detection rules currently loaded and enforcing on this machine.">
+          <div
+            class="cd"
+            title="Total ATR detection rules currently loaded and enforcing on this machine."
+          >
             <div class="cl" data-i18n="k_rules">Rules Active</div>
             <div class="cv sg" id="v-rules">--</div>
           </div>
@@ -1653,11 +1666,17 @@
             <div
               class="lc-cta-text"
               id="lc-cta-text"
-              style="font-size: 12px; color: var(--text-muted); line-height: 1.6; flex: 1; min-width: 220px"
+              style="
+                font-size: 12px;
+                color: var(--text-muted);
+                line-height: 1.6;
+                flex: 1;
+                min-width: 220px;
+              "
             >
               Optional: connect your own LLM for a second opinion on flagged events — catches novel
-              attacks A and B miss. Advisory only: it flags for review, never auto-blocks. Free with a
-              local model, or a few cents a month with a cloud key.
+              attacks A and B miss. Advisory only: it flags for review, never auto-blocks. Free with
+              a local model, or a few cents a month with a cloud key.
             </div>
             <button type="button" class="btn btn-secondary btn-sm" id="lc-cta-btn">
               Set up Layer C
@@ -2038,11 +2057,14 @@
         <div class="pt"><em data-i18n="t_tc">Threat Cloud</em></div>
         <div class="pd" data-i18n="d_tc">
           Threat Cloud is PanGuard's anonymous threat-intelligence network. It is
-          <strong>off by default — until you turn on Collective Defense below, nothing leaves this
-          machine.</strong> When you do enable it, your endpoint uploads anonymized threat signatures
-          (no code, no file contents). New detection rules ship in the open ATR package — Guard
-          checks once a day and tells you when an upgrade is available. It never auto-pulls rule logic
-          from the network, so a compromised relay can't change what your engine enforces.
+          <strong
+            >off by default — until you turn on Collective Defense below, nothing leaves this
+            machine.</strong
+          >
+          When you do enable it, your endpoint uploads anonymized threat signatures (no code, no
+          file contents). New detection rules ship in the open ATR package — Guard checks once a day
+          and tells you when an upgrade is available. It never auto-pulls rule logic from the
+          network, so a compromised relay can't change what your engine enforces.
         </div>
 
         <div id="tc-loading" class="empty">
@@ -2118,17 +2140,35 @@
               <div class="cd-box">
                 <div class="cd-box-title">What is shared (and what is never shared)</div>
                 <ul class="cd-list">
-                  <li>Shared: the matched rule ID(s), attack category + MITRE technique, a coarse country region, and a truncated IP (last two octets zeroed).</li>
-                  <li>Never shared: your prompts, code, file contents, secrets, file paths, hostname, or username.</li>
-                  <li>Sealed with end-to-end encryption before it leaves this machine — only the Threat Cloud backend can open it, not the network or a relay.</li>
-                  <li>A stable random install ID links your own submissions (pseudonymous) — raw samples never leave this machine.</li>
+                  <li>
+                    Shared: the matched rule ID(s), attack category + MITRE technique, a coarse
+                    country region, and a truncated IP (last two octets zeroed).
+                  </li>
+                  <li>
+                    Never shared: your prompts, code, file contents, secrets, file paths, hostname,
+                    or username.
+                  </li>
+                  <li>
+                    Sealed with end-to-end encryption before it leaves this machine — only the
+                    Threat Cloud backend can open it, not the network or a relay.
+                  </li>
+                  <li>
+                    A stable random install ID links your own submissions (pseudonymous) — raw
+                    samples never leave this machine.
+                  </li>
                 </ul>
               </div>
             </div>
 
             <div class="cd-control">
-              <div class="toggle" id="tc-toggle" role="switch" aria-checked="false" tabindex="0"
-                aria-label="Collective defense"></div>
+              <div
+                class="toggle"
+                id="tc-toggle"
+                role="switch"
+                aria-checked="false"
+                tabindex="0"
+                aria-label="Collective defense"
+              ></div>
               <div>
                 <div id="tc-toggle-label" style="font-size: 14px; font-weight: 600">--</div>
                 <div id="tc-toggle-sub" style="font-size: 12px; color: var(--text-muted)"></div>
@@ -2255,13 +2295,15 @@
             language and catch novel attacks the deterministic layers miss. It is
             <strong>advisory only</strong> — it flags events for your review and
             <strong>can never block on its own</strong>. It runs only on events A or B already
-            flagged, not on every action, so a cloud model typically costs a few cents a month, and a
-            local model is free.
+            flagged, not on every action, so a cloud model typically costs a few cents a month, and
+            a local model is free.
           </div>
 
           <div class="cd-grid">
             <div class="cd-box">
-              <div class="cd-box-title cd-good">Path 1 — Local model (free &amp; fully private)</div>
+              <div class="cd-box-title cd-good">
+                Path 1 — Local model (free &amp; fully private)
+              </div>
               <ul class="cd-list">
                 <li>Runs a model on this machine with Ollama.</li>
                 <li>No API key, no cost — nothing leaves your computer.</li>
@@ -2273,8 +2315,8 @@
               <ul class="cd-list">
                 <li>Use an OpenAI or Anthropic key you already have.</li>
                 <li id="lc-settings-cost">
-                  Typically a few cents a month with typical usage (flagged events only) — free
-                  with a local model.
+                  Typically a few cents a month with typical usage (flagged events only) — free with
+                  a local model.
                 </li>
                 <li>Your key is sent only to that provider — never to PanGuard.</li>
               </ul>
@@ -2303,8 +2345,8 @@
             <ul class="cd-list" style="margin-top: 10px; padding-left: 18px">
               <li>
                 <strong>Typed privately in the terminal.</strong> The key is read with the screen
-                echo off, so it never shows on screen, never lands in your shell history, and is never
-                passed as a command argument.
+                echo off, so it never shows on screen, never lands in your shell history, and is
+                never passed as a command argument.
               </li>
               <li>
                 <strong>Never entered in the browser.</strong> This dashboard deliberately has no
@@ -2312,17 +2354,16 @@
                 your terminal.
               </li>
               <li id="lc-key-protection-item">
-                <strong>Encrypted at rest.</strong> Stored at
-                <code>~/.panguard/llm.enc</code> with AES-256-GCM, file permissions
-                <code>0600</code> (only you can read it).
+                <strong>Encrypted at rest.</strong> Stored at <code>~/.panguard/llm.enc</code> with
+                AES-256-GCM, file permissions <code>0600</code> (only you can read it).
               </li>
               <li>
                 <strong>Locked to this machine.</strong> The encryption key is derived from this
                 machine and user, so a copied file is useless anywhere else.
               </li>
               <li>
-                <strong>Sent only to your provider.</strong> Your key goes only to the model provider
-                you chose. It is never sent to PanGuard.
+                <strong>Sent only to your provider.</strong> Your key goes only to the model
+                provider you chose. It is never sent to PanGuard.
               </li>
             </ul>
           </details>
@@ -2344,11 +2385,11 @@
         <div class="fs">
           <h3 data-i18n="st_tc">Threat Cloud Endpoint</h3>
           <div class="desc" data-i18n="st_tc_desc">
-            The server Guard talks to for Threat Cloud. <strong>Most people should leave this
-            blank</strong> — Guard uses the default (tc.panguard.ai). Change it only if you run your
-            own private or air-gapped relay: when Collective Defense is on, anonymized signatures and
-            the daily rule-update check go to whatever URL is set here. Your prompts, code, and keys
-            are never sent regardless.
+            The server Guard talks to for Threat Cloud.
+            <strong>Most people should leave this blank</strong> — Guard uses the default
+            (tc.panguard.ai). Change it only if you run your own private or air-gapped relay: when
+            Collective Defense is on, anonymized signatures and the daily rule-update check go to
+            whatever URL is set here. Your prompts, code, and keys are never sent regardless.
           </div>
           <div class="fr">
             <label data-i18n="st_endpoint">Endpoint</label>
@@ -2399,9 +2440,9 @@
           <div class="desc">
             This list is <strong>read-only here</strong> — an "armed" response only runs
             automatically when Guard Mode is set to Protection; in Learning or Report-only nothing
-            automatic happens. To change what's armed, edit
-            <code>enforcementPolicy</code> in <code>~/.panguard-guard/config.json</code> (or run
-            <code>pga setup</code>) and restart Guard.
+            automatic happens. To change what's armed, edit <code>enforcementPolicy</code> in
+            <code>~/.panguard-guard/config.json</code> (or run <code>pga setup</code>) and restart
+            Guard.
           </div>
           <div
             id="st-enforce-list"
@@ -2562,7 +2603,7 @@
           '<div style="font-size:13px;color:var(--text,#e6e8eb);margin-bottom:8px">' +
           'To get an authenticated URL, run:</div>' +
           '<div style="background:var(--surface-3,#0f1216);border-radius:8px;padding:12px 14px;' +
-          'font-family:ui-monospace,\'SF Mono\',Menlo,monospace;font-size:13px;color:var(--emerald,#34d399)">' +
+          "font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:var(--emerald,#34d399)\">" +
           'pga up</div>' +
           '<div style="font-size:12px;color:var(--text-muted,#9aa1a9);line-height:1.6;margin-top:14px">' +
           'It prints a link like ' +
@@ -2807,6 +2848,12 @@
       function updateStatus(s) {
         if (!s) return;
         markConnLive();
+        // Record the Guard HOST's platform so the key-storage 0600 copy reflects
+        // the machine the file lives on, not the browser's OS.
+        if (s.hostPlatform && window.__hostPlatform !== s.hostPlatform) {
+          window.__hostPlatform = s.hostPlatform;
+          applyKeyProtectionCopy();
+        }
         // First-run welcome: only ever after a confirmed live+authenticated status,
         // so it can never appear over the "Guard not running" banner or 401 overlay.
         if (!_welcomeChecked) {
@@ -3088,13 +3135,20 @@
       function applyKeyProtectionCopy() {
         var el = document.getElementById('lc-key-protection-item');
         if (!el) return;
-        var plat =
-          (typeof navigator !== 'undefined' &&
-            ((navigator.userAgentData && navigator.userAgentData.platform) ||
-              navigator.platform ||
-              navigator.userAgent)) ||
-          '';
-        var isWindows = /win/i.test(plat);
+        // Prefer the GUARD HOST's platform (process.platform via /api/status).
+        // navigator.* is the BROWSER's OS — wrong when the dashboard is viewed
+        // from a different machine than the Guard host — so it is only a
+        // fallback before the first status arrives.
+        var host = (typeof window !== 'undefined' && window.__hostPlatform) || '';
+        var isWindows = host
+          ? /^win/i.test(host)
+          : /win/i.test(
+              (typeof navigator !== 'undefined' &&
+                ((navigator.userAgentData && navigator.userAgentData.platform) ||
+                  navigator.platform ||
+                  navigator.userAgent)) ||
+                ''
+            );
         if (!isWindows) return;
         el.innerHTML =
           '<strong>Encrypted at rest.</strong> Stored at <code>~/.panguard/llm.enc</code> with ' +
@@ -3225,14 +3279,16 @@
             label: 'DEGRADED',
             color: 'var(--danger)',
             badge: 'badge-learning',
-            detail: '0 detection rules loaded — detection is a no-op. Run "pga guard sync-rules" to restore.',
+            detail:
+              '0 detection rules loaded — detection is a no-op. Run "pga guard sync-rules" to restore.',
             sub: 'The detection engine has no rules loaded, so nothing is being caught. Restore rules to regain protection.',
           },
           tampered: {
             label: 'TAMPERED',
             color: 'var(--danger)',
             badge: 'badge-learning',
-            detail: 'Config integrity check failed — protection may have been weakened. Review the config, then re-seal with "pga up".',
+            detail:
+              'Config integrity check failed — protection may have been weakened. Review the config, then re-seal with "pga up".',
             sub: 'The protection config changed outside PanGuard. Verify the change was yours before trusting this machine.',
           },
         };
@@ -3494,7 +3550,8 @@
         }
         var subEl = emp.querySelector('.sub');
         var p = _lastStatus ? postureView(_lastStatus) : null;
-        var posture = p && _lastStatus && _lastStatus.enforcement ? _lastStatus.enforcement.posture : null;
+        var posture =
+          p && _lastStatus && _lastStatus.enforcement ? _lastStatus.enforcement.posture : null;
         var head = 'All clear — no threats recorded.';
         var sub = 'Threats will appear here if anything is caught.';
         if (posture === 'protected') {
@@ -3502,10 +3559,18 @@
           sub = 'Your agents are protected. Threats will appear here if anything is caught.';
         } else if (posture === 'degraded' || posture === 'off' || posture === 'tampered') {
           head = 'No threats recorded — but this does not mean you are clean.';
-          sub = (p ? p.detail : 'Detection is not currently active.') + ' An empty list here reflects detection status, not a clean bill of health.';
-        } else if (posture === 'report-only' || posture === 'monitoring' || posture === 'learning') {
+          sub =
+            (p ? p.detail : 'Detection is not currently active.') +
+            ' An empty list here reflects detection status, not a clean bill of health.';
+        } else if (
+          posture === 'report-only' ||
+          posture === 'monitoring' ||
+          posture === 'learning'
+        ) {
           head = 'Nothing recorded yet.';
-          sub = (p ? p.sub : 'Guard is watching, but no automatic blocking is armed.') + ' Threats will appear here if anything is caught.';
+          sub =
+            (p ? p.sub : 'Guard is watching, but no automatic blocking is armed.') +
+            ' Threats will appear here if anything is caught.';
         }
         if (headEl) headEl.nodeValue = head + ' ';
         if (subEl) subEl.textContent = sub;
@@ -3596,7 +3661,7 @@
                 esc(d.currentVersion || '?') +
                 ' &rarr; ' +
                 esc(d.latestVersion) +
-                '. Run <code>pga upgrade</code> in your terminal when you\'re ready — your current ' +
+                ". Run <code>pga upgrade</code> in your terminal when you're ready — your current " +
                 'rules keep protecting you until you do, and nothing changes automatically. Rules ' +
                 'are verified by npm and never auto-applied.';
               b.style.display = '';
@@ -3959,7 +4024,8 @@
             }
             // Keep the CLI command in sync with the action the toggle will take.
             var cli = document.getElementById('tc-cli-cmd');
-            if (cli) cli.textContent = 'pga config set telemetry ' + (d.uploadEnabled ? 'false' : 'true');
+            if (cli)
+              cli.textContent = 'pga config set telemetry ' + (d.uploadEnabled ? 'false' : 'true');
           })
           .catch(function () {
             document.getElementById('tc-loading').innerHTML =
@@ -4103,7 +4169,8 @@
           key: 'webhook',
           name: 'Webhook',
           what: 'POST each alert as JSON to any URL you own (wire it into your own tooling).',
-          snippet: '"webhook": { "url": "https://example.com/guard-hook", "secret": "OPTIONAL_SHARED_SECRET" }',
+          snippet:
+            '"webhook": { "url": "https://example.com/guard-hook", "secret": "OPTIONAL_SHARED_SECRET" }',
         },
       ];
       var notifySnippetSeq = 0;
@@ -4329,7 +4396,9 @@
                 act === 'quarantine'
                   ? 'Quarantined ' + name + ' — moved out of the agent’s reach (restorable below).'
                   : act === 'unwhitelist'
-                    ? 'Un-trusted ' + name + ' — Guard will evaluate it again like any unknown skill.'
+                    ? 'Un-trusted ' +
+                      name +
+                      ' — Guard will evaluate it again like any unknown skill.'
                     : 'Marked safe — Guard will stop flagging ' + name + '.';
               toast(msg);
               loadSkills();
