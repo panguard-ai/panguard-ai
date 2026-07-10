@@ -86,9 +86,9 @@ export default function HowItWorksContent() {
   return (
     <>
       <p id="definition" className="sr-only">
-        Panguard&apos;s security pipeline — Detect, Analyze, and Respond — processes threats through
-        deterministic on-device detection: ATR regex rules, behavioral baselines, and on-device
-        correlation, with no LLM in the detection path.
+        Panguard&apos;s three-stage security pipeline — Detect, Analyze, and Respond — processes
+        threats through a three-tier AI funnel where 90% of threats are caught by local rules, 7% by
+        local AI, and only 3% require cloud analysis.
       </p>
 
       {/* ── Hero ── */}
@@ -139,60 +139,6 @@ export default function HowItWorksContent() {
         </div>
       </SectionWrapper>
 
-      {/* ── Where the rules come from: slow committee path vs four fast ATR paths ── */}
-      <SectionWrapper className="border-t border-border/30">
-        <SectionTitle
-          overline={t('ruleEngine.overline')}
-          title={t('ruleEngine.title')}
-          subtitle={t('ruleEngine.subtitle')}
-        />
-        <div className="max-w-5xl mx-auto mt-14 grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,2.1fr)] items-stretch">
-          {/* Slow path */}
-          <FadeInUp>
-            <div className="h-full bg-surface-1 rounded-xl border border-border border-dashed p-6 flex flex-col">
-              <p className="text-[11px] uppercase tracking-[0.15em] text-text-tertiary font-semibold">
-                {t('ruleEngine.slow.label')}
-              </p>
-              <p className="text-sm text-text-secondary leading-relaxed mt-3">
-                {t('ruleEngine.slow.desc')}
-              </p>
-            </div>
-          </FadeInUp>
-
-          {/* Four fast paths */}
-          <FadeInUp delay={0.08}>
-            <div className="h-full bg-surface-1 rounded-xl border border-brand-sage/30 p-6">
-              <p className="text-[11px] uppercase tracking-[0.15em] text-brand-sage font-semibold">
-                {t('ruleEngine.fastLabel')}
-              </p>
-              <div className="grid sm:grid-cols-2 gap-4 mt-4">
-                {(t.raw('ruleEngine.paths') as Array<{ name: string; desc: string }>).map(
-                  (path, i) => (
-                    <div
-                      key={path.name}
-                      className="bg-surface-2 rounded-lg border border-border p-4"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-brand-sage tabular-nums">{`0${i + 1}`}</span>
-                        <p className="text-sm font-semibold text-text-primary">{path.name}</p>
-                      </div>
-                      <p className="text-xs text-text-secondary leading-relaxed mt-1.5">
-                        {path.desc}
-                      </p>
-                    </div>
-                  )
-                )}
-              </div>
-            </div>
-          </FadeInUp>
-        </div>
-        <FadeInUp delay={0.16}>
-          <p className="max-w-3xl mx-auto mt-8 text-sm text-text-secondary leading-relaxed text-center">
-            {t('ruleEngine.wall')}
-          </p>
-        </FadeInUp>
-      </SectionWrapper>
-
       {/* ── Five Detection Stages (funnel) ── */}
       <SectionWrapper dark className="border-t border-border/30">
         <SectionTitle
@@ -238,7 +184,7 @@ export default function HowItWorksContent() {
         </div>
       </SectionWrapper>
 
-      {/* ── Detection Funnel (detailed) ── */}
+      {/* ── AI Funnel (detailed) ── */}
       <SectionWrapper className="border-t border-border/30">
         <SectionTitle
           overline={t('aiFunnel.overline')}
