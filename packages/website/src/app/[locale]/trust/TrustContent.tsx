@@ -91,7 +91,7 @@ export default function TrustContent() {
           </FadeInUp>
           <FadeInUp delay={0.05}>
             <h1 className="text-[clamp(40px,5vw,64px)] font-extrabold leading-[1.08] tracking-tight text-text-primary max-w-3xl">
-              {t('title')} <span className="text-brand-sage">{t('titleHighlight')}</span>
+              {t('title')}<span className="text-brand-sage">{t('titleHighlight')}</span>
             </h1>
           </FadeInUp>
           <FadeInUp delay={0.1}>

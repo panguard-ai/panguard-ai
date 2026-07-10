@@ -186,7 +186,7 @@ export default function LayerDetailContent({ layer }: { layer: Layer }) {
                 {isZh ? '這一層攔下的攻擊' : 'ATTACKS THIS LAYER CATCHES'}
               </p>
               <h2 className="text-[clamp(20px,3vw,32px)] font-bold text-text-primary">
-                {isZh ? '具體威脅,具體對策' : 'Concrete threats, concrete controls'}
+                {isZh ? '具體威脅，具體對策' : 'Concrete threats, concrete controls'}
               </h2>
             </FadeInUp>
             <div className="mt-10 space-y-4">
@@ -290,7 +290,7 @@ export default function LayerDetailContent({ layer }: { layer: Layer }) {
           <FadeInUp>
             <h2 className="text-[clamp(20px,3vw,36px)] font-bold text-text-primary leading-[1.15]">
               {isZh
-                ? '一家廠商覆蓋 7 層,不是 5 家合購'
+                ? '一家廠商覆蓋 7 層，不是 5 家合購'
                 : 'One vendor, 7 layers — instead of 5 tools glued together'}
             </h2>
           </FadeInUp>

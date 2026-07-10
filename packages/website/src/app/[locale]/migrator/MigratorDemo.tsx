@@ -293,7 +293,7 @@ export default function MigratorDemo() {
               {/* INPUT PANE */}
               <div className="rounded-2xl border border-border bg-surface-1 overflow-hidden">
                 <div className="px-4 py-2 border-b border-border-subtle text-[11px] uppercase tracking-[0.15em] text-text-muted font-semibold flex items-center justify-between">
-                  <span>{isZh ? '輸入 (Sigma 或 YARA)' : 'Input (Sigma or YARA)'}</span>
+                  <span>{isZh ? '輸入 （Sigma 或 YARA）' : 'Input (Sigma or YARA)'}</span>
                   <span className="font-mono normal-case tracking-normal text-[10px]">
                     {input.length.toLocaleString()} {isZh ? '字元' : 'chars'}
                   </span>
@@ -303,7 +303,7 @@ export default function MigratorDemo() {
                   onChange={(e) => setInput(e.target.value)}
                   placeholder={
                     isZh
-                      ? '在這裡貼上一條 Sigma 或 YARA 規則...'
+                      ? '在這裡貼上一條 Sigma 或 YARA 規則…'
                       : 'Paste a Sigma or YARA rule here...'
                   }
                   spellCheck={false}
@@ -387,7 +387,7 @@ export default function MigratorDemo() {
                 {busy ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    {isZh ? '轉換中...' : 'Converting...'}
+                    {isZh ? '轉換中…' : 'Converting...'}
                   </>
                 ) : (
                   <>
@@ -507,26 +507,26 @@ export default function MigratorDemo() {
                 {isZh ? '年約 · 旗艦' : 'annual · flagship'}
               </p>
               <ul className="space-y-2 text-sm text-text-secondary flex-1">
-                <ComparisonRow ok pilot>
+                <ComparisonRow ok pilot zh={isZh}>
                   {isZh ? '全部 Community 功能' : 'Everything in Community'}
                 </ComparisonRow>
-                <ComparisonRow ok pilot>
+                <ComparisonRow ok pilot zh={isZh}>
                   {isZh ? '13 種額外輸入格式' : '13 more input formats'} (
                   <span className="font-mono text-[10px] text-text-muted">
                     {PILOT_FORMATS.join(', ')}
                   </span>
                   )
                 </ComparisonRow>
-                <ComparisonRow ok pilot>
-                  {isZh ? 'LLM 強化 (5 種合規框架對應)' : 'LLM enrichment (5-framework mapping)'}
+                <ComparisonRow ok pilot zh={isZh}>
+                  {isZh ? 'LLM 強化 （5 種合規框架對應）' : 'LLM enrichment (5-framework mapping)'}
                 </ComparisonRow>
-                <ComparisonRow ok pilot>
+                <ComparisonRow ok pilot zh={isZh}>
                   {isZh ? 'EU AI Act 稽核證據包' : 'EU AI Act evidence pack'}
                 </ComparisonRow>
-                <ComparisonRow ok pilot>
+                <ComparisonRow ok pilot zh={isZh}>
                   {isZh ? 'Threat Cloud 貢獻管線' : 'Threat Cloud contribute pipeline'}
                 </ComparisonRow>
-                <ComparisonRow ok pilot>
+                <ComparisonRow ok pilot zh={isZh}>
                   {isZh ? '簽章、持續重掃的合規證據' : 'Signed, continuously re-scanned evidence'}
                 </ComparisonRow>
               </ul>
@@ -572,10 +572,12 @@ function ComparisonRow({
   children,
   ok,
   pilot,
+  zh,
 }: {
   readonly children: React.ReactNode;
   readonly ok: boolean;
   readonly pilot?: boolean;
+  readonly zh?: boolean;
 }) {
   return (
     <li className="flex items-start gap-2 text-sm">
@@ -589,7 +591,7 @@ function ComparisonRow({
         {children}
         {pilot ? (
           <span className="ml-2 inline-block text-[9px] font-semibold uppercase tracking-wider text-brand-sage bg-brand-sage/10 rounded-full px-2 py-0.5 align-middle">
-            {ok ? 'Pro only' : 'Pro'}
+            {ok ? (zh ? '限 Pro' : 'Pro only') : 'Pro'}
           </span>
         ) : null}
       </div>
@@ -602,7 +604,7 @@ function humanizeError(code: string, isZh: boolean): string {
     case 'empty_input':
       return isZh ? '請貼上一條 Sigma 或 YARA 規則' : 'Paste a Sigma or YARA rule first';
     case 'input_too_large':
-      return isZh ? '輸入過大 (上限 64KB)' : 'Input too large (max 64KB)';
+      return isZh ? '輸入過大 （上限 64KB）' : 'Input too large (max 64KB)';
     case 'invalid_json':
       return isZh ? '請求格式錯誤' : 'Invalid request payload';
     case 'sigma_parse_error':

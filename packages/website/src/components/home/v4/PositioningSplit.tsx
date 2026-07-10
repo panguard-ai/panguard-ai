@@ -75,7 +75,7 @@ export default function PositioningSplit() {
           <SectionTitleV2 className="lg:text-5xl">
             {isZh ? (
               <>
-                一套平台,<span className="text-brand-sage">兩個採購窗口一次過。</span>
+                一套平台，<span className="text-brand-sage">兩個採購窗口一次過。</span>
               </>
             ) : (
               <>
@@ -85,7 +85,7 @@ export default function PositioningSplit() {
           </SectionTitleV2>
           <p className="mt-6 max-w-xl text-base leading-relaxed text-text-muted">
             {isZh
-              ? '銀行、保險、醫療的資安團隊跟合規團隊,不用各買各的廠商。'
+              ? '銀行、保險、醫療的資安團隊跟合規團隊，不用各買各的廠商。'
               : 'Bank / insurance / healthcare CISO and GRC do not need to buy two vendors.'}
           </p>
 
@@ -104,7 +104,7 @@ export default function PositioningSplit() {
 
           <p className="mt-10 max-w-xl border-l-2 border-brand-sage/60 pl-4 text-base font-semibold leading-relaxed text-text-primary sm:text-lg">
             {isZh
-              ? '偵測工具沒有合規證據,合規工具沒有即時偵測——單一產品做不到這件事。'
+              ? '偵測工具沒有合規證據，合規工具沒有即時偵測——單一產品做不到這件事。'
               : 'Detection tools have no evidence. Compliance tools have no detection. No point product does both.'}
           </p>
         </FadeInUp>
@@ -120,7 +120,7 @@ export default function PositioningSplit() {
             </h3>
             <p className="mt-4 text-sm leading-relaxed text-paper-muted">
               {isZh
-                ? `攻擊擋下之後,自動產出可稽核證據:每筆偵測都對到 ATR 規則 ID + ${FRAMEWORK_COUNT} 個合規框架條文。格式化為稽核級證據 —— 規則 ID + 框架條文 + SHA-256 + Ed25519 簽章。`
+                ? `攻擊擋下之後，自動產出可稽核證據：每筆偵測都對到 ATR 規則 ID + ${FRAMEWORK_COUNT} 個合規框架條文。格式化為稽核級證據——規則 ID + 框架條文 + SHA-256 + Ed25519 簽章。`
                 : `After an attack is blocked, the platform produces audit-ready evidence automatically: every detection links to ATR rule ID + clauses across ${FRAMEWORK_COUNT} compliance frameworks. Formatted as auditor-ready evidence — rule ID + framework clause + SHA-256 + Ed25519 signature.`}
             </p>
 
@@ -161,7 +161,7 @@ export default function PositioningSplit() {
       <FadeInUp delay={0.2}>
         <div className="mt-16 border-t border-border-subtle pt-8">
           <p className="font-mono text-[11px] uppercase tracking-micro text-text-muted">
-            {isZh ? '每個框架,一份證據包。' : 'Every framework. One evidence pack.'}
+            {isZh ? '每個框架，一份證據包。' : 'Every framework. One evidence pack.'}
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             {FRAMEWORKS.map((name) => (

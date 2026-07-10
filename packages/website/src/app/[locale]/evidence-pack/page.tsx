@@ -15,6 +15,8 @@
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
 import { Link } from '@/navigation';
+import NavBar from '@/components/NavBar';
+import Footer from '@/components/Footer';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import { Check, Download, ShieldCheck, FileText, Code, Lock } from 'lucide-react';
@@ -62,7 +64,9 @@ export default async function EvidencePackPage({
   const files = manifest.files as ManifestFile[];
 
   return (
-    <div className="bg-surface-0 text-text-primary min-h-screen">
+    <>
+      <NavBar />
+      <div className="bg-surface-0 text-text-primary min-h-screen pt-14">
       <SectionWrapper>
         <FadeInUp>
           <div className="max-w-3xl mx-auto text-center">
@@ -134,7 +138,7 @@ export default async function EvidencePackPage({
               </table>
             </div>
             <p className="mt-3 text-xs text-text-muted">
-              {isZh ? '驗證指令:' : 'Verify integrity:'}{' '}
+              {isZh ? '驗證指令：' : 'Verify integrity:'}{' '}
               <code className="bg-surface-2 border border-border rounded px-1.5 py-0.5 text-[11px] text-text-secondary">
                 {manifest.verification_command ?? 'shasum -a 256 RPT-*'}
               </code>{' '}
@@ -166,7 +170,7 @@ export default async function EvidencePackPage({
               value={`${STATS.benchmark.skill.fp}%`}
               caption={
                 isZh
-                  ? `${STATS.benchmark.skill.samples} 樣本 SKILL.md 語料;65K benign-gate 為 lane 制 ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt`
+                  ? `${STATS.benchmark.skill.samples} 樣本 SKILL.md 語料；65K benign-gate 為 lane 制 ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt`
                   : `${STATS.benchmark.skill.samples}-sample SKILL.md corpus; 65K benign-gate FP is lane-based ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt`
               }
             />
@@ -187,22 +191,22 @@ export default async function EvidencePackPage({
             <ul className="space-y-2.5 text-sm text-text-secondary leading-relaxed">
               <Bullet>
                 {isZh
-                  ? `偵測:${STATS.totalRulesDisplay} 條 ATR 規則 + Garak ${STATS.benchmark.garak.recall}% recall(${STATS.benchmark.garak.samples} 樣本);${STATS.benchmark.skill.fp}% FP 於 ${STATS.benchmark.skill.samples} 樣本 SKILL.md 語料,65K benign-gate 為 lane 制 ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt——LLM 0 個 token`
+                  ? `偵測：${STATS.totalRulesDisplay} 條 ATR 規則 + Garak ${STATS.benchmark.garak.recall}% recall(${STATS.benchmark.garak.samples} 樣本);${STATS.benchmark.skill.fp}% FP 於 ${STATS.benchmark.skill.samples} 樣本 SKILL.md 語料，65K benign-gate 為 lane 制 ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt——LLM 0 個 token`
                   : `Detection: ${STATS.totalRulesDisplay} ATR rules with ${STATS.benchmark.garak.recall}% Garak recall (${STATS.benchmark.garak.samples} samples); ${STATS.benchmark.skill.fp}% FP on the ${STATS.benchmark.skill.samples}-sample SKILL.md corpus, and lane-based benign-gate FP of ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt — zero LLM tokens`}
               </Bullet>
               <Bullet>
                 {isZh
-                  ? '報告敘述:由規則 YAML metadata 直接渲染(title / severity / description / compliance citation)'
+                  ? '報告敘述：由規則 YAML metadata 直接渲染(title / severity / description / compliance citation)'
                   : 'Report narrative: rendered directly from rule YAML metadata (title / severity / description / compliance citation)'}
               </Bullet>
               <Bullet>
                 {isZh
-                  ? '評估發現:assessors 在客戶機器上直接讀 firewall / encryption / TLS / logging 設定'
+                  ? '評估發現：assessors 在客戶機器上直接讀 firewall / encryption / TLS / logging 設定'
                   : 'Assessment findings: assessors read firewall, encryption, TLS, and logging configuration on the customer machine'}
               </Bullet>
               <Bullet>
                 {isZh
-                  ? '稽核完整性:每個檔案都有 SHA-256 + HMAC-SHA256 簽章(production 客戶簽章用客戶綁定 key)'
+                  ? '稽核完整性：每個檔案都有 SHA-256 + HMAC-SHA256 簽章（production 客戶簽章用客戶綁定 key）'
                   : 'Audit integrity: every file carries SHA-256 + HMAC-SHA256 signatures (production signatures use a customer-bound key)'}
               </Bullet>
               <Bullet>
@@ -218,7 +222,7 @@ export default async function EvidencePackPage({
           <div className="mt-12 max-w-3xl mx-auto text-center">
             <p className="text-sm text-text-secondary mb-4">
               {isZh
-                ? '想要綁你自己 workspace 的版本?'
+                ? '想要綁你自己 workspace 的版本？'
                 : 'Want this generated against your own workspace?'}
             </p>
             <div className="flex flex-wrap justify-center gap-3">
@@ -238,7 +242,9 @@ export default async function EvidencePackPage({
           </div>
         </FadeInUp>
       </SectionWrapper>
-    </div>
+      </div>
+      <Footer />
+    </>
   );
 }
 

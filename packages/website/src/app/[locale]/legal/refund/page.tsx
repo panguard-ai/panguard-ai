@@ -21,7 +21,7 @@ export async function generateMetadata(props: {
 export default async function RefundPage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;
   const isZh = params.locale === 'zh-TW';
-  const lastUpdatedLabel = isZh ? '最後更新:' : 'Last updated:';
+  const lastUpdatedLabel = isZh ? '最後更新：' : 'Last updated:';
   const lastUpdatedValue = isZh ? REFUND_LAST_UPDATED_ZH : REFUND_LAST_UPDATED_EN;
 
   return (
@@ -41,7 +41,7 @@ export default async function RefundPage(props: { params: Promise<{ locale: stri
         </p>
         <p className="text-text-primary">
           {isZh
-            ? 'Migrator Pro 為年約制 B2B 合約——費用、退費與終止一律依主服務協議 (MSA) 辦理,不適用消費型 7 天退費窗。'
+            ? 'Migrator Pro 為年約制 B2B 合約——費用、退費與終止一律依主服務協議 (MSA) 辦理，不適用消費型 7 天退費窗。'
             : 'Migrator Pro is an annual B2B engagement — fees, refunds, and termination are governed by the Master Services Agreement (MSA); it is not subject to a consumer-style refund window.'}
         </p>
       </div>
@@ -63,7 +63,7 @@ export default async function RefundPage(props: { params: Promise<{ locale: stri
       <h2>{isZh ? '資料退出' : 'Data export on exit'}</h2>
       <p>
         {isZh
-          ? '合約終止時,所有交付物 Customer 保有,並提供 30 天資料匯出視窗。'
+          ? '合約終止時，所有交付物 Customer 保有，並提供 30 天資料匯出視窗。'
           : "On termination, all delivered artifacts remain the Customer's, with a 30-day data export window."}
       </p>
 

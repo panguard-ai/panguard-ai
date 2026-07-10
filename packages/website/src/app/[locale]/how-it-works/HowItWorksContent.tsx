@@ -107,7 +107,7 @@ export default function HowItWorksContent() {
               {t('overline')}
             </p>
             <h1 className="text-[clamp(24px,4.5vw,56px)] font-extrabold leading-[1.08] tracking-tight text-text-primary max-w-3xl mx-auto">
-              {t('title')} <span className="text-brand-sage">{t('titleHighlight')}</span>
+              {t('title')}<span className="text-brand-sage">{t('titleHighlight')}</span>
             </h1>
           </FadeInUp>
           <FadeInUp delay={0.1}>

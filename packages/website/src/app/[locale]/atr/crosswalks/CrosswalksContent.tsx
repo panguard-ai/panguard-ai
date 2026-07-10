@@ -53,7 +53,7 @@ const CROSSWALKS: readonly Crosswalk[] = [
     noteEn:
       'ATR maps to 34 of 101 top-level ATLAS techniques (13 of 16 tactics), ATLAS v5.6.0 draft alignment 2026-06. Coverage is partial and grows as rules land — the goal is an executable detection layer for ATLAS TTPs, as Sigma is for ATT&CK.',
     noteZh:
-      'ATR 對應 101 個 ATLAS 頂層技術中的 34 個（16 個戰術中的 13 個），ATLAS v5.6.0 草稿對齊，2026-06。覆蓋為部分、隨規則新增持續擴大 — 目標是成為 ATLAS 攻擊技術的可執行偵測層，如同 Sigma 之於 ATT&CK。',
+      'ATR 對應 101 個 ATLAS 頂層技術中的 34 個（16 個戰術中的 13 個），ATLAS v5.6.0 草稿對齊，2026-06。覆蓋為部分、隨規則新增持續擴大——目標是成為 ATLAS 攻擊技術的可執行偵測層，如同 Sigma 之於 ATT&CK。',
   },
   {
     id: 'nist-ai-rmf',
@@ -87,7 +87,7 @@ const CROSSWALKS: readonly Crosswalk[] = [
     noteEn:
       'Detections aligned with Art. 15 obligations for high-risk AI systems. Submission filed to EU AI Office Have-Your-Say (deadline 2026-06-03).',
     noteZh:
-      '對應高風險 AI 系統的第 15 條 (準確性／穩健性／資安) 義務。已向 EU AI Office Have-Your-Say 提交 (截止 2026-06-03)。',
+      '對應高風險 AI 系統的第 15 條 （準確性／穩健性／資安） 義務。已向 EU AI Office Have-Your-Say 提交 （截止 2026-06-03）。',
   },
   {
     id: 'safe-mcp',

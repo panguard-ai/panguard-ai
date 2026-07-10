@@ -94,7 +94,7 @@ const ADOPTERS: readonly Adopter[] = [
     caveatEn:
       'PR #74 merged into the OWASP org Agent Security Regression Harness; PR #14 is a separate mapping in a third-party precize repo, not an OWASP Foundation publication.',
     caveatZh:
-      'PR #74 併入 OWASP 官方 organization 的 Agent Security Regression Harness；PR #14 是第三方 precize repo 的另一份對應,非 OWASP Foundation 官方出版品。',
+      'PR #74 併入 OWASP 官方 organization 的 Agent Security Regression Harness；PR #14 是第三方 precize repo 的另一份對應，非 OWASP Foundation 官方出版品。',
     prs: [
       {
         number: 74,
@@ -107,7 +107,7 @@ const ADOPTERS: readonly Adopter[] = [
         number: 14,
         repo: 'precize/Agentic-AI-Top10-Vulnerability',
         titleEn: 'OWASP Agentic mapping (third-party)',
-        titleZh: 'OWASP Agentic 對應(第三方)',
+        titleZh: 'OWASP Agentic 對應（第三方）',
         date: '2026-03-30',
       },
     ],
@@ -116,7 +116,7 @@ const ADOPTERS: readonly Adopter[] = [
     org: 'Gen Digital Sage',
     category: 'enterprise',
     noteEn: 'Norton / Avast / AVG parent (consumer security). Merged by Václav Belák.',
-    noteZh: 'Norton / Avast / AVG 母公司 (消費端資安)。由 Václav Belák 合併。',
+    noteZh: 'Norton / Avast / AVG 母公司 （消費端資安）。由 Václav Belák 合併。',
     prs: [
       {
         number: 33,
@@ -193,7 +193,7 @@ export default function AdoptersContent() {
 
       <p className="-mt-8 mb-12 text-xs leading-relaxed text-text-muted">
         {isZh
-          ? `Production 合併:Microsoft AGT(PR #908 + #1277)+ Cisco AI Defense(PR #79 + #99)+ MISP taxonomies #323 + MISP galaxy #1207 + OWASP A-S-R-H #74 + Gen Digital Sage #33,共 7 件,跨 6 個生態系。另有 ${awesomeListInclusions} 件 awesome-list 收錄(不視為 production 採用)。`
+          ? `Production 合併：Microsoft AGT(PR #908 + #1277)+ Cisco AI Defense(PR #79 + #99)+ MISP taxonomies #323 + MISP galaxy #1207 + OWASP A-S-R-H #74 + Gen Digital Sage #33，共 7 件，跨 6 個生態系。另有 ${awesomeListInclusions} 件 awesome-list 收錄（不視為 production 採用）。`
           : `Production merges: Microsoft AGT (PR #908 + #1277) + Cisco AI Defense (PR #79 + #99) + MISP taxonomies #323 + MISP galaxy #1207 + OWASP A-S-R-H #74 + Gen Digital Sage #33 — 7 PRs across 6 ecosystems. Plus ${awesomeListInclusions} awesome-list inclusions (not counted as production adoption).`}
       </p>
 
@@ -240,7 +240,7 @@ export default function AdoptersContent() {
           title={isZh ? '審閱中（尚未合併）' : 'Open PRs (Not Yet Merged)'}
           subtitle={
             isZh
-              ? '此列表反映進行中的對話，非採納證明。狀態為時間點快照，可能已變動 — 以各 PR 頁面為準'
+              ? '此列表反映進行中的對話，非採納證明。狀態為時間點快照，可能已變動——以各 PR 頁面為準'
               : 'Reflects in-flight conversations, not adoption. Statuses are point-in-time snapshots and may have changed — check each PR for current state'
           }
         />

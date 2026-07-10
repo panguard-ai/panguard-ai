@@ -21,7 +21,7 @@ export async function generateMetadata(props: {
 export default async function MSAPage(props: { params: Promise<{ locale: string }> }) {
   const params = await props.params;
   const isZh = params.locale === 'zh-TW';
-  const lastUpdatedLabel = isZh ? '最後更新:' : 'Last updated:';
+  const lastUpdatedLabel = isZh ? '最後更新：' : 'Last updated:';
   const lastUpdatedValue = isZh ? MSA_LAST_UPDATED_ZH : MSA_LAST_UPDATED_EN;
 
   return (

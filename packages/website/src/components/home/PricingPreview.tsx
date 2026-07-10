@@ -110,7 +110,7 @@ export default function PricingPreview() {
         </SectionTitleV2>
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-text-secondary sm:text-lg">
           {isZh
-            ? 'Community 永久免費開源(餵感測網路)。Enterprise 拿到平台 + 5 框架合規證據包。中間 tier 是陷阱 — /pricing 解釋為什麼。'
+            ? 'Community 永久免費開源（餵感測網路）。Enterprise 拿到平台 + 5 框架合規證據包。中間 tier 是陷阱 — /pricing 解釋為什麼。'
             : 'Community is free and open source forever (feeds the sensor network). Enterprise gets the platform + 5-framework compliance evidence kit. The middle tier is a trap — /pricing explains why.'}
         </p>
       </FadeInUp>
@@ -169,7 +169,7 @@ export default function PricingPreview() {
       <FadeInUp delay={0.3}>
         <SectionKicker>
           {isZh
-            ? '完整功能比較、ATR Enterprise Member ($10K/年) 治理層、與 FAQ 請見 /pricing'
+            ? '完整功能比較、ATR Enterprise Member （$10K/年） 治理層、與 FAQ 請見 /pricing'
             : 'Full feature comparison, ATR Enterprise Member tier ($10K/yr governance), and FAQ at /pricing'}
         </SectionKicker>
       </FadeInUp>

@@ -777,6 +777,26 @@
       "badgeCisco": "7 organizations merged · NIST OSCAL submission in review",
       "badgeSafeMcp": "SAFE-MCP 91.8% coverage"
     },
+    "installHero": {
+      "titleLine1": "Free and open source. ",
+      "titleLine2": "Security for every AI agent.",
+      "subtitle": "One command, 30 seconds — MIT-licensed, self-hosted, zero telemetry. It scans every skill and MCP server, then guards each agent action at runtime.",
+      "copy": "Copy",
+      "copied": "Copied",
+      "installNote": "30-second install · no signup · runs offline",
+      "ctaScan": "Not ready to install? Scan a skill first →",
+      "ctaDocs": "Read the quickstart",
+      "badgeRules": "{count} ATR rules",
+      "badgeRecall": "97.2% Garak recall",
+      "badgeMerged": "Microsoft + Cisco merged",
+      "badgeLicense": "MIT · free forever",
+      "platformLabel": "Auto-detects your AI agents:",
+      "ticker1": "postmark-mcp v1.0.16 silently forwarded 15,000 emails/day",
+      "ticker2": "MCPJam Inspector CVSS 9.8 remote code execution",
+      "ticker3": "Claude Code hooks exploited for API key theft",
+      "ticker4": "Azure MCP Server SSRF stole managed identity tokens",
+      "ticker5": "43% of public MCP servers vulnerable to command execution"
+    },
     "demo": {
       "overline": "See it in action",
       "title": "One command. Full protection.",
@@ -2133,7 +2153,14 @@
       },
       "workflow": {
         "title": "Fits your workflow",
-        "tools": ["CLI", "REST API", "GitHub Actions", "Docker", "SSH", "Webhooks"]
+        "tools": [
+          "CLI",
+          "REST API",
+          "GitHub Actions",
+          "Docker",
+          "SSH",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "Secure your stack with one command",
@@ -2194,7 +2221,13 @@
       },
       "integrations": {
         "title": "Integrations your team already uses",
-        "tools": ["Slack", "Telegram", "Email", "Microsoft Teams", "Webhooks"]
+        "tools": [
+          "Slack",
+          "Telegram",
+          "Email",
+          "Microsoft Teams",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "Protect your business today",
@@ -2254,7 +2287,15 @@
       },
       "integrations": {
         "title": "Enterprise integrations",
-        "tools": ["SIEM", "PagerDuty", "Jira", "Slack", "Microsoft Teams", "REST API", "Webhooks"]
+        "tools": [
+          "SIEM",
+          "PagerDuty",
+          "Jira",
+          "Slack",
+          "Microsoft Teams",
+          "REST API",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "See Panguard in action",
@@ -2310,7 +2351,14 @@
       "stack": "e.g. CrowdStrike, Cloudflare, custom scripts...",
       "message": "Tell us about your security goals or any specific questions..."
     },
-    "teamSizes": ["Just me", "2-10", "11-50", "51-200", "201-500", "500+"],
+    "teamSizes": [
+      "Just me",
+      "2-10",
+      "11-50",
+      "51-200",
+      "201-500",
+      "500+"
+    ],
     "submit": "Send Message",
     "submitting": "Submitting...",
     "error": "Failed to submit request. Please try again.",
@@ -2695,7 +2743,7 @@
   },
   "trust": {
     "overline": "Trust Center",
-    "title": "Security You Can",
+    "title": "Security You Can ",
     "titleHighlight": "Verify",
     "subtitle": "Transparency is the foundation of trust. Review our compliance status, security architecture, data handling practices, and subprocessor relationships -- all in one place.",
     "compliance": {
@@ -2912,7 +2960,7 @@
     "overline": "Security & Trust",
     "title": "We're a security company.",
     "titleHighlight": "Our own security",
-    "titleSuffix": "is non-negotiable.",
+    "titleSuffix": " is non-negotiable.",
     "subtitle": "You trust us to protect your infrastructure. That means we hold ourselves to a higher standard than we hold anyone else. Here is exactly how we do it.",
     "practices": {
       "overline": "Practices",
@@ -4575,7 +4623,7 @@
   },
   "howItWorks": {
     "overline": "HOW IT WORKS",
-    "title": "How Panguard",
+    "title": "How Panguard ",
     "titleHighlight": "Protects You",
     "subtitle": "Five stages that ship today, in a 7-layer model. Three levels of AI analysis. One command to deploy.",
     "overview": {
@@ -4988,7 +5036,7 @@
   },
   "about": {
     "overline": "ABOUT PANGUARD AI",
-    "title": "We believe security is a right,",
+    "title": "We believe security is a right, ",
     "titleHighlight": "not a luxury.",
     "oneLiner": "AI agents install skills with full system access -- zero review process. We're building the missing gatekeeper.",
     "origin": {
@@ -5166,7 +5214,12 @@
       },
       "inProgress": {
         "title": "In Progress",
-        "items": ["Report + Trap", "Web Dashboard UI", "Windows support", "Kubernetes integration"]
+        "items": [
+          "Report + Trap",
+          "Web Dashboard UI",
+          "Windows support",
+          "Kubernetes integration"
+        ]
       },
       "planned": {
         "title": "Planned",

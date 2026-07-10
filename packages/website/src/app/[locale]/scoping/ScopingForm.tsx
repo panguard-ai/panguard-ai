@@ -110,7 +110,7 @@ export default function ScopingForm({ locale }: Props) {
             result.message ??
             (result.error === 'slots_exhausted'
               ? isZh
-                ? 'Founding Customer Pilot 3 個名額已售完。請聯絡 sales@panguard.ai 詢問 Enterprise tier ($250K起)。'
+                ? 'Founding Customer Pilot 3 個名額已售完。請聯絡 sales@panguard.ai 詢問 Enterprise tier （$250K起）。'
                 : 'All 3 Founding Customer slots claimed. Email sales@panguard.ai for Enterprise tier ($250K+).'
               : isZh
                 ? '提交失敗。請寄信給 adam@panguard.ai。'
@@ -205,7 +205,7 @@ export default function ScopingForm({ locale }: Props) {
       </div>
 
       <Field
-        label={isZh ? '主要合規框架 (選一)' : 'Primary compliance framework (pick one)'}
+        label={isZh ? '主要合規框架 （選一）' : 'Primary compliance framework (pick one)'}
         hint={
           isZh
             ? '我們會根據這個產出 sample evidence pack — 之後可在 Enterprise tier 加掛其他框架。'
@@ -272,7 +272,7 @@ export default function ScopingForm({ locale }: Props) {
         label={isZh ? '使用情境' : 'Use case'}
         hint={
           isZh
-            ? '簡述你的 AI agent / chatbot / RAG / 客服系統 — 我們會根據這個挑 50-100 條 ATR 規則。(10-1000 字)'
+            ? '簡述你的 AI agent / chatbot / RAG / 客服系統——我們會根據這個挑 50-100 條 ATR 規則。（10-1000 字）'
             : 'Briefly describe the AI agent / chatbot / RAG / customer-facing system you want to protect. We use this to pick 50-100 ATR rules. (10-1000 chars)'
         }
         required
@@ -285,7 +285,7 @@ export default function ScopingForm({ locale }: Props) {
           rows={4}
           placeholder={
             isZh
-              ? '例:我們在客服跑一個 GPT-4 chatbot,擔心 prompt injection 跟 PII 洩漏...'
+              ? '例：我們在客服跑一個 GPT-4 chatbot，擔心 prompt injection 跟 PII 洩漏…'
               : 'e.g. We run a GPT-4 customer-support chatbot, concerns are prompt injection and PII exfiltration…'
           }
           className="w-full bg-surface-1 border border-border rounded-lg px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-sage resize-y"
@@ -296,7 +296,7 @@ export default function ScopingForm({ locale }: Props) {
         label={isZh ? '付款方式' : 'Payment method'}
         hint={
           isZh
-            ? 'F500 採購建議選電匯;直接刷卡適合 P-card 上限 > $25K 的客戶。'
+            ? 'F500 採購建議選電匯；直接刷卡適合 P-card 上限 > $25K 的客戶。'
             : 'F500 procurement: wire (Net-30). P-card-friendly buyers: card.'
         }
         required
@@ -324,20 +324,20 @@ export default function ScopingForm({ locale }: Props) {
         <TermsCheckbox
           name="accepted_msa"
           href="/legal/msa"
-          label={isZh ? '我接受 MSA (主服務協議)' : 'I accept the MSA (Master Services Agreement)'}
+          label={isZh ? '我接受 MSA （主服務協議）' : 'I accept the MSA (Master Services Agreement)'}
           isZh={isZh}
         />
         <TermsCheckbox
           name="accepted_dpa"
           href="/legal/dpa"
-          label={isZh ? '我接受 DPA (資料處理協議)' : 'I accept the DPA (Data Processing Addendum)'}
+          label={isZh ? '我接受 DPA （資料處理協議）' : 'I accept the DPA (Data Processing Addendum)'}
           isZh={isZh}
         />
         <TermsCheckbox
           name="accepted_refund_policy"
           href="/legal/refund"
           label={
-            isZh ? '我接受退費政策 (7 天無條件)' : 'I accept the Refund Policy (7-day no-questions)'
+            isZh ? '我接受退費政策 （7 天無條件）' : 'I accept the Refund Policy (7-day no-questions)'
           }
           isZh={isZh}
         />
@@ -456,12 +456,12 @@ function SuccessPanel({
       <p className="mt-3 text-sm text-text-secondary leading-relaxed max-w-md mx-auto">
         {magicLinkSent
           ? isZh
-            ? '已寄出 magic link 到你提供的 email。點擊信中連結後會跳到 Stripe 結帳頁面。 (連結 60 分鐘內有效)'
+            ? '已寄出 magic link 到你提供的 email。點擊信中連結後會跳到 Stripe 結帳頁面。 （連結 60 分鐘內有效）'
             : 'A magic link has been sent to your email. Click it within 60 minutes to land on Stripe Checkout.'
           : isZh
-            ? '提交保留下來了,但 magic link email 沒寄出。請寄信給 adam@panguard.ai 主旨「[Pilot Intent ' +
+            ? '提交保留下來了，但 magic link email 沒寄出。請寄信給 adam@panguard.ai 主旨「[Pilot Intent ' +
               intentId +
-              '] resend」,我會手動寄。'
+              '] resend」，我會手動寄。'
             : 'Submission saved, but magic-link email failed. Email adam@panguard.ai with subject "[Pilot Intent ' +
               intentId +
               '] resend" and we will manually send the link.'}
@@ -470,7 +470,7 @@ function SuccessPanel({
         {isZh ? 'Intent ID: ' : 'Intent ID: '}
         <code>{intentId}</code>
         {' · '}
-        {isZh ? '剩餘名額: ' : 'Slots remaining: '}
+        {isZh ? '剩餘名額： ' : 'Slots remaining: '}
         <strong>{slotsRemaining}</strong>
       </p>
     </div>
@@ -485,7 +485,7 @@ function ExhaustedPanel({ isZh }: { isZh: boolean }) {
       </h2>
       <p className="mt-3 text-sm text-text-secondary leading-relaxed max-w-md mx-auto">
         {isZh
-          ? '3 個 $25K Pilot 名額已全部被認領。Enterprise tier ($250K起、sales-led) 仍開放。寄信給 sales@panguard.ai 啟動 scoping。'
+          ? '3 個 $25K Pilot 名額已全部被認領。Enterprise tier （$250K起、sales-led） 仍開放。寄信給 sales@panguard.ai 啟動 scoping。'
           : 'All three $25K Founding Customer Pilot slots have been claimed. Enterprise tier ($250K+, sales-led) remains open. Email sales@panguard.ai to start scoping.'}
       </p>
       <a

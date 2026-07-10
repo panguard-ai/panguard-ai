@@ -76,14 +76,14 @@ function localizeCheck(label: string, isZh: boolean): string {
   // Dynamic patterns
   if (label.startsWith('ATR Detection:')) {
     return label
-      .replace('ATR Detection:', 'ATR 偵測:')
+      .replace('ATR Detection:', 'ATR 偵測：')
       .replace('rule(s) triggered', '條規則觸發')
       .replace('evaluated', '條已評估')
       .replace('clean', '安全');
   }
   if (label.startsWith('Secrets:'))
-    return label.replace('Secrets:', '機密偵測:').replace('exposed', '組已暴露');
-  if (label.startsWith('Size:')) return label.replace('Size:', '大小:');
+    return label.replace('Secrets:', '機密偵測：').replace('exposed', '組已暴露');
+  if (label.startsWith('Size:')) return label.replace('Size:', '大小：');
   return label;
 }
 
@@ -342,7 +342,7 @@ export default function ScanResultCard({
         <div className="px-5 py-4 border-t border-border bg-surface-2/40">
           <p className="text-[11px] font-semibold text-panguard-green mb-3">
             {isZh
-              ? `Layer 2(稽核)攔到 ${report.findings.length} 個攻擊 — Layer 3-6 runtime 守護,L1/L7 規劃中`
+              ? `Layer 2（稽核）攔到 ${report.findings.length} 個攻擊 — Layer 3-6 runtime 守護，L1/L7 規劃中`
               : `Layer 2 (Audit) caught ${report.findings.length} attack${report.findings.length > 1 ? 's' : ''} — Layers 3-6 protect at runtime, L1/L7 planned`}
           </p>
           <ul className="space-y-1.5 text-[11px] text-text-secondary">
@@ -470,7 +470,7 @@ export default function ScanResultCard({
         </code>
         <p className="text-[10px] text-text-muted mb-2">
           {isZh
-            ? `一行安裝。自動偵測你的 AI agent(Claude Code、Cursor、Windsurf、Gemini CLI 等 agent runtime),把 ${STATS.totalRulesDisplay} 條 ATR 規則的即時防護裝進去。`
+            ? `一行安裝。自動偵測你的 AI agent(Claude Code、Cursor、Windsurf、Gemini CLI 等 agent runtime)，把 ${STATS.totalRulesDisplay} 條 ATR 規則的即時防護裝進去。`
             : `One command. Auto-detects your AI agents (Claude Code, Cursor, Windsurf, Gemini CLI + more) and installs ${STATS.totalRulesDisplay} ATR rules of real-time protection.`}
         </p>
         <Link
@@ -486,8 +486,8 @@ export default function ScanResultCard({
         <p className="text-[10px] text-text-muted leading-relaxed text-center">
           {isZh ? (
             <>
-              你的掃描協助訓練社群防禦網路。僅匿名規則 ID 與攻擊類型,不含內容。停用:
-              <code className="text-[10px] font-mono">scanner-no-telemetry</code> cookie。隱私:{' '}
+              你的掃描協助訓練社群防禦網路。僅匿名規則 ID 與攻擊類型，不含內容。停用：
+              <code className="text-[10px] font-mono">scanner-no-telemetry</code> cookie。隱私：{' '}
               <Link href="/legal/privacy" className="underline hover:text-text-secondary">
                 panguard.ai/privacy
               </Link>

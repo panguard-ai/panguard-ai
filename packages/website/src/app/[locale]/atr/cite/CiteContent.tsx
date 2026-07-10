@@ -122,7 +122,7 @@ export default function CiteContent() {
         </h3>
         <p className="text-sm leading-relaxed text-text-secondary">
           {isZh
-            ? '若需要規範性的版本鎖定引用 (例：政策文件採納特定 ATR 版本作為合規基準)，建議直接引用 GitHub 的 tag (例如 v'
+            ? '若需要規範性的版本鎖定引用 （例：政策文件採納特定 ATR 版本作為合規基準），建議直接引用 GitHub 的 tag (例如 v'
             : 'For normative version-locked citation (e.g., policy documents adopting a specific ATR version as a compliance baseline), cite the GitHub release tag (e.g., v'}
           {VERSION}
           {isZh
