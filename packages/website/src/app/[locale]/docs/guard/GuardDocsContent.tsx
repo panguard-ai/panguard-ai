@@ -59,13 +59,9 @@ export default function GuardDocsContent() {
             Panguard Guard
           </h1>
           <p className="text-lg text-text-secondary mt-4 max-w-2xl">
-            Inline detection powered by a 5-agent pipeline. Guard watches AI agent tool calls,
-            prompt flows, and skill behavior using ATR (Agent Threat Rules) plus behavioral
-            baselines and on-device correlation — deterministic detection that blocks threats at
-            runtime with no LLM in the detection path.
-          </p>
-          <p className="text-sm text-text-muted mt-3 max-w-2xl">
-            Free and open source under the MIT license. No account required.
+            Real-time endpoint protection powered by a 5-agent AI pipeline. Guard monitors AI agent
+            tool calls, prompt flows, and skill behavior 24/7 using ATR (Agent Threat Rules) backed
+            by a three-layer AI analysis funnel.
           </p>
         </FadeInUp>
 
@@ -115,10 +111,10 @@ export default function GuardDocsContent() {
                   <td className="px-4 py-3 text-panguard-green font-medium flex items-center gap-2">
                     <Brain className="w-4 h-4" /> Analyze
                   </td>
-                  <td className="px-4 py-3 text-text-primary">Correlation</td>
+                  <td className="px-4 py-3 text-text-primary">AI triage</td>
                   <td className="px-4 py-3 text-text-secondary">
-                    Cross-correlates alerts on-device against behavioral baselines and temporal
-                    patterns. Adjusts confidence scores deterministically — no LLM involved.
+                    Escalates ambiguous alerts through the three-layer AI funnel. Adjusts confidence
+                    scores and adds contextual reasoning.
                   </td>
                 </tr>
                 <tr>
@@ -187,41 +183,36 @@ export default function GuardDocsContent() {
           </div>
         </FadeInUp>
 
-        {/* Deterministic Detection Stages */}
+        {/* Three-Layer AI Funnel */}
         <FadeInUp className="mt-16">
-          <h2 className="text-2xl font-bold text-text-primary mb-6">Detection Stages</h2>
+          <h2 className="text-2xl font-bold text-text-primary mb-6">Three-Layer AI Funnel</h2>
           <p className="text-text-secondary mb-6">
-            Every stage is deterministic and runs entirely on-device. No LLM sits in the detection
-            path, so the same input always produces the same verdict — online or fully air-gapped.
-          </p>
-          <p className="text-text-secondary mb-6">
-            Optionally, you can connect your own model — a cloud API (Anthropic, OpenAI,
-            OpenAI-compatible) or a local Ollama — to add an <em>advisory</em> semantic layer. It is
-            off by default and runs alongside the detection path, not inside it: it can explain a
-            verdict or flag a novel pattern for your review, but it never auto-blocks. Deterministic
-            detection stays the only thing that acts.
+            Not every alert needs cloud-scale AI. The funnel resolves the vast majority of events
+            locally, keeping latency low and costs predictable.
           </p>
           <div className="space-y-4">
             {[
               {
-                layer: 'Stage 1: Rule Engine',
+                layer: 'Layer 1: Rules',
+                percent: '90%',
                 latency: '< 50 ms',
-                description:
-                  '650+ ATR regex rules resolve clear-cut matches instantly. Pure pattern matching, fully deterministic.',
+                description: 'ATR rules resolve clear-cut matches. No AI involved.',
                 color: 'border-green-500/30 bg-green-500/5',
               },
               {
-                layer: 'Stage 2: Behavioral Baseline',
-                latency: 'On-device',
+                layer: 'Layer 2: Local AI (Ollama)',
+                percent: '7%',
+                latency: '~ 2 s',
                 description:
-                  'Events that rules do not match are checked against behavioral baselines and fingerprints recorded during onboarding. Flags drift from expected behavior. No data leaves the machine.',
+                  'Ambiguous alerts are analysed by a local LLM running on-device via Ollama. No data leaves the machine.',
                 color: 'border-yellow-500/30 bg-yellow-500/5',
               },
               {
-                layer: 'Stage 3: Correlation & AST',
-                latency: 'On-device',
+                layer: 'Layer 3: Cloud AI',
+                percent: '3%',
+                latency: '~ 5 s',
                 description:
-                  'Surviving events are cross-correlated on-device: AST static analysis of skill code plus temporal correlation of behavioral signals, producing a reproducible confidence-scored verdict.',
+                  'Complex, multi-signal events are escalated to cloud AI for deep reasoning and cross-tenant intelligence.',
                 color: 'border-orange-500/30 bg-orange-500/5',
               },
             ].map((item) => (
@@ -229,6 +220,8 @@ export default function GuardDocsContent() {
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="text-sm font-semibold text-text-primary">{item.layer}</h4>
                   <div className="flex items-center gap-3 text-xs text-text-secondary">
+                    <span>{item.percent} of events</span>
+                    <span className="text-text-muted">|</span>
                     <span>{item.latency}</span>
                   </div>
                 </div>
@@ -363,6 +356,18 @@ export default function GuardDocsContent() {
                     'URL',
                     '(none)',
                     'Generic webhook endpoint for all events.',
+                  ],
+                  [
+                    'ai.local_model',
+                    'model name',
+                    'llama3.2:3b',
+                    'Ollama model used for Layer 2 analysis.',
+                  ],
+                  [
+                    'ai.cloud_enabled',
+                    'true | false',
+                    'true',
+                    'Allow Layer 3 cloud AI escalation.',
                   ],
                 ].map(([option, values, def, desc]) => (
                   <tr key={option}>
@@ -520,8 +525,8 @@ panguard guard config set auto_response true`}
           <div className="bg-surface-1/50 border border-border rounded-2xl p-8 text-center">
             <h3 className="text-xl font-bold text-text-primary mb-3">Start Protecting</h3>
             <p className="text-text-secondary mb-6 max-w-lg mx-auto">
-              Install Panguard and activate Guard in under a minute. Everything here — full scan and
-              all rule-based protection layers — is free and open source today.
+              Install Panguard and activate Guard in under a minute. Community plan includes full
+              scan and Layer 1 rule-based protection at no cost.
             </p>
             <CodeBlock code="panguard guard start" />
             <div className="flex flex-wrap justify-center gap-3 mt-6">

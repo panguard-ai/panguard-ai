@@ -110,8 +110,8 @@ export default function ScopingForm({ locale }: Props) {
             result.message ??
             (result.error === 'slots_exhausted'
               ? isZh
-                ? 'Founding Customer Pilot 3 個名額已售完。請聯絡 sales@panguard.ai 詢問 Enterprise tier(業務洽談定價)。'
-                : 'All 3 Founding Customer slots claimed. Email sales@panguard.ai for Enterprise tier (sales-led pricing).'
+                ? 'Founding Customer Pilot 3 個名額已售完。請聯絡 sales@panguard.ai 詢問 Enterprise tier ($250K起)。'
+                : 'All 3 Founding Customer slots claimed. Email sales@panguard.ai for Enterprise tier ($250K+).'
               : isZh
                 ? '提交失敗。請寄信給 adam@panguard.ai。'
                 : 'Submission failed. Please email adam@panguard.ai.'),
@@ -485,8 +485,8 @@ function ExhaustedPanel({ isZh }: { isZh: boolean }) {
       </h2>
       <p className="mt-3 text-sm text-text-secondary leading-relaxed max-w-md mx-auto">
         {isZh
-          ? '3 個 $25K Pilot 名額已全部被認領。Enterprise tier(業務洽談定價)仍開放。寄信給 sales@panguard.ai 啟動 scoping。'
-          : 'All three $25K Founding Customer Pilot slots have been claimed. Enterprise tier (sales-led pricing) remains open. Email sales@panguard.ai to start scoping.'}
+          ? '3 個 $25K Pilot 名額已全部被認領。Enterprise tier ($250K起、sales-led) 仍開放。寄信給 sales@panguard.ai 啟動 scoping。'
+          : 'All three $25K Founding Customer Pilot slots have been claimed. Enterprise tier ($250K+, sales-led) remains open. Email sales@panguard.ai to start scoping.'}
       </p>
       <a
         href="mailto:sales@panguard.ai?subject=Enterprise%20scoping%20request"

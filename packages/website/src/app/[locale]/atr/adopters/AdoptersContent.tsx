@@ -92,9 +92,9 @@ const ADOPTERS: readonly Adopter[] = [
     noteEn: 'Project Lead Mert Satilmaz merged with "Welcome to the team" greeting.',
     noteZh: 'Project Lead Mert Satilmaz 合併並以 "Welcome to the team" 致意。',
     caveatEn:
-      'PR #74 merged into the OWASP-org Agent Security Regression Harness project; PR #14 is a separate mapping in a third-party precize repo, not an OWASP Foundation publication.',
+      'PR #74 merged into the OWASP org Agent Security Regression Harness; PR #14 is a separate mapping in a third-party precize repo, not an OWASP Foundation publication.',
     caveatZh:
-      'PR #74 併入 OWASP 組織的 Agent Security Regression Harness 專案;PR #14 是第三方 precize repo 的另一份對應,非 OWASP Foundation 官方出版。',
+      'PR #74 併入 OWASP 官方 organization 的 Agent Security Regression Harness；PR #14 是第三方 precize repo 的另一份對應,非 OWASP Foundation 官方出版品。',
     prs: [
       {
         number: 74,
@@ -106,8 +106,8 @@ const ADOPTERS: readonly Adopter[] = [
       {
         number: 14,
         repo: 'precize/Agentic-AI-Top10-Vulnerability',
-        titleEn: 'OWASP Agentic mapping',
-        titleZh: 'OWASP Agentic 對應',
+        titleEn: 'OWASP Agentic mapping (third-party)',
+        titleZh: 'OWASP Agentic 對應(第三方)',
         date: '2026-03-30',
       },
     ],
@@ -310,9 +310,7 @@ function AdopterCard({ a, isZh }: { a: Adopter; isZh: boolean }) {
         </div>
         <CategoryPill category={a.category} isZh={isZh} />
       </div>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
-        {isZh ? a.noteZh : a.noteEn}
-      </p>
+      <p className="mb-4 text-sm leading-relaxed text-text-secondary">{isZh ? a.noteZh : a.noteEn}</p>
       <div className="space-y-2">
         {a.prs.map((pr) => {
           const repo = pr.repo ?? inferRepoFromOrg(a.org);

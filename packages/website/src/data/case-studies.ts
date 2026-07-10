@@ -47,7 +47,7 @@ export const caseStudies: CaseStudy[] = [
     industry: 'E-Commerce',
     companySize: '120 employees',
     productsUsed: ['Guard', 'Trap', 'Chat'],
-    headline: 'Scenario: Reducing security incidents 94% with automated endpoint protection',
+    headline: 'Scenario: Reducing security incidents 94% with AI-powered endpoint protection',
     excerpt:
       'An e-commerce platform handling millions of transactions per month is losing $50K quarterly to security incidents. Panguard Guard automates detection and response across 50 endpoints.',
     challenge:

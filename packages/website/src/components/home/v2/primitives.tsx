@@ -24,13 +24,7 @@ export function Eyebrow({ children, className = '' }: { children: ReactNode; cla
 }
 
 /** Section headline — huge, tight, flush-left, two-tone via <sage> rich text */
-export function SectionTitleV2({
-  children,
-  className = '',
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
+export function SectionTitleV2({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
     <h2
       className={`mt-6 max-w-4xl font-display text-4xl font-bold leading-[1.05] tracking-tight text-text-primary sm:text-5xl lg:text-6xl ${className}`}
@@ -54,9 +48,7 @@ export function SectionV2({
 }) {
   return (
     <section id={id} className={`${bordered ? 'border-t border-border-subtle' : ''} ${className}`}>
-      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-32">
-        {children}
-      </div>
+      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-32">{children}</div>
     </section>
   );
 }
@@ -91,9 +83,7 @@ export function CardV2({
       ? 'border-border border-provisional'
       : 'border-border';
   return (
-    <div className={`lift rounded-2xl border ${border} bg-surface-1 p-6 ${className}`}>
-      {children}
-    </div>
+    <div className={`lift rounded-2xl border ${border} bg-surface-1 p-6 ${className}`}>{children}</div>
   );
 }
 
@@ -105,13 +95,7 @@ export function CardKicker({ children }: { children: ReactNode }) {
 }
 
 /** Bottom-of-section thesis kicker (deck footer line) */
-export function SectionKicker({
-  children,
-  className = '',
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
+export function SectionKicker({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
     <p
       className={`mt-14 border-t border-border-subtle pt-6 text-right font-mono text-[10px] uppercase tracking-micro text-text-muted ${className}`}

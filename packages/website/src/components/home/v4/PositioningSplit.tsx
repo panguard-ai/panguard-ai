@@ -132,9 +132,7 @@ export default function PositioningSplit() {
               <LedgerRow
                 label={isZh ? '框架對照' : 'Framework mapping'}
                 value={
-                  isZh
-                    ? `${FRAMEWORK_COUNT} 個合規框架`
-                    : `${FRAMEWORK_COUNT} compliance frameworks`
+                  isZh ? `${FRAMEWORK_COUNT} 個合規框架` : `${FRAMEWORK_COUNT} compliance frameworks`
                 }
               />
               <LedgerRow label={isZh ? '格式' : 'Formats'} value="PDF + JSON + HTML" />

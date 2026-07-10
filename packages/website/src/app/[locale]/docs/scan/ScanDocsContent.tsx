@@ -75,9 +75,6 @@ export default function ScanDocsContent() {
             analyze code, check remote targets, and generate machine-readable reports for CI/CD
             pipelines.
           </p>
-          <p className="text-sm text-text-muted mt-3 max-w-2xl">
-            Free and open source under the MIT license. No account required.
-          </p>
         </FadeInUp>
 
         {/* Quick Start */}
@@ -557,8 +554,8 @@ SUMMARY: 1 critical, 1 high, 1 medium, 1 low`}
           <div className="bg-surface-1/50 border border-border rounded-2xl p-8 text-center">
             <h3 className="text-xl font-bold text-text-primary mb-3">Start Scanning</h3>
             <p className="text-text-secondary mb-6 max-w-lg mx-auto">
-              Install Panguard and run your first security scan in under a minute. Open source with
-              unlimited local scans. MIT licensed, no account required.
+              Install Panguard and run your first security scan in under a minute. The Open source
+              with unlimited local scans. MIT licensed.
             </p>
             <CodeBlock code="curl -fsSL https://get.panguard.ai | bash && panguard scan" />
             <div className="flex flex-wrap justify-center gap-3 mt-6">
