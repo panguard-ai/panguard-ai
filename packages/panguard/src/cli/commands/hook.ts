@@ -33,6 +33,10 @@ import { join, dirname } from 'node:path';
 import { homedir } from 'node:os';
 import { c } from '@panguard-ai/core';
 import { ProxyEvaluator } from '@panguard-ai/panguard-mcp-proxy/evaluator';
+import {
+  readAutoUpdateSettings,
+  resolveStagedAutoRules,
+} from '@panguard-ai/panguard-guard/auto-rules';
 
 // ── Platforms ───────────────────────────────────────────────────────────────
 
@@ -602,6 +606,20 @@ export async function runHook(
     }
     // Rules loaded → ensure any prior degraded marker is cleared.
     clearZeroRulesFailOpen(ruleCount);
+    // Gap A: fold in any auto-pulled rules the daemon has staged (opt-in). A
+    // FRESH bundle's rules ADVISE (can surface an 'ask') but cannot hard-deny
+    // until the user runs `pga guard trust-updates`; a trusted bundle arms. This
+    // is best-effort and never breaks the hook — the bundled ruleset already
+    // loaded above is the enforce floor.
+    try {
+      const s = readAutoUpdateSettings();
+      if (s.autoUpdateRules) {
+        const staged = resolveStagedAutoRules(s.dataDir, s.autoUpdateTrustedVersion);
+        if (staged) await evaluator.loadAutoRules(staged.dir, { adviseOnly: staged.adviseOnly });
+      }
+    } catch {
+      /* auto-rules are additive; a failure here must not affect the enforce path */
+    }
     // Neutral tool name so tool_name-existence rules never fire on a built-in
     // tool name; only the command content is judged. 'tool_call' selects the
     // tool_call rule set (shell injection, credential theft, SSRF, RCE) plus
@@ -648,10 +666,20 @@ export async function runHook(
     //   guarded (default) → block 'deny', advise 'ask'
     //   enforce           → block both
     //   advisory          → block neither
-    const block = posture === 'enforce' || (posture === 'guarded' && outcome === 'deny');
+    // Gap A: an 'ask' driven ONLY by advise-only (fresh, untrusted auto-pulled)
+    // rules is NEVER escalated to a block — not even under enforce — so a fresh
+    // rule cannot wall off a tool call until the user runs `pga guard
+    // trust-updates`. (A 'deny' is always from a trusted rule and still blocks.)
+    const adviseOnlyAsk = outcome === 'ask' && result.adviseOnly === true;
+    const block =
+      !adviseOnlyAsk && (posture === 'enforce' || (posture === 'guarded' && outcome === 'deny'));
     if (!block) {
-      const hint =
-        posture === 'guarded' && outcome === 'ask'
+      // An advise-only ask comes from a FRESH auto-pulled rule that cannot block
+      // until trusted — point the user at the arm command, not at --enforce
+      // (which deliberately does NOT block it either).
+      const hint = adviseOnlyAsk
+        ? ' — new auto-pulled rule; run `pga guard trust-updates` to let it block'
+        : posture === 'guarded' && outcome === 'ask'
           ? ' — enforce mode (--enforce) would also block lower-confidence matches'
           : '';
       process.stderr.write(`[panguard] advisory (not blocked): ${reason}${hint}\n`);
