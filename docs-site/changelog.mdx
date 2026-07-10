@@ -13,9 +13,63 @@ All notable changes to Panguard AI, organized by version.
 
 ---
 
+## v1.8.3 (2026-07-10)
+
+**Released: 2026-07-10** -- Current stable release. ATR v3.5.7 (714 rules), OWASP Agentic Top 10: 10/10 covered.
+
+### Highlights
+
+- **714 ATR rules** across 10 threat categories (was 419 in v2.2.0), now with **detection lanes**: enforce (stable, confirm-gated rules) ~0.24% FP / hunt (all rules, default) ~9% FP, measured on a 65,000-sample benign corpus
+- **17 platform support**: `panguard setup` auto-detects and configures Claude Code, Claude Desktop, Cursor, Hermes Agent, OpenClaw, Codex CLI, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS Code Copilot, Zed, Gemini CLI, Continue, and Roo Code
+- **Benchmarks** (Layer 1 deterministic, verified 2026-07-04): Garak 97.2% recall (650 samples), SKILL.md 100% recall / 97% precision / 0.2% FP (498 samples), PINT 63.6% recall / 99.7% precision (850 samples), HackAPrompt 69.6% recall vs 28.6% baseline / 100% precision (4,780 samples)
+- **1.8.3 fix**: DNS-rebind SSRF pinning + monotonic retention-floor
+
+### Compliance tiers
+
+Community is free and open source forever. Enterprise, Migrator Pro, and Sovereign tiers add signed, continuously re-scanned compliance evidence (Ed25519 issuer signatures, npm provenance) on top of the Community core.
+
+---
+
+## v1.8.2 (2026-07-10)
+
+**Released: 2026-07-10** -- Installed-footprint hardening
+
+- Hardened installed footprint: key-leak, phone-home, MCP fail-open, and daemon-import fixes
+- 43 security + UX findings remediated across 12 subsystems
+- 6 non-blocking follow-ups (Layer C health, redaction, export scrub, host-OS copy, onboarding)
+
+---
+
+## v1.8.0 (2026-07-08) -- Community GA hardening
+
+**Released: 2026-07-08**
+
+- **PreToolUse hook false-positive root-cause fix** + advisory default -- eliminates false blocks on legitimate MCP tool calls
+- **E2E sealed telemetry** + unknown-attack flywheel: opt-in, advisory-only upload that never blocks, with automatic rule updates on consent
+- GA security-hardening pass across guard, installed footprint, and MCP proxy
+
+---
+
+## v1.7.0 (2026-06-21) -- GA hardening
+
+**Released: 2026-06-21** -- Security-hardening release: guard hooks, installed-footprint, and IP-leak fixes.
+
+---
+
+## v1.6.0 (2026-06-15) -- GA
+
+**Released: 2026-06-15**
+
+- **Dual-path agent containment** closed-loop (MVP) + MCP proxy chokepoint
+- **ATR 2.x -> 3.2.0** upgrade + 6-framework 100% compliance coverage
+- **Community GA**: free-tier detection (651 rules at ship), security hardening, honest dashboard + site
+- Opt-in advisory semantic layer (default engine remains 100% deterministic regex)
+
+---
+
 ## v1.5.6 (2026-05-12)
 
-**Released: 2026-05-12** -- Latest stable release alongside ATR v2.2.0 (419 rules)
+**Released: 2026-05-12** -- Released alongside ATR v2.2.0 (419 rules)
 
 ### Highlights
 
