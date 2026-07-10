@@ -112,8 +112,8 @@ function HeroSection() {
           Where PanGuard fits in your security stack
         </h1>
         <p className="text-text-secondary mt-4 text-lg max-w-2xl mx-auto leading-relaxed">
-          Endpoint tools secure the OS. Dependency scanners secure your code. Prompt firewalls filter
-          the model boundary.
+          Endpoint tools secure the OS. Dependency scanners secure your code. Prompt firewalls
+          filter the model boundary.
           <br />
           <span className="text-brand-sage font-semibold">
             PanGuard adds the AI agent layer — and complements the tools you already run.

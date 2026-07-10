@@ -145,7 +145,7 @@ export default function LayersIndexContent() {
             <p className="text-text-secondary mt-5 leading-relaxed">
               {isZh
                 ? '各家單層廠商要你一層一層買、一家一家整合。PanGuard 把七層做在同一個開源安裝裡 — 今天出貨的一切免費,企業運營層(feed、支援、規模化證據)在 roadmap 上。'
-                : "Single-layer vendors sell one layer each and leave the integration to you. PanGuard ships all seven in one open-source install — everything shipped today is free; enterprise operations (feed, support, evidence at scale) are on the roadmap."}
+                : 'Single-layer vendors sell one layer each and leave the integration to you. PanGuard ships all seven in one open-source install — everything shipped today is free; enterprise operations (feed, support, evidence at scale) are on the roadmap.'}
             </p>
           </FadeInUp>
           <FadeInUp delay={0.2}>

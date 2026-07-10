@@ -9,13 +9,17 @@
  * including IPv4-mapped IPv6 (::ffff:a.b.c.d), IPv6 ULA / link-local, and the
  * well-known cloud-metadata DNS names (metadata.google.internal, etc.).
  *
- * Dependency-free by design (no DNS resolution): this blocks literal-IP and
- * the common metadata-hostname SSRF targets. An ARBITRARY hostname that resolves
- * to a private IP (DNS-name SSRF / DNS-rebinding) is out of scope for a static
- * URL check and must be handled at the socket layer if ever needed.
+ * The static checks here block literal-IP and the common metadata-hostname SSRF
+ * targets with no DNS. An ARBITRARY hostname that RESOLVES to a private IP
+ * (DNS-name SSRF / DNS-rebinding) cannot be caught statically — for that, use
+ * `safeLookup` below as the http/https request `lookup` option so resolution is
+ * validated at connect time.
  *
  * @module @panguard-ai/panguard-guard/net/validate-outbound-url
  */
+
+import { lookup as dnsLookup } from 'node:dns';
+import type { LookupFunction } from 'node:net';
 
 /** Private / reserved / loopback / metadata ranges (literal-IP SSRF guard). */
 const PRIVATE_HOST_PATTERNS: readonly RegExp[] = [
@@ -115,3 +119,80 @@ export function assertSafeOutboundUrl(url: string, options: OutboundUrlOptions =
     throw new Error(`Unsafe outbound URL rejected: ${reason} (${url})`);
   }
 }
+
+/** True when a RESOLVED IP literal is loopback (127.0.0.0/8 or ::1). */
+function isLoopbackAddress(ip: string): boolean {
+  const host = normalizeHost(ip);
+  return /^127\./.test(host) || host === '::1';
+}
+
+/** True when a RESOLVED IP literal falls in a private/reserved/loopback range. */
+export function isPrivateAddress(ip: string): boolean {
+  const host = normalizeHost(ip);
+  return PRIVATE_HOST_PATTERNS.some((pattern) => pattern.test(host));
+}
+
+/**
+ * Build a dns.lookup drop-in for the http/https request `lookup` option: it
+ * resolves the hostname and REFUSES the connection if ANY resolved address is
+ * private — closing the DNS-rebinding / DNS-name-SSRF window that a static URL
+ * check (checkOutboundUrl) cannot see. Validation happens at connect time, so a
+ * name that passed the static check but resolves to 169.254.169.254 / 10.x is
+ * still blocked. Pair the two: static check up front, this at the socket.
+ *
+ * `allowLoopback` mirrors checkOutboundUrl's option so a caller that already
+ * permits loopback statically (e.g. a dev endpoint) is not broken by the socket
+ * check resolving 127.0.0.1 / ::1.
+ */
+export function createSafeLookup(options: { allowLoopback?: boolean } = {}): LookupFunction {
+  const isBlocked = (ip: string): boolean => {
+    if (options.allowLoopback && isLoopbackAddress(ip)) return false;
+    return isPrivateAddress(ip);
+  };
+  return ((
+    hostname: string,
+    lookupOptions: unknown,
+    callback: (err: NodeJS.ErrnoException | null, address?: unknown, family?: number) => void
+  ): void => {
+    const cb = (typeof lookupOptions === 'function' ? lookupOptions : callback) as (
+      err: NodeJS.ErrnoException | null,
+      address?: unknown,
+      family?: number
+    ) => void;
+    const opts = (typeof lookupOptions === 'function' ? {} : (lookupOptions ?? {})) as {
+      all?: boolean;
+      family?: number;
+      hints?: number;
+    };
+    dnsLookup(hostname, { ...opts, all: true }, (err, addresses) => {
+      if (err) {
+        cb(err);
+        return;
+      }
+      const blocked = addresses.find((a) => isBlocked(a.address));
+      if (blocked) {
+        const e: NodeJS.ErrnoException = new Error(
+          `Blocked DNS resolution: ${hostname} resolves to private address ${blocked.address}`
+        );
+        e.code = 'ESSRFBLOCKED';
+        cb(e);
+        return;
+      }
+      if (opts.all) {
+        cb(null, addresses);
+        return;
+      }
+      const first = addresses[0];
+      if (!first) {
+        const e: NodeJS.ErrnoException = new Error(`No addresses resolved for ${hostname}`);
+        e.code = 'ENOTFOUND';
+        cb(e);
+        return;
+      }
+      cb(null, first.address, first.family);
+    });
+  }) as LookupFunction;
+}
+
+/** Strict default: blocks any private/reserved/loopback resolution. */
+export const safeLookup: LookupFunction = createSafeLookup();

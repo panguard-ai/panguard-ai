@@ -21,10 +21,7 @@ export async function generateMetadata(props: {
     openGraph: {
       type: 'website',
       locale: locale === 'zh-TW' ? 'zh_TW' : 'en_US',
-      url:
-        locale === 'zh-TW'
-          ? 'https://panguard.ai/zh-TW/pricing'
-          : 'https://panguard.ai/pricing',
+      url: locale === 'zh-TW' ? 'https://panguard.ai/zh-TW/pricing' : 'https://panguard.ai/pricing',
       siteName: 'Panguard AI',
       title: t('title'),
       description: t('description'),

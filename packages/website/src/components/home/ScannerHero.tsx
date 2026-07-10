@@ -173,7 +173,10 @@ function ScannerHeroInner() {
   const tickerItems = [t('ticker1'), t('ticker2'), t('ticker3'), t('ticker4'), t('ticker5')];
 
   const prefersReducedMotion = useReducedMotion() ?? false;
-  const heroVariants = useMemo(() => buildHeroVariants(prefersReducedMotion), [prefersReducedMotion]);
+  const heroVariants = useMemo(
+    () => buildHeroVariants(prefersReducedMotion),
+    [prefersReducedMotion]
+  );
 
   /* Layer B: one semantic radar ping per completed scan. Keyed on the scan
      identity so a new result remounts the ping and replays it exactly once. */
@@ -229,8 +232,7 @@ function ScannerHeroInner() {
             variants={heroVariants.headline}
             className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] tracking-tight text-text-primary break-words"
           >
-            {t('titleLine1')}{' '}
-            <span className="text-brand-sage">{t('titleLine2')}</span>
+            {t('titleLine1')} <span className="text-brand-sage">{t('titleLine2')}</span>
           </motion.h1>
           <motion.p
             variants={heroVariants.child}
@@ -273,115 +275,115 @@ function ScannerHeroInner() {
             <div
               className={`rounded-2xl border ${cardBorderClass} bg-surface-1 p-4 sm:p-5 text-left transition-colors duration-300 ease-out-quint`}
             >
-            <p className="mb-3 font-mono text-[11px] uppercase tracking-micro text-brand-sage">
-              {t('scanLabel')}
-            </p>
+              <p className="mb-3 font-mono text-[11px] uppercase tracking-micro text-brand-sage">
+                {t('scanLabel')}
+              </p>
 
-            {/* Mode tabs */}
-            <div className="flex gap-1 mb-3 bg-surface-hero/60 rounded-lg p-1 border border-border/60">
-              <button
-                type="button"
-                onClick={() => setScanMode('url')}
-                className={`flex-1 text-xs font-semibold py-2 rounded-md transition-all ${
-                  scanMode === 'url'
-                    ? 'bg-brand-sage/15 text-brand-sage border border-brand-sage/30'
-                    : 'text-text-muted hover:text-text-secondary'
-                }`}
-              >
-                {t('tabUrl')}
-              </button>
-              <button
-                type="button"
-                onClick={() => setScanMode('paste')}
-                className={`flex-1 text-xs font-semibold py-2 rounded-md transition-all ${
-                  scanMode === 'paste'
-                    ? 'bg-brand-sage/15 text-brand-sage border border-brand-sage/30'
-                    : 'text-text-muted hover:text-text-secondary'
-                }`}
-              >
-                {t('tabPaste')}
-              </button>
-            </div>
+              {/* Mode tabs */}
+              <div className="flex gap-1 mb-3 bg-surface-hero/60 rounded-lg p-1 border border-border/60">
+                <button
+                  type="button"
+                  onClick={() => setScanMode('url')}
+                  className={`flex-1 text-xs font-semibold py-2 rounded-md transition-all ${
+                    scanMode === 'url'
+                      ? 'bg-brand-sage/15 text-brand-sage border border-brand-sage/30'
+                      : 'text-text-muted hover:text-text-secondary'
+                  }`}
+                >
+                  {t('tabUrl')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setScanMode('paste')}
+                  className={`flex-1 text-xs font-semibold py-2 rounded-md transition-all ${
+                    scanMode === 'paste'
+                      ? 'bg-brand-sage/15 text-brand-sage border border-brand-sage/30'
+                      : 'text-text-muted hover:text-text-secondary'
+                  }`}
+                >
+                  {t('tabPaste')}
+                </button>
+              </div>
 
-            {scanMode === 'url' ? (
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <ScanIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
-                  <input
-                    type="text"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleScan()}
-                    placeholder="github.com/modelcontextprotocol/servers"
-                    className="w-full bg-surface-hero border border-border rounded-xl pl-10 pr-4 py-4 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-sage focus:ring-1 focus:ring-brand-sage/30 transition-all"
+              {scanMode === 'url' ? (
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <ScanIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                    <input
+                      type="text"
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleScan()}
+                      placeholder="github.com/modelcontextprotocol/servers"
+                      className="w-full bg-surface-hero border border-border rounded-xl pl-10 pr-4 py-4 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-sage focus:ring-1 focus:ring-brand-sage/30 transition-all"
+                      disabled={loading}
+                    />
+                  </div>
+                  <button
+                    onClick={handleScan}
+                    disabled={loading || !url.trim()}
+                    className="sheen lift shrink-0 flex items-center gap-2 rounded-xl bg-panguard-green px-7 py-4 text-sm font-semibold text-surface-hero transition-colors duration-300 ease-out-quint hover:bg-panguard-green-light disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? (
+                      <span className="inline-block w-4 h-4 border-2 border-surface-hero/30 border-t-surface-hero rounded-full animate-spin" />
+                    ) : (
+                      <ShieldIcon className="w-4 h-4" />
+                    )}
+                    {t('scanBtn')}
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {/* Content type selector */}
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPasteContentType('skill')}
+                      className={`font-mono text-[11px] font-semibold px-3 py-1.5 rounded-lg border transition-all ${
+                        pasteContentType === 'skill'
+                          ? 'border-brand-sage/50 bg-brand-sage/10 text-brand-sage'
+                          : 'border-border text-text-muted hover:text-text-secondary'
+                      }`}
+                    >
+                      SKILL.md
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPasteContentType('mcp-config')}
+                      className={`font-mono text-[11px] font-semibold px-3 py-1.5 rounded-lg border transition-all ${
+                        pasteContentType === 'mcp-config'
+                          ? 'border-brand-sage/50 bg-brand-sage/10 text-brand-sage'
+                          : 'border-border text-text-muted hover:text-text-secondary'
+                      }`}
+                    >
+                      MCP Config
+                    </button>
+                  </div>
+                  {/* Textarea */}
+                  <textarea
+                    value={pasteContent}
+                    onChange={(e) => setPasteContent(e.target.value)}
+                    placeholder={
+                      pasteContentType === 'skill' ? t('placeholderSkill') : t('placeholderMcp')
+                    }
+                    className="w-full bg-surface-hero border border-border rounded-xl p-4 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-sage focus:ring-1 focus:ring-brand-sage/30 transition-all font-mono resize-none"
+                    rows={6}
                     disabled={loading}
                   />
-                </div>
-                <button
-                  onClick={handleScan}
-                  disabled={loading || !url.trim()}
-                  className="sheen lift shrink-0 flex items-center gap-2 rounded-xl bg-panguard-green px-7 py-4 text-sm font-semibold text-surface-hero transition-colors duration-300 ease-out-quint hover:bg-panguard-green-light disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? (
-                    <span className="inline-block w-4 h-4 border-2 border-surface-hero/30 border-t-surface-hero rounded-full animate-spin" />
-                  ) : (
-                    <ShieldIcon className="w-4 h-4" />
-                  )}
-                  {t('scanBtn')}
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {/* Content type selector */}
-                <div className="flex gap-2">
                   <button
-                    type="button"
-                    onClick={() => setPasteContentType('skill')}
-                    className={`font-mono text-[11px] font-semibold px-3 py-1.5 rounded-lg border transition-all ${
-                      pasteContentType === 'skill'
-                        ? 'border-brand-sage/50 bg-brand-sage/10 text-brand-sage'
-                        : 'border-border text-text-muted hover:text-text-secondary'
-                    }`}
+                    onClick={handleScan}
+                    disabled={loading || !pasteContent.trim()}
+                    className="sheen lift w-full flex items-center justify-center gap-2 rounded-xl bg-panguard-green px-7 py-4 text-sm font-semibold text-surface-hero transition-colors duration-300 ease-out-quint hover:bg-panguard-green-light disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    SKILL.md
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPasteContentType('mcp-config')}
-                    className={`font-mono text-[11px] font-semibold px-3 py-1.5 rounded-lg border transition-all ${
-                      pasteContentType === 'mcp-config'
-                        ? 'border-brand-sage/50 bg-brand-sage/10 text-brand-sage'
-                        : 'border-border text-text-muted hover:text-text-secondary'
-                    }`}
-                  >
-                    MCP Config
+                    {loading ? (
+                      <span className="inline-block w-4 h-4 border-2 border-surface-hero/30 border-t-surface-hero rounded-full animate-spin" />
+                    ) : (
+                      <ShieldIcon className="w-4 h-4" />
+                    )}
+                    {t('scanBtn')}
                   </button>
                 </div>
-                {/* Textarea */}
-                <textarea
-                  value={pasteContent}
-                  onChange={(e) => setPasteContent(e.target.value)}
-                  placeholder={
-                    pasteContentType === 'skill' ? t('placeholderSkill') : t('placeholderMcp')
-                  }
-                  className="w-full bg-surface-hero border border-border rounded-xl p-4 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-sage focus:ring-1 focus:ring-brand-sage/30 transition-all font-mono resize-none"
-                  rows={6}
-                  disabled={loading}
-                />
-                <button
-                  onClick={handleScan}
-                  disabled={loading || !pasteContent.trim()}
-                  className="sheen lift w-full flex items-center justify-center gap-2 rounded-xl bg-panguard-green px-7 py-4 text-sm font-semibold text-surface-hero transition-colors duration-300 ease-out-quint hover:bg-panguard-green-light disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? (
-                    <span className="inline-block w-4 h-4 border-2 border-surface-hero/30 border-t-surface-hero rounded-full animate-spin" />
-                  ) : (
-                    <ShieldIcon className="w-4 h-4" />
-                  )}
-                  {t('scanBtn')}
-                </button>
-              </div>
-            )}
+              )}
             </div>
           </div>
 
@@ -506,8 +508,8 @@ function ScannerHeroSkeleton() {
           <span className="text-brand-sage">for the age of AI agents.</span>
         </h1>
         <p className="text-base sm:text-lg text-text-secondary max-w-2xl mx-auto leading-relaxed">
-          Drop in a GitHub URL or paste a SKILL/MCP manifest. PanGuard runs {STATS.totalRulesDisplay} ATR rules
-          against it and tells you if it&apos;s safe to install.
+          Drop in a GitHub URL or paste a SKILL/MCP manifest. PanGuard runs{' '}
+          {STATS.totalRulesDisplay} ATR rules against it and tells you if it&apos;s safe to install.
         </p>
         <div className="flex flex-wrap justify-center gap-2 pt-4">
           <span className="rounded-full border border-border bg-surface-1 px-3 py-1 font-mono text-[10px] uppercase tracking-micro text-text-muted">

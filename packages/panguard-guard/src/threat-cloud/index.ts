@@ -18,9 +18,20 @@ import { request as httpRequest } from 'node:http';
 import { createLogger } from '@panguard-ai/core';
 import type { AnonymizedThreatData, ThreatCloudUpdate, ThreatCloudStatus } from '../types.js';
 import { getAnonymousClientId } from './client-id.js';
-import { assertSafeOutboundUrl, checkOutboundUrl } from '../net/validate-outbound-url.js';
+import {
+  assertSafeOutboundUrl,
+  checkOutboundUrl,
+  createSafeLookup,
+} from '../net/validate-outbound-url.js';
 
 const logger = createLogger('panguard-guard:threat-cloud');
+
+/**
+ * Connect-time SSRF guard for TC requests: rejects a hostname that resolves to a
+ * private/metadata IP (DNS-rebinding). Loopback is allowed because the endpoint's
+ * static check (checkOutboundUrl, allowLoopback:true) already permits it for dev.
+ */
+const TC_LOOKUP = createSafeLookup({ allowLoopback: true });
 
 /** Local cache file name / 本地快取檔名 */
 // Cache file removed — community data stays in memory only (see loadCache/saveCache no-ops)
@@ -768,6 +779,9 @@ export class ThreatCloudClient {
 
       const req = transport(
         {
+          // Validate the RESOLVED IP at connect time (DNS-rebind / DNS-name SSRF)
+          // — the static checkOutboundUrl above cannot see what a name resolves to.
+          lookup: TC_LOOKUP,
           hostname: parsed.hostname,
           port: parsed.port || defaultPort,
           path: parsed.pathname + parsed.search,
@@ -813,6 +827,9 @@ export class ThreatCloudClient {
 
       const req = transport(
         {
+          // Validate the RESOLVED IP at connect time (DNS-rebind / DNS-name SSRF)
+          // — the static checkOutboundUrl above cannot see what a name resolves to.
+          lookup: TC_LOOKUP,
           hostname: parsed.hostname,
           port: parsed.port || defaultPort,
           path: parsed.pathname + parsed.search,

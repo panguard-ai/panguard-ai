@@ -114,10 +114,9 @@ export default function EcosystemReportContent() {
             <span className="text-red-400">{flaggedPercent}% Had Security Issues.</span>
           </h1>
           <p className="text-text-secondary mt-4 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            A large-scale security audit of the MCP skill ecosystem.{' '}
-            {scannedTotal.toLocaleString()} packages analyzed.{' '}
-            {eco.toolsExtracted.toLocaleString()} tool definitions extracted. {flaggedPercent}%
-            flagged.
+            A large-scale security audit of the MCP skill ecosystem. {scannedTotal.toLocaleString()}{' '}
+            packages analyzed. {eco.toolsExtracted.toLocaleString()} tool definitions extracted.{' '}
+            {flaggedPercent}% flagged.
           </p>
           <p className="text-text-muted text-xs mt-4">
             Published March 2026 | Methodology: {STATS.atrRules} ATR rules + secret detection +
@@ -186,9 +185,9 @@ export default function EcosystemReportContent() {
               <p>
                 We crawled {eco.entriesCrawled.toLocaleString()} MCP/AI skill entries from{' '}
                 {eco.registrySources} sources (npm registry, GitHub repositories, community
-                awesome-lists). Of these, {scannedTotal.toLocaleString()} had parseable
-                SKILL.md, README.md files, or built JavaScript that could be analyzed and produced
-                a severity classification.
+                awesome-lists). Of these, {scannedTotal.toLocaleString()} had parseable SKILL.md,
+                README.md files, or built JavaScript that could be analyzed and produced a severity
+                classification.
               </p>
               <p>Each skill was scanned using:</p>
               <ul className="list-disc list-inside space-y-1 ml-4">

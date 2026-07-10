@@ -262,23 +262,23 @@ export default function PressContent() {
       {/* ───────────── Filter Tabs ───────────── */}
       {showFilters && (
         <SectionWrapper spacing="tight">
-        <FadeInUp>
-          <div className="flex flex-wrap items-center gap-2 justify-center">
-            {filterTabs.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`text-sm font-semibold rounded-full px-5 py-2 transition-all duration-200 ${
-                  activeTab === tab.key
-                    ? 'bg-brand-sage text-surface-0'
-                    : 'bg-surface-1 text-text-secondary border border-border hover:border-brand-sage/40 hover:text-text-primary'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </FadeInUp>
+          <FadeInUp>
+            <div className="flex flex-wrap items-center gap-2 justify-center">
+              {filterTabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`text-sm font-semibold rounded-full px-5 py-2 transition-all duration-200 ${
+                    activeTab === tab.key
+                      ? 'bg-brand-sage text-surface-0'
+                      : 'bg-surface-1 text-text-secondary border border-border hover:border-brand-sage/40 hover:text-text-primary'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </FadeInUp>
         </SectionWrapper>
       )}
 
