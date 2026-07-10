@@ -241,19 +241,35 @@ export class ProxyEvaluator {
         };
       }
 
-      // Hard-DENY only on a trusted match (see shouldHardDeny); every other
-      // match is still surfaced as 'ask' (user-in-the-loop), never silently
-      // allowed. This is the proxy's false-positive control point — the engine
-      // runs full 'hunt' detection so nothing is missed.
+      // FALSE-POSITIVE CONTROL POINT (this is a SYNCHRONOUS per-tool-call gate).
+      //  1. Hard-DENY on a trusted match (shouldHardDeny: critical, or high+stable).
+      //  2. Otherwise surface an 'ask' advisory ONLY for a high-severity match —
+      //     something serious enough to warrant a per-call heads-up even if
+      //     unproven.
+      //  3. Medium/low matches are demoted to a SILENT allow here. The engine
+      //     runs full 'hunt' detection, and many broad rules (e.g. keyword-
+      //     presence rules that fire on any `curl`/`rm`/`env`, severity=medium,
+      //     condition:any) would otherwise spam an advisory on routine tool calls
+      //     — the dominant false-positive source. Their matches are still
+      //     returned in matchedRules and the async daemon path keeps them for
+      //     offline review; we just do not raise a per-call advisory/block on an
+      //     unactionable low-severity broad match. Real attacks are
+      //     critical/high-stable and hard-deny at step 1, so are unaffected.
       const blockMatch = matches.find((m) => shouldHardDeny(m.rule));
-      const outcome: EvalResult['outcome'] = blockMatch ? 'deny' : 'ask';
-      const topMatch = blockMatch ?? matches[0]!;
+      const askMatch =
+        blockMatch ??
+        matches.find((m) => m.rule.severity === 'high' || m.rule.severity === 'critical');
+      const outcome: EvalResult['outcome'] = blockMatch ? 'deny' : askMatch ? 'ask' : 'allow';
+      const topMatch = blockMatch ?? askMatch ?? matches[0]!;
 
       return {
         outcome,
-        reason: `${topMatch.rule.title} (${topMatch.rule.severity})`,
+        reason:
+          outcome === 'allow'
+            ? `No actionable threat (low-severity match suppressed: ${topMatch.rule.title}, ${topMatch.rule.severity})`
+            : `${topMatch.rule.title} (${topMatch.rule.severity})`,
         matchedRules: matches.map((m) => m.rule.id),
-        confidence: topMatch.confidence,
+        confidence: outcome === 'allow' ? 0 : topMatch.confidence,
         durationMs,
       };
     } catch (err: unknown) {

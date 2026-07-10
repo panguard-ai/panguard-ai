@@ -36,7 +36,8 @@ export default function AboutContent() {
           </FadeInUp>
           <FadeInUp delay={0.05}>
             <h1 className="text-[clamp(24px,4.5vw,56px)] font-extrabold leading-[1.1] tracking-tight text-text-primary max-w-4xl">
-              {t('title')}<span className="text-brand-sage">{t('titleHighlight')}</span>
+              {t('title')}
+              <span className="text-brand-sage">{t('titleHighlight')}</span>
             </h1>
           </FadeInUp>
           <FadeInUp delay={0.1}>

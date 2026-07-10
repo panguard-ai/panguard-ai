@@ -45,7 +45,8 @@ const INSTALL_OPTIONS: Record<Platform, InstallOption[]> = {
       recommended: true,
       command: 'curl -fsSL https://get.panguard.ai | bash',
       note: 'Apple Silicon (ARM64) native binary. Intel Mac users: install via npm, or enable Rosetta 2 first.',
-      noteZh: 'Apple Silicon（ARM64）原生 binary。Intel Mac 使用者：請改用 npm 安裝，或先啟用 Rosetta 2。',
+      noteZh:
+        'Apple Silicon（ARM64）原生 binary。Intel Mac 使用者：請改用 npm 安裝，或先啟用 Rosetta 2。',
     },
     {
       method: 'npm',
@@ -89,7 +90,8 @@ const INSTALL_OPTIONS: Record<Platform, InstallOption[]> = {
       command:
         'powershell -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"',
       note: 'If using PowerShell 7+: pwsh -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"',
-      noteZh: '若使用 PowerShell 7+：pwsh -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"',
+      noteZh:
+        '若使用 PowerShell 7+：pwsh -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows | iex"',
     },
   ],
 };
@@ -397,9 +399,7 @@ export default function GettingStartedContent() {
                   <CodeBlock code="pga setup --platform claude-code" label="Setup" />
                   <p>
                     <strong className="text-text-primary">{isZh ? '步驟 3：' : 'Step 3:'}</strong>
-                    {isZh
-                      ? '重新啟動 Claude Code，然後試試：'
-                      : ' Restart Claude Code, then try:'}
+                    {isZh ? '重新啟動 Claude Code，然後試試：' : ' Restart Claude Code, then try:'}
                   </p>
                   <CodeBlock
                     code={
@@ -539,9 +539,10 @@ jobs:
                   ) : (
                     <>
                       {' '}
-                      Scans your repo for MCP config files and SKILL.md files using{' '}
-                      {STATS.atrRules} ATR detection rules. Outputs SARIF to the GitHub Security
-                      tab.
+                      Scans your repo for MCP config files and SKILL.md files using {
+                        STATS.atrRules
+                      }{' '}
+                      ATR detection rules. Outputs SARIF to the GitHub Security tab.
                     </>
                   )}
                 </p>
@@ -559,8 +560,7 @@ jobs:
                     <code className="text-text-secondary">fail-on-finding</code>
                     {isZh ? (
                       <>
-                        ——設為 <code className="text-text-secondary">false</code>{' '}
-                        時只警告、不阻擋
+                        ——設為 <code className="text-text-secondary">false</code> 時只警告、不阻擋
                       </>
                     ) : (
                       <>
@@ -710,12 +710,32 @@ jobs:
               <div className="p-4 font-mono text-sm space-y-2">
                 {[
                   { cmd: 'pga', desc: 'Open interactive menu', descZh: '開啟互動式選單' },
-                  { cmd: 'pga up', desc: 'Start protection + dashboard', descZh: '啟動防護 + dashboard' },
-                  { cmd: 'pga setup', desc: 'Auto-configure AI platforms', descZh: '自動設定 AI 平台' },
+                  {
+                    cmd: 'pga up',
+                    desc: 'Start protection + dashboard',
+                    descZh: '啟動防護 + dashboard',
+                  },
+                  {
+                    cmd: 'pga setup',
+                    desc: 'Auto-configure AI platforms',
+                    descZh: '自動設定 AI 平台',
+                  },
                   { cmd: 'pga scan', desc: 'Run security scan', descZh: '執行安全掃描' },
-                  { cmd: 'pga scan --deep', desc: 'Deep scan with all engines', descZh: '啟用所有引擎深度掃描' },
-                  { cmd: 'pga audit skill <dir>', desc: 'Audit a skill before installing', descZh: '安裝前先審計 skill' },
-                  { cmd: 'pga guard start', desc: 'Start real-time protection', descZh: '啟動即時防護' },
+                  {
+                    cmd: 'pga scan --deep',
+                    desc: 'Deep scan with all engines',
+                    descZh: '啟用所有引擎深度掃描',
+                  },
+                  {
+                    cmd: 'pga audit skill <dir>',
+                    desc: 'Audit a skill before installing',
+                    descZh: '安裝前先審計 skill',
+                  },
+                  {
+                    cmd: 'pga guard start',
+                    desc: 'Start real-time protection',
+                    descZh: '啟動即時防護',
+                  },
                   { cmd: 'pga status', desc: 'Check protection status', descZh: '查看防護狀態' },
                   { cmd: 'pga doctor', desc: 'Diagnose installation', descZh: '診斷安裝問題' },
                   { cmd: 'pga --help', desc: 'Show all commands', descZh: '顯示所有指令' },
