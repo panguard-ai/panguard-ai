@@ -10,6 +10,7 @@
  * @module @panguard-ai/panguard-guard/rule-sync
  */
 
+import { createHash } from 'node:crypto';
 import { createLogger } from '@panguard-ai/core';
 import type { ThreatIntelFeedManager } from '@panguard-ai/core';
 import type { GuardConfig } from './types.js';
@@ -346,15 +347,122 @@ export async function checkForRuleUpdates(deps: CloudSyncDeps): Promise<RuleUpda
 }
 
 /**
+ * Verify a downloaded tarball against an npm SRI integrity string
+ * ("sha512-<base64>", possibly space-separated alternatives). Returns true only
+ * when a supported-algorithm digest of `buf` matches. This is the TRUST ANCHOR
+ * for auto-update: a byte that does not hash to the registry-published value
+ * means tamper/MITM, and the bundle MUST be discarded. Hash comparison is over
+ * public values, so a plain === is correct.
+ */
+export function verifyTarballIntegrity(buf: Buffer, integrity: string): boolean {
+  for (const entry of integrity.trim().split(/\s+/)) {
+    const dash = entry.indexOf('-');
+    if (dash < 0) continue;
+    const algo = entry.slice(0, dash);
+    const expected = entry.slice(dash + 1);
+    if (algo !== 'sha512' && algo !== 'sha384' && algo !== 'sha256') continue;
+    if (createHash(algo).update(buf).digest('base64') === expected) return true;
+  }
+  return false;
+}
+
+/**
+ * Gap A (slice 1): download the latest agent-threat-rules bundle from npm,
+ * VERIFY its integrity, and stage the rules on disk. Runs only when
+ * config.autoUpdateRules === true. Returns the staged rules dir, or null (never
+ * throws into the daemon).
+ *
+ * SECURITY: the npm SRI check is the trust anchor — a tarball whose hash does
+ * not match the registry-published dist.integrity is DISCARDED (never extracted,
+ * never loaded). The tarball must come from registry.npmjs.org.
+ *
+ * SCOPE: this fetches + verifies + stages ONLY. Staged rules are DETECT-only and
+ * are NOT wired into the enforce path here — arming is gated behind an explicit
+ * user trust step. See docs/design/gap-a-auto-rule-update.md.
+ */
+export async function pullRuleUpdate(deps: CloudSyncDeps): Promise<string | null> {
+  if (deps.config.autoUpdateRules !== true) return null;
+  const status = await checkForRuleUpdates(deps);
+  if (!status.updateAvailable || !status.latestVersion) return null;
+  const version = status.latestVersion;
+  try {
+    const metaRes = await fetch(
+      `https://registry.npmjs.org/agent-threat-rules/${encodeURIComponent(version)}`,
+      { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(15_000) }
+    );
+    if (!metaRes.ok) return null;
+    const meta = (await metaRes.json()) as {
+      dist?: { tarball?: string; integrity?: string };
+    };
+    const tarball = meta.dist?.tarball;
+    const integrity = meta.dist?.integrity;
+    if (!tarball || !integrity) {
+      logger.warn('Rule auto-update: registry metadata missing tarball/integrity — refusing.');
+      return null;
+    }
+    // Never follow the tarball URL off the official registry host.
+    if (new URL(tarball).host !== 'registry.npmjs.org') {
+      logger.warn(`Rule auto-update: tarball host is not registry.npmjs.org — refusing.`);
+      return null;
+    }
+    const tarRes = await fetch(tarball, { signal: AbortSignal.timeout(30_000) });
+    if (!tarRes.ok) return null;
+    const buf = Buffer.from(await tarRes.arrayBuffer());
+    if (!verifyTarballIntegrity(buf, integrity)) {
+      logger.error(
+        'Rule auto-update: INTEGRITY MISMATCH — tarball discarded, nothing loaded (possible tamper/MITM).'
+      );
+      return null;
+    }
+    const { mkdirSync, writeFileSync, rmSync, existsSync, cpSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const { execFileSync } = await import('node:child_process');
+    const { tmpdir } = await import('node:os');
+    const dest = join(deps.config.dataDir, 'auto-rules', version);
+    if (existsSync(dest)) return dest; // already staged this version
+    const work = join(tmpdir(), `pg-atr-${version}-${process.pid}`);
+    mkdirSync(work, { recursive: true, mode: 0o700 });
+    try {
+      const tgz = join(work, 'bundle.tgz');
+      writeFileSync(tgz, buf, { mode: 0o600 });
+      // Extract ONLY package/rules from the verified archive.
+      execFileSync('tar', ['-xzf', tgz, '-C', work, 'package/rules'], { timeout: 30_000 });
+      const extracted = join(work, 'package', 'rules');
+      if (!existsSync(extracted)) return null;
+      mkdirSync(join(deps.config.dataDir, 'auto-rules'), { recursive: true, mode: 0o700 });
+      cpSync(extracted, dest, { recursive: true });
+      logger.info(
+        `Rule auto-update: staged agent-threat-rules@${version} (integrity-verified) — detect-only until trusted.`
+      );
+      return dest;
+    } finally {
+      rmSync(work, { recursive: true, force: true });
+    }
+  } catch (err: unknown) {
+    logger.warn(
+      `Rule auto-update pull failed: ${err instanceof Error ? err.message : String(err)}`
+    );
+    return null;
+  }
+}
+
+/**
  * Create a DAILY rule-update-check timer (notify-only). Rules are not a
  * real-time feed; the integrity-checked npm registry is the source of truth, so
  * checking once a day is both sufficient and far smaller an attack surface than
  * a high-frequency live pull. Returns the timer handle (caller clears it).
  */
 export function setupRuleUpdateCheckTimer(deps: CloudSyncDeps): ReturnType<typeof setInterval> {
+  const tick = async (): Promise<void> => {
+    await checkForRuleUpdates(deps);
+    // Gap A (opt-in): when auto-update is on, also pull + integrity-verify + stage
+    // the latest bundle so a fresh, verified copy is always on disk. Staging is
+    // DETECT-only foundation — nothing is armed to BLOCK here.
+    if (deps.config.autoUpdateRules === true) await pullRuleUpdate(deps);
+  };
   return setInterval(
     () => {
-      void checkForRuleUpdates(deps);
+      void tick();
     },
     24 * 60 * 60 * 1000
   );
