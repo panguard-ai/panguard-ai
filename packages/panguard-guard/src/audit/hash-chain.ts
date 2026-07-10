@@ -75,6 +75,13 @@ export interface RetentionFloor {
   readonly seq: number;
   /** prevHash the oldest surviving record must carry (its deleted predecessor's hash). */
   readonly prevHash: string;
+  /**
+   * Monotonic generation counter, incremented each time a floor is recorded. A
+   * separately-persisted high-water mark of this value lets the reader reject a
+   * stale but validly-signed head replayed to roll the floor backward (see
+   * audit-chain.ts). Optional for backward-compat with floors written before it.
+   */
+  readonly gen?: number;
 }
 
 /**

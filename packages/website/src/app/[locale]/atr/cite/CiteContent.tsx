@@ -193,7 +193,9 @@ function KvBox({ label, value, href }: { label: string; value: string; href?: st
   const inner = (
     <>
       <div className="text-xs uppercase tracking-wide text-text-muted">{label}</div>
-      <div className="mt-1 break-all font-mono text-sm font-semibold text-text-primary">{value}</div>
+      <div className="mt-1 break-all font-mono text-sm font-semibold text-text-primary">
+        {value}
+      </div>
     </>
   );
   if (href)

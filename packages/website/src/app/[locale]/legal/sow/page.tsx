@@ -31,7 +31,9 @@ export default async function SOWPage(props: { params: Promise<{ locale: string 
           {lastUpdatedLabel} {lastUpdatedValue} · {SOW_VERSION}
         </p>
         <h1 className="mt-4 text-3xl font-bold text-text-primary">
-          {isZh ? 'Migrator Pro 服務說明書 (SOW) 範本' : 'Migrator Pro Statement of Work — Template'}
+          {isZh
+            ? 'Migrator Pro 服務說明書 (SOW) 範本'
+            : 'Migrator Pro Statement of Work — Template'}
         </h1>
       </header>
 
