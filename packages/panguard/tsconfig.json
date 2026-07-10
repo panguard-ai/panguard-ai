@@ -9,7 +9,6 @@
     { "path": "../core" },
     { "path": "../panguard-scan" },
     { "path": "../panguard-guard" },
-    { "path": "../panguard-report" },
     { "path": "../panguard-chat" },
     { "path": "../panguard-trap" },
 
