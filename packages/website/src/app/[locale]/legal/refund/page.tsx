@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { buildAlternates } from '@/lib/seo';
 
-const REFUND_LAST_UPDATED_EN = 'May 20, 2026';
-const REFUND_LAST_UPDATED_ZH = '2026年5月20日';
-const REFUND_VERSION = 'v1.0';
-const REFUND_PDF_URL = '/legal/03-Refund-Policy.pdf';
+const REFUND_LAST_UPDATED_EN = 'July 10, 2026';
+const REFUND_LAST_UPDATED_ZH = '2026年7月10日';
+const REFUND_VERSION = 'v2.0';
+const REFUND_PDF_URL = '/legal/03-Refund-Termination.pdf';
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;
@@ -85,7 +85,7 @@ export default async function RefundPage(props: { params: Promise<{ locale: stri
           download
           className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold rounded-lg px-5 py-2.5 text-sm hover:bg-brand-sage-light transition-colors"
         >
-          {isZh ? '下載退費政策 PDF (192 KB)' : 'Download Refund Policy PDF (192 KB)'}
+          {isZh ? '下載退費與終止 PDF (80 KB)' : 'Download Refund & Termination PDF (80 KB)'}
         </a>
       </div>
 
