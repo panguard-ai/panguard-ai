@@ -75,8 +75,8 @@ export default async function EvidencePackPage({
             </h1>
             <p className="mt-4 text-base text-text-secondary leading-relaxed">
               {isZh
-                ? '這份檔案是 PanGuard Pilot / Enterprise 客戶每季拿到的東西。下方所有 PDF / JSON / HTML 是 panguard-report 在 server 端直接從 ATR 規則 metadata + 即時資產評估渲染的——沒有任何 LLM call。'
-                : 'This is the artifact every PanGuard Pilot / Enterprise customer receives quarterly. Every PDF / JSON / HTML below is rendered server-side by panguard-report directly from ATR rule metadata plus live asset assessment — zero LLM calls.'}
+                ? '這份檔案是 PanGuard Enterprise / Migrator Pro 客戶每季拿到的東西。下方所有 PDF / JSON / HTML 是 panguard-report 在 server 端直接從 ATR 規則 metadata + 即時資產評估渲染的——沒有任何 LLM call。'
+                : 'This is the artifact every PanGuard Enterprise / Migrator Pro customer receives quarterly. Every PDF / JSON / HTML below is rendered server-side by panguard-report directly from ATR rule metadata plus live asset assessment — zero LLM calls.'}
             </p>
             <p className="mt-3 text-xs text-text-muted leading-relaxed">
               {isZh
@@ -207,8 +207,8 @@ export default async function EvidencePackPage({
               </Bullet>
               <Bullet>
                 {isZh
-                  ? 'Pilot / Enterprise 客戶完全不必綁定 OpenAI / Anthropic key 給偵測層使用'
-                  : 'Pilot / Enterprise customers never need to bind an OpenAI / Anthropic key to the detection path'}
+                  ? 'Enterprise / Migrator Pro 客戶完全不必綁定 OpenAI / Anthropic key 給偵測層使用'
+                  : 'Enterprise / Migrator Pro customers never need to bind an OpenAI / Anthropic key to the detection path'}
               </Bullet>
             </ul>
           </div>
@@ -232,7 +232,7 @@ export default async function EvidencePackPage({
                 href="/pricing"
                 className="inline-flex items-center gap-2 bg-surface-2 border border-border text-text-primary font-semibold rounded-lg px-5 py-2.5 text-sm hover:bg-surface-1 transition-colors"
               >
-                {isZh ? '看 Pilot ($25K / 90d)' : 'See Pilot ($25K / 90d)'}
+                {isZh ? '看 Migrator Pro' : 'See Migrator Pro'}
               </Link>
             </div>
           </div>

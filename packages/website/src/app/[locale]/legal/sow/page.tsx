@@ -11,9 +11,9 @@ export async function generateMetadata(props: {
 }): Promise<Metadata> {
   const { locale } = await props.params;
   return {
-    title: 'Pilot Statement of Work — Template',
+    title: 'Migrator Pro Statement of Work — Template',
     description:
-      'PanGuard AI Pilot SOW template. 90-day scope, $25,000 fee, 6 deliverables. Founding Customer pricing (first 3 only).',
+      'PanGuard AI Migrator Pro SOW template. Annual engagement, sales-led pricing, core onboarding deliverables.',
     alternates: buildAlternates('/legal/sow', locale),
   };
 }
@@ -31,14 +31,14 @@ export default async function SOWPage(props: { params: Promise<{ locale: string 
           {lastUpdatedLabel} {lastUpdatedValue} · {SOW_VERSION}
         </p>
         <h1 className="mt-4 text-3xl font-bold text-text-primary">
-          {isZh ? 'Pilot 服務說明書 (SOW) 範本' : 'Pilot Statement of Work — Template'}
+          {isZh ? 'Migrator Pro 服務說明書 (SOW) 範本' : 'Migrator Pro Statement of Work — Template'}
         </h1>
       </header>
 
       <p>
         {isZh
-          ? '這是 PanGuard AI 90 天 Pilot 標準 SOW 範本。每個結帳的 Customer 收到的 SOW 都依此產生，並附上指定 SOW 編號、Customer 名稱、Effective Date 與框架選擇。'
-          : 'This is the PanGuard AI 90-day Pilot Standard SOW template. Every Customer who checks out receives a SOW generated from this template with their assigned SOW number, Customer name, Effective Date, and framework selection.'}
+          ? '這是 PanGuard AI Migrator Pro 標準 SOW 範本。每個 Customer 的 SOW 都依此產生，並附上指定 SOW 編號、Customer 名稱、Effective Date 與框架選擇。'
+          : 'This is the PanGuard AI Migrator Pro Standard SOW template. Every Customer receives a SOW generated from this template with their assigned SOW number, Customer name, Effective Date, and framework selection.'}
       </p>
 
       <div className="my-6 p-6 bg-surface-1 border border-brand-sage/40 rounded-xl">
@@ -50,11 +50,11 @@ export default async function SOWPage(props: { params: Promise<{ locale: string 
           download
           className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold rounded-lg px-5 py-2.5 text-sm hover:bg-brand-sage-light transition-colors"
         >
-          {isZh ? '下載 Pilot SOW PDF (332 KB)' : 'Download Pilot SOW PDF (332 KB)'}
+          {isZh ? '下載 SOW PDF 範本 (332 KB)' : 'Download SOW PDF template (332 KB)'}
         </a>
       </div>
 
-      <h2>{isZh ? '6 個 deliverables (90 天)' : 'The 6 deliverables (90 days)'}</h2>
+      <h2>{isZh ? '導入交付項目' : 'Onboarding deliverables'}</h2>
       <ol>
         <li>
           <strong>{isZh ? 'ATR 引擎部署' : 'ATR engine deployment'}</strong>{' '}
@@ -82,21 +82,21 @@ export default async function SOWPage(props: { params: Promise<{ locale: string 
         </li>
         <li>
           <strong>{isZh ? '資深工程辦公時間' : 'Senior engineering office hours'}</strong>{' '}
-          {isZh ? '6 小時 / 週 (90 天合計 78 小時)' : '6 hrs / wk (78 hrs total over 90 days)'}
+          {isZh ? '6 小時 / 週 (導入期)' : '6 hrs / wk (onboarding phase)'}
         </li>
         <li>
-          <strong>{isZh ? 'Day 90 結束包' : 'Day-90 exit packet'}</strong>{' '}
+          <strong>{isZh ? '續約包' : 'Renewal packet'}</strong>{' '}
           {isZh
-            ? '最終發現報告 + Enterprise 範圍方案 + 乾淨退出選項 (Day 86-90)'
-            : 'final findings report + Enterprise scoping + clean-exit options (Day 86-90)'}
+            ? '最終發現報告 + 擴充範圍方案 + 續約選項'
+            : 'final findings report + expansion scoping + renewal options'}
         </li>
       </ol>
 
-      <h2>{isZh ? 'Founding Customer 定價' : 'Founding Customer pricing'}</h2>
+      <h2>{isZh ? 'Migrator Pro 定價' : 'Migrator Pro pricing'}</h2>
       <p>
         {isZh
-          ? '$25,000 USD 僅適用前 3 個 Customer。第 4 個起轉至 Enterprise $250K base ($150K floor、$250-350K target、$500K+ upside)。'
-          : '$25,000 USD applies only to the first three Customers. The 4th onwards transitions to Enterprise $250K base ($150K floor, $250-350K target, $500K+ upside).'}
+          ? 'Migrator Pro 為年約制,$500K–2M / 年(業務洽談定價)。也已內建於 PanGuard Enterprise 方案中。'
+          : 'Migrator Pro is an annual engagement, $500K–2M / year (sales-led pricing). It is also bundled inside PanGuard Enterprise.'}
       </p>
 
       <h2>{isZh ? '付款路徑' : 'Payment paths'}</h2>
@@ -113,8 +113,8 @@ export default async function SOWPage(props: { params: Promise<{ locale: string 
           </strong>
           :{' '}
           {isZh
-            ? 'Stripe 開立發票,30 天內電匯 (適合 F500 P-card 上限 > $5K 的採購流程)'
-            : 'Stripe-generated invoice, wire within 30 days (suits F500 procurement where P-card limits exclude $25K)'}
+            ? 'Stripe 開立發票,30 天內電匯 (適合 F500 採購流程,P-card 上限不足以支付六位數費用)'
+            : 'Stripe-generated invoice, wire within 30 days (suits F500 procurement where P-card limits exclude six-figure fees)'}
         </li>
         <li>
           <strong>{isZh ? '路徑 C — 主權 / 政府' : 'Path C — Sovereign / Government'}</strong>:{' '}

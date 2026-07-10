@@ -11,9 +11,9 @@ export async function generateMetadata(props: {
 }): Promise<Metadata> {
   const { locale } = await props.params;
   return {
-    title: 'Refund Policy',
+    title: 'Refund & Termination',
     description:
-      'PanGuard AI Pilot refund policy. 7-day no-questions refund, then service-credit options. Founding Customer protections.',
+      'PanGuard AI Migrator Pro refund & termination policy. Annual engagements are governed by the Master Services Agreement.',
     alternates: buildAlternates('/legal/refund', locale),
   };
 }
@@ -31,7 +31,7 @@ export default async function RefundPage(props: { params: Promise<{ locale: stri
           {lastUpdatedLabel} {lastUpdatedValue} · {REFUND_VERSION}
         </p>
         <h1 className="mt-4 text-3xl font-bold text-text-primary">
-          {isZh ? 'Pilot 退費政策' : 'Refund Policy — Pilot Engagements'}
+          {isZh ? 'Migrator Pro 退費與終止' : 'Refund & Termination — Migrator Pro Engagements'}
         </h1>
       </header>
 
@@ -41,114 +41,39 @@ export default async function RefundPage(props: { params: Promise<{ locale: stri
         </p>
         <p className="text-text-primary">
           {isZh
-            ? '結帳後 7 天無條件退費。Day 8 起不退費,除非 PanGuard material breach。'
-            : 'Full refund within 7 days of checkout, no questions. After Day 7 no refund except for PanGuard material breach.'}
+            ? 'Migrator Pro 為年約制 B2B 合約——費用、退費與終止一律依主服務協議 (MSA) 辦理,不適用消費型 7 天退費窗。'
+            : 'Migrator Pro is an annual B2B engagement — fees, refunds, and termination are governed by the Master Services Agreement (MSA); it is not subject to a consumer-style refund window.'}
         </p>
       </div>
 
-      <h2>{isZh ? '7 天無條件退費' : '7-day no-questions refund'}</h2>
+      <h2>{isZh ? '終止與退費' : 'Termination & refunds'}</h2>
       <p>
         {isZh
-          ? 'Customer 可在 Effective Date 起 7 個日曆天內取消 Pilot SOW,獲全額 $25,000 USD 退費。'
-          : 'Customer may cancel within seven (7) calendar days of the Effective Date and receive a full $25,000 USD refund.'}
-      </p>
-      <ul>
-        <li>
-          {isZh
-            ? '寄信到 billing@panguard.ai (使用結帳時的 email 地址)'
-            : 'Email billing@panguard.ai from the email used at checkout'}
-        </li>
-        <li>
-          {isZh
-            ? '附上 Pilot SOW 編號 (歡迎信內)'
-            : 'Include the Pilot SOW number (provided in welcome email)'}
-        </li>
-        <li>{isZh ? '不必說明原因' : 'No reason required'}</li>
-        <li>
-          {isZh
-            ? '5 個工作天內以原付款方式退費'
-            : 'Refund processed within 5 business days via original payment method'}
-        </li>
-      </ul>
-      <p>
-        {isZh
-          ? '即使 PanGuard 已開始 service delivery,7 天權利仍然適用。'
-          : 'This 7-day right applies even if PanGuard has begun service delivery.'}
+          ? '年約制 Migrator Pro 合約的終止與退費一律依 MSA 辦理。任一方得於書面通知後 30 天內未補救之 material breach 時終止合約 (MSA Section 3.3)。年約 B2B 合約不適用消費型無條件退費窗。'
+          : 'Termination and refunds for annual Migrator Pro engagements are governed by the MSA. Either party may terminate for a material breach left uncured within thirty (30) days of written notice (MSA Section 3.3). Annual B2B engagements are not subject to a consumer-style no-questions refund window.'}
       </p>
 
-      <h2>{isZh ? 'Day 7 之後' : 'After Day 7'}</h2>
+      <h2>{isZh ? '服務 credit' : 'Service credits'}</h2>
       <p>
         {isZh
-          ? '7 天視窗關閉後,退費 NOT 提供,除非 PanGuard material breach (依 MSA Section 3.3 — 30 天通知未補救)。'
-          : 'After the 7-day window closes, refunds are NOT available except for PanGuard material breach (per MSA Section 3.3 — uncured breach within 30 days of written notice).'}
+          ? '若 PanGuard 因自身過失未交付合約約定的 deliverable,Customer 可依適用 SOW 所載之補救條款請求服務 credit。具體 credit 由各 SOW 明定。'
+          : 'If PanGuard fails to deliver a contracted deliverable due to PanGuard fault, Customer may claim service credits under the remedy terms of the applicable SOW. Specific credits are defined per SOW.'}
       </p>
-      <p>{isZh ? '這是刻意政策設計:' : 'This is a deliberate policy choice:'}</p>
-      <ul>
-        <li>
-          {isZh
-            ? '$25,000 反映 90 天最多 78 小時資深工程時間 ($300+/小時等價)'
-            : '$25,000 reflects up to 78 hours of senior engineering time over 90 days ($300+/hr equivalent)'}
-        </li>
-        <li>
-          {isZh
-            ? '7 天視窗存在的目的就是讓 Customer 在 commitment 之前審視 onboarding 品質、安全揭露、與 SOC 2 timeline'
-            : 'The 7-day window exists specifically to let Customer audit onboarding quality, security disclosures, and SOC 2 timeline before commitment'}
-        </li>
-      </ul>
 
-      <h2>{isZh ? '服務 credit 取代退費' : 'Service credits in lieu of refund'}</h2>
+      <h2>{isZh ? '資料退出' : 'Data export on exit'}</h2>
       <p>
         {isZh
-          ? '若 PanGuard 因 PanGuard 過失而於 Day 90 未交付某項 deliverable,Customer 可選擇下列任一項:'
-          : 'If PanGuard fails to deliver a Section 2 deliverable by Day 90 due to PanGuard fault (excluding Customer-caused delays), Customer may elect:'}
-      </p>
-      <ul>
-        <li>{isZh ? 'Pilot 延期最多 30 天' : 'Pilot extension up to 30 additional days'}</li>
-        <li>
-          {isZh
-            ? 'Enterprise contract 10% 折扣 (與 $25K Founding Customer credit 累加)'
-            : 'Enterprise contract 10% discount (additive to $25K Founding Customer credit)'}
-        </li>
-        <li>
-          {isZh
-            ? 'Founder 工程時數加 10 小時 (Pilot 期間使用)'
-            : 'Additional 10 hours of founder engineering time within the Pilot window'}
-        </li>
-      </ul>
-
-      <h2>{isZh ? '路徑 B (電匯) 特殊情況' : 'Path B (Wire / Invoice) specifics'}</h2>
-      <p>
-        {isZh
-          ? '電匯路徑下,7 天視窗從 Effective Date (SOW 簽署日) 起算,非從電匯收到日。'
-          : 'For Path B Pilots, the 7-day window starts from the Effective Date (SOW signature), not from the wire receipt date.'}
-      </p>
-      <ul>
-        <li>
-          {isZh
-            ? '7 天內取消但尚未電匯 → PanGuard 撤銷發票,無費用產生'
-            : 'Cancel within 7 days BEFORE wiring → PanGuard voids the invoice, no fees owed'}
-        </li>
-        <li>
-          {isZh
-            ? '電匯已收到後 7 天內取消 → 透過電匯路徑 10 個工作天內退費'
-            : 'Cancel within 7 days AFTER wire receipt → refund via wire within 10 business days'}
-        </li>
-      </ul>
-
-      <h2>{isZh ? 'Day 90 乾淨退出' : 'Day-90 clean exit'}</h2>
-      <p>
-        {isZh
-          ? '這不是退費機制。Day 90 Customer 可選擇乾淨退出 (SOW Section 11.1)。所有交付物 Customer 保有,30 天資料匯出視窗。'
-          : "This is not a refund mechanism. At Day 90 Customer may elect a clean exit (SOW Section 11.1). All delivered artifacts remain Customer's, with a 30-day data export window after exit."}
+          ? '合約終止時,所有交付物 Customer 保有,並提供 30 天資料匯出視窗。'
+          : "On termination, all delivered artifacts remain the Customer's, with a 30-day data export window."}
       </p>
 
-      <h2>{isZh ? '退費要求' : 'How to request a refund'}</h2>
+      <h2>{isZh ? '帳務問題' : 'Billing questions'}</h2>
       <p>
-        {isZh ? '從結帳時使用的 email 寄信到 ' : 'Email '}
+        {isZh ? '請從合約聯絡 email 寄信到 ' : 'Email '}
         <a href="mailto:billing@panguard.ai">billing@panguard.ai</a>
         {isZh
-          ? '。附上 Pilot SOW 編號。我們會於 1 個工作天內回覆,5 個工作天內處理退費。'
-          : ' from the email address used at checkout, including the Pilot SOW number. We respond within 1 business day and process refunds within 5 business days.'}
+          ? '。我們會於 1 個工作天內回覆。'
+          : ' from your contract contact address. We respond within 1 business day.'}
       </p>
 
       <div className="my-6 p-6 bg-surface-1 border border-brand-sage/40 rounded-xl">
@@ -170,7 +95,7 @@ export default async function RefundPage(props: { params: Promise<{ locale: stri
           <a href="/legal/msa">{isZh ? '主服務協議 (MSA)' : 'Master Services Agreement'}</a>
         </li>
         <li>
-          <a href="/legal/sow">{isZh ? 'Pilot SOW 範本' : 'Pilot SOW template'}</a>
+          <a href="/legal/sow">{isZh ? 'Migrator Pro SOW 範本' : 'Migrator Pro SOW template'}</a>
         </li>
       </ul>
     </article>
