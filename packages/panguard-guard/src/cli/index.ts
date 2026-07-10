@@ -138,18 +138,70 @@ export async function runCLI(args: string[]): Promise<void> {
       const script = generateInstallScript({ dataDir, licenseKey });
       if (licenseKey) {
         // Never echo a script that embeds a secret to stdout (terminal scrollback,
-        // pipes, CI logs). Write it 0600 and print the path instead.
-        const { writeFileSync, chmodSync, mkdirSync, existsSync } = await import('node:fs');
+        // pipes, CI logs). Write it to an exclusively-created, owner-only file and
+        // print only the path.
+        const { openSync, writeSync, closeSync, fstatSync, unlinkSync, mkdirSync, chmodSync } =
+          await import('node:fs');
         const { join } = await import('node:path');
         const { homedir, platform } = await import('node:os');
+        const { randomBytes } = await import('node:crypto');
+        const isWin = platform() === 'win32';
         const dir = join(homedir(), '.panguard');
-        if (!existsSync(dir)) mkdirSync(dir, { recursive: true, mode: 0o700 });
-        const outPath = join(dir, `install-panguard.${platform() === 'win32' ? 'ps1' : 'sh'}`);
-        writeFileSync(outPath, script, { encoding: 'utf-8', mode: 0o600 });
+        // Create 0700; tighten even if it already existed (Node ignores `mode`
+        // on a pre-existing dir, so don't trust a dir we didn't just create).
+        mkdirSync(dir, { recursive: true, mode: 0o700 });
+        if (!isWin) {
+          try {
+            chmodSync(dir, 0o700);
+          } catch {
+            /* best effort */
+          }
+        }
+        // Random, unpredictable name. 'wx' = O_CREAT|O_EXCL: fails with EEXIST on
+        // a pre-existing file OR a pre-planted symlink, so an attacker cannot make
+        // us write the secret through their file/link. mode 0o600 is honored here
+        // because O_EXCL guarantees a brand-new file. Verify with fstat before the
+        // secret touches disk; refuse (never truncate) on any anomaly.
+        const outPath = join(
+          dir,
+          `install-panguard-${randomBytes(6).toString('hex')}.${isWin ? 'ps1' : 'sh'}`
+        );
+        let fd: number;
         try {
-          chmodSync(outPath, 0o600);
-        } catch {
-          /* best effort — platforms without POSIX perms */
+          fd = openSync(outPath, 'wx', 0o600);
+        } catch (err) {
+          process.stderr.write(
+            `  ${symbols.fail} Could not create a private file for the install script ` +
+              `(${err instanceof Error ? err.message : String(err)}). Aborting to avoid leaking the key.\n`
+          );
+          process.exitCode = 1;
+          break;
+        }
+        let refused = false;
+        try {
+          if (!isWin) {
+            const st = fstatSync(fd);
+            if ((st.mode & 0o777) !== 0o600) {
+              process.stderr.write(
+                `  ${symbols.fail} Refusing to write the key: created file is not 0600 ` +
+                  `(mode ${(st.mode & 0o777).toString(8)}).\n`
+              );
+              refused = true;
+            }
+          }
+          if (!refused) writeSync(fd, script);
+        } finally {
+          closeSync(fd);
+        }
+        if (refused) {
+          // fstat check failed after create — remove the empty file we made.
+          try {
+            unlinkSync(outPath);
+          } catch {
+            /* best effort */
+          }
+          process.exitCode = 1;
+          break;
         }
         console.log(
           `  ${symbols.pass} Install script written to ${c.sage(outPath)} ${c.dim('(0600 — contains your license key)')}`

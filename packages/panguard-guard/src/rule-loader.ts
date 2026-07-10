@@ -219,17 +219,22 @@ export async function initEngines(
   );
   const investigationEngine = new InvestigationEngine(baseline);
 
-  // Auto-provision a TC client key ONLY when the user has opted into collective
-  // defense (=== true, default OFF). Provisioning is an OUTBOUND registration POST
-  // (a phone-home), so without consent create() builds an offline client — no key
-  // minted, no TC call — and bundled ATR rules still protect the host. An
-  // explicitly-configured key is honored regardless. If the endpoint is
-  // unreachable, create() also falls back to offline mode.
+  // ALL Threat Cloud network — inbound indicator pulls (blocklist/domain/skill
+  // lists) AND outbound sharing — is gated on collective-defense consent
+  // (threatCloudUploadEnabled === true, default OFF). Without consent we pass
+  // endpoint=undefined so the client is truly OFFLINE: every fetch/upload
+  // short-circuits (constructor sets status='offline'), so there is NO
+  // registration POST, NO recurring 5-minute blocklist GET (which would leak this
+  // host's source IP + uptime), and a stray TC_API_KEY env var cannot re-enable
+  // authenticated calls (offline returns before any Authorization header is
+  // built). Bundled ATR rules still protect the host offline. With consent, the
+  // real endpoint + key are used and auto-registration (POST) is allowed.
+  const tcConsented = config.threatCloudUploadEnabled === true;
   const threatCloud = await ThreatCloudClient.create(
-    config.threatCloudEndpoint,
+    tcConsented ? config.threatCloudEndpoint : undefined,
     config.dataDir,
-    config.threatCloudApiKey,
-    { allowProvision: config.threatCloudUploadEnabled === true }
+    tcConsented ? config.threatCloudApiKey : undefined,
+    { allowProvision: tcConsented }
   );
 
   const feedManager = new ThreatIntelFeedManager({
