@@ -15,6 +15,16 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import path from 'node:path';
+import { PidFile } from '@panguard-ai/panguard-guard';
+
+/**
+ * The single canonical PID filename the guard daemon writes on startup.
+ * Kept in sync with PidFile (packages/panguard-guard/src/daemon/index.ts) so
+ * start, stop, and status all agree on which file to read.
+ * 守護常駐程式啟動時寫入的唯一標準 PID 檔名。與 PidFile 保持一致，
+ * 讓 start、stop、status 都讀同一個檔案。
+ */
+const GUARD_PID_FILENAME = 'panguard-guard.pid';
 
 /**
  * Resolve the guard data directory from args or default.
@@ -43,7 +53,7 @@ export async function executeGuardStart(args: Record<string, unknown>) {
   }
 
   // Check if guard is already running
-  const pidFile = path.join(dataDir, 'panguard-guard.pid');
+  const pidFile = path.join(dataDir, GUARD_PID_FILENAME);
   try {
     const pidContent = await fs.readFile(pidFile, 'utf-8');
     const existingPid = parseInt(pidContent.trim(), 10);
@@ -232,29 +242,31 @@ export async function executeGuardStart(args: Record<string, unknown>) {
  */
 export async function executeGuardStop(args: Record<string, unknown>) {
   const dataDir = resolveDataDir(args);
-  const pidFile = path.join(dataDir, 'guard.pid');
+  // Reuse the guard's PidFile so we read the exact file the daemon writes
+  // (panguard-guard.pid) with the same symlink-safety and PID-range checks.
+  const pidFile = new PidFile(dataDir);
+  const pid = pidFile.read();
 
-  let pid: number | null = null;
   let stopped = false;
+  let message: string;
 
-  try {
-    const pidContent = await fs.readFile(pidFile, 'utf-8');
-    pid = parseInt(pidContent.trim(), 10);
-
-    if (!isNaN(pid)) {
-      try {
-        process.kill(pid, 'SIGTERM');
-        stopped = true;
-        // Remove stale PID file
-        await fs.unlink(pidFile).catch(() => undefined);
-      } catch {
-        // Process not running — clean up stale PID file
-        await fs.unlink(pidFile).catch(() => undefined);
-        stopped = false;
-      }
+  if (pid === null) {
+    // No valid PID file — nothing to stop
+    message = 'Guard engine was not running (no PID file found).';
+  } else if (!pidFile.isRunning()) {
+    // Recorded process is gone — clean up the stale PID file
+    pidFile.remove();
+    message = `Guard engine was not running (stale PID ${pid} cleaned up).`;
+  } else {
+    try {
+      process.kill(pid, 'SIGTERM');
+      stopped = true;
+      message = `Guard engine (PID: ${pid}) has been sent SIGTERM.`;
+    } catch (err) {
+      message = `Failed to signal guard engine (PID: ${pid}): ${
+        err instanceof Error ? err.message : String(err)
+      }`;
     }
-  } catch {
-    // No PID file found
   }
 
   return {
@@ -265,9 +277,7 @@ export async function executeGuardStop(args: Record<string, unknown>) {
           {
             status: stopped ? 'stopped' : 'not_running',
             pid,
-            message: stopped
-              ? `Guard engine (PID: ${pid}) has been sent SIGTERM.`
-              : 'Guard engine was not running (no PID file found).',
+            message,
           },
           null,
           2
@@ -283,22 +293,12 @@ export async function executeGuardStop(args: Record<string, unknown>) {
  */
 export async function executeStatus(args: Record<string, unknown>) {
   const dataDir = resolveDataDir(args);
-  const pidFile = path.join(dataDir, 'guard.pid');
-
-  let isRunning = false;
-  let pid: number | null = null;
-
-  try {
-    const pidContent = await fs.readFile(pidFile, 'utf-8');
-    pid = parseInt(pidContent.trim(), 10);
-    if (!isNaN(pid)) {
-      // Sending signal 0 checks if process exists without killing it
-      process.kill(pid, 0);
-      isRunning = true;
-    }
-  } catch {
-    isRunning = false;
-  }
+  // Reuse the guard's PidFile so status reads the same file the daemon writes
+  // (panguard-guard.pid). Reading a mismatched filename made status always
+  // report "not running" even while the guard was live.
+  const pidFile = new PidFile(dataDir);
+  const pid = pidFile.read();
+  const isRunning = pidFile.isRunning();
 
   // Try to read guard config
   let config: Record<string, unknown> = {};

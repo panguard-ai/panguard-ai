@@ -15,6 +15,7 @@ import {
   EncryptedFileCredentialStore,
 } from '@panguard-ai/security-hardening';
 import type { VulnerabilityFinding } from '@panguard-ai/security-hardening';
+import { readSecret } from '../secret-input.js';
 
 function severityColor(severity: string, text: string): string {
   switch (severity) {
@@ -105,14 +106,22 @@ export function hardeningCommand(): Command {
     .command('migrate')
     .description('Migrate plaintext credentials to encrypted storage')
     .option('--dry-run', 'Report only, do not migrate', false)
-    .option('--key <key>', 'Encryption key (or set PANGUARD_CREDENTIAL_KEY env var)')
-    .action(async (opts: { dryRun: boolean; key?: string }) => {
-      const encryptionKey = opts.key ?? process.env['PANGUARD_CREDENTIAL_KEY'];
+    .action(async (opts: { dryRun: boolean }) => {
+      // Secret-input policy: env > stdin (hidden prompt) > argv (never). The
+      // encryption key protects ALL migrated credentials, so it must never be
+      // accepted as a --key flag — argv is visible via `ps aux` and lands in
+      // shell history in cleartext.
+      let encryptionKey = process.env['PANGUARD_CREDENTIAL_KEY'];
       if (!encryptionKey && !opts.dryRun) {
-        console.error(
-          `${symbols.fail} Encryption key required. Use --key <key> or set PANGUARD_CREDENTIAL_KEY env var.`
-        );
-        process.exit(1);
+        if (process.stdin.isTTY) {
+          encryptionKey = await readSecret(`  Paste PANGUARD_CREDENTIAL_KEY (input hidden): `);
+        }
+        if (!encryptionKey) {
+          console.error(
+            `${symbols.fail} Encryption key required. Set the PANGUARD_CREDENTIAL_KEY env var (or run interactively to be prompted).`
+          );
+          process.exit(1);
+        }
       }
 
       const store = new EncryptedFileCredentialStore(encryptionKey ?? 'dry-run');

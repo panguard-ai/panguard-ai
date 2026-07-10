@@ -18,6 +18,7 @@ import { request as httpRequest } from 'node:http';
 import { createLogger } from '@panguard-ai/core';
 import type { AnonymizedThreatData, ThreatCloudUpdate, ThreatCloudStatus } from '../types.js';
 import { getAnonymousClientId } from './client-id.js';
+import { assertSafeOutboundUrl, checkOutboundUrl } from '../net/validate-outbound-url.js';
 
 const logger = createLogger('panguard-guard:threat-cloud');
 
@@ -92,7 +93,25 @@ export class ThreatCloudClient {
    * @param apiKey - API key for authentication / 認證用 API 金鑰
    */
   constructor(endpoint: string | undefined, dataDir: string, apiKey?: string) {
-    this.endpoint = endpoint;
+    // SSRF guard (defense in depth): validate the configured endpoint ONCE here so
+    // an unsafe target (private / reserved / link-local / cloud-metadata) can never
+    // become a live client. The endpoint flows from a .passthrough() config schema
+    // that only checks z.string().url(), so it happily accepts https://169.254.169.254.
+    // Because every request attaches Authorization: Bearer <TC_API_KEY>, a poisoned
+    // endpoint would both turn the daemon into an SSRF proxy AND leak the bearer key.
+    // An unsafe endpoint short-circuits the whole client to offline — same fail-safe
+    // policy the sibling key-provisioner uses (checkOutboundUrl, allowLoopback: true).
+    const safeEndpoint =
+      endpoint && checkOutboundUrl(endpoint, { allowLoopback: true }) === null
+        ? endpoint
+        : undefined;
+    if (endpoint && !safeEndpoint) {
+      logger.error(
+        `Threat Cloud endpoint rejected as unsafe (SSRF guard) — forcing offline mode. ` +
+          `威脅雲端點被 SSRF 防護拒絕，強制離線。`
+      );
+    }
+    this.endpoint = safeEndpoint;
     this.apiKey = apiKey ?? process.env['TC_API_KEY'];
     this.dataDir = dataDir;
     this.clientId = getAnonymousClientId();
@@ -101,7 +120,7 @@ export class ThreatCloudClient {
     this.cache = this.loadCache();
     this.uploadQueue = this.loadQueue();
 
-    if (!endpoint) {
+    if (!safeEndpoint) {
       this.status = 'offline';
       logger.info('Threat Cloud in offline mode (no endpoint configured) / 威脅雲離線模式');
     } else {
@@ -154,24 +173,29 @@ export class ThreatCloudClient {
   }
 
   /**
-   * POST threat telemetry to `/api/threats`, END-TO-END SEALED when an ingest key is
-   * bundled (seal.ts INGEST_KEYS). When sealing is active the payload is JWE-wrapped
-   * to the ingest public key so only the KMS private-key holder can read it — not the
-   * relay, a TLS middlebox, or a self-hosted relay operator. If sealing is active but
-   * produces no envelope (key expired mid-flight) we THROW rather than fall back to
-   * plaintext, so a key misconfiguration can never leak cleartext. With no key bundled
-   * (current default), sends the anonymized payload over HTTPS as before.
+   * POST threat telemetry to `/api/threats`, ALWAYS END-TO-END SEALED. The payload is
+   * JWE-wrapped to the bundled ingest public key (seal.ts INGEST_KEYS) so only the KMS
+   * private-key holder can read it — not the relay, a TLS middlebox, or a self-hosted
+   * relay operator.
+   *
+   * FAIL-CLOSED (honesty invariant): if sealing is unavailable for ANY reason — no
+   * ingest key bundled, or the key expired mid-flight and produced no envelope — we
+   * THROW and refuse to upload rather than silently falling back to plaintext-over-TLS.
+   * The first-run CLI consent states E2E encryption as an unconditional fact, so an
+   * upload must NEVER happen unsealed: whenever telemetry actually leaves the machine,
+   * the E2E-encrypted claim the user agreed to is guaranteed true.
    */
   private async postThreats(payload: Record<string, unknown>): Promise<void> {
-    if (sealingAvailable()) {
-      const sealed = await sealForIngest(payload);
-      if (!sealed) {
-        throw new Error('E2E sealing unavailable — refusing to send plaintext threat telemetry');
-      }
-      await this.httpPost(`${this.endpoint}/api/threats`, { sealed });
-      return;
+    if (!sealingAvailable()) {
+      throw new Error(
+        'E2E sealing unavailable (no active ingest key) — refusing to upload plaintext threat telemetry'
+      );
     }
-    await this.httpPost(`${this.endpoint}/api/threats`, payload);
+    const sealed = await sealForIngest(payload);
+    if (!sealed) {
+      throw new Error('E2E sealing unavailable — refusing to send plaintext threat telemetry');
+    }
+    await this.httpPost(`${this.endpoint}/api/threats`, { sealed });
   }
 
   /**
@@ -698,16 +722,19 @@ export class ThreatCloudClient {
   // HTTP helpers / HTTP 輔助函數
   // ---------------------------------------------------------------------------
 
-  /** Select transport — enforce HTTPS for external endpoints */
+  /**
+   * Select transport and enforce the shared SSRF policy at the single choke point
+   * every outbound TC request passes through. Replaces the old "https OR loopback"
+   * host check with checkOutboundUrl() so the policy is IDENTICAL to webhook /
+   * telemetry / key-provisioner: https required (http allowed only for loopback),
+   * and private / reserved / link-local / cloud-metadata targets are rejected —
+   * closing the SSRF + TC-bearer-key-leak gap. Throws on any unsafe URL so no
+   * request (GET pull or POST upload) can ever reach an internal host.
+   */
   private selectTransport(url: string) {
-    if (url.startsWith('https')) return httpsRequest;
-    // Allow HTTP only for localhost/loopback (development/testing)
+    assertSafeOutboundUrl(url, { allowLoopback: true });
     const parsed = new URL(url);
-    if (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1') {
-      return httpRequest;
-    }
-    logger.warn(`Refusing HTTP for non-loopback endpoint: ${parsed.hostname}. Use HTTPS.`);
-    throw new Error(`HTTPS required for Threat Cloud endpoint (got HTTP for ${parsed.hostname})`);
+    return parsed.protocol === 'https:' ? httpsRequest : httpRequest;
   }
 
   /**

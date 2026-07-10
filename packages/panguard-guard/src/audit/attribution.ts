@@ -7,14 +7,16 @@
  * alone.
  *
  * The FULL actor (including OS username) is kept in the LOCAL durable log. The
- * EXPORT path anonymizes the username before forwarding to an external auditor
- * (see anonymizeActorForExport).
+ * EXPORT path replaces the username with a per-install, salt-keyed pseudonym
+ * before forwarding to an external auditor (see anonymizeActorForExport) — not
+ * reversible by the recipient, who never receives the salt.
  *
  * @module @panguard-ai/panguard-guard/audit/attribution
  */
 
 import { hostname, userInfo } from 'node:os';
-import { createHash, randomUUID } from 'node:crypto';
+import { createHmac, randomUUID } from 'node:crypto';
+import { getExportSalt } from './export-salt.js';
 
 /** Optional agent identity attached when the record originates from an agent session. */
 export interface AgentAttribution {
@@ -60,10 +62,18 @@ export function newDecisionId(): string {
 }
 
 /**
- * Anonymize an actor for EXPORT: replace the username with a stable salted hash
- * so an auditor can correlate same-user records without learning the username,
- * and never leak a real OS username into a forwarded document. Host/pid/agent
- * are retained (operationally useful, not personally identifying in the same way).
+ * Anonymize an actor for EXPORT: replace the username with a per-install pseudonym
+ * so an auditor can correlate same-user records ACROSS the exported set without
+ * being able to recover the real OS username, and never leak a real username into
+ * a forwarded document. Host/pid/agent are retained (operationally useful, not
+ * personally identifying in the same way).
+ *
+ * The pseudonym is an HMAC under a random per-install salt that is kept only in
+ * the local data dir and NEVER exported (see hashUser / export-salt). This is what
+ * makes it resistant to a wordlist/rainbow-table attack on the (very low-entropy)
+ * username: without the never-exported salt the auditor cannot precompute the
+ * mapping. It is a pseudonym, not true anonymization — a party that ALSO holds the
+ * local salt could still map it back.
  */
 export function anonymizeActorForExport(
   actor: Actor | undefined
@@ -77,9 +87,18 @@ export function anonymizeActorForExport(
   };
 }
 
-/** SHA-256 of the username with a fixed domain separator. Not reversible. */
+/**
+ * Per-install pseudonymous digest of the username: HMAC-SHA256(localSalt, user).
+ *
+ * NOT a plain digest of low-entropy input: usernames are guessable, so an unsalted
+ * (or fixed-domain) hash is trivially reversible by an auditor with a wordlist, and
+ * one precomputed table would work for every install. The random per-install salt
+ * lives only in the local data dir and is never exported, so the digest stays
+ * correlatable within one install's documents but is not brute-forceable back to
+ * the username by the export's recipient.
+ */
 function hashUser(user: string): string {
-  return createHash('sha256').update(`panguard-audit-user:${user}`).digest('hex').slice(0, 32);
+  return createHmac('sha256', getExportSalt()).update(user).digest('hex').slice(0, 32);
 }
 
 function safeUsername(): string {

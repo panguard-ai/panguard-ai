@@ -19,6 +19,7 @@ import { PANGUARD_VERSION } from '../../index.js';
 import { saveLlmConfig, loadLlmConfig, deleteLlmConfig } from '../credentials.js';
 import { loadGuardConfig, updateGuardConfig } from '../guard-config.js';
 import { saveLang } from '../interactive/lang.js';
+import { printCollectiveDefenseDisclosure } from '../consent.js';
 
 /**
  * Print how to provide a cloud key without persisting it: via the environment
@@ -87,7 +88,11 @@ export function configCommand(): Command {
   cmd
     .command('show')
     .description('Show current configuration')
-    .action(() => {
+    .option(
+      '--verbose',
+      'Also reprint the full Collective Defense disclosure (what is/never shared)'
+    )
+    .action((opts: { verbose?: boolean }) => {
       console.log(banner(PANGUARD_VERSION));
       console.log(`  ${c.sage('Guard Configuration')}`);
       const guardConfig = loadGuardConfig();
@@ -117,6 +122,19 @@ export function configCommand(): Command {
         console.log(`  Saved:     ${c.dim(llmConfig.savedAt)}`);
       }
       console.log('');
+
+      // Durable re-read of what was agreed to. Without this, the rich
+      // first-run disclosure (what's shared / never shared) prints once and
+      // is gone — a CLI-only user has no command to double-check it months
+      // later, short of trusting memory of a prompt seen once.
+      if (opts.verbose) {
+        printCollectiveDefenseDisclosure();
+      } else {
+        console.log(
+          `  ${c.dim('Run "pga config show --verbose" to see the full Collective Defense disclosure.')}`
+        );
+        console.log('');
+      }
     });
 
   cmd

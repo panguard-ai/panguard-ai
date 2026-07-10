@@ -16,6 +16,7 @@ import { existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import type { AuditFinding, CheckResult, SkillManifest } from '../types.js';
 import type { ATREngine as ATREngineType, AgentEvent, ATRMatch } from '@panguard-ai/atr';
+import { filterInjectableCloudRules } from './cloud-rule-guard.js';
 
 const CHECK_LABEL = 'ATR Pattern Detection';
 
@@ -221,9 +222,17 @@ export async function checkWithATR(
     const engine = new ATREngine(engineConfig as ConstructorParameters<typeof ATREngineType>[0]);
     let ruleCount = await engine.loadRules();
 
-    // Inject cloud rules from Threat Cloud (flywheel: community rules enhance audits)
+    // Inject cloud rules from Threat Cloud (flywheel: community rules enhance
+    // audits). These are network-delivered, community-authored detection logic
+    // whose regex the engine compiles and runs against the skill under audit, so
+    // they are executable trust. Defense-in-depth (regardless of caller): before
+    // any engine.addRule(), enforce the same MAX_CLOUD_RULES capacity cap and
+    // ReDoS pattern gate as the guard daemon's GuardATREngine.addCloudRule(),
+    // dropping any rule with an unsafe/oversized/catastrophic-backtracking regex.
+    // (Signature verification is enforced upstream in the CLI fetch loop.)
     if (cloudRules && cloudRules.length > 0) {
-      for (const rule of cloudRules) {
+      const safeCloudRules = filterInjectableCloudRules(cloudRules);
+      for (const rule of safeCloudRules) {
         try {
           engine.addRule(rule as unknown as import('@panguard-ai/atr').ATRRule);
           ruleCount++;

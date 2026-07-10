@@ -27,16 +27,115 @@ import type { SkillWhitelistConfig } from './skill-whitelist.js';
 const logger = createLogger('panguard-guard:atr-engine');
 
 /**
- * Simplified ReDoS safety check (mirrors packages/scan-core/src/atr-engine.ts).
+ * True when the token that begins at `src[i]` is followed by an UNBOUNDED
+ * quantifier (`+`, `*`, or `{n,}` with no upper bound). Bounded quantifiers
+ * like `{2,4}` cannot drive exponential backtracking, so they are treated as
+ * safe. Returns false when there is no quantifier.
+ */
+function hasUnboundedQuantifierAt(src: string, i: number): boolean {
+  const next = src[i];
+  if (next === '+' || next === '*') return true;
+  if (next === '{') return /^\{\d*,\}/.test(src.slice(i));
+  return false;
+}
+
+/**
+ * Scan the interior of a group for a quantified atom or a quantified inner
+ * group — the ingredient that, when the whole group is itself quantified,
+ * produces catastrophic backtracking (e.g. the inner `+` of `(([a-z])+)+`).
+ * Character classes and escapes are skipped so their contents cannot be
+ * mistaken for quantifiable structure.
+ */
+function interiorHasQuantifiedAtom(interior: string): boolean {
+  for (let i = 0; i < interior.length; i++) {
+    const c = interior[i];
+    if (c === '\\') {
+      i++;
+      continue;
+    }
+    if (c === '[') {
+      i++;
+      while (i < interior.length && interior[i] !== ']') {
+        if (interior[i] === '\\') i++;
+        i++;
+      }
+      if (hasUnboundedQuantifierAt(interior, i + 1)) return true;
+      continue;
+    }
+    if (c === ')') {
+      if (hasUnboundedQuantifierAt(interior, i + 1)) return true;
+      continue;
+    }
+    if (c === '+' || c === '*') return true;
+    if (c === '{' && /^\{\d*,\}/.test(interior.slice(i))) return true;
+  }
+  return false;
+}
+
+/**
+ * Structurally detect catastrophic nested-quantifier regexes: any group
+ * `(...)` that is itself quantified by an unbounded quantifier AND whose
+ * interior contains a quantified atom or quantified subgroup. This is the
+ * `(a+)+` / `(([a-z])+)+` / `((ab)*)*` / `(a*)*b` class — the previous
+ * `/\([^)]*[+*]\)[+*{]/` heuristic could not see an INNER quantified group
+ * (its `[^)]*` cannot cross a nested `)`), so it accepted `(([a-z])+)+`
+ * despite clean exponential blowup. This walks the source, matches groups via
+ * a paren stack (honoring escapes + char classes), and checks each quantified
+ * group's interior at any nesting depth.
+ */
+function hasNestedQuantifier(src: string): boolean {
+  const openStack: number[] = [];
+  const groups: Array<{ start: number; end: number }> = [];
+  for (let i = 0; i < src.length; i++) {
+    const c = src[i];
+    if (c === '\\') {
+      i++;
+      continue;
+    }
+    if (c === '[') {
+      i++;
+      while (i < src.length && src[i] !== ']') {
+        if (src[i] === '\\') i++;
+        i++;
+      }
+      continue;
+    }
+    if (c === '(') openStack.push(i);
+    else if (c === ')') {
+      const start = openStack.pop();
+      if (start !== undefined) groups.push({ start, end: i });
+    }
+  }
+  for (const g of groups) {
+    if (!hasUnboundedQuantifierAt(src, g.end + 1)) continue;
+    if (interiorHasQuantifiedAtom(src.slice(g.start + 1, g.end))) return true;
+  }
+  return false;
+}
+
+/**
+ * Hardened ReDoS safety check for the cloud-rule compile gate.
  * A successful `new RegExp(p)` compile does NOT detect catastrophic
  * backtracking — patterns like (a+)+, (a*)*b, ([a-z]+)* compile fine but blow
  * up to exponential time on non-matching input. This rejects those structures
  * statically before a cloud rule's regex is ever executed against live traffic.
+ *
+ * NOTE — divergence, do NOT assume parity: packages/scan-core/src/atr-engine.ts
+ * still carries the older single-heuristic form (`/\([^)]*[+*]\)[+*{]/`) which
+ * cannot see an INNER quantified group and therefore accepts `(([a-z])+)+`.
+ * This guard copy replaced that heuristic with the structural `hasNestedQuantifier`
+ * walk above; scan-core (and the upstream @panguard-ai/atr `isReDoSSafe`) must be
+ * brought to the same standard separately before this can be re-unified into one
+ * shared implementation.
+ *
+ * Exported for direct unit testing of the ReDoS compile-gate.
  */
-function isSafeRegex(re: RegExp): boolean {
+export function isSafeRegex(re: RegExp): boolean {
   const src = re.source;
-  // Reject nested quantifiers: (pattern+)+ or (pattern*)+ or (pattern+)* etc.
-  if (/\([^)]*[+*]\)[+*{]/.test(src)) return false;
+  // Reject nested quantifiers, incl. INNER quantified groups: (a+)+, (([a-z])+)+,
+  // ((ab)*)*, (a*)*b. Structural walk — not a single heuristic regex — so
+  // arbitrarily nested quantified subgroups are caught.
+  if (hasNestedQuantifier(src)) return false;
   // Reject overlapping alternations with quantifiers: (a|a)+
   if (/\(([^|)]+)\|\1\)[+*]/.test(src)) return false;
   // Reject star-of-star: .*.*.*  (3+ consecutive greedy wildcards)
@@ -334,25 +433,45 @@ export class GuardATREngine {
       return true;
     };
 
-    const conditions = rule.detection?.conditions;
-    if (!Array.isArray(conditions)) return true; // no patterns to validate
-
-    for (const cond of conditions) {
-      if (!cond || typeof cond !== 'object') continue;
-
+    // Validate a single condition node, recursing into sequence steps. A rule can
+    // nest regexes inside `steps`/`sequence` — if the gate does not descend into
+    // them, a catastrophic-backtracking pattern smuggled in a step still reaches
+    // the engine's ungated sequence-step compile. Recurse so EVERY compiled regex
+    // passes the ReDoS gate, not just the top-level ones.
+    const checkCondition = (cond: unknown): boolean => {
+      if (!cond || typeof cond !== 'object') return true;
+      const node = cond as {
+        patterns?: unknown;
+        operator?: unknown;
+        value?: unknown;
+        steps?: unknown;
+        sequence?: unknown;
+      };
       // Named/grouped format: { patterns: [string, ...] }
-      const patterns = (cond as { patterns?: unknown }).patterns;
-      if (Array.isArray(patterns)) {
-        for (const p of patterns) {
-          if (!checkPattern(p)) return false;
+      if (Array.isArray(node.patterns)) {
+        for (const p of node.patterns) if (!checkPattern(p)) return false;
+      }
+      // Array format: { operator: "regex", value: "..." }
+      if (node.operator === 'regex' && node.value !== undefined) {
+        if (!checkPattern(node.value)) return false;
+      }
+      // Sequence format: { steps: [...] } / { sequence: [...] } — each step is a
+      // nested condition whose regexes must also pass the gate.
+      for (const key of ['steps', 'sequence'] as const) {
+        const steps = node[key];
+        if (Array.isArray(steps)) {
+          for (const s of steps) if (!checkCondition(s)) return false;
         }
       }
+      return true;
+    };
 
-      // Array format: { operator: "regex", value: "..." }
-      const entry = cond as { operator?: unknown; value?: unknown };
-      if (entry.operator === 'regex' && entry.value !== undefined) {
-        if (!checkPattern(entry.value)) return false;
-      }
+    const conditions = rule.detection?.conditions;
+    if (Array.isArray(conditions)) {
+      for (const cond of conditions) if (!checkCondition(cond)) return false;
+    } else if (conditions && typeof conditions === 'object') {
+      // Named-map form: { name: <condition>, ... } — the engine compiles these too.
+      for (const cond of Object.values(conditions)) if (!checkCondition(cond)) return false;
     }
 
     return true;

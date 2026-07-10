@@ -30,6 +30,7 @@ import { dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { homedir } from 'node:os';
+import { lookup } from 'node:dns/promises';
 import { WebSocketServer, type WebSocket as WS } from 'ws';
 import { createLogger } from '@panguard-ai/core';
 import { FileQuarantine } from '../response/file-quarantine.js';
@@ -42,7 +43,7 @@ import type {
 } from '../types.js';
 import { saveConfig, loadConfig } from '../config.js';
 import { verifyConfigIntegrity, checkSelfState } from '../integrity.js';
-import { redactSecrets } from '../redact.js';
+import { redactSecrets, SECRET_KEY_RE, SECRET_VALUE_RE, REDACTED } from '../redact.js';
 import { DashboardRelayClient, type RelayClientConfig } from './relay-client.js';
 import {
   AuditChain,
@@ -93,8 +94,25 @@ interface RateLimitEntry {
 
 const RATE_LIMIT_MAX = 120;
 const RATE_LIMIT_WINDOW_MS = 60_000;
+// Small pre-auth cap: bounds 401/403 spam from an unauthenticated local caller
+// WITHOUT letting it consume the authenticated user's RATE_LIMIT_MAX budget. The
+// authenticated budget is checked only AFTER token validation, keyed on the
+// token, so an unauthenticated flood can never exhaust the real dashboard's
+// quota. Loopback-only binding means per-IP keying adds nothing, so the pre-auth
+// bucket is a single global counter that just caps the reject path.
+const PREAUTH_RATE_LIMIT_MAX = 240;
 const MAX_WS_CLIENTS = 20;
 const MAX_WS_PER_IP = 5;
+
+/**
+ * Layer C is downgraded to 'degraded' when its last advisory call errored and no
+ * successful call has landed since (or none ever has). This window bounds how
+ * long a stale success keeps the layer green after errors start: if the most
+ * recent success is older than this AND there is a more recent error, the layer
+ * reports degraded. 15 minutes is long enough to ride out a transient blip but
+ * short enough to surface a dead key / dead local model promptly.
+ */
+const LAYER_C_STALE_SUCCESS_MS = 15 * 60_000;
 
 /**
  * The dashboard's per-launch auth token is persisted here (0o600) while the
@@ -236,6 +254,20 @@ export class DashboardServer {
    * optional module is unavailable in this install.
    */
   private mcpConfigModulePromise: Promise<Record<string, unknown> | null> | null = null;
+
+  /**
+   * Live health of the optional Layer C (semantic LLM) client, reported by the
+   * engine via reportLayerCOutcome(). Config-presence alone is NOT health: an
+   * expired cloud key or a dead local Ollama still has a config object, so
+   * without this the layer-health row would keep showing green 'active' while
+   * every advisory call silently fails. `null` = the engine has not reported an
+   * outcome yet (no call has been attempted since launch).
+   */
+  private layerCHealth: {
+    readonly lastSuccessAt: number | null;
+    readonly lastErrorAt: number | null;
+    readonly lastError: string | null;
+  } | null = null;
 
   constructor(port: number, relayConfig?: DashboardRelayOptions) {
     this.port = port;
@@ -394,6 +426,13 @@ export class DashboardServer {
 
       // Handle WebSocket upgrade manually (noServer mode)
       this.server.on('upgrade', (req, socket, head) => {
+        // DNS-rebinding defense: reject an upgrade whose Host is not the loopback
+        // dashboard, before parsing the URL against it. Mirrors the HTTP gate so
+        // a rebound hostname cannot open the live event stream either.
+        if (!this.isAllowedHost(req.headers.host)) {
+          socket.destroy();
+          return;
+        }
         const { pathname } = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`);
         if (pathname === '/ws') {
           wss.handleUpgrade(req, socket, head, (ws) => {
@@ -458,6 +497,39 @@ export class DashboardServer {
 
   updateStatus(update: Partial<DashboardStatus>): void {
     this.status = { ...this.status, ...update };
+    this.broadcast({
+      type: 'status_update',
+      data: {
+        ...this.status,
+        layers: this.computeLayers(),
+        enforcement: this.computeEnforcement(),
+      },
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  /**
+   * Record the outcome of a Layer C (semantic LLM) advisory call so the layer
+   * health reflects LIVE reachability, not just config presence. The engine
+   * calls this after each attempt: `ok:true` on a successful verdict, `ok:false`
+   * with an error message when the provider rejected / timed out / billing-
+   * blocked / local model down. Immutable update (new object each time) per the
+   * project's no-mutation rule; broadcasts the refreshed layer health.
+   */
+  reportLayerCOutcome(ok: boolean, error?: string): void {
+    const now = Date.now();
+    const prev = this.layerCHealth;
+    this.layerCHealth = ok
+      ? {
+          lastSuccessAt: now,
+          lastErrorAt: prev?.lastErrorAt ?? null,
+          lastError: null,
+        }
+      : {
+          lastSuccessAt: prev?.lastSuccessAt ?? null,
+          lastErrorAt: now,
+          lastError: error ?? 'semantic layer call failed',
+        };
     this.broadcast({
       type: 'status_update',
       data: {
@@ -564,11 +636,54 @@ export class DashboardServer {
       return;
     }
 
-    const clientIP = req.socket.remoteAddress ?? 'unknown';
-    if (!this.checkRateLimit(clientIP)) {
-      res.writeHead(429, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Rate limit exceeded' }));
+    // DNS-rebinding defense-in-depth: this service binds to loopback only, so the
+    // ONLY legitimate Host is 127.0.0.1:PORT / localhost:PORT. Reject any other
+    // Host (e.g. a rebound attacker hostname resolving to 127.0.0.1) before any
+    // other processing. Belt-and-suspenders on top of the cookie/CORS gate — it
+    // does not depend on those staying correct.
+    if (!this.isAllowedHost(req.headers.host)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Forbidden: invalid Host header' }));
       return;
+    }
+
+    // Parse the auth token ONCE (Authorization header first, then the HttpOnly
+    // cookie) so the rate-limit tiering below and the /api gate share a single
+    // verdict. Query-param tokens (?token=) are never accepted here — they leak
+    // into server logs, browser history, and Referer headers. (The launch token
+    // in GET /?token= only mints the cookie in serveIndex; it never authenticates
+    // an API call.) timingSafeEqual is guarded by an equal-length short-circuit
+    // so it is never handed mismatched-length buffers.
+    const authHeader = req.headers.authorization ?? '';
+    const headerToken = authHeader.replace('Bearer ', '');
+    const cookieToken =
+      (req.headers.cookie ?? '')
+        .split(';')
+        .map((c) => c.trim())
+        .find((c) => c.startsWith('panguard_auth='))
+        ?.split('=')[1] ?? '';
+    const usedHeaderToken = headerToken.length > 0;
+    const providedToken = headerToken || cookieToken;
+    const authed =
+      providedToken.length > 0 &&
+      providedToken.length === this.authToken.length &&
+      timingSafeEqual(Buffer.from(providedToken), Buffer.from(this.authToken));
+
+    // Tiered rate limiting so an unauthenticated flood can NEVER throttle the
+    // real dashboard. Authenticated requests are metered ONLY by the per-token
+    // 'auth' budget (checked in the /api/* block); every UNAUTHENTICATED request
+    // is metered by the separate 'preauth' bucket here. The two buckets never
+    // share a counter, so exhausting the pre-auth cap (401 / 404 / index spam)
+    // leaves the authenticated user's API traffic completely untouched — closing
+    // the shared-bucket DoS where any local process could 429 the real user.
+    // Loopback-only binding makes per-IP keying meaningless, so each tier is a
+    // single global bucket, not a per-IP one.
+    if (!authed) {
+      if (!this.checkRateLimit('preauth', PREAUTH_RATE_LIMIT_MAX)) {
+        res.writeHead(429, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Rate limit exceeded' }));
+        return;
+      }
     }
 
     const url = req.url ?? '/';
@@ -579,28 +694,18 @@ export class DashboardServer {
     }
 
     if (url.startsWith('/api/')) {
-      const authHeader = req.headers.authorization ?? '';
-      // Parse auth token from: 1) Authorization header, 2) HttpOnly cookie.
-      // Query-param tokens (?token=) are NOT accepted on /api/* — they leak into
-      // server logs, browser history, and Referer headers. (The launch token in
-      // GET /?token= only mints the cookie; it never authenticates an API call.)
-      const headerToken = authHeader.replace('Bearer ', '');
-      const cookieToken =
-        (req.headers.cookie ?? '')
-          .split(';')
-          .map((c) => c.trim())
-          .find((c) => c.startsWith('panguard_auth='))
-          ?.split('=')[1] ?? '';
-      const usedHeaderToken = headerToken.length > 0;
-      const providedToken = headerToken || cookieToken;
-
-      if (
-        !providedToken ||
-        providedToken.length !== this.authToken.length ||
-        !timingSafeEqual(Buffer.from(providedToken), Buffer.from(this.authToken))
-      ) {
+      if (!authed) {
         res.writeHead(401, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Unauthorized' }));
+        return;
+      }
+
+      // Authenticated budget: enforced ONLY after the token is validated so an
+      // unauthenticated caller can never consume it. Keyed on the token tier
+      // rather than the always-identical loopback IP.
+      if (!this.checkRateLimit('auth', RATE_LIMIT_MAX)) {
+        res.writeHead(429, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Rate limit exceeded' }));
         return;
       }
 
@@ -806,23 +911,67 @@ export class DashboardServer {
     }
   }
 
-  private checkRateLimit(ip: string): boolean {
+  /**
+   * Fixed-window rate limiter. `key` selects the bucket ('preauth' for the
+   * unauthenticated reject-path cap, 'auth' for the token-authenticated budget)
+   * and `max` its ceiling. Splitting the buckets is what stops an unauthenticated
+   * flood from exhausting the authenticated user's quota — the two never share a
+   * counter. Loopback-only binding makes per-IP keying meaningless (every caller
+   * is 127.0.0.1), so the key is the bucket name, not the source IP.
+   */
+  private checkRateLimit(key: string, max: number): boolean {
     const now = Date.now();
 
     // Periodic cleanup of expired entries to prevent unbounded growth
     if (this.rateLimits.size > 100) {
-      for (const [key, val] of this.rateLimits) {
-        if (now > val.resetAt) this.rateLimits.delete(key);
+      for (const [k, val] of this.rateLimits) {
+        if (now > val.resetAt) this.rateLimits.delete(k);
       }
     }
 
-    const entry = this.rateLimits.get(ip);
+    const entry = this.rateLimits.get(key);
     if (!entry || now > entry.resetAt) {
-      this.rateLimits.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+      this.rateLimits.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
       return true;
     }
     entry.count++;
-    return entry.count <= RATE_LIMIT_MAX;
+    return entry.count <= max;
+  }
+
+  /**
+   * True when the request's Host header targets this loopback dashboard. The
+   * server binds to 127.0.0.1 only, so the sole legitimate Host is
+   * 127.0.0.1:PORT or localhost:PORT (the port may be omitted for default
+   * ports, which never applies here, but we accept a bare hostname match too).
+   * Any other Host — including a rebound attacker hostname resolving to
+   * loopback — is rejected. IPv6 loopback ([::1]) is accepted for completeness.
+   */
+  private isAllowedHost(hostHeader: string | undefined): boolean {
+    if (!hostHeader) return false;
+    // Host is "hostname[:port]"; an IPv6 literal is bracketed: "[::1]:PORT".
+    let hostname: string;
+    let port: string;
+    if (hostHeader.startsWith('[')) {
+      const end = hostHeader.indexOf(']');
+      if (end === -1) return false;
+      hostname = hostHeader.slice(1, end);
+      port = hostHeader.slice(end + 1).replace(/^:/, '');
+    } else {
+      const colon = hostHeader.lastIndexOf(':');
+      if (colon === -1) {
+        hostname = hostHeader;
+        port = '';
+      } else {
+        hostname = hostHeader.slice(0, colon);
+        port = hostHeader.slice(colon + 1);
+      }
+    }
+    const loopback = hostname === '127.0.0.1' || hostname === 'localhost' || hostname === '::1';
+    if (!loopback) return false;
+    // Port, when present, must match the dashboard port. A bare hostname (no
+    // port) is allowed so tooling that drops the port on a default-looking URL
+    // still works; loopback + no port cannot reach a foreign origin.
+    return port === '' || port === String(this.port);
   }
 
   private serveIndex(req: IncomingMessage, res: ServerResponse, nonce: string): void {
@@ -922,13 +1071,57 @@ export class DashboardServer {
         state: running ? 'active' : 'idle',
         detail: 'heuristic + behavioral baseline',
       },
-      c: {
-        state: aiConfigured ? 'active' : 'off',
+      c: this.computeLayerC(aiConfigured),
+    };
+  }
+
+  /**
+   * Layer C (optional semantic LLM) health. Its state is NOT config-presence:
+   * a configured client whose key expired / hit a billing block / whose local
+   * model died is reported 'degraded' (with the live error), matching the
+   * honesty bar Layer A already meets (0 rules -> degraded). A configured client
+   * with recent success — or one that has simply not been exercised yet — reads
+   * 'active'. The cost line is grounded in the user's OWN flagged-event count so
+   * a quiet dev box and a noisy CI runner no longer get the identical claim.
+   */
+  private computeLayerC(aiConfigured: boolean): LayerState {
+    if (!aiConfigured) {
+      return {
+        state: 'off',
         optional: true,
-        detail: aiConfigured
-          ? 'semantic verdict configured (advisory) · runs only on flagged events, not every action — typically a few cents/month, or free with local Ollama'
-          : 'off · optional advisory LLM. Connect your own model with `pga guard ai` (free local Ollama, or a cloud key for a few cents/month). Advisory only — flags for review, never auto-blocks; runs only on already-flagged events.',
-      },
+        detail:
+          'off · optional advisory LLM. Connect your own model with `pga guard ai` (free local Ollama, or a cloud key that bills only on flagged events). Advisory only — flags for review, never auto-blocks; runs only on already-flagged events.',
+      };
+    }
+    const h = this.layerCHealth;
+    // Degraded when the most recent attempt errored and no success has landed
+    // since (or the last success is older than the stale window). This is the
+    // "expired key / dead Ollama still shows green" fix.
+    const errored =
+      !!h?.lastErrorAt &&
+      (h.lastSuccessAt === null ||
+        h.lastErrorAt > h.lastSuccessAt ||
+        Date.now() - h.lastSuccessAt > LAYER_C_STALE_SUCCESS_MS);
+    // Grounded cost line: reference the user's actual flagged-event volume
+    // rather than an unqualified flat "a few cents" claim (findings 26 + 30).
+    const flagged = this.status.threatsDetected ?? 0;
+    const costLine =
+      flagged > 0
+        ? `${flagged} flagged event${flagged === 1 ? '' : 's'} so far — a cloud model bills only on these (roughly cents at typical per-event token cost), free with local Ollama`
+        : 'no flagged events yet — a cloud model bills only when events are flagged (roughly cents each at typical token cost), free with local Ollama';
+    if (errored) {
+      return {
+        state: 'degraded',
+        optional: true,
+        detail: `semantic layer configured but the last call failed: ${
+          h?.lastError ?? 'unknown error'
+        } — advisory verdicts are not landing until it recovers. Re-check the key/model with \`pga guard ai\`.`,
+      };
+    }
+    return {
+      state: 'active',
+      optional: true,
+      detail: `semantic verdict configured (advisory) · runs only on flagged events, not every action · ${costLine}`,
     };
   }
 
@@ -1127,6 +1320,36 @@ export class DashboardServer {
   }
 
   /**
+   * Map a hash-chain verify result to an honest integrity label for exports.
+   * Collapsing every `ok:false` into 'TAMPERED' was dishonest: a pristine fresh
+   * install (reason 'empty', zero events) and a legitimate pre-chain upgrade
+   * (reason 'unchained-legacy') are benign, expected states — NOT forgery.
+   * 'TAMPERED' is reserved for actual chain-break evidence (hash-break / seq-gap
+   * / bad-hmac / truncated). This keeps the honest-status invariant: a clean box
+   * must never accuse itself of tampering.
+   */
+  private static integrityLabelFor(
+    verify: VerifyResult
+  ): 'VERIFIED' | 'NO_RECORDS' | 'LEGACY_PREFIX' | 'TAMPERED' {
+    if (verify.ok) return 'VERIFIED';
+    switch (verify.reason) {
+      case 'empty':
+        return 'NO_RECORDS';
+      case 'unchained-legacy':
+        return 'LEGACY_PREFIX';
+      case 'hash-break':
+      case 'seq-gap':
+      case 'bad-hmac':
+      case 'truncated':
+        return 'TAMPERED';
+      default:
+        // Unknown/future non-ok reason: fail toward the honest-but-cautious
+        // label rather than silently claiming VERIFIED.
+        return 'TAMPERED';
+    }
+  }
+
+  /**
    * Real SARIF 2.1.0 export.
    * - tool.driver.rules: every ATR rule actually loaded by this Guard instance.
    * - results: one entry per durable event in the on-disk events.jsonl chain.
@@ -1159,9 +1382,12 @@ export class DashboardServer {
           err instanceof Error ? err.message : String(err)
         }`
       );
+      // A read EXCEPTION is a genuine failure (unreadable/corrupt log), not an
+      // empty chain — use 'truncated' so integrityLabelFor keeps emitting
+      // 'TAMPERED', never the benign 'NO_RECORDS'.
       durable = {
         records: [],
-        verify: { ok: false, verifiedCount: 0, firstBadIndex: -1, reason: 'empty' },
+        verify: { ok: false, verifiedCount: 0, firstBadIndex: -1, reason: 'truncated' },
         headSeq: -1,
         headHash: '',
       };
@@ -1213,7 +1439,9 @@ export class DashboardServer {
       };
     });
 
-    const integrity = durable.verify.ok ? 'VERIFIED' : 'TAMPERED';
+    // Honest integrity label: 'empty' (fresh install) and 'unchained-legacy'
+    // (pre-chain upgrade) are benign and must NOT read as 'TAMPERED'.
+    const integrity = DashboardServer.integrityLabelFor(durable.verify);
     const attestationChain = {
       algorithm: 'sha256-hmac',
       verified: durable.verify.ok,
@@ -1318,15 +1546,22 @@ export class DashboardServer {
           err instanceof Error ? err.message : String(err)
         }`
       );
+      // A read EXCEPTION is a genuine failure (unreadable/corrupt log), not an
+      // empty chain — use 'truncated' so integrityLabelFor keeps emitting
+      // 'TAMPERED', never the benign 'NO_RECORDS'.
       durable = {
         records: [],
-        verify: { ok: false, verifiedCount: 0, firstBadIndex: -1, reason: 'empty' },
+        verify: { ok: false, verifiedCount: 0, firstBadIndex: -1, reason: 'truncated' },
         headSeq: -1,
         headHash: '',
       };
     }
 
-    const integrity: 'VERIFIED' | 'TAMPERED' = durable.verify.ok ? 'VERIFIED' : 'TAMPERED';
+    // Honest integrity label: reserve 'TAMPERED' for real chain-break evidence.
+    // 'empty' (fresh install) => 'NO_RECORDS'; 'unchained-legacy' (pre-chain
+    // upgrade) => 'LEGACY_PREFIX'. See integrityLabelFor.
+    const integrity: 'VERIFIED' | 'NO_RECORDS' | 'LEGACY_PREFIX' | 'TAMPERED' =
+      DashboardServer.integrityLabelFor(durable.verify);
 
     const content = {
       kind: 'panguard.evidence-pack',
@@ -1452,7 +1687,12 @@ export class DashboardServer {
         ? {
             provider: config.ai.provider,
             model: config.ai.model,
-            endpoint: config.ai.endpoint,
+            // A BYO-LLM endpoint set via `pga guard ai` can legitimately embed a
+            // credential in the URL (https://user:token@host/v1 or
+            // https://host/v1?key=SECRET). /api/config runs redactSecrets on the
+            // whole config, but this hand-picked path must redact too or it leaks
+            // the credential into the JSON body + the settings UI input.
+            endpoint: DashboardServer.redactEndpointUrl(config.ai.endpoint),
             hasApiKey: !!config.ai.apiKey,
           }
         : null,
@@ -1472,8 +1712,10 @@ export class DashboardServer {
   // ---------------------------------------------------------------------------
 
   /**
-   * True when `host` is a private/internal/loopback/link-local IPv4 address (or
-   * `localhost`). Self-contained so the SSRF check stays in this file.
+   * True when `host` is a private/internal/loopback/link-local address (or
+   * `localhost`). Covers IPv4 private ranges, the cloud metadata IP, and IPv6
+   * loopback / unique-local (fc00::/7) / link-local (fe80::/10). Self-contained
+   * so the SSRF check stays in this file. Accepts bracket-wrapped IPv6 literals.
    */
   private static isPrivateHost(host: string): boolean {
     if (host === 'localhost' || host === '0.0.0.0') return true;
@@ -1489,7 +1731,90 @@ export class DashboardServer {
       const second = parseInt(host.split('.')[1] ?? '0', 10);
       if (second >= 16 && second <= 31) return true;
     }
+    // IPv6 loopback / unspecified / private (ULA fc00::/7) / link-local (fe80::/10).
+    const v6 = (
+      host.startsWith('[') && host.endsWith(']') ? host.slice(1, -1) : host
+    ).toLowerCase();
+    if (v6 === '::1' || v6 === '::') return true;
+    if (
+      v6.startsWith('fc') ||
+      v6.startsWith('fd') || // fc00::/7 unique-local
+      v6.startsWith('fe8') ||
+      v6.startsWith('fe9') ||
+      v6.startsWith('fea') ||
+      v6.startsWith('feb') // fe80::/10 link-local
+    ) {
+      return true;
+    }
     return false;
+  }
+
+  /**
+   * Resolve the endpoint hostname to its A/AAAA records and return false if ANY
+   * resolves to a private/internal/loopback address — the outbound DNS-rebinding
+   * defense. A resolution failure returns false (fail-closed: we do not persist
+   * an endpoint we cannot prove is public). An IP-literal host is validated
+   * directly without a DNS round-trip.
+   */
+  private static async endpointResolvesPublic(url: string): Promise<boolean> {
+    let hostname: string;
+    try {
+      hostname = new URL(url).hostname.toLowerCase();
+    } catch {
+      return false;
+    }
+    // IP literal (v4 or bracketed v6): check directly, no DNS needed.
+    const isV4Literal = /^\d{1,3}(\.\d{1,3}){3}$/.test(hostname);
+    const isV6Literal =
+      hostname.includes(':') || (hostname.startsWith('[') && hostname.endsWith(']'));
+    if (isV4Literal || isV6Literal) {
+      const mapped = DashboardServer.extractMappedIpv4(hostname);
+      return !DashboardServer.isPrivateHost(mapped ?? hostname);
+    }
+    try {
+      const records = await lookup(hostname, { all: true });
+      if (records.length === 0) return false;
+      for (const r of records) {
+        const addr = r.address.toLowerCase();
+        const mapped = DashboardServer.extractMappedIpv4(addr);
+        if (DashboardServer.isPrivateHost(mapped ?? addr)) return false;
+      }
+      return true;
+    } catch {
+      // DNS failure — fail closed rather than persist an unverifiable endpoint.
+      return false;
+    }
+  }
+
+  /**
+   * Redact any credential embedded in an endpoint URL before it is returned to
+   * the browser. A BYO-LLM endpoint can carry a secret in userinfo
+   * (https://user:token@host) or in a query param (?key=..., ?api_key=...,
+   * ?token=..., ?access_token=...). We strip userinfo and replace secret-ish
+   * query-param VALUES with [redacted], preserving scheme+host+path+port so the
+   * settings UI can still show WHERE the model lives. A clean URL is returned
+   * unchanged. `undefined` stays `undefined` (channel not configured).
+   */
+  private static redactEndpointUrl(url: string | undefined): string | undefined {
+    if (!url) return url;
+    let parsed: URL;
+    try {
+      parsed = new URL(url);
+    } catch {
+      // Not a parseable URL — if it merely looks secret-ish by the shared value
+      // regex, redact wholesale; otherwise pass through unchanged.
+      return SECRET_VALUE_RE.test(url) ? REDACTED : url;
+    }
+    // Strip userinfo (https://user:token@host -> https://host).
+    if (parsed.username || parsed.password) {
+      parsed.username = '';
+      parsed.password = '';
+    }
+    // Redact secret-ish query-param values by key name (shared SECRET_KEY_RE).
+    for (const k of [...parsed.searchParams.keys()]) {
+      if (SECRET_KEY_RE.test(k)) parsed.searchParams.set(k, REDACTED);
+    }
+    return parsed.toString();
   }
 
   private static isValidEndpointUrl(url: string): boolean {
@@ -1656,91 +1981,121 @@ export class DashboardServer {
       }
     });
     req.on('end', () => {
-      if (aborted) return;
-      try {
-        const update = JSON.parse(body) as {
-          uploadEnabled?: boolean;
-          // Collective-defense single answer. When present it is the source of
-          // truth for BOTH telemetryEnabled and threatCloudUploadEnabled (they
-          // move together, exactly like the CLI first-run consent prompt) and it
-          // records the consent marker. Opt-in: only `true` turns sharing on.
-          consentGiven?: boolean;
-          endpoint?: string;
-          mode?: string;
-        };
+      void this.finishThreatCloudPost(body, aborted, res);
+    });
+  }
 
-        if (update.consentGiven !== undefined && typeof update.consentGiven !== 'boolean') {
-          this.jsonResponse(res, { error: 'consentGiven must be a boolean' }, 400);
-          return;
-        }
-        if (update.uploadEnabled !== undefined && typeof update.uploadEnabled !== 'boolean') {
-          this.jsonResponse(res, { error: 'uploadEnabled must be a boolean' }, 400);
-          return;
-        }
+  /**
+   * Body-complete half of handleThreatCloudPost. Split out so it can be `async`
+   * — the endpoint SSRF check now resolves DNS (see validateEndpointForWrite),
+   * which cannot run inside a synchronous 'end' listener.
+   */
+  private async finishThreatCloudPost(
+    body: string,
+    aborted: boolean,
+    res: ServerResponse
+  ): Promise<void> {
+    if (aborted) return;
+    try {
+      const update = JSON.parse(body) as {
+        uploadEnabled?: boolean;
+        // Collective-defense single answer. When present it is the source of
+        // truth for BOTH telemetryEnabled and threatCloudUploadEnabled (they
+        // move together, exactly like the CLI first-run consent prompt) and it
+        // records the consent marker. Opt-in: only `true` turns sharing on.
+        consentGiven?: boolean;
+        endpoint?: string;
+        mode?: string;
+      };
 
-        if (update.endpoint !== undefined && !DashboardServer.isValidEndpointUrl(update.endpoint)) {
+      if (update.consentGiven !== undefined && typeof update.consentGiven !== 'boolean') {
+        this.jsonResponse(res, { error: 'consentGiven must be a boolean' }, 400);
+        return;
+      }
+      if (update.uploadEnabled !== undefined && typeof update.uploadEnabled !== 'boolean') {
+        this.jsonResponse(res, { error: 'uploadEnabled must be a boolean' }, 400);
+        return;
+      }
+
+      if (update.endpoint !== undefined) {
+        // Shape check + literal-IP SSRF gate (fast, synchronous).
+        if (!DashboardServer.isValidEndpointUrl(update.endpoint)) {
           this.jsonResponse(res, { error: 'Invalid endpoint URL' }, 400);
           return;
         }
-        // Accept all THREE real modes. Omitting 'report-only' here used to both
-        // reject a legitimate report-only save (400) and let the binary UI toggle
-        // silently overwrite a user's report-only config with 'learning' on the
-        // next save — quietly downgrading their enforcement posture.
-        if (
-          update.mode !== undefined &&
-          update.mode !== 'learning' &&
-          update.mode !== 'report-only' &&
-          update.mode !== 'protection'
-        ) {
-          this.jsonResponse(res, { error: 'Invalid mode' }, 400);
+        // DNS-resolution SSRF gate: a hostname like tc.attacker.com can resolve
+        // to 127.0.0.1 / 169.254.169.254 / a 10.x host and slip past the literal
+        // checks. Resolve every A/AAAA record and reject if ANY is private. The
+        // outbound TC client re-validates at fetch time (rule-loader path) to
+        // close the resolve-then-rebind window; this is the write-time gate.
+        const dnsSafe = await DashboardServer.endpointResolvesPublic(update.endpoint);
+        if (!dnsSafe) {
+          this.jsonResponse(
+            res,
+            { error: 'Endpoint host resolves to a private or internal address' },
+            400
+          );
           return;
         }
-
-        // Merge base = the CURRENT ON-DISK config, not the stale live config
-        // the daemon was constructed with. Two consecutive saves (e.g. a mode
-        // change then a consent toggle) used to each spread the stale live
-        // config and rewrite the OTHER field back to its launch-time value —
-        // the consent POST would clobber a freshly-saved report-only mode back
-        // to protection. Re-reading disk makes saves compose instead of fight.
-        // Falls back to the live config when no file exists yet (fresh install).
-        const live = this.getConfig!();
-        const configPath = join(live.dataDir ?? join(homedir(), '.panguard-guard'), 'config.json');
-        const config: GuardConfig = existsSync(configPath) ? loadConfig(configPath) : live;
-        // consentGiven is the single collective-defense answer: it drives BOTH
-        // flags so they can never drift apart (the CLI gate reads both). A plain
-        // `uploadEnabled` is still honoured for the legacy upload toggle, but
-        // consentGiven wins when both are sent.
-        const sharingEnabled =
-          update.consentGiven ?? update.uploadEnabled ?? config.threatCloudUploadEnabled;
-        const updatedConfig: GuardConfig = {
-          ...config,
-          threatCloudUploadEnabled: sharingEnabled,
-          // Keep the deprecated telemetryEnabled flag in lockstep — the CLI
-          // upload gate and consent module both read it.
-          telemetryEnabled: update.consentGiven ?? update.uploadEnabled ?? config.telemetryEnabled,
-          threatCloudEndpoint: update.endpoint ?? config.threatCloudEndpoint,
-          mode: (update.mode as GuardConfig['mode']) ?? config.mode,
-        };
-
-        saveConfig(updatedConfig);
-        // Push the persisted change into the live daemon so getConfig() /
-        // /api/status / enforcement immediately reflect it (no stale read, no
-        // UI snap-back). The engine mutates its in-memory config + mode and
-        // re-arms enforcement for the new mode. A restart is still required for
-        // OS-level response actions, which the UI surfaces as "pending restart".
-        if (this.configApplier) {
-          this.configApplier(updatedConfig);
-        }
-        // The user has now answered the collective-defense question from the
-        // dashboard, so the CLI first-run prompt must not re-ask and clobber it.
-        if (update.consentGiven !== undefined) {
-          markConsentAnswered();
-        }
-        this.jsonResponse(res, { success: true });
-      } catch {
-        this.jsonResponse(res, { error: 'Invalid JSON' }, 400);
       }
-    });
+      // Accept all THREE real modes. Omitting 'report-only' here used to both
+      // reject a legitimate report-only save (400) and let the binary UI toggle
+      // silently overwrite a user's report-only config with 'learning' on the
+      // next save — quietly downgrading their enforcement posture.
+      if (
+        update.mode !== undefined &&
+        update.mode !== 'learning' &&
+        update.mode !== 'report-only' &&
+        update.mode !== 'protection'
+      ) {
+        this.jsonResponse(res, { error: 'Invalid mode' }, 400);
+        return;
+      }
+
+      // Merge base = the CURRENT ON-DISK config, not the stale live config
+      // the daemon was constructed with. Two consecutive saves (e.g. a mode
+      // change then a consent toggle) used to each spread the stale live
+      // config and rewrite the OTHER field back to its launch-time value —
+      // the consent POST would clobber a freshly-saved report-only mode back
+      // to protection. Re-reading disk makes saves compose instead of fight.
+      // Falls back to the live config when no file exists yet (fresh install).
+      const live = this.getConfig!();
+      const configPath = join(live.dataDir ?? join(homedir(), '.panguard-guard'), 'config.json');
+      const config: GuardConfig = existsSync(configPath) ? loadConfig(configPath) : live;
+      // consentGiven is the single collective-defense answer: it drives BOTH
+      // flags so they can never drift apart (the CLI gate reads both). A plain
+      // `uploadEnabled` is still honoured for the legacy upload toggle, but
+      // consentGiven wins when both are sent.
+      const sharingEnabled =
+        update.consentGiven ?? update.uploadEnabled ?? config.threatCloudUploadEnabled;
+      const updatedConfig: GuardConfig = {
+        ...config,
+        threatCloudUploadEnabled: sharingEnabled,
+        // Keep the deprecated telemetryEnabled flag in lockstep — the CLI
+        // upload gate and consent module both read it.
+        telemetryEnabled: update.consentGiven ?? update.uploadEnabled ?? config.telemetryEnabled,
+        threatCloudEndpoint: update.endpoint ?? config.threatCloudEndpoint,
+        mode: (update.mode as GuardConfig['mode']) ?? config.mode,
+      };
+
+      saveConfig(updatedConfig);
+      // Push the persisted change into the live daemon so getConfig() /
+      // /api/status / enforcement immediately reflect it (no stale read, no
+      // UI snap-back). The engine mutates its in-memory config + mode and
+      // re-arms enforcement for the new mode. A restart is still required for
+      // OS-level response actions, which the UI surfaces as "pending restart".
+      if (this.configApplier) {
+        this.configApplier(updatedConfig);
+      }
+      // The user has now answered the collective-defense question from the
+      // dashboard, so the CLI first-run prompt must not re-ask and clobber it.
+      if (update.consentGiven !== undefined) {
+        markConsentAnswered();
+      }
+      this.jsonResponse(res, { success: true });
+    } catch {
+      this.jsonResponse(res, { error: 'Invalid JSON' }, 400);
+    }
   }
 
   private handleLoadedRulesApi(res: ServerResponse): void {

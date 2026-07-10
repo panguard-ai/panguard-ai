@@ -10,6 +10,7 @@ import { c, box } from '@panguard-ai/core';
 import { PANGUARD_VERSION } from '../../index.js';
 import { renderLogo, theme } from '../theme.js';
 import { moduleCountDisplay } from '../ux-helpers.js';
+import { fetchDaemonStatus } from '../daemon-status.js';
 import type { Lang } from '../menu.js';
 import { MENU_DEFS } from './menu-defs.js';
 
@@ -51,13 +52,48 @@ export async function isMCPConfigured(): Promise<boolean> {
 // Status panel with box border
 // ---------------------------------------------------------------------------
 
-export function renderStatusPanel(lang: Lang): void {
+/**
+ * Honest guard-posture label + color from the daemon's ACTUAL mode and
+ * loaded rule count — never from process liveness alone. Mirrors
+ * `computeStartupStatus` in packages/panguard-guard/src/cli/index.ts, whose
+ * own comment states the invariant this exists to protect: "A user in
+ * report-only mode, or in protection mode with zero loaded rules, must
+ * NEVER see PROTECTED." That function is not (yet) exported from the
+ * `@panguard-ai/panguard-guard` package root, so this is a same-semantics
+ * local copy rather than a shared import — consolidate once it is exported.
+ *
+ * When mode/rule count cannot be verified (dashboard disabled, launch token
+ * not yet persisted, daemon unreachable) this deliberately falls back to a
+ * neutral "RUNNING" rather than guessing PROTECTED — fail-safe wording over
+ * an unverified claim.
+ */
+function guardPostureLabel(
+  mode: string | undefined,
+  ruleCount: number | undefined
+): { text: string; color: (s: string) => string } {
+  if (mode === 'learning') return { text: 'LEARNING', color: c.caution };
+  if (mode === 'report-only') return { text: 'REPORT-ONLY', color: c.caution };
+  if (typeof ruleCount === 'number' && ruleCount <= 0) {
+    return { text: 'DEGRADED', color: c.critical };
+  }
+  if (mode === 'protection' && typeof ruleCount === 'number' && ruleCount > 0) {
+    return { text: 'PROTECTED', color: c.safe };
+  }
+  return { text: 'RUNNING', color: c.caution };
+}
+
+export async function renderStatusPanel(lang: Lang): Promise<void> {
   const guardStatus = isGuardRunning();
   const modulesValue = moduleCountDisplay(lang);
 
-  const guardLine = guardStatus.running
-    ? `${c.safe('PROTECTED')} ${c.dim(`(PID: ${guardStatus.pid})`)}`
-    : c.dim('Inactive');
+  let guardLine: string;
+  if (!guardStatus.running) {
+    guardLine = c.dim('Inactive');
+  } else {
+    const daemonStatus = await fetchDaemonStatus();
+    const posture = guardPostureLabel(daemonStatus?.mode, daemonStatus?.atrRuleCount);
+    guardLine = `${posture.color(posture.text)} ${c.dim(`(PID: ${guardStatus.pid})`)}`;
+  }
 
   const lines =
     lang === 'zh-TW'
@@ -168,13 +204,13 @@ export function showHelp(lang: Lang): void {
 // Startup screen
 // ---------------------------------------------------------------------------
 
-export function renderStartup(lang: Lang): void {
+export async function renderStartup(lang: Lang): Promise<void> {
   console.clear();
   renderLogo();
   console.log('');
   console.log(c.dim('  AI-Powered Security Platform'));
   console.log('');
-  renderStatusPanel(lang);
+  await renderStatusPanel(lang);
   console.log('');
   renderMenu(lang);
   renderFooter(lang);

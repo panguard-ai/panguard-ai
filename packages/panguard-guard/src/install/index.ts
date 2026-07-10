@@ -14,6 +14,30 @@ import { createLogger } from '@panguard-ai/core';
 
 const logger = createLogger('panguard-guard:install');
 
+// Safe path charset for dataDir. Allows the values we actually generate scripts
+// for (POSIX paths, `$HOME/...`, `~`, drive letters `C:\...`, spaces) while
+// forbidding every character that could break out of the double-quoted bash
+// assignment / PowerShell string or the config JSON: quotes, backtick, `;&|`,
+// and (critically) newline / CR. The CLI's --data-dir filter does NOT reject
+// quotes or newlines, so this boundary guard is the real defence.
+const SAFE_DATA_DIR_RE = /^[A-Za-z0-9._\-/\\$ :~]+$/;
+
+/**
+ * Reject a dataDir that could break out of the generated script.
+ * 拒絕可能突破生成腳本的 dataDir。
+ *
+ * Fail-closed: throw rather than silently sanitize, so an unsafe value never
+ * reaches a target machine as an embedded install command.
+ */
+function assertSafeDataDir(dataDir: string): void {
+  if (!SAFE_DATA_DIR_RE.test(dataDir)) {
+    throw new Error(
+      'generateInstallScript: dataDir must match [A-Za-z0-9._-/\\$ :~]+ ' +
+        '(refusing to embed an unsafe path — quotes, backticks, ;&|, and newlines are not allowed).'
+    );
+  }
+}
+
 /**
  * Generate a platform-appropriate install script
  * 產生適合平台的安裝腳本
@@ -34,6 +58,13 @@ export function generateInstallScript(options: {
     throw new Error(
       'generateInstallScript: licenseKey must match [A-Za-z0-9._-]+ (refusing to embed an unsafe key).'
     );
+  }
+
+  // Same boundary discipline for dataDir. The CLI filter (cli/index.ts) does not
+  // reject `"` or newlines, so a value like `x"<newline>touch /tmp/pwned<newline>"`
+  // would otherwise close the DATA_DIR="..." assignment and inject a command line.
+  if (options.dataDir !== undefined) {
+    assertSafeDataDir(options.dataDir);
   }
 
   const os = platform();
@@ -113,7 +144,7 @@ if [ ! -f "$CONFIG_FILE" ]; then
   "learningDays": 7,
   "actionPolicy": { "autoRespond": 85, "notifyAndWait": 50, "logOnly": 0 },
   "notifications": {},
-  "dataDir": "${dataDir}",
+  "dataDir": ${JSON.stringify(dataDir)},
   "dashboardPort": 3743,
   "dashboardEnabled": true,
   "verbose": false,

@@ -44,6 +44,8 @@ import {
 import type { ThreatContext } from './interactive-handler.js';
 import { DailySummaryCollector } from '../summary/daily-summary.js';
 import { isSafeOutboundUrl } from '../net/validate-outbound-url.js';
+import type { RuleValidation, CommonFailureCause } from './validate-rules.js';
+import { queryLiveRuleCounts } from './live-status.js';
 
 import { createRequire } from 'node:module';
 const _require = createRequire(import.meta.url);
@@ -65,6 +67,51 @@ export function computeStartupStatus(
   // protection mode
   if (ruleCount <= 0) return { label: 'DEGRADED', status: 'critical' };
   return { label: 'PROTECTED', status: 'safe' };
+}
+
+/** Commands recognized by the switch below, used to detect an unknown command. */
+const KNOWN_COMMANDS = [
+  'start',
+  'stop',
+  'status',
+  'install',
+  'uninstall',
+  'config',
+  'generate-key',
+  'install-script',
+  'scan',
+  'validate',
+  'help',
+] as const;
+
+/**
+ * Find the closest known command to an unrecognized one (simple Levenshtein),
+ * so an "Unknown command" error can suggest a likely fix.
+ */
+function suggestCommand(input: string): string | undefined {
+  const distance = (a: string, b: string): number => {
+    const dp: number[][] = Array.from({ length: a.length + 1 }, () =>
+      new Array<number>(b.length + 1).fill(0)
+    );
+    for (let i = 0; i <= a.length; i++) dp[i]![0] = i;
+    for (let j = 0; j <= b.length; j++) dp[0]![j] = j;
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        dp[i]![j] =
+          a[i - 1] === b[j - 1]
+            ? dp[i - 1]![j - 1]!
+            : 1 + Math.min(dp[i - 1]![j]!, dp[i]![j - 1]!, dp[i - 1]![j - 1]!);
+      }
+    }
+    return dp[a.length]![b.length]!;
+  };
+  let best: { cmd: string; dist: number } | undefined;
+  for (const cmd of KNOWN_COMMANDS) {
+    const dist = distance(input, cmd);
+    if (best === undefined || dist < best.dist) best = { cmd, dist };
+  }
+  // Only suggest when reasonably close, otherwise a suggestion is noise.
+  return best !== undefined && best.dist <= 3 ? best.cmd : undefined;
 }
 
 /**
@@ -96,7 +143,7 @@ export async function runCLI(args: string[]): Promise<void> {
       commandStop(dataDir);
       break;
     case 'status':
-      commandStatus(dataDir);
+      await commandStatus(dataDir);
       break;
     case 'install':
       await commandInstall(dataDir);
@@ -221,9 +268,22 @@ export async function runCLI(args: string[]): Promise<void> {
       await commandValidate(args.slice(1));
       break;
     case 'help':
-    default:
       printHelp();
       break;
+    default: {
+      // Unrecognized command: fail loudly instead of silently succeeding with
+      // help text. A typo'd command must never look like a successful run.
+      // (`command` defaults to 'help' when args are empty, so reaching this
+      // branch always means the user typed something we don't recognize.)
+      process.stderr.write(`  ${symbols.fail} Unknown command: '${command}'\n`);
+      const suggestion = suggestCommand(command);
+      if (suggestion !== undefined) {
+        process.stderr.write(`  ${c.dim(`Did you mean '${suggestion}'?`)}\n`);
+      }
+      process.stderr.write(`  ${c.dim("Run 'panguard-guard help' to see all commands.")}\n`);
+      process.exitCode = 1;
+      break;
+    }
   }
 }
 
@@ -238,6 +298,50 @@ export async function runCLI(args: string[]): Promise<void> {
  *
  * Exit 0 = every rule passed. Exit 1 = any rule failed (or dir missing).
  */
+/** Max rule-detail blocks printed before collapsing the rest into a note.
+ *  Keeps a large systemic failure (e.g. hundreds of rules sharing one
+ *  templating mistake) from dumping an unreadable wall of near-duplicate
+ *  blocks — the aggregated "common failure causes" section above already
+ *  carries the signal; --json still returns every result untruncated. */
+const MAX_VALIDATE_RULE_BLOCKS = 20;
+
+/** Max affected-rule ids listed inline per aggregated common cause. */
+const MAX_COMMON_CAUSE_IDS_SHOWN = 5;
+
+/** Print the "N rules share this failure" aggregation with a fix hint. */
+function printCommonFailureCauses(common: ReadonlyArray<CommonFailureCause>): void {
+  if (common.length === 0) return;
+  console.log(divider());
+  console.log(`  ${symbols.warn} ${c.bold('common failure causes:')}`);
+  for (const cause of common) {
+    console.log(`\n  ${c.critical(`${cause.count}x`)}  ${cause.message}`);
+    console.log(`    ${c.dim('fix:')} ${cause.fixHint}`);
+    const shown = cause.ruleIds.slice(0, MAX_COMMON_CAUSE_IDS_SHOWN);
+    const rest = cause.ruleIds.length - shown.length;
+    const suffix = rest > 0 ? c.dim(` ...and ${rest} more`) : '';
+    console.log(`    ${c.dim('affects:')} ${shown.join(', ')}${suffix}`);
+  }
+}
+
+/** Print each failing rule's own detail block, capped for readability. */
+function printPerRuleFailures(failures: ReadonlyArray<RuleValidation>): void {
+  console.log(divider());
+  console.log(`  ${symbols.fail} ${c.bold('failures:')}`);
+  const shown = failures.slice(0, MAX_VALIDATE_RULE_BLOCKS);
+  for (const r of shown) {
+    console.log(`\n  ${c.bold(r.ruleId ?? '<no id>')}  ${c.dim(r.file)}`);
+    for (const reason of r.failures) {
+      console.log(`    ${symbols.fail} ${reason}`);
+    }
+  }
+  const rest = failures.length - shown.length;
+  if (rest > 0) {
+    console.log(
+      `\n  ${c.dim(`...and ${rest} more rule(s) with failures (use --json for the full list).`)}`
+    );
+  }
+}
+
 async function commandValidate(args: string[]): Promise<void> {
   const positional = args.filter((a) => !a.startsWith('--'));
   const dir = positional[0];
@@ -249,7 +353,7 @@ async function commandValidate(args: string[]): Promise<void> {
     return;
   }
 
-  const { validateRulesDir } = await import('./validate-rules.js');
+  const { validateRulesDir, summarizeCommonFailureCauses } = await import('./validate-rules.js');
   let report;
   try {
     report = validateRulesDir(dir);
@@ -277,14 +381,8 @@ async function commandValidate(args: string[]): Promise<void> {
   );
 
   if (report.failed > 0) {
-    console.log(divider());
-    console.log(`  ${symbols.fail} ${c.bold('failures:')}`);
-    for (const r of report.failures) {
-      console.log(`\n  ${c.bold(r.ruleId ?? '<no id>')}  ${c.dim(r.file)}`);
-      for (const reason of r.failures) {
-        console.log(`    ${symbols.fail} ${reason}`);
-      }
-    }
+    printCommonFailureCauses(summarizeCommonFailureCauses(report.failures));
+    printPerRuleFailures(report.failures);
   }
 
   process.exit(report.failed === 0 ? 0 : 1);
@@ -1007,25 +1105,77 @@ function commandStop(dataDir: string): void {
 }
 
 /** Show engine status / 顯示引擎狀態 */
-function commandStatus(dataDir: string): void {
+async function commandStatus(dataDir: string): Promise<void> {
   console.log(header());
 
+  const { existsSync } = await import('node:fs');
   const pidFile = new PidFile(dataDir);
   const pid = pidFile.read();
   const running = pidFile.isRunning();
 
+  // Finding #34: distinguish a persisted config from in-memory defaults. When no
+  // config.json exists, loadConfig() returns hardcoded defaults (mode:protection,
+  // etc.) — rendering those as if they were a saved, active config reads as
+  // "protected" on a never-configured install. Trust config only when a real
+  // config file exists — either the guard-specific one OR the master config
+  // (~/.panguard/config.json) that loadConfig() also resolves from.
+  const configExists =
+    existsSync(join(dataDir, 'config.json')) ||
+    existsSync(join(homedir(), '.panguard', 'config.json'));
+  // A running daemon IS configured even if no config.json is on disk yet — the
+  // standalone `panguard-guard start` flow runs on in-memory defaults without
+  // writing the file. So "NOT CONFIGURED" applies ONLY to a never-started,
+  // never-saved install; a live daemon must never be mislabeled that way.
+  const notConfigured = !configExists && !running;
+  let config: ReturnType<typeof loadConfig> | undefined;
+  if (configExists || running) {
+    try {
+      config = loadConfig(join(dataDir, 'config.json'));
+    } catch {
+      config = undefined;
+    }
+  }
+
+  // Finding #35: a running daemon in protection mode with zero loaded rules is
+  // DEGRADED, not PROTECTED. `status` is the command a user re-runs later to
+  // re-check posture, so it must reflect the same honest computeStartupStatus
+  // rule the startup log uses — query the live daemon (fail-safe: undefined =
+  // "unknown", never treated as healthy).
+  let liveRules: Awaited<ReturnType<typeof queryLiveRuleCounts>>;
+  if (running && config) {
+    liveRules = await queryLiveRuleCounts(config.dashboardPort);
+  }
+  const degraded =
+    running && config?.mode === 'protection' && liveRules !== undefined && liveRules.atr <= 0;
+
+  const statusValue = notConfigured
+    ? c.caution('NOT CONFIGURED')
+    : !running
+      ? c.critical('STOPPED')
+      : degraded
+        ? c.critical('DEGRADED (0 rules)')
+        : c.safe('RUNNING');
+  const statusState: 'safe' | 'caution' | 'critical' = notConfigured
+    ? 'caution'
+    : !running || degraded
+      ? 'critical'
+      : 'safe';
+
   const items: StatusItem[] = [
-    {
-      label: 'Status',
-      value: running ? c.safe('RUNNING') : c.critical('STOPPED'),
-      status: running ? ('safe' as const) : ('critical' as const),
-    },
+    { label: 'Status', value: statusValue, status: statusState },
     ...(pid ? [{ label: 'PID', value: c.sage(String(pid)) }] : []),
     { label: 'Data Dir', value: c.dim(dataDir) },
   ];
 
-  try {
-    const config = loadConfig(join(dataDir, 'config.json'));
+  if (running && liveRules !== undefined) {
+    items.push({
+      label: 'ATR Rules',
+      value: liveRules.atr > 0 ? c.safe(String(liveRules.atr)) : c.critical('0 — detection OFF'),
+      status: liveRules.atr > 0 ? ('safe' as const) : ('critical' as const),
+    });
+  }
+
+  if (config) {
     items.push({ label: 'Mode', value: c.sage(config.mode) });
     items.push({
       label: 'Dashboard',
@@ -1038,11 +1188,26 @@ function commandStatus(dataDir: string): void {
       value: config.licenseKey ? c.safe('configured') : c.caution('free tier'),
       status: config.licenseKey ? ('safe' as const) : ('caution' as const),
     });
-  } catch {
-    items.push({ label: 'Config', value: c.critical('not found'), status: 'critical' as const });
+  } else {
+    items.push({
+      label: 'Config',
+      value: c.caution('not configured'),
+      status: 'caution' as const,
+    });
   }
 
   console.log(statusPanel('PANGUARD AI Security Status', items));
+
+  if (notConfigured) {
+    console.log(
+      `  ${c.dim('Not configured yet.')} Run ${c.sage('panguard-guard start')} to set up and start protection.`
+    );
+  } else if (degraded) {
+    console.log(
+      `  ${c.critical(symbols.fail)} ${c.critical('DEGRADED')}: the daemon is running but 0 ATR rules are loaded — ` +
+        `pattern detection is OFF. Restore rules with ${c.sage('pga guard sync-rules')} (or reinstall ${c.sage('@panguard-ai/atr')}).`
+    );
+  }
 }
 
 /** Install as system service / 安裝為系統服務 */
@@ -1213,7 +1378,14 @@ function extractOption(args: string[], option: string): string | undefined {
     if (value === undefined) return undefined;
     if (value.startsWith('-')) return undefined;
     if (option === '--data-dir') {
-      if (/\.\.[\\/]/.test(value) || /[;&|`$]/.test(value)) {
+      // Reject path traversal, shell metacharacters, quotes, and any
+      // control/newline character. Quotes and newlines are NOT sufficient to
+      // trip the older `;&|\`$` check but can still close out the
+      // double-quoted DATA_DIR="..." assignment in the generated install
+      // script (see install/index.ts assertSafeDataDir) — reject them here
+      // too so a bad value is caught at the CLI boundary, not just downstream.
+      // eslint-disable-next-line no-control-regex -- rejecting control chars is the intent
+      if (/\.\.[\\/]/.test(value) || /[;&|`$"']/.test(value) || /[\x00-\x1f\x7f]/.test(value)) {
         console.error(`  ${symbols.fail} Invalid ${option} value: unsafe characters`);
         return undefined;
       }

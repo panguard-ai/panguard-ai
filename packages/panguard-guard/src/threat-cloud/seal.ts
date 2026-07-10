@@ -17,7 +17,8 @@
  * Trust root = the ingest keypair. The PUBLIC half is bundled + pinned here (safe
  * to ship in the open-source client). The PRIVATE half lives in KMS and is NEVER
  * present in the client, so a client provably cannot decrypt its own contribution
- * — a property a customer can verify (see `pga tc --show-sample-upload`).
+ * — a property anyone can verify by inspecting INGEST_KEYS below (public X25519
+ * key only, no `d` component) against this open-source source.
  *
  * @module @panguard-ai/panguard-guard/threat-cloud/seal
  */

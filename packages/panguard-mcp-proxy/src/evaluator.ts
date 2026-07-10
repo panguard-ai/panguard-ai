@@ -192,11 +192,29 @@ export class ProxyEvaluator {
     return this.evaluate(event, start);
   }
 
-  /** Evaluate a tool response (PostToolUse) */
+  /**
+   * Evaluate a tool response (PostToolUse) — the indirect-prompt-injection path.
+   *
+   * The event MUST be typed 'tool_response' (NOT 'mcp_exchange'). A poisoned MCP /
+   * tool / RAG output is where indirect prompt injection rides in, and the ATR
+   * engine handles that case only for a 'tool_response'-typed event:
+   *   1. EVENT_TYPE_TO_SOURCE['tool_response'] === 'mcp_exchange', which fires the
+   *      engine's llmIoOverToolResponse exception so the whole llm_io family
+   *      (system-prompt-override, SSRF-via-URL, SQLi-in-natural-language,
+   *      shell-injection) is allowed to run against the response.
+   *   2. getFieldValue() routes event.content into the user_input / agent_output
+   *      fields ONLY when event.type === 'tool_response'. The ~200 llm_io rules
+   *      that target user_input/agent_output therefore see the response text and
+   *      can match.
+   * Passing 'mcp_exchange' (the old value) is NOT a key in EVENT_TYPE_TO_SOURCE, so
+   * eventSourceType is undefined: the source-type filter is bypassed (llm_io rules
+   * run) but getFieldValue leaves user_input/agent_output undefined, so those rules
+   * silently match nothing — defeating the entire indirect-injection scan.
+   */
   async evaluateToolResponse(toolName: string, response: string): Promise<EvalResult> {
     const start = Date.now();
     const event: AgentEvent = {
-      type: 'mcp_exchange' as AgentEvent['type'],
+      type: 'tool_response',
       timestamp: new Date().toISOString(),
       content: response,
       fields: {

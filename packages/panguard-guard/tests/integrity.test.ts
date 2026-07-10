@@ -208,10 +208,22 @@ describe('self-state discovery + merge (finding #20 — dead self-removal wiring
     expect(merged.map((r) => r.path).sort()).toEqual(['/x/a', '/x/b']);
   });
 
-  it('mergeSelfState: recorded wins on a path conflict (keeps the original marker)', () => {
-    const rec: SelfStateRef = { kind: 'launchagent', path: '/x/p', marker: 'ORIG' };
-    const disc: SelfStateRef = { kind: 'launchagent', path: '/x/p', marker: 'NEW' };
-    expect(mergeSelfState([rec], [disc])).toEqual([rec]);
+  it('mergeSelfState: on a path conflict keeps recorded identity but REFRESHES integrity fields from disk', () => {
+    // A re-seal (pga up) must adopt the current plist's content hash for a path
+    // still present — otherwise a legitimate ProgramArguments edit that was
+    // re-sealed would false-positive as "tampered" on every subsequent start.
+    // Identity (kind/label) comes from the recorded ref; marker/contentHash are
+    // refreshed from the freshly-discovered ref.
+    const rec: SelfStateRef = { kind: 'launchagent', path: '/x/p', marker: 'ORIG', label: 'L' };
+    const disc: SelfStateRef = {
+      kind: 'launchagent',
+      path: '/x/p',
+      marker: 'NEW',
+      contentHash: 'h-new',
+    };
+    expect(mergeSelfState([rec], [disc])).toEqual([
+      { kind: 'launchagent', path: '/x/p', marker: 'NEW', contentHash: 'h-new', label: 'L' },
+    ]);
   });
 
   it('END-TO-END: a re-seal with merge keeps a removed LaunchAgent flagged as missing', () => {
