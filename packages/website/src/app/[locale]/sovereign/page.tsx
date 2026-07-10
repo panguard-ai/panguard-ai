@@ -1,0 +1,187 @@
+import type { Metadata } from 'next';
+import './sovereign.css';
+
+export const metadata: Metadata = {
+  title: 'Sovereign AI — Capability Brief',
+  description:
+    'PanGuard Sovereign is a governance and assurance layer that enforces national policy at every autonomous-agent action and produces cryptographic, offline-verifiable evidence of every decision. A reference architecture for national institutions.',
+  openGraph: {
+    title: 'PanGuard Sovereign — Capability Brief',
+    description:
+      'Sovereign control over autonomous AI systems. Enforced at every agent action; cryptographic proof of every decision; verifiable offline.',
+  },
+};
+
+const BRIEF_HTML = `<div class="sv">
+  <div class="topglow"></div>
+  <div class="grain"></div>
+
+  <div class="docstrip">
+    <div class="bar">
+      <div class="mark">
+        <span class="wm">PANGUARD</span>
+        <svg class="logo" viewBox="385 323 1278 1403" fill="none" aria-hidden="true">
+          <path fill="#8B9A8E" d="M 1021.5 830.423 C 1026.54 829.911 1045.81 832.659 1051.64 833.401 C 1072.38 835.99 1093.1 838.746 1113.8 841.667 L 1329.99 871.428 L 1329.95 1306.51 L 1330 1422.21 C 1330.01 1450.54 1332.08 1491.81 1325.18 1518.04 C 1318.79 1541.46 1305.62 1562.47 1287.31 1578.42 C 1269.98 1593.59 1234.62 1610.78 1212.96 1622.97 C 1151.4 1657.6 1087.44 1689.5 1026.42 1725.08 L 1024.58 1725.72 C 1020.72 1724.57 1005.67 1715.74 1001.44 1713.38 C 986.676 1705.08 971.857 1696.88 956.982 1688.79 L 836.342 1623.07 C 818.678 1613.37 800.537 1603.48 783.285 1593.93 C 741.183 1570.62 718.225 1528.6 718.162 1480.8 C 718.14 1463.85 718.093 1446.28 718.119 1429.07 L 718.13 1313.33 L 718.15 871.408 C 819.171 858.462 920.068 841.835 1021.5 830.423 z"/>
+          <path fill="#0E0C0B" d="M 1022.52 931.436 C 1027.43 930.745 1072.31 937.152 1079.51 938.107 C 1129.15 944.531 1178.76 951.264 1228.32 958.306 L 1228.23 1353.88 L 1228.35 1443.73 C 1228.37 1464.29 1233.5 1493.24 1214.51 1505.36 C 1195.74 1517.34 1175.98 1527.71 1156.43 1538.41 C 1112.57 1561.92 1068.87 1585.75 1025.35 1609.89 L 1024.59 1610.05 C 1019.31 1608.51 1009.91 1602.52 1004.79 1599.72 C 950.803 1570.14 896.481 1541.36 842.686 1511.4 C 829.113 1503.85 820.756 1496.4 820.195 1479.81 C 819.565 1461.16 819.816 1442.57 819.824 1423.9 L 819.867 1314.91 L 819.664 958.376 C 837.727 956.927 860.873 952.653 879.255 950.388 C 926.512 944.567 975.292 936.455 1022.52 931.436 z"/>
+          <path fill="#8B9A8E" d="M 687.515 577.4 C 696.504 576.451 715.718 579.584 725.68 580.913 L 782.266 588.553 C 853.62 598.25 926.853 607.634 997.939 618.387 L 997.872 779.654 C 966.188 784.487 928.734 789.954 897.039 793.352 L 897.073 705.399 C 831.524 696.853 760.432 685.286 694.176 678.356 C 683.151 677.203 646.195 683.753 632.643 685.485 L 487.112 705.406 C 488.77 841.757 487.098 980.17 487.357 1116.69 L 487.339 1188.98 C 487.213 1243.94 479.328 1246.69 530.666 1273.69 C 574.625 1298.03 623.372 1322.43 666.093 1347.35 C 665.454 1385.26 666.06 1424.82 666.087 1462.87 C 649.609 1452.6 628.321 1441.62 610.88 1432.12 L 500.871 1372.76 C 476.603 1359.56 440.159 1342.09 421.535 1323.57 C 404.11 1306.02 392.433 1283.59 388.055 1259.25 C 384.254 1237.81 385.323 1203.28 385.354 1180.66 L 385.478 1064.48 L 385.312 618.209 C 414.868 615.376 445.833 609.518 475.437 605.863 C 545.54 597.208 617.46 584.737 687.515 577.4 z"/>
+          <path fill="#8B9A8E" d="M 1348.89 577.369 C 1360.73 575.936 1415.83 584.528 1431.77 586.589 C 1508.75 596.536 1585.62 608.685 1662.67 618.335 L 1662.73 1028.87 L 1662.69 1154.09 C 1662.67 1223.3 1674.33 1293.75 1609.64 1337.92 C 1596.01 1347.22 1581.75 1354.57 1567.33 1362.44 L 1512.89 1391.87 L 1382 1462.6 C 1383.76 1427.96 1382.35 1382.83 1382.21 1347.24 C 1420 1324.81 1467.93 1301.58 1507.58 1279.5 C 1524.53 1270.36 1558.74 1256.3 1560.1 1235.39 C 1561.42 1215.18 1560.95 1193.69 1560.9 1173.32 L 1560.87 1066.29 L 1560.68 705.345 C 1543.39 703.65 1521.51 700.068 1504.1 697.576 C 1473.23 693.054 1442.33 688.801 1411.39 684.819 C 1399.03 683.204 1369.09 678.563 1357.99 678.482 C 1343.65 678.377 1310.02 683.839 1294.14 685.904 C 1246.36 692.092 1198.63 698.627 1150.95 705.51 C 1151.37 734.567 1151.1 764.255 1151.14 793.361 C 1118.48 789.558 1083.43 784.206 1050.79 779.597 L 1050.69 617.847 L 1348.89 577.369 z"/>
+          <path fill="#8B9A8E" d="M 1017.32 323.354 C 1027.15 321.591 1105.66 333.344 1122.51 335.603 C 1166.74 341.267 1210.92 347.328 1255.05 353.786 C 1279.68 357.183 1305.51 360.23 1329.92 364.192 L 1329.98 526.684 C 1296.55 530.372 1261.73 535.721 1228.25 540.29 C 1228.4 510.591 1228.39 480.892 1228.23 451.193 C 1219.27 449.729 1209.61 448.427 1200.57 447.329 C 1144.13 440.467 1086.78 429.864 1030.24 424.572 C 1018.71 422.967 967.642 430.978 952.027 433.125 L 819.579 450.968 C 820.252 479.945 819.726 511.22 819.879 540.382 C 785.991 535.397 752.051 530.778 718.064 526.526 L 717.99 364.358 C 745.543 359.872 774.642 356.332 802.417 352.399 L 1017.32 323.354 z"/>
+        </svg>
+        <span class="wm">AI</span>
+        <span class="sov">Sovereign</span>
+      </div>
+      <div class="docref">Capability Brief · Rev 0.1</div>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div class="wrap">
+      <div class="eyebrow reveal">Capability Brief · For National Institutions</div>
+      <h1 class="reveal"><span class="em">Sovereign</span> control over autonomous AI systems.</h1>
+      <div class="register reveal">Enforced at every agent action &nbsp;·&nbsp; Cryptographic proof of every decision &nbsp;·&nbsp; Verifiable offline, without trust in the supplier</div>
+      <p class="abstract reveal">As nations bring AI capability in-house, the governing question is no longer which model to procure, but how autonomous agents may act on sovereign data — and how that control is demonstrated to a regulator, an auditor, or an allied state. PanGuard Sovereign is a governance and assurance layer that enforces national policy at every agent action and produces cryptographic evidence of every decision. It operates in front of any model or agent framework, on infrastructure the institution controls.</p>
+      <div class="heroactions reveal">
+        <a class="btn" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20technical%20briefing">Request a technical briefing <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+      <div class="controlline reveal">
+        <span>STATUS &nbsp;<b>Reference architecture · design-partner stage</b></span>
+        <span>MATURITY &nbsp;<b>Laboratory-validated prototype (≈ TRL 4)</b></span>
+        <span>ACCREDITATION &nbsp;<b>None claimed</b></span>
+      </div>
+    </div>
+  </header>
+
+  <div class="roster-sec">
+    <div class="wrap">
+      <div class="roster-h reveal">Nations advancing sovereign AI capability</div>
+      <div class="roster reveal"><span class="nchip" title="United States"><span class="nfe">🇺🇸</span><span class="ncode">US</span><span class="nname">United States</span></span><span class="nchip" title="United Kingdom"><span class="nfe">🇬🇧</span><span class="ncode">GB</span><span class="nname">United Kingdom</span></span><span class="nchip" title="European Union"><span class="nfe">🇪🇺</span><span class="ncode">EU</span><span class="nname">European Union</span></span><span class="nchip" title="Japan"><span class="nfe">🇯🇵</span><span class="ncode">JP</span><span class="nname">Japan</span></span><span class="nchip" title="Singapore"><span class="nfe">🇸🇬</span><span class="ncode">SG</span><span class="nname">Singapore</span></span><span class="nchip" title="South Korea"><span class="nfe">🇰🇷</span><span class="ncode">KR</span><span class="nname">South Korea</span></span><span class="nchip" title="France"><span class="nfe">🇫🇷</span><span class="ncode">FR</span><span class="nname">France</span></span><span class="nchip" title="Germany"><span class="nfe">🇩🇪</span><span class="ncode">DE</span><span class="nname">Germany</span></span><span class="nchip" title="Canada"><span class="nfe">🇨🇦</span><span class="ncode">CA</span><span class="nname">Canada</span></span><span class="nchip" title="Australia"><span class="nfe">🇦🇺</span><span class="ncode">AU</span><span class="nname">Australia</span></span><span class="nchip" title="UAE"><span class="nfe">🇦🇪</span><span class="ncode">AE</span><span class="nname">UAE</span></span><span class="nchip" title="Saudi Arabia"><span class="nfe">🇸🇦</span><span class="ncode">SA</span><span class="nname">Saudi Arabia</span></span><span class="nchip" title="India"><span class="nfe">🇮🇳</span><span class="ncode">IN</span><span class="nname">India</span></span><span class="nchip" title="Israel"><span class="nfe">🇮🇱</span><span class="ncode">IL</span><span class="nname">Israel</span></span><span class="nchip" title="Taiwan"><span class="nfe">🇹🇼</span><span class="ncode">TW</span><span class="nname">Taiwan</span></span><span class="nchip" title="Switzerland"><span class="nfe">🇨🇭</span><span class="ncode">CH</span><span class="nname">Switzerland</span></span><span class="nchip" title="Netherlands"><span class="nfe">🇳🇱</span><span class="ncode">NL</span><span class="nname">Netherlands</span></span></div>
+    </div>
+  </div>
+
+  <section>
+    <div class="wrap">
+      <div class="shead reveal"><span class="snum">§ 01</span><span class="slabel">Sovereign control domains</span></div>
+      <h2 class="reveal">An enforceable control for every dimension of sovereignty</h2>
+      <p class="sub reveal">Data, compute, model, and governance — the four dimensions nations use to define AI sovereignty. The architecture provides an enforced, auditable control for each, positioned in front of any agent, model, or tool platform already in operation.</p>
+      <div class="matrix">
+        <div class="cell reveal">
+          <div class="ci">D1 — DATA</div><h3>Data sovereignty</h3>
+          <p>Sensitive data is classified and its handling enforced as it flows — decrypted only where policy and hardware attestation permit.</p>
+          <ul><li>Classification that rides the data (high-water-mark)</li><li>Jurisdiction and residency enforced at every boundary</li><li>Policy-gated decryption with envelope encryption</li><li>Secret-egress prevention on outbound calls</li></ul>
+        </div>
+        <div class="cell reveal">
+          <div class="ci">D2 — COMPUTE</div><h3>Compute sovereignty</h3>
+          <p>Executes on hardware the institution controls — fully offline, no phone-home — releasing keys only to attested endpoints.</p>
+          <ul><li>Air-gap delivery: signed bundle, verify-before-install</li><li>On-premise runtime, no outbound dependency</li><li class="seam">Confidential-compute attestation (NVIDIA CC / TEE)</li></ul>
+        </div>
+        <div class="cell reveal">
+          <div class="ci">D3 — MODEL</div><h3>Model sovereignty</h3>
+          <p>Model-agnostic by design. Governs any agent or LLM; an optional on-premise adjudicator may escalate for review, never authorize.</p>
+          <ul><li>Operates in front of any model or agent framework</li><li class="seam">On-premise semantic adjudicator (encoder classifier)</li><li>Tighten-only: advises escalation, never grants authority</li></ul>
+        </div>
+        <div class="cell reveal">
+          <div class="ci">D4 — GOVERNANCE</div><h3>Governance sovereignty</h3>
+          <p>Every agent action is decided by the institution's own signed policy and written to a ledger any third party can verify.</p>
+          <ul><li>Signed policy-as-code; deny-by-default; anti-rollback</li><li>Signed decision ledger with transparency log</li><li>Human approval, dual-control break-glass, kill-switch</li><li>Continuous, tamper-evident audit trail</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="shead reveal"><span class="snum">§ 02</span><span class="slabel">Assurance model</span></div>
+      <h2 class="reveal">Assurance that does not depend on trusting the supplier</h2>
+      <p class="sub reveal">Sovereignty means the institution need never take the supplier's word. Every security-critical action is cryptographically signed, and any party holding only a public key can verify it, offline.</p>
+      <div class="principles">
+        <div class="pr reveal"><span class="pn">01</span><div><h4>Signed, not asserted</h4><p>Policies, approvals, break-glass grants, key releases, and every gate decision are Ed25519-signed at the point of action.</p></div></div>
+        <div class="pr reveal"><span class="pn">02</span><div><h4>Third-party provable</h4><p>An auditor holding only the public key and an inclusion proof confirms a decision occurred — without the log, without the operator.</p></div></div>
+        <div class="pr reveal"><span class="pn">03</span><div><h4>Fail-closed by default</h4><p>A missing identity, an unverifiable policy, or a broken audit path denies the action. Absence never resolves to allow.</p></div></div>
+        <div class="pr reveal"><span class="pn">04</span><div><h4>Open and inspectable</h4><p>Built on the open Agent Threat Rules standard. No black box and no proprietary data model to adopt.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="shead reveal"><span class="snum">§ 03</span><span class="slabel">Standards alignment — crosswalk</span></div>
+      <h2 class="reveal">Built to produce the evidence that governing frameworks require</h2>
+      <p class="sub reveal">A design-intent mapping between the architecture's controls and the frameworks that govern national AI programmes. It indicates the controls the system is built to support — <span class="note">not a certification or accreditation.</span></p>
+      <div class="tbl reveal"><table>
+        <thead><tr><th>Control capability</th><th>Framework reference</th></tr></thead>
+        <tbody>
+          <tr><td class="k">Signed, tamper-evident decision ledger</td><td class="std">EU AI Act Art. 12 (logging) · NIST 800-53 AU</td></tr>
+          <tr><td class="k">Policy-as-code + least-privilege identity</td><td class="std">NIST 800-53 AC · ISO/IEC 42001</td></tr>
+          <tr><td class="k">Signed, versioned policy distribution</td><td class="std">NIST 800-53 CM (anti-rollback)</td></tr>
+          <tr><td class="k">Classification, egress &amp; jurisdiction control</td><td class="std">NIST 800-53 SC · CUI handling</td></tr>
+          <tr><td class="k">Human approval, break-glass, kill-switch</td><td class="std">NIST 800-53 IR · human oversight (AI Act)</td></tr>
+          <tr><td class="k">Air-gap signed delivery + supply-chain trust</td><td class="std">SLSA-style provenance · supply-chain (SR)</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="shead reveal"><span class="snum">§ 04</span><span class="slabel">Capability register</span></div>
+      <h2 class="reveal">Present capability and maturity</h2>
+      <p class="sub reveal">A working prototype under continuous independent adversarial review (approximately 1,600 automated tests; 27 review passes to date). Maturity is stated per capability against a two-state scale, defined in the legend below.</p>
+      <div class="tbl reveal"><table>
+        <thead><tr><th>#</th><th>Capability</th><th>Function</th><th>Maturity</th></tr></thead>
+        <tbody>
+          <tr><td class="idx">01</td><td class="k">Identity &amp; least-privilege</td><td class="fn">Per-agent verified principal; delegation only attenuates, never widens</td><td><span class="mat impl">Implemented</span></td></tr>
+          <tr><td class="idx">02</td><td class="k">Policy-as-code</td><td class="fn">Signed, versioned, deny-by-default; classification / jurisdiction / obligations</td><td><span class="mat impl">Implemented</span></td></tr>
+          <tr><td class="idx">03</td><td class="k">Signed decision ledger</td><td class="fn">Ed25519 with Merkle transparency; third-party verifiable</td><td><span class="mat impl">Implemented</span></td></tr>
+          <tr><td class="idx">04</td><td class="k">Data taint &amp; egress control</td><td class="fn">Classification rides data; secret-egress and jurisdiction gates</td><td><span class="mat impl">Implemented</span></td></tr>
+          <tr><td class="idx">05</td><td class="k">Human approval &amp; break-glass</td><td class="fn">Signed single-use approvals; dual-control emergency override</td><td><span class="mat impl">Implemented</span></td></tr>
+          <tr><td class="idx">06</td><td class="k">Supply-chain &amp; A2A auth</td><td class="fn">Signed tool-trust catalogue; authenticated inter-agent messages</td><td><span class="mat impl">Implemented</span></td></tr>
+          <tr><td class="idx">07</td><td class="k">Kill-switch</td><td class="fn">Enforced containment — severs the session; every subsequent call denied</td><td><span class="mat impl">Implemented</span></td></tr>
+          <tr><td class="idx">08</td><td class="k">Policy-gated key release</td><td class="fn">Sensitive documents decrypt only at an authorized, attested endpoint</td><td><span class="mat impl">Implemented</span></td></tr>
+          <tr><td class="idx">09</td><td class="k">Air-gap bundle</td><td class="fn">Signed manifest; the receiver verifies provenance before installing</td><td><span class="mat impl">Implemented</span></td></tr>
+          <tr><td class="idx">10</td><td class="k">Operator console</td><td class="fn">Loopback, token-authenticated control surface with web interface</td><td><span class="mat impl">Implemented</span></td></tr>
+          <tr><td class="idx">11</td><td class="k">Confidential-compute attestation</td><td class="fn">Measurement allowlist with key-binding anti-relay verification</td><td><span class="mat seam">Integration seam</span></td></tr>
+          <tr><td class="idx">12</td><td class="k">On-premise adjudicator</td><td class="fn">Local model advises escalation only (tighten-only)</td><td><span class="mat seam">Integration seam</span></td></tr>
+        </tbody>
+      </table></div>
+      <div class="legend reveal">
+        <span><b>Implemented</b> — built and validated under independent adversarial review in a laboratory environment (≈ TRL 4).</span>
+        <span><b>Integration seam</b> — interface defined and tested against a reference verifier; integration with the institution's own hardware or models is pending.</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="shead reveal"><span class="snum">§ 05</span><span class="slabel">Engagement</span></div>
+      <h2 class="reveal">Evaluate the architecture, or deploy within your jurisdiction</h2>
+      <div class="engage" style="margin-top:30px">
+        <div class="path reveal">
+          <h3>National institutions</h3>
+          <p>For AI safety and security institutes, AI offices, ministries, and operators of defense and critical infrastructure. An asynchronous technical evaluation: architecture documentation, honest capability boundaries, and a verifiable demonstration — under NDA where required, with no commercial commitment.</p>
+          <div><a class="btn" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20technical%20briefing">Request a technical briefing <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+        </div>
+        <div class="path reveal">
+          <h3>In-country partners</h3>
+          <p>For system integrators and national laboratories with public-sector relationships. Deploy locally, in the customer's jurisdiction and language. PanGuard supplies the runtime and signing stack; the partner owns the relationship and the deployment.</p>
+          <div><a class="btn ghost" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20in-country%20partner">Establish a partnership</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="docfoot">
+    <div class="wrap">
+      <div class="ctrl reveal">
+        <div><div class="lab">Document</div><div class="val">Sovereign Capability Brief</div></div>
+        <div><div class="lab">Revision</div><div class="val">0.1</div></div>
+        <div><div class="lab">Classification</div><div class="val">Unrestricted</div></div>
+        <div><div class="lab">Contact</div><div class="val">adam@agentthreatrule.org</div></div>
+      </div>
+      <p class="disclaimer reveal">PanGuard Sovereign is a reference architecture at design-partner stage, built on the open Agent Threat Rules standard. This brief describes a working prototype under active development — not a generally-available, certified, or accredited product. Framework references indicate design intent and traceability, not certification. Maturity and capability statements are current as of Revision 0.1 and are subject to independent verification.</p>
+    </div>
+  </div>
+</div>`;
+
+export default function SovereignPage() {
+  return <div dangerouslySetInnerHTML={{ __html: BRIEF_HTML }} />;
+}
