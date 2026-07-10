@@ -1116,9 +1116,12 @@ async function commandStatus(dataDir: string): Promise<void> {
   // Finding #34: distinguish a persisted config from in-memory defaults. When no
   // config.json exists, loadConfig() returns hardcoded defaults (mode:protection,
   // etc.) — rendering those as if they were a saved, active config reads as
-  // "protected" on a never-configured install. Only trust config fields when the
-  // file is actually on disk.
-  const configExists = existsSync(join(dataDir, 'config.json'));
+  // "protected" on a never-configured install. Trust config only when a real
+  // config file exists — either the guard-specific one OR the master config
+  // (~/.panguard/config.json) that loadConfig() also resolves from.
+  const configExists =
+    existsSync(join(dataDir, 'config.json')) ||
+    existsSync(join(homedir(), '.panguard', 'config.json'));
   // A running daemon IS configured even if no config.json is on disk yet — the
   // standalone `panguard-guard start` flow runs on in-memory defaults without
   // writing the file. So "NOT CONFIGURED" applies ONLY to a never-started,
