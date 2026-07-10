@@ -24,7 +24,11 @@ async function loadReportModule(): Promise<{
   generateSummaryText: any;
 }> {
   try {
-    return await import('@panguard-ai/panguard-report');
+    // Optional paid module — moved to the private repo. Indirect specifier so
+    // the community build doesn't statically require it; resolved at runtime
+    // only if the customer installs @panguard-ai/panguard-report from npm.
+    const spec: string = '@panguard-ai/panguard-report';
+    return await import(spec);
   } catch {
     return {
       generateComplianceReport: () => ({ findings: [], summary: 'Report module not available' }),
