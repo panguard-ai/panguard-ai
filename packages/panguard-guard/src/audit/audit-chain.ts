@@ -240,14 +240,57 @@ export class AuditChain {
     if (!oldest) return;
     // seq 0 (genesis) is not a retention boundary — nothing older was deleted.
     if (oldest.seq <= 0 || oldest.prevHash === GENESIS_HASH) return;
-    const floor: RetentionFloor = { seq: oldest.seq, prevHash: oldest.prevHash };
+    const gen = (this.head.floor?.gen ?? 0) + 1;
+    const floor: RetentionFloor = { seq: oldest.seq, prevHash: oldest.prevHash, gen };
     const nextHead: ChainHead = { ...this.head, floor };
     try {
       this.writeHead(nextHead);
       this.head = nextHead;
-      logger.info(`Audit retention floor recorded at seq ${floor.seq}`);
+      // Persist the monotonic high-water separately so a later replay of an
+      // older signed head (with a lower gen) is detected and rejected.
+      this.writeFloorHighWater(gen);
+      logger.info(`Audit retention floor recorded at seq ${floor.seq} (gen ${gen})`);
     } catch (err) {
       logger.warn(`Failed to persist retention floor: ${errMsg(err)}`);
+    }
+  }
+
+  /** Separately-persisted monotonic high-water for the retention-floor gen. */
+  private floorHwPath(): string {
+    return `${this.headPath}.hw`;
+  }
+
+  /** Write the HMAC-authenticated floor-gen high-water (no-op when unkeyed). */
+  private writeFloorHighWater(gen: number): void {
+    if (!this.key) return;
+    const hmac = createHmac('sha256', this.key).update(String(gen)).digest('hex');
+    const tmp = `${this.floorHwPath()}.tmp`;
+    writeFileSync(tmp, JSON.stringify({ gen, hmac }), { mode: 0o600 });
+    renameSync(tmp, this.floorHwPath());
+  }
+
+  /**
+   * Read the authenticated floor-gen high-water. Returns 0 (do-not-block) when
+   * unkeyed, absent, unreadable, or HMAC-invalid — this guard only ever REJECTS
+   * a stale floor, so a missing/forged high-water must never block a legit one.
+   */
+  private readFloorHighWater(): number {
+    if (!this.key) return 0;
+    try {
+      if (!existsSync(this.floorHwPath())) return 0;
+      const parsed = JSON.parse(readFileSync(this.floorHwPath(), 'utf-8')) as {
+        gen?: number;
+        hmac?: string;
+      };
+      if (typeof parsed.gen !== 'number') return 0;
+      const expected = createHmac('sha256', this.key).update(String(parsed.gen)).digest('hex');
+      const got = typeof parsed.hmac === 'string' ? parsed.hmac : '';
+      const ok =
+        got.length === expected.length &&
+        timingSafeEqual(Buffer.from(got, 'utf-8'), Buffer.from(expected, 'utf-8'));
+      return ok ? parsed.gen : 0;
+    } catch {
+      return 0;
     }
   }
 
@@ -362,6 +405,19 @@ export class AuditChain {
           if (!ok) {
             logger.warn(
               'Audit head-anchor HMAC invalid — ignoring its retention floor (possible tamper).'
+            );
+            return { seq: head.seq, hash: head.hash, updatedAt: head.updatedAt };
+          }
+          // Monotonic replay guard: a validly-signed but STALE head (a floor gen
+          // behind the separately-persisted high-water) is a rollback replay.
+          // Drop its floor so verify() demands GENESIS and surfaces the
+          // front-truncation the replay was trying to conceal. Raises the bar
+          // from swapping one signed file to rolling back two consistently.
+          const hw = this.readFloorHighWater();
+          if (hw > (head.floor.gen ?? 0)) {
+            logger.warn(
+              `Audit head floor gen ${head.floor.gen ?? 0} is behind high-water ${hw} — ` +
+                'possible stale-head replay; ignoring the floor.'
             );
             return { seq: head.seq, hash: head.hash, updatedAt: head.updatedAt };
           }
