@@ -110,6 +110,15 @@ export function guardCommand(): Command {
     });
 
   cmd
+    .command('trust-updates')
+    .description('Arm auto-pulled rules so fresh rules can BLOCK (not just advise)')
+    .option('-y, --yes', 'Skip the confirmation prompt', false)
+    .action(async (opts: { yes?: boolean }) => {
+      const { runTrustUpdates } = await import('./trust-updates.js');
+      await runTrustUpdates(opts);
+    });
+
+  cmd
     .command('generate-key [tier]')
     .description('Generate a test license key')
     .action(async (tier?: string) => {

@@ -19,6 +19,10 @@
     "./audit": {
       "import": "./dist/audit/index.js",
       "types": "./dist/audit/index.d.ts"
+    },
+    "./auto-rules": {
+      "import": "./dist/auto-rules.js",
+      "types": "./dist/auto-rules.d.ts"
     }
   },
   "bin": {
