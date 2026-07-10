@@ -114,9 +114,104 @@ export async function runCLI(args: string[]): Promise<void> {
       break;
     }
     case 'install-script': {
-      const licenseKey = extractOption(args, '--license-key');
+      // The license key is a secret. Prefer PANGUARD_LICENSE_KEY (env) over the
+      // legacy --license-key flag, which is visible in `ps`/`ps aux` argv and
+      // captured in shell history. This restores the project's own secret-input
+      // hierarchy (env > stdin > file > argv, never) for the installer itself.
+      const envKey = process.env['PANGUARD_LICENSE_KEY'];
+      const argvKey = extractOption(args, '--license-key');
+      if (argvKey && !envKey) {
+        process.stderr.write(
+          `  ${symbols.warn} --license-key on the command line is visible via \`ps\` and lands in ` +
+            `shell history. Prefer: PANGUARD_LICENSE_KEY=... pga install-script\n`
+        );
+      }
+      const licenseKey = envKey ?? argvKey;
+      // Constrain the key charset so it can never inject into the generated
+      // bash/PowerShell config it is interpolated into.
+      if (licenseKey && !/^[A-Za-z0-9._-]+$/.test(licenseKey)) {
+        process.stderr.write(
+          `  ${symbols.fail} License key contains unexpected characters; refusing to embed it.\n`
+        );
+        break;
+      }
       const script = generateInstallScript({ dataDir, licenseKey });
-      console.log(script);
+      if (licenseKey) {
+        // Never echo a script that embeds a secret to stdout (terminal scrollback,
+        // pipes, CI logs). Write it to an exclusively-created, owner-only file and
+        // print only the path.
+        const { openSync, writeSync, closeSync, fstatSync, unlinkSync, mkdirSync, chmodSync } =
+          await import('node:fs');
+        const { join } = await import('node:path');
+        const { homedir, platform } = await import('node:os');
+        const { randomBytes } = await import('node:crypto');
+        const isWin = platform() === 'win32';
+        const dir = join(homedir(), '.panguard');
+        // Create 0700; tighten even if it already existed (Node ignores `mode`
+        // on a pre-existing dir, so don't trust a dir we didn't just create).
+        mkdirSync(dir, { recursive: true, mode: 0o700 });
+        if (!isWin) {
+          try {
+            chmodSync(dir, 0o700);
+          } catch {
+            /* best effort */
+          }
+        }
+        // Random, unpredictable name. 'wx' = O_CREAT|O_EXCL: fails with EEXIST on
+        // a pre-existing file OR a pre-planted symlink, so an attacker cannot make
+        // us write the secret through their file/link. mode 0o600 is honored here
+        // because O_EXCL guarantees a brand-new file. Verify with fstat before the
+        // secret touches disk; refuse (never truncate) on any anomaly.
+        const outPath = join(
+          dir,
+          `install-panguard-${randomBytes(6).toString('hex')}.${isWin ? 'ps1' : 'sh'}`
+        );
+        let fd: number;
+        try {
+          fd = openSync(outPath, 'wx', 0o600);
+        } catch (err) {
+          process.stderr.write(
+            `  ${symbols.fail} Could not create a private file for the install script ` +
+              `(${err instanceof Error ? err.message : String(err)}). Aborting to avoid leaking the key.\n`
+          );
+          process.exitCode = 1;
+          break;
+        }
+        let refused = false;
+        try {
+          if (!isWin) {
+            const st = fstatSync(fd);
+            if ((st.mode & 0o777) !== 0o600) {
+              process.stderr.write(
+                `  ${symbols.fail} Refusing to write the key: created file is not 0600 ` +
+                  `(mode ${(st.mode & 0o777).toString(8)}).\n`
+              );
+              refused = true;
+            }
+          }
+          if (!refused) writeSync(fd, script);
+        } finally {
+          closeSync(fd);
+        }
+        if (refused) {
+          // fstat check failed after create — remove the empty file we made.
+          try {
+            unlinkSync(outPath);
+          } catch {
+            /* best effort */
+          }
+          process.exitCode = 1;
+          break;
+        }
+        console.log(
+          `  ${symbols.pass} Install script written to ${c.sage(outPath)} ${c.dim('(0600 — contains your license key)')}`
+        );
+        console.log(
+          `  ${c.dim('Run it on the target machine, then delete it. Do not commit, pipe, or share it.')}`
+        );
+      } else {
+        console.log(script);
+      }
       break;
     }
     case 'scan':

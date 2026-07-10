@@ -94,7 +94,9 @@ export default function PricingContent() {
                       Guard + support for production agents in regulated buyers.
                     </li>
                     <li>
-                      <span className="text-text-primary font-semibold">Migrator Pro (flagship)</span>{' '}
+                      <span className="text-text-primary font-semibold">
+                        Migrator Pro (flagship)
+                      </span>{' '}
                       — signed, continuously re-scanned compliance evidence — living proof, not a
                       one-off PDF.
                     </li>

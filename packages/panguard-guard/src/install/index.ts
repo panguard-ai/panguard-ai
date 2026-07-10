@@ -26,6 +26,16 @@ export function generateInstallScript(options: {
   licenseKey?: string;
   autoStart?: boolean;
 }): string {
+  // Enforce the key charset at the function boundary so EVERY caller of this
+  // public export (not just the CLI) is protected: the key is embedded into the
+  // generated bash/PowerShell config, so anything outside [A-Za-z0-9._-] (quotes,
+  // $, backticks, ;, whitespace, newlines) could break out and inject commands.
+  if (options.licenseKey !== undefined && !/^[A-Za-z0-9._-]+$/.test(options.licenseKey)) {
+    throw new Error(
+      'generateInstallScript: licenseKey must match [A-Za-z0-9._-]+ (refusing to embed an unsafe key).'
+    );
+  }
+
   const os = platform();
 
   switch (os) {
@@ -116,7 +126,7 @@ if [ ! -f "$CONFIG_FILE" ]; then
     "processPollInterval": 10000
   },
   "watchdogEnabled": true,
-  "watchdogInterval": 30000${options.licenseKey ? `,\n  "licenseKey": "${options.licenseKey}"` : ''}
+  "watchdogInterval": 30000${options.licenseKey ? `,\n  "licenseKey": ${JSON.stringify(options.licenseKey)}` : ''}
 }
 CONFIGEOF
   echo "Default config created: $CONFIG_FILE"
@@ -209,7 +219,7 @@ if (-not (Test-Path $configFile)) {
             processPollInterval = 10000
         }
         watchdogEnabled = $true
-        watchdogInterval = 30000${options.licenseKey ? `\n        licenseKey = "${options.licenseKey}"` : ''}
+        watchdogInterval = 30000${options.licenseKey ? `\n        licenseKey = '${options.licenseKey}'` : ''}
     }
     $config | ConvertTo-Json -Depth 5 | Set-Content $configFile
     Write-Host "Default config created: $configFile"

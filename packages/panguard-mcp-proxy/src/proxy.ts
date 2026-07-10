@@ -98,6 +98,15 @@ export class MCPProxy {
   private readonly agentId: string;
   /** Upstream tool names = the Layer 0 capability scope (populated in start()). */
   private upstreamToolNames = new Set<string>();
+  /**
+   * True once listTools() succeeds (any count) → the scope is KNOWN. False means
+   * the list has not been fetched or the fetch FAILED → scope unknown (degraded,
+   * fail-open by tool name). A known-but-empty scope is resolved=true with an
+   * empty set, which DENIES every call — not the same as unresolved.
+   */
+  private capabilityScopeResolved = false;
+  /** One-shot throttle so the per-call degraded warning does not spam stderr. */
+  private warnedScopeDegraded = false;
   /** Tamper-evident chain over proxy-verdicts.jsonl (lazily keyed in connect()). */
   private chain: AuditChain | null = null;
 
@@ -174,8 +183,25 @@ export class MCPProxy {
     try {
       const upstream = await this.client.listTools();
       this.upstreamToolNames = new Set(upstream.tools.map((t) => t.name));
+      // Scope is RESOLVED regardless of count. A successful empty list is a known
+      // (empty) scope — every tool call is then out-of-scope and gets DENIED,
+      // NOT waved through. This is distinct from a listTools FAILURE (below),
+      // where the scope is unknown.
+      this.capabilityScopeResolved = true;
     } catch {
-      /* leave empty; per-call fallback allows the requested tool */
+      // listTools failed → the Layer-0 capability scope is UNKNOWN (unresolved).
+      // Do NOT pass silently (that was indistinguishable from a real allow in
+      // logs). We loudly flag it here and on the first gated call. HONEST scope of
+      // the fallback: while degraded, Layer-0 capability scope is fail-OPEN — the
+      // requested tool is allowed by name. The Layer-1 inline gate and the async
+      // ATR evaluator still run, but they match on CONTENT and have NO capability/
+      // tool-scope concept, so they do NOT re-close this specific gap (e.g. a
+      // benign-looking out-of-scope / shadow tool). Full deny-by-default would
+      // break availability on a transient list failure, hence observe + fail-open.
+      this.capabilityScopeResolved = false;
+      process.stderr.write(
+        '[panguard-proxy] WARNING: upstream listTools() failed — Layer-0 capability-scope enforcement is DEGRADED (fail-open by tool name). Content rules still run but do not re-check tool scope.\n'
+      );
     }
 
     this.server = new Server(
@@ -211,12 +237,32 @@ export class MCPProxy {
    * only adds block-on-sight + risk gating. Exposed so the wiring is testable.
    */
   gateCheck(name: string, toolArgs: Record<string, unknown>): McpGateVerdict {
+    // Decide the capability set from whether the scope is RESOLVED, never from
+    // its size — that was the bug: a successful-but-empty list looked identical
+    // to "no list yet" and fell through to a silent allow.
+    let capabilities: ReadonlySet<string>;
+    if (this.capabilityScopeResolved) {
+      // Known scope. If it is empty, the upstream exposes no tools, so every call
+      // is out-of-scope and applyMcpGate DENIES it. No fallback, no silent allow.
+      capabilities = this.upstreamToolNames;
+    } else {
+      // Unknown scope (listTools failed / not yet run) → fail-open by name to
+      // preserve availability, but make the degradation auditable (throttled so
+      // it does not spam). This gap is capability-scope only; content rules run.
+      if (!this.warnedScopeDegraded) {
+        this.warnedScopeDegraded = true;
+        process.stderr.write(
+          `[panguard-proxy] scope-degraded: capability scope unresolved — tools (starting with '${name}') pass Layer-0 by name fallback. Content rules still evaluate them; tool-scope is NOT enforced until the upstream tool list is available.\n`
+        );
+      }
+      capabilities = new Set([name]);
+    }
     return applyMcpGate(this.guard, {
       name,
       args: toolArgs,
       sessionId: this.sessionId,
       agentId: this.agentId,
-      capabilities: this.upstreamToolNames.size > 0 ? this.upstreamToolNames : new Set([name]),
+      capabilities,
     });
   }
 
