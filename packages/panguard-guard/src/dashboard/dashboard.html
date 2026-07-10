@@ -384,6 +384,21 @@
       .ev-card.suspicious .ev-sevtag {
         color: var(--warn);
       }
+      /* Positive-signal treatment for benign/clean entries — without this the
+         Overview feed only ever reads as alarming (red/orange/amber) or
+         undifferentiated grey noise, with no reassuring "all clear" color. */
+      .ev-card.benign,
+      .ev-card.clean {
+        border-left-color: var(--ok);
+      }
+      .ev-card.benign .ev-sev,
+      .ev-card.clean .ev-sev {
+        background: var(--ok);
+      }
+      .ev-card.benign .ev-sevtag,
+      .ev-card.clean .ev-sevtag {
+        color: var(--ok);
+      }
 
       /* First-run welcome guide */
       .welcome {
@@ -682,6 +697,10 @@
       .badge-low {
         background: rgba(139, 154, 142, 0.15);
         color: var(--sage);
+      }
+      .badge-reviewed {
+        background: rgba(160, 154, 148, 0.15);
+        color: var(--text-muted);
       }
       .badge-informational {
         background: rgba(160, 154, 148, 0.15);
@@ -1570,14 +1589,14 @@
           </div>
           <div class="cd" title="Threats Guard has detected on this machine.">
             <div class="cl" data-i18n="k_threats">Threats Detected</div>
-            <div class="cv sg" id="v-threats">0</div>
+            <div class="cv sg" id="v-threats">--</div>
           </div>
           <div
             class="cd"
             title="Detection rules pulled from the Threat Cloud network, included in your active rule set."
           >
             <div class="cl" data-i18n="k_tc">Threat Cloud rules synced</div>
-            <div class="cv sg" id="v-tcsync">0</div>
+            <div class="cv sg" id="v-tcsync">--</div>
           </div>
         </div>
 
@@ -1698,6 +1717,7 @@
             <button class="fb" data-sev="high" data-i18n="high">High</button>
             <button class="fb" data-sev="medium" data-i18n="medium">Medium</button>
             <button class="fb" data-sev="low" data-i18n="low">Low</button>
+            <button class="fb" data-sev="reviewed" data-i18n="reviewed">Reviewed (benign)</button>
           </div>
           <div style="display: flex; gap: 8px; align-items: center">
             <button
@@ -2100,6 +2120,7 @@
                 <ul class="cd-list">
                   <li>Shared: the matched rule ID(s), attack category + MITRE technique, a coarse country region, and a truncated IP (last two octets zeroed).</li>
                   <li>Never shared: your prompts, code, file contents, secrets, file paths, hostname, or username.</li>
+                  <li>Sealed with end-to-end encryption before it leaves this machine — only the Threat Cloud backend can open it, not the network or a relay.</li>
                   <li>A stable random install ID links your own submissions (pseudonymous) — raw samples never leave this machine.</li>
                 </ul>
               </div>
@@ -2251,7 +2272,10 @@
               <div class="cd-box-title">Path 2 — Cloud model (bring your own key)</div>
               <ul class="cd-list">
                 <li>Use an OpenAI or Anthropic key you already have.</li>
-                <li>Typically a few cents a month (flagged events only).</li>
+                <li id="lc-settings-cost">
+                  Typically a few cents a month with typical usage (flagged events only) — free
+                  with a local model.
+                </li>
                 <li>Your key is sent only to that provider — never to PanGuard.</li>
               </ul>
             </div>
@@ -2287,7 +2311,7 @@
                 field for your key — a localhost web page is a weaker place to handle a secret than
                 your terminal.
               </li>
-              <li>
+              <li id="lc-key-protection-item">
                 <strong>Encrypted at rest.</strong> Stored at
                 <code>~/.panguard/llm.enc</code> with AES-256-GCM, file permissions
                 <code>0600</code> (only you can read it).
@@ -2787,7 +2811,7 @@
         // so it can never appear over the "Guard not running" banner or 401 overlay.
         if (!_welcomeChecked) {
           _welcomeChecked = true;
-          maybeShowWelcome();
+          maybeShowWelcome(s);
         }
         setKPI('v-rules', (s.atrRuleCount || 0).toLocaleString());
         var th = s.threatsDetected || 0;
@@ -2819,7 +2843,7 @@
         var hdsc = document.getElementById('hero-desc');
         if (hdsc && p.sub) hdsc.textContent = p.sub;
         updatePBar(s);
-        renderLayers(s.layers);
+        renderLayers(s.layers, th);
         _lastStatus = s;
         renderPosture(s);
         applyTierGates(s);
@@ -2843,6 +2867,7 @@
           ded.push({
             label: threats + ' unresolved threat' + (threats > 1 ? 's' : ''),
             pts: pt,
+            max: 40,
             goto: 'threats',
             btn: 'Review',
           });
@@ -2853,6 +2878,7 @@
           ded.push({
             label: 'Detection engine: ' + (la.detail || 'not running'),
             pts: 30,
+            max: 30,
             goto: 'rules',
             btn: 'Inspect',
           });
@@ -2867,6 +2893,7 @@
               (_agentUnprotected > 1 ? 's' : '') +
               ' unprotected',
             pts: pa,
+            max: 20,
             goto: 'coverage',
             btn: 'Connect',
           });
@@ -2879,6 +2906,7 @@
           ded.push({
             label: 'Protection mode on, but no automatic response is armed',
             pts: 10,
+            max: 10,
             goto: 'settings',
             btn: 'Configure',
           });
@@ -2924,7 +2952,10 @@
                 esc(d.label) +
                 ' <span style="color:var(--danger)">&minus;' +
                 d.pts +
-                '</span></span>' +
+                '</span>' +
+                '<span style="color:var(--text-muted)"> (of ' +
+                d.max +
+                ' max)</span></span>' +
                 '<button type="button" class="btn btn-secondary btn-sm" data-goto="' +
                 d.goto +
                 '">' +
@@ -2952,7 +2983,7 @@
       /* Real per-layer health from the server (never hard-coded green). The
          server reports state per layer; Layer A goes red 'Degraded' if zero
          rules are loaded, and Layer C shows the BYO-LLM guidance inline. */
-      function renderLayers(L) {
+      function renderLayers(L, flaggedCount) {
         if (!L) return;
         // Live status arrived: restore the section dot (cleared to neutral while
         // Guard was unreachable) so it reflects real per-layer health again.
@@ -3001,18 +3032,30 @@
               'It never blocks on its own.';
             ctaBtn.textContent = 'Manage Layer C';
           } else {
+            var costHint =
+              typeof flaggedCount === 'number'
+                ? 'Free with a local model, or roughly cents a month with a cloud key — billed only ' +
+                  'on your own flagged events (' +
+                  flaggedCount +
+                  ' so far).'
+                : 'Free with a local model, or a few cents a month with a cloud key.';
             ctaText.textContent =
               'Optional: connect your own LLM for a second opinion on flagged events — catches ' +
               'novel attacks A and B miss. Advisory only: it flags for review, never auto-blocks. ' +
-              'Free with a local model, or a few cents a month with a cloud key.';
+              costHint;
             ctaBtn.textContent = 'Set up Layer C';
           }
         }
-        renderLayerCSettings(L);
+        renderLayerCSettings(L, flaggedCount);
       }
       /* Reflect Layer C connected/off state in the Settings section header. Defaults
-         to Off in markup so it never reads green before real status loads. */
-      function renderLayerCSettings(L) {
+         to Off in markup so it never reads green before real status loads. Also
+         grounds the "a few cents a month" cost claim in the user's OWN
+         flagged-event count (the same number shown as "Threats Detected" on
+         Overview) instead of leaving it an unqualified flat claim — a quiet
+         single-agent dev box and a noisy multi-agent CI runner should not read
+         the identical cost line. */
+      function renderLayerCSettings(L, flaggedCount) {
         var on = L && L.c && L.c.state === 'active';
         var dot = document.getElementById('lc-set-dot');
         var st = document.getElementById('lc-set-state');
@@ -3021,6 +3064,42 @@
           st.textContent = on ? 'Connected · advisory' : 'Off · optional';
           st.style.color = on ? 'var(--ok)' : 'var(--text-muted)';
         }
+        var costEl = document.getElementById('lc-settings-cost');
+        if (costEl) {
+          var n = typeof flaggedCount === 'number' ? flaggedCount : null;
+          costEl.textContent =
+            n !== null
+              ? 'Bills only on your own flagged events (' +
+                n +
+                ' so far — see "Threats Detected" on Overview), roughly cents each at typical token cost.'
+              : 'Typically a few cents a month with typical usage (flagged events only) — free with a local model.';
+        }
+      }
+      /* The "file permissions 0600 (only you can read it)" claim only holds on
+         POSIX (chmodSync actually restricts the file there). On Windows, Node's
+         mode/chmod calls are a documented no-op (see llm-detect.ts
+         writeEncryptedLlmConfig) and the file inherits the parent directory's
+         NTFS ACL instead — so shipping the unqualified claim there is false.
+         Best-effort client platform check (this dashboard is opened on the same
+         machine that runs Guard in the overwhelming common case); when
+         genuinely uncertain we deliberately keep the current POSIX-accurate
+         copy rather than guess, since POSIX is both the default build target
+         and the common case. */
+      function applyKeyProtectionCopy() {
+        var el = document.getElementById('lc-key-protection-item');
+        if (!el) return;
+        var plat =
+          (typeof navigator !== 'undefined' &&
+            ((navigator.userAgentData && navigator.userAgentData.platform) ||
+              navigator.platform ||
+              navigator.userAgent)) ||
+          '';
+        var isWindows = /win/i.test(plat);
+        if (!isWindows) return;
+        el.innerHTML =
+          '<strong>Encrypted at rest.</strong> Stored at <code>~/.panguard/llm.enc</code> with ' +
+          'AES-256-GCM. On Windows, POSIX file-permission bits (<code>chmod 0600</code>) do not ' +
+          'apply — access is controlled by your account’s NTFS permissions on the file instead.';
       }
 
       /* ----------------------------------------------------------------
@@ -3031,14 +3110,48 @@
          launch; the sidebar link reopens it.
          ---------------------------------------------------------------- */
       var _welcomeChecked = false;
-      function maybeShowWelcome() {
+      function maybeShowWelcome(s) {
         try {
           if (localStorage.getItem('pg.welcome.dismissed') === '1') return;
         } catch (e) {
           /* private mode: fall through and show once for this page load */
         }
+        applyWelcomePosture(s);
         var w = document.getElementById('welcome-guide');
         if (w) w.style.display = '';
+      }
+      /* Keep the welcome guide's headline/lead honest and in sync with the same
+         postureView() mapping the hero uses, so the two panels never contradict
+         each other (e.g. a green "You're protected" banner sitting above an
+         hero that says no blocking is armed). Falls back to the generic
+         "You're set up" wording if status isn't available yet. */
+      function applyWelcomePosture(s) {
+        var titleEl = document.querySelector('#welcome-guide .welcome-title');
+        var dotEl = document.querySelector('#welcome-guide .dot');
+        var leadEl = document.querySelector('#welcome-guide .welcome-lead');
+        if (!titleEl) return;
+        var p = s ? postureView(s) : null;
+        var isProtected = !!p && p.label === 'PROTECTED';
+        titleEl.textContent = isProtected
+          ? "You're protected. Here's the lay of the land."
+          : "You're set up. Here's the lay of the land.";
+        if (dotEl) dotEl.className = 'dot ' + (isProtected ? 'dot-ok' : 'dot-w');
+        if (leadEl) {
+          // Static, non-user-controlled copy only — safe to set via innerHTML to
+          // preserve the <strong> emphasis used in the original markup.
+          leadEl.innerHTML = isProtected
+            ? 'PanGuard Guard is watching the AI agents on this machine. Two detection layers run ' +
+              'automatically and need no setup: <strong>Layer A</strong> (proven ATR pattern rules) ' +
+              'and <strong>Layer B</strong> (behavioural heuristics). They run fully on-device — ' +
+              'nothing about your activity leaves this machine. Everything below is here only ' +
+              'when you want it.'
+            : 'PanGuard Guard is set up on this machine, currently in <strong>' +
+              (p ? p.label : 'an unknown') +
+              '</strong> mode: ' +
+              (p ? p.sub : 'status is still loading.') +
+              ' Two detection layers run fully on-device — nothing about your activity leaves ' +
+              'this machine. Everything below is here only when you want it.';
+        }
       }
       function hideWelcome(persist) {
         var w = document.getElementById('welcome-guide');
@@ -3058,6 +3171,7 @@
           /* ignore */
         }
         nav('overview');
+        applyWelcomePosture(_lastStatus);
         var w = document.getElementById('welcome-guide');
         if (w) w.style.display = '';
       }
@@ -3144,6 +3258,7 @@
           ' events | Uptime: ' +
           fmtUptime(s.uptime || 0);
       }
+      var BENIGN_SEVS = { benign: true, clean: true };
       function appendEvent(m) {
         var emp = document.getElementById('ev-empty');
         if (emp) emp.style.display = 'none';
@@ -3152,6 +3267,22 @@
         var data = (m && m.data) || {};
         var sev = String(data.severity || data.conclusion || 'benign').toLowerCase();
         var t = m.timestamp ? m.timestamp.split('T')[1].split('.')[0] : '--:--:--';
+        // Anti alert-fatigue: consecutive benign/clean entries collapse into a
+        // single "+N reviewed, nothing found" row instead of one card each,
+        // mirroring the SUPPRESS_THRESHOLD pattern already used on the Threats
+        // tab. Any non-benign event breaks the run and starts a fresh card.
+        if (BENIGN_SEVS[sev] && log.firstChild && log.firstChild.getAttribute) {
+          var prevBenign = log.firstChild.getAttribute('data-benign-run');
+          if (prevBenign) {
+            var n = parseInt(prevBenign, 10) + 1;
+            log.firstChild.setAttribute('data-benign-run', String(n));
+            var titleNode = log.firstChild.querySelector('.ev-title');
+            var timeNode = log.firstChild.querySelector('.ev-time');
+            if (titleNode) titleNode.textContent = '+' + n + ' reviewed, nothing found';
+            if (timeNode) timeNode.textContent = t;
+            return;
+          }
+        }
         // Plain-English summary instead of a raw JSON dump — a solo dev scans
         // these. Prefer a human label; fall back to rule id / event type.
         var title =
@@ -3165,6 +3296,7 @@
         if (data.matchedPattern) bits.push('matched ' + String(data.matchedPattern).slice(0, 56));
         var card = document.createElement('div');
         card.className = 'ev-card ' + sev;
+        if (BENIGN_SEVS[sev]) card.setAttribute('data-benign-run', '1');
         card.innerHTML =
           '<span class="ev-sev"></span>' +
           '<div class="ev-body">' +
@@ -3227,12 +3359,17 @@
               return {
                 timestamp: v.timestamp || new Date().toISOString(),
                 ruleId: ruleId,
+                // A benign-concluding verdict is not a caught threat — give it its
+                // own "reviewed" bucket (grey, distinct filter chip) instead of
+                // collapsing it into the real low-severity findings.
                 severity:
                   v.conclusion === 'malicious'
                     ? 'critical'
                     : v.conclusion === 'suspicious'
                       ? 'medium'
-                      : 'low',
+                      : v.conclusion === 'benign'
+                        ? 'reviewed'
+                        : 'low',
                 confidence: Math.round(conf),
                 pattern: (v.reasoning || '').slice(0, 160),
                 action: v.recommendedAction || 'log_only',
@@ -3256,8 +3393,12 @@
         var emp = document.getElementById('th-empty');
         var sum = document.getElementById('th-summary');
         tb.innerHTML = '';
+        // "All" means all real threats — benign-concluding "reviewed" entries are
+        // a separate, explicitly-opted-into bucket so they never inflate the
+        // default threat count or get mistaken for a catch.
         var bySev = allThreats.filter(function (t) {
-          return currentSevFilter === 'all' || t.severity === currentSevFilter;
+          if (currentSevFilter === 'all') return t.severity !== 'reviewed';
+          return t.severity === currentSevFilter;
         });
         // Anti alert-fatigue: low-confidence detections are suppressed from the
         // default view (the #1 reason solo devs mute a security tool). The count
@@ -3299,7 +3440,10 @@
           return (av < bv ? -1 : 1) * (currentSort.dir === 'desc' ? -1 : 1);
         });
         if (list.length === 0) {
-          if (emp) emp.style.display = '';
+          if (emp) {
+            emp.style.display = '';
+            applyThreatsEmptyCopy();
+          }
           return;
         }
         if (emp) emp.style.display = 'none';
@@ -3332,6 +3476,39 @@
             '</td>';
           tb.appendChild(tr);
         });
+      }
+      /* The Threats-tab empty state must never claim "protected" on its own —
+         it has to agree with the same honest posture the Overview hero shows.
+         A daemon that is OFFLINE/DEGRADED/TAMPERED can have an empty threat
+         list for the wrong reason (nothing is being watched), and REPORT-ONLY/
+         MONITORING/LEARNING never "protect" in the blocking sense at all. */
+      function applyThreatsEmptyCopy() {
+        var emp = document.getElementById('th-empty');
+        if (!emp) return;
+        var headEl = null;
+        for (var i = 0; i < emp.childNodes.length; i++) {
+          if (emp.childNodes[i].nodeType === 3) {
+            headEl = emp.childNodes[i];
+            break;
+          }
+        }
+        var subEl = emp.querySelector('.sub');
+        var p = _lastStatus ? postureView(_lastStatus) : null;
+        var posture = p && _lastStatus && _lastStatus.enforcement ? _lastStatus.enforcement.posture : null;
+        var head = 'All clear — no threats recorded.';
+        var sub = 'Threats will appear here if anything is caught.';
+        if (posture === 'protected') {
+          head = 'All clear — no threats today.';
+          sub = 'Your agents are protected. Threats will appear here if anything is caught.';
+        } else if (posture === 'degraded' || posture === 'off' || posture === 'tampered') {
+          head = 'No threats recorded — but this does not mean you are clean.';
+          sub = (p ? p.detail : 'Detection is not currently active.') + ' An empty list here reflects detection status, not a clean bill of health.';
+        } else if (posture === 'report-only' || posture === 'monitoring' || posture === 'learning') {
+          head = 'Nothing recorded yet.';
+          sub = (p ? p.sub : 'Guard is watching, but no automatic blocking is armed.') + ' Threats will appear here if anything is caught.';
+        }
+        if (headEl) headEl.nodeValue = head + ' ';
+        if (subEl) subEl.textContent = sub;
       }
       function filterThreats(sev, ev) {
         currentSevFilter = sev;
@@ -3802,8 +3979,10 @@
             'Turn on collective defense?\n\n' +
               'When Guard blocks an attack on this machine, it will share a minimal signature ' +
               '(the matched rule ID + attack category + a coarse region + a truncated IP) with the ATR ' +
-              'network.\n\nNever shared: your prompts, code, file contents, secrets, file paths, ' +
-              'hostname, or username.\n\nYou can turn this off anytime.'
+              'network.\n\nSealed with end-to-end encryption before it leaves this machine — only ' +
+              'the Threat Cloud backend can open it, not the network or a relay.\n\nNever shared: ' +
+              'your prompts, code, file contents, secrets, file paths, hostname, or username.\n\n' +
+              'You can turn this off anytime.'
           );
           if (!ok) return;
         }
@@ -4010,7 +4189,7 @@
       function loadSettings() {
         // Reflect Layer C connected/off state when the tab is opened cold, from
         // the last live status (the layer state rides on /api/status, not /api/config).
-        if (_lastStatus) renderLayerCSettings(_lastStatus.layers);
+        if (_lastStatus) renderLayerCSettings(_lastStatus.layers, _lastStatus.threatsDetected);
         af('/api/config')
           .then(function (r) {
             return r.json();
@@ -4360,6 +4539,10 @@
         connectWS();
         loadStatus();
         loadThreats();
+        // Static, status-independent copy correction: runs once at boot so the
+        // key-protection claim in Settings is never wrong for the platform this
+        // dashboard is being viewed from, even before the first status arrives.
+        applyKeyProtectionCopy();
         // Mark default nav active
         nav('overview');
         // Fallback: if neither the WS push nor the initial fetch yields a live

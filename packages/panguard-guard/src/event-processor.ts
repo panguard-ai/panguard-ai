@@ -392,8 +392,6 @@ export async function processEvent(
       detection = advisory;
     }
 
-    state.threatsDetected++;
-
     // Skill Whitelist check
     const toolName = event.metadata?.['tool_name'] as string | undefined;
     const isWhitelisted = toolName ? deps.atrEngine.isSkillWhitelisted(toolName) : false;
@@ -410,6 +408,18 @@ export async function processEvent(
 
     // Stage 2: Analyze
     const verdict: ThreatVerdict = await deps.analyzeAgent.analyze(detection, state.baseline);
+
+    // Only count as a "threat" once analyze CONFIRMS it — a rule/threat-intel/
+    // correlation match or an advisory baseline deviation is just a CANDIDATE.
+    // Incrementing before analyze() ran meant the dashboard's "Threats Detected"
+    // KPI (and the posture-score deduction derived from it) permanently counted
+    // events analyze itself later concluded were benign, with no decrement or
+    // reclassification path. Gating on the confirmed verdict keeps the headline
+    // number honest; a raw "candidates reviewed" metric, if ever needed, should
+    // be a separate, clearly-labeled counter — not this one.
+    if (verdict.conclusion !== 'benign') {
+      state.threatsDetected++;
+    }
 
     // Knowledge Distillation
     if (deps.knowledgeDistiller && verdict.conclusion !== 'benign' && verdict.confidence >= 70) {

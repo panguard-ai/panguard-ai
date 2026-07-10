@@ -305,3 +305,88 @@ export function validateRulesDir(directory: string): ValidationReport {
     failures: failedResults,
   };
 }
+
+/** A failure message shared by enough rules to be worth aggregating. */
+export interface CommonFailureCause {
+  readonly message: string;
+  readonly count: number;
+  /** Rule id (or file path, when the rule has no id) of every affected rule. */
+  readonly ruleIds: ReadonlyArray<string>;
+  readonly fixHint: string;
+}
+
+/**
+ * A literal failure message must recur across at least this many DIFFERENT
+ * rules before it is worth calling out as a common cause rather than just
+ * reading naturally in each rule's own per-rule block.
+ */
+export const COMMON_CAUSE_THRESHOLD = 3;
+
+/**
+ * Suggest a fix for a validator failure message, matched by its fixed
+ * (non-interpolated) prefix. Falls back to a generic pointer when the
+ * message doesn't match a known shape — never invents specifics.
+ */
+export function failureFixHint(message: string): string {
+  if (message.startsWith('missing required field:')) {
+    return 'add the missing field to the rule YAML.';
+  }
+  if (message.startsWith('detection.conditions must be')) {
+    return 'add at least one condition under detection.conditions.';
+  }
+  if (message.startsWith('pattern exceeds')) {
+    return 'shorten the regex, or split it into simpler patterns.';
+  }
+  if (message.startsWith('pattern failed to compile')) {
+    return 'fix the regex syntax — test it in isolation before committing.';
+  }
+  if (message.startsWith('true_positive[') && message.includes('does not match')) {
+    return "update the rule's patterns, or remove the stale test case.";
+  }
+  if (message.startsWith('true_negative[') && message.includes('unexpectedly matched')) {
+    return 'tighten the pattern, or move the case out of true_negatives.';
+  }
+  if (message.startsWith('YAML parse failed:')) {
+    return 'check YAML indentation and syntax.';
+  }
+  if (message === 'YAML root must be an object') {
+    return 'ensure the file defines a single rule object, not a list.';
+  }
+  return 'see the rule file for detail.';
+}
+
+/**
+ * Group failure results by EXACT failure-message text and surface the ones
+ * shared by >= COMMON_CAUSE_THRESHOLD different rules. Grouping on the exact
+ * literal string (not a normalized/stripped key) is deliberate: messages like
+ * "missing required field: agent_source.type" are already a fixed, finite
+ * set (no per-rule interpolation), so exact-match grouping catches the
+ * systemic-mistake case (e.g. one templating error affecting N rules)
+ * without conflating unrelated failures (e.g. missing `id` vs missing
+ * `title`) into the same bucket.
+ */
+export function summarizeCommonFailureCauses(
+  failures: ReadonlyArray<RuleValidation>
+): CommonFailureCause[] {
+  const byMessage = new Map<string, string[]>();
+  for (const r of failures) {
+    const label = r.ruleId ?? r.file;
+    for (const message of r.failures) {
+      const ids = byMessage.get(message);
+      if (ids) {
+        ids.push(label);
+      } else {
+        byMessage.set(message, [label]);
+      }
+    }
+  }
+
+  const common: CommonFailureCause[] = [];
+  for (const [message, ruleIds] of byMessage) {
+    if (ruleIds.length >= COMMON_CAUSE_THRESHOLD) {
+      common.push({ message, count: ruleIds.length, ruleIds, fixHint: failureFixHint(message) });
+    }
+  }
+  // Most-affected cause first — that's the highest-leverage fix.
+  return common.sort((a, b) => b.count - a.count);
+}

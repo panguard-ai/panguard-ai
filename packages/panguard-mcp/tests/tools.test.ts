@@ -427,7 +427,7 @@ describe('panguard_guard_stop', () => {
     dirsToClean.push(dataDir);
 
     await fs.mkdir(dataDir, { recursive: true });
-    await fs.writeFile(path.join(dataDir, 'guard.pid'), 'not-a-number');
+    await fs.writeFile(path.join(dataDir, 'panguard-guard.pid'), 'not-a-number');
 
     const result = await dispatchTool('panguard_guard_stop', { dataDir });
     const parsed = parseResult(result);
@@ -442,7 +442,7 @@ describe('panguard_guard_stop', () => {
 
     await fs.mkdir(dataDir, { recursive: true });
     // Use a very high PID that almost certainly doesn't exist
-    await fs.writeFile(path.join(dataDir, 'guard.pid'), '9999999');
+    await fs.writeFile(path.join(dataDir, 'panguard-guard.pid'), '9999999');
 
     const result = await dispatchTool('panguard_guard_stop', { dataDir });
     const parsed = parseResult(result);
@@ -454,9 +454,12 @@ describe('panguard_guard_stop', () => {
     const dataDir = tmpDir('guard-stop-cleanup');
     dirsToClean.push(dataDir);
 
-    const pidFile = path.join(dataDir, 'guard.pid');
+    const pidFile = path.join(dataDir, 'panguard-guard.pid');
     await fs.mkdir(dataDir, { recursive: true });
-    await fs.writeFile(pidFile, '9999999');
+    // Valid-range (<= 4194304) but almost-certainly-dead PID, so PidFile.read()
+    // returns it (not null) and the stale-cleanup branch runs. 9999999 would be
+    // rejected as out-of-range and never reach cleanup.
+    await fs.writeFile(pidFile, '4194303');
 
     await dispatchTool('panguard_guard_stop', { dataDir });
 

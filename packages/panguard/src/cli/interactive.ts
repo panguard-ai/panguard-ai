@@ -7,13 +7,13 @@
  * @module @panguard-ai/panguard/cli/interactive
  */
 
-import { existsSync } from 'node:fs';
 import { c, setLogLevel } from '@panguard-ai/core';
 import { waitForMainInput, cleanupTerminal } from './menu.js';
 import { checkFeatureAccess, showUpgradePrompt } from './auth-guard.js';
 import { formatError } from './ux-helpers.js';
+import { isFirstRun } from './first-run.js';
 
-import { getLang, setLang, getConfigPath, detectLang, saveLang } from './interactive/lang.js';
+import { getLang, setLang, detectLang, saveLang } from './interactive/lang.js';
 import { MENU_DEFS } from './interactive/menu-defs.js';
 import { renderStartup, showHelp, isMCPConfigured } from './interactive/render.js';
 
@@ -54,11 +54,11 @@ export async function startInteractive(lang?: string): Promise<void> {
   process.on('SIGINT', exit);
   process.on('SIGTERM', exit);
 
-  renderStartup(getLang());
+  await renderStartup(getLang());
 
   // First-time user hint
   const mcpConfigured = await isMCPConfigured();
-  if (!existsSync(getConfigPath())) {
+  if (isFirstRun()) {
     console.log(
       getLang() === 'zh-TW'
         ? `  ${c.sage('\u25C6')} \u9996\u6B21\u4F7F\u7528\uFF1F\u5EFA\u8B70\u6D41\u7A0B\uFF1A`
@@ -103,7 +103,7 @@ export async function startInteractive(lang?: string): Promise<void> {
       case 'lang_toggle':
         setLang(getLang() === 'zh-TW' ? 'en' : 'zh-TW');
         saveLang(getLang());
-        renderStartup(getLang());
+        await renderStartup(getLang());
         continue;
 
       case 'number': {
@@ -113,7 +113,7 @@ export async function startInteractive(lang?: string): Promise<void> {
         if (!checkFeatureAccess(def.featureKey)) {
           showUpgradePrompt(def.featureKey, getLang());
           await new Promise((r) => setTimeout(r, 500));
-          renderStartup(getLang());
+          await renderStartup(getLang());
           continue;
         }
 
@@ -134,7 +134,7 @@ export async function startInteractive(lang?: string): Promise<void> {
         }
 
         await new Promise((r) => setTimeout(r, 500));
-        renderStartup(getLang());
+        await renderStartup(getLang());
         continue;
       }
 
@@ -171,7 +171,7 @@ async function dispatchCommand(text: string): Promise<boolean> {
       console.clear();
       await actionStatus(lang);
       await new Promise((r) => setTimeout(r, 500));
-      renderStartup(lang);
+      await renderStartup(lang);
       return true;
 
     case 'login':
@@ -181,14 +181,14 @@ async function dispatchCommand(text: string): Promise<boolean> {
       console.log('  Authentication removed. All features are free and open source.');
       console.log('');
       await new Promise((r) => setTimeout(r, 500));
-      renderStartup(lang);
+      await renderStartup(lang);
       return true;
 
     case 'config':
       console.clear();
       await actionConfig(lang);
       await new Promise((r) => setTimeout(r, 500));
-      renderStartup(lang);
+      await renderStartup(lang);
       return true;
 
     case 'upgrade':
@@ -197,14 +197,14 @@ async function dispatchCommand(text: string): Promise<boolean> {
       console.log('  All features are free and open source.');
       console.log('');
       await new Promise((r) => setTimeout(r, 500));
-      renderStartup(lang);
+      await renderStartup(lang);
       return true;
 
     case 'hardening':
       console.clear();
       await actionHardening(lang);
       await new Promise((r) => setTimeout(r, 500));
-      renderStartup(lang);
+      await renderStartup(lang);
       return true;
 
     case 'doctor':
@@ -222,7 +222,7 @@ async function dispatchCommand(text: string): Promise<boolean> {
         );
       }
       await new Promise((r) => setTimeout(r, 500));
-      renderStartup(lang);
+      await renderStartup(lang);
       return true;
 
     case 'whoami':
@@ -231,21 +231,21 @@ async function dispatchCommand(text: string): Promise<boolean> {
       console.log('  All features available (no login required).');
       console.log('');
       await new Promise((r) => setTimeout(r, 500));
-      renderStartup(lang);
+      await renderStartup(lang);
       return true;
 
     case 'audit':
       console.clear();
       await actionAudit(lang);
       await new Promise((r) => setTimeout(r, 500));
-      renderStartup(lang);
+      await renderStartup(lang);
       return true;
 
     case 'setup':
       console.clear();
       await actionMCPSetup(lang);
       await new Promise((r) => setTimeout(r, 500));
-      renderStartup(lang);
+      await renderStartup(lang);
       return true;
 
     case 'help':

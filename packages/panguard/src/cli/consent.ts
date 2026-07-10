@@ -45,27 +45,21 @@ export function markConsentAsked(): void {
 }
 
 /**
- * Ask the user for telemetry consent (opt-in).
- * Returns true if the user opted in, false otherwise.
+ * Print the full what's-shared / never-shared Collective Defense disclosure.
+ * Shared by the first-run consent prompt AND `pga config show --verbose` /
+ * `pga tc --explain`, so a user who wants to re-read what they agreed to
+ * (or are about to agree to) months later sees the exact same copy — not a
+ * status-line summary that drops the privacy detail.
  *
- * In non-interactive mode (no TTY), defaults to OFF and marks as asked.
+ * The "END-TO-END ENCRYPT" line below is stated as unconditional fact
+ * because it IS one: postThreats() (packages/panguard-guard/src/threat-cloud
+ * /index.ts) throws and refuses to upload rather than falling back to
+ * plaintext-over-TLS when sealing is unavailable, so whenever an upload
+ * actually leaves the machine, it is always sealed. Never soften this back
+ * to "when possible" without re-verifying that fail-closed invariant still
+ * holds.
  */
-export async function askTelemetryConsent(): Promise<boolean> {
-  // Non-interactive (CI / headless): we cannot show the disclosure, so stay
-  // fully OFF — set both flags explicitly false (not just unset) so the guard's
-  // upload gate blocks. Opt in by setting the flags in config for headless use.
-  if (!process.stdin.isTTY) {
-    const config = loadGuardConfig();
-    updateGuardConfig({
-      ...config,
-      telemetryEnabled: false,
-      threatCloudUploadEnabled: false,
-      threatCloudRuleSyncEnabled: false,
-    });
-    markConsentAsked();
-    return false;
-  }
-
+export function printCollectiveDefenseDisclosure(): void {
   console.log('');
   console.log(`  ${symbols.info} ${c.bold('Join Collective Defense (optional, off by default)')}`);
   console.log('');
@@ -109,6 +103,31 @@ export async function askTelemetryConsent(): Promise<boolean> {
   console.log(`  ${c.dim('Turn off anytime: pga config set telemetry false (upload) /')}`);
   console.log(`  ${c.dim('pga config set threat-cloud false (rule sync).')}`);
   console.log('');
+}
+
+/**
+ * Ask the user for telemetry consent (opt-in).
+ * Returns true if the user opted in, false otherwise.
+ *
+ * In non-interactive mode (no TTY), defaults to OFF and marks as asked.
+ */
+export async function askTelemetryConsent(): Promise<boolean> {
+  // Non-interactive (CI / headless): we cannot show the disclosure, so stay
+  // fully OFF — set both flags explicitly false (not just unset) so the guard's
+  // upload gate blocks. Opt in by setting the flags in config for headless use.
+  if (!process.stdin.isTTY) {
+    const config = loadGuardConfig();
+    updateGuardConfig({
+      ...config,
+      telemetryEnabled: false,
+      threatCloudUploadEnabled: false,
+      threatCloudRuleSyncEnabled: false,
+    });
+    markConsentAsked();
+    return false;
+  }
+
+  printCollectiveDefenseDisclosure();
 
   // Opt-in: default is NO. Pressing Enter declines (default OFF).
   const answer = await promptYesNo('  Agree and join Collective Defense? [y/N] ', false);

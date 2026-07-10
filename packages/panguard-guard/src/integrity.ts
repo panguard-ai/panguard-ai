@@ -60,6 +60,14 @@ export interface SelfStateRef {
   readonly path: string;
   /** If set, the file must still CONTAIN this substring (e.g. the injected hook command). */
   readonly marker?: string;
+  /**
+   * If set, a SHA-256 over the file's SECURITY-RELEVANT fields (not the whole
+   * file — plist formatting/comments are irrelevant). checkSelfState recomputes
+   * it and flags 'tampered' on mismatch. This catches a hijack that keeps the
+   * Label line (so `marker` still matches) but rewrites ProgramArguments to point
+   * the reboot-persistence service at attacker code. See plistSecurityHash.
+   */
+  readonly contentHash?: string;
   readonly label?: string;
 }
 
@@ -74,7 +82,7 @@ export interface SelfStateFinding {
   readonly kind: string;
   readonly path: string;
   readonly label?: string;
-  readonly reason: 'missing' | 'marker-gone';
+  readonly reason: 'missing' | 'marker-gone' | 'tampered';
 }
 
 export type IntegrityStatus = 'sealed' | 'tampered' | 'unsealed' | 'manifest-tampered';
@@ -267,17 +275,65 @@ export function checkSelfState(dataDir: string): SelfStateVerdict {
       findings.push({ kind: r.kind, path: r.path, label: r.label, reason: 'missing' });
       continue;
     }
-    if (r.marker) {
+    let content: string | null = null;
+    if (r.marker || r.contentHash) {
       try {
-        if (!readFileSync(r.path, 'utf-8').includes(r.marker)) {
-          findings.push({ kind: r.kind, path: r.path, label: r.label, reason: 'marker-gone' });
-        }
+        content = readFileSync(r.path, 'utf-8');
       } catch {
         findings.push({ kind: r.kind, path: r.path, label: r.label, reason: 'missing' });
+        continue;
       }
+    }
+    if (r.marker && content !== null && !content.includes(r.marker)) {
+      findings.push({ kind: r.kind, path: r.path, label: r.label, reason: 'marker-gone' });
+      continue;
+    }
+    // Content-hash check: catches a hijack that keeps the marker (e.g. the plist
+    // Label) but rewrites the security-relevant fields (e.g. ProgramArguments).
+    if (r.contentHash && content !== null && plistSecurityHash(content) !== r.contentHash) {
+      findings.push({ kind: r.kind, path: r.path, label: r.label, reason: 'tampered' });
     }
   }
   return { ok: findings.length === 0, findings };
+}
+
+/**
+ * Hash the SECURITY-RELEVANT fields of a launchd plist so a rewrite of the
+ * fields that decide WHAT runs at reboot (ProgramArguments), UNDER WHICH label
+ * (Label), and WHEN (RunAtLoad / KeepAlive) is detectable — even if the attacker
+ * preserves the Label line the substring marker checks.
+ *
+ * We deliberately do NOT hash the whole file: plist whitespace, key ordering, and
+ * unrelated keys (e.g. StandardOutPath) are not security-relevant and would cause
+ * spurious 'tampered' findings on a benign reformat. We extract each field's raw
+ * XML slice by tag and hash the concatenation. Extraction is best-effort and
+ * order-stable; a field that is absent contributes an empty slice, so ADDING a
+ * previously-absent ProgramArguments/KeepAlive also changes the hash.
+ */
+export function plistSecurityHash(plistXml: string): string {
+  const fields = ['Label', 'ProgramArguments', 'RunAtLoad', 'KeepAlive'];
+  const parts = fields.map((f) => `${f}=${extractPlistField(plistXml, f)}`);
+  return createHash('sha256').update(parts.join('\n')).digest('hex');
+}
+
+/**
+ * Extract the XML value node that immediately follows `<key>NAME</key>` in a
+ * plist, normalized (whitespace collapsed) so cosmetic reformatting does not
+ * change the hash but a value change does. Returns '' when the key is absent.
+ */
+function extractPlistField(plistXml: string, key: string): string {
+  const keyRe = new RegExp(`<key>\\s*${key}\\s*</key>\\s*`, 'i');
+  const m = keyRe.exec(plistXml);
+  if (!m) return '';
+  const rest = plistXml.slice(m.index + m[0].length);
+  // Self-closing value (<true/>, <false/>) or a paired value node.
+  const selfClosing = /^<(true|false)\s*\/>/i.exec(rest);
+  if (selfClosing) return selfClosing[0].toLowerCase().replace(/\s+/g, '');
+  const paired = /^<([a-zA-Z]+)>([\s\S]*?)<\/\1>/.exec(rest);
+  if (!paired) return '';
+  const tag = paired[1] ?? '';
+  const body = paired[2] ?? '';
+  return `${tag}:${body.replace(/\s+/g, ' ').trim()}`;
 }
 
 /** Read the self-state refs recorded in the manifest (for re-sealing after a change). */
@@ -308,10 +364,21 @@ export function collectSelfState(): SelfStateRef[] {
   if (platform() === 'darwin') {
     const plist = join(homedir(), 'Library', 'LaunchAgents', `${GUARD_SERVICE_LABEL}.plist`);
     if (existsSync(plist)) {
+      // Hash the security-relevant plist fields at seal time so a later hijack of
+      // ProgramArguments (attacker persistence under our Label) is caught, not
+      // just outright removal. Best-effort: an unreadable plist records no hash
+      // (presence + marker still guard it).
+      let contentHash: string | undefined;
+      try {
+        contentHash = plistSecurityHash(readFileSync(plist, 'utf-8'));
+      } catch {
+        /* keep contentHash undefined; presence + marker still apply */
+      }
       refs.push({
         kind: 'launchagent',
         path: plist,
         marker: GUARD_SERVICE_LABEL,
+        ...(contentHash ? { contentHash } : {}),
         label: 'reboot-persistence service',
       });
     }
@@ -320,24 +387,46 @@ export function collectSelfState(): SelfStateRef[] {
 }
 
 /**
- * Union two SelfStateRef lists by path, preferring the previously-recorded ref
- * on conflict. CRITICAL: this never DROPS a recorded ref — a recorded artifact
- * that is now missing must stay in the set so checkSelfState() flags its
- * removal. We only ADD newly-present artifacts. Re-sealing with a bare
- * collectSelfState() (which omits anything currently absent) would erase the
- * very removal we exist to detect; merging is what makes a refresh safe.
+ * Union two SelfStateRef lists by path. CRITICAL: this never DROPS a recorded
+ * ref — a recorded artifact that is now missing must stay in the set so
+ * checkSelfState() flags its removal. We ADD newly-present artifacts and, for an
+ * artifact present in BOTH lists, REFRESH its integrity fields (marker /
+ * contentHash) from the freshly-discovered ref. That refresh is what lets a
+ * legitimate re-seal (`pga up` after the user's own change) re-baseline the plist
+ * content hash instead of flagging the user's own edit as tampered forever, while
+ * a removed artifact (absent from `discovered`) keeps its recorded ref and stays
+ * detectable. kind/path/label are pinned from the recorded ref (identity is
+ * stable); only the integrity fields track the current on-disk artifact.
  */
 export function mergeSelfState(
   recorded: readonly SelfStateRef[],
   discovered: readonly SelfStateRef[]
 ): SelfStateRef[] {
-  const byPath = new Map<string, SelfStateRef>();
+  const discByPath = new Map<string, SelfStateRef>();
   for (const r of discovered) {
-    if (r && typeof r.path === 'string') byPath.set(r.path, r);
+    if (r && typeof r.path === 'string') discByPath.set(r.path, r);
   }
-  // Recorded wins on conflict (preserves the original marker/label + presence contract).
+  const byPath = new Map<string, SelfStateRef>();
+  // Start from recorded so a removed artifact (not in `discovered`) is preserved.
   for (const r of recorded) {
-    if (r && typeof r.path === 'string') byPath.set(r.path, r);
+    if (!r || typeof r.path !== 'string') continue;
+    const fresh = discByPath.get(r.path);
+    if (fresh) {
+      // Present in both: keep recorded identity, refresh integrity fields.
+      byPath.set(r.path, {
+        kind: r.kind,
+        path: r.path,
+        ...(fresh.marker !== undefined ? { marker: fresh.marker } : {}),
+        ...(fresh.contentHash !== undefined ? { contentHash: fresh.contentHash } : {}),
+        ...(r.label !== undefined ? { label: r.label } : {}),
+      });
+    } else {
+      byPath.set(r.path, r);
+    }
+  }
+  // Add newly-present artifacts not previously recorded.
+  for (const r of discovered) {
+    if (r && typeof r.path === 'string' && !byPath.has(r.path)) byPath.set(r.path, r);
   }
   return [...byPath.values()];
 }

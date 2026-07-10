@@ -32,6 +32,7 @@ import {
 } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
 import { createInterface } from 'node:readline';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import { createLogger } from '@panguard-ai/core';
 import {
   GENESIS_HASH,
@@ -39,6 +40,7 @@ import {
   signHmac,
   verifyChain,
   type ChainedRecord,
+  type RetentionFloor,
   type VerifyResult,
 } from './hash-chain.js';
 
@@ -52,6 +54,13 @@ export interface ChainHead {
   readonly hash: string;
   /** ISO timestamp the head was last updated. */
   readonly updatedAt: string;
+  /**
+   * Legitimate retention boundary: recorded when log retention deletes the file
+   * holding older records (including seq 0). verify() passes it to verifyChain so
+   * the oldest SURVIVING record's non-genesis prevHash is accepted as a legitimate
+   * mid-chain start, not a hash-break. Absent until the first retention deletion.
+   */
+  readonly floor?: RetentionFloor;
 }
 
 /** Hook invoked after the head advances. Default is a no-op (local-only). */
@@ -123,7 +132,14 @@ export class AuditChain {
 
     try {
       appendFileSync(this.logPath, JSON.stringify(record) + '\n', 'utf-8');
-      const nextHead: ChainHead = { seq, hash, updatedAt: ts };
+      // Carry any recorded retention floor forward — a new head must never erase
+      // the boundary that lets verify() accept a legitimately-retained mid-chain.
+      const nextHead: ChainHead = {
+        seq,
+        hash,
+        updatedAt: ts,
+        ...(this.head.floor ? { floor: this.head.floor } : {}),
+      };
       this.writeHead(nextHead);
       this.head = nextHead;
       this.safeAnchor(nextHead);
@@ -161,7 +177,9 @@ export class AuditChain {
    */
   async verify(): Promise<VerifyResult> {
     const records = await this.readAll();
-    const base = verifyChain(records, this.key);
+    // Pass the recorded retention floor so a legitimately-retained chain whose
+    // oldest surviving record is not the genesis is not misreported as tampered.
+    const base = verifyChain(records, this.key, this.head.floor);
 
     // A content-level failure (hash-break / seq-gap / bad-hmac) is MORE specific
     // than truncation and points at the exact bad index, so it wins. Truncation
@@ -208,13 +226,74 @@ export class AuditChain {
     logger.info(`Audit chain spans rotation at seq ${this.head.seq} (head hash carried forward)`);
   }
 
+  /**
+   * Recompute and persist the retention floor from the OLDEST surviving chained
+   * record. Call this AFTER log retention deletes rotated files (report-agent's
+   * enforceRetention): once the file holding seq 0 is gone, the oldest surviving
+   * record has a non-genesis prevHash, and verify() must know that prevHash is a
+   * LEGITIMATE boundary, not a hash-break. Best-effort: on any read error the floor
+   * is left unchanged (verify then treats the non-genesis start as a break — the
+   * safe, loud default).
+   */
+  recordRetentionFloor(): void {
+    const oldest = this.oldestChainedRecordSync();
+    if (!oldest) return;
+    // seq 0 (genesis) is not a retention boundary — nothing older was deleted.
+    if (oldest.seq <= 0 || oldest.prevHash === GENESIS_HASH) return;
+    const floor: RetentionFloor = { seq: oldest.seq, prevHash: oldest.prevHash };
+    const nextHead: ChainHead = { ...this.head, floor };
+    try {
+      this.writeHead(nextHead);
+      this.head = nextHead;
+      logger.info(`Audit retention floor recorded at seq ${floor.seq}`);
+    } catch (err) {
+      logger.warn(`Failed to persist retention floor: ${errMsg(err)}`);
+    }
+  }
+
+  /** First (oldest) chained record across the ordered log files, or null. */
+  private oldestChainedRecordSync(): ChainedRecord | null {
+    for (const filePath of this.orderedLogFiles()) {
+      try {
+        if (!existsSync(filePath)) continue;
+        const content = readFileSync(filePath, 'utf-8');
+        for (const line of content.split('\n')) {
+          if (!line.trim()) continue;
+          const parsed = safeParse(line);
+          if (parsed && isChainedRecord(parsed)) return parsed;
+        }
+      } catch {
+        // skip unreadable file
+      }
+    }
+    return null;
+  }
+
   // ---------------------------------------------------------------------------
   // Head-anchor persistence (tmp + rename, 0600).
   // ---------------------------------------------------------------------------
 
+  /**
+   * HMAC over the security-relevant head fields — critically the retention
+   * `floor`, which verify() trusts to accept a non-genesis chain start. Without
+   * authenticating it, an attacker with write access could forge a floor
+   * matching a mid-chain record, front-truncate the log (erasing early
+   * evidence), and verify would still report VERIFIED. Signed with the same key
+   * as the records so the head is protected to the same level as the chain.
+   */
+  private headMac(head: ChainHead): string {
+    const payload = JSON.stringify({ seq: head.seq, hash: head.hash, floor: head.floor ?? null });
+    return createHmac('sha256', this.key as Buffer)
+      .update(payload)
+      .digest('hex');
+  }
+
   private writeHead(head: ChainHead): void {
     const tmp = `${this.headPath}.tmp`;
-    writeFileSync(tmp, JSON.stringify(head), { mode: 0o600 });
+    const onDisk: ChainHead & { hmac?: string } = this.key
+      ? { ...head, hmac: this.headMac(head) }
+      : head;
+    writeFileSync(tmp, JSON.stringify(onDisk), { mode: 0o600 });
     renameSync(tmp, this.headPath);
   }
 
@@ -261,13 +340,33 @@ export class AuditChain {
     try {
       if (!existsSync(this.headPath)) return null;
       const raw = readFileSync(this.headPath, 'utf-8');
-      const parsed = JSON.parse(raw) as Partial<ChainHead>;
+      const parsed = JSON.parse(raw) as Partial<ChainHead> & { hmac?: string };
       if (typeof parsed.seq === 'number' && typeof parsed.hash === 'string') {
-        return {
+        const head: ChainHead = {
           seq: parsed.seq,
           hash: parsed.hash,
           updatedAt: typeof parsed.updatedAt === 'string' ? parsed.updatedAt : '',
+          ...(isRetentionFloor(parsed.floor) ? { floor: parsed.floor } : {}),
         };
+        // When signing, the head — above all its retention floor — MUST verify.
+        // A missing/invalid HMAC means the anchor was tampered: do NOT honor its
+        // floor (that would let a forged boundary conceal a front-truncation).
+        // Drop the floor and warn; verify() then demands GENESIS at the chain
+        // start, so any truncation surfaces as a hash-break / TAMPERED.
+        if (this.key && head.floor) {
+          const expected = this.headMac(head);
+          const got = typeof parsed.hmac === 'string' ? parsed.hmac : '';
+          const ok =
+            got.length === expected.length &&
+            timingSafeEqual(Buffer.from(got, 'utf-8'), Buffer.from(expected, 'utf-8'));
+          if (!ok) {
+            logger.warn(
+              'Audit head-anchor HMAC invalid — ignoring its retention floor (possible tamper).'
+            );
+            return { seq: head.seq, hash: head.hash, updatedAt: head.updatedAt };
+          }
+        }
+        return head;
       }
     } catch (err) {
       logger.warn(`Audit head-anchor unreadable: ${errMsg(err)}`);
@@ -378,6 +477,17 @@ function isChainedRecord(rec: unknown): rec is ChainedRecord {
     typeof r['prevHash'] === 'string' &&
     typeof r['seq'] === 'number'
   );
+}
+
+/**
+ * Validate a persisted retention floor read back from the head-anchor. A malformed
+ * or partial floor is dropped (treated as absent) so verify() falls back to the
+ * safe GENESIS anchor rather than trusting attacker-supplied floor values.
+ */
+function isRetentionFloor(v: unknown): v is RetentionFloor {
+  if (v === null || typeof v !== 'object') return false;
+  const f = v as Record<string, unknown>;
+  return typeof f['seq'] === 'number' && f['seq'] >= 0 && typeof f['prevHash'] === 'string';
 }
 
 function errMsg(err: unknown): string {

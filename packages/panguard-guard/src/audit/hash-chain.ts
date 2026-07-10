@@ -64,6 +64,20 @@ export interface VerifyResult {
 }
 
 /**
+ * A recorded retention boundary: the seq and prevHash of the oldest record that
+ * survived log retention (older rotated files were legitimately deleted). Lets
+ * verifyChain accept a chain whose first surviving record is NOT the genesis
+ * (its prevHash is its deleted predecessor's real hash) as a legitimate mid-chain
+ * start, instead of misreporting the whole untampered log as tampered.
+ */
+export interface RetentionFloor {
+  /** seq of the oldest surviving record. */
+  readonly seq: number;
+  /** prevHash the oldest surviving record must carry (its deleted predecessor's hash). */
+  readonly prevHash: string;
+}
+
+/**
  * Deterministic JSON serialization with RECURSIVELY sorted object keys.
  *
  * Two semantically equal objects (same data, different key order, nested at any
@@ -163,8 +177,21 @@ function isChained(rec: unknown): rec is ChainedRecord {
  *  - recompute hash and compare (else 'hash-break'),
  *  - prevHash of each record must equal the previous record's hash (else 'hash-break'),
  *  - if a key is supplied, recompute the HMAC and timing-safe compare (else 'bad-hmac').
+ *
+ * `floor` is an optional legitimate RETENTION boundary. When log retention deletes
+ * the file that held seq 0, the oldest SURVIVING record has a non-genesis prevHash
+ * (its deleted predecessor's real hash), which would otherwise read as a hash-break
+ * at index 0 and flag the whole untampered log as tampered. If the first chained
+ * record's seq equals `floor.seq`, its prevHash is checked against `floor.prevHash`
+ * instead of GENESIS — a legitimate mid-chain start. Internal continuity (seq
+ * monotonic + each prevHash == prior hash + HMAC) is still enforced from there
+ * forward, so this loosens ONLY the genesis anchor, never the tamper detection.
  */
-export function verifyChain(records: readonly unknown[], key?: Buffer): VerifyResult {
+export function verifyChain(
+  records: readonly unknown[],
+  key?: Buffer,
+  floor?: RetentionFloor
+): VerifyResult {
   if (records.length === 0) {
     return { ok: false, verifiedCount: 0, firstBadIndex: -1, reason: 'empty' };
   }
@@ -183,8 +210,15 @@ export function verifyChain(records: readonly unknown[], key?: Buffer): VerifyRe
 
   const hasLegacyPrefix = firstChainedIndex > 0;
   let verifiedCount = 0;
-  let expectedPrevHash = GENESIS_HASH;
-  let expectedSeq = (records[firstChainedIndex] as ChainedRecord).seq;
+  const firstSeq = (records[firstChainedIndex] as ChainedRecord).seq;
+  // Genesis by default. If a retention floor is recorded and the first surviving
+  // record starts exactly at the floor seq, accept the floor's prevHash as the
+  // legitimate mid-chain anchor (older records were legitimately retained away).
+  let expectedPrevHash =
+    floor && floor.seq === firstSeq && typeof floor.prevHash === 'string'
+      ? floor.prevHash
+      : GENESIS_HASH;
+  let expectedSeq = firstSeq;
   // The first chained record's seq is the baseline; subsequent records must
   // increment by exactly 1. (A post-rotation genesis can start at any seq, but
   // within a single readAll() the suffix is contiguous.)

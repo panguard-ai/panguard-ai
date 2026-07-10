@@ -252,9 +252,37 @@ export function upCommand(): Command {
               stdio: 'inherit',
             });
           } catch (err) {
-            process.stderr.write(
-              `[panguard up] Setup failed: ${err instanceof Error ? err.message : String(err)}\n`
+            // Setup can fail or be interrupted (e.g. Ctrl-C during the
+            // interactive skill review, a platform-detection error). Whatever
+            // completed before the failure stays in place, but no MCP platforms
+            // may be configured and the whitelist may be empty — surface that
+            // plainly instead of a bracketed stderr line the user can miss, since
+            // we fall through into the rest of `pga up` regardless.
+            console.log('');
+            console.log(
+              `  ${c.caution(
+                t(
+                  lang,
+                  'Setup was interrupted — some platforms may not be configured.',
+                  '設定被中斷 — 部分平台可能尚未設定。'
+                )
+              )}`
             );
+            console.log(
+              `  ${c.dim(
+                t(
+                  lang,
+                  `Run ${c.sage('pga setup')} to finish, or continue below for whatever completed.`,
+                  `執行 ${c.sage('pga setup')} 完成設定，或繼續以下已完成的部分。`
+                )
+              )}`
+            );
+            console.log('');
+            if (opts.verbose) {
+              process.stderr.write(
+                `[panguard up] Setup error detail: ${err instanceof Error ? err.message : String(err)}\n`
+              );
+            }
           }
         }
 
@@ -338,6 +366,24 @@ export function upCommand(): Command {
           }
           if (detectedPlatforms.length === 0) {
             console.log(`    ${c.dim(t(lang, 'No AI tools found yet.', '尚未找到 AI 工具。'))}`);
+            console.log(
+              `    ${c.dim(
+                t(
+                  lang,
+                  'Supported: Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy.',
+                  '支援：Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy。'
+                )
+              )}`
+            );
+            console.log(
+              `    ${c.dim(
+                t(
+                  lang,
+                  'Guard is still running in the background and will pick up newly installed tools automatically.',
+                  'Guard 仍在背景執行，安裝新工具後會自動偵測。'
+                )
+              )}`
+            );
           }
           console.log();
         } catch {
@@ -390,7 +436,10 @@ export function upCommand(): Command {
 
             if (skills.length === 0) {
               console.log(
-                `  ${c.dim('No skills found. Install some MCP skills and run again.')}\n`
+                `  ${c.dim('No skills found. Install some MCP skills and run "pga scan" again.')}\n`
+              );
+              console.log(
+                `  ${c.dim('Guard is still running in the background and will pick up newly installed skills automatically.')}\n`
               );
             } else {
               // Load whitelist
@@ -623,9 +672,13 @@ export function upCommand(): Command {
                 }
               }
               if (done.length) {
+                // The hook is written to disk but not yet loaded by the running
+                // agent process — built-in tools are NOT protected until the
+                // agent restarts. Lead with that so the user doesn't read a
+                // green line and assume protection is already active.
                 console.log(
-                  `    ${c.safe(`Built-in tools guarded on ${done.length} platform(s)`)} ` +
-                    `${c.dim(`(${done.join(', ')} — restart the agent to activate)`)}`
+                  `    ${c.caution(`Built-in tools will be guarded on ${done.length} platform(s) after you restart the agent`)} ` +
+                    `${c.dim(`(${done.join(', ')})`)}`
                 );
                 console.log(
                   `    ${c.dim('Guarded = critical/high-confidence threats blocked, the rest advisory. `pga hook install --enforce` blocks everything.')}`
