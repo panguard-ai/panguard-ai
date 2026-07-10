@@ -175,14 +175,17 @@ describe('Dashboard 1.7 — consumer onboarding UX (Cluster B)', () => {
   });
 
   describe('status .layers.c — honest cost transparency', () => {
-    it('Layer C off-state guidance states flagged-only + a few cents/month + free local Ollama', async () => {
+    it('Layer C off-state guidance states flagged-only + free local Ollama (no ungrounded cost number)', async () => {
       const d = await (await get('/api/status')).json();
       const detail = String(d.layers.c.detail).toLowerCase();
       expect(d.layers.c.state).toBe('off');
       expect(detail).toContain('flagged events');
-      expect(detail).toContain('cents');
       expect(detail).toContain('ollama');
       expect(detail).toContain('free');
+      // Finding #30: the OFF state must NOT assert an ungrounded flat cost number
+      // ("a few cents"); the concrete "cents" figure only appears grounded in the
+      // user's actual flagged-event volume in the active/degraded state.
+      expect(detail).not.toContain('cents');
     });
   });
 

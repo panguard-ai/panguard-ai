@@ -236,8 +236,18 @@ describe('MCPProxy PreToolUse event routing (proxy.ts callTool -> evaluateToolCa
 // high-confidence deny NEVER escalated the session. recordEvalVerdict must scale
 // 0-1 up before the threshold check. Drive it exactly on the 0-1 scale.
 describe('MCPProxy session-risk escalation (recordEvalVerdict 0-1 normalization)', () => {
+  // Resolve the capability scope with 'echo' in it so these tests isolate the
+  // session-risk ESCALATION logic — not the fail-closed unresolved-scope gate.
+  // (An unresolved scope now DENIES under the fail-closed default.)
   function proxy(): MCPProxy {
-    return new MCPProxy({ upstreamCommand: 'noop', upstreamArgs: [] });
+    const p = new MCPProxy({ upstreamCommand: 'noop', upstreamArgs: [] });
+    const internals = p as unknown as {
+      upstreamToolNames: Set<string>;
+      capabilityScopeResolved: boolean;
+    };
+    internals.upstreamToolNames = new Set(['echo']);
+    internals.capabilityScopeResolved = true;
+    return p;
   }
 
   it('a 0-1-scale high-confidence deny (0.98) escalates the session -> fast-blocks next call', () => {

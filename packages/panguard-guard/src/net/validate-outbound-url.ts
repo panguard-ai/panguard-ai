@@ -6,10 +6,12 @@
  * endpoint, key-provisioner endpoint, user-configured webhook). Requires https:
  * (http allowed ONLY for loopback when explicitly opted in) and rejects
  * private / reserved / link-local / loopback / cloud-metadata addresses,
- * including IPv4-mapped IPv6 (::ffff:a.b.c.d) and IPv6 ULA / link-local.
+ * including IPv4-mapped IPv6 (::ffff:a.b.c.d), IPv6 ULA / link-local, and the
+ * well-known cloud-metadata DNS names (metadata.google.internal, etc.).
  *
  * Dependency-free by design (no DNS resolution): this blocks literal-IP and
- * obvious-hostname SSRF targets. DNS-rebinding is out of scope for a static
+ * the common metadata-hostname SSRF targets. An ARBITRARY hostname that resolves
+ * to a private IP (DNS-name SSRF / DNS-rebinding) is out of scope for a static
  * URL check and must be handled at the socket layer if ever needed.
  *
  * @module @panguard-ai/panguard-guard/net/validate-outbound-url
@@ -32,6 +34,14 @@ const PRIVATE_HOST_PATTERNS: readonly RegExp[] = [
   /^fd[0-9a-f]{2}:/i, // IPv6 ULA fd00::/8
   /^fe80:/i, // IPv6 link-local
   /^::ffff:/i, // IPv4-mapped IPv6 (::ffff:a.b.c.d)
+  // Cloud-metadata DNS names that resolve to 169.254.169.254 / fd00:ec2::254.
+  // A static IP denylist misses these header-free aliases, so match them by
+  // exact hostname. (DNS-rebinding to an arbitrary name that resolves to a
+  // private IP is still out of scope for a static check — see module doc.)
+  /^metadata\.google\.internal$/i, // GCP
+  /^metadata\.goog$/i, // GCP (short alias)
+  /^metadata$/i, // GCP bare hostname (resolves inside GCE)
+  /^metadata\.tencentyun\.com$/i, // Tencent Cloud
 ];
 
 export interface OutboundUrlOptions {

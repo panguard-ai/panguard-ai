@@ -88,6 +88,12 @@ export class MCPProxy {
   private readonly riskStore: InMemoryRiskStore;
   /** Confidence at/above which an evaluator deny escalates the whole session. */
   private static readonly ESCALATE_CONFIDENCE = 95;
+  /** Max background attempts to re-fetch the tool list after a listTools() failure. */
+  private static readonly SCOPE_RETRY_MAX = 5;
+  /** Base backoff (ms) for the exponential scope re-fetch retry (capped). */
+  private static readonly SCOPE_RETRY_BASE_MS = 500;
+  /** Ceiling (ms) for the exponential scope re-fetch backoff. */
+  private static readonly SCOPE_RETRY_MAX_MS = 30_000;
   /**
    * One stdio session per proxy process. Defaults to a per-process unique id
    * (not the old hardcoded constant) so verdict lines from distinct runs are
@@ -107,6 +113,10 @@ export class MCPProxy {
   private capabilityScopeResolved = false;
   /** One-shot throttle so the per-call degraded warning does not spam stderr. */
   private warnedScopeDegraded = false;
+  /** Count of background scope re-fetch attempts made after a listTools() failure. */
+  private scopeRetryAttempts = 0;
+  /** True while a background scope re-fetch is in flight (prevents pile-up). */
+  private scopeRetryInFlight = false;
   /** Tamper-evident chain over proxy-verdicts.jsonl (lazily keyed in connect()). */
   private chain: AuditChain | null = null;
 
@@ -178,30 +188,25 @@ export class MCPProxy {
     process.stderr.write(`[panguard-proxy] Connected to upstream\n`);
 
     // Cache upstream tool names as the Layer 0 capability scope: an agent may
-    // only call tools the upstream actually exposes. Best-effort — if the list
-    // can't be fetched, the gate falls back to allowing the requested tool.
-    try {
-      const upstream = await this.client.listTools();
-      this.upstreamToolNames = new Set(upstream.tools.map((t) => t.name));
-      // Scope is RESOLVED regardless of count. A successful empty list is a known
-      // (empty) scope — every tool call is then out-of-scope and gets DENIED,
-      // NOT waved through. This is distinct from a listTools FAILURE (below),
-      // where the scope is unknown.
-      this.capabilityScopeResolved = true;
-    } catch {
+    // only call tools the upstream actually exposes. If the list can't be fetched
+    // we do NOT latch a permanent fail-open: a bounded background retry re-tries
+    // the fetch (so a transient failure self-heals) and, until it resolves, the
+    // gate honors this.failMode — fail-CLOSED (the default) DENIES rather than
+    // waving unknown-scope calls through. See resolveCapabilityScope + gateCheck.
+    const resolved = await this.resolveCapabilityScope();
+    if (!resolved) {
       // listTools failed → the Layer-0 capability scope is UNKNOWN (unresolved).
-      // Do NOT pass silently (that was indistinguishable from a real allow in
-      // logs). We loudly flag it here and on the first gated call. HONEST scope of
-      // the fallback: while degraded, Layer-0 capability scope is fail-OPEN — the
-      // requested tool is allowed by name. The Layer-1 inline gate and the async
-      // ATR evaluator still run, but they match on CONTENT and have NO capability/
-      // tool-scope concept, so they do NOT re-close this specific gap (e.g. a
-      // benign-looking out-of-scope / shadow tool). Full deny-by-default would
-      // break availability on a transient list failure, hence observe + fail-open.
-      this.capabilityScopeResolved = false;
+      // Loudly flag it (a silent pass was indistinguishable from a real allow in
+      // logs) and start the background re-fetch so the scope can self-heal.
       process.stderr.write(
-        '[panguard-proxy] WARNING: upstream listTools() failed — Layer-0 capability-scope enforcement is DEGRADED (fail-open by tool name). Content rules still run but do not re-check tool scope.\n'
+        `[panguard-proxy] WARNING: upstream listTools() failed — Layer-0 capability-scope enforcement is DEGRADED. ` +
+          `Fail-mode='${this.failMode}': ` +
+          (this.failMode === 'closed'
+            ? 'tool calls are DENIED until the scope resolves.'
+            : 'tools are allowed by name (fail-open opt-in) until the scope resolves.') +
+          ' A bounded background retry is re-fetching the tool list.\n'
       );
+      this.scheduleScopeRetry();
     }
 
     this.server = new Server(
@@ -231,38 +236,123 @@ export class MCPProxy {
   }
 
   /**
+   * Fetch the upstream tool list and cache it as the Layer 0 capability scope.
+   * Returns true on success (scope RESOLVED, regardless of count — a successful
+   * empty list is a known-empty scope that DENIES every call), false if
+   * listTools() throws (scope left UNRESOLVED). Never throws. Shared by connect()
+   * and the background retry so both paths update the scope identically.
+   */
+  private async resolveCapabilityScope(): Promise<boolean> {
+    if (!this.client) return false;
+    try {
+      const upstream = await this.client.listTools();
+      this.upstreamToolNames = new Set(upstream.tools.map((t) => t.name));
+      this.capabilityScopeResolved = true;
+      // Reset the degraded-warning throttle so a later re-failure warns again.
+      this.warnedScopeDegraded = false;
+      return true;
+    } catch {
+      this.capabilityScopeResolved = false;
+      return false;
+    }
+  }
+
+  /**
+   * Schedule a bounded, exponential-backoff background re-fetch of the tool list
+   * so a transient listTools() failure self-heals instead of latching a degraded
+   * capability scope for the whole proxy lifetime. Fire-and-forget (never blocks a
+   * tool call); at most one attempt is in flight at a time and total attempts are
+   * capped by SCOPE_RETRY_MAX.
+   */
+  private scheduleScopeRetry(): void {
+    if (this.capabilityScopeResolved || this.scopeRetryInFlight) return;
+    if (this.scopeRetryAttempts >= MCPProxy.SCOPE_RETRY_MAX) return;
+    this.scopeRetryInFlight = true;
+    const attempt = this.scopeRetryAttempts;
+    const delay = Math.min(
+      MCPProxy.SCOPE_RETRY_BASE_MS * 2 ** attempt,
+      MCPProxy.SCOPE_RETRY_MAX_MS
+    );
+    const timer = setTimeout(() => {
+      void this.runScopeRetry();
+    }, delay);
+    // Do not keep the event loop alive solely for this retry timer.
+    if (typeof timer.unref === 'function') timer.unref();
+  }
+
+  /** Execute one background scope re-fetch attempt, then reschedule if needed. */
+  private async runScopeRetry(): Promise<void> {
+    this.scopeRetryAttempts += 1;
+    const ok = await this.resolveCapabilityScope();
+    this.scopeRetryInFlight = false;
+    if (ok) {
+      process.stderr.write(
+        `[panguard-proxy] Layer-0 capability scope RESOLVED after retry (${this.upstreamToolNames.size} tools); tool-scope enforcement restored.\n`
+      );
+      return;
+    }
+    // Still failing — back off and try again until the attempt cap is reached.
+    this.scheduleScopeRetry();
+  }
+
+  /**
    * Run the Layer 1 inline gate for a tool call (sync, sub-ms): build the
    * ActionContext and apply the gate. Capabilities default to the upstream tool
-   * set (Layer 0 scope); when unknown, the requested tool is allowed so the gate
-   * only adds block-on-sight + risk gating. Exposed so the wiring is testable.
+   * set (Layer 0 scope); when the scope is unresolved the fallback honors
+   * this.failMode — fail-CLOSED (default) DENIES, fail-open allows by name.
+   * Exposed so the wiring is testable.
    */
   gateCheck(name: string, toolArgs: Record<string, unknown>): McpGateVerdict {
     // Decide the capability set from whether the scope is RESOLVED, never from
     // its size — that was the bug: a successful-but-empty list looked identical
     // to "no list yet" and fell through to a silent allow.
-    let capabilities: ReadonlySet<string>;
     if (this.capabilityScopeResolved) {
       // Known scope. If it is empty, the upstream exposes no tools, so every call
       // is out-of-scope and applyMcpGate DENIES it. No fallback, no silent allow.
-      capabilities = this.upstreamToolNames;
-    } else {
-      // Unknown scope (listTools failed / not yet run) → fail-open by name to
-      // preserve availability, but make the degradation auditable (throttled so
-      // it does not spam). This gap is capability-scope only; content rules run.
-      if (!this.warnedScopeDegraded) {
-        this.warnedScopeDegraded = true;
-        process.stderr.write(
-          `[panguard-proxy] scope-degraded: capability scope unresolved — tools (starting with '${name}') pass Layer-0 by name fallback. Content rules still evaluate them; tool-scope is NOT enforced until the upstream tool list is available.\n`
-        );
-      }
-      capabilities = new Set([name]);
+      return applyMcpGate(this.guard, {
+        name,
+        args: toolArgs,
+        sessionId: this.sessionId,
+        agentId: this.agentId,
+        capabilities: this.upstreamToolNames,
+      });
     }
+
+    // Unknown scope (listTools failed / not yet run). Nudge a bounded background
+    // re-fetch so a transient failure does not permanently disable tool-scope,
+    // then decide THIS call by failMode — never an unconditional fail-open.
+    this.scheduleScopeRetry();
+    if (!this.warnedScopeDegraded) {
+      this.warnedScopeDegraded = true;
+      process.stderr.write(
+        `[panguard-proxy] scope-degraded: capability scope unresolved (fail-${this.failMode}) — ` +
+          (this.failMode === 'closed'
+            ? `tools (starting with '${name}') are DENIED until the upstream tool list resolves.`
+            : `tools (starting with '${name}') pass Layer-0 by name fallback (fail-open opt-in). Content rules still evaluate them; tool-scope is NOT enforced until the upstream tool list is available.`) +
+          '\n'
+      );
+    }
+
+    if (this.failMode === 'closed') {
+      // Fail-CLOSED default (security-first, mirrors the evaluator): an unknown
+      // capability scope must not wave calls through. Deny until it resolves.
+      return {
+        allow: false,
+        reason:
+          'Capability scope is unresolved (upstream tool list unavailable); denying under fail-closed policy. ' +
+          'Set PANGUARD_PROXY_FAIL_MODE=open to allow tools by name while degraded.',
+        escalated: false,
+      };
+    }
+
+    // Fail-open opt-in: allow by name to preserve availability. This gap is
+    // capability-scope only; the inline content gate below still runs.
     return applyMcpGate(this.guard, {
       name,
       args: toolArgs,
       sessionId: this.sessionId,
       agentId: this.agentId,
-      capabilities,
+      capabilities: new Set([name]),
     });
   }
 

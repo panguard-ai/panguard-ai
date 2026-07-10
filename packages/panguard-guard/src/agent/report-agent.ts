@@ -30,6 +30,7 @@ import type {
   GuardMode,
 } from '../types.js';
 import { updateBaseline } from '../memory/baseline.js';
+import { scrubSecretValues } from './scrub-secrets.js';
 import {
   AuditChain,
   buildActor,
@@ -233,6 +234,7 @@ export class ReportAgent {
     const dir = dirname(this.logPath);
     const base = basename(this.logPath);
     const cutoff = Date.now() - this.rotation.retentionDays * 24 * 60 * 60 * 1000;
+    let deletedAny = false;
 
     try {
       const files = readdirSync(dir).filter((f) => f.startsWith(base + '.'));
@@ -250,6 +252,7 @@ export class ReportAgent {
         if (entry.num > this.rotation.maxRotatedFiles) {
           try {
             unlinkSync(join(dir, entry.file));
+            deletedAny = true;
             logger.info(`Retention: deleted ${entry.file} (exceeds max rotated files)`);
           } catch {
             // Non-critical
@@ -262,6 +265,7 @@ export class ReportAgent {
           const stat = statSync(join(dir, entry.file));
           if (stat.mtimeMs < cutoff) {
             unlinkSync(join(dir, entry.file));
+            deletedAny = true;
             logger.info(
               `Retention: deleted ${entry.file} (older than ${this.rotation.retentionDays} days)`
             );
@@ -273,6 +277,15 @@ export class ReportAgent {
     } catch {
       // Directory read failure is non-critical
     }
+
+    // If retention deleted any file, the file that held seq 0 may now be gone, so
+    // the oldest SURVIVING record has a non-genesis prevHash. Record that boundary
+    // as a legitimate retention floor so verify() does not misreport the whole
+    // (untampered) log as tampered. recordRetentionFloor self-guards: it only
+    // persists a floor when the oldest surviving record is genuinely mid-chain.
+    if (deletedAny) {
+      this.chain.recordRetentionFloor();
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -280,10 +293,17 @@ export class ReportAgent {
   // ---------------------------------------------------------------------------
 
   private appendLog(record: ReportRecord): void {
+    // Scrub secret VALUES (AWS/GitHub/API keys, PRIVATE KEY blocks, DB URLs) out
+    // of the payload BEFORE it is hash-chained in place. Monitored event content
+    // can embed the very credential a monitor matched (e.g. a git-watcher diff
+    // finding), and command/log monitors capture raw command lines — none of which
+    // key-name redaction catches. Once appended, a record is immutable in the
+    // chain and can reach an export, so redaction must happen here, at write time.
+    const safe = scrubSecretValues(record);
     // Append through the tamper-evident chain. AuditChain.append is itself
     // fail-open (logs to stderr, never throws) so a broken audit file never
     // bricks the pipeline.
-    this.chain.append<ReportRecord>(record);
+    this.chain.append<ReportRecord>(safe);
   }
 
   /**

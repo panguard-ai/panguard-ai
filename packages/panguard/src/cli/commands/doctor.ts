@@ -18,6 +18,7 @@ import { PANGUARD_VERSION } from '../../index.js';
 import { readHookProtectionStatus } from './hook.js';
 import { lastScanAt, readFlaggedSkills } from '../flagged-skills.js';
 import { SERVICE_PLIST_BASENAME } from './persist.js';
+import { fetchDaemonStatus } from '../daemon-status.js';
 import { verifyConfigIntegrity, checkSelfState } from '@panguard-ai/panguard-guard';
 
 // ---------------------------------------------------------------------------
@@ -265,7 +266,20 @@ function checkAiProvider(): CheckResult {
   };
 }
 
-function checkGuardEngine(): CheckResult {
+/**
+ * Ask the live daemon for its actual loaded rule count via its own
+ * `/api/status` (the same source the dashboard's Layer A health uses) rather
+ * than inferring health from process liveness alone. Resolves to `null` on
+ * ANY failure — token missing, dashboard disabled, timeout, unreachable —
+ * so a host with the dashboard turned off (an unrelated feature) is never
+ * penalized for a signal it never opted into.
+ */
+async function fetchDaemonAtrRuleCount(): Promise<number | null> {
+  const status = await fetchDaemonStatus();
+  return typeof status?.atrRuleCount === 'number' ? status.atrRuleCount : null;
+}
+
+async function checkGuardEngine(): Promise<CheckResult> {
   if (!existsSync(GUARD_PID_PATH)) {
     return {
       status: 'fail',
@@ -275,16 +289,12 @@ function checkGuardEngine(): CheckResult {
     };
   }
 
+  let pid: number;
   try {
     const pidStr = readFileSync(GUARD_PID_PATH, 'utf-8').trim();
-    const pid = parseInt(pidStr, 10);
+    pid = parseInt(pidStr, 10);
     if (isNaN(pid)) throw new Error('Invalid PID');
     process.kill(pid, 0); // signal 0 checks existence without killing
-    return {
-      status: 'pass',
-      label: 'Guard engine',
-      detail: `Daemon running (PID ${pid})`,
-    };
   } catch {
     return {
       status: 'fail',
@@ -293,6 +303,29 @@ function checkGuardEngine(): CheckResult {
       fix: 'Run "pga guard start" to restart the guard daemon',
     };
   }
+
+  // A live PID alone does not prove detection is active — a daemon can be up
+  // with 0 loaded rules (checkHookProtection already treats that as degraded
+  // for the built-in-tool hook; this check previously had no equivalent for
+  // the daemon itself, so it always read PASS regardless of rule count).
+  const ruleCount = await fetchDaemonAtrRuleCount();
+  if (ruleCount !== null && ruleCount <= 0) {
+    return {
+      status: 'fail',
+      label: 'Guard engine',
+      detail: `Daemon running (PID ${pid}) but 0 detection rules loaded — protection is NOT active`,
+      fix: 'Reinstall @panguard-ai/atr or run "pga guard sync-rules"',
+    };
+  }
+
+  return {
+    status: 'pass',
+    label: 'Guard engine',
+    detail:
+      ruleCount !== null
+        ? `Daemon running (PID ${pid}), ${ruleCount} rules loaded`
+        : `Daemon running (PID ${pid})`,
+  };
 }
 
 function checkNotificationChannels(): CheckResult {
@@ -665,7 +698,7 @@ function checkAiLayerCloud(): CheckResult {
   };
 }
 
-function runAllChecks(): CheckResult[] {
+async function runAllChecks(): Promise<CheckResult[]> {
   return [
     checkInstallation(),
     checkConfiguration(),
@@ -674,7 +707,7 @@ function runAllChecks(): CheckResult[] {
     checkAiProvider(),
     checkAiLayerLocal(),
     checkAiLayerCloud(),
-    checkGuardEngine(),
+    await checkGuardEngine(),
     checkHookProtection(),
     checkNotificationChannels(),
     checkLastScan(),
@@ -720,7 +753,7 @@ function capitalise(text: string): string {
 // ---------------------------------------------------------------------------
 
 export async function runDoctor(lang: Lang): Promise<void> {
-  const results = runAllChecks();
+  const results = await runAllChecks();
 
   console.log('');
   console.log(header(lang === 'zh-TW' ? 'Panguard AI 健康診斷' : 'Panguard AI Health Check'));
@@ -769,7 +802,7 @@ export function doctorCommand(): Command {
     .option('--lang <language>', 'Language override (en | zh-TW)')
     .action(async (opts: { json?: boolean; fix?: boolean; lang?: string }) => {
       const lang: Lang = opts.lang === 'zh-TW' ? 'zh-TW' : 'en';
-      const results = runAllChecks();
+      const results = await runAllChecks();
 
       if (opts.json) {
         console.log(JSON.stringify(results, null, 2));

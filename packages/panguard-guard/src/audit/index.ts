@@ -17,6 +17,7 @@ export {
   signHmac,
   verifyChain,
   type ChainedRecord,
+  type RetentionFloor,
   type VerifyReason,
   type VerifyResult,
 } from './hash-chain.js';
@@ -29,6 +30,8 @@ export {
 } from './audit-chain.js';
 
 export { getAuditKey, __resetAuditKeyCacheForTests } from './audit-key.js';
+
+export { getExportSalt, __resetExportSaltCacheForTests } from './export-salt.js';
 
 export {
   buildActor,

@@ -10,6 +10,7 @@
 
 import { Command } from 'commander';
 import { readFileSync, existsSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { createPublicKey, verify as edVerify } from 'node:crypto';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { c, banner, divider, box, symbols, setLogLevel } from '@panguard-ai/core';
@@ -23,6 +24,47 @@ import { PANGUARD_VERSION } from '../../index.js';
 
 /** Default Threat Cloud endpoint */
 const DEFAULT_TC_ENDPOINT = 'https://tc.panguard.ai';
+
+/**
+ * Maximum number of network-delivered cloud rules the audit engine will accept.
+ * Mirrors GuardATREngine.MAX_CLOUD_RULES in panguard-guard so the auditor path
+ * shares the same resource bound as the daemon. Exported for regression tests.
+ */
+export const MAX_CLOUD_RULES = 500;
+
+/**
+ * Verify a detached ed25519 signature on a network-delivered detection rule
+ * BEFORE it is injected into the audit engine. This mirrors panguard-guard's
+ * verifyCloudRuleSignature (rule-loader.ts) so the skill-auditor path enforces
+ * the SAME trust boundary as the guard daemon: a rule pulled from Threat Cloud
+ * must be cryptographically attributable to the ATR publisher, not merely shaped
+ * like JSON. The engine compiles a rule's `detection` regex and runs it against
+ * the skill under audit, so an unsigned rule is unverified executable trust.
+ *
+ * Fail CLOSED: no provisioned publisher key (PANGUARD_RULE_PUBKEY, PEM ed25519),
+ * or a missing/invalid signature, or missing content => reject. The signing
+ * infrastructure that issues signed rules is not yet deployed, so until a key is
+ * provisioned this rejects every cloud rule by design — matching the daemon,
+ * which loads detection rules only from the signed npm package by default.
+ */
+export function verifyCloudRuleSignature(update: {
+  ruleContent?: string;
+  signature?: string;
+}): boolean {
+  const pem = process.env['PANGUARD_RULE_PUBKEY'];
+  if (!pem || !update.signature || !update.ruleContent) return false;
+  try {
+    const key = createPublicKey(pem);
+    return edVerify(
+      null,
+      Buffer.from(update.ruleContent, 'utf-8'),
+      key,
+      Buffer.from(update.signature, 'base64')
+    );
+  } catch {
+    return false;
+  }
+}
 
 // ---------------------------------------------------------------------------
 // URL detection & content fetching
@@ -345,21 +387,60 @@ export function auditCommand(): Command {
               // Blacklist fetch is best-effort
             }
 
-            // Fetch community ATR rules
-            const atrUpdates = await tc.fetchATRRules();
-            for (const update of atrUpdates) {
-              try {
-                const parsed = JSON.parse(update.ruleContent) as CloudATRRule;
-                if (parsed.id && parsed.title && parsed.detection) {
-                  cloudRules.push(parsed);
+            // Fetch community ATR rules. TRUST BOUNDARY: a rule fetched here is
+            // network-delivered detection logic — the audit engine compiles its
+            // `detection` regex and runs it against the skill under audit — so it
+            // is executable trust. Mirror the guard daemon's fail-closed gate
+            // (rule-loader.ts): only inject rules that carry a valid ed25519
+            // publisher signature, and cap the total. The signing infrastructure
+            // is not yet deployed (no PANGUARD_RULE_PUBKEY), so by default this
+            // rejects EVERY cloud rule rather than trusting unsigned content —
+            // exactly like the daemon, which uses only the signed npm package.
+            const hasPublisherKey = !!process.env['PANGUARD_RULE_PUBKEY'];
+            if (hasPublisherKey) {
+              const atrUpdates = await tc.fetchATRRules();
+              let rejectedUnsigned = 0;
+              for (const update of atrUpdates) {
+                if (cloudRules.length >= MAX_CLOUD_RULES) break;
+                // Reject any rule that is not signed by the ATR publisher key.
+                if (!verifyCloudRuleSignature(update)) {
+                  rejectedUnsigned++;
+                  continue;
                 }
-              } catch {
-                // Skip unparseable rules
+                try {
+                  const parsed = JSON.parse(update.ruleContent) as CloudATRRule;
+                  if (parsed.id && parsed.title && parsed.detection) {
+                    cloudRules.push(parsed);
+                  }
+                } catch {
+                  // Skip unparseable rules
+                }
               }
-            }
-            if (cloudRules.length > 0 && !options.json) {
-              console.log(c.dim(`  Threat Cloud: ${cloudRules.length} community rule(s) loaded`));
-              if (!isBlacklisted) console.log();
+              if (!options.json) {
+                if (cloudRules.length > 0) {
+                  console.log(
+                    c.dim(
+                      `  Threat Cloud: ${cloudRules.length} signature-verified community rule(s) loaded`
+                    )
+                  );
+                  if (!isBlacklisted) console.log();
+                }
+                if (rejectedUnsigned > 0) {
+                  console.log(
+                    c.dim(
+                      `  Threat Cloud: ${rejectedUnsigned} unsigned/invalid rule(s) rejected (fail-closed)`
+                    )
+                  );
+                }
+              }
+            } else if (!options.json && options.verbose) {
+              // Be honest that no cloud rules were loaded and why. Only surface
+              // in verbose mode so the normal audit output stays clean.
+              console.log(
+                c.dim(
+                  '  Threat Cloud: cloud rule sync skipped — no publisher key provisioned (fail-closed; bundled rules still apply)'
+                )
+              );
             }
           } catch {
             // Threat Cloud fetch is best-effort — never block the audit

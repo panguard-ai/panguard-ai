@@ -27,6 +27,7 @@ export {
   collectSelfState,
   mergeSelfState,
   readSelfStateRefs,
+  plistSecurityHash,
   GUARD_SERVICE_LABEL,
 } from './integrity.js';
 export type {
