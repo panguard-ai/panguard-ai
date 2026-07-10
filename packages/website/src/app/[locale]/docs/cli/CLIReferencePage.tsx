@@ -143,7 +143,7 @@ function SidebarNav({
   return (
     <nav className="hidden lg:block sticky top-24 self-start w-48 shrink-0">
       <p className="text-xs uppercase tracking-wider text-text-muted font-semibold mb-3">
-        {t('cli.categories')}
+        {t('cli.categoriesLabel')}
       </p>
       <ul className="space-y-1">
         {CATEGORIES.map((cat) => (

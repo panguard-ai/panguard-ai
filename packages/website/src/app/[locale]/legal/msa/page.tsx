@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import { buildAlternates } from '@/lib/seo';
 
-const MSA_LAST_UPDATED_EN = 'May 20, 2026';
-const MSA_LAST_UPDATED_ZH = '2026年5月20日';
-const MSA_VERSION = 'v1.0';
+const MSA_LAST_UPDATED_EN = 'July 10, 2026';
+const MSA_LAST_UPDATED_ZH = '2026年7月10日';
+const MSA_VERSION = 'v2.0';
 const MSA_PDF_URL = '/legal/01-MSA.pdf';
 
 export async function generateMetadata(props: {

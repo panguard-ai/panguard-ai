@@ -1617,11 +1617,20 @@
       },
       "inProgress": {
         "title": "進行中",
-        "items": ["Report + Trap", "Web Dashboard UI", "Windows 支援", "Kubernetes 整合"]
+        "items": [
+          "Report + Trap",
+          "Web Dashboard UI",
+          "Windows 支援",
+          "Kubernetes 整合"
+        ]
       },
       "planned": {
         "title": "規劃中",
-        "items": ["行動 App（iOS/Android）", "Threat Cloud API v2", "偵測規則社群市集"]
+        "items": [
+          "行動 App（iOS/Android）",
+          "Threat Cloud API v2",
+          "偵測規則社群市集"
+        ]
       }
     },
     "cta": {
@@ -2979,7 +2988,14 @@
       },
       "workflow": {
         "title": "適合你的工作流",
-        "tools": ["CLI", "REST API", "GitHub Actions", "Docker", "SSH", "Webhooks"]
+        "tools": [
+          "CLI",
+          "REST API",
+          "GitHub Actions",
+          "Docker",
+          "SSH",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "一行指令保護你的技術棧",
@@ -3040,7 +3056,13 @@
       },
       "integrations": {
         "title": "你團隊已在使用的整合",
-        "tools": ["Slack", "Telegram", "Email", "Microsoft Teams", "Webhooks"]
+        "tools": [
+          "Slack",
+          "Telegram",
+          "Email",
+          "Microsoft Teams",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "今天就保護你的企業",
@@ -3100,7 +3122,15 @@
       },
       "integrations": {
         "title": "企業整合",
-        "tools": ["SIEM", "PagerDuty", "Jira", "Slack", "Microsoft Teams", "REST API", "Webhooks"]
+        "tools": [
+          "SIEM",
+          "PagerDuty",
+          "Jira",
+          "Slack",
+          "Microsoft Teams",
+          "REST API",
+          "Webhooks"
+        ]
       },
       "cta": {
         "title": "看 Panguard 實際運作",
@@ -3156,7 +3186,14 @@
       "stack": "例如 CrowdStrike、Cloudflare、自訂腳本...",
       "message": "告訴我們你的安全目標或任何具體問題..."
     },
-    "teamSizes": ["只有我", "2-10", "11-50", "51-200", "201-500", "500+"],
+    "teamSizes": [
+      "只有我",
+      "2-10",
+      "11-50",
+      "51-200",
+      "201-500",
+      "500+"
+    ],
     "submit": "送出訊息",
     "submitting": "提交中...",
     "error": "提交失敗，請再試一次。",
@@ -3585,7 +3622,11 @@
       },
       "applicationLayer": {
         "title": "應用層",
-        "items": ["輸入驗證和消毒", "本地組態檔案權限（0600）", "CLI 透過本地令牌認證"]
+        "items": [
+          "輸入驗證和消毒",
+          "本地組態檔案權限（0600）",
+          "CLI 透過本地令牌認證"
+        ]
       },
       "infrastructureLayer": {
         "title": "基礎設施層",
@@ -3751,7 +3792,8 @@
       "title": "需要合規文件？",
       "desc": "申請 SOC 2 報告、滲透測試摘要或資料處理協議。所有文件對社群開放。",
       "cta1": "申請文件",
-      "cta2": "查看安全實踐"
+      "cta2": "查看安全實踐",
+      "cta3": "報告簽章金鑰"
     }
   },
   "security": {
@@ -4797,6 +4839,7 @@
       "title": "CLI 參考文件",
       "subtitle": "Panguard CLI 完整命令參考。涵蓋掃描、防護、聊天、蜜罐、報告、基礎設施、安全加固、設定和系統工具等 10 大類別共 35+ 個命令。",
       "installTitle": "安裝 CLI：",
+      "categoriesLabel": "分類",
       "categories": {
         "scanning": {
           "title": "掃描",
@@ -5238,19 +5281,34 @@
         "title": "MSP 合作夥伴",
         "subtitle": "託管安全服務供應商",
         "desc": "將 Panguard 的 AI 安全防護加入你的託管服務組合。多租戶管理、白標選項、開源。",
-        "highlights": ["多租戶管理主控台", "白標部署選項", "100% 免費開源", "自動化佈建 API"]
+        "highlights": [
+          "多租戶管理主控台",
+          "白標部署選項",
+          "100% 免費開源",
+          "自動化佈建 API"
+        ]
       },
       "technology": {
         "title": "技術合作夥伴",
         "subtitle": "整合與技術",
         "desc": "將 Panguard 與你的平台整合。API 存取、共同行銷機會、聯合解決方案開發。",
-        "highlights": ["完整 REST API 存取", "共同行銷計畫", "聯合解決方案開發", "技術整合支援"]
+        "highlights": [
+          "完整 REST API 存取",
+          "共同行銷計畫",
+          "聯合解決方案開發",
+          "技術整合支援"
+        ]
       },
       "reseller": {
         "title": "經銷合作夥伴",
         "subtitle": "增值經銷商",
         "desc": "向你的客戶群經銷 Panguard AI。交易登記、銷售賦能、專屬合作夥伴經理。",
-        "highlights": ["交易登記保護", "銷售賦能資源", "專屬合作夥伴經理", "完善的合作架構"]
+        "highlights": [
+          "交易登記保護",
+          "銷售賦能資源",
+          "專屬合作夥伴經理",
+          "完善的合作架構"
+        ]
       }
     },
     "benefits": {
@@ -6725,5 +6783,45 @@
       "eyebrow": "HOW IT WORKS",
       "title": "威脅<sage>結晶</sage>（Threat Crystallization）"
     }
+  },
+  "trustSigningKey": {
+    "overline": "Trust Center",
+    "title": "報告簽章金鑰",
+    "subtitle": "PanGuard 出具的每份審計報告，都以本頁公布的 Ed25519 金鑰簽署。Pin 住下方的金鑰指紋，即可離線驗證任何報告 — 不需帳號、不需 API，也不需信任交付通道。",
+    "facts": {
+      "title": "現行簽章金鑰",
+      "statusActive": "使用中",
+      "issuer": "簽發者",
+      "keyId": "金鑰指紋",
+      "algorithm": "演算法",
+      "created": "產生日期",
+      "usage": "用途",
+      "usageValue": "審計報告簽章",
+      "payloadFormat": "簽章格式"
+    },
+    "pem": {
+      "title": "公開金鑰（PEM）",
+      "copy": "複製",
+      "copied": "已複製",
+      "desc": "SPKI 編碼之 Ed25519 公開金鑰，可自由散布；私鑰永不離開簽發機器。金鑰指紋為此金鑰 DER 編碼之 SHA-256 前 16 位十六進位，加上 pgk1- 前綴。"
+    },
+    "verify": {
+      "title": "驗證報告",
+      "copy": "複製",
+      "steps": {
+        "0": "取得 JSON 格式的報告。審計報告以 HTML、Markdown、JSON 三種格式交付，共用同一雜湊與同一簽章。",
+        "1": "執行下方驗證指令：它會從報告正文重新計算 canonical SHA-256，並完全離線驗證內嵌的 Ed25519 簽章。",
+        "2": "確認回報的 key_id 與本頁一致。由未在本頁公布之金鑰簽署的報告，不應信任。"
+      }
+    },
+    "wellKnown": {
+      "title": "機器可讀的金鑰 Pinning",
+      "desc": "自動化與 CI 管線可從 well-known 端點取得現行金鑰清單，金鑰標示 active 或 revoked 狀態。"
+    },
+    "limits": {
+      "title": "本簽章是什麼 — 以及不是什麼",
+      "desc": "簽章證明報告完整性（任何竄改皆可偵測）與簽發來源（私鑰僅 PanGuard 持有）。它是簽發者自持的密碼學簽章，並非政府核定或合格憑證機構簽發之憑證；各法域的法律效力聲明與限制，皆載明於每份簽章報告內。"
+    },
+    "backToTrust": "返回 Trust Center"
   }
 }
