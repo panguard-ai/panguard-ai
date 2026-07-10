@@ -46,7 +46,7 @@ const COPY = {
       { en: 'pga CLI + Guard daemon (11 response actions)', zh: '' },
       { en: 'Honeypot integrated in Guard (trap-bridge.ts)', zh: '' },
       { en: 'Threat Cloud sensor registration on pga up', zh: '' },
-      { en: '15 agent runtimes auto-detected (Claude Code, Cursor, Windsurf, ...)', zh: '' },
+      { en: '17 agent runtimes auto-detected (Claude Code, Cursor, Windsurf, ...)', zh: '' },
     ],
   },
   zh: {
@@ -83,7 +83,7 @@ const COPY = {
       { en: '', zh: 'pga CLI + Guard daemon（11 種反應動作）' },
       { en: '', zh: '整合在 Guard 內的蜜罐(trap-bridge.ts)' },
       { en: '', zh: 'pga up 時自動註冊為 Threat Cloud 感測器' },
-      { en: '', zh: '自動偵測 15 種 agent runtime（Claude Code、Cursor、Windsurf…）' },
+      { en: '', zh: '自動偵測 17 種 agent runtime（Claude Code、Cursor、Windsurf…）' },
     ],
   },
 };

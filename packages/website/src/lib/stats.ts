@@ -249,8 +249,8 @@ export const STATS = {
     cisaKevCovered: 1,
     agentsProtected: 50,
     githubStars: 86,
-    /** Verified agent runtimes PanGuard auto-detects/registers into (VS Code Copilot + Zed are in preview, excluded). */
-    platformsSupported: 15,
+    /** Agent runtimes PanGuard auto-detects and registers its MCP protection into. */
+    platformsSupported: 17,
   },
   /** Platform coverage */
   platform: {
