@@ -9,7 +9,7 @@ const inputStyles =
   'w-full bg-surface-1 border border-border rounded-full px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-sage transition-colors';
 
 const TIER_TO_INQUIRY_INDEX: Record<string, number> = {
-  pilot: 1,
+  migrator: 1,
   enterprise: 2,
   'founding-f500': 3,
   sovereign: 4,
@@ -40,7 +40,7 @@ export default function ContactForm() {
     const prefilledType =
       idx !== undefined && inquiryTypes[idx] !== undefined ? inquiryTypes[idx] : '';
     const tierLabel: Record<string, string> = {
-      pilot: 'Pilot ($25K, 90 days)',
+      migrator: 'Migrator Pro',
       enterprise: 'Enterprise',
       'founding-f500': 'Founding F500 program',
       sovereign: 'Sovereign AI',

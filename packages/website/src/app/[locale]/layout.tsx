@@ -120,7 +120,7 @@ const jsonLd = [
   softwareApplicationSchema({
     name: 'PanGuard AI',
     description:
-      'The open standard plus commercial platform for AI agent security. ATR detection rules plus PanGuard runtime. Free Community tier, commercial Pilot / Enterprise / Sovereign tiers.',
+      'The open standard plus commercial platform for AI agent security. ATR detection rules plus PanGuard runtime. Free Community tier, commercial Enterprise / Migrator Pro / Sovereign tiers.',
     url: 'https://panguard.ai',
     category: 'SecurityApplication',
     pricing: 'mixed',

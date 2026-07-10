@@ -47,9 +47,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/evidence-pack',
     '/demo',
     '/early-access',
-    '/scoping',
     '/scan',
-    '/pilot/welcome',
     '/blacklist',
     '/whitelist',
     // blog + docs hubs
