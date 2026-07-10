@@ -320,7 +320,7 @@ export default function GettingStartedContent() {
               <p className="text-sm text-text-secondary mb-3">
                 {isZh
                   ? '執行 setup 自動設定所有偵測到的 AI 平台（Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、WorkBuddy、NemoClaw、ArkClaw、Windsurf、QClaw、Cline、VS Code Copilot、Zed、Gemini CLI、Continue、Roo Code）：'
-                  : 'Run setup to auto-configure all detected AI platforms (Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS Code Copilot, Zed, Gemini CLI, Continue, Roo Code):'}
+                  : 'Run setup to auto-configure all detected AI platforms (Claude Code, Claude Desktop, Cursor, Hermes Agent, OpenClaw, Codex, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS Code Copilot, Zed, Gemini CLI, Continue, Roo Code):'}
               </p>
               <CodeBlock code="pga setup" label="Terminal" />
               <p className="text-xs text-text-muted mt-1">
@@ -483,8 +483,8 @@ export default function GettingStartedContent() {
                 <CodeBlock code="pga setup" label="Terminal" />
                 <p className="text-xs text-text-muted mt-2">
                   {isZh
-                    ? '自動偵測 15 種 agent runtime——Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、Windsurf、Gemini CLI 等——並將 PanGuard 的 MCP 防護註冊進每一個（VS Code Copilot 與 Zed 為預覽版，不計入）。'
-                    : "Auto-detects 15 agent runtimes — Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, Windsurf, Gemini CLI, and more — and registers PanGuard's MCP protection into each (VS Code Copilot and Zed are in preview, not counted)."}
+                    ? '自動偵測 17 種 agent runtime——Claude Code、Claude Desktop、Cursor、OpenClaw、Codex、Windsurf、Gemini CLI 等——並將 PanGuard 的 MCP 防護註冊進每一個。'
+                    : "Auto-detects 17 agent runtimes — Claude Code, Claude Desktop, Cursor, OpenClaw, Codex, Windsurf, Gemini CLI, and more — and registers PanGuard's MCP protection into each."}
                 </p>
               </div>
             </FadeInUp>
