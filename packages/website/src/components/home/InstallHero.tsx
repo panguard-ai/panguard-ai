@@ -557,11 +557,7 @@ export default function InstallHero() {
           </div>
 
           {/* RIGHT — terminal */}
-          <motion.div
-            variants={variants.card}
-            id="install"
-            className="relative scroll-mt-24"
-          >
+          <motion.div variants={variants.card} id="install" className="relative scroll-mt-24">
             <TerminalGlow reduced={prefersReducedMotion} />
 
             {/* radar ping ring */}

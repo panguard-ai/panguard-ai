@@ -61,9 +61,10 @@ describe('guardCommand', () => {
       expect(subcommandNames).toContain('uninstall');
     });
 
-    it('should have 9 subcommands total', () => {
+    it('should have 10 subcommands total', () => {
       const cmd = guardCommand();
-      expect(cmd.commands).toHaveLength(9);
+      // 9 original + `trust-updates` (Gap A slice 2 arm command).
+      expect(cmd.commands).toHaveLength(10);
     });
   });
 
