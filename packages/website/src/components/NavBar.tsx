@@ -215,6 +215,16 @@ export default function NavBar() {
           <div className="hidden xl:flex items-center gap-0.5">
             <NavDropdown label={t('product')} items={productItems} />
             <NavDropdown label={t('atr')} items={atrItems} />
+            <Link
+              href="/sovereign"
+              className="group inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-brand-sage border border-brand-sage/40 hover:border-brand-sage hover:bg-brand-sage/10 transition duration-200"
+            >
+              <span
+                className="w-1.5 h-1.5 rounded-full bg-brand-sage group-hover:shadow-[0_0_0_3px_rgba(139,154,142,0.25)] transition"
+                aria-hidden
+              />
+              {t('sovereign')}
+            </Link>
             {topLinks.map((link) => (
               <Link
                 key={link.href}
@@ -324,6 +334,16 @@ export default function NavBar() {
                 ))}
               </div>
             )}
+
+            {/* Sovereign — featured */}
+            <Link
+              href="/sovereign"
+              className="flex items-center gap-2 py-3 min-h-[44px] text-sm font-medium text-brand-sage"
+              onClick={() => setMobileOpen(false)}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-sage" aria-hidden />
+              {t('sovereign')}
+            </Link>
 
             {/* Top links */}
             {topLinks.map((link) => (

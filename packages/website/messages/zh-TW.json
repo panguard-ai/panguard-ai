@@ -1,7 +1,7 @@
 {
   "common": {
     "getStarted": "立即開始",
-    "signIn": "Login",
+    "signIn": "登入",
     "startFreeTrial": "Install",
     "scanFree": "免費掃描",
     "contactSales": "聯繫業務",
@@ -27,18 +27,19 @@
     "footerTagline": "AI agent 安全平台——建立在開放的 ATR 標準上。一個指令安裝，AI 守護一切。"
   },
   "nav": {
+    "sovereign": "主權 AI",
     "product": "產品",
     "solutions": "解決方案",
     "resources": "資源",
     "company": "關於我們",
-    "pricing": "Pricing",
+    "pricing": "定價",
     "docs": "文件",
     "useCases": "使用場景",
     "howItWorks": "技術架構",
     "threatCloud": "Threat Cloud",
     "atr": "ATR",
     "about": "關於我們",
-    "blog": "Blog",
+    "blog": "部落格",
     "startFreeScan": "免費掃描",
     "getStarted": "立即開始",
     "install": "安裝",
@@ -99,13 +100,13 @@
       "partnersDesc": "託管服務供應商"
     },
     "resourceLinks": {
-      "blog": "Blog",
+      "blog": "部落格",
       "blogDesc": "最新洞察",
       "docs": "技術文件",
       "docsDesc": "指南與參考",
       "api": "API 文件",
       "apiDesc": "開發者文件",
-      "changelog": "Changelog",
+      "changelog": "更新日誌",
       "changelogDesc": "最新功能",
       "status": "系統狀態",
       "statusDesc": "服務運行狀態",
@@ -121,7 +122,7 @@
       "contactDesc": "與我們聯繫",
       "press": "新聞中心",
       "pressDesc": "媒體報導",
-      "trust": "Trust Center",
+      "trust": "信任中心",
       "trustDesc": "安全與合規",
       "partners": "合作夥伴",
       "partnersDesc": "夥伴生態系",
@@ -148,9 +149,9 @@
     "documentation": "技術文件",
     "cliReference": "CLI 參考文件",
     "apiReference": "API 文件",
-    "blog": "Blog",
+    "blog": "部落格",
     "resourceCenter": "資源中心",
-    "changelog": "Changelog",
+    "changelog": "更新日誌",
     "statusPage": "系統狀態",
     "about": "關於我們",
     "careers": "加入團隊",
@@ -160,7 +161,7 @@
     "customers": "客戶案例",
     "openSource": "開源",
     "sponsorAtr": "贊助 ATR",
-    "trustCenter": "Trust Center",
+    "trustCenter": "信任中心",
     "security": "安全",
     "privacyPolicy": "隱私政策",
     "termsOfService": "服務條款",
@@ -1845,6 +1846,10 @@
       "nextDesc": "線上掃描器是單次稽核。安裝 Panguard 即可即時守護你的代理——同一套 ATR 規則,持續運作。",
       "installCta": "安裝 Panguard",
       "docsCta": "閱讀文件"
+    },
+    "account": {
+      "title": "帳戶",
+      "description": "管理您的 Panguard AI 帳戶。免費且開源。"
     }
   },
   "pricingPage": {
@@ -3461,10 +3466,10 @@
       "tripleThreat": "個三重威脅（shell + network + fs）",
       "breakdownTitle": "各嚴重度分布",
       "severity": {
-        "critical": "Critical",
-        "high": "High",
-        "medium": "Medium",
-        "low": "Low"
+        "critical": "嚴重",
+        "high": "高",
+        "medium": "中",
+        "low": "低"
       }
     },
     "why": {
@@ -3540,7 +3545,7 @@
     }
   },
   "trust": {
-    "overline": "Trust Center",
+    "overline": "信任中心",
     "title": "可以",
     "titleHighlight": "驗證",
     "subtitle": "透明是信任的基礎。查看我們的合規狀態、安全架構、資料處理實踐和次處理者關係 -- 全在一處。",
@@ -3933,7 +3938,7 @@
       "note": "Panguard 是 100% 免費開源。社群支援透過 GitHub issues。"
     },
     "trustCenter": {
-      "overline": "Trust Center",
+      "overline": "信任中心",
       "title": "可驗證的文件。",
       "subtitle": "下載我們的安全文件、申請稽核報告，或查看我們的合規文件。",
       "doc1": {
@@ -5146,7 +5151,7 @@
     }
   },
   "changelog": {
-    "overline": "Changelog",
+    "overline": "更新日誌",
     "title": "Panguard 最新動態",
     "subtitle": "我們快速且透明地交付。每一次更新、改進和修復 -- 都記錄在這裡。",
     "filters": {
@@ -5556,6 +5561,10 @@
       "apiDocs": {
         "title": "API 文件",
         "description": "整合至您的工具鏈"
+      },
+      "account": {
+        "title": "帳戶",
+        "description": "管理您的帳戶"
       }
     },
     "usageHeading": "本月使用量",
@@ -5565,7 +5574,7 @@
     "quickStartDescription": "安裝 Panguard CLI，2 分鐘內完成首次安全掃描：",
     "quickStart": {
       "install": "安裝",
-      "login": "Login",
+      "login": "登入",
       "scan": "掃描"
     },
     "onboarding": {
@@ -6310,6 +6319,8 @@
         "tools": "ATR 規則",
         "items": [
           "ATR 規則：Prompt Injection、Tool Poisoning、Skill 入侵",
+          "ATR 規則：憑證外洩、上下文操縱",
+          "ATR 規則：跨代理攻擊、未授權存取",
           "670+ 條規則，社群驅動，持續更新"
         ]
       },
