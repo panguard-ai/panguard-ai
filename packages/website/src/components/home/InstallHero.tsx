@@ -4,20 +4,22 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion, useReducedMotion, type Variants } from 'framer-motion';
 import { Check, Copy } from 'lucide-react';
-import BrandLogo from '@/components/ui/BrandLogo';
 import { STATS } from '@/lib/stats';
 
 /* ─────────────────────────────────────────────────────────────────
-   InstallHero — one-command install, played out in a live terminal.
-   The scanner moved to /scan; the hero now sells the 30-second path:
-   type the command → rules load → agents detected → guard active.
+   InstallHero — split layout: copy on the left, live terminal on
+   the right (founder-approved hero-split mockup, 2026-07-11).
+   The terminal keeps the original typing-playback mechanism; the
+   background gains three aurora blobs, a breathing glow anchored
+   behind the terminal, and a sweeping light beam. Platform ticker
+   runs full-width at the bottom of the section.
    Pure framer-motion + CSS (no canvas, no new deps, CSP-safe).
    ───────────────────────────────────────────────────────────────── */
 
 const INSTALL_CMD = 'curl -fsSL https://get.panguard.ai | bash';
 
-// The 15 verified agent runtimes PanGuard auto-detects (2 more in preview,
-// deliberately excluded — keep in sync with STATS.adoption.platformsSupported).
+// The 17 agent runtimes PanGuard auto-detects — keep this list in sync
+// with STATS.adoption.platformsSupported (17).
 const PLATFORM_NAMES = [
   'Claude Code',
   'Claude Desktop',
@@ -31,6 +33,8 @@ const PLATFORM_NAMES = [
   'Windsurf',
   'QClaw',
   'Cline',
+  'VS Code Copilot',
+  'Zed',
   'Gemini CLI',
   'Continue',
   'Roo Code',
@@ -52,7 +56,11 @@ function buildScript(): readonly TermLine[] {
     { type: 'out', text: `✓ panguard ${STATS.cliVersion} installed`, tone: 'ok' },
     { type: 'cmd', text: 'pga up' },
     { type: 'out', text: `✓ ${STATS.atrRules.toLocaleString()} ATR rules loaded`, tone: 'ok' },
-    { type: 'out', text: '✓ 3 agents detected — Claude Code · Cursor · Gemini CLI', tone: 'ok' },
+    {
+      type: 'out',
+      text: `✓ ${STATS.adoption.platformsSupported} agent runtimes detected — Claude Code · Cursor · Gemini CLI …`,
+      tone: 'ok',
+    },
     { type: 'out', text: '✓ dashboard → http://127.0.0.1:3100', tone: 'link' },
     { type: 'out', text: '● guard active — watching every agent action', tone: 'live' },
   ];
@@ -62,6 +70,7 @@ const TYPE_MS = 26; // per character
 const CMD_PAUSE_MS = 420; // pause after a command before its output
 const OUT_MS = 300; // per output line
 const START_DELAY_MS = 900;
+const COPY_RESET_MS = 2000;
 
 /* Deterministic terminal playback. Reduced motion renders the finished
    transcript immediately. */
@@ -109,6 +118,17 @@ function useTerminalPlayback(script: readonly TermLine[], reduced: boolean) {
   return { lines, current: current && current.type === 'cmd' ? current : null, typed, done };
 }
 
+/* Shared copy-to-clipboard state (install pill + terminal title bar). */
+function useCopyCommand() {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(INSTALL_CMD);
+    setCopied(true);
+    setTimeout(() => setCopied(false), COPY_RESET_MS);
+  };
+  return { copied, handleCopy };
+}
+
 function ToneText({ line }: { readonly line: TermLine }) {
   const cls =
     line.tone === 'ok'
@@ -132,13 +152,7 @@ function Terminal({
 }) {
   const script = useMemo(() => buildScript(), []);
   const { lines, current, typed, done } = useTerminalPlayback(script, reduced);
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(INSTALL_CMD);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  const { copied, handleCopy } = useCopyCommand();
 
   // out lines that follow the *last shown* cmd still pending → nothing extra to render
   return (
@@ -149,7 +163,7 @@ function Terminal({
         aria-hidden="true"
       />
 
-      <div className="relative rounded-2xl border border-border bg-[#131010]/95 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.8)] overflow-hidden backdrop-blur">
+      <div className="relative rounded-2xl border border-border bg-[#131010]/95 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.9)] overflow-hidden backdrop-blur">
         {/* sheen sweep */}
         {!reduced && (
           <motion.div
@@ -168,7 +182,7 @@ function Terminal({
             <span className="w-3 h-3 rounded-full bg-[#FEBC2E]/80" />
             <span className="w-3 h-3 rounded-full bg-[#28C840]/80" />
             <span className="ml-3 font-mono text-[11px] text-text-muted tracking-wide">
-              panguard — zsh
+              panguard — install
             </span>
           </div>
           <button
@@ -248,33 +262,14 @@ function Terminal({
   );
 }
 
-/* ─── tickers (shared visual language with the previous hero) ─── */
-function ThreatTicker({ items }: { readonly items: readonly string[] }) {
-  const doubled = [...items, ...items];
-  return (
-    <div className="relative overflow-hidden w-full py-3">
-      <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-surface-hero to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-surface-hero to-transparent z-10 pointer-events-none" />
-      <motion.div
-        className="flex gap-8 whitespace-nowrap"
-        animate={{ x: ['0%', '-50%'] }}
-        transition={{ duration: 30, ease: 'linear', repeat: Infinity }}
-      >
-        {doubled.map((item, i) => (
-          <span
-            key={`${item}-${i}`}
-            className="text-xs sm:text-sm text-red-400/80 font-mono tracking-wide flex items-center gap-2"
-          >
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-400/60 shrink-0" />
-            {item}
-          </span>
-        ))}
-      </motion.div>
-    </div>
-  );
-}
-
-function PlatformTicker({ names }: { readonly names: readonly string[] }) {
+/* ─── platform ticker (full-width strip at the bottom of the hero) ─── */
+function PlatformTicker({
+  names,
+  reduced,
+}: {
+  readonly names: readonly string[];
+  readonly reduced: boolean;
+}) {
   const doubled = [...names, ...names];
   return (
     <div className="relative overflow-hidden w-full py-2">
@@ -282,19 +277,135 @@ function PlatformTicker({ names }: { readonly names: readonly string[] }) {
       <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-surface-hero to-transparent z-10 pointer-events-none" />
       <motion.div
         className="flex gap-6 whitespace-nowrap"
-        animate={{ x: ['0%', '-50%'] }}
-        transition={{ duration: 25, ease: 'linear', repeat: Infinity }}
+        animate={reduced ? undefined : { x: ['0%', '-50%'] }}
+        transition={{ duration: 40, ease: 'linear', repeat: Infinity }}
       >
         {doubled.map((name, i) => (
           <span
             key={`${name}-${i}`}
-            className="text-xs text-text-secondary/70 font-medium flex items-center gap-1.5"
+            className="text-xs text-text-secondary/70 font-mono flex items-center gap-1.5"
           >
-            <span className="inline-block w-1 h-1 rounded-full bg-panguard-green/40 shrink-0" />
+            <span className="inline-block w-1 h-1 rounded-full bg-panguard-green/50 shrink-0" />
             {name}
           </span>
         ))}
       </motion.div>
+    </div>
+  );
+}
+
+/* ─── background: grid + aurora + beam (mockup .bg) ─── */
+const AURORA_BLOBS = [
+  {
+    size: 820,
+    position: { left: '-8%', top: '-30%' },
+    background: 'radial-gradient(circle, rgba(139,154,142,0.16), transparent 60%)',
+    x: [0, 70, -40, 0],
+    y: [0, 50, 20, 0],
+    duration: 24,
+  },
+  {
+    size: 860,
+    position: { right: '-8%', top: '4%' },
+    background: 'radial-gradient(circle, rgba(52,211,153,0.30), transparent 58%)',
+    x: [0, -80, 30, 0],
+    y: [0, -40, 50, 0],
+    duration: 30,
+  },
+  {
+    size: 520,
+    position: { left: '20%', bottom: '-30%' },
+    background: 'radial-gradient(circle, rgba(52,211,153,0.10), transparent 60%)',
+    x: [0, -40, 70, 0],
+    y: [0, 20, 50, 0],
+    duration: 36,
+  },
+] as const;
+
+function HeroBackground({ reduced }: { readonly reduced: boolean }) {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      {/* grid with radial mask, brighter than the old hero */}
+      <div
+        className="absolute inset-0 opacity-[0.055]"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)',
+          backgroundSize: '112px 112px',
+          WebkitMaskImage: 'radial-gradient(120% 100% at 70% 45%, #000 30%, transparent 78%)',
+          maskImage: 'radial-gradient(120% 100% at 70% 45%, #000 30%, transparent 78%)',
+        }}
+      />
+
+      {/* sweeping light beam */}
+      {!reduced && (
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(100deg, transparent 40%, rgba(139,154,142,0.06) 50%, transparent 60%)',
+          }}
+          animate={{ x: ['-8%', '8%', '-8%'], opacity: [0, 1, 0] }}
+          transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      )}
+
+      {/* aurora blobs — transform-only drift */}
+      {AURORA_BLOBS.map((blob, i) =>
+        reduced ? (
+          <div
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              width: blob.size,
+              height: blob.size,
+              ...blob.position,
+              background: blob.background,
+              filter: 'blur(14px)',
+            }}
+          />
+        ) : (
+          <motion.div
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              width: blob.size,
+              height: blob.size,
+              ...blob.position,
+              background: blob.background,
+              filter: 'blur(14px)',
+            }}
+            animate={{ x: [...blob.x], y: [...blob.y] }}
+            transition={{ duration: blob.duration, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        )
+      )}
+    </div>
+  );
+}
+
+/* ─── breathing glow anchored behind the terminal (desktop only) ─── */
+function TerminalGlow({ reduced }: { readonly reduced: boolean }) {
+  const gradient =
+    'radial-gradient(closest-side, rgba(52,211,153,0.38), rgba(52,211,153,0.12) 55%, transparent 80%)';
+  return (
+    <div
+      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[760px] h-[560px] max-w-none hidden lg:block pointer-events-none"
+      aria-hidden="true"
+    >
+      {reduced ? (
+        <div
+          className="h-full w-full opacity-75"
+          style={{ background: gradient, filter: 'blur(4px)' }}
+        />
+      ) : (
+        <motion.div
+          className="h-full w-full"
+          style={{ background: gradient, filter: 'blur(4px)' }}
+          animate={{ opacity: [0.75, 1, 0.75], scale: [1, 1.06, 1] }}
+          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      )}
     </div>
   );
 }
@@ -324,157 +435,164 @@ function buildVariants(reduced: boolean): { container: Variants; child: Variants
   };
 }
 
+/* ─── install command pill (left column) ─── */
+function InstallCommandPill({
+  copyLabel,
+  copiedLabel,
+}: {
+  readonly copyLabel: string;
+  readonly copiedLabel: string;
+}) {
+  const { copied, handleCopy } = useCopyCommand();
+  return (
+    <div className="mt-5 inline-flex max-w-full items-center gap-3 overflow-x-auto rounded-[10px] border border-border bg-[#131010]/90 px-3.5 py-2.5 font-mono text-[13px] text-text-secondary shadow-[0_0_20px_rgba(52,211,153,0.06)]">
+      <span className="text-panguard-green font-semibold select-none">$</span>
+      <span className="whitespace-nowrap text-text-primary/85">{INSTALL_CMD}</span>
+      <button
+        type="button"
+        onClick={handleCopy}
+        className="ml-1 flex shrink-0 items-center gap-1 rounded-md border border-border px-2 py-0.5 font-mono text-[11px] text-text-muted hover:text-text-primary hover:border-border-hover transition-colors"
+        aria-label={copyLabel}
+      >
+        {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+        {copied ? copiedLabel : copyLabel}
+      </button>
+    </div>
+  );
+}
+
 export default function InstallHero() {
   const t = useTranslations('home.installHero');
   const prefersReducedMotion = useReducedMotion() ?? false;
   const variants = useMemo(() => buildVariants(prefersReducedMotion), [prefersReducedMotion]);
 
-  const tickerItems = [t('ticker1'), t('ticker2'), t('ticker3'), t('ticker4'), t('ticker5')];
+  const badges = [
+    t('badgeRules', { count: STATS.atrRules.toLocaleString() }),
+    t('badgeRecall'),
+    t('badgeMerged'),
+    t('badgeLicense'),
+  ];
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-surface-hero">
-      {/* faint grid */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.015]"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)',
-          backgroundSize: '120px 120px',
-        }}
-      />
-      {/* scan-beam grid reveal (pure CSS, defined in globals) */}
-      <div className="scan-reveal" aria-hidden="true">
-        <div className="scan-reveal-layer" />
+    <section className="relative overflow-hidden bg-surface-hero">
+      <HeroBackground reduced={prefersReducedMotion} />
+
+      <div className="relative z-10 min-h-[78vh] flex items-center px-5 sm:px-8 lg:px-12 pt-10 sm:pt-12 pb-8">
+        <motion.div
+          variants={variants.container}
+          initial="hidden"
+          animate="show"
+          className="w-full max-w-[1200px] mx-auto grid items-center gap-10 lg:gap-[clamp(2.5rem,6vw,6rem)] lg:grid-cols-[0.92fr_1.08fr]"
+        >
+          {/* LEFT — copy */}
+          <div className="flex flex-col items-start text-left">
+            <motion.span
+              variants={variants.child}
+              className="mb-6 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-micro text-brand-sage"
+            >
+              <motion.span
+                aria-hidden="true"
+                className="w-1.5 h-1.5 rounded-full bg-panguard-green shadow-[0_0_8px_rgba(52,211,153,0.9)]"
+                animate={prefersReducedMotion ? undefined : { opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+              />
+              {t('eyebrow')}
+            </motion.span>
+
+            <motion.h1
+              variants={variants.child}
+              className="font-display text-4xl sm:text-5xl xl:text-[4.4rem] font-bold leading-[1.06] tracking-[-0.035em] text-text-primary [text-wrap:balance]"
+            >
+              {t('titleLine1')}
+              <br />
+              <span className="text-brand-sage">{t('titleLine2')}</span>
+            </motion.h1>
+
+            <motion.p
+              variants={variants.child}
+              className="mt-6 max-w-[40ch] text-base sm:text-lg text-text-secondary leading-[1.72] [text-wrap:balance]"
+            >
+              {t('subtitle')}
+            </motion.p>
+
+            <motion.div
+              variants={variants.child}
+              className="mt-9 flex flex-wrap items-center gap-x-5 gap-y-3"
+            >
+              <a
+                href="#install"
+                className="inline-flex items-center rounded-full bg-panguard-green px-6 py-3 font-display text-sm sm:text-base font-semibold text-surface-hero shadow-[0_0_30px_rgba(52,211,153,0.28)] hover:bg-panguard-green-light hover:shadow-[0_0_40px_rgba(52,211,153,0.42)] transition-all duration-200 active:scale-[0.98]"
+              >
+                {t('ctaInstall')}
+              </a>
+              <a
+                href="/scan"
+                className="text-sm sm:text-[0.95rem] font-semibold text-brand-sage hover:text-brand-sage-light hover:underline transition-colors"
+              >
+                {t('ctaScan')}
+              </a>
+            </motion.div>
+
+            <motion.div variants={variants.child} className="max-w-full">
+              <InstallCommandPill copyLabel={t('copy')} copiedLabel={t('copied')} />
+            </motion.div>
+
+            <motion.p
+              variants={variants.child}
+              className="mt-4 font-mono text-[11px] uppercase tracking-micro text-text-muted"
+            >
+              {t('installNote')}
+            </motion.p>
+
+            <motion.div variants={variants.child} className="mt-10 flex flex-wrap gap-2">
+              {badges.map((badge) => (
+                <span
+                  key={badge}
+                  className="rounded-full border border-border bg-surface-1/50 px-3 py-1 font-mono text-[10px] uppercase tracking-micro text-text-muted"
+                >
+                  {badge}
+                </span>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* RIGHT — terminal */}
+          <motion.div
+            variants={variants.card}
+            id="install"
+            className="relative scroll-mt-24"
+          >
+            <TerminalGlow reduced={prefersReducedMotion} />
+
+            {/* radar ping ring */}
+            {!prefersReducedMotion && (
+              <motion.div
+                aria-hidden="true"
+                className="absolute -inset-7 rounded-[26px] border border-current pointer-events-none"
+                style={{ color: 'rgba(52, 211, 153, 0.30)' }}
+                animate={{ scale: [0.95, 1.05], opacity: [0.55, 0] }}
+                transition={{ duration: 3, repeat: Infinity, repeatDelay: 4, ease: 'easeOut' }}
+              />
+            )}
+
+            <Terminal
+              reduced={prefersReducedMotion}
+              copyLabel={t('copy')}
+              copiedLabel={t('copied')}
+            />
+          </motion.div>
+        </motion.div>
       </div>
 
-      {/* aurora drift — two soft blobs, transform-only */}
-      {!prefersReducedMotion && (
-        <>
-          <motion.div
-            aria-hidden="true"
-            className="absolute w-[720px] h-[720px] rounded-full pointer-events-none"
-            style={{
-              left: '8%',
-              top: '-18%',
-              background: 'radial-gradient(circle, rgba(139,154,142,0.10) 0%, transparent 62%)',
-            }}
-            animate={{ x: [0, 60, -30, 0], y: [0, 40, 10, 0] }}
-            transition={{ duration: 26, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div
-            aria-hidden="true"
-            className="absolute w-[640px] h-[640px] rounded-full pointer-events-none"
-            style={{
-              right: '2%',
-              bottom: '-22%',
-              background: 'radial-gradient(circle, rgba(52,211,153,0.07) 0%, transparent 60%)',
-            }}
-            animate={{ x: [0, -70, 20, 0], y: [0, -30, -60, 0] }}
-            transition={{ duration: 32, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        </>
-      )}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(700px,200vw)] h-[min(700px,200vw)] rounded-full pointer-events-none hero-orb" />
+      {/* platform ticker — full-width strip at the bottom */}
+      <div className="relative z-10 max-w-[1200px] mx-auto px-5 sm:px-8 lg:px-12 pb-10 animate-[fadeIn_0.5s_0.6s_ease_both]">
+        <p className="mb-3 font-mono text-[10px] uppercase tracking-micro text-text-muted">
+          {t('platformLabel')}
+        </p>
+        <PlatformTicker names={PLATFORM_NAMES} reduced={prefersReducedMotion} />
+      </div>
 
-      <motion.div
-        variants={variants.container}
-        initial="hidden"
-        animate="show"
-        className="relative z-10 text-center px-4 sm:px-6 pt-28 sm:pt-36 pb-16 max-w-3xl mx-auto"
-      >
-        {/* logo */}
-        <motion.div variants={variants.child} className="mb-8">
-          <BrandLogo size={36} className="text-panguard-green mx-auto sm:w-12 sm:h-12" />
-        </motion.div>
-
-        {/* headline */}
-        <div className="mb-6">
-          <motion.h1
-            variants={variants.child}
-            className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.1] tracking-tight text-text-primary [text-wrap:balance]"
-          >
-            {t('titleLine1')}
-            <span className="text-brand-sage">{t('titleLine2')}</span>
-          </motion.h1>
-          <motion.p
-            variants={variants.child}
-            className="mt-5 text-base sm:text-lg text-text-secondary leading-[1.85] max-w-xl mx-auto [text-wrap:balance]"
-          >
-            {t('subtitle')}
-          </motion.p>
-        </div>
-
-        {/* threat ticker */}
-        <motion.div variants={variants.child} className="mb-8">
-          <ThreatTicker items={tickerItems} />
-        </motion.div>
-
-        {/* terminal + radar ping */}
-        <motion.div variants={variants.card} className="max-w-xl mx-auto relative">
-          {!prefersReducedMotion && (
-            <motion.div
-              aria-hidden="true"
-              className="absolute -inset-8 -z-10 rounded-3xl border border-current pointer-events-none"
-              style={{ color: 'rgba(139, 154, 142, 0.25)' }}
-              animate={{ scale: [0.92, 1.12], opacity: [0.3, 0] }}
-              transition={{ duration: 2.4, repeat: Infinity, repeatDelay: 5, ease: 'easeOut' }}
-            />
-          )}
-          <Terminal
-            reduced={prefersReducedMotion}
-            copyLabel={t('copy')}
-            copiedLabel={t('copied')}
-          />
-
-          {/* install note + secondary paths */}
-          <p className="mt-4 font-mono text-[11px] uppercase tracking-micro text-text-muted">
-            {t('installNote')}
-          </p>
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm">
-            <a href="/scan" className="text-brand-sage font-semibold hover:underline">
-              {t('ctaScan')}
-            </a>
-            <span className="text-border select-none" aria-hidden="true">
-              ·
-            </span>
-            <a
-              href="https://docs.panguard.ai/quickstart"
-              className="text-text-secondary hover:text-text-primary transition-colors"
-            >
-              {t('ctaDocs')}
-            </a>
-          </div>
-        </motion.div>
-
-        {/* trust badges */}
-        <motion.div variants={variants.child} className="mt-9">
-          <div className="flex flex-wrap justify-center gap-2">
-            {[
-              t('badgeRules', { count: STATS.atrRules.toLocaleString() }),
-              t('badgeRecall'),
-              t('badgeMerged'),
-              t('badgeLicense'),
-            ].map((badge) => (
-              <span
-                key={badge}
-                className="rounded-full border border-border bg-surface-1 px-3 py-1 font-mono text-[10px] uppercase tracking-micro text-text-muted"
-              >
-                {badge}
-              </span>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* platform ticker */}
-        <div className="mt-6 animate-[fadeIn_0.5s_0.6s_ease_both]">
-          <p className="mb-2 font-mono text-[10px] uppercase tracking-micro text-text-muted">
-            {t('platformLabel')}
-          </p>
-          <PlatformTicker names={PLATFORM_NAMES} />
-        </div>
-      </motion.div>
-
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-surface-hero to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-surface-hero to-transparent pointer-events-none" />
     </section>
   );
 }

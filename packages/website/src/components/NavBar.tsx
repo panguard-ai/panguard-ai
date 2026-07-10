@@ -189,12 +189,11 @@ export default function NavBar() {
     { label: t('atrLinks.cite'), desc: t('atrLinks.citeDesc'), href: '/atr/cite' },
   ];
 
+  // Main nav is 5 items: Product, ATR, Sovereign (highlighted), How it Works,
+  // Docs. Threat Cloud / About / Blog moved to the footer only.
   const topLinks = [
     { label: t('howItWorks'), href: '/how-it-works' },
-    { label: t('threatCloud'), href: '/threat-cloud' },
     { label: t('docs'), href: 'https://docs.panguard.ai' },
-    { label: t('about'), href: '/about' },
-    { label: t('blog'), href: '/blog' },
   ];
 
   return (
@@ -217,10 +216,10 @@ export default function NavBar() {
             <NavDropdown label={t('atr')} items={atrItems} />
             <Link
               href="/sovereign"
-              className="group inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-brand-sage border border-brand-sage/40 hover:border-brand-sage hover:bg-brand-sage/10 transition duration-200"
+              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold text-panguard-green bg-panguard-green/10 border border-panguard-green/30 hover:border-panguard-green/60 hover:bg-panguard-green/15 transition duration-200"
             >
               <span
-                className="w-1.5 h-1.5 rounded-full bg-brand-sage group-hover:shadow-[0_0_0_3px_rgba(139,154,142,0.25)] transition"
+                className="w-1.5 h-1.5 rounded-full bg-panguard-green shadow-[0_0_8px_rgba(52,211,153,0.9)] motion-safe:animate-pulse"
                 aria-hidden
               />
               {t('sovereign')}
@@ -338,10 +337,13 @@ export default function NavBar() {
             {/* Sovereign — featured */}
             <Link
               href="/sovereign"
-              className="flex items-center gap-2 py-3 min-h-[44px] text-sm font-medium text-brand-sage"
+              className="flex items-center gap-2 py-3 min-h-[44px] text-sm font-semibold text-panguard-green"
               onClick={() => setMobileOpen(false)}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-sage" aria-hidden />
+              <span
+                className="w-1.5 h-1.5 rounded-full bg-panguard-green shadow-[0_0_8px_rgba(52,211,153,0.9)] motion-safe:animate-pulse"
+                aria-hidden
+              />
               {t('sovereign')}
             </Link>
 
