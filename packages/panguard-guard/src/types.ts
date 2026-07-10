@@ -581,6 +581,13 @@ export interface GuardConfig {
   threatCloudUploadEnabled?: boolean;
   /** Receive new ATR rules from Threat Cloud. ON by default; false pins to bundled rules. */
   threatCloudRuleSyncEnabled?: boolean;
+  /**
+   * Gap A: auto-pull the latest integrity-verified agent-threat-rules bundle
+   * from npm and hot-reload it. Opt-in (default false). Auto-pulled rules
+   * DETECT (advise) only — they never gain BLOCK power until the user trusts an
+   * update. See docs/design/gap-a-auto-rule-update.md.
+   */
+  autoUpdateRules?: boolean;
   licenseKey?: string;
   /** CLI tier from panguard credentials (overrides key-based license) */
   cliTier?: string;
