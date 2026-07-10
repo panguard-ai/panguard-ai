@@ -13,9 +13,63 @@ Panguard AI 的所有重要變更，按版本組織。
 
 ---
 
+## v1.8.3 (2026-07-10)
+
+**發佈日期：2026-07-10** -- 當前穩定版本。ATR v3.5.7（714 條規則），OWASP Agentic Top 10：10/10 完整覆蓋。
+
+### 重點
+
+- **714 條 ATR 規則**，涵蓋 10 個威脅類別（原 v2.2.0 為 419 條），並導入**偵測 lane**：enforce（穩定、需二次確認的規則）約 0.24% FP／hunt（全部規則，預設）約 9% FP，於 65,000 筆良性語料上量測
+- **支援 17 個平台**：`panguard setup` 自動偵測並設定 Claude Code、Claude Desktop、Cursor、Hermes Agent、OpenClaw、Codex CLI、WorkBuddy、NemoClaw、ArkClaw、Windsurf、QClaw、Cline、VS Code Copilot、Zed、Gemini CLI、Continue、Roo Code
+- **Benchmarks**（Layer 1 確定性規則，2026-07-04 驗證）：Garak 97.2% recall（650 筆）、SKILL.md 100% recall／97% precision／0.2% FP（498 筆）、PINT 63.6% recall／99.7% precision（850 筆）、HackAPrompt 69.6% recall vs 28.6% baseline／100% precision（4,780 筆）
+- **1.8.3 修正**：DNS-rebind SSRF pinning + 單調遞增的保留下限（retention-floor）
+
+### 合規方案分層
+
+Community 永久免費且開源。Enterprise、Migrator Pro、Sovereign 方案在 Community 核心之上，額外提供已簽章、持續重新掃描的合規證據（Ed25519 簽發者簽章、npm provenance）。
+
+---
+
+## v1.8.2 (2026-07-10)
+
+**發佈日期：2026-07-10** -- 安裝足跡硬化
+
+- 硬化安裝後足跡：金鑰外洩、phone-home、MCP fail-open、daemon import 等修正
+- 跨 12 個子系統修復 43 項安全 + UX 問題
+- 6 項非阻斷性後續（Layer C 健康檢查、redaction、匯出清洗、host-OS 複製、onboarding）
+
+---
+
+## v1.8.0 (2026-07-08) -- Community GA 硬化
+
+**發佈日期：2026-07-08**
+
+- **PreToolUse hook 誤報根因修正** + 預設 advisory -- 消除對合法 MCP tool call 的誤擋
+- **E2E 封裝遙測** + 未知攻擊飛輪：opt-in、僅 advisory 的上傳，永不阻斷，同意後自動更新規則
+- 跨 guard、安裝足跡、MCP proxy 的 GA 安全硬化
+
+---
+
+## v1.7.0 (2026-06-21) -- GA 硬化
+
+**發佈日期：2026-06-21** -- 安全硬化版本：guard hooks、安裝足跡、IP 外洩修正。
+
+---
+
+## v1.6.0 (2026-06-15) -- GA
+
+**發佈日期：2026-06-15**
+
+- **雙路徑 agent 圍堵**閉環（MVP）+ MCP proxy 咽喉點
+- **ATR 2.x -> 3.2.0** 升級 + 6 框架 100% 合規覆蓋
+- **Community GA**：免費層偵測（發布時 651 條規則）、安全硬化、誠實 dashboard + 網站
+- opt-in advisory 語意層（預設引擎維持 100% 確定性 regex）
+
+---
+
 ## v1.5.6 (2026-05-12)
 
-**發佈日期：2026-05-12** -- 最新穩定版本，搭配 ATR v2.2.0（419 條規則）
+**發佈日期：2026-05-12** -- 搭配 ATR v2.2.0（419 條規則）
 
 ### 重點
 
