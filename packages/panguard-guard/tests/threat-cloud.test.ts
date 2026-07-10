@@ -42,42 +42,35 @@ vi.mock('../src/threat-cloud/tc-key-provisioner.js', () => ({
 // top-level const would be in the temporal dead zone when the factory runs.
 // mockHttpsRequest is named so tests can assert whether ANY https request was
 // issued (the privacy invariant: an offline / no-consent client makes zero calls).
-const { mockHttpsRequest, mockRequestWrite, mockRequestEnd, mockRequestDestroy, mockRequestOn } =
-  vi.hoisted(() => {
-    const mockRequestWrite = vi.fn();
-    const mockRequestEnd = vi.fn();
-    const mockRequestDestroy = vi.fn();
-    const mockRequestOn = vi.fn();
-    const mockHttpsRequest = vi.fn((_opts: unknown, cb: (res: unknown) => void) => {
-      // Default: simulate a successful 200 response
-      const mockRes = {
-        statusCode: 200,
-        on: vi.fn((event: string, handler: (data?: Buffer) => void) => {
-          if (event === 'data') {
-            handler(Buffer.from('[]'));
-          }
-          if (event === 'end') {
-            setTimeout(() => handler(), 0);
-          }
-        }),
-      };
-      // Defer the callback so the caller can set up event handlers first
-      setTimeout(() => cb(mockRes), 0);
-      return {
-        write: mockRequestWrite,
-        end: mockRequestEnd,
-        destroy: mockRequestDestroy,
-        on: mockRequestOn,
-      };
-    });
+const { mockHttpsRequest } = vi.hoisted(() => {
+  const mockRequestWrite = vi.fn();
+  const mockRequestEnd = vi.fn();
+  const mockRequestDestroy = vi.fn();
+  const mockRequestOn = vi.fn();
+  const mockHttpsRequest = vi.fn((_opts: unknown, cb: (res: unknown) => void) => {
+    // Default: simulate a successful 200 response
+    const mockRes = {
+      statusCode: 200,
+      on: vi.fn((event: string, handler: (data?: Buffer) => void) => {
+        if (event === 'data') {
+          handler(Buffer.from('[]'));
+        }
+        if (event === 'end') {
+          setTimeout(() => handler(), 0);
+        }
+      }),
+    };
+    // Defer the callback so the caller can set up event handlers first
+    setTimeout(() => cb(mockRes), 0);
     return {
-      mockHttpsRequest,
-      mockRequestWrite,
-      mockRequestEnd,
-      mockRequestDestroy,
-      mockRequestOn,
+      write: mockRequestWrite,
+      end: mockRequestEnd,
+      destroy: mockRequestDestroy,
+      on: mockRequestOn,
     };
   });
+  return { mockHttpsRequest };
+});
 
 vi.mock('node:https', () => ({
   request: mockHttpsRequest,
