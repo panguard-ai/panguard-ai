@@ -1119,8 +1119,13 @@ async function commandStatus(dataDir: string): Promise<void> {
   // "protected" on a never-configured install. Only trust config fields when the
   // file is actually on disk.
   const configExists = existsSync(join(dataDir, 'config.json'));
+  // A running daemon IS configured even if no config.json is on disk yet — the
+  // standalone `panguard-guard start` flow runs on in-memory defaults without
+  // writing the file. So "NOT CONFIGURED" applies ONLY to a never-started,
+  // never-saved install; a live daemon must never be mislabeled that way.
+  const notConfigured = !configExists && !running;
   let config: ReturnType<typeof loadConfig> | undefined;
-  if (configExists) {
+  if (configExists || running) {
     try {
       config = loadConfig(join(dataDir, 'config.json'));
     } catch {
@@ -1140,14 +1145,14 @@ async function commandStatus(dataDir: string): Promise<void> {
   const degraded =
     running && config?.mode === 'protection' && liveRules !== undefined && liveRules.atr <= 0;
 
-  const statusValue = !configExists
+  const statusValue = notConfigured
     ? c.caution('NOT CONFIGURED')
     : !running
       ? c.critical('STOPPED')
       : degraded
         ? c.critical('DEGRADED (0 rules)')
         : c.safe('RUNNING');
-  const statusState: 'safe' | 'caution' | 'critical' = !configExists
+  const statusState: 'safe' | 'caution' | 'critical' = notConfigured
     ? 'caution'
     : !running || degraded
       ? 'critical'
@@ -1190,9 +1195,9 @@ async function commandStatus(dataDir: string): Promise<void> {
 
   console.log(statusPanel('PANGUARD AI Security Status', items));
 
-  if (!configExists) {
+  if (notConfigured) {
     console.log(
-      `  ${c.dim('Not configured yet.')} Run ${c.sage('panguard-guard start')} (or ${c.sage('pga up')}) to set up and start protection.`
+      `  ${c.dim('Not configured yet.')} Run ${c.sage('panguard-guard start')} to set up and start protection.`
     );
   } else if (degraded) {
     console.log(

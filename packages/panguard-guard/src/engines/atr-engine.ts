@@ -433,25 +433,45 @@ export class GuardATREngine {
       return true;
     };
 
-    const conditions = rule.detection?.conditions;
-    if (!Array.isArray(conditions)) return true; // no patterns to validate
-
-    for (const cond of conditions) {
-      if (!cond || typeof cond !== 'object') continue;
-
+    // Validate a single condition node, recursing into sequence steps. A rule can
+    // nest regexes inside `steps`/`sequence` — if the gate does not descend into
+    // them, a catastrophic-backtracking pattern smuggled in a step still reaches
+    // the engine's ungated sequence-step compile. Recurse so EVERY compiled regex
+    // passes the ReDoS gate, not just the top-level ones.
+    const checkCondition = (cond: unknown): boolean => {
+      if (!cond || typeof cond !== 'object') return true;
+      const node = cond as {
+        patterns?: unknown;
+        operator?: unknown;
+        value?: unknown;
+        steps?: unknown;
+        sequence?: unknown;
+      };
       // Named/grouped format: { patterns: [string, ...] }
-      const patterns = (cond as { patterns?: unknown }).patterns;
-      if (Array.isArray(patterns)) {
-        for (const p of patterns) {
-          if (!checkPattern(p)) return false;
+      if (Array.isArray(node.patterns)) {
+        for (const p of node.patterns) if (!checkPattern(p)) return false;
+      }
+      // Array format: { operator: "regex", value: "..." }
+      if (node.operator === 'regex' && node.value !== undefined) {
+        if (!checkPattern(node.value)) return false;
+      }
+      // Sequence format: { steps: [...] } / { sequence: [...] } — each step is a
+      // nested condition whose regexes must also pass the gate.
+      for (const key of ['steps', 'sequence'] as const) {
+        const steps = node[key];
+        if (Array.isArray(steps)) {
+          for (const s of steps) if (!checkCondition(s)) return false;
         }
       }
+      return true;
+    };
 
-      // Array format: { operator: "regex", value: "..." }
-      const entry = cond as { operator?: unknown; value?: unknown };
-      if (entry.operator === 'regex' && entry.value !== undefined) {
-        if (!checkPattern(entry.value)) return false;
-      }
+    const conditions = rule.detection?.conditions;
+    if (Array.isArray(conditions)) {
+      for (const cond of conditions) if (!checkCondition(cond)) return false;
+    } else if (conditions && typeof conditions === 'object') {
+      // Named-map form: { name: <condition>, ... } — the engine compiles these too.
+      for (const cond of Object.values(conditions)) if (!checkCondition(cond)) return false;
     }
 
     return true;

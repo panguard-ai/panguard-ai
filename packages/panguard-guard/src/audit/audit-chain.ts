@@ -32,6 +32,7 @@ import {
 } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
 import { createInterface } from 'node:readline';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import { createLogger } from '@panguard-ai/core';
 import {
   GENESIS_HASH,
@@ -272,9 +273,27 @@ export class AuditChain {
   // Head-anchor persistence (tmp + rename, 0600).
   // ---------------------------------------------------------------------------
 
+  /**
+   * HMAC over the security-relevant head fields — critically the retention
+   * `floor`, which verify() trusts to accept a non-genesis chain start. Without
+   * authenticating it, an attacker with write access could forge a floor
+   * matching a mid-chain record, front-truncate the log (erasing early
+   * evidence), and verify would still report VERIFIED. Signed with the same key
+   * as the records so the head is protected to the same level as the chain.
+   */
+  private headMac(head: ChainHead): string {
+    const payload = JSON.stringify({ seq: head.seq, hash: head.hash, floor: head.floor ?? null });
+    return createHmac('sha256', this.key as Buffer)
+      .update(payload)
+      .digest('hex');
+  }
+
   private writeHead(head: ChainHead): void {
     const tmp = `${this.headPath}.tmp`;
-    writeFileSync(tmp, JSON.stringify(head), { mode: 0o600 });
+    const onDisk: ChainHead & { hmac?: string } = this.key
+      ? { ...head, hmac: this.headMac(head) }
+      : head;
+    writeFileSync(tmp, JSON.stringify(onDisk), { mode: 0o600 });
     renameSync(tmp, this.headPath);
   }
 
@@ -321,14 +340,33 @@ export class AuditChain {
     try {
       if (!existsSync(this.headPath)) return null;
       const raw = readFileSync(this.headPath, 'utf-8');
-      const parsed = JSON.parse(raw) as Partial<ChainHead>;
+      const parsed = JSON.parse(raw) as Partial<ChainHead> & { hmac?: string };
       if (typeof parsed.seq === 'number' && typeof parsed.hash === 'string') {
-        return {
+        const head: ChainHead = {
           seq: parsed.seq,
           hash: parsed.hash,
           updatedAt: typeof parsed.updatedAt === 'string' ? parsed.updatedAt : '',
           ...(isRetentionFloor(parsed.floor) ? { floor: parsed.floor } : {}),
         };
+        // When signing, the head — above all its retention floor — MUST verify.
+        // A missing/invalid HMAC means the anchor was tampered: do NOT honor its
+        // floor (that would let a forged boundary conceal a front-truncation).
+        // Drop the floor and warn; verify() then demands GENESIS at the chain
+        // start, so any truncation surfaces as a hash-break / TAMPERED.
+        if (this.key && head.floor) {
+          const expected = this.headMac(head);
+          const got = typeof parsed.hmac === 'string' ? parsed.hmac : '';
+          const ok =
+            got.length === expected.length &&
+            timingSafeEqual(Buffer.from(got, 'utf-8'), Buffer.from(expected, 'utf-8'));
+          if (!ok) {
+            logger.warn(
+              'Audit head-anchor HMAC invalid — ignoring its retention floor (possible tamper).'
+            );
+            return { seq: head.seq, hash: head.hash, updatedAt: head.updatedAt };
+          }
+        }
+        return head;
       }
     } catch (err) {
       logger.warn(`Audit head-anchor unreadable: ${errMsg(err)}`);

@@ -16,6 +16,7 @@ import {
   readSelfStateRefs,
   collectSelfState,
   mergeSelfState,
+  checkSelfState,
 } from './integrity.js';
 
 const logger = createLogger('panguard-guard:config');
@@ -377,11 +378,18 @@ export function saveConfig(config: GuardConfig, configPath?: string): void {
   // folding in any newly-installed one. Best-effort: a seal failure must never
   // fail a save.
   try {
-    sealConfigManifest(
-      config as unknown as Record<string, unknown>,
-      mergeSelfState(readSelfStateRefs(dir), collectSelfState()),
-      dir
-    );
+    // Re-baselining self-state from the CURRENT artifacts is only safe when they
+    // are untampered. If checkSelfState reports an active tamper (e.g. a hijacked
+    // LaunchAgent ProgramArguments), folding the current contentHash in would
+    // silently launder the attacker's change as legitimate. In that case keep the
+    // sealed baseline so the tamper stays detectable on the next start — a config
+    // write must never re-bless a live self-state tamper.
+    const selfVerdict = checkSelfState(dir);
+    const tampered = !selfVerdict.ok && selfVerdict.findings.some((f) => f.reason === 'tampered');
+    const selfState = tampered
+      ? readSelfStateRefs(dir)
+      : mergeSelfState(readSelfStateRefs(dir), collectSelfState());
+    sealConfigManifest(config as unknown as Record<string, unknown>, selfState, dir);
   } catch {
     /* best-effort — integrity sealing must not block a config save */
   }
