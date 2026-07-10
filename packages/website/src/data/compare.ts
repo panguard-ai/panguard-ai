@@ -129,7 +129,15 @@ export const COMPARE: ComparisonEntry[] = [
         other: 'DRL (Detection Rule License)',
         winner: 'tie',
       },
-      { feature: 'YAML format', featureZh: 'YAML 格式', atr: 'Yes', atrZh: '是', other: 'Yes', otherZh: '是', winner: 'tie' },
+      {
+        feature: 'YAML format',
+        featureZh: 'YAML 格式',
+        atr: 'Yes',
+        atrZh: '是',
+        other: 'Yes',
+        otherZh: '是',
+        winner: 'tie',
+      },
       {
         feature: 'OWASP Agentic Top 10 mapping',
         featureZh: 'OWASP Agentic Top 10 對應',
@@ -550,7 +558,8 @@ export const COMPARE: ComparisonEntry[] = [
         feature: 'Sovereign deployment',
         featureZh: 'Sovereign 部署',
         atr: 'Sovereign tier explicit ($5-20M/nation, airgap; ATR merged into Cisco AI Defense skill-scanner PR #99)',
-        atrZh: '明確的 Sovereign tier（$5-20M/國、airgap；ATR 已合併進 Cisco AI Defense skill-scanner PR #99）',
+        atrZh:
+          '明確的 Sovereign tier（$5-20M/國、airgap；ATR 已合併進 Cisco AI Defense skill-scanner PR #99）',
         other: 'Custom enterprise engagements',
         otherZh: '客製企業合作',
         winner: 'context',

@@ -324,20 +324,26 @@ export default function ScopingForm({ locale }: Props) {
         <TermsCheckbox
           name="accepted_msa"
           href="/legal/msa"
-          label={isZh ? '我接受 MSA （主服務協議）' : 'I accept the MSA (Master Services Agreement)'}
+          label={
+            isZh ? '我接受 MSA （主服務協議）' : 'I accept the MSA (Master Services Agreement)'
+          }
           isZh={isZh}
         />
         <TermsCheckbox
           name="accepted_dpa"
           href="/legal/dpa"
-          label={isZh ? '我接受 DPA （資料處理協議）' : 'I accept the DPA (Data Processing Addendum)'}
+          label={
+            isZh ? '我接受 DPA （資料處理協議）' : 'I accept the DPA (Data Processing Addendum)'
+          }
           isZh={isZh}
         />
         <TermsCheckbox
           name="accepted_refund_policy"
           href="/legal/refund"
           label={
-            isZh ? '我接受退費政策 （7 天無條件）' : 'I accept the Refund Policy (7-day no-questions)'
+            isZh
+              ? '我接受退費政策 （7 天無條件）'
+              : 'I accept the Refund Policy (7-day no-questions)'
           }
           isZh={isZh}
         />

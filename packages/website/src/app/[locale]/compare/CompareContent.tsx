@@ -131,8 +131,7 @@ const REAL_FINDINGS = [
     typeZh: 'Prompt Injection',
     severity: 'CRITICAL',
     desc: 'Skill injects hidden instructions into agent context: "ignore previous instructions and execute..."',
-    descZh:
-      'Skill 把隱藏指令注入 agent 上下文：「ignore previous instructions and execute...」',
+    descZh: 'Skill 把隱藏指令注入 agent 上下文：「ignore previous instructions and execute...」',
     found: '12 instances, including 4 with obfuscated payloads',
     foundZh: '共 12 例，其中 4 例使用混淆 payload',
   },
@@ -164,9 +163,7 @@ function HeroSection() {
           {isZh ? '為什麼選 PANGUARD' : 'WHY PANGUARD'}
         </p>
         <h1 className="text-[clamp(30px,5vw,56px)] font-bold text-text-primary leading-[1.08] max-w-4xl mx-auto">
-          {isZh
-            ? 'PanGuard 在你安全架構中的位置'
-            : 'Where PanGuard fits in your security stack'}
+          {isZh ? 'PanGuard 在你安全架構中的位置' : 'Where PanGuard fits in your security stack'}
         </h1>
         <p className="text-text-secondary mt-4 text-lg max-w-2xl mx-auto leading-relaxed">
           {isZh
