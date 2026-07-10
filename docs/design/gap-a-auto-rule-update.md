@@ -1,8 +1,8 @@
 # Gap A — background auto-update of detection rules (compromise design)
 
-Status: spec + slice 1 (verified-pull foundation, zero engine change) landed.
-Slice 2 (load-as-advise + enforce-on-trust, touches both engines) staged for a
-dedicated, adversarially-verified build.
+Status: slice 1 (verified-pull foundation) + slice 2 (advise-cap load +
+enforce-on-trust for the tool-call hook path) landed, adversarially verified.
+Daemon async-response advise-cap is a documented follow-up (see below).
 
 ## Goal
 
@@ -59,30 +59,51 @@ NO decision path, so it cannot change a single block/allow outcome.
   not even advise. So there is provably no detection or enforcement change yet.
   The staged dir is the input the verified engine slice consumes next.
 
-## Slice 2 (staged — load-as-advise + enforce-on-trust; own PR + adversarial verify)
+## Slice 2 (LANDED — advise-cap load + enforce-on-trust on the tool-call hook path)
 
-This is the slice that touches the two engines, so it gets its own verified build.
+The path a developer actually FEELS in real time is the per-tool-call hook
+(`pga hook run` on Bash/Edit/WebFetch/MCP), evaluated by `ProxyEvaluator`. That
+is the exact FP-scar surface, so slice 2 gates it end-to-end:
 
-1. Load the staged `<dataDir>/auto-rules/<version>/` rules into `GuardATREngine`
-   AND `ProxyEvaluator` on an ADVISE-capped path: they surface as detections on
-   the dashboard/telemetry but are excluded from every block decision.
-2. config: `autoUpdateTrustedVersion?: string` — the bundle version whose
+1. config `autoUpdateTrustedVersion?: string` — the bundle version whose
    auto-pulled rules are trusted to ENFORCE.
-3. `GuardATREngine` + `ProxyEvaluator`: tag auto-pulled rules with their source
-   version; the hard-deny path (`shouldHardDeny` / the daemon block decision)
-   arms a rule only when it is bundled-with-the-install OR its source version
-   `<= autoUpdateTrustedVersion`. A newer auto-pulled rule detects but cannot
-   block until trusted.
-4. CLI `pga guard trust-updates` (+ dashboard toggle): shows the N new
-   would-block rules, and on confirm sets `autoUpdateTrustedVersion` to current.
-5. Adversarial verify (like 1.8.1–1.8.4): prove (a) an untrusted auto-pulled
-   critical rule DETECTS but does NOT block, (b) after trust it blocks, (c) the
-   hook engine honors the same gate, (d) integrity failure => no load,
-   fail-closed.
+2. `resolveStagedAutoRules(dataDir, trustedVersion)` (lean `./auto-rules`
+   subpath) decides `adviseOnly = !trusted || staged > trusted`. Single source
+   of the advise-vs-enforce decision.
+3. `ProxyEvaluator.loadAutoRules(dir, {adviseOnly})` merges only FRESH rule ids
+   (ids not already bundled stay as their trusted bundled copy) and records the
+   fresh ids in `adviseOnlyIds`. `evaluate()` excludes advise-only ids from the
+   hard-deny decision — they can surface an 'ask' but never a 'deny'.
+4. Enforce-posture safety: `EvalResult.adviseOnly` flags an 'ask' driven ONLY by
+   advise-only rules; the hook does NOT escalate such an 'ask' to a block even
+   under `--enforce`. So a fresh rule cannot wall off a tool under ANY posture
+   until trusted.
+5. The hook wires steps 2–3 in behind `readAutoUpdateSettings()` (opt-in).
+6. CLI `pga guard trust-updates` shows the N fresh rules and, on confirm, writes
+   `autoUpdateTrustedVersion` (atomically, to the config file the daemon reads).
 
-## Verification bar for slice 2 (do not merge without)
+### Adversarially verified (3 independent skeptics)
 
-- Unit + live: an auto-pulled critical rule, untrusted => outcome advise/allow;
-  trusted => deny. In BOTH the daemon and the hook path.
-- Tamper: a bundle whose integrity fails is never loaded (fail-closed).
-- No regression to the shipped-bundle enforce behavior.
+- A fresh (untrusted) auto-pulled critical rule DETECTS ('ask') but never blocks
+  — under guarded AND enforce postures. Armed (trusted) => 'deny'.
+- Enforce floor intact: no bundled/trusted rule can stop blocking; no bundled id
+  can enter `adviseOnlyIds`.
+- Tamper (slice 1): an integrity-mismatched bundle is never extracted/loaded.
+- Trust persistence writes the file the daemon actually reads; corrupt config
+  fails SAFE (defaults off, does not fall through to an enabling master config).
+
+## Known limitations / documented follow-ups
+
+- Daemon async-response path: the daemon (`event-processor` → confidence-
+  threshold `actionPolicy`) does NOT yet load `<dataDir>/auto-rules/`. So
+  auto-pulled detections do not yet surface on the dashboard/telemetry until
+  trusted+installed. No safety gap (the daemon simply doesn't see them); it is a
+  visibility follow-up that needs the confidence-cap treatment, not the
+  hook's shouldHardDeny gate.
+- Re-shipped severity upgrade: `loadAutoRules` keeps the bundled copy on an id
+  collision, so a newer bundle that UPGRADES an existing rule's severity is not
+  applied by auto-update (net-new ids only). Safe (never weakens the floor),
+  applied on the next full `pga upgrade`.
+- Rollback: trusting version N trusts all staged versions `<= N`. Re-arming an
+  older bundle requires local write access to `<dataDir>/auto-rules/`, which
+  already bypasses the npm integrity anchor — no new remote surface.

@@ -38,6 +38,15 @@ export interface EvalResult {
   readonly matchedRules: readonly string[];
   readonly confidence: number;
   readonly durationMs: number;
+  /**
+   * Gap A slice 2: true when a non-'allow' outcome is driven ONLY by advise-only
+   * (fresh, untrusted auto-pulled) rules — i.e. no bundled/trusted rule justifies
+   * it. A caller MUST NOT escalate such an outcome to a hard block (even under an
+   * enforce posture), so a fresh rule can never wall off a tool call until the
+   * user trusts it. Always false for 'deny' (deny only ever comes from a trusted
+   * rule) and for 'allow'.
+   */
+  readonly adviseOnly: boolean;
 }
 
 /** Minimal rule shape the deny policy needs. */
@@ -74,6 +83,15 @@ export class ProxyEvaluator {
   private readonly engine: ATREngine;
   private rulesLoaded = false;
   private ruleCount = 0;
+  /**
+   * Gap A slice 2: IDs of auto-pulled rules that are ADVISE-ONLY — loaded fresh
+   * from a not-yet-trusted bundle. They may surface an 'ask' advisory but are
+   * EXCLUDED from the hard-deny decision, so a fresh rule can never silently
+   * block the user's tool. Once the user trusts the bundle version, the hook
+   * loads them with adviseOnly=false and they are absent from this set (i.e.
+   * they arm). Bundled/shipped rules are never in this set.
+   */
+  private readonly adviseOnlyIds: Set<string> = new Set();
   private blockedTools: Set<string> = new Set();
   private readonly blocklistPath: string;
   private blocklistMtime = 0;
@@ -130,8 +148,45 @@ export class ProxyEvaluator {
     return this.ruleCount;
   }
 
+  /**
+   * Gap A slice 2: merge auto-pulled rules (staged + integrity-verified by the
+   * daemon) into the engine. ONLY rules whose id is not already bundled are
+   * added — a newer bundle re-ships existing ids, and those stay as their trusted
+   * bundled copy. `adviseOnly` marks the fresh ids so evaluate() lets them advise
+   * but never hard-deny (see adviseOnlyIds). Best-effort: a failure here must
+   * never break the enforce path, so it is caught and the proxy keeps running on
+   * the bundled ruleset alone. Returns the number of fresh rules added.
+   */
+  async loadAutoRules(rulesDir: string, opts: { adviseOnly: boolean }): Promise<number> {
+    try {
+      if (!existsSync(rulesDir)) return 0;
+      const existing = new Set(this.engine.getRules().map((r) => r.id));
+      const sub = new ATREngine({ rulesDir });
+      await sub.loadRules();
+      let added = 0;
+      for (const rule of sub.getRules()) {
+        if (existing.has(rule.id)) continue; // already have this id from the bundled set
+        this.engine.addRule(rule);
+        if (opts.adviseOnly) this.adviseOnlyIds.add(rule.id);
+        added++;
+      }
+      this.ruleCount += added;
+      return added;
+    } catch (err: unknown) {
+      process.stderr.write(
+        `[panguard-proxy] auto-rules load skipped (ignored, bundled rules unaffected): ${err instanceof Error ? err.message : String(err)}\n`
+      );
+      return 0;
+    }
+  }
+
   getRuleCount(): number {
     return this.ruleCount;
+  }
+
+  /** Number of auto-pulled rules currently held advise-only (not yet trusted). */
+  getAdviseOnlyCount(): number {
+    return this.adviseOnlyIds.size;
   }
 
   /** Flatten args into a readable string for ATR regex matching */
@@ -174,6 +229,7 @@ export class ProxyEvaluator {
         matchedRules: ['guard-blocklist'],
         confidence: 100,
         durationMs: Date.now() - start,
+        adviseOnly: false,
       };
     }
 
@@ -238,6 +294,7 @@ export class ProxyEvaluator {
           matchedRules: [],
           confidence: 0,
           durationMs,
+          adviseOnly: false,
         };
       }
 
@@ -255,12 +312,32 @@ export class ProxyEvaluator {
       //     offline review; we just do not raise a per-call advisory/block on an
       //     unactionable low-severity broad match. Real attacks are
       //     critical/high-stable and hard-deny at step 1, so are unaffected.
-      const blockMatch = matches.find((m) => shouldHardDeny(m.rule));
+      // Gap A slice 2: an advise-only auto-pulled rule (fresh, not yet trusted)
+      // is EXCLUDED from the hard-deny decision — it can still surface as an
+      // 'ask' advisory below, but it can never silently block the user's tool.
+      // Bundled/trusted rules are unaffected. This is the arm gate for the
+      // enforce path.
+      const blockMatch = matches.find(
+        (m) => shouldHardDeny(m.rule) && !this.adviseOnlyIds.has(m.rule.id)
+      );
       const askMatch =
         blockMatch ??
         matches.find((m) => m.rule.severity === 'high' || m.rule.severity === 'critical');
       const outcome: EvalResult['outcome'] = blockMatch ? 'deny' : askMatch ? 'ask' : 'allow';
       const topMatch = blockMatch ?? askMatch ?? matches[0]!;
+
+      // An 'ask' is advise-only-driven when NO trusted (non-advise-only)
+      // high/critical rule justifies it — i.e. the only rules asking for
+      // attention are fresh, untrusted auto-pulled ones. The caller must not
+      // escalate such an 'ask' to a block. A 'deny' is never advise-only (the
+      // block gate above already excluded advise-only rules).
+      const adviseOnly =
+        outcome === 'ask' &&
+        !matches.some(
+          (m) =>
+            (m.rule.severity === 'high' || m.rule.severity === 'critical') &&
+            !this.adviseOnlyIds.has(m.rule.id)
+        );
 
       return {
         outcome,
@@ -271,6 +348,7 @@ export class ProxyEvaluator {
         matchedRules: matches.map((m) => m.rule.id),
         confidence: outcome === 'allow' ? 0 : topMatch.confidence,
         durationMs,
+        adviseOnly,
       };
     } catch (err: unknown) {
       // Fail-closed: if evaluation crashes, deny the call (security-first)
@@ -283,6 +361,7 @@ export class ProxyEvaluator {
         matchedRules: ['evaluation-error'],
         confidence: 100,
         durationMs: Date.now() - start,
+        adviseOnly: false,
       };
     }
   }

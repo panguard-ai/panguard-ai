@@ -503,6 +503,7 @@ export class MCPProxy {
           matchedRules: [] as string[],
           confidence: 0,
           durationMs: this.evalTimeout,
+          adviseOnly: false,
         };
       }
 
@@ -577,6 +578,7 @@ export class MCPProxy {
             matchedRules: [] as string[],
             confidence: 0,
             durationMs: this.evalTimeout,
+            adviseOnly: false,
           };
         }
 

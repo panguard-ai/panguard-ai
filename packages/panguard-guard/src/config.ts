@@ -117,6 +117,11 @@ const GuardConfigFileSchema = z
     // Opt-in. Auto-pulled rules DETECT (advise) only — they never gain BLOCK
     // power until the user trusts an update (see docs/design/gap-a-auto-rule-update.md).
     autoUpdateRules: z.boolean().optional(),
+    // Gap A slice 2: the auto-pulled bundle version the user has TRUSTED to
+    // enforce. Auto-pulled rules from a version <= this may hard-deny; newer
+    // ones only advise until `pga guard trust-updates` bumps this. Absent =>
+    // no auto-pulled rule can block (safest default).
+    autoUpdateTrustedVersion: z.string().optional(),
     telemetryEnabled: z.boolean().optional(),
     trustedSkills: z.array(z.string()).optional(),
   })

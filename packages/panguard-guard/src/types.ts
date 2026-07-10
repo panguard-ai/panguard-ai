@@ -588,6 +588,14 @@ export interface GuardConfig {
    * update. See docs/design/gap-a-auto-rule-update.md.
    */
   autoUpdateRules?: boolean;
+  /**
+   * Gap A slice 2: the auto-pulled bundle version the user has TRUSTED to
+   * enforce. An auto-pulled rule may hard-deny only when its source version is
+   * `<= autoUpdateTrustedVersion`; a newer auto-pulled rule advises but cannot
+   * block. Absent => no auto-pulled rule can block (safest default). Bumped by
+   * `pga guard trust-updates`.
+   */
+  autoUpdateTrustedVersion?: string;
   licenseKey?: string;
   /** CLI tier from panguard credentials (overrides key-based license) */
   cliTier?: string;

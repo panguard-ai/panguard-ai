@@ -13,6 +13,11 @@
 import { createHash } from 'node:crypto';
 import { createLogger } from '@panguard-ai/core';
 import type { ThreatIntelFeedManager } from '@panguard-ai/core';
+import { isNewerVersion } from './auto-rules.js';
+// Re-export so existing `@panguard-ai/panguard-guard` importers keep working;
+// the lean copy lives in ./auto-rules for the hook's subpath import.
+export { resolveStagedAutoRules } from './auto-rules.js';
+export type { StagedAutoRules } from './auto-rules.js';
 import type { GuardConfig } from './types.js';
 import type { ThreatCloudClient } from './threat-cloud/index.js';
 import type { GuardATREngine } from './engines/atr-engine.js';
@@ -275,18 +280,6 @@ async function readBundledAtrVersion(): Promise<string | null> {
   } catch {
     return null;
   }
-}
-
-/** Compare dotted version strings; true iff `a` is strictly newer than `b`. */
-function isNewerVersion(a: string, b: string): boolean {
-  const pa = a.split('.').map((n) => parseInt(n, 10) || 0);
-  const pb = b.split('.').map((n) => parseInt(n, 10) || 0);
-  for (let i = 0; i < 3; i++) {
-    const x = pa[i] ?? 0;
-    const y = pb[i] ?? 0;
-    if (x !== y) return x > y;
-  }
-  return false;
 }
 
 export interface RuleUpdateStatus {
