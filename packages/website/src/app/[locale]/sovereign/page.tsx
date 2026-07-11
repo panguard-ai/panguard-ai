@@ -30,7 +30,7 @@ const BRIEF_HTML = `<div class="sv">
         <span class="wm">AI</span>
         <span class="sov">Sovereign</span>
       </div>
-      <div class="docref">Capability Brief · Rev 0.1</div>
+      <div class="docref">Capability Brief · Rev 0.2</div>
     </div>
   </div>
 
@@ -125,7 +125,7 @@ const BRIEF_HTML = `<div class="sv">
     <div class="wrap">
       <div class="shead reveal"><span class="snum">§ 04</span><span class="slabel">Capability register</span></div>
       <h2 class="reveal">Present capability and maturity</h2>
-      <p class="sub reveal">A working prototype under continuous independent adversarial review (approximately 1,600 automated tests; 27 review passes to date). Maturity is stated per capability against a two-state scale, defined in the legend below.</p>
+      <p class="sub reveal">A working prototype under continuous independent adversarial review (approximately 1,700 automated tests; 30 review passes to date). Maturity is stated per capability against a two-state scale, defined in the legend below.</p>
       <div class="tbl reveal"><table>
         <thead><tr><th>#</th><th>Capability</th><th>Function</th><th>Maturity</th></tr></thead>
         <tbody>
@@ -139,8 +139,10 @@ const BRIEF_HTML = `<div class="sv">
           <tr><td class="idx">08</td><td class="k">Policy-gated key release</td><td class="fn">Sensitive documents decrypt only at an authorized, attested endpoint</td><td><span class="mat impl">Implemented</span></td></tr>
           <tr><td class="idx">09</td><td class="k">Air-gap bundle</td><td class="fn">Signed manifest; the receiver verifies provenance before installing</td><td><span class="mat impl">Implemented</span></td></tr>
           <tr><td class="idx">10</td><td class="k">Operator console</td><td class="fn">Loopback, token-authenticated control surface with web interface</td><td><span class="mat impl">Implemented</span></td></tr>
-          <tr><td class="idx">11</td><td class="k">Confidential-compute attestation</td><td class="fn">Measurement allowlist with key-binding anti-relay verification</td><td><span class="mat seam">Integration seam</span></td></tr>
-          <tr><td class="idx">12</td><td class="k">On-premise adjudicator</td><td class="fn">Local model advises escalation only (tighten-only)</td><td><span class="mat seam">Integration seam</span></td></tr>
+          <tr><td class="idx">11</td><td class="k">Agent-facing HTTP fleet</td><td class="fn">Multi-session Streamable HTTP transport; per-session isolation and resource bounds</td><td><span class="mat impl">Implemented</span></td></tr>
+          <tr><td class="idx">12</td><td class="k">Confidential-compute attestation</td><td class="fn">Measurement allowlist with key-binding anti-relay verification</td><td><span class="mat seam">Integration seam</span></td></tr>
+          <tr><td class="idx">13</td><td class="k">On-premise adjudicator</td><td class="fn">Local model advises escalation only (tighten-only)</td><td><span class="mat seam">Integration seam</span></td></tr>
+          <tr><td class="idx">14</td><td class="k">HSM / PKCS#11 signing</td><td class="fn">Hardware-held keys for jurisdictions that mandate a validated module</td><td><span class="mat seam">Integration seam</span></td></tr>
         </tbody>
       </table></div>
       <div class="legend reveal">
@@ -152,12 +154,85 @@ const BRIEF_HTML = `<div class="sv">
 
   <section>
     <div class="wrap">
-      <div class="shead reveal"><span class="snum">§ 05</span><span class="slabel">Engagement</span></div>
+      <div class="shead reveal"><span class="snum">§ 05</span><span class="slabel">Engagement path</span></div>
+      <h2 class="reveal">A staged path from evaluation to a deployment you operate</h2>
+      <p class="sub reveal">Each stage is bounded and low-commitment; you can stop after any one. Nothing requires a purchase to evaluate, and no data leaves your environment at any stage.</p>
+      <div class="stages">
+        <div class="stg reveal">
+          <div class="sn">STAGE 01</div>
+          <h4>Technical evaluation</h4>
+          <p>An asynchronous evaluation, under NDA where required. You receive the evaluation kit: a reference architecture, a compliance crosswalk for your own jurisdiction, an honest statement of maturity and boundaries, and a demonstration you can run yourself — drive an agent through the governed layer, then verify the signed decision ledger offline holding only a public key.</p>
+          <div class="meta">Commitment &nbsp;<b>None</b></div>
+        </div>
+        <div class="stg reveal">
+          <div class="sn">STAGE 02</div>
+          <h4>Reference deployment</h4>
+          <p>A single deployment in a controlled environment you choose, in your jurisdiction and language. Delivered air-gapped and verified before install. You receive a running, governed reference case, plus the human-signed acceptance and decision evidence you can put in front of a regulator or auditor.</p>
+          <div class="meta">Commitment &nbsp;<b>Scoped pilot</b></div>
+        </div>
+        <div class="stg reveal">
+          <div class="sn">STAGE 03</div>
+          <h4>Production path</h4>
+          <p>Scope the requirements only an external party can satisfy — certification via an accredited path, and a validated hardware module where a jurisdiction mandates one — with support, service levels, and responsibilities defined against the concrete deployment rather than a brochure.</p>
+          <div class="meta">Commitment &nbsp;<b>Framework agreement</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="shead reveal"><span class="snum">§ 06</span><span class="slabel">Collaboration model</span></div>
+      <h2 class="reveal">How a deployment reaches an institution — and who owns what</h2>
+      <p class="sub reveal">PanGuard is the technology supplier, not the prime. An in-country partner holds the local relationship and the contract vehicle; the institution keeps sovereign control. Each party owns a distinct part, so accountability and language stay in-country — a familiar supplier-to-integrator arrangement, not a new one to invent.</p>
+      <div class="parties">
+        <div class="party reveal">
+          <div class="phdr"><div class="pname">PanGuard</div><div class="prole">Technology supplier</div></div>
+          <div class="prow"><div class="pk">Provides</div><div class="pv">The sovereign runtime, the signing and verification stack, and the open Agent Threat Rules standard.</div></div>
+          <div class="prow"><div class="pk">Owns</div><div class="pv own">The engine and its evidence model — maintained in the open.</div></div>
+        </div>
+        <div class="party reveal">
+          <div class="phdr"><div class="pname">In-country partner</div><div class="prole">Prime integrator · SI or national lab</div></div>
+          <div class="prow"><div class="pk">Provides</div><div class="pv">The contract vehicle, local delivery, language, first-line support, and the government relationship.</div></div>
+          <div class="prow"><div class="pk">Owns</div><div class="pv own">The customer relationship and the deployment.</div></div>
+        </div>
+        <div class="party reveal">
+          <div class="phdr"><div class="pname">National institution</div><div class="prole">Operator · customer</div></div>
+          <div class="prow"><div class="pk">Provides</div><div class="pv">Its own signed policy, its data, and the environment the runtime runs in.</div></div>
+          <div class="prow"><div class="pk">Owns</div><div class="pv own">Sovereign control — the signing keys, the policy, and the audit trail. Nothing leaves its control.</div></div>
+        </div>
+      </div>
+      <div class="modelnote reveal">
+        <div><span class="mk">Procurement</span><span>The institution procures through its in-country partner, who holds the local contract vehicle. PanGuard supplies the technology beneath — the same channel governments already use for complex systems.</span></div>
+        <div><span class="mk">Continuity</span><span>Because the standard and the verifier are open, the institution's evidence stays verifiable regardless of any single supplier's future. Sovereignty is never a dependency on one company.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="shead reveal"><span class="snum">§ 07</span><span class="slabel">Delivery</span></div>
+      <h2 class="reveal">Delivered into an environment with no outbound connectivity — verifiable at every step</h2>
+      <p class="sub reveal">The delivery mechanism is built for an air-gapped environment and leaves cryptographic evidence at each step, so an auditor can later confirm exactly what was installed and that a human authorized it.</p>
+      <div class="steps reveal">
+        <div class="step"><span class="qn">01</span><div><h4>Package</h4><p>A signed bundle: a manifest over every file, signed by the delivery key.</p></div></div>
+        <div class="step"><span class="qn">02</span><div><h4>Transfer</h4><p>Moved across the air gap on approved media. Nothing phones home; the runtime needs no outbound connectivity.</p></div></div>
+        <div class="step"><span class="qn">03</span><div><h4>Verify</h4><p>Offline, with only the published public key. The receiver confirms the signature and that every file matches the manifest before anything is installed; a mismatch fails closed.</p></div></div>
+        <div class="step"><span class="qn">04</span><div><h4>Accept</h4><p>A human signs acceptance (検収 / 驗収). The record recomputes the sign-off from the actual delivery steps, binds to the bundle's cryptographic identity, and is itself verifiable with only a public key.</p></div></div>
+        <div class="step"><span class="qn">05</span><div><h4>Deploy</h4><p>Configuration and orchestration values are derived from your country pack; an unsafe network exposure is refused at deploy time, not left to a checklist.</p></div></div>
+        <div class="step"><span class="qn">06</span><div><h4>Operate</h4><p>A loopback operator console: human approvals, dual-control break-glass, and the kill-switch — every action written to the signed, tamper-evident decision ledger.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="shead reveal"><span class="snum">§ 08</span><span class="slabel">Direct engagement</span></div>
       <h2 class="reveal">Evaluate the architecture, or deploy within your jurisdiction</h2>
       <div class="engage" style="margin-top:30px">
         <div class="path reveal">
           <h3>National institutions</h3>
-          <p>For AI safety and security institutes, AI offices, ministries, and operators of defense and critical infrastructure. An asynchronous technical evaluation: architecture documentation, honest capability boundaries, and a verifiable demonstration — under NDA where required, with no commercial commitment.</p>
+          <p>For AI safety and security institutes, AI offices, ministries, and operators of defense and critical infrastructure. Begin at Stage 01 — an asynchronous technical evaluation with the kit above, under NDA where required, with no commercial commitment.</p>
           <div><a class="btn" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20technical%20briefing">Request a technical briefing <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
         </div>
         <div class="path reveal">
@@ -173,11 +248,11 @@ const BRIEF_HTML = `<div class="sv">
     <div class="wrap">
       <div class="ctrl reveal">
         <div><div class="lab">Document</div><div class="val">Sovereign Capability Brief</div></div>
-        <div><div class="lab">Revision</div><div class="val">0.1</div></div>
+        <div><div class="lab">Revision</div><div class="val">0.2</div></div>
         <div><div class="lab">Classification</div><div class="val">Unrestricted</div></div>
         <div><div class="lab">Contact</div><div class="val">adam@agentthreatrule.org</div></div>
       </div>
-      <p class="disclaimer reveal">PanGuard Sovereign is a reference architecture at design-partner stage, built on the open Agent Threat Rules standard. This brief describes a working prototype under active development — not a generally-available, certified, or accredited product. Framework references indicate design intent and traceability, not certification. Maturity and capability statements are current as of Revision 0.1 and are subject to independent verification.</p>
+      <p class="disclaimer reveal">PanGuard Sovereign is a reference architecture at design-partner stage, built on the open Agent Threat Rules standard. This brief describes a working prototype under active development — not a generally-available, certified, or accredited product. Framework references indicate design intent and traceability, not certification. Maturity and capability statements are current as of Revision 0.2 and are subject to independent verification.</p>
     </div>
   </div>
 </div>`;
