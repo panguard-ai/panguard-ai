@@ -109,11 +109,37 @@ async function resolveBundledAtrCli(): Promise<string | null> {
   }
 }
 
+/**
+ * Discover a skill source in the current project so a bare `pga scan` can scan
+ * SKILLS (this product's job) instead of the host OS. Returns a directory ATR
+ * can scan, or null. Priority: a SKILL.md in cwd, then a ./skills dir that
+ * contains at least one nested SKILL.md.
+ */
+async function findLocalSkillDir(): Promise<string | null> {
+  const { existsSync, readdirSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const cwd = process.cwd();
+  if (existsSync(join(cwd, 'SKILL.md'))) return cwd;
+  const skillsDir = join(cwd, 'skills');
+  if (existsSync(skillsDir)) {
+    try {
+      const hasSkill = readdirSync(skillsDir, { withFileTypes: true }).some(
+        (d) => d.isDirectory() && existsSync(join(skillsDir, d.name, 'SKILL.md'))
+      );
+      if (hasSkill) return skillsDir;
+    } catch {
+      /* unreadable — fall through */
+    }
+  }
+  return null;
+}
+
 export function scanCommand(): Command {
   return new Command('scan')
     .description('Scan skills for threats, or run a system security scan')
     .argument('[path]', 'File or directory to scan with ATR (auto-detects MCP JSON vs SKILL.md)')
     .option('--all', 'Scan all installed MCP skills (non-invasive, no guard/proxy)', false)
+    .option('--system', 'Run a host/OS security scan (firewall, ports, CVEs) instead of a skill scan', false)
     .option('--quick', 'Quick scan mode (~30s)', false)
     .option('--output <path>', 'Output PDF report path')
     .option('--lang <language>', 'Language: en or zh-TW', 'en')
@@ -133,6 +159,7 @@ export function scanCommand(): Command {
         path: string | undefined,
         options: {
           all: boolean;
+          system: boolean;
           quick: boolean;
           output?: string;
           lang: string;
@@ -146,6 +173,21 @@ export function scanCommand(): Command {
         }
       ) => {
         const lang: Language = options.lang === 'zh-TW' ? 'zh-TW' : 'en';
+
+        // ── Default routing: in an agent project, `pga scan` scans SKILLS ────
+        // PanGuard is an AI-AGENT security product. The #1 confusion was a user
+        // sitting in a project with a ./skills dir running `pga scan` and getting
+        // a host OS firewall/port/CVE audit instead of scanning THEIR skills. So
+        // when no path/mode is given AND a local project skill context exists
+        // (./skills/*/SKILL.md or a SKILL.md in cwd), scan that. With no local
+        // skills we keep the (now de-noised) host scan as the default; `--all`
+        // scans installed skills and `--system` forces the host scan explicitly.
+        if (!path && !options.all && !options.target && !options.system) {
+          const localDir = await findLocalSkillDir();
+          if (localDir) {
+            path = localDir; // fall into the ATR skill-path scan below
+          }
+        }
 
         // ── Batch skill scan mode: pga scan --all ─────────────
         if (options.all) {

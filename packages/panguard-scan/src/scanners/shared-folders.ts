@@ -284,33 +284,49 @@ async function checkWindowsShares(): Promise<Finding[]> {
  * @param platform - Platform descriptor (macOS, Samba, etc.) / 平台描述（macOS、Samba 等）
  * @returns A Finding for the insecure share / 不安全共用的 Finding
  */
+/**
+ * Redact the OS username/display name that the default per-user Public share
+ * embeds (e.g. macOS "Adam 的公用檔案夾", Windows "Adam's Public Folder"). Left
+ * raw, that personal identifier leaks into every finding — and into any report
+ * or Threat-Cloud upload. Strip the possessive name segment so only the generic
+ * folder label remains. Custom shares (no possessive) pass through unchanged.
+ */
+function sanitizeShareName(name: string): string {
+  const isPublicFolder = /public|公用檔案夾|公用資料夾|公共文件夹/i.test(name);
+  if (!isPublicFolder) return name;
+  // Remove a leading "<name>'s " (en) or "<name> 的" (zh) possessive prefix.
+  const stripped = name.replace(/^.*?(?:['’]s\s+|的\s*)/u, '').trim();
+  return stripped || 'Public folder';
+}
+
 function createShareFinding(
   counter: number,
   shareName: string,
   sharePath: string,
   platform: string
 ): Finding {
+  const safeName = sanitizeShareName(shareName);
   return {
     id: `SCAN-SHARE-${String(counter).padStart(3, '0')}`,
     title:
-      `Shared folder with open access: ${shareName} / ` +
-      `具有開放存取權的共用資料夾：${shareName}`,
+      `Shared folder with open access: ${safeName} / ` +
+      `具有開放存取權的共用資料夾：${safeName}`,
     description:
-      `The ${platform} share "${shareName}" allows guest or everyone access. ` +
+      `The ${platform} share "${safeName}" allows guest or everyone access. ` +
       'This may expose sensitive data to unauthorized users on the network. ' +
       `Path: ${sharePath || 'unknown'}. / ` +
-      `${platform} 共用「${shareName}」允許訪客或所有人存取。` +
+      `${platform} 共用「${safeName}」允許訪客或所有人存取。` +
       '這可能將敏感資料暴露給網路上未授權的使用者。' +
       `路徑：${sharePath || 'unknown'}。`,
     severity: 'medium',
     category: 'access',
     remediation:
-      `Restrict access to the share "${shareName}" by removing guest/everyone ` +
+      `Restrict access to the share "${safeName}" by removing guest/everyone ` +
       'permissions and configuring explicit user or group-based access controls. / ' +
-      `限制共用「${shareName}」的存取，移除訪客/所有人權限，` +
+      `限制共用「${safeName}」的存取，移除訪客/所有人權限，` +
       '並配置明確的使用者或群組存取控制。',
     complianceRef: '4.2',
-    details: `Share: ${shareName}, Path: ${sharePath || 'N/A'}, Platform: ${platform}`,
+    details: `Share: ${safeName}, Path: ${sharePath || 'N/A'}, Platform: ${platform}`,
   };
 }
 

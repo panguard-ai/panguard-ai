@@ -127,10 +127,11 @@ describe('scanCommand', () => {
       expect(targetOpt!.flags).toContain('<host>');
     });
 
-    it('should have exactly 11 options', () => {
+    it('should have exactly 12 options', () => {
       const cmd = scanCommand();
-      // 11 includes --no-report (explicit opt-out override for Threat Cloud reporting).
-      expect(cmd.options).toHaveLength(11);
+      // 12 includes --no-report (Threat Cloud opt-out override) and --system
+      // (force the host/OS scan; a bare in-project `pga scan` defaults to skills).
+      expect(cmd.options).toHaveLength(12);
     });
 
     it('should define --save option for saving JSON results to file', () => {

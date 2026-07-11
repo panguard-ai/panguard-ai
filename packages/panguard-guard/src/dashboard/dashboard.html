@@ -1626,15 +1626,18 @@
             every action, so cloud use is typically a few cents a month — and a local model (Ollama)
             is free and keeps everything on your machine.
           </div>
+          <!-- Ship NEUTRAL, never green: renderLayers() paints the real per-layer
+               health from live status; a hardcoded green "Active" here would be a
+               false-green if the JS never runs or the guard is unreachable. -->
           <div class="layer-row">
             <span class="layer-label">Layer A &mdash; Pattern match (ATR rules)</span>
-            <div class="layer-bar"><div class="layer-fill on" id="la-bar"></div></div>
-            <span class="layer-status on" id="la-st">Active</span>
+            <div class="layer-bar"><div class="layer-fill" id="la-bar"></div></div>
+            <span class="layer-status" id="la-st">&mdash;</span>
           </div>
           <div class="layer-row">
             <span class="layer-label">Layer B &mdash; Heuristic correlation</span>
-            <div class="layer-bar"><div class="layer-fill on" id="lb-bar"></div></div>
-            <span class="layer-status on" id="lb-st">Active</span>
+            <div class="layer-bar"><div class="layer-fill" id="lb-bar"></div></div>
+            <span class="layer-status" id="lb-st">&mdash;</span>
           </div>
           <div class="layer-row">
             <span class="layer-label"
@@ -1688,11 +1691,11 @@
         <div class="cg" style="margin-bottom: 20px">
           <div class="cd">
             <div class="cl" data-i18n="k_uptime">Uptime</div>
-            <div class="cv sg" id="v-uptime">0s</div>
+            <div class="cv sg" id="v-uptime">--</div>
           </div>
           <div class="cd">
             <div class="cl" data-i18n="k_events">Events Scanned</div>
-            <div class="cv sg" id="v-events">0</div>
+            <div class="cv sg" id="v-events">--</div>
           </div>
           <div class="cd">
             <div class="cl" data-i18n="k_mode">Mode</div>
@@ -2580,6 +2583,19 @@
           hb.className = 'badge badge-off';
           hb.title = 'Open the launch URL from `pga up` to authenticate this dashboard.';
         }
+        // Blank KPIs + posture: an unauthenticated page has no real data, so it
+        // must never show measured-looking zeros or an optimistic score.
+        ['v-uptime', 'v-events', 'v-rules', 'v-threats', 'v-mode'].forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) el.textContent = '--';
+        });
+        var uSc = document.getElementById('posture-score');
+        if (uSc) {
+          uSc.textContent = '--';
+          uSc.style.color = 'var(--text-muted)';
+        }
+        var uPl = document.getElementById('posture-label');
+        if (uPl) uPl.textContent = 'Not authenticated';
         var ov = document.getElementById('unauth-overlay');
         if (ov) {
           ov.style.display = 'flex';
@@ -2608,8 +2624,10 @@
           '<div style="font-size:12px;color:var(--text-muted,#9aa1a9);line-height:1.6;margin-top:14px">' +
           'It prints a link like ' +
           '<code>http://127.0.0.1:&lt;port&gt;/?token=&hellip;</code> — open that ' +
-          'link to authenticate. If Guard is already running, re-run ' +
-          '<code>pga up</code> to reprint the authenticated link.</div>' +
+          'link to authenticate. If Guard is already running, run ' +
+          '<code>pga status</code> to reprint the link (no re-scan), or ' +
+          '<code>pga up</code> to restart. Still 401 after that? Run ' +
+          '<code>pga doctor</code> — it checks the dashboard token.</div>' +
           '</div>';
         document.body.appendChild(ov);
       }
@@ -2788,6 +2806,12 @@
           if (banner) banner.style.display = 'flex';
           if (wl && wl.textContent !== 'Invalid token') wl.textContent = 'Not running';
           if (wd) wd.classList.remove('on');
+          // Blank the KPI cards: an unreachable Guard has UNKNOWN metrics, not
+          // measured zeros. Leaving "0s / 0 events" reads as real data.
+          ['v-uptime', 'v-events', 'v-rules', 'v-threats', 'v-mode'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = '--';
+          });
         }
       }
 
@@ -2814,7 +2838,11 @@
             if (wl && wl.textContent !== 'Invalid token') wl.textContent = 'Reconnecting…';
             if (!_downGrace) {
               _downGrace = setTimeout(function () {
-                if (_connState !== 'live') setConnState('down');
+                // If the socket dropped because the token is invalid (server
+                // rejects the WS upgrade), Guard IS running — the fix is auth,
+                // not "start Guard". Don't mislabel it as GUARD NOT RUNNING;
+                // the 401 path already showed the unauthenticated overlay.
+                if (!_unauthShown && _connState !== 'live') setConnState('down');
               }, 4000);
             }
           }
@@ -2846,7 +2874,12 @@
         }
       }
       function updateStatus(s) {
-        if (!s) return;
+        // Only a REAL status payload may drive the UI + flip the connection to
+        // live. A defensive shape check so an error body / partial object can
+        // never mark the dashboard "Connected" or paint an optimistic posture
+        // (the real /api/status always carries layers + enforcement + mode).
+        if (!s || typeof s !== 'object' || s.error) return;
+        if (!s.layers && !s.enforcement && s.mode === undefined) return;
         markConnLive();
         // Record the Guard HOST's platform so the key-storage 0600 copy reflects
         // the machine the file lives on, not the browser's OS.
@@ -2905,6 +2938,26 @@
       var _agentUnprotected = 0;
       function renderPosture(s) {
         if (!s) return;
+        // Absence of real health data is UNKNOWN, not perfect. Without live
+        // s.layers the score would sit at 100 → "Strong", contradicting an
+        // OFFLINE banner. Show an honest unknown state and stop.
+        if (!s.layers) {
+          var scU = document.getElementById('posture-score');
+          if (scU) {
+            scU.textContent = '--';
+            scU.style.color = 'var(--text-muted)';
+          }
+          var barU = document.getElementById('posture-bar');
+          if (barU) barU.style.width = '0';
+          var lbU = document.getElementById('posture-label');
+          if (lbU) lbU.textContent = 'Unknown — can’t reach Guard';
+          var ddU = document.getElementById('posture-deductions');
+          if (ddU)
+            ddU.innerHTML =
+              '<div style="font-size:12px;color:var(--text-muted)">Guard isn’t reporting ' +
+              'live status, so posture can’t be assessed. Start it with "pga up".</div>';
+          return;
+        }
         var score = 100;
         var ded = [];
         var threats = s.threatsDetected || 0;
@@ -2920,10 +2973,12 @@
           });
         }
         var la = s.layers && s.layers.a;
-        if (la && la.state !== 'active') {
+        // Fail-closed: a missing Layer A is 'unknown/not running', not a free
+        // pass — deduct just as we would for an explicitly non-active engine.
+        if (!la || la.state !== 'active') {
           score -= 30;
           ded.push({
-            label: 'Detection engine: ' + (la.detail || 'not running'),
+            label: 'Detection engine: ' + ((la && la.detail) || 'not running'),
             pts: 30,
             max: 30,
             goto: 'rules',
@@ -3233,8 +3288,11 @@
          (emerald) ONLY when the daemon will actually act; 'protection' mode with
          no armed response → MONITORING (amber), not a green over-claim. */
       function postureView(s) {
+        // No enforcement + no mode = we have no real posture. Default to 'off'
+        // (OFFLINE), never the optimistic 'learning' — an empty/401 body must
+        // never read as "Guard is running and building a baseline".
         var enf = s.enforcement || {
-          posture: s.mode === 'protection' ? 'protected' : s.mode || 'learning',
+          posture: s.mode ? (s.mode === 'protection' ? 'protected' : s.mode) : 'off',
           armedActions: [],
         };
         var MAP = {
@@ -3377,9 +3435,17 @@
       function loadStatus() {
         af('/api/status')
           .then(function (r) {
+            // A non-OK response (401 invalid-token, 5xx) carries an ERROR body,
+            // not a real status. Feeding {error:'Unauthorized'} into updateStatus
+            // faked a live "Strong / 0 rules / 0 events" screen. Short-circuit so
+            // only a genuine 200 status ever drives the UI; af() has already shown
+            // the unauthenticated overlay on 401.
+            if (!r.ok) return null;
             return r.json();
           })
-          .then(updateStatus)
+          .then(function (s) {
+            if (s) updateStatus(s);
+          })
           .catch(function () {
             // Fetch failed (not a 401 — that path shows the unauthenticated
             // screen). On localhost this means Guard isn't reachable: surface

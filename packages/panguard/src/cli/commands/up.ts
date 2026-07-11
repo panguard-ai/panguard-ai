@@ -435,8 +435,13 @@ export function upCommand(): Command {
             }
 
             if (skills.length === 0) {
+              // Be precise about SCOPE: `pga up` scans skills already INSTALLED
+              // across your AI platforms (~/.claude/skills + MCP server configs).
+              // A project folder of SKILL.md files is a different thing — point at
+              // `pga scan <path>` for that so "no skills" doesn't read as "nothing
+              // is installed" when the user has a ./skills dir right there.
               console.log(
-                `  ${c.dim('No skills found. Install some MCP skills and run "pga scan" again.')}\n`
+                `  ${c.dim('No installed skills found across your AI platforms. ("pga up" scans ~/.claude/skills and your MCP server configs — to scan a project folder instead, run "pga scan ./skills" or "pga scan <path>".)')}\n`
               );
               console.log(
                 `  ${c.dim('Guard is still running in the background and will pick up newly installed skills automatically.')}\n`
@@ -793,10 +798,16 @@ export function upCommand(): Command {
         // slow-first-run paths actually open the dashboard; only a pathological
         // start falls back (to `pga status`, not a full re-scan).
         let dashboardUrl: string | null = null;
-        if (opts.dashboard && isGuardRunning()) {
+        if (opts.dashboard) {
+          // Do NOT gate on an early isGuardRunning() snapshot: a first-run daemon
+          // loads the full ruleset before writing its PID, so it can be up seconds
+          // later. Poll for the daemon AND its token inside the loop, so a slow
+          // start is 'still starting', not a false 'Guard is not running'.
           for (let i = 0; i < 400; i++) {
-            dashboardUrl = readAuthenticatedDashboardUrl();
-            if (dashboardUrl) break;
+            if (isGuardRunning()) {
+              dashboardUrl = readAuthenticatedDashboardUrl();
+              if (dashboardUrl) break;
+            }
             if (i === 10) {
               console.log(`  ${c.dim(t(lang, 'Starting dashboard...', '正在啟動儀表板...'))}`);
             }
@@ -824,12 +835,15 @@ export function upCommand(): Command {
               )}\n`
             );
           } else {
+            // Guard did not come up. Never tell the user to re-run the command
+            // they are already running — point them at the log + doctor + a
+            // foreground start so the failure is self-debuggable.
             console.log(
               `\n  ${c.caution(
                 t(
                   lang,
-                  `Dashboard not available (Guard is not running). Start it with: pga up`,
-                  `儀表板無法使用（Guard 未執行）。請用以下指令啟動：pga up`
+                  `Dashboard not available — Guard did not start. See ~/.panguard-guard/panguard-guard.log, run "pga doctor", or "pga guard --watch" to start it in the foreground and see the error.`,
+                  `儀表板無法使用 — Guard 未啟動。請查看 ~/.panguard-guard/panguard-guard.log,執行「pga doctor」,或用「pga guard --watch」在前景啟動以查看錯誤。`
                 )
               )}\n`
             );
@@ -884,10 +898,21 @@ export function upCommand(): Command {
         }
         console.log('');
         if (opts.dashboard) {
-          // Print the AUTHENTICATED URL (with token) so copy-pasting it works —
-          // a bare URL 401s. Fall back to the base URL only as a last resort
-          // when the token is not yet on disk.
-          console.log(`  ${c.sage('Dashboard')}     ${dashboardUrl ?? dashboardBaseUrl()}`);
+          // Reflect real state — never print a bare URL that 401s. Only show a
+          // link when we have the AUTHENTICATED (token) URL; otherwise say where
+          // to get it (running) or where to debug (not started). This keeps the
+          // summary consistent with the dashboard-status branch above.
+          if (dashboardUrl) {
+            console.log(`  ${c.sage('Dashboard')}     ${dashboardUrl}`);
+          } else if (guardRunning) {
+            console.log(
+              `  ${c.sage('Dashboard')}     ${c.dim(t(lang, 'run "pga status" for the link', '執行「pga status」取得連結'))}`
+            );
+          } else {
+            console.log(
+              `  ${c.sage('Dashboard')}     ${c.dim(t(lang, 'not started — see ~/.panguard-guard/panguard-guard.log', '未啟動 — 見 ~/.panguard-guard/panguard-guard.log'))}`
+            );
+          }
         }
         console.log(
           `  ${c.sage(t(lang, 'Rules', '規則'))}         ${ruleCount} ${t(lang, 'detection rules active', '條偵測規則運作中')}`

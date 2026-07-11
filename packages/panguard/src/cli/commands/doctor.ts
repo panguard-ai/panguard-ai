@@ -50,6 +50,7 @@ const GUARD_DIR = join(HOME, '.panguard-guard');
 const GUARD_CONFIG_PATH = join(GUARD_DIR, 'config.json');
 const LAST_SCAN_PATH = join(PANGUARD_DIR, 'last-scan.json');
 const GUARD_PID_PATH = join(GUARD_DIR, 'panguard-guard.pid');
+const DASHBOARD_TOKEN_PATH = join(GUARD_DIR, 'dashboard-token');
 // Derive from persist.ts's single source of truth — a hard-coded name here drifts
 // from what `pga up` actually installs and makes the service check always fail.
 const LAUNCHD_PLIST_PATH = join(HOME, 'Library', 'LaunchAgents', SERVICE_PLIST_BASENAME);
@@ -325,6 +326,78 @@ async function checkGuardEngine(): Promise<CheckResult> {
       ruleCount !== null
         ? `Daemon running (PID ${pid}), ${ruleCount} rules loaded`
         : `Daemon running (PID ${pid})`,
+  };
+}
+
+/** Is the guard daemon process actually alive? (PID file present + reachable) */
+function isDaemonAlive(): boolean {
+  if (!existsSync(GUARD_PID_PATH)) return false;
+  try {
+    const pid = parseInt(readFileSync(GUARD_PID_PATH, 'utf-8').trim(), 10);
+    if (isNaN(pid)) return false;
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * A running-but-tokenless (or stale-token) dashboard is the exact silent
+ * failure behind "the dashboard says Invalid token / OFFLINE". `pga doctor` is
+ * where a user self-diagnoses, so verify: dashboard enabled + daemon up + token
+ * present + the token actually authenticates a live probe.
+ */
+async function checkDashboardToken(): Promise<CheckResult> {
+  let dashboardEnabled = true;
+  try {
+    if (existsSync(GUARD_CONFIG_PATH)) {
+      const cfg = JSON.parse(readFileSync(GUARD_CONFIG_PATH, 'utf-8')) as {
+        dashboardEnabled?: boolean;
+      };
+      if (cfg.dashboardEnabled === false) dashboardEnabled = false;
+    }
+  } catch {
+    /* unreadable config — treat as enabled (the default) */
+  }
+  if (!dashboardEnabled) {
+    return { status: 'pass', label: 'Dashboard token', detail: 'Dashboard disabled in config' };
+  }
+  // Only meaningful when the daemon is up; the Guard-engine check already
+  // reports a down daemon, so don't double-flag it here.
+  if (!isDaemonAlive()) {
+    return {
+      status: 'pass',
+      label: 'Dashboard token',
+      detail: 'Daemon not running (dashboard check deferred to Guard engine)',
+    };
+  }
+  const tokenMissing =
+    !existsSync(DASHBOARD_TOKEN_PATH) || readFileSync(DASHBOARD_TOKEN_PATH, 'utf-8').trim() === '';
+  if (tokenMissing) {
+    return {
+      status: 'fail',
+      label: 'Dashboard token',
+      detail:
+        'Guard is running but its launch token is missing — the dashboard will return 401 "Invalid token"',
+      fix: 'Restart Guard: "pga guard restart" (or "pga up"). If it recurs, ensure ~/.panguard-guard is writable (chmod 700).',
+    };
+  }
+  // Token present — probe the live dashboard to confirm it actually authenticates
+  // (catches a stale token left by a prior daemon, or a dashboard that never bound).
+  const status = await fetchDaemonStatus(1500);
+  if (status) {
+    return {
+      status: 'pass',
+      label: 'Dashboard token',
+      detail: 'Dashboard reachable; launch token valid',
+    };
+  }
+  return {
+    status: 'fail',
+    label: 'Dashboard token',
+    detail: 'On-disk token does not authenticate the running dashboard (stale token) — visits 401',
+    fix: 'Restart Guard to re-mint the launch token: "pga guard restart"',
   };
 }
 
@@ -720,6 +793,7 @@ async function runAllChecks(): Promise<CheckResult[]> {
     checkAiLayerLocal(),
     checkAiLayerCloud(),
     await checkGuardEngine(),
+    await checkDashboardToken(),
     checkHookProtection(),
     checkNotificationChannels(),
     checkLastScan(),
