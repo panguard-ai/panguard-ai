@@ -32,7 +32,10 @@ import {
 import { join, dirname } from 'node:path';
 import { homedir } from 'node:os';
 import { c } from '@panguard-ai/core';
-import { ProxyEvaluator } from '@panguard-ai/panguard-mcp-proxy/evaluator';
+import {
+  ProxyEvaluator,
+  EVALUATION_ERROR_SENTINEL,
+} from '@panguard-ai/panguard-mcp-proxy/evaluator';
 import {
   readAutoUpdateSettings,
   resolveStagedAutoRules,
@@ -157,8 +160,12 @@ export function normalizeInput(
     return content ? { toolName: action || 'command', content } : null;
   }
   if (platform === 'cursor') {
-    // beforeShellExecution → top-level command; beforeMCPExecution → tool_name + tool_input(string)
-    if (payload['command'] != null) return { toolName: 'shell', content: str(payload['command']) };
+    // beforeMCPExecution → tool_name + tool_input(string); beforeShellExecution
+    // → top-level command. Check the MCP tool call FIRST: a stdio-launched MCP
+    // server's payload can also carry a top-level `command` (the server's own
+    // LAUNCH command), and an earlier `command` branch would scan that static
+    // launch string instead of the actual (possibly malicious) tool_input —
+    // making MCP scanning a silent no-op for the common stdio case.
     const toolName = str(payload['tool_name']);
     let input: ToolInput = {};
     const raw = payload['tool_input'];
@@ -169,8 +176,12 @@ export function normalizeInput(
         input = { _raw: raw };
       }
     } else if (raw && typeof raw === 'object') input = raw as ToolInput;
-    if (!toolName && !Object.keys(input).length) return null;
-    return { toolName: toolName || 'tool', content: contentFromArgs(toolName, input) };
+    if (toolName || Object.keys(input).length) {
+      return { toolName: toolName || 'tool', content: contentFromArgs(toolName, input) };
+    }
+    // No MCP tool call → genuine beforeShellExecution (top-level command).
+    if (payload['command'] != null) return { toolName: 'shell', content: str(payload['command']) };
+    return null;
   }
   // claude-code / continue / codex / gemini: top-level tool_name + tool_input
   const toolName = str(payload['tool_name']);
@@ -179,6 +190,25 @@ export function normalizeInput(
     toolName,
     content: contentFromArgs(toolName, (payload['tool_input'] ?? {}) as ToolInput),
   };
+}
+
+/**
+ * The proxy evaluator returns a SYNTHETIC deny (matchedRules === ['evaluation-
+ * error']) when its OWN evaluation crashed — a fail-closed default that is right
+ * for the MCP proxy but wrong for this per-tool-call hook, where it would brick
+ * the agent and hand an untrusted crash-inducing rule hard-block power. The hook
+ * treats this as an OPERATIONAL error (fail open), never a real block. Pure +
+ * exported so the policy is unit-tested independent of the live evaluator.
+ */
+export function isEvaluationErrorSentinel(r: {
+  outcome: string;
+  matchedRules?: readonly string[];
+}): boolean {
+  return (
+    r.outcome === 'deny' &&
+    r.matchedRules?.length === 1 &&
+    r.matchedRules[0] === EVALUATION_ERROR_SENTINEL
+  );
 }
 
 // ── Output adapters (the security-critical part — byte-exact per host) ───────
@@ -637,6 +667,24 @@ export async function runHook(
     const outcome: Verdict =
       rawOutcome === 'allow' || rawOutcome === 'ask' || rawOutcome === 'deny' ? rawOutcome : 'deny';
     if (outcome === 'allow') process.exit(0);
+
+    // An INTERNAL ATR-engine crash surfaces from the evaluator as a synthetic
+    // deny (matchedRules === ['evaluation-error']) — a fail-closed default that
+    // is correct for the MCP proxy but WRONG here: in the per-tool-call hook it
+    // would (a) block every subsequent Bash/Edit/Write/Read/WebFetch under the
+    // default 'guarded' posture, bricking the agent, and (b) let a crash-inducing
+    // (e.g. bad auto-pulled) rule gain hard-block power, bypassing shouldHardDeny
+    // and the advise-only cap. This is an OPERATIONAL error, not a flagged match,
+    // so per this hook's invariant (operational errors never brick) we fail OPEN
+    // — loudly, and record the degraded state so doctor/dashboard surface it.
+    if (isEvaluationErrorSentinel(result)) {
+      process.stderr.write(
+        '[panguard-hook] WARNING: the detection engine failed to evaluate this tool call ' +
+          '(operational error) — NOT blocking (fail-open). Protection is degraded; run "pga doctor".\n'
+      );
+      writeContractMarker(platform, 'evaluation-error-failopen', 'allowed');
+      process.exit(0);
+    }
     if (outcome !== rawOutcome) {
       // Record the marker with the disposition this posture will ACTUALLY apply:
       // advisory blocks nothing, so an unrecognized outcome is coerced to 'deny'
@@ -830,6 +878,22 @@ const claudeSettingsPath = (): string => join(homedir(), '.claude', 'settings.js
 export function isHookInstalled(settings: ClaudeSettings): boolean {
   const arr = settings.hooks?.PreToolUse ?? [];
   return arr.some((m) => m.hooks?.some((h) => h.command?.startsWith('pga hook run')));
+}
+
+/**
+ * Is the built-in-tool hook actually installed on the primary host (Claude
+ * settings — what `pga up` / `pga hook install` write by default)? Best-effort;
+ * false on absent/corrupt settings. Lets `pga doctor` avoid greening a
+ * "Built-in-tool hook" check when the hook was never installed at all (a
+ * missing degraded-marker alone does NOT prove protection is active).
+ */
+export function isBuiltinHookInstalled(): boolean {
+  try {
+    const r = readJsonForRoundTrip(claudeSettingsPath());
+    return r.kind === 'ok' && isHookInstalled(r.data as ClaudeSettings);
+  } catch {
+    return false;
+  }
 }
 /** Merge our hook into Claude-style settings without clobbering existing hooks (pure). */
 export function withHookInstalled(
