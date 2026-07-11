@@ -108,8 +108,8 @@ export default async function PilotWelcomePage({
               title={isZh ? '7 天無條件退費窗' : '7-day no-questions refund window'}
               body={
                 isZh
-                  ? '從今天算起 7 天內,任何理由都能 100% 退費。寄信給 billing@panguard.ai 就好。'
-                  : 'Through Day 7, full refund for any reason. Email billing@panguard.ai — no explanation needed.'
+                  ? '從今天算起 7 天內,任何理由都能 100% 退費——而你在 Day 3 就已拿到初步掃描與發現報告,退費前先看到實際價值。寄信給 billing@panguard.ai 就好。'
+                  : 'Through Day 7, full refund for any reason — and you already have your Day-3 initial scan and findings report in hand, so you see real value before the window closes. Email billing@panguard.ai, no explanation needed.'
               }
             />
           </section>
@@ -117,9 +117,14 @@ export default async function PilotWelcomePage({
           {/* What you've signed up for */}
           <section className="mt-12 rounded-2xl border border-border bg-surface-1 p-6">
             <p className="text-[11px] uppercase tracking-[0.12em] text-brand-sage font-semibold mb-3">
-              {isZh ? '你買的 6 個 deliverables' : 'The 6 deliverables you signed up for'}
+              {isZh ? '你買的 7 個 deliverables' : 'The 7 deliverables you signed up for'}
             </p>
             <ul className="space-y-2.5 text-sm text-text-secondary">
+              <Bullet>
+                {isZh
+                  ? '初步 ATR 掃描 + 初步發現報告 (Day 3)'
+                  : 'Initial ATR scan + preliminary findings report (Day 3)'}
+              </Bullet>
               <Bullet>{isZh ? 'ATR 引擎部署 (Day 14)' : 'ATR engine deployment (Day 14)'}</Bullet>
               <Bullet>
                 {isZh

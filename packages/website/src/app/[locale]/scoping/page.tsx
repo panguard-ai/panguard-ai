@@ -29,8 +29,8 @@ export default async function ScopingPage({ params }: { params: Promise<{ locale
           </h1>
           <p className="mt-4 text-sm text-text-secondary leading-relaxed">
             {isZh
-              ? 'Founding Customer Pilot 限前 3 個客戶,$25,000 USD 一次性收費,90 天交付,$25K 全額抵入 Y1 Enterprise (簽約後 12 個月內升級有效)。送出表單後,我們會寄 magic link 到你的工作信箱,點開後進入 Stripe 結帳。這套 Pilot 專為需要在企業或銀行資安審查中證明 agent 安全性的 AI 廠商與受監管團隊設計。'
-              : 'Founding Customer Pilot is limited to the first three customers. $25,000 USD one-time, 90-day delivery, $25K credits 100% to a Y1 Enterprise contract signed within 12 months. After submission we email a magic-link to your work address; clicking it takes you to Stripe checkout. Built for AI vendors and regulated teams that must prove agent security inside an enterprise or bank security review.'}
+              ? 'Founding Customer Pilot 限前 3 個客戶,$25,000 USD 一次性收費,90 天交付,$25K 全額抵入 Y1 Enterprise (簽約後 12 個月內升級有效)。送出表單後,我們會寄 magic link 到你的工作信箱,點開後進入 Stripe 結帳。這套 Pilot 專為需要在企業或銀行資安審查中證明 agent 安全性的 AI 廠商與受監管團隊設計。你在 Day 3 就會拿到初步掃描與發現報告——遠早於 7 天退費窗關閉,先看到價值再決定。'
+              : 'Founding Customer Pilot is limited to the first three customers. $25,000 USD one-time, 90-day delivery, $25K credits 100% to a Y1 Enterprise contract signed within 12 months. After submission we email a magic-link to your work address; clicking it takes you to Stripe checkout. Built for AI vendors and regulated teams that must prove agent security inside an enterprise or bank security review. You get an initial scan and findings report on Day 3 — well before the 7-day refund window closes, so you see value before you commit.'}
           </p>
 
           <ScopingForm locale={locale} />
