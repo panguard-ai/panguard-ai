@@ -658,11 +658,16 @@ export function scanCommand(): Command {
             }
           }
           if (fixableCount > 0) {
+            // The per-finding manual-fix commands are printed above. Do NOT point
+            // at `pga scan --fix` — that flag does not exist and the CLI rejects
+            // it ("unknown option '--fix'"); telling users to run a command the
+            // tool refuses is a trust-eroding broken affordance.
             console.log(
-              box(`Auto-fix available for ${fixableCount} issue(s):\n  $ pga scan --fix`, {
-                borderColor: c.sage,
-                title: 'Panguard AI',
-              })
+              box(
+                `${fixableCount} issue(s) have a manual fix listed above.\n` +
+                  `Apply them, then re-run \`pga scan\` to verify.`,
+                { borderColor: c.sage, title: 'Panguard AI' }
+              )
             );
           }
           console.log('');

@@ -34,6 +34,8 @@ import { lookup } from 'node:dns/promises';
 import { WebSocketServer, type WebSocket as WS } from 'ws';
 import { createLogger } from '@panguard-ai/core';
 import { FileQuarantine } from '../response/file-quarantine.js';
+import { normalizeSkillName } from '../engines/skill-whitelist.js';
+import type { SkillWhitelistManager } from '../engines/skill-whitelist.js';
 import type {
   DashboardStatus,
   DashboardEvent,
@@ -234,6 +236,10 @@ export class DashboardServer {
   private readonly port: number;
   private getConfig: (() => GuardConfig) | null = null;
   private configApplier: ((cfg: GuardConfig) => void) | null = null;
+  // The LIVE skill-whitelist manager the detection engine actually consults.
+  // When present, "Mark safe"/"Un-trust" route through it so the change takes
+  // effect on the running daemon AND is persisted in the format the gate reads.
+  private whitelistManager: SkillWhitelistManager | null = null;
   private getRulesProvider:
     | (() => Array<{
         id: string;
@@ -320,6 +326,16 @@ export class DashboardServer {
     }>
   ): void {
     this.getRulesProvider = getter;
+  }
+
+  /**
+   * Inject the live skill-whitelist manager so dashboard "Mark safe"/"Un-trust"
+   * mutate the SAME in-memory whitelist the detection engine consults (and
+   * persist it correctly), instead of hand-writing a JSON record the gate never
+   * matches. Wired by GuardEngine at startup.
+   */
+  setWhitelistManager(manager: SkillWhitelistManager): void {
+    this.whitelistManager = manager;
   }
 
   async start(): Promise<void> {
@@ -1205,13 +1221,6 @@ export class DashboardServer {
     return 'community';
   }
 
-  /**
-   * SARIF 2.1.0 stub export. Production wiring to the migrator's evidence
-   * generator lives in Block F; this stub returns a realistic-shape document
-   * with the workspace_id, generated_at, and a 1-rule sample so the UI flow
-   * and downstream tooling (GitHub code-scanning, etc.) can be validated end
-   * to end.
-   */
   /**
    * Load all loaded ATR rules from disk. Shared between SARIF + Evidence export.
    * Returns the same shape as /api/loaded-rules.
@@ -2357,22 +2366,49 @@ export class DashboardServer {
       return;
     }
     try {
+      // Preferred: mutate the LIVE gate. add() computes normalizedName, uses a
+      // valid WhitelistSource, updates the in-memory Map the detection engine
+      // reads, and persists — so "Mark safe" takes effect immediately and the
+      // engine actually stops flagging the skill (was a fake-green before).
+      if (this.whitelistManager) {
+        // add() returns false when the whitelist is at capacity (the skill was
+        // NOT added) — surface that honestly instead of a green success that the
+        // gate never matches.
+        const added = this.whitelistManager.add(name, 'manual', 'Marked safe from dashboard');
+        if (!added) {
+          this.jsonResponse(res, { error: 'Whitelist is at capacity — could not mark safe' }, 409);
+          return;
+        }
+        this.jsonResponse(res, { success: true });
+        return;
+      }
+      // Fallback (no engine wired, e.g. relay-only): still write a VALID record —
+      // normalizedName + a real source — so a later engine start honors it.
+      // Never the old partial record (missing normalizedName) that never matched.
       const dataDir = this.getConfig?.()?.dataDir ?? join(homedir(), '.panguard-guard');
       const whitelistPath = join(dataDir, 'skill-whitelist.json');
-      let entries: Array<{ name: string; source?: string; addedAt?: string }> = [];
+      let entries: Array<{
+        name: string;
+        normalizedName?: string;
+        source?: string;
+        addedAt?: string;
+      }> = [];
       if (existsSync(whitelistPath)) {
         try {
           const raw = JSON.parse(readFileSync(whitelistPath, 'utf-8')) as {
-            whitelist?: Array<{ name: string; source?: string }>;
-            skills?: Array<{ name: string; source?: string }>;
+            whitelist?: typeof entries;
+            skills?: typeof entries;
           };
           entries = raw.whitelist ?? raw.skills ?? [];
         } catch {
           /* corrupt file — start fresh */
         }
       }
-      if (!entries.some((s) => s.name === name)) {
-        entries.push({ name, source: 'manual-dashboard', addedAt: new Date().toISOString() });
+      const normalizedName = normalizeSkillName(name);
+      if (
+        !entries.some((s) => (s.normalizedName ?? normalizeSkillName(s.name)) === normalizedName)
+      ) {
+        entries.push({ name, normalizedName, source: 'manual', addedAt: new Date().toISOString() });
       }
       mkdirSync(dataDir, { recursive: true });
       const tmp = `${whitelistPath}.tmp.${process.pid}`;
@@ -2402,24 +2438,39 @@ export class DashboardServer {
       return;
     }
     try {
+      // Preferred: REVOKE on the LIVE gate. revoke() marks the skill revoked so
+      // isWhitelisted() returns false immediately AND auto-promotion is blocked,
+      // then persists. We must NOT use remove(): remove() deletes the revoked
+      // flag, so on the next tool event atr-engine.autoPromote() would silently
+      // re-whitelist a stable-fingerprint skill the user just un-trusted (a fake
+      // un-trust). revoke() is what the engine's own action handler uses.
+      if (this.whitelistManager) {
+        const removed = this.whitelistManager.revoke(name, 'Un-trusted from dashboard');
+        this.jsonResponse(res, { success: true, removed });
+        return;
+      }
       const dataDir = this.getConfig?.()?.dataDir ?? join(homedir(), '.panguard-guard');
       const whitelistPath = join(dataDir, 'skill-whitelist.json');
       if (!existsSync(whitelistPath)) {
         this.jsonResponse(res, { success: true, removed: false });
         return;
       }
-      let entries: Array<{ name: string; source?: string; addedAt?: string }> = [];
+      let entries: Array<{ name: string; normalizedName?: string; source?: string }> = [];
       try {
         const raw = JSON.parse(readFileSync(whitelistPath, 'utf-8')) as {
-          whitelist?: Array<{ name: string; source?: string }>;
-          skills?: Array<{ name: string; source?: string }>;
+          whitelist?: typeof entries;
+          skills?: typeof entries;
         };
         entries = raw.whitelist ?? raw.skills ?? [];
       } catch {
         this.jsonResponse(res, { success: true, removed: false });
         return;
       }
-      const next = entries.filter((s) => s.name !== name);
+      // Match by normalized name so a differently-cased/spaced name still removes.
+      const target = normalizeSkillName(name);
+      const next = entries.filter(
+        (s) => (s.normalizedName ?? normalizeSkillName(s.name)) !== target
+      );
       const removed = next.length !== entries.length;
       mkdirSync(dataDir, { recursive: true });
       const tmp = `${whitelistPath}.tmp.${process.pid}`;

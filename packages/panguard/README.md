@@ -4,7 +4,7 @@ AI-powered security for agents and servers — detect threats in real-time, on-d
 
 ## Features
 
-- **Guard Daemon** — Real-time endpoint monitoring with automatic threat response
+- **Guard Daemon** — Real-time endpoint monitoring; blocks high-confidence threats (critical / high-stable) in the default guarded posture and advises on the rest (`--enforce` to block all, `--advisory` to detect-only)
 - **Local Dashboard** — Zero-telemetry security control center running on your machine
 - **675+ Detection Rules** — ATR (Agent Threat Rules) community-driven, LLM-reviewed standards
 - **MCP Proxy** — Transparent tool-call evaluation for Claude, Cursor, and other AI agents

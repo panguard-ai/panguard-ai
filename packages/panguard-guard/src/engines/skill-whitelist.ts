@@ -72,6 +72,17 @@ const DEFAULT_CONFIG: Required<SkillWhitelistConfig> = {
   maxSize: 1000,
 };
 
+/**
+ * Canonical skill-name normalization — the SINGLE key any whitelist lookup uses.
+ * Exported so callers that persist whitelist entries out-of-band (e.g. the
+ * dashboard's fallback path) produce entries the live gate can actually match.
+ * A record written without this normalizedName lands under key `undefined` and
+ * is silently never honored (the 2026-07 "Mark safe" fake-green).
+ */
+export function normalizeSkillName(name: string): string {
+  return name.toLowerCase().trim().replace(/\s+/g, '-');
+}
+
 // ---------------------------------------------------------------------------
 // Engine
 // ---------------------------------------------------------------------------
@@ -430,7 +441,7 @@ export class SkillWhitelistManager {
   // -------------------------------------------------------------------------
 
   private normalize(name: string): string {
-    return name.toLowerCase().trim().replace(/\s+/g, '-');
+    return normalizeSkillName(name);
   }
 
   /**

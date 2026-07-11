@@ -314,7 +314,7 @@ async function checkGuardEngine(): Promise<CheckResult> {
       status: 'fail',
       label: 'Guard engine',
       detail: `Daemon running (PID ${pid}) but 0 detection rules loaded — protection is NOT active`,
-      fix: 'Reinstall @panguard-ai/atr or run "pga guard sync-rules"',
+      fix: 'Reinstall @panguard-ai/atr or run "pga upgrade"',
     };
   }
 
@@ -555,7 +555,7 @@ function checkHookProtection(): CheckResult {
       detail: `Hook loaded 0 rules — protection DEGRADED (allowing all tool calls)${
         status.at ? ` since ${status.at}` : ''
       }`,
-      fix: 'Run "pga guard sync-rules" (or reinstall) to restore detection rules, then restart the host agent',
+      fix: 'Run "pga upgrade" (or reinstall) to restore detection rules, then restart the host agent',
     };
   }
   return {
@@ -595,7 +595,7 @@ function checkShellCompletions(): CheckResult {
     status: 'warn',
     label: 'Shell completions',
     detail: 'zsh completions not found',
-    fix: 'Run "pga completion install" to install shell completions',
+    fix: 'Shell tab-completion is not bundled yet (cosmetic; safe to ignore)',
   };
 }
 
