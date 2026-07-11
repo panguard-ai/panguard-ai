@@ -1,5 +1,74 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import './sovereign.css';
+import {
+  resolveCountry,
+  SOVEREIGN_COUNTRIES,
+  GENERIC_COUNTRY,
+  COUNTRY_ORDER,
+  type SovereignCountry,
+} from './countries';
+
+// Dynamic: the §03 crosswalk is rendered for the visitor's jurisdiction, read
+// from the `?c=` selection or the request geo (Vercel x-vercel-ip-country).
+export const dynamic = 'force-dynamic';
+
+const escapeHtml = (s: string): string =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/**
+ * Build the §03 section for a resolved jurisdiction: a country selector, the
+ * deployment profile (algorithm / HSM / residency / air-gap / retention), and
+ * the compliance crosswalk in that country's own framework vocabulary. All data
+ * is author-controlled display copy (see countries.ts) — escaped defensively.
+ */
+function crosswalkSection(country: SovereignCountry): string {
+  const isGeneric = country.code === GENERIC_COUNTRY.code;
+  const chips = [...COUNTRY_ORDER.map((code) => SOVEREIGN_COUNTRIES[code]!), GENERIC_COUNTRY]
+    .map((c) => {
+      const active = c.code === country.code ? ' active' : '';
+      const param = c.code === GENERIC_COUNTRY.code ? 'gen' : c.code;
+      return `<a class="cchip${active}" href="?c=${param}"><span class="cf">${c.flag}</span>${escapeHtml(c.name)}</a>`;
+    })
+    .join('');
+  const rows = country.crosswalk
+    .map(
+      (r) =>
+        `<tr><td class="k">${escapeHtml(r.capability)}</td><td class="std">${escapeHtml(r.frameworks)}</td></tr>`
+    )
+    .join('');
+  const hsmVal = country.hsm
+    ? '<div class="pfv req">Required (validated module)</div>'
+    : '<div class="pfv">Not required</div>';
+  const heading = isGeneric
+    ? 'Built to produce the evidence that governing frameworks require'
+    : `Mapped to the frameworks that govern ${escapeHtml(country.name)}`;
+  const sub = isGeneric
+    ? 'Showing a general, cross-framework mapping. Select your jurisdiction to see its deployment profile and the specific frameworks this maps to.'
+    : `Showing <b>${escapeHtml(country.name)}</b> — detected or selected. Choose another jurisdiction to compare its deployment profile and frameworks.`;
+  const note = country.note ? `<p class="cnote reveal">${escapeHtml(country.note)}</p>` : '';
+  const colHead = isGeneric ? 'Framework reference' : `${escapeHtml(country.name)} framework reference`;
+  return `<section>
+    <div class="wrap">
+      <div class="shead reveal"><span class="snum">§ 03</span><span class="slabel">Compliance crosswalk — by jurisdiction</span></div>
+      <h2 class="reveal">${heading}</h2>
+      <p class="sub reveal">${sub} <span class="note">Design-intent mapping — not a certification or accreditation.</span></p>
+      <div class="cselect reveal">${chips}</div>
+      <div class="profile reveal">
+        <div class="pf"><div class="pfk">Signing algorithm</div><div class="pfv">${escapeHtml(country.alg)}</div></div>
+        <div class="pf"><div class="pfk">Hardware module</div>${hsmVal}</div>
+        <div class="pf"><div class="pfk">Data residency</div><div class="pfv">${escapeHtml(country.residency)}</div></div>
+        <div class="pf"><div class="pfk">Air-gap</div><div class="pfv">${escapeHtml(country.airGap)}</div></div>
+        <div class="pf"><div class="pfk">Audit-log retention</div><div class="pfv">${escapeHtml(country.retention)}</div></div>
+      </div>
+      <div class="tbl reveal"><table>
+        <thead><tr><th>Control capability</th><th>${colHead}</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>
+      ${note}
+    </div>
+  </section>`;
+}
 
 export const metadata: Metadata = {
   title: 'Sovereign AI — Capability Brief',
@@ -102,24 +171,7 @@ const BRIEF_HTML = `<div class="sv">
     </div>
   </section>
 
-  <section>
-    <div class="wrap">
-      <div class="shead reveal"><span class="snum">§ 03</span><span class="slabel">Standards alignment — crosswalk</span></div>
-      <h2 class="reveal">Built to produce the evidence that governing frameworks require</h2>
-      <p class="sub reveal">A design-intent mapping between the architecture's controls and the frameworks that govern national AI programmes. It indicates the controls the system is built to support — <span class="note">not a certification or accreditation.</span></p>
-      <div class="tbl reveal"><table>
-        <thead><tr><th>Control capability</th><th>Framework reference</th></tr></thead>
-        <tbody>
-          <tr><td class="k">Signed, tamper-evident decision ledger</td><td class="std">EU AI Act Art. 12 (logging) · NIST 800-53 AU</td></tr>
-          <tr><td class="k">Policy-as-code + least-privilege identity</td><td class="std">NIST 800-53 AC · ISO/IEC 42001</td></tr>
-          <tr><td class="k">Signed, versioned policy distribution</td><td class="std">NIST 800-53 CM (anti-rollback)</td></tr>
-          <tr><td class="k">Classification, egress &amp; jurisdiction control</td><td class="std">NIST 800-53 SC · CUI handling</td></tr>
-          <tr><td class="k">Human approval, break-glass, kill-switch</td><td class="std">NIST 800-53 IR · human oversight (AI Act)</td></tr>
-          <tr><td class="k">Air-gap signed delivery + supply-chain trust</td><td class="std">SLSA-style provenance · supply-chain (SR)</td></tr>
-        </tbody>
-      </table></div>
-    </div>
-  </section>
+  <!--CROSSWALK-->
 
   <section>
     <div class="wrap">
@@ -257,6 +309,13 @@ const BRIEF_HTML = `<div class="sv">
   </div>
 </div>`;
 
-export default function SovereignPage() {
-  return <div dangerouslySetInnerHTML={{ __html: BRIEF_HTML }} />;
+export default async function SovereignPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ c?: string }>;
+}) {
+  const [sp, hdrs] = await Promise.all([searchParams, headers()]);
+  const country = resolveCountry(sp?.c, hdrs.get('x-vercel-ip-country'));
+  const html = BRIEF_HTML.replace('<!--CROSSWALK-->', crosswalkSection(country));
+  return <div dangerouslySetInnerHTML={{ __html: html }} />;
 }
