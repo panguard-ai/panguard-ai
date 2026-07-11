@@ -24,6 +24,7 @@ import {
   installFor,
   lastHookInstallError,
   readHookProtectionStatus,
+  isEvaluationErrorSentinel,
 } from '../src/cli/commands/hook.js';
 
 describe('normalizeInput — per-platform stdin, evaluate command not tool name', () => {
@@ -54,6 +55,19 @@ describe('normalizeInput — per-platform stdin, evaluate command not tool name'
       tool_input: '{"file_path":"/a","content":"x"}',
     });
     expect(n?.content).toBe('/a x');
+  });
+  it('cursor: MCP tool_input is scanned even when a top-level launch `command` is present (no shadow)', () => {
+    // A stdio-launched MCP server payload carries BOTH the server LAUNCH command
+    // and the real tool call. The real tool_input must be evaluated, not the
+    // static launch command (else MCP scanning is a silent no-op).
+    const n = normalizeInput('cursor', {
+      command: 'npx -y @some/mcp-server',
+      tool_name: 'fetch',
+      tool_input: '{"url":"http://169.254.169.254/latest/meta-data/"}',
+    });
+    expect(n?.toolName).toBe('fetch');
+    expect(n?.content).toContain('169.254.169.254');
+    expect(n?.content).not.toContain('npx -y @some/mcp-server');
   });
   it('windsurf: tool_info.command_line', () => {
     expect(
@@ -125,6 +139,35 @@ describe('normalizeInput — per-platform stdin, evaluate command not tool name'
   });
   it('abstains on empty/unknown', () => {
     expect(normalizeInput('claude-code', {})).toBeNull();
+  });
+});
+
+describe('isEvaluationErrorSentinel — engine-crash fail-open policy', () => {
+  it('true ONLY for the synthetic evaluation-error deny (so the hook fails OPEN, never bricks)', () => {
+    expect(isEvaluationErrorSentinel({ outcome: 'deny', matchedRules: ['evaluation-error'] })).toBe(
+      true
+    );
+  });
+  it('false for a REAL deny from a trusted rule (that must still block)', () => {
+    expect(isEvaluationErrorSentinel({ outcome: 'deny', matchedRules: ['ATR-2026-00001'] })).toBe(
+      false
+    );
+    // a real deny plus the sentinel is still a real match → must block
+    expect(
+      isEvaluationErrorSentinel({
+        outcome: 'deny',
+        matchedRules: ['ATR-2026-00001', 'evaluation-error'],
+      })
+    ).toBe(false);
+  });
+  it('false for allow / ask / blocklist deny', () => {
+    expect(isEvaluationErrorSentinel({ outcome: 'allow', matchedRules: [] })).toBe(false);
+    expect(isEvaluationErrorSentinel({ outcome: 'ask', matchedRules: ['evaluation-error'] })).toBe(
+      false
+    );
+    expect(isEvaluationErrorSentinel({ outcome: 'deny', matchedRules: ['guard-blocklist'] })).toBe(
+      false
+    );
   });
 });
 

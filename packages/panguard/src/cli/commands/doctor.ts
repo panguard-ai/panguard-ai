@@ -15,7 +15,7 @@ import { homedir } from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { c, symbols, box, header } from '@panguard-ai/core';
 import { PANGUARD_VERSION } from '../../index.js';
-import { readHookProtectionStatus } from './hook.js';
+import { readHookProtectionStatus, isBuiltinHookInstalled } from './hook.js';
 import { lastScanAt, readFlaggedSkills } from '../flagged-skills.js';
 import { SERVICE_PLIST_BASENAME } from './persist.js';
 import { fetchDaemonStatus } from '../daemon-status.js';
@@ -521,10 +521,22 @@ function checkHookProtection(): CheckResult {
   // instead of claiming tool calls were allowed.
   const status = readHookProtectionStatus();
   if (!status) {
+    // No degraded marker just means the hook has never RECORDED a problem — it
+    // does NOT prove protection is active. Distinguish "installed, not yet
+    // exercised" from "never installed at all" (which previously showed a green
+    // PASS = fake protection state).
+    if (!isBuiltinHookInstalled()) {
+      return {
+        status: 'warn',
+        label: 'Built-in-tool hook',
+        detail: 'Not installed — built-in tools (Bash/Edit/Write/WebFetch) are NOT intercepted',
+        fix: 'Run "pga hook install" (or "pga up") to protect built-in agent tools',
+      };
+    }
     return {
       status: 'pass',
       label: 'Built-in-tool hook',
-      detail: 'No degraded protection recorded',
+      detail: 'Installed; no degraded run recorded (verified on the next tool call)',
     };
   }
   if (status.degraded && status.reason) {

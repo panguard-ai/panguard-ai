@@ -49,6 +49,17 @@ export interface EvalResult {
   readonly adviseOnly: boolean;
 }
 
+/**
+ * The synthetic matchedRules id the evaluator emits when its OWN evaluation
+ * throws (a fail-closed 'deny' produced by the catch below, NOT a real rule
+ * match). Exported as the single source of truth so the tool-call hook can
+ * detect an engine crash and fail OPEN (never brick the agent) instead of
+ * treating it as a real block — see panguard/cli/commands/hook.ts. Keep the two
+ * sides coupled through THIS constant, never a bare string, so a rename can't
+ * silently break the fail-open contract.
+ */
+export const EVALUATION_ERROR_SENTINEL = 'evaluation-error';
+
 /** Minimal rule shape the deny policy needs. */
 interface RuleLike {
   readonly severity: string;
@@ -358,7 +369,7 @@ export class ProxyEvaluator {
       return {
         outcome: 'deny',
         reason: 'Evaluation error (fail-closed for safety)',
-        matchedRules: ['evaluation-error'],
+        matchedRules: [EVALUATION_ERROR_SENTINEL],
         confidence: 100,
         durationMs: Date.now() - start,
         adviseOnly: false,

@@ -2002,7 +2002,7 @@
             <div class="cv sg" id="cov-detected">--</div>
           </div>
           <div class="cd">
-            <div class="cl">Protected</div>
+            <div class="cl">Configured</div>
             <div class="cv" id="cov-configured" style="color: var(--emerald)">--</div>
           </div>
           <div class="cd">
@@ -3806,8 +3806,8 @@
               var status = !a.detected
                 ? '<span style="color:var(--text-muted)">not installed</span>'
                 : a.alreadyConfigured
-                  ? '<span style="color:var(--emerald)">● protected</span>'
-                  : '<span style="color:var(--warn)">○ unprotected — run <code>pga init</code></span>';
+                  ? '<span style="color:var(--emerald)">● configured</span>'
+                  : '<span style="color:var(--warn)">○ not configured — run <code>pga init</code></span>';
               var tr = document.createElement('tr');
               tr.innerHTML = '<td>' + esc(a.name || a.id || '') + '</td><td>' + status + '</td>';
               tb.appendChild(tr);
