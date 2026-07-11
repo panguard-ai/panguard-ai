@@ -43,6 +43,20 @@ export default async function SOWPage(props: { params: Promise<{ locale: string 
           : 'This is the PanGuard AI Migrator Pro Standard SOW template. Every Customer receives a SOW generated from this template with their assigned SOW number, Customer name, Effective Date, and framework selection.'}
       </p>
 
+      {/* $25K 一次性 Founding Pilot SOW — 自助購買（panguard.ai/scoping） */}
+      <div className="my-6 p-6 bg-surface-1 border border-brand-emerald/40 rounded-xl">
+        <p className="text-sm font-semibold text-brand-emerald uppercase tracking-wider mb-2">
+          {isZh
+            ? '$25K 一次性 Founding Pilot SOW（90 天）'
+            : '$25K one-time Founding Pilot SOW (90 days)'}
+        </p>
+        <p className="text-text-primary">
+          {isZh
+            ? '前 3 家客戶可經 panguard.ai/scoping 自助購買 $25,000 USD 一次性、90 天的 Founding Pilot。交付項目即下方導入交付清單（初步掃描 Day3、ATR 引擎部署、客製 ATR 規則包、SIEM webhook、合規證據包、6 小時/週創辦人工程時間、Day-90 退出包），並享結帳後 7 天無條件退費（見退費政策）。$25K 於 12 個月內簽 Y1 Enterprise 全額抵扣。'
+            : 'The first 3 customers can buy a $25,000 USD one-time, 90-day Founding Pilot self-serve at panguard.ai/scoping. Deliverables are the onboarding list below (initial scan on Day 3, ATR engine deployment, custom ATR rule pack, SIEM webhook, compliance evidence pack, 6 hrs/wk founder engineering time, Day-90 exit packet), plus a 7-day no-questions refund after checkout (see Refund Policy). The $25K credits 100% toward a Y1 Enterprise contract signed within 12 months.'}
+        </p>
+      </div>
+
       <div className="my-6 p-6 bg-surface-1 border border-brand-sage/40 rounded-xl">
         <p className="text-sm font-semibold text-brand-sage uppercase tracking-wider mb-3">
           {isZh ? '完整 SOW 範本' : 'Full SOW template'}
@@ -58,6 +72,14 @@ export default async function SOWPage(props: { params: Promise<{ locale: string 
 
       <h2>{isZh ? '導入交付項目' : 'Onboarding deliverables'}</h2>
       <ol>
+        <li>
+          <strong>
+            {isZh
+              ? '初步 ATR 掃描 + 初步發現報告'
+              : 'Initial ATR scan + preliminary findings report'}
+          </strong>{' '}
+          {isZh ? '（Day 3,退費窗內即交付）' : '(Day 3, delivered within the refund window)'}
+        </li>
         <li>
           <strong>{isZh ? 'ATR 引擎部署' : 'ATR engine deployment'}</strong>{' '}
           {isZh
