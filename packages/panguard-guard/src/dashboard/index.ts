@@ -135,11 +135,22 @@ const DASHBOARD_TOKEN_PATH = join(DASHBOARD_TOKEN_DIR, 'dashboard-token');
  * when the process is killed without a graceful `stop()` (e.g. SIGTERM mid-run).
  * Best-effort: a missing file or permission error is not fatal.
  */
-export function removeDashboardToken(): void {
+export function removeDashboardToken(expectedToken?: string): void {
   try {
-    if (existsSync(DASHBOARD_TOKEN_PATH)) {
-      rmSync(DASHBOARD_TOKEN_PATH, { force: true });
+    if (!existsSync(DASHBOARD_TOKEN_PATH)) return;
+    // Owner-aware delete: on a restart/overlap a departing OLD daemon must not
+    // erase a NEWLY-started daemon's live token. When the caller knows its own
+    // token, only remove the file if the on-disk contents still match it.
+    if (expectedToken !== undefined) {
+      let onDisk = '';
+      try {
+        onDisk = readFileSync(DASHBOARD_TOKEN_PATH, 'utf-8');
+      } catch {
+        /* unreadable — fall through to a best-effort remove */
+      }
+      if (onDisk && onDisk !== expectedToken) return; // belongs to another daemon
     }
+    rmSync(DASHBOARD_TOKEN_PATH, { force: true });
   } catch {
     /* best effort — never block shutdown on token cleanup */
   }
@@ -228,6 +239,12 @@ interface EnforcementStatus {
  */
 export class DashboardServer {
   private server: ReturnType<typeof createServer> | null = null;
+  // Did the HTTP server actually bind this port? False after an EADDRINUSE /
+  // listen error, so the launcher never opens a /?token= URL for a dead server.
+  private listening = false;
+  // Did the launch token land on disk? Surfaced so a running-but-tokenless
+  // daemon (dashboard 401s) is self-diagnosable via status/doctor.
+  private tokenPersisted = false;
   private wsClients: Set<WSClient> = new Set();
   private status: DashboardStatus;
   private recentEvents: DashboardEvent[] = [];
@@ -461,6 +478,7 @@ export class DashboardServer {
       });
 
       this.server.listen(this.port, '127.0.0.1', () => {
+        this.listening = true;
         logger.info(`Dashboard started on http://127.0.0.1:${this.port}`);
         // Token never logged. The launcher (guard-engine) opens the browser at
         // /?token=<authToken>; that one-time token mints the HttpOnly auth
@@ -483,8 +501,12 @@ export class DashboardServer {
 
   async stop(): Promise<void> {
     // Remove the persisted launch token so the secret never outlives the
-    // dashboard — a stale token would point `pga up` at a dead port.
-    removeDashboardToken();
+    // dashboard — a stale token would point `pga up` at a dead port. Pass our
+    // own token so a shutting-down OLD daemon never deletes a NEWER daemon's
+    // live token during a restart/overlap.
+    removeDashboardToken(this.authToken);
+    this.listening = false;
+    this.tokenPersisted = false;
 
     if (this.relayClient) {
       this.relayClient.disconnect();
@@ -598,6 +620,16 @@ export class DashboardServer {
     return this.authToken;
   }
 
+  /** True only after the HTTP server actually bound its port (not EADDRINUSE). */
+  isListening(): boolean {
+    return this.listening;
+  }
+
+  /** True only after the launch token was written AND read back successfully. */
+  isTokenPersisted(): boolean {
+    return this.tokenPersisted;
+  }
+
   /**
    * Persist the launch token to ~/.panguard-guard/dashboard-token with 0o600 so
    * a separate `pga up` invocation (rerun, already-running daemon, headless,
@@ -607,28 +639,51 @@ export class DashboardServer {
    * just means the CLI falls back to printing guidance instead of a live URL.
    */
   private persistAuthToken(): void {
-    try {
-      if (!existsSync(DASHBOARD_TOKEN_DIR)) {
-        mkdirSync(DASHBOARD_TOKEN_DIR, { recursive: true, mode: 0o700 });
-      }
-      // Atomic write via a temp file + rename so a concurrent reader never sees
-      // a half-written token. The temp file is created owner-only from the start.
-      const tmpPath = `${DASHBOARD_TOKEN_PATH}.tmp.${process.pid}`;
-      writeFileSync(tmpPath, this.authToken, { encoding: 'utf-8', mode: 0o600 });
-      renameSync(tmpPath, DASHBOARD_TOKEN_PATH);
-      // chmod even if the file pre-existed, to tighten a loosely-created file.
+    // Reliability matters: a dashboard that is LISTENING but has no token on disk
+    // 401s every visit ("Invalid token") with no clue. Write, then READ BACK and
+    // verify; retry a few times; log an affirmative line on success and an
+    // actionable error (never the token value) on final failure so the state is
+    // self-debuggable from the daemon log + `pga doctor`.
+    let lastErr: unknown = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
       try {
-        chmodSync(DASHBOARD_TOKEN_PATH, 0o600);
-      } catch {
-        /* platforms without POSIX permissions */
+        if (!existsSync(DASHBOARD_TOKEN_DIR)) {
+          mkdirSync(DASHBOARD_TOKEN_DIR, { recursive: true, mode: 0o700 });
+        }
+        // Atomic write via a temp file + rename so a concurrent reader never sees
+        // a half-written token. The temp file is created owner-only from the start.
+        const tmpPath = `${DASHBOARD_TOKEN_PATH}.tmp.${process.pid}`;
+        writeFileSync(tmpPath, this.authToken, { encoding: 'utf-8', mode: 0o600 });
+        renameSync(tmpPath, DASHBOARD_TOKEN_PATH);
+        // chmod even if the file pre-existed, to tighten a loosely-created file.
+        try {
+          chmodSync(DASHBOARD_TOKEN_PATH, 0o600);
+        } catch {
+          /* platforms without POSIX permissions */
+        }
+        // Read back and confirm — a silent partial/failed write is exactly the
+        // bug this hardens against.
+        if (readFileSync(DASHBOARD_TOKEN_PATH, 'utf-8') === this.authToken) {
+          this.tokenPersisted = true;
+          logger.info(
+            `Dashboard launch token persisted (0600) to ${DASHBOARD_TOKEN_PATH}. ` +
+              `The authenticated URL is available via "pga status"/"pga up".`
+          );
+          return;
+        }
+        lastErr = new Error('readback mismatch');
+      } catch (err) {
+        lastErr = err;
       }
-    } catch (err) {
-      // Never block dashboard startup on token persistence — log without the
-      // token value, then continue. The CLI degrades to guidance text.
-      logger.warn(
-        `Could not persist dashboard launch token: ${err instanceof Error ? err.message : String(err)}`
-      );
     }
+    // Final failure: escalate to error with the recovery path. Never fatal —
+    // the dashboard keeps serving; the CLI degrades to guidance text.
+    this.tokenPersisted = false;
+    logger.error(
+      `Dashboard is serving but its launch token could not be written to ${DASHBOARD_TOKEN_PATH} ` +
+        `(${lastErr instanceof Error ? lastErr.message : String(lastErr)}); the dashboard will return ` +
+        `401 "Invalid token". Fix: ensure ~/.panguard-guard is writable (chmod 700), then run "pga up" to restart.`
+    );
   }
 
   private handleRequest(req: IncomingMessage, res: ServerResponse): void {

@@ -685,7 +685,7 @@ async function commandStart(
 
   // ── First-run welcome / 首次啟動歡迎 ──────────────────────────────
   if (!process.env['PANGUARD_QUIET_GUARD']) {
-    await showFirstRunWelcome(config.dashboardPort);
+    await showFirstRunWelcome(config.dashboardPort, engine.getRuleCounts().atr);
     console.log(`  ${symbols.info} Monitoring...`);
   }
   console.log('');
@@ -1028,7 +1028,7 @@ async function commandStart(
  * Show first-run welcome with onboarding guidance.
  * Only shown once — writes a marker file after display.
  */
-async function showFirstRunWelcome(dashboardPort: number): Promise<void> {
+async function showFirstRunWelcome(dashboardPort: number, atrRuleCount: number): Promise<void> {
   const { existsSync, writeFileSync, mkdirSync } = await import('node:fs');
   const markerPath = join(homedir(), '.panguard', '.guard-onboarded');
 
@@ -1037,16 +1037,14 @@ async function showFirstRunWelcome(dashboardPort: number): Promise<void> {
   console.log('');
   console.log(divider());
   console.log('');
-  console.log(`  ${c.sage(c.bold('Welcome to Panguard AI Guard!'))}`);
-  console.log(`  ${c.sage(c.bold('Panguard AI Guard!'))}`);
+  console.log(`  ${c.sage(c.bold('Welcome to PanGuard AI Guard!'))}`);
   console.log('');
   console.log(`  Your agent security protection is now active.`);
-  console.log(`  AI Agent`);
   console.log('');
-  console.log(`  ${c.bold('Dashboard / :')}`);
+  console.log(`  ${c.bold('Dashboard:')}`);
   console.log(`    ${c.underline(`http://localhost:${dashboardPort}`)}`);
   console.log('');
-  console.log(`  ${c.bold('Quick commands / :')}`);
+  console.log(`  ${c.bold('Quick commands:')}`);
   console.log(`    ${c.sage('panguard-guard start')}    Start protection + dashboard`);
   console.log(`    ${c.sage('panguard-guard status')}   Check protection status`);
   console.log(`    ${c.sage('panguard-guard scan')}     Scan all installed skills`);
@@ -1057,9 +1055,11 @@ async function showFirstRunWelcome(dashboardPort: number): Promise<void> {
   );
   console.log(`  ${c.dim('install the CLI:')} ${c.sage('npm install -g @panguard-ai/panguard')}`);
   console.log('');
-  console.log(`  ${c.bold('What Guard does / Guard :')}`);
+  console.log(`  ${c.bold('What Guard does:')}`);
   console.log(`    ${symbols.pass} Monitors new skill installations in real-time`);
-  console.log(`    ${symbols.pass} Auto-audits skills with 61+ ATR threat rules`);
+  // Real loaded rule count, never a hardcoded "61+" — an at-launch snapshot
+  // from the engine, so the banner tells the truth about what's enforcing.
+  console.log(`    ${symbols.pass} Auto-audits skills with ${atrRuleCount} ATR threat rules`);
   console.log(`    ${symbols.pass} Blocks critical threats, alerts on suspicious ones`);
   console.log(`    ${symbols.pass} Syncs community threat intelligence via Threat Cloud`);
   console.log('');

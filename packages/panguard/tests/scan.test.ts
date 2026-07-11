@@ -127,10 +127,11 @@ describe('scanCommand', () => {
       expect(targetOpt!.flags).toContain('<host>');
     });
 
-    it('should have exactly 11 options', () => {
+    it('should have exactly 12 options', () => {
       const cmd = scanCommand();
-      // 11 includes --no-report (explicit opt-out override for Threat Cloud reporting).
-      expect(cmd.options).toHaveLength(11);
+      // 12 includes --no-report (Threat Cloud opt-out override) and --system
+      // (force the host/OS scan; a bare in-project `pga scan` defaults to skills).
+      expect(cmd.options).toHaveLength(12);
     });
 
     it('should define --save option for saving JSON results to file', () => {
@@ -149,20 +150,22 @@ describe('scanCommand', () => {
 
       const cmd = scanCommand();
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-      await cmd.parseAsync(['--quick'], { from: 'user' });
+      // --system forces the host scan; a bare `pga scan` now routes to the SKILL
+      // scan when a ./skills project context exists (which the repo root has).
+      await cmd.parseAsync(['--system', '--quick'], { from: 'user' });
       consoleSpy.mockRestore();
 
       expect(mockedRunScan).toHaveBeenCalledWith(expect.objectContaining({ depth: 'quick' }));
     });
 
-    it('should pass "full" depth by default', async () => {
+    it('should pass "full" depth for a host scan by default', async () => {
       const { runScan } = await import('@panguard-ai/panguard-scan');
       const mockedRunScan = vi.mocked(runScan);
       mockedRunScan.mockClear();
 
       const cmd = scanCommand();
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-      await cmd.parseAsync([], { from: 'user' });
+      await cmd.parseAsync(['--system'], { from: 'user' });
       consoleSpy.mockRestore();
 
       expect(mockedRunScan).toHaveBeenCalledWith(expect.objectContaining({ depth: 'full' }));
@@ -189,7 +192,7 @@ describe('scanCommand', () => {
 
       const cmd = scanCommand();
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-      await cmd.parseAsync(['--json'], { from: 'user' });
+      await cmd.parseAsync(['--system', '--json'], { from: 'user' });
 
       // The last console.log call should be a JSON string
       const calls = consoleSpy.mock.calls;
@@ -213,7 +216,7 @@ describe('scanCommand', () => {
 
       const cmd = scanCommand();
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-      await cmd.parseAsync(['--lang', 'zh-TW'], { from: 'user' });
+      await cmd.parseAsync(['--system', '--lang', 'zh-TW'], { from: 'user' });
       consoleSpy.mockRestore();
 
       expect(mockedRunScan).toHaveBeenCalledWith(expect.objectContaining({ lang: 'zh-TW' }));
@@ -239,7 +242,7 @@ describe('scanCommand', () => {
 
       const cmd = scanCommand();
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-      await cmd.parseAsync(['--json'], { from: 'user' });
+      await cmd.parseAsync(['--system', '--json'], { from: 'user' });
       const lastCall = consoleSpy.mock.calls[consoleSpy.mock.calls.length - 1]![0] as string;
       const parsed = JSON.parse(lastCall);
       // safetyScore = max(0, 100 - 5) = 95 >= 90 -> A
@@ -265,7 +268,7 @@ describe('scanCommand', () => {
 
       const cmd = scanCommand();
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-      await cmd.parseAsync(['--json'], { from: 'user' });
+      await cmd.parseAsync(['--system', '--json'], { from: 'user' });
       const lastCall = consoleSpy.mock.calls[consoleSpy.mock.calls.length - 1]![0] as string;
       const parsed = JSON.parse(lastCall);
       // safetyScore = max(0, 100 - 80) = 20 < 40 -> F
