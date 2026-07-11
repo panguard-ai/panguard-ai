@@ -47,7 +47,9 @@ function crosswalkSection(country: SovereignCountry): string {
     ? 'Showing a general, cross-framework mapping. Select your jurisdiction to see its deployment profile and the specific frameworks this maps to.'
     : `Showing <b>${escapeHtml(country.name)}</b> — detected or selected. Choose another jurisdiction to compare its deployment profile and frameworks.`;
   const note = country.note ? `<p class="cnote reveal">${escapeHtml(country.note)}</p>` : '';
-  const colHead = isGeneric ? 'Framework reference' : `${escapeHtml(country.name)} framework reference`;
+  const colHead = isGeneric
+    ? 'Framework reference'
+    : `${escapeHtml(country.name)} framework reference`;
   return `<section>
     <div class="wrap">
       <div class="shead reveal"><span class="snum">§ 03</span><span class="slabel">Compliance crosswalk — by jurisdiction</span></div>
