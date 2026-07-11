@@ -18,6 +18,7 @@ import { mkdtempSync, rmSync, existsSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DashboardServer } from '../src/dashboard/index.js';
+import { SkillWhitelistManager } from '../src/engines/skill-whitelist.js';
 import type { GuardConfig } from '../src/types.js';
 
 function pickFreePort(): Promise<number> {
@@ -97,11 +98,16 @@ describe('DashboardServer — skill action endpoints', () => {
       const wlPath = join(dataDir, 'skill-whitelist.json');
       expect(existsSync(wlPath)).toBe(true);
       const data = JSON.parse(readFileSync(wlPath, 'utf-8')) as {
-        whitelist: Array<{ name: string; source?: string }>;
+        whitelist: Array<{ name: string; normalizedName?: string; source?: string }>;
       };
       const entry = data.whitelist.find((s) => s.name === 'weather-helper');
       expect(entry).toBeDefined();
-      expect(entry?.source).toBe('manual-dashboard');
+      // Fallback path (no engine wired) MUST still write a record the live gate
+      // can match: a valid WhitelistSource + the normalizedName key. Writing a
+      // partial record (missing normalizedName / out-of-union source) was the
+      // 2026-07 "Mark safe" fake-green.
+      expect(entry?.source).toBe('manual');
+      expect(entry?.normalizedName).toBe('weather-helper');
     });
 
     it('is idempotent — whitelisting twice does not duplicate', async () => {
@@ -128,6 +134,36 @@ describe('DashboardServer — skill action endpoints', () => {
     it('rejects unauthenticated POST with 401', async () => {
       const res = await post('/api/skills/whitelist', { name: 'x' }, false);
       expect(res.status).toBe(401);
+    });
+
+    // The core fix for the 2026-07 fake-green: when a live whitelist manager is
+    // wired (the real guard process), "Mark safe"/"Un-trust" must take effect on
+    // the SAME in-memory gate the detection engine consults — no restart.
+    it('routes Mark safe / Un-trust through the LIVE gate (effect without restart)', async () => {
+      const mgr = new SkillWhitelistManager();
+      dashboard.setWhitelistManager(mgr);
+
+      expect(mgr.isWhitelisted('Weather Helper')).toBe(false);
+
+      const r1 = await post('/api/skills/whitelist', { name: 'Weather Helper' });
+      expect(r1.status).toBe(200);
+      expect((await r1.json()).success).toBe(true);
+      // Live gate now honors it immediately, case/space-insensitively — this is
+      // exactly what never worked before (record landed under key `undefined`).
+      expect(mgr.isWhitelisted('Weather Helper')).toBe(true);
+      expect(mgr.isWhitelisted('weather-helper')).toBe(true);
+
+      const r2 = await post('/api/skills/unwhitelist', { name: 'Weather Helper' });
+      expect(r2.status).toBe(200);
+      expect((await r2.json()).removed).toBe(true);
+      // Revocation takes effect on the live gate immediately (was restart-only).
+      expect(mgr.isWhitelisted('Weather Helper')).toBe(false);
+      // ...and it must SURVIVE auto-promotion: a stable fingerprint must not
+      // silently re-whitelist a just-un-trusted skill. (Using remove() instead of
+      // revoke() would let autoPromote re-add it here — the regression the
+      // adversarial review caught.)
+      expect(mgr.autoPromote('Weather Helper', 'deadbeefcafe0123')).toBe(false);
+      expect(mgr.isWhitelisted('Weather Helper')).toBe(false);
     });
   });
 

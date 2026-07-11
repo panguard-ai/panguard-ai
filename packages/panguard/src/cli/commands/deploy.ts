@@ -330,7 +330,7 @@ async function runDeploy(opts: {
             `\u63A5\u4E0B\u4F86\uFF1A`,
             `  ${c.sage('pga guard start')}  \u555F\u52D5\u5373\u6642\u9632\u8B77`,
             `  ${c.sage('pga status')}       \u67E5\u770B\u7CFB\u7D71\u72C0\u614B`,
-            `  ${c.sage('pga scan --full')}  \u57F7\u884C\u5B8C\u6574\u6383\u63CF`,
+            `  ${c.sage('pga scan --all')}  \u57F7\u884C\u5B8C\u6574\u6383\u63CF`,
           ].join('\n')
         : [
             `${symbols.pass} Deployment complete!`,
@@ -338,7 +338,7 @@ async function runDeploy(opts: {
             `Next:`,
             `  ${c.sage('pga guard start')}  Start real-time protection`,
             `  ${c.sage('pga status')}       Check system status`,
-            `  ${c.sage('pga scan --full')}  Run a full scan`,
+            `  ${c.sage('pga scan --all')}  Run a full scan`,
           ].join('\n'),
       { borderColor: c.safe }
     )

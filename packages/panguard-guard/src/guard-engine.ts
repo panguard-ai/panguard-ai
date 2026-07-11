@@ -384,6 +384,10 @@ export class GuardEngine {
       // serving the stale launch-time config (which made the UI snap back).
       this.dashboard.setConfigApplier((cfg) => this.applyConfig(cfg));
       this.dashboard.setRulesProvider(() => this.engines.atrEngine.getAllRules());
+      // Route dashboard "Mark safe"/"Un-trust" through the SAME whitelist manager
+      // the detection engine consults, so those controls actually take effect on
+      // the running daemon (previously a disk-only write the gate never matched).
+      this.dashboard.setWhitelistManager(this.engines.atrEngine.getWhitelistManager());
       // Feed live Layer C (semantic LLM) call outcomes into the dashboard so it
       // reports 'degraded' when a configured model stops responding, rather than
       // a config-only green. No-ops for LLM adapters that don't expose the sink.
