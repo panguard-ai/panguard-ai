@@ -357,7 +357,7 @@ function signalZeroRulesFailOpen(): void {
     warnedZeroRules = true;
     process.stderr.write(
       '[panguard-hook] WARNING: 0 detection rules loaded — built-in-tool protection is ' +
-        'DEGRADED (allowing all tool calls). Run "pga doctor" / "pga guard sync-rules" to ' +
+        'DEGRADED (allowing all tool calls). Run "pga doctor" / "pga upgrade" to ' +
         'restore protection.\n'
     );
   }

@@ -98,10 +98,19 @@ export async function actionScan(
     console.log(c.dim(`  ${issuesText}`));
 
     if (fixableCount > 0) {
+      // Do not print `pga scan --fix` \u2014 that flag does not exist (the CLI rejects
+      // it). State honestly that manual fixes exist; the full `pga scan` report
+      // lists the exact commands per finding.
       const upgradeLines =
         lang === 'zh-TW'
-          ? [`\u53EF\u81EA\u52D5\u4FEE\u5FA9:`, `$ pga scan --fix`]
-          : [`Auto-fix available:`, `$ pga scan --fix`];
+          ? [
+              `${fixableCount} \u500B\u554F\u984C\u6709\u624B\u52D5\u4FEE\u5FA9\u6B65\u9A5F`,
+              `\u57F7\u884C pga scan \u67E5\u770B\u4FEE\u5FA9\u6307\u4EE4`,
+            ]
+          : [
+              `${fixableCount} issue(s) have a manual fix`,
+              `Run \`pga scan\` to see the fix commands`,
+            ];
       console.log('');
       console.log(box(upgradeLines.join('\n'), { borderColor: c.sage }));
     }
@@ -161,12 +170,12 @@ export async function actionScan(
               cmd: '[8] \u6280\u80FD\u5BE9\u8A08',
               desc: '\u5BE9\u8A08\u5DF2\u5B89\u88DD\u6280\u80FD\u7684\u5B89\u5168\u5A01\u8105',
             },
-            { cmd: 'scan --full', desc: '\u57F7\u884C\u5B8C\u6574\u6383\u63CF' },
+            { cmd: 'scan --all', desc: '\u57F7\u884C\u5B8C\u6574\u6383\u63CF' },
             { cmd: 'guard start', desc: '\u555F\u52D5\u5373\u6642\u9632\u8B77' },
           ]
         : [
             { cmd: '[8] Skill Auditor', desc: 'Audit installed skills for threats' },
-            { cmd: 'scan --full', desc: 'Run a comprehensive scan' },
+            { cmd: 'scan --all', desc: 'Run a comprehensive scan' },
             { cmd: 'guard start', desc: 'Enable real-time protection' },
           ],
       lang
