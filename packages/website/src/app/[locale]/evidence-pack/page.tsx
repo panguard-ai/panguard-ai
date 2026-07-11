@@ -227,8 +227,16 @@ export default async function EvidencePackPage({
               </p>
               <div className="flex flex-wrap justify-center gap-3">
                 <Link
-                  href="/demo"
+                  href="/scoping"
                   className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold rounded-lg px-5 py-2.5 text-sm hover:bg-brand-sage-light transition-colors"
+                >
+                  {isZh
+                    ? '訂購 Founding Pilot（$25K / 90 天）'
+                    : 'Order the Founding Pilot ($25K / 90d)'}
+                </Link>
+                <Link
+                  href="/demo"
+                  className="inline-flex items-center gap-2 bg-surface-2 border border-border text-text-primary font-semibold rounded-lg px-5 py-2.5 text-sm hover:bg-surface-1 transition-colors"
                 >
                   {isZh ? '預約示範' : 'Book demo'}
                 </Link>

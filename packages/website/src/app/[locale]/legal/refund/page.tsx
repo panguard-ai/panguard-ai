@@ -13,7 +13,7 @@ export async function generateMetadata(props: {
   return {
     title: 'Refund & Termination',
     description:
-      'PanGuard AI Migrator Pro refund & termination policy. Annual engagements are governed by the Master Services Agreement.',
+      'PanGuard AI refund & termination policy — the $25K one-time Founding Pilot (7-day no-questions refund) plus annual Migrator Pro engagements (MSA-governed).',
     alternates: buildAlternates('/legal/refund', locale),
   };
 }
@@ -31,9 +31,21 @@ export default async function RefundPage(props: { params: Promise<{ locale: stri
           {lastUpdatedLabel} {lastUpdatedValue} · {REFUND_VERSION}
         </p>
         <h1 className="mt-4 text-3xl font-bold text-text-primary">
-          {isZh ? 'Migrator Pro 退費與終止' : 'Refund & Termination — Migrator Pro Engagements'}
+          {isZh ? '退費與終止' : 'Refund & Termination'}
         </h1>
       </header>
+
+      {/* $25K 一次性 Founding Pilot — 自助購買（panguard.ai/scoping） */}
+      <div className="my-6 p-6 bg-surface-1 border border-brand-sage/40 rounded-xl">
+        <p className="text-sm font-semibold text-brand-sage uppercase tracking-wider mb-2">
+          {isZh ? '$25K 一次性 Founding Pilot' : '$25K one-time Founding Pilot'}
+        </p>
+        <p className="text-text-primary">
+          {isZh
+            ? '$25,000 USD 一次性 90 天 Founding Pilot（經 panguard.ai/scoping 自助購買）享結帳後 7 個日曆天內無條件全額退費——寄信到 billing@panguard.ai 即可，無需說明理由。Day 8 起不退費，除非 PanGuard 未依 SOW 交付所致之 material breach，此時依下方服務 credit 補救。'
+            : 'The $25,000 USD one-time 90-day Founding Pilot (bought self-serve at panguard.ai/scoping) carries a full, no-questions refund within seven (7) calendar days of checkout — email billing@panguard.ai, no explanation required. After Day 7 the Pilot is non-refundable except for a PanGuard material breach of the SOW, remedied via the service credits below.'}
+        </p>
+      </div>
 
       <div className="my-6 p-6 bg-surface-1 border border-brand-emerald/40 rounded-xl">
         <p className="text-sm font-semibold text-brand-emerald uppercase tracking-wider mb-2">
