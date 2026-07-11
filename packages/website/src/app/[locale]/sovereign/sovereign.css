@@ -92,6 +92,19 @@
   .sv .pr h4{margin:0 0 7px;font-size:15.5px;font-weight:600;color:var(--ink)}
   .sv .pr p{margin:0;font-size:13.5px;color:var(--dim);line-height:1.58}
 
+  /* ============ §03 country selector + per-jurisdiction profile ============ */
+  .sv .cselect{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+  .sv .cchip{display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border:1px solid var(--hair);border-radius:3px;background:var(--s1);font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--dim);transition:border-color .25s var(--ease),color .25s var(--ease),background .25s var(--ease)}
+  .sv .cchip .cf{font-size:15px;line-height:1}
+  .sv .cchip:hover{border-color:var(--sage);color:var(--ink)}
+  .sv .cchip.active{border-color:var(--sage);background:var(--sageglow);color:var(--ink)}
+  .sv .profile{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-bottom:8px}
+  .sv .pf{background:var(--s1);padding:15px 18px}
+  .sv .pf .pfk{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+  .sv .pf .pfv{font-size:13px;color:var(--ink);line-height:1.42}
+  .sv .pf .pfv.req{color:var(--sage-l)}
+  .sv .cnote{font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.7;margin:16px 0 0;max-width:82ch}
+
   /* ============ tables (crosswalk + capability register) ============ */
   .sv .tbl{overflow-x:auto;border:1px solid var(--line);border-radius:4px}
   .sv table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:600px}
