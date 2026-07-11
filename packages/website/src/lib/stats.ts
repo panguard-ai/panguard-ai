@@ -35,14 +35,14 @@ export const STATS = {
    * This is the count of the exact bundle this site scans with — auditable by
    * `npm i agent-threat-rules@3.5.4 && find rules -name '*.yaml' | wc -l`.
    */
-  atrRules: 714,
+  atrRules: 745,
   /** Total unique detection patterns across all bundled ATR rules. */
   atrPatterns: 3_025,
-  totalRules: 714,
+  totalRules: 745,
   /** Use this for all user-facing display — avoids stale hardcoded counts. */
-  totalRulesDisplay: '714' as const,
+  totalRulesDisplay: '745' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '714' as const,
+  atrRulesDisplay: '745' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,
