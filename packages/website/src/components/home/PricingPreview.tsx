@@ -7,8 +7,8 @@ import { ArrowRight } from 'lucide-react';
 import { STATS } from '@/lib/stats';
 import { Eyebrow, SectionTitleV2, SectionV2, CardV2, SectionKicker } from './v2/primitives';
 
-// Pricing v4 (LOCKED 2026-04-22): Community + Pilot + Enterprise + ATR governance.
-// NO middle tier (Team/Business). The /pricing page explains why.
+// Pricing 3-card model (2026-07-12): Community (free) · Founding Pilot ($25K,
+// self-serve at /scoping) · Enterprise & up (sales-led, full spec at /enterprise).
 
 const TIERS_EN = [
   {
@@ -17,36 +17,27 @@ const TIERS_EN = [
     price: '$0',
     period: ' forever',
     desc: `Open source · ${STATS.totalRulesDisplay} ATR rules · MIT · self-host · unlimited`,
-    cta: 'Get Started',
+    cta: 'Install now',
     href: 'https://github.com/panguard-ai/panguard-ai',
     external: true,
   },
   {
     id: 'pilot',
-    name: 'Pilot',
+    name: 'Founding Pilot',
     price: '$25K',
-    period: ' / 90d',
-    desc: 'F500 POC before procurement · IT director can approve · credits to Y1 Enterprise',
-    cta: 'Request Pilot',
-    href: '/contact?tier=pilot',
+    period: ' one-time',
+    desc: 'Prove agent security in a bank/enterprise review · 90-day founder-led · self-serve',
+    cta: 'Order now',
+    href: '/scoping',
   },
   {
     id: 'enterprise',
-    name: 'Enterprise',
-    price: '$150-500K',
-    period: ' / yr',
-    desc: 'Migrator Pro · 5-framework signed evidence · airgap · SLA · CSM',
-    cta: 'Contact Sales',
-    href: '/contact?tier=enterprise',
-  },
-  {
-    id: 'sovereign',
-    name: 'Sovereign',
-    price: '$5-20M',
-    period: ' / nation',
-    desc: 'Nation-state airgap · multi-tenant · custom compliance · on-prem, per-nation',
-    cta: 'Sovereign Desk',
-    href: '/contact?tier=sovereign',
+    name: 'Enterprise & up',
+    price: '$150K',
+    period: ' + / yr',
+    desc: 'Enterprise · Migrator Pro · Sovereign · OEM — living signed evidence, airgap, per-nation',
+    cta: 'See full spec',
+    href: '/enterprise',
   },
 ];
 
@@ -57,36 +48,27 @@ const TIERS_ZH = [
     price: '$0',
     period: ' 永久',
     desc: `開源 · ${STATS.totalRulesDisplay} 條 ATR 規則 · MIT · 自架 · 無上限`,
-    cta: '立即使用',
+    cta: '立即安裝',
     href: 'https://github.com/panguard-ai/panguard-ai',
     external: true,
   },
   {
     id: 'pilot',
-    name: 'Pilot 試點',
+    name: 'Founding Pilot',
     price: '$25K',
-    period: ' / 90 天',
-    desc: 'F500 採購前試水合約 · IT 主管可審批 · 全額 credit 到 Y1 Enterprise',
-    cta: '申請 Pilot',
-    href: '/contact?tier=pilot',
+    period: ' 一次性',
+    desc: '在銀行/企業資安審查證明 agent 安全 · 90 天創辦人親帶 · 自助下單',
+    cta: '立即訂購',
+    href: '/scoping',
   },
   {
     id: 'enterprise',
-    name: 'Enterprise 企業版',
-    price: '$150-500K',
-    period: ' / 年',
-    desc: 'Migrator Pro · 5 框架 signed evidence · 離網 · SLA · 專屬 CSM',
-    cta: '洽詢業務',
-    href: '/contact?tier=enterprise',
-  },
-  {
-    id: 'sovereign',
-    name: 'Sovereign 主權級',
-    price: '$5-20M',
-    period: ' / 國家',
-    desc: '主權國家 airgap · 多 tenant · 客製化合規 · 地端部署 · 按國家授權',
-    cta: '主權團隊洽詢',
-    href: '/contact?tier=sovereign',
+    name: 'Enterprise 及以上',
+    price: '$150K',
+    period: ' 起 / 年',
+    desc: 'Enterprise · Migrator Pro · Sovereign · OEM — 活的簽章證據、離網、按國家授權',
+    cta: '查看完整規格',
+    href: '/enterprise',
   },
 ];
 
@@ -106,18 +88,18 @@ export default function PricingPreview() {
       <FadeInUp>
         <Eyebrow>{isZh ? '定價' : 'PRICING'}</Eyebrow>
         <SectionTitleV2>
-          {isZh ? '開放核心 · 不做中間 tier' : 'Open-core · No middle tier'}
+          {isZh ? '免費開始,需要時再升級' : 'Free to start, paid when you must prove it'}
         </SectionTitleV2>
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-text-secondary sm:text-lg">
           {isZh
-            ? 'Community 永久免費開源（餵感測網路）。Enterprise 拿到平台 + 5 框架合規證據包。中間 tier 是陷阱 — /pricing 解釋為什麼。'
-            : 'Community is free and open source forever (feeds the sensor network). Enterprise gets the platform + 5-framework compliance evidence kit. The middle tier is a trap — /pricing explains why.'}
+            ? '自架完整堆疊永久免費。要在銀行或企業資安審查中證明 agent 安全時,$25K Founding Pilot 自助下單即可開始;更大的部署走洽談。'
+            : 'Self-host the full stack free forever. When you must prove agent security in a bank or enterprise review, the $25K Founding Pilot is self-serve; larger deployments are sales-led.'}
         </p>
       </FadeInUp>
 
-      <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-14 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
         {tiers.map((tier, i) => {
-          const emphasized = tier.id === 'community';
+          const emphasized = tier.id === 'pilot';
           const ctaClass = emphasized ? PRIMARY_CTA : SECONDARY_CTA;
           return (
             <FadeInUp key={tier.id} delay={i * 0.06} className="h-full">
@@ -169,8 +151,8 @@ export default function PricingPreview() {
       <FadeInUp delay={0.3}>
         <SectionKicker>
           {isZh
-            ? '完整功能比較、ATR Enterprise Member （$10K/年） 治理層、與 FAQ 請見 /pricing'
-            : 'Full feature comparison, ATR Enterprise Member tier ($10K/yr governance), and FAQ at /pricing'}
+            ? 'Enterprise、Migrator Pro、Sovereign 與 OEM 完整規格請見 /enterprise'
+            : 'Full Enterprise, Migrator Pro, Sovereign & OEM specification at /enterprise'}
         </SectionKicker>
       </FadeInUp>
     </SectionV2>
