@@ -39,6 +39,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/solutions/developers',
     '/migrator',
     '/pricing',
+    '/enterprise',
     // NOTE: /customers, /partners, /solutions/{enterprise,smb}, /careers,
     // /product/manager, /legal/sla all redirect to '/' (see next.config.mjs)
     // and are deliberately absent.
