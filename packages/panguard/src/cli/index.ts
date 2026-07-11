@@ -343,7 +343,9 @@ async function main(): Promise<void> {
       // AI platforms + installs a background service) and how to undo it, so the
       // zero-config flow is informed rather than surprising.
       console.log('  First run: PanGuard will detect your AI agent platforms, add its MCP');
-      console.log('  config to each, and install a background Guard service (auto-starts on boot).');
+      console.log(
+        '  config to each, and install a background Guard service (auto-starts on boot).'
+      );
       console.log('  Undo anytime:  pga guard uninstall  ·  pga setup --remove\n');
       await program.parseAsync(['node', 'panguard', 'setup']);
       markInitialized();

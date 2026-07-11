@@ -139,7 +139,11 @@ export function scanCommand(): Command {
     .description('Scan skills for threats, or run a system security scan')
     .argument('[path]', 'File or directory to scan with ATR (auto-detects MCP JSON vs SKILL.md)')
     .option('--all', 'Scan all installed MCP skills (non-invasive, no guard/proxy)', false)
-    .option('--system', 'Run a host/OS security scan (firewall, ports, CVEs) instead of a skill scan', false)
+    .option(
+      '--system',
+      'Run a host/OS security scan (firewall, ports, CVEs) instead of a skill scan',
+      false
+    )
     .option('--quick', 'Quick scan mode (~30s)', false)
     .option('--output <path>', 'Output PDF report path')
     .option('--lang <language>', 'Language: en or zh-TW', 'en')

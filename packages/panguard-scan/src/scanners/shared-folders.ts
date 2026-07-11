@@ -309,8 +309,7 @@ function createShareFinding(
   return {
     id: `SCAN-SHARE-${String(counter).padStart(3, '0')}`,
     title:
-      `Shared folder with open access: ${safeName} / ` +
-      `具有開放存取權的共用資料夾：${safeName}`,
+      `Shared folder with open access: ${safeName} / ` + `具有開放存取權的共用資料夾：${safeName}`,
     description:
       `The ${platform} share "${safeName}" allows guest or everyone access. ` +
       'This may expose sensitive data to unauthorized users on the network. ' +
