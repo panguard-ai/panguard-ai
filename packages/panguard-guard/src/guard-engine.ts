@@ -401,37 +401,50 @@ export class GuardEngine {
       // Push real status immediately so first WS client gets non-zero data
       this.updateDashboardStatus();
 
-      const dashPort = Number(this.config.dashboardPort);
-      // The auth token is a launch secret. The dashboard mints the HttpOnly
-      // auth cookie ONLY for a request carrying this one-time token in the query
-      // string — an unauthenticated GET / never receives a token. So the
-      // launch URL must include it; opening this URL is what authenticates the
-      // operator's browser. The token is not logged (only the bare URL is) to
-      // avoid leaking it into log files; it is passed to the OS opener via argv
-      // for this local-only process.
-      const baseUrl = `http://127.0.0.1:${dashPort}`;
-      const launchUrl = `${baseUrl}/?token=${this.dashboard.getAuthToken()}`;
-      logger.info(`Dashboard: ${baseUrl} (open via the printed launch URL to authenticate)`);
-      // Only auto-open in an interactive foreground start — never when launched
-      // by the persistence service (launchd/systemd/sc.exe), which would pop a
-      // browser tab on every login/reboot/restart. See shouldAutoOpenDashboard().
-      if (shouldAutoOpenDashboard(process.env, !!process.stdout.isTTY)) {
-        try {
-          const { execFile } = await import('node:child_process');
-          const openCmd =
-            process.platform === 'darwin'
-              ? 'open'
-              : process.platform === 'win32'
-                ? 'start'
-                : 'xdg-open';
-          execFile(openCmd, [launchUrl]);
-        } catch {
-          logger.debug('Could not auto-open browser');
-        }
-      } else {
-        logger.debug(
-          'Dashboard auto-open suppressed (non-interactive / service start). Open the printed launch URL manually.'
+      // If the dashboard did NOT bind (port already in use — another Guard owns
+      // it), do not open a /?token= URL whose token matches nothing; that would
+      // 401. Point the operator at the running instance instead. NOTE: only the
+      // launch-URL step is skipped — the proxy watcher / watchdog / status timer
+      // below still run, so a port conflict never disables the guard itself.
+      if (!this.dashboard.isListening()) {
+        logger.warn(
+          `Dashboard port ${this.config.dashboardPort} is already in use — another Guard ` +
+            `instance owns the dashboard. Not opening a launch URL. Use its window, or run ` +
+            `"pga guard restart".`
         );
+      } else {
+        const dashPort = Number(this.config.dashboardPort);
+        // The auth token is a launch secret. The dashboard mints the HttpOnly
+        // auth cookie ONLY for a request carrying this one-time token in the query
+        // string — an unauthenticated GET / never receives a token. So the
+        // launch URL must include it; opening this URL is what authenticates the
+        // operator's browser. The token is not logged (only the bare URL is) to
+        // avoid leaking it into log files; it is passed to the OS opener via argv
+        // for this local-only process.
+        const baseUrl = `http://127.0.0.1:${dashPort}`;
+        const launchUrl = `${baseUrl}/?token=${this.dashboard.getAuthToken()}`;
+        logger.info(`Dashboard: ${baseUrl} (open via the printed launch URL to authenticate)`);
+        // Only auto-open in an interactive foreground start — never when launched
+        // by the persistence service (launchd/systemd/sc.exe), which would pop a
+        // browser tab on every login/reboot/restart. See shouldAutoOpenDashboard().
+        if (shouldAutoOpenDashboard(process.env, !!process.stdout.isTTY)) {
+          try {
+            const { execFile } = await import('node:child_process');
+            const openCmd =
+              process.platform === 'darwin'
+                ? 'open'
+                : process.platform === 'win32'
+                  ? 'start'
+                  : 'xdg-open';
+            execFile(openCmd, [launchUrl]);
+          } catch {
+            logger.debug('Could not auto-open browser');
+          }
+        } else {
+          logger.debug(
+            'Dashboard auto-open suppressed (non-interactive / service start). Open the printed launch URL manually.'
+          );
+        }
       }
     }
 

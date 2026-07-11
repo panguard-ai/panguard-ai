@@ -338,8 +338,15 @@ async function main(): Promise<void> {
     if (isFirstRun()) {
       // First time user — run setup wizard directly, then mark initialized so
       // subsequent bare `pga` goes straight to the interactive menu.
-      console.log('\n  Welcome to Panguard AI! / Panguard AI!\n');
-      console.log('  First time detected. Starting setup wizard...\n');
+      console.log('\n  Welcome to PanGuard AI! / 歡迎使用 PanGuard AI!\n');
+      // Be transparent about what first-run setup changes (it configures your
+      // AI platforms + installs a background service) and how to undo it, so the
+      // zero-config flow is informed rather than surprising.
+      console.log('  First run: PanGuard will detect your AI agent platforms, add its MCP');
+      console.log(
+        '  config to each, and install a background Guard service (auto-starts on boot).'
+      );
+      console.log('  Undo anytime:  pga guard uninstall  ·  pga setup --remove\n');
       await program.parseAsync(['node', 'panguard', 'setup']);
       markInitialized();
       return;
