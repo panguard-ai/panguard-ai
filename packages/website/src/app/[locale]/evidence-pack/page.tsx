@@ -230,7 +230,9 @@ export default async function EvidencePackPage({
                   href="/scoping"
                   className="inline-flex items-center gap-2 bg-brand-sage text-surface-0 font-semibold rounded-lg px-5 py-2.5 text-sm hover:bg-brand-sage-light transition-colors"
                 >
-                  {isZh ? '訂購 Founding Pilot（$25K / 90 天）' : 'Order the Founding Pilot ($25K / 90d)'}
+                  {isZh
+                    ? '訂購 Founding Pilot（$25K / 90 天）'
+                    : 'Order the Founding Pilot ($25K / 90d)'}
                 </Link>
                 <Link
                   href="/demo"
