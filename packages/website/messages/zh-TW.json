@@ -6581,10 +6581,10 @@
       "title": "它真的在跑。<sage>這是攻擊被抓到的樣子。</sage>",
       "terminalCaption": "真實的 pga scan 輸出——掃的是 2026-07-02 從 OpenClaw 生態抓下來、已確認惡意的 skill，不是示意圖（擷取當時為 ATR v3.5.3 bundle，規則庫此後持續增長）。",
       "b1Label": "HackAPrompt recall（基線 28.6%）· 100% precision",
-      "b2Label": "PINT 格式語料 precision(recall 63.6%)",
+      "b2Label": "PINT 格式語料 precision（recall 63.6%）",
       "b3Label": "Garak recall",
       "b4Label": "SKILL.md recall / 誤報率",
-      "honesty": "全部是語料庫層級、Layer 1（確定性規則）的實測，每次對外引用前重驗。在 65,000 筆 benign 樣本的 gate 上，誤報率分 lane:enforce ~0.24%、hunt（預設）~9%——不存在單一混合數字，我們也不硬湊一個。",
+      "honesty": "全部是語料庫層級、Layer 1（確定性規則）的實測，每次對外引用前重驗。在 65,000 筆 benign 樣本的 gate 上，誤報率分 lane：enforce ~0.24%、hunt（預設）~9%——不存在單一混合數字，我們也不硬湊一個。",
       "kicker": "DETECTION — MEASURED, NOT CLAIMED",
       "cta": "看完整 benchmark"
     },
@@ -6594,7 +6594,7 @@
       "protectKicker": "PROTECT",
       "protectTitle": "抓住攻擊",
       "protectTag": "at runtime · before it loads",
-      "protectBody": "agent 載入前，先用 ATR 掃過 skill 與 MCP server;agent 跑起來之後，即時偵測並攔阻挾持。",
+      "protectBody": "agent 載入前，先用 ATR 掃過 skill 與 MCP server；agent 跑起來之後，即時偵測並攔阻挾持。",
       "proveKicker": "PROVE",
       "proveTitle": "證明你抓到了",
       "proveTag": "signed · audit-ready",
@@ -6634,7 +6634,7 @@
       "oldBody": "有人發現攻擊 → 手寫規則 → 委員會審。而且只有那家廠商的用戶受益。",
       "newTitle": "ATR——新攻擊 → 規則 ~1 小時",
       "newBody": "飛輪自動發現與起草；CI 自動測 precision 與 benign 誤報 gate；人類快審。所有採用者同時受益。",
-      "crystal": "我們叫它威脅結晶（Threat Crystallization）:AI 把攻擊理解一次，結晶成確定性規則——毫秒級，在所有人的機器上執行。",
+      "crystal": "我們叫它威脅結晶（Threat Crystallization）：AI 把攻擊理解一次，結晶成確定性規則——毫秒級，在所有人的機器上執行。",
       "kicker": "SECURITY ISN'T WON BY PERFECTION — IT'S WON BY MAKING ATTACKS UNECONOMICAL"
     },
     "free": {

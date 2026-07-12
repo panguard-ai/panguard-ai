@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Space_Grotesk, JetBrains_Mono, Noto_Sans_TC, Newsreader } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
+import ZhAutoBreak from '@/components/typography/ZhAutoBreak';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { buildAlternates } from '@/lib/seo';
@@ -205,6 +206,7 @@ export default async function LocaleLayout(
           Skip to content
         </a>
         <NextIntlClientProvider messages={messages}>
+          <ZhAutoBreak />
           {children}
           <CookieBannerLazy />
         </NextIntlClientProvider>
