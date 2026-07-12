@@ -3,8 +3,23 @@
  * Tests command structure, option parsing, and scan mode selection
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { scanCommand } from '../src/cli/commands/scan.js';
+
+// The bare-scan skill path shells out to the bundled ATR CLI via execFileSync.
+// Stub it so the routing test asserts the DECISION (skill vs host) without
+// spawning a real subprocess. execFileSync is imported dynamically inside the
+// scan action, so mocking node:child_process here is safe at module load.
+vi.mock('node:child_process', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('node:child_process')>();
+  return {
+    ...actual,
+    execFileSync: vi.fn(() => Buffer.from('{"results":[]}')),
+  };
+});
 
 // Mock external dependencies
 vi.mock('@panguard-ai/panguard-scan', () => ({
@@ -274,6 +289,55 @@ describe('scanCommand', () => {
       // safetyScore = max(0, 100 - 80) = 20 < 40 -> F
       expect(parsed.grade).toBe('F');
       consoleSpy.mockRestore();
+    });
+  });
+
+  describe('default scan routing (bare `pga scan`)', () => {
+    const origCwd = process.cwd();
+    let tmp = '';
+
+    afterEach(() => {
+      process.chdir(origCwd);
+      if (tmp) {
+        rmSync(tmp, { recursive: true, force: true });
+        tmp = '';
+      }
+    });
+
+    it('falls through to the host scan when there is no local ./skills context', async () => {
+      tmp = mkdtempSync(join(tmpdir(), 'pga-noskills-'));
+      process.chdir(tmp);
+      const { runScan } = await import('@panguard-ai/panguard-scan');
+      vi.mocked(runScan).mockClear();
+
+      const cmd = scanCommand();
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      // bare `pga scan` (no --system): with no ./skills it defaults to the host scan.
+      await cmd.parseAsync(['--json'], { from: 'user' });
+      consoleSpy.mockRestore();
+
+      expect(runScan).toHaveBeenCalled();
+    });
+
+    it('routes to the ATR skill scan (not the host scan) when ./skills/<x>/SKILL.md exists', async () => {
+      tmp = mkdtempSync(join(tmpdir(), 'pga-skills-'));
+      mkdirSync(join(tmp, 'skills', 'evil'), { recursive: true });
+      writeFileSync(join(tmp, 'skills', 'evil', 'SKILL.md'), '# evil skill\n');
+      process.chdir(tmp);
+      const { runScan } = await import('@panguard-ai/panguard-scan');
+      vi.mocked(runScan).mockClear();
+
+      const cmd = scanCommand();
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const stdoutSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
+      // bare `pga scan` in a project with skills → the ATR skill path, never host.
+      await cmd.parseAsync(['--json'], { from: 'user' });
+      stdoutSpy.mockRestore();
+      errSpy.mockRestore();
+      consoleSpy.mockRestore();
+
+      expect(runScan).not.toHaveBeenCalled();
     });
   });
 });
