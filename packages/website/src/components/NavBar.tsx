@@ -57,7 +57,14 @@ function Logo() {
 }
 
 /* ─── Desktop Dropdown ─── */
-type DropdownItem = { label: string; desc: string; href: string; comingSoon?: boolean };
+type DropdownItem = {
+  label: string;
+  desc: string;
+  href: string;
+  comingSoon?: boolean;
+  /** Featured item — rendered with the sovereign green pulse dot */
+  highlight?: boolean;
+};
 
 function NavDropdown({ label, items }: { label: string; items: DropdownItem[] }) {
   const [open, setOpen] = useState(false);
@@ -125,7 +132,19 @@ function NavDropdown({ label, items }: { label: string; items: DropdownItem[] })
                 className={`flex flex-col px-4 py-2.5 rounded-lg hover:bg-surface-2 transition-colors group ${item.comingSoon ? 'opacity-60' : ''}`}
                 onClick={() => setOpen(false)}
               >
-                <span className="text-sm font-semibold text-text-primary group-hover:text-brand-sage transition-colors flex items-center gap-2">
+                <span
+                  className={`text-sm font-semibold transition-colors flex items-center gap-2 ${
+                    item.highlight
+                      ? 'text-panguard-green'
+                      : 'text-text-primary group-hover:text-brand-sage'
+                  }`}
+                >
+                  {item.highlight && (
+                    <span
+                      className="w-1.5 h-1.5 rounded-full bg-panguard-green shadow-[0_0_8px_rgba(52,211,153,0.9)] motion-safe:animate-pulse"
+                      aria-hidden
+                    />
+                  )}
                   {item.label}
                   {item.comingSoon && (
                     <span className="text-[10px] font-medium text-text-muted bg-surface-2 rounded-full px-2 py-0.5">
@@ -147,7 +166,9 @@ export default function NavBar() {
   const t = useTranslations('nav');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
+  const [mobileSolutionsOpen, setMobileSolutionsOpen] = useState(false);
   const [mobileAtrOpen, setMobileAtrOpen] = useState(false);
+  const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -169,7 +190,58 @@ export default function NavBar() {
       desc: t('productLinks.migratorDesc'),
       href: '/migrator',
     },
-    { label: t('productLinks.atrStandard'), desc: t('productLinks.atrStandardDesc'), href: '/atr' },
+    {
+      label: t('howItWorks'),
+      desc: t('productLinks.howItWorksDesc'),
+      href: '/how-it-works',
+    },
+  ];
+
+  // Intent: "which situation am I in?" — sovereign stays featured (green dot).
+  const solutionItems: DropdownItem[] = [
+    {
+      label: t('solutionLinks.sovereign'),
+      desc: t('solutionLinks.sovereignDesc'),
+      href: '/sovereign',
+      highlight: true,
+    },
+    {
+      label: t('solutionLinks.enterprise'),
+      desc: t('solutionLinks.enterpriseDesc'),
+      href: '/enterprise',
+    },
+    {
+      label: t('solutionLinks.developers'),
+      desc: t('solutionLinks.developersDesc'),
+      href: '/solutions/developers',
+    },
+    { label: t('solutionLinks.smb'), desc: t('solutionLinks.smbDesc'), href: '/solutions/smb' },
+  ];
+
+  // Intent: "I want to learn / verify" — docs, research, proof artifacts.
+  const resourceItems: DropdownItem[] = [
+    { label: t('resourceLinks.docs'), desc: t('resourceLinks.docsDesc'), href: '/docs' },
+    {
+      label: t('resourceLinks.research'),
+      desc: t('resourceLinks.researchDesc'),
+      href: '/research/96k-scan',
+    },
+    {
+      label: t('resourceLinks.benchmarks'),
+      desc: t('resourceLinks.benchmarksDesc'),
+      href: '/research/benchmarks',
+    },
+    {
+      label: t('resourceLinks.evidencePack'),
+      desc: t('resourceLinks.evidencePackDesc'),
+      href: '/evidence-pack',
+    },
+    { label: t('resourceLinks.blog'), desc: t('resourceLinks.blogDesc'), href: '/blog' },
+    {
+      label: t('resourceLinks.community'),
+      desc: t('resourceLinks.communityDesc'),
+      href: '/community',
+    },
   ];
 
   const atrItems: DropdownItem[] = [
@@ -189,12 +261,9 @@ export default function NavBar() {
     { label: t('atrLinks.cite'), desc: t('atrLinks.citeDesc'), href: '/atr/cite' },
   ];
 
-  // Main nav is 5 items: Product, ATR, Sovereign (highlighted), How it Works,
-  // Docs. Threat Cloud / About / Blog moved to the footer only.
-  const topLinks = [
-    { label: t('howItWorks'), href: '/how-it-works' },
-    { label: t('docs'), href: 'https://docs.panguard.ai' },
-  ];
+  // Intent-oriented nav, 5 groups: Product (what do I install) · Solutions
+  // (which situation am I in) · ATR (the standard) · Pricing · Resources.
+  // Sovereign keeps its prominence as the featured first item of Solutions.
 
   return (
     <nav
@@ -213,26 +282,15 @@ export default function NavBar() {
           {/* Desktop nav — xl gate: at lg the full row overflows max-w-7xl */}
           <div className="hidden xl:flex items-center gap-0.5">
             <NavDropdown label={t('product')} items={productItems} />
+            <NavDropdown label={t('solutions')} items={solutionItems} />
             <NavDropdown label={t('atr')} items={atrItems} />
             <Link
-              href="/sovereign"
-              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold text-panguard-green bg-panguard-green/10 border border-panguard-green/30 hover:border-panguard-green/60 hover:bg-panguard-green/15 transition duration-200"
+              href="/pricing"
+              className="rounded-full px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-2 transition duration-200"
             >
-              <span
-                className="w-1.5 h-1.5 rounded-full bg-panguard-green shadow-[0_0_8px_rgba(52,211,153,0.9)] motion-safe:animate-pulse"
-                aria-hidden
-              />
-              {t('sovereign')}
+              {t('pricing')}
             </Link>
-            {topLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="rounded-full px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-2 transition duration-200"
-              >
-                {link.label}
-              </Link>
-            ))}
+            <NavDropdown label={t('resources')} items={resourceItems} />
           </div>
 
           {/* Desktop CTA + Locale Switcher */}
@@ -308,6 +366,40 @@ export default function NavBar() {
               </div>
             )}
 
+            {/* Solutions accordion */}
+            <button
+              onClick={() => setMobileSolutionsOpen(!mobileSolutionsOpen)}
+              className="flex items-center justify-between w-full py-3 min-h-[44px] text-sm text-text-secondary hover:text-text-primary"
+              aria-expanded={mobileSolutionsOpen}
+            >
+              {t('solutions')}
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-200 ${mobileSolutionsOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+            {mobileSolutionsOpen && (
+              <div className="pl-4 pb-2 space-y-1">
+                {solutionItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-2 py-3 min-h-[44px] text-sm hover:text-text-primary ${
+                      item.highlight ? 'font-semibold text-panguard-green' : 'text-text-tertiary'
+                    }`}
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {item.highlight && (
+                      <span
+                        className="w-1.5 h-1.5 rounded-full bg-panguard-green shadow-[0_0_8px_rgba(52,211,153,0.9)] motion-safe:animate-pulse"
+                        aria-hidden
+                      />
+                    )}
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+
             {/* ATR accordion */}
             <button
               onClick={() => setMobileAtrOpen(!mobileAtrOpen)}
@@ -334,30 +426,40 @@ export default function NavBar() {
               </div>
             )}
 
-            {/* Sovereign — featured */}
+            {/* Resources accordion */}
+            <button
+              onClick={() => setMobileResourcesOpen(!mobileResourcesOpen)}
+              className="flex items-center justify-between w-full py-3 min-h-[44px] text-sm text-text-secondary hover:text-text-primary"
+              aria-expanded={mobileResourcesOpen}
+            >
+              {t('resources')}
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-200 ${mobileResourcesOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+            {mobileResourcesOpen && (
+              <div className="pl-4 pb-2 space-y-1">
+                {resourceItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="block py-3 min-h-[44px] text-sm text-text-tertiary hover:text-text-primary"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {/* Pricing — direct link */}
             <Link
-              href="/sovereign"
-              className="flex items-center gap-2 py-3 min-h-[44px] text-sm font-semibold text-panguard-green"
+              href="/pricing"
+              className="block py-3 min-h-[44px] text-sm text-text-secondary hover:text-text-primary"
               onClick={() => setMobileOpen(false)}
             >
-              <span
-                className="w-1.5 h-1.5 rounded-full bg-panguard-green shadow-[0_0_8px_rgba(52,211,153,0.9)] motion-safe:animate-pulse"
-                aria-hidden
-              />
-              {t('sovereign')}
+              {t('pricing')}
             </Link>
-
-            {/* Top links */}
-            {topLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="block py-3 min-h-[44px] text-sm text-text-secondary hover:text-text-primary"
-                onClick={() => setMobileOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
 
             <a
               href="https://github.com/panguard-ai/panguard-ai"

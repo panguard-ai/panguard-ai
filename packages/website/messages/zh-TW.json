@@ -69,7 +69,8 @@
       "migrator": "Migrator",
       "migratorDesc": "Sigma/YARA → ATR YAML 轉換器（免費）",
       "atrStandard": "ATR 標準",
-      "atrStandardDesc": "AI Agent 威脅偵測開放標準"
+      "atrStandardDesc": "AI Agent 威脅偵測開放標準",
+      "howItWorksDesc": "三層偵測架構，從頭到尾"
     },
     "atrLinks": {
       "overview": "ATR 概覽",
@@ -88,30 +89,28 @@
       "sponsorDesc": "Open Collective + Strategic Partner"
     },
     "solutionLinks": {
-      "developers": "開發者方案",
-      "developersDesc": "獨立與個人開發者",
-      "smb": "中小企業方案",
-      "smbDesc": "5-50 名員工",
-      "enterprise": "中型企業方案",
-      "enterpriseDesc": "50-500 名員工",
-      "customers": "客戶案例",
-      "customersDesc": "成功故事",
-      "partners": "MSP 合作夥伴",
-      "partnersDesc": "託管服務供應商"
+      "sovereign": "主權 AI",
+      "sovereignDesc": "離網、按國家部署——迴路裡沒有任何外國廠商",
+      "enterprise": "企業",
+      "enterpriseDesc": "完整規格：Enterprise、Migrator Pro、Sovereign 與 OEM",
+      "developers": "開發者",
+      "developersDesc": "永久免費——掃描並防護你自己的 agent",
+      "smb": "小型團隊",
+      "smbDesc": "沒有資安團隊，也有真正的防護"
     },
     "resourceLinks": {
-      "blog": "部落格",
-      "blogDesc": "最新洞察",
-      "docs": "技術文件",
-      "docsDesc": "指南與參考",
-      "api": "API 文件",
-      "apiDesc": "開發者文件",
-      "changelog": "更新日誌",
-      "changelogDesc": "最新功能",
-      "status": "系統狀態",
-      "statusDesc": "服務運行狀態",
-      "resources": "資源中心",
-      "resourcesDesc": "報告與白皮書"
+      "docs": "文件",
+      "docsDesc": "安裝、CLI、部署、API",
+      "research": "野外掃描研究",
+      "researchDesc": "我們在野外掃描 skill 的發現",
+      "benchmarks": "Benchmark",
+      "benchmarksDesc": "召回率與精確率——實測，不宣稱",
+      "evidencePack": "證據包樣本",
+      "evidencePackDesc": "企業客戶實際拿到的稽核產物",
+      "blog": "Blog",
+      "blogDesc": "工程筆記與威脅研究",
+      "community": "社群",
+      "communityDesc": "排行榜、貢獻者、Discord"
     },
     "companyLinks": {
       "about": "關於我們",

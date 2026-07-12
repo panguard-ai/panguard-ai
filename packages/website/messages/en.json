@@ -69,7 +69,8 @@
       "migrator": "Migrator",
       "migratorDesc": "Sigma/YARA → ATR YAML converter (free)",
       "atrStandard": "ATR Standard",
-      "atrStandardDesc": "Open standard for AI agent threats"
+      "atrStandardDesc": "Open standard for AI agent threats",
+      "howItWorksDesc": "The three-layer detection architecture, end to end"
     },
     "atrLinks": {
       "overview": "ATR Overview",
@@ -88,30 +89,28 @@
       "sponsorDesc": "Open Collective + Strategic Partner"
     },
     "solutionLinks": {
-      "developers": "For Developers",
-      "developersDesc": "Solo & indie developers",
-      "smb": "For Small Business",
-      "smbDesc": "5-50 employees",
-      "enterprise": "For Mid-size",
-      "enterpriseDesc": "50-500 employees",
-      "customers": "Customers",
-      "customersDesc": "Success stories",
-      "partners": "For MSPs",
-      "partnersDesc": "Managed service providers"
+      "sovereign": "Sovereign AI",
+      "sovereignDesc": "Airgapped, per-nation deployment — no foreign vendor in the loop",
+      "enterprise": "Enterprise",
+      "enterpriseDesc": "Full specification: Enterprise, Migrator Pro, Sovereign & OEM",
+      "developers": "Developers",
+      "developersDesc": "Free forever — scan and guard your own agents",
+      "smb": "Small teams",
+      "smbDesc": "Real protection without a security team"
     },
     "resourceLinks": {
+      "docs": "Docs",
+      "docsDesc": "Install, CLI, deployment, API",
+      "research": "Wild-scan research",
+      "researchDesc": "What we found scanning skills in the wild",
+      "benchmarks": "Benchmarks",
+      "benchmarksDesc": "Recall and precision — measured, not claimed",
+      "evidencePack": "Sample evidence pack",
+      "evidencePackDesc": "The audit artifact enterprise customers receive",
       "blog": "Blog",
-      "blogDesc": "Latest insights",
-      "docs": "Documentation",
-      "docsDesc": "Guides & references",
-      "api": "API Reference",
-      "apiDesc": "Developer docs",
-      "changelog": "Changelog",
-      "changelogDesc": "What's new",
-      "status": "Status Page",
-      "statusDesc": "System uptime",
-      "resources": "Resource Center",
-      "resourcesDesc": "Reports & whitepapers"
+      "blogDesc": "Engineering notes and threat research",
+      "community": "Community",
+      "communityDesc": "Leaderboard, contributors, Discord"
     },
     "companyLinks": {
       "about": "About",
