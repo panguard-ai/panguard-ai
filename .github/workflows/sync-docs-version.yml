@@ -43,6 +43,11 @@ jobs:
           echo "ver=$VER" >> "$GITHUB_OUTPUT"
           echo "Stamping docs-site to v$VER"
 
+      # setup-node@v5 auto-detects the repo's packageManager (pnpm) and enables
+      # its cache — which needs pnpm on PATH. Install pnpm first or the step
+      # fails with "Unable to locate executable file: pnpm".
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v5
         with:
           node-version: '22'
