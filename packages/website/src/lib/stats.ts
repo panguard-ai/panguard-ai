@@ -14,7 +14,7 @@
  *   packages/panguard/src/cli/index.ts         -> 23 top-level commands
  *   packages/panguard-mcp/src/server.ts        -> 10 MCP tools shown on /product/mcp
  *   packages/panguard-skill-auditor/src/checks/ -> 8 audit checks
- *   agent-threat-rules/rules/                  -> 672 ATR rules (npm v3.5.4, compiled bundle atr-rules-compiled.json). Re-sync with the three-command flow above when bumping ATR.
+ *   agent-threat-rules/rules/                  -> 747 ATR rules (npm v3.5.8). The web-scanner bundle atr-rules-compiled.json ships the 650 production rules (draft/deprecated excluded, mirroring the runtime engine). Re-sync with the three-command flow above when bumping ATR.
  *   packages/panguard-guard/src/playbook/      -> 3 playbook templates
  *   packages/panguard-guard/src/collectors/     -> 4 log parsers
  *
@@ -27,17 +27,19 @@ export const STATS = {
   /**
    * Synced from agent-threat-rules by: pnpm update agent-threat-rules ->
    * node scripts/compile-atr-rules.mjs -> node scripts/apply-atr-stats.mjs.
-   * Rule count matches the compiled bundle (src/lib/atr-rules-compiled.json).
+   * atrRules/totalRules below is the full ATR corpus (747). The web-scanner
+   * bundle (src/lib/atr-rules-compiled.json) ships the 650 production rules
+   * only — draft/deprecated are excluded to mirror the runtime engine.
    */
-  atrVersion: '3.5.0',
+  atrVersion: '3.5.8',
   /**
-   * ATR rules PanGuard ships (agent-threat-rules v3.5.4 on npm = 672 YAML rules).
-   * This is the count of the exact bundle this site scans with — auditable by
-   * `npm i agent-threat-rules@3.5.4 && find rules -name '*.yaml' | wc -l`.
+   * Full ATR corpus (agent-threat-rules v3.5.8 on npm = 747 YAML rules) —
+   * auditable by `npm i agent-threat-rules@3.5.8 && find rules -name '*.yaml' | wc -l`.
+   * The online scanner runs the 650 production subset (see atr-rules-compiled.json).
    */
   atrRules: 747,
-  /** Total unique detection patterns across all bundled ATR rules. */
-  atrPatterns: 3_025,
+  /** Total detection patterns across the full ATR corpus (747 rules, v3.5.8). */
+  atrPatterns: 3_200,
   totalRules: 747,
   /** Use this for all user-facing display — avoids stale hardcoded counts. */
   totalRulesDisplay: '747' as const,
@@ -79,17 +81,18 @@ export const STATS = {
       { id: 'ASI10', rules: 7, strength: 'MODERATE' as const },
     ],
   },
-  /** Per-category breakdown — counted from the compiled bundle (agent-threat-rules v3.5.4, 672 rules). */
+  /** Per-category breakdown — counted from the full agent-threat-rules v3.5.8 corpus (747 rules). */
   rulesByCategory: {
-    'prompt-injection': 219,
-    'context-exfiltration': 108,
-    'agent-manipulation': 106,
-    'tool-poisoning': 84,
-    'skill-compromise': 41,
-    'privilege-escalation': 39,
-    'model-abuse': 39,
-    'excessive-autonomy': 30,
-    'data-poisoning': 6,
+    'prompt-injection': 246,
+    'context-exfiltration': 119,
+    'agent-manipulation': 108,
+    'tool-poisoning': 97,
+    'privilege-escalation': 51,
+    'skill-compromise': 45,
+    'model-abuse': 38,
+    'excessive-autonomy': 33,
+    'data-poisoning': 7,
+    'model-security': 3,
   },
   /** Compliance frameworks ATR maps to (per-rule metadata) — matches complianceFrameworkList length. */
   complianceFrameworks: 7,
