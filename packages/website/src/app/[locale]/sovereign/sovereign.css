@@ -59,8 +59,7 @@
   .sv .roster-h{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:20px}
   .sv .roster{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
   .sv .nchip{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid var(--hair);border-radius:3px;background:var(--s1)}
-  .sv .nchip .nfe{font-size:16px;line-height:1}
-  .sv .nchip .ncode{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--dim)}
+  .sv .nchip .ncode{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--sage);padding-right:8px;border-right:1px solid var(--hair)}
   .sv .nchip .nname{font-size:12px;color:var(--muted)}
 
   /* ============ strategic frame: the sovereign stack (three pillars) ============ */
