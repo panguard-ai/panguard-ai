@@ -13,9 +13,24 @@ All notable changes to Panguard AI, organized by version.
 
 ---
 
-## v1.8.5 (2026-07-12)
+## v1.8.7 (2026-07-12)
 
 **Released: 2026-07-12** -- Current stable release. ATR v3.5.8 (747 rules), OWASP Agentic Top 10: 10/10 covered.
+
+- **`pga up` dashboard handoff hardened**: the reboot-persistence launchd service now pins `HOME`, so the dashboard launch token, config, and logs always resolve to the directory the CLI reads -- no more false "Dashboard not available" when launchd's `HOME` differs from the install shell.
+- **npm provenance**: published tarballs now carry signed build provenance.
+
+---
+
+## v1.8.6 (2026-07-12)
+
+**Released: 2026-07-12** -- GA finalization: honest Community/Enterprise tier copy, a single fully-gated npm publisher, and README/docs reconciled to ATR v3.5.8 / 747 rules. No runtime/product code changed.
+
+---
+
+## v1.8.5 (2026-07-12)
+
+**Released: 2026-07-12** -- ATR v3.5.8 (747 rules), OWASP Agentic Top 10: 10/10 covered.
 
 ### Highlights
 

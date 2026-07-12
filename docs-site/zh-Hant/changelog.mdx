@@ -13,9 +13,24 @@ Panguard AI 的所有重要變更，按版本組織。
 
 ---
 
-## v1.8.5 (2026-07-12)
+## v1.8.7 (2026-07-12)
 
 **發佈日期：2026-07-12** -- 當前穩定版本。ATR v3.5.8（747 條規則），OWASP Agentic Top 10：10/10 完整覆蓋。
+
+- **`pga up` dashboard 交接硬化**：reboot 持久化的 launchd 服務現在明確釘死 `HOME`,dashboard 啟動 token、設定與日誌一定落在 CLI 讀取的目錄——不再因 launchd 的 `HOME` 與安裝 shell 不同而誤報「Dashboard not available」。
+- **npm provenance**：發布的 tarball 現在帶有簽章建置來源。
+
+---
+
+## v1.8.6 (2026-07-12)
+
+**發佈日期：2026-07-12** -- GA 收尾:誠實化 Community/Enterprise 分層文案、單一完全設閘的 npm 發布者、README/docs 對齊 ATR v3.5.8 / 747 條規則。未變更 runtime/產品程式碼。
+
+---
+
+## v1.8.5 (2026-07-12)
+
+**發佈日期：2026-07-12** -- ATR v3.5.8（747 條規則），OWASP Agentic Top 10：10/10 完整覆蓋。
 
 ### 重點
 
