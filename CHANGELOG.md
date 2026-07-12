@@ -8,6 +8,7 @@ GA UX + honesty + tier-boundary release, driven by a full end-to-end walkthrough
 and a multi-dimension audit of the Community dashboard.
 
 Detection
+
 - Bundled `agent-threat-rules` floored to `^3.5.8` across all packages — the
   engine now loads the full current rule set (747 rules). Includes the
   ATR-2026-00013 SSRF precision fix (stops flagging dev-localhost / 127.0.0.1 /
@@ -16,12 +17,14 @@ Detection
   block) — removing the one recurring runtime false positive.
 
 CLI / scan
+
 - `pga scan` in a project with a `./skills` dir now runs the ATR skill-threat
   scan by default (was a host OS firewall/port/CVE audit); the host scan moves
   behind `pga scan --system`, and its CVE check drops pre-2015 entries + no
   longer leaks the OS username.
 
 Dashboard — real data, self-debuggable, honest tiering
+
 - Removed the compliance "Evidence Pack" export from the free Community
   dashboard (it's an Enterprise feature); the endpoint is now server-gated (403
   on Community). SARIF export stays free.
