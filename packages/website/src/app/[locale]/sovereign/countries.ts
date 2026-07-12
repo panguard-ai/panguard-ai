@@ -21,7 +21,6 @@ export interface CrosswalkRow {
 export interface SovereignCountry {
   readonly code: string;
   readonly name: string;
-  readonly flag: string;
   /** Signing algorithm the country's approved lists accept. */
   readonly alg: 'Ed25519' | 'ECDSA P-256';
   /** True where a validated hardware crypto module is legally required. */
@@ -38,7 +37,6 @@ export const SOVEREIGN_COUNTRIES: Readonly<Record<string, SovereignCountry>> = {
   TW: {
     code: 'TW',
     name: 'Taiwan',
-    flag: '🇹🇼',
     alg: 'Ed25519',
     hsm: false,
     residency: 'In-country (government / Tier-A)',
@@ -75,7 +73,6 @@ export const SOVEREIGN_COUNTRIES: Readonly<Record<string, SovereignCountry>> = {
   JP: {
     code: 'JP',
     name: 'Japan',
-    flag: '🇯🇵',
     alg: 'Ed25519',
     hsm: false,
     residency: 'In-country (specified-secret systems out of scope)',
@@ -104,7 +101,6 @@ export const SOVEREIGN_COUNTRIES: Readonly<Record<string, SovereignCountry>> = {
   SG: {
     code: 'SG',
     name: 'Singapore',
-    flag: '🇸🇬',
     alg: 'Ed25519',
     hsm: false,
     residency: 'By classification (CII / defense isolated)',
@@ -134,7 +130,6 @@ export const SOVEREIGN_COUNTRIES: Readonly<Record<string, SovereignCountry>> = {
   AE: {
     code: 'AE',
     name: 'United Arab Emirates',
-    flag: '🇦🇪',
     alg: 'Ed25519',
     hsm: false,
     residency: 'In-country (federal / sovereign cloud)',
@@ -160,7 +155,6 @@ export const SOVEREIGN_COUNTRIES: Readonly<Record<string, SovereignCountry>> = {
   EU: {
     code: 'EU',
     name: 'European Union',
-    flag: '🇪🇺',
     alg: 'ECDSA P-256',
     hsm: false,
     residency: 'In-country / EU (per procurement; SecNumCloud, C5)',
@@ -186,7 +180,6 @@ export const SOVEREIGN_COUNTRIES: Readonly<Record<string, SovereignCountry>> = {
   KR: {
     code: 'KR',
     name: 'South Korea',
-    flag: '🇰🇷',
     alg: 'ECDSA P-256',
     hsm: true,
     residency: 'In-country + physical isolation (C-tier)',
@@ -212,7 +205,6 @@ export const SOVEREIGN_COUNTRIES: Readonly<Record<string, SovereignCountry>> = {
   SA: {
     code: 'SA',
     name: 'Saudi Arabia',
-    flag: '🇸🇦',
     alg: 'ECDSA P-256',
     hsm: true,
     residency: 'In-country (CCC / NDMO)',
@@ -238,7 +230,6 @@ export const SOVEREIGN_COUNTRIES: Readonly<Record<string, SovereignCountry>> = {
 export const GENERIC_COUNTRY: SovereignCountry = {
   code: 'GEN',
   name: 'General',
-  flag: '🌐',
   alg: 'Ed25519',
   hsm: false,
   residency: 'Deployed on infrastructure the institution controls',
