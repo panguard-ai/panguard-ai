@@ -13,20 +13,26 @@ Panguard AI 的所有重要變更，按版本組織。
 
 ---
 
-## v1.8.3 (2026-07-10)
+## v1.8.5 (2026-07-12)
 
-**發佈日期：2026-07-10** -- 當前穩定版本。ATR v3.5.7（714 條規則），OWASP Agentic Top 10：10/10 完整覆蓋。
+**發佈日期：2026-07-12** -- 當前穩定版本。ATR v3.5.8（747 條規則），OWASP Agentic Top 10：10/10 完整覆蓋。
 
 ### 重點
 
-- **714 條 ATR 規則**，涵蓋 10 個威脅類別（原 v2.2.0 為 419 條），並導入**偵測 lane**：enforce（穩定、需二次確認的規則）約 0.24% FP／hunt（全部規則，預設）約 9% FP，於 65,000 筆良性語料上量測
+- **747 條 ATR 規則**，涵蓋 10 個威脅類別（原 v2.2.0 為 419 條），並導入**偵測 lane**：enforce（穩定、需二次確認的規則）約 0.24% FP／hunt（全部規則，預設）約 9% FP，於 65,000 筆良性語料上量測
 - **支援 17 個平台**：`panguard setup` 自動偵測並設定 Claude Code、Claude Desktop、Cursor、Hermes Agent、OpenClaw、Codex CLI、WorkBuddy、NemoClaw、ArkClaw、Windsurf、QClaw、Cline、VS Code Copilot、Zed、Gemini CLI、Continue、Roo Code
 - **Benchmarks**（Layer 1 確定性規則，2026-07-04 驗證）：Garak 97.2% recall（650 筆）、SKILL.md 100% recall／97% precision／0.2% FP（498 筆）、PINT 63.6% recall／99.7% precision（850 筆）、HackAPrompt 69.6% recall vs 28.6% baseline／100% precision（4,780 筆）
-- **1.8.3 修正**：DNS-rebind SSRF pinning + 單調遞增的保留下限（retention-floor）
+- **1.8.5**：誠實化 Community/Enterprise 分層——合規 Evidence Pack 改為 Enterprise 專屬（Community 端 server 回 403；SARIF 匯出維持免費）；ATR-2026-00013 SSRF 精度修正（內建 ATR 下限提升至 v3.5.8）；在含 `./skills` 目錄的專案中 `pga scan` 預設執行 ATR 技能掃描；dashboard 真實數據 + 可自我除錯的 token 修正
 
 ### 合規方案分層
 
 Community 永久免費且開源。Enterprise、Migrator Pro、Sovereign 方案在 Community 核心之上，額外提供已簽章、持續重新掃描的合規證據（Ed25519 簽發者簽章、npm provenance）。
+
+---
+
+## v1.8.3 (2026-07-10)
+
+**發佈日期：2026-07-10** -- DNS-rebind SSRF pinning + 單調遞增的保留下限（retention-floor）。ATR v3.5.7（714 條規則）。
 
 ---
 

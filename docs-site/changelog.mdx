@@ -13,20 +13,26 @@ All notable changes to Panguard AI, organized by version.
 
 ---
 
-## v1.8.3 (2026-07-10)
+## v1.8.5 (2026-07-12)
 
-**Released: 2026-07-10** -- Current stable release. ATR v3.5.7 (714 rules), OWASP Agentic Top 10: 10/10 covered.
+**Released: 2026-07-12** -- Current stable release. ATR v3.5.8 (747 rules), OWASP Agentic Top 10: 10/10 covered.
 
 ### Highlights
 
-- **714 ATR rules** across 10 threat categories (was 419 in v2.2.0), now with **detection lanes**: enforce (stable, confirm-gated rules) ~0.24% FP / hunt (all rules, default) ~9% FP, measured on a 65,000-sample benign corpus
+- **747 ATR rules** across 10 threat categories (was 419 in v2.2.0), now with **detection lanes**: enforce (stable, confirm-gated rules) ~0.24% FP / hunt (all rules, default) ~9% FP, measured on a 65,000-sample benign corpus
 - **17 platform support**: `panguard setup` auto-detects and configures Claude Code, Claude Desktop, Cursor, Hermes Agent, OpenClaw, Codex CLI, WorkBuddy, NemoClaw, ArkClaw, Windsurf, QClaw, Cline, VS Code Copilot, Zed, Gemini CLI, Continue, and Roo Code
 - **Benchmarks** (Layer 1 deterministic, verified 2026-07-04): Garak 97.2% recall (650 samples), SKILL.md 100% recall / 97% precision / 0.2% FP (498 samples), PINT 63.6% recall / 99.7% precision (850 samples), HackAPrompt 69.6% recall vs 28.6% baseline / 100% precision (4,780 samples)
-- **1.8.3 fix**: DNS-rebind SSRF pinning + monotonic retention-floor
+- **1.8.5**: honest Community/Enterprise tiering -- the compliance Evidence Pack is Enterprise-only (server-gated 403 on Community; SARIF export stays free); ATR-2026-00013 SSRF precision fix (bundled ATR floored to v3.5.8); `pga scan` runs the ATR skill scan by default in a project with a `./skills` dir; dashboard real-data + self-debuggable-token fixes
 
 ### Compliance tiers
 
 Community is free and open source forever. Enterprise, Migrator Pro, and Sovereign tiers add signed, continuously re-scanned compliance evidence (Ed25519 issuer signatures, npm provenance) on top of the Community core.
+
+---
+
+## v1.8.3 (2026-07-10)
+
+**Released: 2026-07-10** -- DNS-rebind SSRF pinning + monotonic retention-floor. ATR v3.5.7 (714 rules).
 
 ---
 
