@@ -28,7 +28,3 @@ security-hardening
 tests/e2e
 .turbo
 **/.turbo
-</content>
-</invoke>
-<invoke name="Bash">
-<parameter name="command">cd /Users/user/Downloads/panguard-ai && vercel --prod --yes 2>&1 | tail -20

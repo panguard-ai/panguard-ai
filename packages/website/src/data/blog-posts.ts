@@ -2373,7 +2373,7 @@ export const blogPosts: BlogPost[] = [
       '- **Business / Enterprise** — [enterprise@panguard.ai](mailto:enterprise@panguard.ai) for on-prem, compliance reporting, AIAM, SLA.',
       'Whatever protocol wins — MCP, ACP, A2A, something else — your defense rules should not have to be rewritten. The attack taxonomy is about the agent, not the transport. That is why we open-sourced the rules and build the platform on top.',
       '---',
-      '*KUAN-HSIN LIN is the founder of PanGuard and maintainer of the Agent Threat Rules open standard. Paper: [Zenodo DOI 10.5281/zenodo.19178002](https://doi.org/10.5281/zenodo.19178002). Contact: attlab0527@gmail.com.*',
+      '*KUAN-HSIN LIN is the founder of PanGuard and maintainer of the Agent Threat Rules open standard. Paper: [Zenodo DOI 10.5281/zenodo.19178002](https://doi.org/10.5281/zenodo.19178002). Contact: adam@agentthreatrule.org.*',
     ],
   },
   {
@@ -2433,7 +2433,7 @@ export const blogPosts: BlogPost[] = [
       '- **Business / Enterprise** — 寫 [enterprise@panguard.ai](mailto:enterprise@panguard.ai) 談地端、合規報告、AIAM、SLA。',
       '不管哪個協定會贏 — MCP、ACP、A2A 或別的——你的防禦規則不該被迫重寫。攻擊分類學是關於 agent，不是關於 transport。這就是為什麼我們開源規則，在上面建平台。',
       '---',
-      '*林冠鑫 (KUAN-HSIN LIN) 是 PanGuard 創辦人與 Agent Threat Rules 開源標準維護者。論文：[Zenodo DOI 10.5281/zenodo.19178002](https://doi.org/10.5281/zenodo.19178002)。聯絡：attlab0527@gmail.com。*',
+      '*林冠辛 (KUAN-HSIN LIN) 是 PanGuard 創辦人與 Agent Threat Rules 開源標準維護者。論文：[Zenodo DOI 10.5281/zenodo.19178002](https://doi.org/10.5281/zenodo.19178002)。聯絡：adam@agentthreatrule.org。*',
     ],
   },
   {
