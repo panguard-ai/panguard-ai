@@ -1,0 +1,72 @@
+name: Sync docs version
+
+# Keeps the Mintlify docs (docs-site/) current-version references in lockstep
+# with each npm release, so the docs never lag behind (as they did stuck at
+# 1.8.5 while npm shipped 1.8.6 / 1.8.7). This only rewrites the "current
+# version" strings; changelog entries stay manual because they carry release
+# notes. Commits directly to main (same pattern as sync-atr-stats.yml) so the
+# Mintlify site redeploys with the current version.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to stamp (without the v), e.g. 1.8.7'
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+
+      - name: Determine target version
+        id: ver
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VER="${{ github.event.inputs.version }}"
+          else
+            VER="${GITHUB_REF_NAME#v}"
+          fi
+          case "$VER" in
+            [0-9]*.[0-9]*.[0-9]*) ;;
+            *) echo "Refusing to stamp a non-semver value: '$VER'"; exit 1 ;;
+          esac
+          echo "ver=$VER" >> "$GITHUB_OUTPUT"
+          echo "Stamping docs-site to v$VER"
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Rewrite current-version references (never the changelog history)
+        run: node scripts/sync-docs-version.mjs "${{ steps.ver.outputs.ver }}"
+
+      - name: Commit + push if changed
+        run: |
+          if git diff --quiet docs-site; then
+            echo "docs-site already current at v${{ steps.ver.outputs.ver }} — nothing to do"
+            exit 0
+          fi
+          git config user.name "Docs Version Sync Bot"
+          git config user.email "release@agentthreatrule.org"
+          git add docs-site
+          git commit -m "docs(docs-site): sync current version to v${{ steps.ver.outputs.ver }}"
+          # Race-safe push: rebase on top of any commits that landed during the run.
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then
+              echo "pushed on attempt $attempt"
+              exit 0
+            fi
+            git fetch origin main && git rebase origin/main
+          done
+          echo "ERROR: failed to push after 3 attempts"
+          exit 1
