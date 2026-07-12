@@ -45,6 +45,14 @@ describe('buildGuardPlist — matches the proven launchd service contract', () =
     expect(plist).toContain('/opt/homebrew/bin');
   });
 
+  it('pins HOME to the data dir parent so the daemon token/logs match what the CLI reads', () => {
+    // Without an explicit HOME the launchd daemon relies on launchd setting it;
+    // pinning it guarantees ~/.panguard-guard (dashboard token) resolves to the
+    // same dir `pga up`/`pga status` read, preventing a false "not running".
+    expect(plist).toContain('<key>HOME</key>');
+    expect(plist).toMatch(/<key>HOME<\/key>\s*<string>\/Users\/x<\/string>/);
+  });
+
   it('points logs into the data dir', () => {
     expect(plist).toContain('/Users/x/.panguard-guard/panguard-guard.log');
     expect(plist).toContain('/Users/x/.panguard-guard/panguard-guard-error.log');
