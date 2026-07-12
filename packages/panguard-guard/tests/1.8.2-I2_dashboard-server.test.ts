@@ -319,7 +319,17 @@ describe('1.8.2-I2 dashboard server', () => {
       expect(integrity).not.toBe('TAMPERED');
     });
 
-    it('Evidence export on an empty durable log reports integrity NO_RECORDS', async () => {
+    it('Evidence export is Enterprise-gated (403 on Community) + reports NO_RECORDS on a paid tier', async () => {
+      // Community: the compliance Evidence Pack is an Enterprise feature → 403.
+      const gated = await fetch(`${baseUrl}/api/export/evidence`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      expect(gated.status).toBe(403);
+
+      // Paid tier: the export runs and, on an empty durable log, reports
+      // NO_RECORDS (never a self-accusing TAMPERED).
+      currentConfig = { ...currentConfig, cliTier: 'enterprise' };
       const res = await fetch(`${baseUrl}/api/export/evidence`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },

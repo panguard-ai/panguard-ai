@@ -543,9 +543,13 @@
         background: var(--bg-raised);
         border-bottom: 1px solid var(--border);
         font-weight: 500;
+      }
+      /* Only sortable headers (wired on the Threats table) get the clickable
+         affordance — other tables' headers no longer look clickable-but-dead. */
+      .tb th.sortable {
         cursor: pointer;
       }
-      .tb th:hover {
+      .tb th.sortable:hover {
         color: var(--text-primary);
       }
       .tb td {
@@ -1591,25 +1595,21 @@
           <div class="hp-fixes" id="posture-deductions"></div>
         </div>
 
-        <!-- 4 KPI cards -->
+        <!-- 2 KPI cards. "Threat Cloud rules synced" was dropped from Overview:
+             collective defense is OFF by default on Community, so it was a
+             permanent 0 / "--" that read as a dead metric. The real synced count
+             (when enabled) lives on the Threat Cloud tab. -->
         <div class="cg">
           <div
             class="cd"
             title="Total ATR detection rules currently loaded and enforcing on this machine."
           >
-            <div class="cl" data-i18n="k_rules">Rules Active</div>
+            <div class="cl">Rules Active</div>
             <div class="cv sg" id="v-rules">--</div>
           </div>
           <div class="cd" title="Threats Guard has detected on this machine.">
-            <div class="cl" data-i18n="k_threats">Threats Detected</div>
+            <div class="cl">Threats Detected</div>
             <div class="cv sg" id="v-threats">--</div>
-          </div>
-          <div
-            class="cd"
-            title="Detection rules pulled from the Threat Cloud network, included in your active rule set."
-          >
-            <div class="cl" data-i18n="k_tc">Threat Cloud rules synced</div>
-            <div class="cv sg" id="v-tcsync">--</div>
           </div>
         </div>
 
@@ -1722,7 +1722,7 @@
           Learning mode they are logged only. Use the severity filter chips to narrow the view.
         </div>
 
-        <!-- Action bar: filters + tier-gated export buttons -->
+        <!-- Action bar: filters + SARIF export (developer-standard threat export) -->
         <div
           style="
             display: flex;
@@ -1747,23 +1747,15 @@
               id="btn-sarif"
               title="Download a .sarif.json of detected threats (the standard format GitHub and code scanners read). Saved to your computer — nothing is uploaded, and it never includes your source code."
             >
-              <span data-i18n="exp_sarif">Export SARIF</span>
-            </button>
-            <button
-              class="btn btn-primary btn-sm"
-              id="btn-evidence"
-              title="Download a JSON evidence report of detections (rule IDs, timestamps, severities, matched patterns). Saved to your computer — nothing is uploaded, and it never includes your source code."
-            >
-              <span data-i18n="exp_evidence">Generate Evidence Pack</span>
+              <span>Export SARIF</span>
             </button>
           </div>
         </div>
 
         <div class="pd" style="margin: -6px 0 14px; font-size: 12px">
-          Export your detected threats as a file you can keep or share. SARIF is a standard format
-          GitHub and code scanners read; the Evidence Pack is a self-contained JSON report. Both
-          download to your computer — nothing is uploaded, and neither includes your source code or
-          file contents.
+          Export your detected threats as a SARIF file you can keep or share — the standard format
+          GitHub and code scanners read. It downloads to your computer; nothing is uploaded, and it
+          never includes your source code or file contents.
         </div>
 
         <!-- Suppression summary (anti alert-fatigue: only high-confidence shown by default) -->
@@ -2461,9 +2453,9 @@
         <div class="info-box" style="margin-top: 20px">
           <strong data-i18n="st_license">License Tier:</strong> <span id="st-tier-display">--</span
           ><br />
-          <span data-i18n="st_license_desc"
-            >Community is free and unlimited — including SARIF and Evidence Pack export. No features
-            are locked.</span
+          <span
+            >Community is free and unlimited on-device protection, with SARIF threat export.
+            Compliance audit-evidence reporting is part of the paid editions.</span
           >
           <br /><br />
           <a
@@ -2683,7 +2675,8 @@
       });
 
       /* ============================================================ */
-      /*  License tier label (no feature gating — everything is free)  */
+      /*  License tier label. Community shows all on-device features; the       */
+      /*  compliance Evidence Pack export is Enterprise (hidden + server-gated). */
       /* ============================================================ */
       function applyTierGates(status) {
         var tier = (status && status.license && status.license.tier) || 'community';
@@ -3010,7 +3003,9 @@
             pts: 10,
             max: 10,
             goto: 'settings',
-            btn: 'Configure',
+            // The enforcement panel is read-only in Community (armed via
+            // config.json + restart), so the button views policy, not "Configure".
+            btn: 'View policy',
           });
         }
         score = Math.max(0, score);
@@ -3090,7 +3085,15 @@
         // Live status arrived: restore the section dot (cleared to neutral while
         // Guard was unreachable) so it reflects real per-layer health again.
         var ld = document.getElementById('layers-dot');
-        if (ld) ld.style.background = '';
+        var colorForState = function (state) {
+          return state === 'active'
+            ? 'var(--ok)'
+            : state === 'degraded'
+              ? 'var(--danger)'
+              : state === 'idle'
+                ? 'var(--warn)'
+                : 'var(--text-muted)';
+        };
         var map = { a: 'la', b: 'lb', c: 'lc' };
         Object.keys(map).forEach(function (k) {
           var ly = L[k];
@@ -3122,6 +3125,21 @@
           }
           if (bar) bar.className = 'layer-fill' + (active ? ' on' : '');
         });
+        // Section header dot reflects the WORST of the always-on layers (A + B);
+        // Layer C is optional so it never drags the header. Never a static green —
+        // if Layer A is degraded (0 rules), the header dot goes red with the row.
+        if (ld) {
+          var aS = L.a && L.a.state;
+          var bS = L.b && L.b.state;
+          var worst =
+            aS === 'degraded' || bS === 'degraded'
+              ? 'degraded'
+              : !aS || aS === 'idle' || bS === 'idle'
+                ? 'idle'
+                : 'active';
+          ld.className = 'dot';
+          ld.style.background = colorForState(worst);
+        }
         // Layer C call-to-action: a real two-state affordance (not a server-filled
         // hint). Not connected -> why + "Set up Layer C"; connected -> calm note.
         var cOn = L.c && L.c.state === 'active';
@@ -3684,31 +3702,9 @@
             toast('Network error');
           });
       }
-      function exportEvidence() {
-        af('/api/export/evidence', { method: 'POST' })
-          .then(function (r) {
-            if (!r.ok) {
-              toast('Export failed');
-              return null;
-            }
-            return r.blob();
-          })
-          .then(function (blob) {
-            if (!blob) return;
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement('a');
-            a.href = url;
-            a.download = 'panguard-evidence.json';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            toast('Evidence pack downloaded to your computer — nothing was uploaded.');
-          })
-          .catch(function () {
-            toast('Network error');
-          });
-      }
+      // Evidence Pack (signed compliance-audit-evidence generation) is an
+      // Enterprise feature — not part of free Community. Removed from this
+      // dashboard; the server also 403s /api/export/evidence for community tier.
 
       /* Surface the daily notify-only rule-update check (rule-sync writes it to
          rule-update.json). The server computed this 'newer rules published'
@@ -3962,14 +3958,9 @@
               var status = s.whitelisted ? 'whitelisted' : 'tracked';
               if (status === 'whitelisted') wl++;
               else unk++;
-              var dotCls =
-                status === 'whitelisted' ? 'dot-ok' : status === 'blocked' ? 'dot-bad' : 'dot-w';
-              var badgeCls =
-                status === 'whitelisted'
-                  ? 'badge-ok'
-                  : status === 'blocked'
-                    ? 'badge-critical'
-                    : 'badge-w';
+              // status is only 'whitelisted' | 'tracked' (no 'blocked' state).
+              var dotCls = status === 'whitelisted' ? 'dot-ok' : 'dot-w';
+              var badgeCls = status === 'whitelisted' ? 'badge-ok' : 'badge-w';
               var actBtn =
                 'padding:3px 9px;font-size:11px;border-radius:6px;cursor:pointer;background:transparent;';
               var actionsCell = s.whitelisted
@@ -4352,26 +4343,25 @@
       }
       function saveSettings() {
         var priorMode = selectedMode;
-        var body = {
-          mode: selectedMode,
-          endpoint: document.getElementById('st-tc-endpoint').value || undefined,
-        };
+        var epVal = document.getElementById('st-tc-endpoint').value.trim();
+        // Write MODE independently of the endpoint. Previously both went in one
+        // request, so a bad/unresolvable endpoint (400) silently rejected the
+        // security-relevant mode change and snapped the control back. Mode is the
+        // change that matters — persist it on its own; the endpoint is a separate,
+        // non-fatal write below (a blank value clears a previously-saved endpoint).
         af('/api/threat-cloud', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
+          body: JSON.stringify({ mode: selectedMode }),
         })
           .then(function (r) {
             return r.json();
           })
           .then(function (d) {
             if (d.success) {
-              // The daemon now live-applies the change (detection re-arms at
-              // once), so loadSettings() re-reads the NEW mode — the control no
-              // longer snaps back. Protection mode's OS-level response actions
-              // still need a restart, so surface that as a pending state rather
-              // than implying nothing happened.
-              if (body.mode === 'protection') {
+              // Daemon live-applies the mode; loadSettings re-reads it. Protection
+              // mode's OS-level responses still need a restart — surface that.
+              if (selectedMode === 'protection') {
                 toast('Saved. Detection is live now; restart Guard to arm automatic responses.');
                 showModePendingRestart();
               } else {
@@ -4380,12 +4370,32 @@
               loadSettings();
             } else {
               toast(d.error || 'Save failed');
-              // Revert the optimistic selection only when the save was rejected.
               selectMode(priorMode);
             }
+            // Persist the endpoint separately: its validation error is shown but
+            // never touches the mode we just saved.
+            saveEndpoint(epVal);
           })
           .catch(function () {
             toast('Network error');
+          });
+      }
+      /* Endpoint write, decoupled from mode. '' clears a saved endpoint; an
+         invalid URL surfaces its error without reverting anything else. */
+      function saveEndpoint(epVal) {
+        af('/api/threat-cloud', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ endpoint: epVal }),
+        })
+          .then(function (r) {
+            return r.json();
+          })
+          .then(function (d) {
+            if (!d.success) toast('Endpoint not saved: ' + (d.error || 'invalid URL'));
+          })
+          .catch(function () {
+            /* mode already saved; endpoint write is best-effort */
           });
       }
       /* Keep the optimistic mode value and show a clear "pending restart" note
@@ -4576,7 +4586,6 @@
           });
         });
         on('btn-sarif', 'click', exportSARIF);
-        on('btn-evidence', 'click', exportEvidence);
         var rs = document.getElementById('ru-search');
         if (rs) {
           rs.addEventListener('input', filterRules);
