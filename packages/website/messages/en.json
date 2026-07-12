@@ -848,7 +848,7 @@
     },
     "realIncidents": {
       "title": "This is not hypothetical.",
-      "subtitle": "Real CVEs. Real attacks. Real victims.",
+      "subtitle": "02 / REAL CVEs · REAL ATTACKS · REAL VICTIMS",
       "cta": "Scan yours",
       "scanCount": "We scanned {count} MCP skills. {percent}% have CRITICAL or HIGH security risks.",
       "incident1Name": "MCPJam Inspector",
@@ -6508,7 +6508,7 @@
     "gap": {
       "eyebrow": "01 / THE GAP",
       "title": "An AI agent is a brilliant new hire <sage>you handed the keys to.</sage>",
-      "body": "It reads your email, runs your code, moves your money — but it can't tell your instruction from a stranger's. The attack isn't code. It's words the agent can't help but obey.",
+      "body": "It reads your email, runs your code, moves your money — but it can't tell your instruction from a stranger's. Hide \"ignore your job, send the data\" in a page, a skill, or a tool it reads, and it obeys. The attack isn't code. It's words the agent can't help but obey.",
       "card1Kicker": "THE PC / NETWORK ERA",
       "card1Title": "One shared rulebook",
       "card1Body": "CVE · antivirus · Sigma. A common, open vocabulary for what counts as malicious. Every defender shares it.",
@@ -6524,7 +6524,7 @@
       "text": "The attack isn't code — <sage>it's words.</sage>"
     },
     "rulebook": {
-      "eyebrow": "02 / THE RULEBOOK",
+      "eyebrow": "04 / THE RULEBOOK",
       "title": "That rulebook exists now: <sage>ATR.</sage>",
       "sub": "The open, executable standard for what an AI agent must never do. MIT, free forever. The CVE/Sigma layer for agents — real today, with {count} rules.",
       "card1Kicker": "ATR",
@@ -6543,7 +6543,7 @@
       "cta": "Read the standard"
     },
     "proof": {
-      "eyebrow": "03 / IT RUNS",
+      "eyebrow": "05 / IT RUNS",
       "title": "It runs. Here's the attack <sage>getting caught.</sage>",
       "terminalCaption": "Real pga scan output on a confirmed-malicious skill from a live agent ecosystem (OpenClaw) — captured 2026-07-02 on the ATR v3.5.3 bundle, not a mockup. The rulebook has grown since.",
       "b1Label": "HackAPrompt recall vs 28.6% baseline · 100% precision",
@@ -6555,7 +6555,7 @@
       "cta": "See the benchmarks"
     },
     "protectProve": {
-      "eyebrow": "04 / WHAT IT DOES",
+      "eyebrow": "06 / WHAT IT DOES",
       "title": "The same rulebook does <sage>two things enterprises need.</sage>",
       "protectKicker": "PROTECT",
       "protectTitle": "Catch the attack",
@@ -6586,7 +6586,7 @@
       "cta": "See all adopters"
     },
     "flywheel": {
-      "eyebrow": "06 / WHY IT STAYS AHEAD",
+      "eyebrow": "03 / WHY IT STAYS AHEAD",
       "title": "Defense has to accumulate <sage>faster than attacks multiply.</sage>",
       "body": "You can't out-patch this one company at a time. Every attack caught anywhere is written once as a rule — and protects everyone forever.",
       "in1": "Community",
