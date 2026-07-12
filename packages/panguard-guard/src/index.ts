@@ -134,6 +134,11 @@ export {
 
 // Threat Cloud / 威脅雲
 export { ThreatCloudClient } from './threat-cloud/index.js';
+// Value-level secret scrubbing (masks AWS/GitHub/Anthropic/OpenAI/Stripe keys,
+// private-key blocks, DB URLs, bearer tokens in free-text). Reused by the CLI
+// flywheel-proposal builder so a matched code snippet can never carry a secret
+// into a Threat Cloud upload.
+export { scrubSecretValues, SECRET_MASK } from './agent/scrub-secrets.js';
 
 // Dashboard / 儀表板
 export { DashboardServer, removeDashboardToken } from './dashboard/index.js';

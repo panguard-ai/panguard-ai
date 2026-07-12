@@ -2,6 +2,71 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.8] - 2026-07-13
+
+Dashboard control + Threat Cloud flywheel honesty.
+
+- **New "Automatic response" control on the dashboard Overview.** A one-click
+  toggle (`POST /api/enforce`) flips the daemon between `protection` and
+  `report-only` — i.e. whether Guard runs its automatic OS-level responses
+  (block IP / isolate file / kill process). It never touches `enforcementPolicy`,
+  so a single click can't enable a destructive action. The copy is explicit that
+  detection and tool-call blocking (MCP proxy + built-in-tool hook) run **always**,
+  independent of this switch, so the control never over- or under-claims what
+  protection is active. Posture still reads MONITORING (not a green PROTECTED)
+  until an OS response is actually configured.
+- **Threat Cloud rule proposals now carry real evidence, not report text.** The
+  `pga up` / `pga audit` flywheel used to synthesize a "rule" whose detection was
+  a regex built from the finding's title keywords — it matched PanGuard's own
+  report text, not the attack, and shipped no test cases. Proposals are now honest
+  draft-requests carrying the actual matched evidence (`needsLLMDraft`), which the
+  drafter turns into a real, test-backed rule. Any secret embedded in a matched
+  snippet is masked before upload.
+
+## [1.8.7] - 2026-07-12
+
+Guard reliability + supply-chain.
+
+- **`pga up` dashboard handoff hardened.** The reboot-persistence launchd service
+  set only `PATH` in its environment, leaving `HOME` to launchd. Any run where
+  launchd's `HOME` differs from the installing shell (sudo, a custom `HOME`,
+  headless) made the daemon write `~/.panguard-guard/dashboard-token` to a
+  different directory than `pga up`/`pga status` read — surfacing as a false
+  "Dashboard not available / Guard not running" even though the daemon was
+  serving. The plist now pins `HOME` to the data-dir parent, so the token,
+  config, and logs always resolve to the directory the CLI reads.
+- **npm provenance now actually attaches.** `pnpm -r publish --provenance`
+  silently no-ops; publishing now sets `NPM_CONFIG_PROVENANCE=true`, so the
+  1.8.7 tarballs carry signed build provenance.
+
+## [1.8.6] - 2026-07-12
+
+GA finalization release — honesty, supply-chain, and public-repo hygiene on top
+of 1.8.5. No runtime/product code changed; the guard, proxy, scanner, and CLI
+behave exactly as 1.8.5.
+
+Release pipeline
+
+- `publish.yml` is now the single, fully-gated npm publisher
+  (build → typecheck → test → publish, all blocking). The parallel ungated
+  publish job in `release.yml` was removed, so a red test can no longer ship a
+  package. Published tarballs now carry npm build provenance (`--provenance`),
+  and the missing-binary release check fails loudly instead of warning.
+
+Docs / honesty
+
+- README rule count corrected to 747 and the ATR standard's GitHub org slug
+  fixed (`Agent-Threat-Rule`).
+- Website + docs reconciled to ATR v3.5.8 / 747 rules; Community/Enterprise tier
+  copy made honest (Community is free and open source; signed compliance
+  evidence reporting is the paid Enterprise add-on); removed a personal-info
+  leak from the public repo.
+
+Tests
+
+- Added regression coverage for the default `pga scan` routing decision
+  (skill scan vs host scan).
+
 ## [1.8.5] - 2026-07-12
 
 GA UX + honesty + tier-boundary release, driven by a full end-to-end walkthrough

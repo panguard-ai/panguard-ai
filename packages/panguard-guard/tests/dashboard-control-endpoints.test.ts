@@ -297,6 +297,86 @@ describe('DashboardServer — 1.7 control endpoints', () => {
       expect(after.mode).toBe('report-only');
       expect(after.threatCloudUploadEnabled).toBe(true);
     });
+
+    // POST /api/enforce — the Overview arm/disarm button. armed=true raises the
+    // live mode to 'protection' (Guard blocks detected threats); armed=false
+    // drops to 'report-only' (detect + log only). It NEVER touches
+    // enforcementPolicy, so arming can never kill a process or delete a file.
+    const enforce = (armed: unknown) =>
+      fetch(`${liveUrl}/api/enforce`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${liveToken}` },
+        body: JSON.stringify({ armed }),
+      });
+    const liveMode = async () =>
+      (
+        await (
+          await fetch(`${liveUrl}/api/config`, {
+            headers: { Authorization: `Bearer ${liveToken}` },
+          })
+        ).json()
+      ).mode;
+
+    it('armed:false disarms to report-only; armed:true arms to protection — live', async () => {
+      const off = await enforce(false);
+      expect(off.status).toBe(200);
+      const offBody = await off.json();
+      expect(offBody).toMatchObject({ success: true, armed: false, mode: 'report-only' });
+      expect(await liveMode()).toBe('report-only');
+
+      const on = await enforce(true);
+      expect(on.status).toBe(200);
+      const onBody = await on.json();
+      expect(onBody).toMatchObject({ success: true, armed: true, mode: 'protection' });
+      expect(await liveMode()).toBe('protection');
+    });
+
+    it('arming never arms an OS-level response (conservative) — enforcement stays monitoring', async () => {
+      // Give the engine rules so posture is not downgraded to 'degraded'.
+      liveDashboard.updateStatus({ atrRuleCount: 100 });
+      await enforce(true);
+      const status = await (
+        await fetch(`${liveUrl}/api/status`, {
+          headers: { Authorization: `Bearer ${liveToken}` },
+        })
+      ).json();
+      // protection mode + NO enforcementPolicy armed = monitoring, not a green
+      // 'protected'. The button must not silently arm destructive OS actions.
+      expect(status.enforcement.mode).toBe('protection');
+      expect(status.enforcement.osActionsArmed).toBe(false);
+      expect(status.enforcement.posture).toBe('monitoring');
+      // The persisted config carries no armed enforcementPolicy.
+      const cfg = await (
+        await fetch(`${liveUrl}/api/config`, {
+          headers: { Authorization: `Bearer ${liveToken}` },
+        })
+      ).json();
+      const ep = cfg.enforcementPolicy ?? {};
+      expect(ep.killProcesses?.enabled ?? false).toBe(false);
+      expect(ep.blockIPs?.enabled ?? false).toBe(false);
+      expect(ep.isolateFiles?.enabled ?? false).toBe(false);
+      expect(ep.disableAccounts?.enabled ?? false).toBe(false);
+    });
+
+    it('rejects a missing or non-boolean "armed" with 400 (no silent mode change)', async () => {
+      const missing = await fetch(`${liveUrl}/api/enforce`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${liveToken}` },
+        body: JSON.stringify({}),
+      });
+      expect(missing.status).toBe(400);
+      const bad = await enforce('yes');
+      expect(bad.status).toBe(400);
+      // Mode is untouched (still the launch-time 'protection').
+      expect(await liveMode()).toBe('protection');
+    });
+
+    it('GET /api/enforce is 405 (POST-only control)', async () => {
+      const res = await fetch(`${liveUrl}/api/enforce`, {
+        headers: { Authorization: `Bearer ${liveToken}` },
+      });
+      expect(res.status).toBe(405);
+    });
   });
 
   describe('enforcement posture — PROTECTED only when it will actually act', () => {
@@ -412,6 +492,31 @@ describe('DashboardServer — 1.7 control endpoints', () => {
       expect(html).toContain('id="posture-deductions"');
       expect(html).toContain('renderPosture');
       expect(html).toContain('data-goto');
+    });
+
+    it('Overview has a one-click automatic-response control wired to /api/enforce (CSP-safe)', () => {
+      expect(html).toContain('id="arm-card"');
+      expect(html).toContain('id="arm-btn"');
+      expect(html).toContain('updateArmControl');
+      expect(html).toContain('toggleArm');
+      expect(html).toContain('/api/enforce');
+      expect(html).toContain('On by default');
+      // Wired via addEventListener, never an inline handler (the whole-file
+      // no-onclick assertion covers this too, but keep it local + explicit).
+      expect(html).toContain("on('arm-btn', 'click', toggleArm)");
+    });
+
+    it('the automatic-response control is HONEST: it does not claim to toggle tool-call blocking', () => {
+      // Regression lock for the pre-release honesty finding: the button governs
+      // the daemon's automatic OS-level responses, NOT tool-call blocking (which
+      // the MCP proxy + built-in hook do ALWAYS). The copy must say so and must
+      // NOT resurrect the old lie that disarming lets blocked actions through.
+      expect(html).toContain('always on'); // detection + tool-call blocking are always on
+      expect(html).toContain('automatic OS-level responses');
+      // The scrapped arm-control overclaims must not come back (these strings
+      // were unique to the old dishonest arm copy).
+      expect(html).not.toContain('Guard now blocks detected threats');
+      expect(html).not.toContain('actions Guard would otherwise stop');
     });
 
     it('uses the full 5-path brand mark (not the 1-path blob)', () => {

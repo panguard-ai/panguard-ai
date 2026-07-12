@@ -14,7 +14,8 @@ import { createPublicKey, verify as edVerify } from 'node:crypto';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { c, banner, divider, box, symbols, setLogLevel } from '@panguard-ai/core';
-import { contentHash, patternHash } from '@panguard-ai/scan-core';
+import { contentHash } from '@panguard-ai/scan-core';
+import { buildSkillAuditProposal } from './atr-proposal.js';
 import {
   buildEventsFromAuditReport,
   getTcCorrelationHeaders,
@@ -612,67 +613,26 @@ export function auditCommand(): Command {
             const tc = await ThreatCloudClient.create(options.tcEndpoint, dataDir);
             const skillName = safeSkillName(report.manifest?.name, resolvedPath);
 
-            const highFindings = report.findings
-              .filter((f) => f.severity === 'critical' || f.severity === 'high')
-              .slice(0, 5);
-            const findingSummary = highFindings.map((f) => f.title).join('; ');
-            const pHash = patternHash(skillName, findingSummary);
-
-            const severity = report.riskLevel === 'CRITICAL' ? 'critical' : 'high';
-            const date = new Date().toISOString().slice(0, 10).replace(/-/g, '/');
-
-            const conditions = highFindings
-              .map((f, idx) => {
-                const keywords = f.title
-                  .split(/\s+/)
-                  .filter((w) => w.length > 4)
-                  .slice(0, 4);
-                if (keywords.length === 0) return null;
-                const regex = keywords
-                  .map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-                  .join('.*');
-                return `    - field: content\n      operator: regex\n      value: "(?i)${regex}"\n      description: "Pattern ${idx + 1}: ${f.title.slice(0, 80)}"`;
-              })
-              .filter(Boolean);
-
-            if (conditions.length > 0) {
-              const ruleContent = `title: "CLI Audit: ${highFindings[0]?.title.slice(0, 60) ?? skillName}"
-id: ATR-2026-DRAFT-${pHash.slice(0, 8)}
-status: draft
-description: |
-  Auto-generated from CLI audit of "${skillName}".
-  Findings: ${findingSummary.slice(0, 200)}
-author: "PanGuard CLI Auditor"
-date: "${date}"
-schema_version: "0.1"
-detection_tier: pattern
-maturity: experimental
-severity: ${severity}
-tags:
-  category: skill-compromise
-  subcategory: cli-audit
-  confidence: medium
-detection:
-  conditions:
-${conditions.join('\n')}
-  condition: any
-response:
-  actions: [alert, snapshot]`;
-
-              await tc.submitATRProposal({
-                patternHash: pHash,
-                ruleContent,
-                llmProvider: 'cli-auditor',
-                llmModel: 'pattern-extraction',
-                selfReviewVerdict: JSON.stringify({
-                  approved: true,
-                  source: 'cli-auditor',
-                  skillName,
-                  riskLevel: report.riskLevel,
-                  findingCount: highFindings.length,
-                }),
-              });
-
+            // Emit a VALID draft-request proposal (real evidence + needsLLMDraft),
+            // never a rule fabricated from finding-title keywords. See
+            // atr-proposal.ts for why the old title-keyword regex was scrapped (it
+            // detected our own report text and shipped no precision test). The
+            // server/Guard drafter builds the real, test-backed rule.
+            const proposal = buildSkillAuditProposal({
+              skillName,
+              riskLevel: report.riskLevel === 'CRITICAL' ? 'CRITICAL' : 'HIGH',
+              source: 'cli-auditor',
+              findings: report.findings.map((f) => ({
+                id: f.id,
+                title: f.title,
+                severity: f.severity,
+                category: f.category,
+                location: f.location,
+                snippet: (f as { explain?: { snippet?: string } }).explain?.snippet,
+              })),
+            });
+            if (proposal) {
+              await tc.submitATRProposal(proposal);
               if (!options.json) {
                 console.log(
                   `  ${c.green(symbols.pass)} ${c.dim('ATR rule proposal submitted to Threat Cloud')}`
