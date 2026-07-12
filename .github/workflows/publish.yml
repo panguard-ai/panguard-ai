@@ -20,7 +20,7 @@ jobs:
 
       - uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version: '22'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Get pnpm store directory
@@ -46,6 +46,6 @@ jobs:
         run: pnpm run test
 
       - name: Publish packages
-        run: pnpm -r publish --access public --no-git-checks
+        run: pnpm -r publish --access public --no-git-checks --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
