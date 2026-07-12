@@ -52,7 +52,7 @@ function crosswalkSection(country: SovereignCountry): string {
     : `${escapeHtml(country.name)} framework reference`;
   return `<section>
     <div class="wrap">
-      <div class="shead reveal"><span class="snum">§ 03</span><span class="slabel">Compliance crosswalk — by jurisdiction</span></div>
+      <div class="shead reveal"><span class="snum">§ 07</span><span class="slabel">Compliance crosswalk — by jurisdiction</span></div>
       <h2 class="reveal">${heading}</h2>
       <p class="sub reveal">${sub} <span class="note">Design-intent mapping — not a certification or accreditation.</span></p>
       <div class="cselect reveal">${chips}</div>
@@ -101,7 +101,7 @@ const BRIEF_HTML = `<div class="sv">
         <span class="wm">AI</span>
         <span class="sov">Sovereign</span>
       </div>
-      <div class="docref">Capability Brief · Rev 0.2</div>
+      <div class="docref">Capability Brief · Rev 0.3</div>
     </div>
   </div>
 
@@ -110,9 +110,10 @@ const BRIEF_HTML = `<div class="sv">
       <div class="eyebrow reveal">Capability Brief · For National Institutions</div>
       <h1 class="reveal"><span class="em">Sovereign</span> control over autonomous AI systems.</h1>
       <div class="register reveal">Enforced at every agent action &nbsp;·&nbsp; Cryptographic proof of every decision &nbsp;·&nbsp; Verifiable offline, without trust in the supplier</div>
-      <p class="abstract reveal">As nations bring AI capability in-house, the governing question is no longer which model to procure, but how autonomous agents may act on sovereign data — and how that control is demonstrated to a regulator, an auditor, or an allied state. PanGuard Sovereign is a governance and assurance layer that enforces national policy at every agent action and produces cryptographic evidence of every decision. It operates in front of any model or agent framework, on infrastructure the institution controls.</p>
+      <p class="abstract reveal">As nations bring AI capability in-house, the governing question is no longer which model to procure, but how autonomous agents may act on sovereign data — and how that control is demonstrated to a regulator, an auditor, or an allied state. PanGuard Sovereign is a governance and assurance layer that enforces national policy at every agent action and produces cryptographic evidence of every decision. It operates in front of any model or agent framework, on infrastructure the institution controls — built on an open, vendor-neutral standard developed in a democratic jurisdiction, so sovereignty does not mean trading one foreign dependency for another.</p>
       <div class="heroactions reveal">
         <a class="btn" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20technical%20briefing">Request a technical briefing <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <a class="btn ghost" href="/PanGuard-Sovereign-Capability-Brief.pdf" target="_blank" rel="noopener">Download the brief (PDF) <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2V11M8 11L4.5 7.5M8 11L11.5 7.5M3 13.5H13" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
       </div>
       <div class="controlline reveal">
         <span>STATUS &nbsp;<b>Reference architecture · design-partner stage</b></span>
@@ -131,7 +132,78 @@ const BRIEF_HTML = `<div class="sv">
 
   <section>
     <div class="wrap">
-      <div class="shead reveal"><span class="snum">§ 01</span><span class="slabel">Sovereign control domains</span></div>
+      <div class="shead reveal"><span class="snum">§ 01</span><span class="slabel">The problem</span></div>
+      <h2 class="reveal">Autonomous AI acts faster than any control built for models</h2>
+      <p class="sub reveal">Agentic systems call tools, move data, and chain decisions on their own. For a national institution, three gaps open that choosing a model — or a cloud — cannot close.</p>
+      <div class="threecol">
+        <div class="tc reveal"><div class="tcn">01 · AUTONOMY</div><h3>The risk is the action, not the model</h3><p>An agent that can act can exfiltrate data, escalate privilege, or destroy state in milliseconds, with no human in the loop. A safer model does not govern what the agent is permitted to do.</p></div>
+        <div class="tc reveal"><div class="tcn">02 · DEPENDENCE</div><h3>Foreign stacks hold your control plane</h3><p>Governing agents on a US or Chinese hyperscaler's model and cloud puts the keys, the policy, and the audit trail outside your jurisdiction — and outside your reach in a crisis.</p></div>
+        <div class="tc reveal"><div class="tcn">03 · PROOF</div><h3>&ldquo;Trust us&rdquo; is not a control</h3><p>A regulator, an auditor, an allied state, or a budget review needs demonstrable proof of what agents did and were allowed to do — not a supplier's assurance.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="shead reveal"><span class="snum">§ 02</span><span class="slabel">How it works</span></div>
+      <h2 class="reveal">One governed chokepoint in front of every agent action</h2>
+      <p class="sub reveal">Every tool call an agent makes passes a single decision point — detection against the open Agent Threat Rules standard, then authorization against your own signed national policy — and produces evidence anyone can verify offline. Deny-by-default: the absence of a decision is a denial.</p>
+      <div class="diagram reveal">
+        <svg class="archdiag" viewBox="0 0 720 284" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Agent to ATR Rules and Policy Engine to signed evidence to tool">
+          <rect x="6" y="86" width="116" height="60" rx="3" fill="#141110" stroke="#29241F"/>
+          <text x="64" y="112" text-anchor="middle" fill="#ECE6DB" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="12.5">Agent</text>
+          <text x="64" y="128" text-anchor="middle" fill="#726A60" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="8.5">any model / framework</text>
+          <path d="M122 116 H182" stroke="#8B9A8E" stroke-width="1.4"/><path d="M182 116 l-7 -4 v8 z" fill="#8B9A8E"/>
+          <rect x="190" y="42" width="338" height="152" rx="4" fill="#141110" stroke="#8B9A8E" stroke-opacity="0.45"/>
+          <text x="206" y="66" fill="#8B9A8E" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="9.5" letter-spacing="1.4">PANGUARD SOVEREIGN CHOKEPOINT</text>
+          <rect x="206" y="80" width="306" height="48" rx="3" fill="#0E0C0B" stroke="#29241F"/>
+          <text x="220" y="101" fill="#ECE6DB" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="12">ATR Rules</text>
+          <text x="220" y="117" fill="#ABA298" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="8.5">detect · open standard · 748 rules</text>
+          <rect x="206" y="136" width="306" height="50" rx="3" fill="#0E0C0B" stroke="#29241F"/>
+          <text x="220" y="158" fill="#ECE6DB" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="12">Policy Engine</text>
+          <text x="220" y="174" fill="#ABA298" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="8.5">authorize · your signed policy · deny-by-default</text>
+          <path d="M528 116 H586" stroke="#8B9A8E" stroke-width="1.4"/><path d="M586 116 l-7 -4 v8 z" fill="#8B9A8E"/>
+          <rect x="594" y="86" width="120" height="60" rx="3" fill="#141110" stroke="#29241F"/>
+          <text x="654" y="112" text-anchor="middle" fill="#ECE6DB" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="12">Tool / Data</text>
+          <text x="654" y="128" text-anchor="middle" fill="#726A60" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="8.5">only if allowed</text>
+          <path d="M359 194 V224" stroke="#8B9A8E" stroke-width="1.4"/><path d="M359 224 l-4 -7 h8 z" fill="#8B9A8E"/>
+          <rect x="190" y="232" width="338" height="46" rx="3" fill="#141110" stroke="#29241F"/>
+          <text x="206" y="253" fill="#B4C1B7" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="12">Signed decision ledger</text>
+          <text x="206" y="269" fill="#726A60" font-family="'JetBrains Mono',ui-monospace,monospace" font-size="8.5">Ed25519 + Merkle · public-key verifiable, offline · even the operator cannot forge it</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="shead reveal"><span class="snum">§ 03</span><span class="slabel">Why PanGuard Sovereign</span></div>
+      <h2 class="reveal">Three properties a hyperscaler cannot give a sovereign buyer</h2>
+      <div class="threecol" style="margin-top:30px">
+        <div class="tc reveal"><div class="tcn">SOVEREIGN</div><h3>Runs where you control it</h3><p>On-premise or air-gapped, on infrastructure the institution owns. No outbound dependency, no phone-home, no foreign cloud in the trust path. The signing keys never leave your control.</p></div>
+        <div class="tc reveal"><div class="tcn">VERIFIABLE</div><h3>Operator-zero-trust evidence</h3><p>Every decision is public-key signed; an auditor verifies it offline holding only a public key — without trusting the operator, the log, or us. Not &ldquo;trust us&rdquo;: prove it.</p></div>
+        <div class="tc reveal"><div class="tcn">OPEN STANDARD</div><h3>Vendor-neutral, no lock-in</h3><p>Built on the open Agent Threat Rules standard — developed in a democratic jurisdiction, not a US or Chinese single-vendor stack — and already shipping in production. Your evidence outlives any one supplier.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="shead reveal"><span class="snum">§ 04</span><span class="slabel">Adoption — in production</span></div>
+      <h2 class="reveal">The open standard underneath is already deployed at scale</h2>
+      <p class="sub reveal">PanGuard Sovereign is built on Agent Threat Rules (748 rules) — the open detection standard adopted, through merged public contributions, by leading security vendors and standards bodies. Every entry below is independently verifiable.</p>
+      <div class="proof reveal">
+        <div class="proofrow"><span class="plab">In production</span><span class="pnames">Microsoft (Agent Governance Toolkit) &nbsp;·&nbsp; Cisco (AI Defense) &nbsp;·&nbsp; Gen Digital (Norton / Avast)</span></div>
+        <div class="proofrow"><span class="plab">Standards bodies</span><span class="pnames">MISP / CIRCL &nbsp;·&nbsp; OWASP &nbsp;·&nbsp; FINOS (Linux Foundation) &nbsp;·&nbsp; SigmaHQ</span></div>
+        <div class="proofrow"><span class="plab">Also shipping</span><span class="pnames">AMD (GAIA) &nbsp;·&nbsp; Microsoft PyRIT &nbsp;·&nbsp; AG2 (AutoGen) &nbsp;·&nbsp; rulezet / CIRCL</span></div>
+      </div>
+      <div><a class="btn ghost" href="https://agentthreatrule.org/ecosystem" target="_blank" rel="noopener noreferrer">Verify independently at agentthreatrule.org/ecosystem <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="shead reveal"><span class="snum">§ 05</span><span class="slabel">Sovereign control domains</span></div>
       <h2 class="reveal">An enforceable control for every dimension of sovereignty</h2>
       <p class="sub reveal">Data, compute, model, and governance — the four dimensions nations use to define AI sovereignty. The architecture provides an enforced, auditable control for each, positioned in front of any agent, model, or tool platform already in operation.</p>
       <div class="matrix">
@@ -161,7 +233,7 @@ const BRIEF_HTML = `<div class="sv">
 
   <section>
     <div class="wrap">
-      <div class="shead reveal"><span class="snum">§ 02</span><span class="slabel">Assurance model</span></div>
+      <div class="shead reveal"><span class="snum">§ 06</span><span class="slabel">Assurance model</span></div>
       <h2 class="reveal">Assurance that does not depend on trusting the supplier</h2>
       <p class="sub reveal">Sovereignty means the institution need never take the supplier's word. Every security-critical action is cryptographically signed, and any party holding only a public key can verify it, offline.</p>
       <div class="principles">
@@ -170,6 +242,7 @@ const BRIEF_HTML = `<div class="sv">
         <div class="pr reveal"><span class="pn">03</span><div><h4>Fail-closed by default</h4><p>A missing identity, an unverifiable policy, or a broken audit path denies the action. Absence never resolves to allow.</p></div></div>
         <div class="pr reveal"><span class="pn">04</span><div><h4>Open and inspectable</h4><p>Built on the open Agent Threat Rules standard. No black box and no proprietary data model to adopt.</p></div></div>
       </div>
+      <p class="cnote reveal">In practice this is the evidence a national-security audit, a budget or procurement review, and an EU AI Act Art. 12 / 26 high-risk logging obligation require — produced continuously at the point of each decision, not reconstructed after an incident.</p>
     </div>
   </section>
 
@@ -177,7 +250,7 @@ const BRIEF_HTML = `<div class="sv">
 
   <section>
     <div class="wrap">
-      <div class="shead reveal"><span class="snum">§ 04</span><span class="slabel">Capability register</span></div>
+      <div class="shead reveal"><span class="snum">§ 08</span><span class="slabel">Capability register</span></div>
       <h2 class="reveal">Present capability and maturity</h2>
       <p class="sub reveal">A working prototype under continuous independent adversarial review (approximately 1,700 automated tests; 30 review passes to date). Maturity is stated per capability against a two-state scale, defined in the legend below.</p>
       <div class="tbl reveal"><table>
@@ -208,7 +281,7 @@ const BRIEF_HTML = `<div class="sv">
 
   <section>
     <div class="wrap">
-      <div class="shead reveal"><span class="snum">§ 05</span><span class="slabel">Engagement path</span></div>
+      <div class="shead reveal"><span class="snum">§ 09</span><span class="slabel">Engagement path</span></div>
       <h2 class="reveal">A staged path from evaluation to a deployment you operate</h2>
       <p class="sub reveal">Each stage is bounded and low-commitment; you can stop after any one. Nothing requires a purchase to evaluate, and no data leaves your environment at any stage.</p>
       <div class="stages">
@@ -236,7 +309,7 @@ const BRIEF_HTML = `<div class="sv">
 
   <section>
     <div class="wrap">
-      <div class="shead reveal"><span class="snum">§ 06</span><span class="slabel">Collaboration model</span></div>
+      <div class="shead reveal"><span class="snum">§ 10</span><span class="slabel">Collaboration model</span></div>
       <h2 class="reveal">How a deployment reaches an institution — and who owns what</h2>
       <p class="sub reveal">PanGuard is the technology supplier, not the prime. An in-country partner holds the local relationship and the contract vehicle; the institution keeps sovereign control. Each party owns a distinct part, so accountability and language stay in-country — a familiar supplier-to-integrator arrangement, not a new one to invent.</p>
       <div class="parties">
@@ -265,7 +338,7 @@ const BRIEF_HTML = `<div class="sv">
 
   <section>
     <div class="wrap">
-      <div class="shead reveal"><span class="snum">§ 07</span><span class="slabel">Delivery</span></div>
+      <div class="shead reveal"><span class="snum">§ 11</span><span class="slabel">Delivery</span></div>
       <h2 class="reveal">Delivered into an environment with no outbound connectivity — verifiable at every step</h2>
       <p class="sub reveal">The delivery mechanism is built for an air-gapped environment and leaves cryptographic evidence at each step, so an auditor can later confirm exactly what was installed and that a human authorized it.</p>
       <div class="steps reveal">
@@ -281,9 +354,15 @@ const BRIEF_HTML = `<div class="sv">
 
   <section>
     <div class="wrap">
-      <div class="shead reveal"><span class="snum">§ 08</span><span class="slabel">Direct engagement</span></div>
-      <h2 class="reveal">Evaluate the architecture, or deploy within your jurisdiction</h2>
-      <div class="engage" style="margin-top:30px">
+      <div class="shead reveal"><span class="snum">§ 12</span><span class="slabel">Next steps</span></div>
+      <h2 class="reveal">Start with a briefing — proceed to a pilot when you are ready</h2>
+      <p class="sub reveal">Three ways to engage, each bounded and low-commitment. Choose the one that fits where your institution is.</p>
+      <div class="nextsteps reveal">
+        <a class="nstep" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20technical%20briefing"><span class="nsn">01</span><span class="nst">Schedule a technical briefing</span><span class="nsd">Async, under NDA where required · architecture, honest boundaries, a verifiable demo · no commitment</span></a>
+        <a class="nstep" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20design-partner%20pilot"><span class="nsn">02</span><span class="nst">Design-partner pilot</span><span class="nsd">A reference deployment in a controlled environment you choose, in your jurisdiction and language</span></a>
+        <a class="nstep" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20sovereign%20PoC"><span class="nsn">03</span><span class="nst">Sovereign PoC</span><span class="nsd">Prove it air-gapped on your own infrastructure — signed delivery, human-signed acceptance, offline-verifiable evidence</span></a>
+      </div>
+      <div class="engage" style="margin-top:1px">
         <div class="path reveal">
           <h3>National institutions</h3>
           <p>For AI safety and security institutes, AI offices, ministries, and operators of defense and critical infrastructure. Begin at Stage 01 — an asynchronous technical evaluation with the kit above, under NDA where required, with no commercial commitment.</p>
@@ -302,11 +381,11 @@ const BRIEF_HTML = `<div class="sv">
     <div class="wrap">
       <div class="ctrl reveal">
         <div><div class="lab">Document</div><div class="val">Sovereign Capability Brief</div></div>
-        <div><div class="lab">Revision</div><div class="val">0.2</div></div>
+        <div><div class="lab">Revision</div><div class="val">0.3</div></div>
         <div><div class="lab">Classification</div><div class="val">Unrestricted</div></div>
         <div><div class="lab">Contact</div><div class="val">adam@agentthreatrule.org</div></div>
       </div>
-      <p class="disclaimer reveal">PanGuard Sovereign is a reference architecture at design-partner stage, built on the open Agent Threat Rules standard. This brief describes a working prototype under active development — not a generally-available, certified, or accredited product. Framework references indicate design intent and traceability, not certification. Maturity and capability statements are current as of Revision 0.2 and are subject to independent verification.</p>
+      <p class="disclaimer reveal">PanGuard Sovereign is a reference architecture at design-partner stage, built on the open Agent Threat Rules standard. This brief describes a working prototype under active development — not a generally-available, certified, or accredited product. Framework references indicate design intent and traceability, not certification. Maturity and capability statements are current as of Revision 0.3 and are subject to independent verification.</p>
     </div>
   </div>
 </div>`;
