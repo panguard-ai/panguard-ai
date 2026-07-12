@@ -89,7 +89,7 @@ const BRIEF_HTML = `<div class="sv">
 
   <div class="docstrip">
     <div class="bar">
-      <div class="mark">
+      <a class="mark" href="/" aria-label="PanGuard — back to the main site">
         <span class="wm">PANGUARD</span>
         <svg class="logo" viewBox="385 323 1278 1403" fill="none" aria-hidden="true">
           <path fill="#8B9A8E" d="M 1021.5 830.423 C 1026.54 829.911 1045.81 832.659 1051.64 833.401 C 1072.38 835.99 1093.1 838.746 1113.8 841.667 L 1329.99 871.428 L 1329.95 1306.51 L 1330 1422.21 C 1330.01 1450.54 1332.08 1491.81 1325.18 1518.04 C 1318.79 1541.46 1305.62 1562.47 1287.31 1578.42 C 1269.98 1593.59 1234.62 1610.78 1212.96 1622.97 C 1151.4 1657.6 1087.44 1689.5 1026.42 1725.08 L 1024.58 1725.72 C 1020.72 1724.57 1005.67 1715.74 1001.44 1713.38 C 986.676 1705.08 971.857 1696.88 956.982 1688.79 L 836.342 1623.07 C 818.678 1613.37 800.537 1603.48 783.285 1593.93 C 741.183 1570.62 718.225 1528.6 718.162 1480.8 C 718.14 1463.85 718.093 1446.28 718.119 1429.07 L 718.13 1313.33 L 718.15 871.408 C 819.171 858.462 920.068 841.835 1021.5 830.423 z"/>
@@ -100,7 +100,7 @@ const BRIEF_HTML = `<div class="sv">
         </svg>
         <span class="wm">AI</span>
         <span class="sov">Sovereign</span>
-      </div>
+      </a>
       <div class="docref">Capability Brief · Rev 0.3</div>
     </div>
   </div>
@@ -385,6 +385,7 @@ const BRIEF_HTML = `<div class="sv">
         <div><div class="lab">Classification</div><div class="val">Unrestricted</div></div>
         <div><div class="lab">Contact</div><div class="val">adam@agentthreatrule.org</div></div>
       </div>
+      <div class="reveal" style="margin-top:22px"><a class="btn ghost" href="/">&#8592; panguard.ai — PanGuard main site</a></div>
       <p class="disclaimer reveal">PanGuard Sovereign is a reference architecture at design-partner stage, built on the open Agent Threat Rules standard. This brief describes a working prototype under active development — not a generally-available, certified, or accredited product. Framework references indicate design intent and traceability, not certification. Maturity and capability statements are current as of Revision 0.3 and are subject to independent verification.</p>
     </div>
   </div>
