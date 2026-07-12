@@ -2149,10 +2149,7 @@ export class DashboardServer {
         }
         const nextMode: GuardConfig['mode'] = update.armed ? 'protection' : 'report-only';
         const live = this.getConfig!();
-        const configPath = join(
-          live.dataDir ?? join(homedir(), '.panguard-guard'),
-          'config.json'
-        );
+        const configPath = join(live.dataDir ?? join(homedir(), '.panguard-guard'), 'config.json');
         const config: GuardConfig = existsSync(configPath) ? loadConfig(configPath) : live;
         const updatedConfig: GuardConfig = { ...config, mode: nextMode };
         saveConfig(updatedConfig);

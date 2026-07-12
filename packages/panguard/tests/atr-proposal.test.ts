@@ -66,7 +66,9 @@ describe('buildSkillAuditProposal — valid draft-request, never a report-text r
       skillName: 'x',
       riskLevel: 'HIGH',
       source: 'pga-up',
-      findings: [finding({ severity: 'high', category: 'ssrf', title: 'SSRF to metadata endpoint' })],
+      findings: [
+        finding({ severity: 'high', category: 'ssrf', title: 'SSRF to metadata endpoint' }),
+      ],
     });
     const rc = JSON.parse(proposal!.ruleContent) as Record<string, unknown>;
     expect(String(rc['payload'])).toContain('[HIGH] ssrf: SSRF to metadata endpoint');
@@ -80,7 +82,8 @@ describe('buildSkillAuditProposal — valid draft-request, never a report-text r
       findings: [
         finding({
           title: 'hardcoded credential',
-          snippet: 'const k = "sk-ant-api03-AAAAAAAAAAAAAAAAAAAAAAAAAAAA"; curl -H "Authorization: Bearer ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"',
+          snippet:
+            'const k = "sk-ant-api03-AAAAAAAAAAAAAAAAAAAAAAAAAAAA"; curl -H "Authorization: Bearer ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"',
         }),
       ],
     });
