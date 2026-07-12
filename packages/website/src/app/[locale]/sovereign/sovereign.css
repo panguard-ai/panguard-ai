@@ -73,32 +73,6 @@
   .sv .sub{color:var(--dim);max-width:70ch;margin:0 0 38px;font-size:16px;line-height:1.68}
   .sv .sub .note{color:var(--muted);font-size:13.5px}
 
-  /* three-column concept grid (problem · why) */
-  .sv .threecol{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:4px;overflow:hidden}
-  .sv .tc{background:var(--s1);padding:28px 26px 30px}
-  .sv .tc .tcn{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--sage);margin-bottom:14px}
-  .sv .tc h3{font-size:16.5px;font-weight:600;margin:0 0 9px;letter-spacing:-.01em}
-  .sv .tc p{color:var(--dim);font-size:13.5px;margin:0;line-height:1.58}
-
-  /* architecture diagram */
-  .sv .diagram{border:1px solid var(--line);border-radius:4px;background:var(--s1);padding:30px 24px;overflow-x:auto}
-  .sv .archdiag{display:block;width:100%;max-width:720px;height:auto;margin:0 auto;min-width:560px}
-
-  /* proof / adoption strip */
-  .sv .proof{border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-bottom:20px}
-  .sv .proofrow{background:var(--s1);display:flex;gap:20px;padding:16px 22px;border-bottom:1px solid var(--hair);align-items:baseline}
-  .sv .proof .proofrow:last-child{border-bottom:none}
-  .sv .proofrow .plab{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--sage);flex:0 0 128px}
-  .sv .proofrow .pnames{font-size:14px;color:var(--ink);line-height:1.55}
-
-  /* next-step CTA cards */
-  .sv .nextsteps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-bottom:1px}
-  .sv .nstep{background:var(--s1);padding:26px 24px;display:flex;flex-direction:column;gap:10px;transition:background .25s var(--ease)}
-  .sv .nstep:hover{background:rgba(139,154,142,.06)}
-  .sv .nstep .nsn{font-family:var(--mono);font-size:11px;color:var(--sage)}
-  .sv .nstep .nst{font-size:15.5px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
-  .sv .nstep .nsd{font-size:12.5px;color:var(--dim);line-height:1.55}
-
   /* domains — 2x2 ruled matrix (hairline separators via gap) */
   .sv .matrix{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:4px;overflow:hidden}
   .sv .cell{background:var(--s1);padding:30px 30px 32px}
@@ -206,8 +180,7 @@
     .sv .docref{display:none}
     .sv section{padding:56px 0}
     .sv .hero{padding:54px 0 48px}
-    .sv .matrix,.sv .principles,.sv .engage,.sv .stages,.sv .parties,.sv .threecol,.sv .nextsteps{grid-template-columns:1fr}
+    .sv .matrix,.sv .principles,.sv .engage,.sv .stages,.sv .parties{grid-template-columns:1fr}
     .sv .modelnote .mk{flex-basis:80px}
-    .sv .proofrow{flex-direction:column;gap:6px}
     .sv .ctrl{grid-template-columns:1fr 1fr}
   }
