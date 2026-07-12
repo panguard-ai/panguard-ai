@@ -28,7 +28,7 @@ function crosswalkSection(country: SovereignCountry): string {
     .map((c) => {
       const active = c.code === country.code ? ' active' : '';
       const param = c.code === GENERIC_COUNTRY.code ? 'gen' : c.code;
-      return `<a class="cchip${active}" href="?c=${param}"><span class="cf">${c.flag}</span>${escapeHtml(c.name)}</a>`;
+      return `<a class="cchip${active}" href="?c=${param}"><span class="cf">${escapeHtml(c.code)}</span>${escapeHtml(c.name)}</a>`;
     })
     .join('');
   const rows = country.crosswalk

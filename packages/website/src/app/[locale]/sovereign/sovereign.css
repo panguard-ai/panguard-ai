@@ -145,7 +145,8 @@
   /* ============ §03 country selector + per-jurisdiction profile ============ */
   .sv .cselect{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
   .sv .cchip{display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border:1px solid var(--hair);border-radius:3px;background:var(--s1);font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--dim);transition:border-color .25s var(--ease),color .25s var(--ease),background .25s var(--ease)}
-  .sv .cchip .cf{font-size:15px;line-height:1}
+  .sv .cchip .cf{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.07em;color:var(--muted);line-height:1;padding-right:9px;margin-right:1px;border-right:1px solid var(--hair)}
+  .sv .cchip:hover .cf,.sv .cchip.active .cf{color:var(--sage-l);border-right-color:var(--sage)}
   .sv .cchip:hover{border-color:var(--sage);color:var(--ink)}
   .sv .cchip.active{border-color:var(--sage);background:var(--sageglow);color:var(--ink)}
   .sv .profile{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-bottom:8px}
