@@ -37,6 +37,10 @@ function pickFreePort(): Promise<number> {
 function baseConfig(dataDir: string): GuardConfig {
   return {
     lang: 'en',
+    // This suite exercises the compliance Evidence Pack export, which is an
+    // Enterprise feature (community gets 403). Run it on a paid tier so the
+    // export runs and its integrity/attestation is what's under test.
+    cliTier: 'enterprise',
     mode: 'protection',
     learningDays: 0,
     actionPolicy: { autoRespond: 85, notifyAndWait: 50, logOnly: 0 },

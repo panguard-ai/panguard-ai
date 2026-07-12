@@ -87,8 +87,8 @@ importers:
   packages/atr:
     dependencies:
       agent-threat-rules:
-        specifier: ^3.5.6
-        version: 3.5.6(zod@3.25.76)
+        specifier: ^3.5.8
+        version: 3.5.8(zod@3.25.76)
     devDependencies:
       '@types/node':
         specifier: ^22.14.0
@@ -144,8 +144,8 @@ importers:
   packages/migrator-community:
     dependencies:
       agent-threat-rules:
-        specifier: ^3.5.6
-        version: 3.5.6(zod@3.25.76)
+        specifier: ^3.5.8
+        version: 3.5.8(zod@3.25.76)
       commander:
         specifier: ^12.1.0
         version: 12.1.0
@@ -345,8 +345,8 @@ importers:
         specifier: workspace:*
         version: link:../panguard-guard
       agent-threat-rules:
-        specifier: ^3.5.6
-        version: 3.5.6(zod@3.25.76)
+        specifier: ^3.5.8
+        version: 3.5.8(zod@3.25.76)
 
   packages/panguard-scan:
     dependencies:
@@ -388,8 +388,8 @@ importers:
         specifier: workspace:*
         version: link:../scan-core
       agent-threat-rules:
-        specifier: ^3.5.6
-        version: 3.5.6(zod@3.25.76)
+        specifier: ^3.5.8
+        version: 3.5.8(zod@3.25.76)
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -2314,11 +2314,6 @@ packages:
   agent-base@7.1.4:
     resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
     engines: {node: '>= 14'}
-
-  agent-threat-rules@3.5.6:
-    resolution: {integrity: sha512-0TdoziKVJ0g5MhuSUCy1kzmlYKXti6qIMjWC802/0PBplYZVe7ktbqGbRN6ZxsVh9kKwiwnl77lRlC5YUKprlg==}
-    engines: {node: '>=18.0.0'}
-    hasBin: true
 
   agent-threat-rules@3.5.8:
     resolution: {integrity: sha512-HsIOq7p+5HAFq7MzLG0SifrYuLUWF5iyniHApSYnOx/Olxg0p0pB97yJF0aYVCrZjBFYwZjvNfB0S2HlL1DR1Q==}
@@ -6619,15 +6614,6 @@ snapshots:
     optional: true
 
   agent-base@7.1.4: {}
-
-  agent-threat-rules@3.5.6(zod@3.25.76):
-    dependencies:
-      '@modelcontextprotocol/sdk': 1.29.0(zod@3.25.76)
-      js-yaml: 4.1.1
-    transitivePeerDependencies:
-      - '@cfworker/json-schema'
-      - supports-color
-      - zod
 
   agent-threat-rules@3.5.8(zod@3.25.76):
     dependencies:

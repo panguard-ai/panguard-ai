@@ -65,6 +65,22 @@ import type { PolicyUpdate } from './response-engine.js';
 
 const logger = createLogger('panguard-guard:engine');
 
+// Real process CPU% between dashboard ticks (one daemon per process, so a
+// module-level previous sample is correct). Replaces the hardcoded cpuPercent:0
+// that made /api/status emit a fabricated 'measured' metric.
+let _prevCpuUsage = process.cpuUsage();
+let _prevCpuAt = Date.now();
+function sampleCpuPercent(): number {
+  const now = Date.now();
+  const elapsedMs = now - _prevCpuAt;
+  const usage = process.cpuUsage(_prevCpuUsage);
+  _prevCpuUsage = process.cpuUsage();
+  _prevCpuAt = now;
+  if (elapsedMs <= 0) return 0;
+  const cpuMs = (usage.user + usage.system) / 1000;
+  return Math.min(100, Math.round((cpuMs / elapsedMs) * 100 * 10) / 10);
+}
+
 /**
  * Whether the daemon should auto-open the dashboard in a browser on start.
  *
@@ -668,7 +684,7 @@ export class GuardEngine {
       heapLimitMB: memCheck.heapLimitMB,
       heapUsagePercent: memCheck.heapUsagePercent,
       memoryStatus: memCheck.memoryStatus,
-      cpuPercent: 0,
+      cpuPercent: sampleCpuPercent(),
       atrRuleCount: this.engines.atrEngine.getRuleCount(),
       atrMatchCount: this.engines.atrEngine.getMatchCount(),
       atrDrafterPatterns: this.engines.atrDrafter?.getPatternCount() ?? 0,

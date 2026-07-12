@@ -1210,7 +1210,7 @@ async function commandStatus(dataDir: string): Promise<void> {
   } else if (degraded) {
     console.log(
       `  ${c.critical(symbols.fail)} ${c.critical('DEGRADED')}: the daemon is running but 0 ATR rules are loaded — ` +
-        `pattern detection is OFF. Restore rules with ${c.sage('pga upgrade')} (or reinstall ${c.sage('@panguard-ai/atr')}).`
+        `pattern detection is OFF. Restore the bundled rules with ${c.sage('pga upgrade')}.`
     );
   }
 }
