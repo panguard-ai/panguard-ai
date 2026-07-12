@@ -49,6 +49,23 @@ jobs:
           echo "Upstream version:"; node -e "console.log(require('/tmp/atr-stats.json').version)"
           echo "Upstream rules:";   node -e "console.log(require('/tmp/atr-stats.json').rules.total)"
 
+      - name: Pin to the SHIPPED npm package, not upstream HEAD
+        # The website bundles agent-threat-rules from npm (see
+        # scripts/compile-atr-rules.mjs), so it must cite the PUBLISHED version
+        # and that package's rule count — not upstream data/stats.json, whose
+        # `.version` lags releases (was stuck at 3.5.0 while npm shipped 3.5.8)
+        # and whose `.rules.total` counts unreleased HEAD rules the site does
+        # not actually ship. Override both with the real npm package so the
+        # citation page stays auditable via
+        # `npm i agent-threat-rules@<ver> && find rules -name '*.yaml' | wc -l`.
+        run: |
+          VER=$(npm view agent-threat-rules version)
+          npm pack "agent-threat-rules@${VER}" --pack-destination /tmp >/dev/null
+          tar -xzf "/tmp/agent-threat-rules-${VER}.tgz" -C /tmp
+          CNT=$(find /tmp/package/rules -name '*.yaml' | wc -l | tr -d ' ')
+          node -e "const fs=require('fs');const p='/tmp/atr-stats.json';const j=JSON.parse(fs.readFileSync(p,'utf8'));j.version='${VER}';j.rules=j.rules||{};j.rules.total=${CNT};fs.writeFileSync(p,JSON.stringify(j,null,2));"
+          echo "Pinned ATR stats to shipped npm v${VER} (${CNT} rules)"
+
       - name: Rewrite stats.ts shared fields
         run: |
           node packages/website/scripts/apply-atr-stats.mjs /tmp/atr-stats.json packages/website/src/lib/stats.ts
