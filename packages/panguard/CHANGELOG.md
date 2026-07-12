@@ -8,7 +8,7 @@ Dashboard performance — Coverage and Skills tabs no longer hang.
 
 - **Fixed: the Coverage and Skills tabs sat blank for ~9 seconds and the whole
   dashboard periodically froze.** Platform/skill detection runs a `claude mcp
-  list` subprocess (~4.5s) that blocks the server's event loop, and it ran on
+list` subprocess (~4.5s) that blocks the server's event loop, and it ran on
   every `/api/agents` and `/api/installed-skills` request — which the Overview
   tab polls. Those results are now cached (5-minute TTL, refreshed in the
   background), so `/api/agents` drops from ~9s to ~40ms once warm and the
