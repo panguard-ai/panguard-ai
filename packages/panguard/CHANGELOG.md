@@ -2,6 +2,20 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.9] - 2026-07-13
+
+Dashboard reliability — every tab loads through a cookie flap.
+
+- **Fixed: only the Overview tab showed live data; Rules / Skills / Coverage /
+  Runtime / Settings loaded to empty.** A proxying or embedded browser can drop
+  the dashboard's HttpOnly SameSite=Strict launch cookie for a single request, so
+  one `/api/*` call returns 401 even though the session is valid — the next one
+  succeeds. Overview hid this because it polls; the other tabs load once when you
+  open them, so a single 401 in that window left them blank with no retry. The
+  dashboard now retries a transient 401 (safe — a 401 is rejected before the
+  handler runs, so the request has no effect) and heals itself when a later call
+  succeeds. Rules, Skills, Coverage, Runtime and Settings now populate reliably.
+
 ## [1.8.8] - 2026-07-13
 
 Dashboard control + Threat Cloud flywheel honesty.

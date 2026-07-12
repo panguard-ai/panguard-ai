@@ -506,6 +506,21 @@ describe('DashboardServer — 1.7 control endpoints', () => {
       expect(html).toContain("on('arm-btn', 'click', toggleArm)");
     });
 
+    it('af() retries a transient 401 (cookie flap) before declaring the session unauthenticated', () => {
+      // Regression for "every tab except Overview fails to load real data": a
+      // proxying/embedded browser intermittently drops the HttpOnly SameSite
+      // cookie, so a single /api call 401s while the session is valid. Overview
+      // polled and recovered; one-shot tab loads (Rules/Skills/Coverage/Runtime/
+      // Settings) failed to empty. af() now retries a 401 (safe — 401 is rejected
+      // at the gate before the handler, so no side effect) and heals the UI when a
+      // later call succeeds.
+      expect(html).toMatch(/function af\(path, opts, _retriesLeft\)/);
+      expect(html).toContain('_retriesLeft');
+      expect(html).toContain('function hideUnauthenticated');
+      // A success must clear a transient overlay so the dashboard self-heals.
+      expect(html).toContain('if (r.ok && _unauthShown) hideUnauthenticated()');
+    });
+
     it('the automatic-response control is HONEST: it does not claim to toggle tool-call blocking', () => {
       // Regression lock for the pre-release honesty finding: the button governs
       // the daemon's automatic OS-level responses, NOT tool-call blocking (which

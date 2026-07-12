@@ -2606,21 +2606,44 @@
           t.classList.remove('show');
         }, 2500);
       }
-      function af(path, opts) {
+      function af(path, opts, _retriesLeft) {
         opts = opts || {};
         opts.credentials = 'same-origin';
         return fetch(path, opts).then(function (r) {
           if (r.status === 401) {
+            // A 401 is rejected at the auth gate BEFORE the handler runs, so the
+            // request had no side effect and is safe to retry. A proxying or
+            // embedded browser (and some cross-origin isolation modes) can drop
+            // the HttpOnly SameSite=Strict launch cookie mid-flight, so a single
+            // /api call 401s even though the session is valid — the next one
+            // succeeds. Overview hid this by polling; a one-shot tab load (Rules,
+            // Skills, Coverage, Runtime, Settings) did NOT — it failed to empty on
+            // the first flap. So retry a few times before declaring the dashboard
+            // unauthenticated; a genuinely bad/absent token still 401s every retry
+            // and falls through to the overlay.
+            var left = _retriesLeft === undefined ? 4 : _retriesLeft;
+            if (left > 0) {
+              return new Promise(function (resolve) {
+                setTimeout(function () {
+                  resolve(af(path, opts, left - 1));
+                }, 250);
+              });
+            }
             var wl = document.getElementById('wl');
             if (wl) wl.textContent = 'Invalid token';
-            // An unauthenticated visit (bare URL, expired/cleared cookie, wrong
-            // token) used to silently no-op and leave a static green "Active"
-            // badge — a dead end with no path forward. Render an explicit screen
-            // that tells the user exactly how to get an authenticated URL.
             showUnauthenticated();
+            return r;
           }
+          // A real success proves the session IS authenticated — clear any overlay
+          // a transient 401 flap put up, so the dashboard heals itself.
+          if (r.ok && _unauthShown) hideUnauthenticated();
           return r;
         });
+      }
+      function hideUnauthenticated() {
+        _unauthShown = false;
+        var ov = document.getElementById('unauth-overlay');
+        if (ov) ov.style.display = 'none';
       }
       /* Explicit unauthenticated state: the cookie that authorizes /api/* is
          minted only by opening the launch URL `pga up` prints. A bare visit has
