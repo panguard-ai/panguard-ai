@@ -413,9 +413,7 @@ export default function EnterpriseContent() {
                   : "Migrator bridges decades of a nation's accumulated SOC detection IP (Sigma, YARA, Snort, SCADA, and others) into the AI agent era — letting the nation keep sovereignty over its detection knowledge, with no rewriting and no rental from foreign vendors."}
               </p>
               <a
-                href="https://sovereign-ai-defense.vercel.app"
-                target="_blank"
-                rel="noreferrer"
+                href="/sovereign"
                 className="inline-flex items-center gap-1.5 text-xs text-brand-sage font-semibold mt-4 hover:underline"
               >
                 {isZh ? '完整 Sovereign AI Defense 倡議書' : 'Full Sovereign AI Defense brief'}{' '}

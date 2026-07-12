@@ -692,9 +692,7 @@ export default function MigratorContent() {
                   : "Nation-scale deployment for sovereign AI programs. Includes full Migrator Pro, the ATR runtime, the Compliance Evidence Module, Threat Cloud, in-region deployment, and custom rule classes tailored to a nation's existing SOC detection IP (traditional SCADA, regional SIEM corpora, and others). Delivered through a certified regional enterprise vendor partner, with PanGuard as the upstream ATR standards maintainer."}
               </p>
               <a
-                href="https://sovereign-ai-defense.vercel.app"
-                target="_blank"
-                rel="noreferrer"
+                href="/sovereign"
                 className="text-[13px] text-blue-400 font-semibold inline-flex items-center gap-1 hover:underline"
               >
                 {isZh ? 'Sovereign AI 倡議書' : 'Sovereign AI brief'}{' '}
