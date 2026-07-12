@@ -101,16 +101,16 @@ const BRIEF_HTML = `<div class="sv">
         <span class="wm">AI</span>
         <span class="sov">Sovereign</span>
       </a>
-      <div class="docref">Capability Brief · Rev 0.3</div>
+      <div class="docref">Capability Brief · Rev 0.4</div>
     </div>
   </div>
 
   <header class="hero">
     <div class="wrap">
-      <div class="eyebrow reveal">Capability Brief · For National Institutions</div>
+      <div class="eyebrow reveal">Capability Brief · For National Institutions &amp; Sovereign AI Teams</div>
       <h1 class="reveal"><span class="em">Sovereign</span> control over autonomous AI systems.</h1>
       <div class="register reveal">Enforced at every agent action &nbsp;·&nbsp; Cryptographic proof of every decision &nbsp;·&nbsp; Verifiable offline, without trust in the supplier</div>
-      <p class="abstract reveal">As nations bring AI capability in-house, the governing question is no longer which model to procure, but how autonomous agents may act on sovereign data — and how that control is demonstrated to a regulator, an auditor, or an allied state. PanGuard Sovereign is a governance and assurance layer that enforces national policy at every agent action and produces cryptographic evidence of every decision. It operates in front of any model or agent framework, on infrastructure the institution controls — built on an open, vendor-neutral standard developed in a democratic jurisdiction, so sovereignty does not mean trading one foreign dependency for another.</p>
+      <p class="abstract reveal">As nations bring AI capability in-house, the governing question is no longer which model to procure, but how autonomous agents may act on sovereign data — and how that control is demonstrated to a regulator, an auditor, or an allied state. PanGuard Sovereign is a governance and assurance layer that enforces national policy at every agent action and produces cryptographic evidence of every decision. It operates in front of any model or agent framework, on infrastructure the institution controls — built on an open, vendor-neutral standard, so sovereignty does not mean trading one foreign dependency for another. Any sovereign nation can deploy it.</p>
       <div class="heroactions reveal">
         <a class="btn" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20technical%20briefing">Request a technical briefing <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
         <a class="btn ghost" href="/PanGuard-Sovereign-Capability-Brief.pdf" target="_blank" rel="noopener">Download the brief (PDF) <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2V11M8 11L4.5 7.5M8 11L11.5 7.5M3 13.5H13" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
@@ -134,11 +134,11 @@ const BRIEF_HTML = `<div class="sv">
     <div class="wrap">
       <div class="shead reveal"><span class="snum">§ 01</span><span class="slabel">The problem</span></div>
       <h2 class="reveal">Autonomous AI acts faster than any control built for models</h2>
-      <p class="sub reveal">Agentic systems call tools, move data, and chain decisions on their own. For a national institution, three gaps open that choosing a model — or a cloud — cannot close.</p>
+      <p class="sub reveal">Agentic systems are entering critical infrastructure and decision flows worldwide — calling tools, moving data, and chaining decisions on their own. For any sovereign institution, three gaps open that choosing a model, or a cloud, cannot close.</p>
       <div class="threecol">
-        <div class="tc reveal"><div class="tcn">01 · AUTONOMY</div><h3>The risk is the action, not the model</h3><p>An agent that can act can exfiltrate data, escalate privilege, or destroy state in milliseconds, with no human in the loop. A safer model does not govern what the agent is permitted to do.</p></div>
-        <div class="tc reveal"><div class="tcn">02 · DEPENDENCE</div><h3>Foreign stacks hold your control plane</h3><p>Governing agents on a US or Chinese hyperscaler's model and cloud puts the keys, the policy, and the audit trail outside your jurisdiction — and outside your reach in a crisis.</p></div>
-        <div class="tc reveal"><div class="tcn">03 · PROOF</div><h3>&ldquo;Trust us&rdquo; is not a control</h3><p>A regulator, an auditor, an allied state, or a budget review needs demonstrable proof of what agents did and were allowed to do — not a supplier's assurance.</p></div>
+        <div class="tc reveal"><div class="tcn">01 · AUTONOMY</div><h3>The risk is the action, not the model</h3><p>Prompt injection, tool poisoning, and over-autonomy can turn or over-reach an agent — it exfiltrates, escalates, or destroys in milliseconds, with no human in the loop. A safer model does not govern what the agent is permitted to do.</p></div>
+        <div class="tc reveal"><div class="tcn">02 · ENFORCEMENT</div><h3>National policy never reaches the decision</h3><p>Policy exists on paper, but nothing enforces it at the point each agent acts — and supply-chain and advanced-model risks enter the decision unseen. Governing on any external hyperscaler puts the keys, the policy, and the audit trail beyond your reach in a crisis.</p></div>
+        <div class="tc reveal"><div class="tcn">03 · PROOF</div><h3>Black-box decisions you cannot audit</h3><p>High-risk systems must produce demonstrable proof of what agents did and were allowed to do — for a regulator, an allied state, or an EU AI Act / NIST AI RMF obligation. &ldquo;Trust us&rdquo; is not a control.</p></div>
       </div>
     </div>
   </section>
@@ -182,7 +182,7 @@ const BRIEF_HTML = `<div class="sv">
       <div class="threecol" style="margin-top:30px">
         <div class="tc reveal"><div class="tcn">SOVEREIGN</div><h3>Runs where you control it</h3><p>On-premise or air-gapped, on infrastructure the institution owns. No outbound dependency, no phone-home, no foreign cloud in the trust path. The signing keys never leave your control.</p></div>
         <div class="tc reveal"><div class="tcn">VERIFIABLE</div><h3>Operator-zero-trust evidence</h3><p>Every decision is public-key signed; an auditor verifies it offline holding only a public key — without trusting the operator, the log, or us. Not &ldquo;trust us&rdquo;: prove it.</p></div>
-        <div class="tc reveal"><div class="tcn">OPEN STANDARD</div><h3>Vendor-neutral, no lock-in</h3><p>Built on the open Agent Threat Rules standard — developed in a democratic jurisdiction, not a US or Chinese single-vendor stack — and already shipping in production. Your evidence outlives any one supplier.</p></div>
+        <div class="tc reveal"><div class="tcn">OPEN STANDARD</div><h3>Vendor-neutral, no lock-in</h3><p>Built on the open Agent Threat Rules standard — vendor-neutral, not tied to any single foreign hyperscaler — and already shipping in production. Your evidence outlives any one supplier.</p></div>
       </div>
     </div>
   </section>
@@ -196,6 +196,7 @@ const BRIEF_HTML = `<div class="sv">
         <div class="proofrow"><span class="plab">In production</span><span class="pnames">Microsoft (Agent Governance Toolkit) &nbsp;·&nbsp; Cisco (AI Defense) &nbsp;·&nbsp; Gen Digital (Norton / Avast)</span></div>
         <div class="proofrow"><span class="plab">Standards bodies</span><span class="pnames">MISP / CIRCL &nbsp;·&nbsp; OWASP &nbsp;·&nbsp; FINOS (Linux Foundation) &nbsp;·&nbsp; SigmaHQ</span></div>
         <div class="proofrow"><span class="plab">Also shipping</span><span class="pnames">AMD (GAIA) &nbsp;·&nbsp; Microsoft PyRIT &nbsp;·&nbsp; AG2 (AutoGen) &nbsp;·&nbsp; rulezet / CIRCL</span></div>
+        <div class="proofrow"><span class="plab">In review</span><span class="pnames">NVIDIA (garak · NeMo Guardrails) &nbsp;·&nbsp; OpenAI Guardrails &nbsp;·&nbsp; Splunk &nbsp;·&nbsp; OpenTelemetry GenAI SIG</span></div>
       </div>
       <div><a class="btn ghost" href="https://agentthreatrule.org/ecosystem" target="_blank" rel="noopener noreferrer">Verify independently at agentthreatrule.org/ecosystem <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     </div>
@@ -242,7 +243,7 @@ const BRIEF_HTML = `<div class="sv">
         <div class="pr reveal"><span class="pn">03</span><div><h4>Fail-closed by default</h4><p>A missing identity, an unverifiable policy, or a broken audit path denies the action. Absence never resolves to allow.</p></div></div>
         <div class="pr reveal"><span class="pn">04</span><div><h4>Open and inspectable</h4><p>Built on the open Agent Threat Rules standard. No black box and no proprietary data model to adopt.</p></div></div>
       </div>
-      <p class="cnote reveal">In practice this is the evidence a national-security audit, a budget or procurement review, and an EU AI Act Art. 12 / 26 high-risk logging obligation require — produced continuously at the point of each decision, not reconstructed after an incident.</p>
+      <p class="cnote reveal">In practice this is the evidence a national-security audit, a budget or procurement review, an EU AI Act Art. 12 / 26 high-risk logging obligation, and a NIST AI RMF audit trail require — produced continuously at the point of each decision, not reconstructed after an incident.</p>
     </div>
   </section>
 
@@ -364,9 +365,9 @@ const BRIEF_HTML = `<div class="sv">
       </div>
       <div class="engage" style="margin-top:1px">
         <div class="path reveal">
-          <h3>National institutions</h3>
-          <p>For AI safety and security institutes, AI offices, ministries, and operators of defense and critical infrastructure. Begin at Stage 01 — an asynchronous technical evaluation with the kit above, under NDA where required, with no commercial commitment.</p>
-          <div><a class="btn" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20technical%20briefing">Request a technical briefing <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+          <h3>National institutions &amp; sovereign AI teams</h3>
+          <p>For AI safety and security institutes, AI offices, ministries, sovereign-AI programmes, and operators of defense and critical infrastructure — in any jurisdiction. Begin at Stage 01: an asynchronous technical evaluation with the kit above, under NDA where required, with no commercial commitment.</p>
+          <div><a class="btn" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20sovereign%20briefing">Book a sovereign briefing <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
         </div>
         <div class="path reveal">
           <h3>In-country partners</h3>
@@ -381,12 +382,12 @@ const BRIEF_HTML = `<div class="sv">
     <div class="wrap">
       <div class="ctrl reveal">
         <div><div class="lab">Document</div><div class="val">Sovereign Capability Brief</div></div>
-        <div><div class="lab">Revision</div><div class="val">0.3</div></div>
+        <div><div class="lab">Revision</div><div class="val">0.4</div></div>
         <div><div class="lab">Classification</div><div class="val">Unrestricted</div></div>
         <div><div class="lab">Contact</div><div class="val">adam@agentthreatrule.org</div></div>
       </div>
       <div class="reveal" style="margin-top:22px"><a class="btn ghost" href="/">&#8592; panguard.ai — PanGuard main site</a></div>
-      <p class="disclaimer reveal">PanGuard Sovereign is a reference architecture at design-partner stage, built on the open Agent Threat Rules standard. This brief describes a working prototype under active development — not a generally-available, certified, or accredited product. Framework references indicate design intent and traceability, not certification. Maturity and capability statements are current as of Revision 0.3 and are subject to independent verification.</p>
+      <p class="disclaimer reveal">PanGuard Sovereign is a reference architecture at design-partner stage, built on the open Agent Threat Rules standard. This brief describes a working prototype under active development — not a generally-available, certified, or accredited product. Framework references indicate design intent and traceability, not certification. Maturity and capability statements are current as of Revision 0.4 and are subject to independent verification.</p>
     </div>
   </div>
 </div>`;
