@@ -378,6 +378,26 @@ const BRIEF_HTML = `<div class="sv">
     </div>
   </section>
 
+  <section>
+    <div class="wrap">
+      <div class="shead reveal"><span class="snum">Appendix</span><span class="slabel">Where this sits</span></div>
+      <h2 class="reveal">Sovereign AI has three pillars. Two are being built. This is the third.</h2>
+      <p class="sub reveal">Most sovereign-AI investment today buys compute and models — whose hardware runs the inference, and whose weights. A second market secures enterprise agents inside a vendor's cloud. PanGuard Sovereign occupies a third position: the assurance layer over agent behaviour itself, on infrastructure the institution controls.</p>
+      <div class="ctable reveal" style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Category</th><th>What it answers</th><th>What it does not</th></tr></thead>
+          <tbody>
+            <tr><td class="k">Sovereign compute &amp; models</td><td>Whose hardware and whose weights run the AI</td><td>Does not govern what an agent may do with sovereign data, or prove it afterwards</td></tr>
+            <tr><td class="k">Enterprise agent security platforms</td><td>Policy and posture for corporate agents, operated as vendor SaaS</td><td>Not air-gapped, not per-nation, and verification requires trusting the vendor</td></tr>
+            <tr><td class="k">Sovereign agent platforms</td><td>Building and running agents on-premises</td><td>The platform is the party being audited — it cannot also be the evidence</td></tr>
+            <tr><td class="k">PanGuard Sovereign</td><td>Enforces national policy at every agent action and emits evidence any auditor verifies offline with a public key — on an open, vendor-neutral standard</td><td>Not a model, not a cloud, not an agent-building platform</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="sub reveal" style="margin-top:14px">Platform sovereignty asks an institution to trust a foreign vendor. This is control the institution can verify — which is what sovereignty means.</p>
+    </div>
+  </section>
+
   <div class="docfoot">
     <div class="wrap">
       <div class="ctrl reveal">
