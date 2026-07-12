@@ -46,6 +46,11 @@ jobs:
         run: pnpm run test
 
       - name: Publish packages
-        run: pnpm -r publish --access public --no-git-checks --provenance
+        # Provenance is driven by NPM_CONFIG_PROVENANCE, not the --provenance CLI
+        # flag: `pnpm -r publish --provenance` silently no-ops (the flag is not
+        # propagated to each package's underlying npm publish), which is why 1.8.6
+        # shipped without attestations. The env var IS read by the underlying npm.
+        run: pnpm -r publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: 'true'
