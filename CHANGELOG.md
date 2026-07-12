@@ -2,6 +2,22 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.7] - 2026-07-12
+
+Guard reliability + supply-chain.
+
+- **`pga up` dashboard handoff hardened.** The reboot-persistence launchd service
+  set only `PATH` in its environment, leaving `HOME` to launchd. Any run where
+  launchd's `HOME` differs from the installing shell (sudo, a custom `HOME`,
+  headless) made the daemon write `~/.panguard-guard/dashboard-token` to a
+  different directory than `pga up`/`pga status` read — surfacing as a false
+  "Dashboard not available / Guard not running" even though the daemon was
+  serving. The plist now pins `HOME` to the data-dir parent, so the token,
+  config, and logs always resolve to the directory the CLI reads.
+- **npm provenance now actually attaches.** `pnpm -r publish --provenance`
+  silently no-ops; publishing now sets `NPM_CONFIG_PROVENANCE=true`, so the
+  1.8.7 tarballs carry signed build provenance.
+
 ## [1.8.6] - 2026-07-12
 
 GA finalization release — honesty, supply-chain, and public-repo hygiene on top
