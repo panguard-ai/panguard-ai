@@ -148,8 +148,9 @@ jobs:
             fi
           done
           if [ ${#missing[@]} -gt 0 ]; then
-            echo "WARNING: Missing platform binaries: ${missing[*]}"
-            echo "Continuing with available binaries..."
+            echo "ERROR: Missing platform binaries: ${missing[*]}"
+            echo "Refusing to cut an incomplete release."
+            exit 1
           else
             echo "All 4 platform binaries present."
           fi
@@ -169,53 +170,7 @@ jobs:
             release/*.zip
             release/SHA256SUMS.txt
 
-  npm-publish:
-    name: Publish to npm
-    needs: release
-    if: always() && needs.release.result == 'success'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build all packages
-        run: pnpm run build
-
-      - name: Publish @panguard-ai/core
-        run: pnpm --filter @panguard-ai/core publish --no-git-checks --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        continue-on-error: true
-
-      - name: Publish @panguard-ai/atr
-        run: pnpm --filter @panguard-ai/atr publish --no-git-checks --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        continue-on-error: true
-
-      - name: Publish @panguard-ai/panguard-guard
-        run: pnpm --filter @panguard-ai/panguard-guard publish --no-git-checks --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        continue-on-error: true
-
-      - name: Publish @panguard-ai/panguard-skill-auditor
-        run: pnpm --filter @panguard-ai/panguard-skill-auditor publish --no-git-checks --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        continue-on-error: true
-
-      - name: Publish @panguard-ai/panguard
-        run: pnpm --filter @panguard-ai/panguard publish --no-git-checks --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        continue-on-error: true
+  # npm publishing lives in a single, fully-gated workflow: .github/workflows/publish.yml
+  # (build -> typecheck -> test -> publish, all blocking). This workflow builds and
+  # attaches the platform binaries only — it must never publish to npm, so there is no
+  # ungated second publish path that could ship a package past a red test.
