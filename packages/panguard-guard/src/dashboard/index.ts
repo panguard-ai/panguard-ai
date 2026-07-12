@@ -279,6 +279,20 @@ export class DashboardServer {
   private mcpConfigModulePromise: Promise<Record<string, unknown> | null> | null = null;
 
   /**
+   * Cache for the EXPENSIVE platform / skill detection (`/api/agents`,
+   * `/api/installed-skills`). Detection runs a `claude mcp list` subprocess
+   * (~4.5s, and it BLOCKS the event loop) plus other on-disk probes, and the
+   * Overview tab POLLS `/api/agents` — so before caching, the dashboard froze
+   * for seconds on every poll and the Coverage / Skills tabs sat blank. We now
+   * serve the last snapshot instantly and refresh in the background at most once
+   * per TTL (warmed at start()). Platform/skill installs change on the order of
+   * minutes, so a 5-minute TTL is safe.
+   */
+  private readonly detectCache = new Map<string, { data: unknown; ts: number }>();
+  private readonly detectInflight = new Map<string, Promise<unknown>>();
+  private static readonly DETECT_TTL_MS = 300_000;
+
+  /**
    * Live health of the optional Layer C (semantic LLM) client, reported by the
    * engine via reportLayerCOutcome(). Config-presence alone is NOT health: an
    * expired cloud key or a dead local Ollama still has a config object, so
@@ -2358,15 +2372,10 @@ export class DashboardServer {
     }> = [];
 
     try {
-      // Dynamic import — module may not be installed in all configurations
-      const mcpConfig = await this.loadMcpConfigModule();
-      const discover = mcpConfig?.['discoverAllSkills'] as
-        | (() => Promise<
-            Array<{ name: string; platformId?: string; platform?: string; command?: string }>
-          >)
-        | undefined;
-      if (discover) {
-        const discovered = await discover();
+      // Cached: skill discovery shares the same expensive platform detection
+      // (blocking `claude mcp list`). Serve the last snapshot instantly.
+      const discovered = await this.cachedDetect('skills', () => this.computeDiscoveredSkills());
+      if (discovered.length > 0 || this.detectCache.has('skills')) {
         const discoveredNames = new Set(discovered.map((s) => s.name));
         allSkills = discovered.map((s) => ({
           name: s.name,
@@ -2733,6 +2742,73 @@ export class DashboardServer {
     return this.mcpConfigModulePromise;
   }
 
+  /**
+   * Serve a cached detection snapshot instantly; refresh in the background when
+   * stale. A request NEVER waits on a fresh compute unless there is nothing
+   * cached yet (first call), and even then it dedupes on any in-flight compute
+   * (e.g. the start() warm), so the expensive `claude mcp list` runs at most
+   * once per TTL rather than once per poll. Warmed at start().
+   */
+  private cachedDetect<T>(key: string, compute: () => Promise<T>): Promise<T> {
+    const c = this.detectCache.get(key);
+    const fresh = c !== undefined && Date.now() - c.ts < DashboardServer.DETECT_TTL_MS;
+    if (c !== undefined && !fresh && !this.detectInflight.has(key)) {
+      // Stale-while-revalidate: kick a background refresh, serve the stale value.
+      void this.runDetect(key, compute).catch(() => undefined);
+    }
+    if (c !== undefined) return Promise.resolve(c.data as T);
+    // Nothing cached yet — dedupe on any in-flight compute.
+    return this.runDetect(key, compute);
+  }
+
+  private runDetect<T>(key: string, compute: () => Promise<T>): Promise<T> {
+    const existing = this.detectInflight.get(key);
+    if (existing) return existing as Promise<T>;
+    const p = (async () => {
+      try {
+        const data = await compute();
+        this.detectCache.set(key, { data, ts: Date.now() });
+        return data;
+      } finally {
+        this.detectInflight.delete(key);
+      }
+    })();
+    this.detectInflight.set(key, p);
+    return p;
+  }
+
+  private async computeDetectedPlatforms(): Promise<
+    Array<{ id: string; name: string; detected: boolean; alreadyConfigured: boolean }>
+  > {
+    const mcpConfig = await this.loadMcpConfigModule();
+    const detect = mcpConfig?.['detectPlatforms'] as
+      | (() => Promise<
+          Array<{ id: string; name: string; detected: boolean; alreadyConfigured: boolean }>
+        >)
+      | undefined;
+    if (!detect) return [];
+    const platforms = await detect();
+    return platforms.map((p) => ({
+      id: p.id,
+      name: p.name,
+      detected: p.detected,
+      alreadyConfigured: p.alreadyConfigured,
+    }));
+  }
+
+  private async computeDiscoveredSkills(): Promise<
+    Array<{ name: string; platformId?: string; platform?: string; command?: string }>
+  > {
+    const mcpConfig = await this.loadMcpConfigModule();
+    const discover = mcpConfig?.['discoverAllSkills'] as
+      | (() => Promise<
+          Array<{ name: string; platformId?: string; platform?: string; command?: string }>
+        >)
+      | undefined;
+    if (!discover) return [];
+    return discover();
+  }
+
   private async handleAgentsApi(res: ServerResponse): Promise<void> {
     type AgentInfo = {
       id: string;
@@ -2742,26 +2818,9 @@ export class DashboardServer {
     };
     let agents: AgentInfo[] = [];
     try {
-      const mcpConfig = await this.loadMcpConfigModule();
-      const detect = mcpConfig?.['detectPlatforms'] as
-        | (() => Promise<
-            Array<{
-              id: string;
-              name: string;
-              detected: boolean;
-              alreadyConfigured: boolean;
-            }>
-          >)
-        | undefined;
-      if (detect) {
-        const platforms = await detect();
-        agents = platforms.map((p) => ({
-          id: p.id,
-          name: p.name,
-          detected: p.detected,
-          alreadyConfigured: p.alreadyConfigured,
-        }));
-      }
+      // Cached: detection runs a blocking `claude mcp list` (~4.5s). Serve the
+      // last snapshot instantly so this polled endpoint never freezes the loop.
+      agents = await this.cachedDetect('platforms', () => this.computeDetectedPlatforms());
     } catch {
       /* module not installed — return empty list */
     }

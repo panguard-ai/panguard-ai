@@ -2,6 +2,19 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.10] - 2026-07-13
+
+Dashboard performance — Coverage and Skills tabs no longer hang.
+
+- **Fixed: the Coverage and Skills tabs sat blank for ~9 seconds and the whole
+  dashboard periodically froze.** Platform/skill detection runs a `claude mcp
+  list` subprocess (~4.5s) that blocks the server's event loop, and it ran on
+  every `/api/agents` and `/api/installed-skills` request — which the Overview
+  tab polls. Those results are now cached (5-minute TTL, refreshed in the
+  background), so `/api/agents` drops from ~9s to ~40ms once warm and the
+  dashboard stays responsive. Coverage and Skills now populate real data
+  promptly instead of appearing broken.
+
 ## [1.8.9] - 2026-07-13
 
 Dashboard reliability — every tab loads through a cookie flap.
