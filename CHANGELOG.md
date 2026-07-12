@@ -2,6 +2,34 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.6] - 2026-07-12
+
+GA finalization release — honesty, supply-chain, and public-repo hygiene on top
+of 1.8.5. No runtime/product code changed; the guard, proxy, scanner, and CLI
+behave exactly as 1.8.5.
+
+Release pipeline
+
+- `publish.yml` is now the single, fully-gated npm publisher
+  (build → typecheck → test → publish, all blocking). The parallel ungated
+  publish job in `release.yml` was removed, so a red test can no longer ship a
+  package. Published tarballs now carry npm build provenance (`--provenance`),
+  and the missing-binary release check fails loudly instead of warning.
+
+Docs / honesty
+
+- README rule count corrected to 747 and the ATR standard's GitHub org slug
+  fixed (`Agent-Threat-Rule`).
+- Website + docs reconciled to ATR v3.5.8 / 747 rules; Community/Enterprise tier
+  copy made honest (Community is free and open source; signed compliance
+  evidence reporting is the paid Enterprise add-on); removed a personal-info
+  leak from the public repo.
+
+Tests
+
+- Added regression coverage for the default `pga scan` routing decision
+  (skill scan vs host scan).
+
 ## [1.8.5] - 2026-07-12
 
 GA UX + honesty + tier-boundary release, driven by a full end-to-end walkthrough
