@@ -2,6 +2,41 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.5] - 2026-07-12
+
+GA UX + honesty + tier-boundary release, driven by a full end-to-end walkthrough
+and a multi-dimension audit of the Community dashboard.
+
+Detection
+
+- Bundled `agent-threat-rules` floored to `^3.5.8` across all packages — the
+  engine now loads the full current rule set (747 rules). Includes the
+  ATR-2026-00013 SSRF precision fix (stops flagging dev-localhost / 127.0.0.1 /
+  RFC1918 / bare service names as SSRF, while cloud metadata/IMDS, obfuscated
+  loopback, exotic schemes, DNS-rebind and URL-shortener SSRF stay a critical
+  block) — removing the one recurring runtime false positive.
+
+CLI / scan
+
+- `pga scan` in a project with a `./skills` dir now runs the ATR skill-threat
+  scan by default (was a host OS firewall/port/CVE audit); the host scan moves
+  behind `pga scan --system`, and its CVE check drops pre-2015 entries + no
+  longer leaks the OS username.
+
+Dashboard — real data, self-debuggable, honest tiering
+
+- Removed the compliance "Evidence Pack" export from the free Community
+  dashboard (it's an Enterprise feature); the endpoint is now server-gated (403
+  on Community). SARIF export stays free.
+- Killed residual fake-green + mock data: a 401 no longer drives a fake "Strong"
+  screen, the Detection-Layers header dot and Layer B reflect real health, and
+  `cpuPercent`/SARIF-invocation fields are real instead of hardcoded.
+- Self-debuggable dashboard token: reliable persistence with readback + retry,
+  an owner-aware cleanup, and a new `pga doctor` check that catches a
+  running-but-tokenless dashboard.
+- `pga up` messaging no longer contradicts itself; failures point at the daemon
+  log + `pga doctor`.
+
 ## [1.8.0] - 2026-07-03
 
 GA security-hardening release. A 31-finding adversarial audit of the free

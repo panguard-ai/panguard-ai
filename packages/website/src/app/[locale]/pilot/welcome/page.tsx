@@ -94,12 +94,12 @@ export default async function PilotWelcomePage({
               num="03"
               title={
                 isZh
-                  ? '回覆我:框架選擇 + 技術 lead + 部署環境'
+                  ? '回覆我：框架選擇 + 技術 lead + 部署環境'
                   : 'Reply to me: framework, tech lead, environment'
               }
               body={
                 isZh
-                  ? '我會在 24 小時內主動聯絡。Day 10 前需要鎖定:合規框架(已選)、tech lead 名字、目標部署環境 access。'
+                  ? '我會在 24 小時內主動聯絡。Day 10 前需要鎖定：合規框架（已選）、tech lead 名字、目標部署環境 access。'
                   : "I'll reach out within 24 hours. By Day 10 we need to lock: chosen framework, tech-lead name, target deployment access."
               }
             />
@@ -108,7 +108,7 @@ export default async function PilotWelcomePage({
               title={isZh ? '7 天無條件退費窗' : '7-day no-questions refund window'}
               body={
                 isZh
-                  ? '從今天算起 7 天內,任何理由都能 100% 退費——而你在 Day 3 就已拿到初步掃描與發現報告,退費前先看到實際價值。寄信給 billing@panguard.ai 就好。'
+                  ? '從今天算起 7 天內，任何理由都能 100% 退費——而你在 Day 3 就已拿到初步掃描與發現報告，退費前先看到實際價值。寄信給 billing@panguard.ai 就好。'
                   : 'Through Day 7, full refund for any reason — and you already have your Day-3 initial scan and findings report in hand, so you see real value before the window closes. Email billing@panguard.ai, no explanation needed.'
               }
             />

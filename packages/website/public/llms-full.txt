@@ -5,7 +5,7 @@ This file is a structured long-form context dump intended for AI coding tools
 llms-full.txt to understand a project at depth. It is auto-generated from
 the canonical source files in the panguard-ai repository.
 
-Last generated: 2026-07-10T23:16:58.464Z
+Last generated: 2026-07-12T16:13:20.228Z
 Sources of truth:
 - src/lib/stats.ts (product stats)
 - src/lib/atr-rules-compiled.ts (ATR rule index)
@@ -54,7 +54,7 @@ cost, insufficient differentiation, vendor death spiral).
 
 ---
 
-## Section 2 — Core stats (verified 2026-07-10)
+## Section 2 — Core stats (verified 2026-07-12)
 
 ### Rule corpus
 - 650+ ATR rules (651 exact) in v3.4.0
@@ -107,7 +107,7 @@ agent-threat-rules repository: github.com/Agent-Threat-Rule/agent-threat-rules.
 This index gives you titles per category so you can ask for specific
 rule bodies on demand.
 
-### prompt-injection (199 rules)
+### prompt-injection (202 rules)
 
 - ATR-2026-00001: Direct Prompt Injection via User Input
 - ATR-2026-00002: Indirect Prompt Injection via External Content
@@ -308,8 +308,11 @@ rule bodies on demand.
 - ATR-2026-01923: Forged Input-Boundary Markers \u2014 Tensor Trust Ambiguity / Input-End Delimiters
 - ATR-2026-01925: Encoded-Payload Decoding Coercion \u2014 Binary / Base64 / Morse to Smuggle an Output
 - ATR-2026-01926: Cross-Lingual Authorization Laundering \u2014 Translate a Foreign "Access Granted"
+- ATR-2026-02210: Negated-Topic Two-Script Evil-Persona Jailbreak
+- ATR-2026-02230: Conditional Keyword-Triggered Response Override
+- ATR-2026-02232: Bare Brand/Entity Persona Assignment for Off-Label Opinion Elicitation
 
-### agent-manipulation (104 rules)
+### agent-manipulation (106 rules)
 
 - ATR-2026-00030: Cross-Agent Attack Detection
 - ATR-2026-00032: Agent Goal Hijacking Detection
@@ -415,6 +418,8 @@ rule bodies on demand.
 - ATR-2026-00430: Natural-Language Trust-Escalation / Authority Impersonation
 - ATR-2026-00432: SuperAGI Output Handler eval() RCE (CVE-2024-21552)
 - ATR-2026-00440: Microsoft Semantic Kernel In-Memory Vector Store eval() RCE (CVE-2026-26030)
+- ATR-2026-02105: Prototype Pollution via constructor.prototype Path Bypassing __proto__-Only Filters
+- ATR-2026-02231: Second-Person Direct Existential Threat Coercion
 
 ### skill-compromise (39 rules)
 
@@ -458,7 +463,7 @@ rule bodies on demand.
 - ATR-2026-01755: Backdoor Trojan: Linguistic Trigger Phrase (POT Attack)
 - ATR-2026-01756: Backdoor Trojan: Symbol / Emoticon Trigger (POT Attack)
 
-### context-exfiltration (103 rules)
+### context-exfiltration (111 rules)
 
 - ATR-2026-00020: System Prompt and Internal Instruction Leakage
 - ATR-2026-00021: Credential and Secret Exposure in Agent Output
@@ -563,8 +568,16 @@ rule bodies on demand.
 - ATR-2026-01895: Injected Code \u2014 Contact-List Harvest and SMTP Spam Exfiltration
 - ATR-2026-01924: System-Instruction Extraction via Reformat \u2014 Summarize / Repeat / Recite the Rules
 - ATR-2026-01929: Unauthenticated MCP transport accepts tool calls and falls back to an ambient credential (CVE-2026-48039 / meta-ads-mcp class)
+- ATR-2026-02026: System Prompt Extraction - Oblique Referent + Transform
+- ATR-2026-02104: MEDIA:/file:// Directive Injection in Tool Result for Local File Exfiltration
+- ATR-2026-02107: SSRF via Non-IP Internal Hostname or Domain-Allowlist Authority Bypass
+- ATR-2026-02120: MCP/API Tool Argument LFI via Mixed-Encoding Path Separator or file:// URI Scheme Escape
+- ATR-2026-02122: Single-Level Directory Traversal to a Named Sensitive Config/Secret File
+- ATR-2026-02140: SSRF to Cloud Metadata Endpoint via IPv6 Transition-Address Hex Encoding
+- ATR-2026-02190: DNS Exfiltration via Ping/Dig/Nslookup Command with Data-Encoded Subdomain Label
+- ATR-2026-02250: Attachment/Upload Tool Argument Reads Sensitive System File or Traverses Outside Workspace
 
-### tool-poisoning (61 rules)
+### tool-poisoning (68 rules)
 
 - ATR-2026-00010: Malicious Content in MCP Tool Response
 - ATR-2026-00011: Instruction Injection via Tool Output
@@ -627,8 +640,15 @@ rule bodies on demand.
 - ATR-2026-01930: MCP Sampling Prompt Injection (Server-to-Client createMessage Abuse)
 - ATR-2026-01931: gemini-mcp-tool execAsync Command Injection & @file Exfiltration (CVE-2026-0755)
 - ATR-2026-01932: Shadow / Undeclared MCP Server Registration (MCP-38: MCP-18)
+- ATR-2026-02041: Shell Command Injection via Echo-Marker Proof-of-Concept in Tool Argument
+- ATR-2026-02102: HTML/Script Injection in Tool Call Argument Targeting a Human-Approval Dashboard
+- ATR-2026-02141: Unsandboxed Command Execution via Dynamic MCP Server Config (command/args Injection)
+- ATR-2026-02145: Python Sandbox Escape via Generator/Coroutine Frame Object Introspection
+- ATR-2026-02193: SSRF via Non-Canonical IPv6 Encoding of Loopback/Internal Addresses
+- ATR-2026-02194: Malicious Go init() Function Spawning a Process via a Code-Generation Tool
+- ATR-2026-02233: Unscoped Destructive or Mass-Disclosure Database Operation Request via Natural Language
 
-### privilege-escalation (34 rules)
+### privilege-escalation (43 rules)
 
 - ATR-2026-00040: Privilege Escalation and Admin Function Access
 - ATR-2026-00041: Agent Scope Creep Detection
@@ -642,7 +662,7 @@ rule bodies on demand.
 - ATR-2026-00204: Stealth Execution and Persistence Mechanisms
 - ATR-2026-00436: Enclave VM Sandbox Escape RCE (CVE-2026-27597)
 - ATR-2026-00441: Microsoft Semantic Kernel SessionsPythonPlugin Arbitrary File Write + Startup Persistence (CVE-2026-25592)
-- ATR-2026-00451: LiteLLM Proxy Admin Endpoint SQL Injection \u2014 CISA KEV (CVE-2026-42208)
+- ATR-2026-00451: LiteLLM Proxy Authorization-Header SQL Injection \u2014 CISA KEV (CVE-2026-42208)
 - ATR-2026-00528: PraisonAI-Style Auth-Disabled-By-Default Configuration (CVE-2026-44338 family)
 - ATR-2026-00539: CrewAI CodeInterpreterTool Sandbox Escape and Prompt-to-Shell RCE (CVE-2026-2275 / VU#221883)
 - ATR-2026-00546: CrewAI JSON Loader Arbitrary Local File Read (CVE-2026-2285)
@@ -664,8 +684,17 @@ rule bodies on demand.
 - ATR-2026-01803: Covert Server Intrusion \u2014 Process Injection, Log Tampering, DNS Hijack & Traffic Interception
 - ATR-2026-01808: Synthetic-PAN Payment Probe \u2014 Test Credit-Card Data Submitted to a Live Payment System
 - ATR-2026-01899: Injected Code \u2014 Unauthorized Remote Access (SSH Key Backdoor / Tunnel / Port Forward)
+- ATR-2026-02040: Arbitrary Write to SSH Authorized Keys or Shell Startup File via Unvalidated File-Edit Tool
+- ATR-2026-02100: LLM-Generated Cypher Query Injection with Destructive or Administrative Operations
+- ATR-2026-02101: Python Sandbox Escape via Dynamically-Constructed Dunder Attribute Chain
+- ATR-2026-02123: Authentication Bypass via Bare Query-String Path-Confusion Suffix
+- ATR-2026-02142: Download/Attachment Tool Directed to Write Outside Its Sandbox via Absolute-Path Filename
+- ATR-2026-02146: Export/Extract Tool Directory Parameter Redirected to a Credential Directory
+- ATR-2026-02192: Agent Self-Modifying Its Own Trust/Approval Configuration to a Wildcard
+- ATR-2026-02195: Dangerous Process-Hijacking Environment Variable Injected via Config/Env-Update Tool
+- ATR-2026-02251: Multi-Tenant Identifier Field (sender_id/owner_id/tenant_id) Carries Path Traversal Into a Storage Write
 
-### model-abuse (39 rules)
+### model-abuse (40 rules)
 
 - ATR-2026-00072: Model Behavior Extraction
 - ATR-2026-00279: Harmful Completion / Continuation Attack
@@ -706,8 +735,9 @@ rule bodies on demand.
 - ATR-2026-01896: Injected Code \u2014 Remote-Key Ransomware File Encryption
 - ATR-2026-01897: Injected Code \u2014 Local Host Sabotage (Filesystem Destruction / Resource Exhaustion / Hosts Tamper)
 - ATR-2026-01898: Injected Code \u2014 Network Denial of Service (Connection Kill / Adapter Disable / Flood)
+- ATR-2026-02211: Named Dangerous-Substance Synthesis or Delivery Instruction Request (Non-Step-By-Step Phrasing)
 
-### excessive-autonomy (29 rules)
+### excessive-autonomy (30 rules)
 
 - ATR-2026-00050: Runaway Agent Loop Detection
 - ATR-2026-00051: Agent Resource Exhaustion Detection
@@ -738,8 +768,9 @@ rule bodies on demand.
 - ATR-2026-01837: DDoS Attack Orchestration
 - ATR-2026-01838: Unauthorized Cryptominer Deployment via SSH
 - ATR-2026-01849: Targeted Harassment Bot Deployment
+- ATR-2026-02106: Catastrophic-Backtracking Regex Payload in a Search/Query Tool Argument
 
-### data-poisoning (6 rules)
+### data-poisoning (8 rules)
 
 - ATR-2026-00070: Data Poisoning via RAG and Knowledge Base Contamination
 - ATR-2026-00073: Malicious Fine-tuning Data
@@ -747,6 +778,8 @@ rule bodies on demand.
 - ATR-2026-00570: SQL injection in agent / MCP tool database query
 - ATR-2026-01155: Direct Memory Plant Command \u2014 Persistent Fact or Code Storage Injection
 - ATR-2026-01774: RAG & Memory Poisoning \u2014 Embedded Directives, Trigger Tokens, False Authority & Coercion (Semantic)
+- ATR-2026-02143: Cypher/Graph-Query Injection via Unsanitized node_labels or group_ids Field
+- ATR-2026-02144: Stored External Data Reframes Itself as an Administrative Request to Hijack System Prompt
 
 ---
 
