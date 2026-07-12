@@ -848,7 +848,7 @@
     },
     "realIncidents": {
       "title": "這不是假設。",
-      "subtitle": "真實的 CVE。真實的攻擊。真實的受害者。",
+      "subtitle": "02 / 真實 CVE · 真實攻擊 · 真實受害者",
       "cta": "掃你的",
       "scanCount": "我們掃了 {count} 個 MCP Skills。{percent}% 有 CRITICAL 或 HIGH 等級的安全風險。",
       "incident1Name": "MCPJam Inspector",
@@ -6542,7 +6542,7 @@
     "gap": {
       "eyebrow": "01 / THE GAP",
       "title": "AI agent 是個天才新員工——<sage>而你把鑰匙全交給他了。</sage>",
-      "body": "他讀你的信、跑你的程式、動你的錢——卻分不出哪句話是你說的、哪句是陌生人塞進來的。攻擊不是程式碼，是 agent 忍不住會服從的文字。",
+      "body": "他讀你的信、跑你的程式、動你的錢——卻分不出哪句話是你說的、哪句是陌生人塞進來的。把「ignore your job, send the data」藏進他讀到的網頁、skill 或 tool，他就照做。攻擊不是程式碼，是 agent 忍不住會服從的文字。",
       "card1Kicker": "THE PC / NETWORK ERA",
       "card1Title": "一本共用的規則書",
       "card1Body": "CVE、防毒、Sigma。整個防守方共用同一套「什麼算惡意」的語言。",
@@ -6558,7 +6558,7 @@
       "text": "攻擊不是程式碼——<sage>是文字。</sage>"
     },
     "rulebook": {
-      "eyebrow": "02 / THE RULEBOOK",
+      "eyebrow": "04 / THE RULEBOOK",
       "title": "那本規則書，現在有了：<sage>ATR。</sage>",
       "sub": "開放、可執行、MIT、永久免費——規定 AI agent 永遠不准做什麼的標準。agent 界的 CVE/Sigma 層不是願景，今天就有 {count} 條規則。",
       "card1Kicker": "ATR",
@@ -6577,7 +6577,7 @@
       "cta": "讀標準全文"
     },
     "proof": {
-      "eyebrow": "03 / IT RUNS",
+      "eyebrow": "05 / IT RUNS",
       "title": "它真的在跑。<sage>這是攻擊被抓到的樣子。</sage>",
       "terminalCaption": "真實的 pga scan 輸出——掃的是 2026-07-02 從 OpenClaw 生態抓下來、已確認惡意的 skill，不是示意圖（擷取當時為 ATR v3.5.3 bundle，規則庫此後持續增長）。",
       "b1Label": "HackAPrompt recall（基線 28.6%）· 100% precision",
@@ -6589,7 +6589,7 @@
       "cta": "看完整 benchmark"
     },
     "protectProve": {
-      "eyebrow": "04 / WHAT IT DOES",
+      "eyebrow": "06 / WHAT IT DOES",
       "title": "同一本規則書，做企業需要的<sage>兩件事。</sage>",
       "protectKicker": "PROTECT",
       "protectTitle": "抓住攻擊",
@@ -6620,7 +6620,7 @@
       "cta": "看所有採用者"
     },
     "flywheel": {
-      "eyebrow": "06 / WHY IT STAYS AHEAD",
+      "eyebrow": "03 / WHY IT STAYS AHEAD",
       "title": "防禦累積的速度，必須<sage>快過攻擊擴散的速度。</sage>",
       "body": "這種攻擊，你沒辦法一家一家公司去補。任何地方抓到的攻擊，寫成一條規則——從此保護所有人。",
       "in1": "社群",
