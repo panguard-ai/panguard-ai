@@ -315,7 +315,7 @@ async function checkGuardEngine(): Promise<CheckResult> {
       status: 'fail',
       label: 'Guard engine',
       detail: `Daemon running (PID ${pid}) but 0 detection rules loaded — protection is NOT active`,
-      fix: 'Reinstall @panguard-ai/atr or run "pga upgrade"',
+      fix: 'Run "pga upgrade" to reinstall the bundled detection rules (agent-threat-rules)',
     };
   }
 

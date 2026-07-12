@@ -41,7 +41,7 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "agent-threat-rules": "^3.5.6"
+    "agent-threat-rules": "^3.5.8"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

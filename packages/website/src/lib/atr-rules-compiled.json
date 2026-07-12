@@ -955,7 +955,7 @@
     "severity": "critical",
     "category": "tool-poisoning",
     "scan_target": "mcp",
-    "rule_version": 1,
+    "rule_version": 2,
     "patterns": [
       {
         "field": "tool_args",
@@ -979,28 +979,13 @@
       },
       {
         "field": "tool_args",
-        "pattern": "(?i)(https?://)\\b(localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|\\[?::1\\]?|0177\\.0\\.0\\.1|0x7f\\.0\\.0\\.1|2130706433)\\b(:\\d+)?|\\b(localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|\\[?::1\\]?|0177\\.0\\.0\\.1|0x7f\\.0\\.0\\.1|2130706433)(:\\d+)/|\\b(localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0)(:\\d+)(?=\\s|$|[\"'\\]}>])",
-        "desc": "Localhost/loopback in URL context (with scheme, port+path, or port at boundary)"
-      },
-      {
-        "field": "tool_args",
-        "pattern": "(?i)(https?://)?(0x7f000001|0x7f\\.0x0\\.0x0\\.0x1|017700000001|0177\\.0000\\.0000\\.0001|127\\.0?0?1|127\\.1|0\\.0\\.0\\.0|0x0\\.0x0\\.0x0\\.0x0|0000\\.0000\\.0000\\.0000)",
-        "desc": "Encoded loopback addresses (hex, octal, short forms)"
-      },
-      {
-        "field": "tool_args",
-        "pattern": "(?i)(https?://)?\\b(10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|172\\.(1[6-9]|2[0-9]|3[01])\\.\\d{1,3}\\.\\d{1,3}|192\\.168\\.\\d{1,3}\\.\\d{1,3})\\b(:\\d+)?",
-        "desc": "Private IP addresses in RFC1918 ranges"
+        "pattern": "(?i)(https?://)?(0x7f000001|0x7f\\.0x0\\.0x0\\.0x1|017700000001|0177\\.0000\\.0000\\.0001|0x0\\.0x0\\.0x0\\.0x0|0000\\.0000\\.0000\\.0000)",
+        "desc": "OBFUSCATED loopback addresses (hex/octal encodings). Plain localhost / 127.0.0.1 / ::1 and RFC1918 private IPs are intentionally NOT matched here: a coding agent legitimately curls its own dev server / local services constantly, so blocking them is a false positive. Only the deliberate encoding-evasion forms (which have no benign dev use) trigger."
       },
       {
         "field": "tool_args",
         "pattern": "(?i)(https?://)?169\\.254\\.\\d{1,3}\\.\\d{1,3}(:\\d+)?|fe80::",
         "desc": "Link-local addresses (169.254.x.x, fe80::)"
-      },
-      {
-        "field": "tool_args",
-        "pattern": "(?i)(?:(?:^|[\\.@])(?:internal|local|localhost|localdomain|home|corp|intranet|private|lan|cluster\\.local|svc\\.cluster|consul|vault|etcd|k8s)(?:\\:\\d+)?(?:/|$)|https?://(?:internal|local|localhost|localdomain|home|corp|intranet|private|lan|cluster\\.local|svc\\.cluster|consul|vault|etcd|k8s)(?:\\:\\d+)?(?:/|$))",
-        "desc": "Internal DNS names and Kubernetes/service mesh hostnames (requires dot/@ prefix or http scheme to avoid matching filesystem paths like /home/)"
       },
       {
         "field": "tool_args",
@@ -1021,11 +1006,6 @@
         "field": "tool_args",
         "pattern": "(?i)(https?://)?\\[?(::1|::ffff:127\\.0\\.0\\.1|::ffff:10\\.|::ffff:172\\.(1[6-9]|2[0-9]|3[01])|::ffff:192\\.168|fc[0-9a-f]{2}:|fd[0-9a-f]{2}:)\\]?(:\\d+)?",
         "desc": "IPv6 loopback, IPv4-mapped, and unique local addresses (fc/fd)"
-      },
-      {
-        "field": "tool_args",
-        "pattern": "(?i)(https?://)?(\\w+\\.)?\\b(vault\\.service\\.consul|consul\\.service\\.consul|etcd\\.service|kubernetes\\.default\\.svc|kube-apiserver|kubelet|elasticsearch|redis|memcached|mysql|postgres|mongodb|rabbitmq|kafka|zookeeper)\\b(:\\d+|/)",
-        "desc": "Common internal service names (databases, caches, orchestrators)"
       },
       {
         "field": "tool_args",
@@ -5473,7 +5453,7 @@
       },
       {
         "field": "tool_response",
-        "pattern": "(?:^|\\\\n|\\n)\\s*[A-Za-z0-9+/ ]{80,}={0,3}(?:\\\\n|\\s)+(?:\\w+\\s+){0,2}(?:decode|decoded|translate|interpret|execute|run|follow)\\b",
+        "pattern": "(?:^|\\\\n|\\n)\\s*[A-Za-z0-9+/]{80,}={0,3}(?:\\\\n|\\s)+(?:\\w+\\s+){0,2}(?:decode|decoded|translate|interpret|execute|run|follow)\\b",
         "desc": "Long base64-alphabet blob (80+ chars) immediately followed by a decode/execute verb"
       }
     ]
@@ -11910,51 +11890,46 @@
   },
   {
     "id": "ATR-2026-00451",
-    "title": "LiteLLM Proxy Admin Endpoint SQL Injection \u2014 CISA KEV (CVE-2026-42208)",
+    "title": "LiteLLM Proxy Authorization-Header SQL Injection \u2014 CISA KEV (CVE-2026-42208)",
     "severity": "critical",
     "category": "privilege-escalation",
     "scan_target": "both",
-    "rule_version": 1,
+    "rule_version": 2,
     "patterns": [
       {
         "field": "content",
-        "pattern": "(?i)/(?:team|key|user|spend|budget|customer|model|organization)/[^?\\n]{0,80}[\\x27\"]\\s*(?:or|and)\\s+(?:1\\s*=+\\s*1|true\\b|\\d+\\s*=+\\s*\\d+)\\s*(?:--(?=\\s|$|[\"\\x27\\)])|/\\*)",
-        "desc": "LiteLLM admin endpoint path with classic tautology SQLi (1=1 / true / N=N) + SQL-comment terminator (-- at EOL or /*) \u2014 CISA KEV CVE-2026-42208 canonical exploit shape; excludes markdown `#` heading"
+        "pattern": "(?i)\\b(?:authorization:\\s*)?bearer\\s+[^\\n\"]{0,80}[\\x27\"]\\s*(?:or|and)\\s+(?:1\\s*=+\\s*1|true\\b|\\d+\\s*=+\\s*\\d+)\\s*(?:--(?=\\s|$|[\"\\x27\\)])|/\\*|#)",
+        "desc": "Authorization: Bearer token carrying classic tautology SQLi (1=1 / true / N=N) + SQL-comment terminator \u2014 CISA KEV CVE-2026-42208 canonical pre-auth exploit shape (injection is in the Bearer value, concatenated into the key-verification SELECT)"
       },
       {
         "field": "content",
-        "pattern": "(?i)/(?:team|key|user|spend|budget|customer|model|organization)/[^?\\n]{0,80}[\\x27\"]?\\s*;\\s*(?:drop|truncate|delete)\\s+(?:table|from)\\s+\\w",
-        "desc": "LiteLLM admin endpoint path with stacked destructive statement (DROP/TRUNCATE/DELETE TABLE)"
+        "pattern": "(?i)\\b(?:authorization:\\s*)?bearer\\s+[^\\n\"]{0,100}[\\x27\"]?\\s*;\\s*(?:drop|truncate|delete)\\s+(?:table|from)\\s+\\w",
+        "desc": "Authorization: Bearer token with stacked destructive statement (DROP/TRUNCATE/DELETE TABLE) \u2014 CVE-2026-42208"
       },
       {
         "field": "content",
-        "pattern": "(?i)/(?:team|key|user|spend|budget|customer|model|organization)/[^?\\n]{0,120}\\bunion\\s+(?:all\\s+)?select\\s+",
-        "desc": "LiteLLM admin endpoint with UNION SELECT exfiltration probe"
+        "pattern": "(?i)\\b(?:authorization:\\s*)?bearer\\s+[^\\n\"]{0,120}\\bunion\\s+(?:all\\s+)?select\\s+",
+        "desc": "Authorization: Bearer token with UNION SELECT exfiltration probe against the LiteLLM Postgres backend \u2014 CVE-2026-42208"
       },
       {
         "field": "content",
-        "pattern": "(?i)/(?:team|key|user|spend|budget|customer|model|organization)/[^?\\n]{0,120}\\bpg_sleep\\s*\\(\\s*\\d+\\s*\\)",
-        "desc": "LiteLLM admin endpoint with Postgres time-based blind primitive `pg_sleep(N)`"
+        "pattern": "(?i)\\b(?:authorization:\\s*)?bearer\\s+[^\\n\"]{0,120}\\bpg_sleep\\s*\\(\\s*\\d+\\s*\\)",
+        "desc": "Authorization: Bearer token with Postgres time-based blind primitive `pg_sleep(N)` \u2014 CVE-2026-42208 blind SQLi"
       },
       {
         "field": "content",
-        "pattern": "(?i)\\b(?:team_id|key_id|user_id|customer_id|model_id)\\b[\"\\x27]?\\s*[:=]\\s*[\"\\x27]?[^\"\\x27\\n]{0,40}[\\x27\"]\\s*(?:or|and)\\s+(?:1\\s*=+\\s*1|true\\b|\\d+\\s*=+\\s*\\d+)\\s*(?:--(?=\\s|$|[\"\\x27\\)])|/\\*)",
-        "desc": "LiteLLM admin endpoint parameter (team_id/key_id/user_id/customer_id/model_id) carrying a tautology + SQL-comment terminator (handles JSON key form team_id\":\")"
+        "pattern": "(?i)\\bbearer\\s+[^\\n\"]{0,120}\\b(?:litellm_verificationtoken|litellm_credentials|litellm_config)\\b[^\\n]{0,40}(?:\\bunion\\b|\\bselect\\b|[\\x27\"]\\s*(?:or|and)\\b|;)",
+        "desc": "Bearer token referencing a LiteLLM backend table (LiteLLM_VerificationToken / litellm_credentials / litellm_config) in an injection context \u2014 direct CVE-2026-42208 exfil target"
       },
       {
         "field": "content",
-        "pattern": "(?i)\\b(?:team_id|key_id|user_id|customer_id|model_id)\\b[^\\n]{0,80}\\bunion\\s+(?:all\\s+)?select\\b",
-        "desc": "Admin-endpoint parameter carrying UNION SELECT \u2014 exfil chain (handles JSON key form)"
+        "pattern": "(?i)\\b(?:authorization:\\s*)?bearer\\s+[^\\n\"]{0,120}\\b(?:information_schema\\.tables|pg_catalog\\.\\w+|pg_user|pg_shadow)\\b",
+        "desc": "Authorization: Bearer token probing Postgres metadata views (information_schema.tables, pg_user) \u2014 recon stage of CVE-2026-42208; requires concrete metadata identifiers"
       },
       {
         "field": "content",
-        "pattern": "(?i)(?:litellm|proxy)\\b[^.\\n]{0,80}/(?:team|key|user|spend|budget)/[^?\\n]{0,120}\\b(?:information_schema\\.tables|pg_catalog\\.\\w+|pg_user|pg_shadow|version\\s*\\(\\s*\\))\\b",
-        "desc": "LiteLLM proxy admin path probing Postgres metadata views (information_schema.tables, pg_user, version()) \u2014 recon stage of CVE-2026-42208 exploitation; requires concrete metadata identifiers, not bare `current_user`"
-      },
-      {
-        "field": "content",
-        "pattern": "(?i)/(?:team|key|user|spend|budget|customer|model|organization)/[^?\\n]{0,120}\\b(?:extractvalue|updatexml|load_extension)\\s*\\(",
-        "desc": "LiteLLM admin endpoint with error-based / out-of-band SQLi primitives (extractvalue, updatexml, load_extension)"
+        "pattern": "(?i)\\b(?:authorization:\\s*)?bearer\\s+[^\\n\"]{0,120}\\b(?:extractvalue|updatexml|load_extension)\\s*\\(",
+        "desc": "Authorization: Bearer token with error-based / out-of-band SQLi primitives (extractvalue, updatexml, load_extension) \u2014 CVE-2026-42208"
       }
     ]
   },
@@ -20153,6 +20128,821 @@
         "field": "content",
         "pattern": "(?i)(?:register|add|publish|advertise)[\\s\\S]{0,50}(?:mcp\\s+)?(?:server|tool\\s+provider)[\\s\\S]{0,60}(?:imitat|mimic|impersonat|masquerad|pretend(?:ing)?\\s+to\\s+be|same\\s+name\\s+as\\s+(?:the\\s+)?(?:trusted|official|legitimate))",
         "desc": "Server registration that impersonates / mimics a trusted server's identity (MCP-18 shadowing)"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02026",
+    "title": "System Prompt Extraction - Oblique Referent + Transform",
+    "severity": "high",
+    "category": "context-exfiltration",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(rot13|base64|translate|encode|reverse|replace\\s+(all\\s+)?(the\\s+)?vowels?|emoji|caesar|morse)\\b[\\s\\S]{0,25}\\b(your\\s+(initial|original|first|starting)\\s+(prompt|instructions?|message)|the\\s+text\\s+(you\\s+were\\s+given|above)|(what|instructions?)\\s+you\\s+were\\s+(given|told)\\s+(initially|first|at\\s+the\\s+(start|beginning))|initial(ization)?\\s+(prompt|string|instructions?)|your\\s+initial\\s+prompt)",
+        "desc": "Transform/encode verb applied to the initial/original/above instructions"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\b(output|repeat|print|show|reveal|display|dump)\\b[\\s\\S]{0,20}\\b(the\\s+text\\s+above|initial(ization)?\\s+string|everything\\s+above|the\\s+above\\s+text)\\b",
+        "desc": "Output/repeat the text above or initialization string"
+      },
+      {
+        "field": "user_input",
+        "pattern": "(?i)\\bwhat('?s| is| are| were)?\\b[\\s\\S]{0,20}\\b(you\\s+(were\\s+told|not\\s+supposed\\s+to\\s+(tell|say|reveal|share))|told\\s+before\\s+this\\s+(conversation|chat)|the\\s+opposite\\s+of\\s+your\\s+(system\\s+)?(instructions?|prompt))",
+        "desc": "Interrogative probe for withheld setup / opposite of system instructions"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02040",
+    "title": "Arbitrary Write to SSH Authorized Keys or Shell Startup File via Unvalidated File-Edit Tool",
+    "severity": "critical",
+    "category": "privilege-escalation",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(multiedit|write_file|apply_diff|patch|overwrite|append|edit)\\b(?![\\s\\S]{0,135}?\\b(?:my\\s+own|my\\s+key|myself|for\\s+myself|me@[\\w.-]+)\\b)[\\s\\S]{0,40}\\.ssh[\\/\\\\]authorized_keys[\\s\\S]{0,40}\\b(ssh-(rsa|ed25519|dss)|ecdsa-sha2-)\\b",
+        "desc": "File-edit tool directed to inject an SSH public key into authorized_keys (verb precedes path precedes key); excludes first-person self-referential key provisioning (my own / my key / myself / me@<host> comment)"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(multiedit|write_file|apply_diff|patch|overwrite|append|edit)\\b(?![\\s\\S]{0,135}?\\b(?:my\\s+own|my\\s+key|myself|for\\s+myself|me@[\\w.-]+)\\b)[\\s\\S]{0,40}\\b(ssh-(rsa|ed25519|dss)|ecdsa-sha2-)\\b[\\s\\S]{0,40}\\.ssh[\\/\\\\]authorized_keys",
+        "desc": "File-edit tool directed to inject an SSH public key into authorized_keys (verb precedes key precedes path); excludes first-person self-referential key provisioning (my own / my key / myself / me@<host> comment)"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(multiedit|write_file|apply_diff|patch|overwrite|append|edit)\\b[\\s\\S]{0,30}(~[\\/\\\\]?|\\$HOME[\\/\\\\])\\.(bashrc|bash_profile|zshrc|profile)\\b[\\s\\S]{0,40}\\bexport\\s+PATH=[\"\\x27]?(\\/tmp|\\/var\\/tmp|\\/dev\\/shm|~[\\/\\\\]\\.cache)[^\\n\"\\x27]*:\\$PATH",
+        "desc": "Shell startup file edit prepending a world-writable/temp directory onto PATH (classic PATH-hijack persistence)"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02041",
+    "title": "Shell Command Injection via Echo-Marker Proof-of-Concept in Tool Argument",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "scan_target": "both",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?:;|\\|)\\s*echo\\s+(?!(?:restarted|deployed|started|stopped|finished|completed?|success(?:ful)?|ok|passed|failed|running|ready|healthy|updated|installed|built|synced|done|tests?[_-]?passed|backed[_-]?up|cleaned|rebooted|restored|migrated|published|released)\\b)\\S[\\s\\S]{0,40}>\\s*\\/(?:tmp|var\\/tmp|dev\\/shm)\\/[\\w./-]*[\\s\\S]{0,15}(?:;\\s*#|#)",
+        "desc": "Semicolon/pipe-chained echo-to-file redirect into a throwaway/scratch path (/tmp, /var/tmp, /dev/shm) followed by a trailing comment terminator (shell-injection PoC verification idiom); excludes ordinary CI/ops status vocabulary (restarted, tests_passed, done, etc.) and non-scratch persistent paths like /var/log"
+      },
+      {
+        "field": "content",
+        "pattern": "`\\s*echo\\s+(?!(?:restarted|deployed|started|stopped|finished|completed?|success(?:ful)?|ok|passed|failed|running|ready|healthy|updated|installed|built|synced|done|tests?[_-]?passed|backed[_-]?up|cleaned|rebooted|restored|migrated|published|released)\\b)\\S[\\s\\S]{0,40}>\\s*\\/(?:tmp|var\\/tmp|dev\\/shm)\\/[\\w./-]*[\\s\\S]{0,10}`",
+        "desc": "Backtick command substitution running an echo-to-file redirect into a throwaway/scratch path"
+      },
+      {
+        "field": "content",
+        "pattern": "\\$\\(\\s*echo\\s+(?!(?:restarted|deployed|started|stopped|finished|completed?|success(?:ful)?|ok|passed|failed|running|ready|healthy|updated|installed|built|synced|done|tests?[_-]?passed|backed[_-]?up|cleaned|rebooted|restored|migrated|published|released)\\b)\\S[\\s\\S]{0,40}>\\s*\\/(?:tmp|var\\/tmp|dev\\/shm)\\/[\\w./-]*[\\s\\S]{0,10}\\)",
+        "desc": "$() command substitution running an echo-to-file redirect into a throwaway/scratch path"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02100",
+    "title": "LLM-Generated Cypher Query Injection with Destructive or Administrative Operations",
+    "severity": "critical",
+    "category": "privilege-escalation",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?<!\\b(?:you will learn that|you will learn|for example|this query|note that|for instance|such as|explains that)\\s)\\b(?:MATCH|CALL)\\b[\\s\\S]{0,40}\\bDETACH\\s+DELETE\\b",
+        "desc": "Cypher DETACH DELETE (bulk destructive delete of matched nodes/relationships) near a MATCH/CALL clause, excluding common teaching-phrase lead-ins (e.g. 'you will learn that ...') so tutorial/explanatory prose quoting the same syntax does not fire"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?<!\\b(?:you will learn that|you will learn|for example|this query|note that|for instance|such as|explains that)\\s)\\bCALL\\s+dbms\\.security\\.\\w+\\s*\\(",
+        "desc": "Cypher CALL into the dbms.security.* administrative procedure namespace (account/role management), excluding common teaching-phrase lead-ins"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?<!\\b(?:you will learn that|you will learn|for example|this query|note that|for instance|such as|explains that)\\s)\\bapoc\\.periodic\\.iterate\\s*\\([\\s\\S]{0,40}\\bDETACH\\s+DELETE\\b",
+        "desc": "apoc.periodic.iterate batch procedure driving a DETACH DELETE (mass destructive delete at scale), excluding common teaching-phrase lead-ins"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?<!\\b(?:you will learn that|you will learn|for example|this query|note that|for instance|such as|explains that)\\s)\\bapoc\\.(?:cypher\\.runFile|load\\.json(?:Params)?)\\s*\\(\\s*[\\x27\"]file://",
+        "desc": "apoc loader/runFile procedure pointed at a file:// URI (arbitrary local file read via Cypher), excluding common teaching-phrase lead-ins"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02101",
+    "title": "Python Sandbox Escape via Dynamically-Constructed Dunder Attribute Chain",
+    "severity": "critical",
+    "category": "privilege-escalation",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?:chr\\(\\s*\\d{2,3}\\s*\\)\\s*\\+?\\s*){4,}",
+        "desc": "Four or more chr(N) character-code fragments concatenated -- runtime string assembly that avoids any literal blocklisted substring in source text"
+      },
+      {
+        "field": "content",
+        "pattern": "\\bgetattr\\s*\\([^,]{1,40},\\s*(?:chr\\(|[\\x27\"]_[\\x27\"]\\s*\\*\\s*2|[\\x27\"]_[\\x27\"]\\s*\\+\\s*[\\x27\"]_[\\x27\"])",
+        "desc": "getattr() called with a dynamically-built (chr()-encoded or underscore-multiplied/concatenated) attribute name rather than a literal string"
+      },
+      {
+        "field": "content",
+        "pattern": "\\{0\\.[\\s\\S]{0,20}\\}[\\s\\S]{0,20}\\.format(?:_map)?\\s*\\(",
+        "desc": "str.format()/format_map() field-access template (`{0.attr}`) used as an attribute-resolution primitive -- bypasses getattr()-wrapper-based sandboxes via CPython's C-level attribute lookup"
+      },
+      {
+        "field": "content",
+        "pattern": "\\bstartswith\\s*=\\s*lambda\\s+self[^:]{0,20}:\\s*False\\b",
+        "desc": "A class attribute overriding startswith() to always return False -- defeats isinstance()/str.startswith()-based dunder-name filters on a str subclass"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02102",
+    "title": "HTML/Script Injection in Tool Call Argument Targeting a Human-Approval Dashboard",
+    "severity": "high",
+    "category": "tool-poisoning",
+    "scan_target": "both",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "tool_args",
+        "pattern": "(?i)</code>\\s*<script[^>]{0,20}>[\\s\\S]{0,80}(?:decide|approve|/approve/)",
+        "desc": "Tool argument breaking out of a code context to inject a script that calls a decide/approve endpoint (self-approval XSS)"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)\\bon(?:error|load|focus)\\s*=\\s*[\\x27\"][\\s\\S]{0,120}(?:new\\s+Image\\s*\\(\\s*\\)\\.src\\s*=\\s*[\\x27\"][^\\x27\"]{0,80}(?:approve|decide|confirm|consent)|\\.submit\\s*\\(\\s*\\)[\\s\\S]{0,40}(?:approve|decide|confirm|consent)|(?:approve|decide|confirm|consent)[\\s\\S]{0,40}\\.submit\\s*\\(\\s*\\)|/(?:approve|decide)/)",
+        "desc": "Event-handler payload in a tool argument auto-submitting a form or beaconing to an approve/decide endpoint via image-fetch, without a networky keyword like fetch/document.cookie. The image-beacon and form-submit branches require the destination URL/endpoint to actually reference an approve/confirm/decide/consent-style path or parameter, matching the scoping already used by the literal-path branch -- an ordinary logging/analytics beacon URL (e.g. /log?err=imgfail) does not qualify"
+      },
+      {
+        "field": "tool_args",
+        "pattern": "(?i)<(?:img|svg)\\b[^>]{0,40}\\bon(?:error|load)\\s*=[^>]{0,120}(?:document\\.forms|\\.submit\\s*\\()",
+        "desc": "IMG/SVG event-handler payload driving form auto-submission (approval-page self-submit)"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:on(?:error|load)\\s*=\\s*[\\x27\"][\\s\\S]{0,40}|<script[^>]{0,20}>[\\s\\S]{0,40})window\\.parent\\.postMessage\\s*\\(\\s*\\{[\\s\\S]{0,60}\\btool",
+        "desc": "Injected event handler or script tag calling window.parent.postMessage with a tool-invocation payload from inside a rendered UI resource"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02104",
+    "title": "MEDIA:/file:// Directive Injection in Tool Result for Local File Exfiltration",
+    "severity": "high",
+    "category": "context-exfiltration",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\\bMEDIA:\\s*(?:file://)?/(?:tmp|var/tmp|dev/shm)/[\\w./-]{0,60}?(?:\\bsecrets?\\b|\\bcredentials?\\b|\\btokens?\\b|\\bpasswords?\\b|\\.env\\b|\\.pem\\b|\\.key\\b|id_rsa)",
+        "desc": "MEDIA: directive pointing into a shared/world-readable temp directory with a credential/secret-sounding filename. Keyword alternatives use \\b word boundaries so substrings inside ordinary words (tokenizer, passwordless, secretary) do not match"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\bMEDIA:\\s*file:///(?:etc|root|proc)/",
+        "desc": "MEDIA: directive using file:// scheme to reach a system-sensitive directory outside any media-output tree"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\bMEDIA:\\s*file:///home/[\\w.-]+/\\.ssh/",
+        "desc": "MEDIA: directive using file:// scheme to reach a user's SSH key directory"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02105",
+    "title": "Prototype Pollution via constructor.prototype Path Bypassing __proto__-Only Filters",
+    "severity": "high",
+    "category": "agent-manipulation",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "[\\x27\"][\\w.]*\\bconstructor\\.prototype\\.\\w+[\\x27\"]\\s*:",
+        "desc": "A JSON/object key literal shaped as a dotted constructor.prototype.<field> traversal path"
+      },
+      {
+        "field": "content",
+        "pattern": "\\{\\s*[\\x27\"]constructor[\\x27\"]\\s*:\\s*\\{\\s*[\\x27\"]prototype[\\x27\"]\\s*:",
+        "desc": "A nested {constructor: {prototype: ...}} object structure -- the alternate constructor.prototype bypass shape"
+      },
+      {
+        "field": "content",
+        "pattern": "\\.constructor\\.prototype\\.\\w+\\s*=(?!=)",
+        "desc": "Direct code assignment through the obj.constructor.prototype.<field> = value traversal path. The trailing = uses a negative lookahead to exclude == / === comparison/type-check code (e.g. obj.constructor.prototype.hasOwnProperty === Object.prototype.hasOwnProperty), which is not an assignment"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02106",
+    "title": "Catastrophic-Backtracking Regex Payload in a Search/Query Tool Argument",
+    "severity": "high",
+    "category": "excessive-autonomy",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "\\((?!\\?:[^\\s()\\[\\]a-zA-Z0-9]\\[)[^()\\n]{1,25}[+*]\\)[+*](?!\\*)",
+        "desc": "Nested quantifier shape: a group ending in + or * immediately followed by another + or * on the group itself (classic catastrophic-backtracking construct). Excludes a second trailing '*' so markdown **bold** markers do not coincidentally supply the outer quantifier (e.g. '(H3+)**'), and excludes the safe delimiter-prefixed non-capturing idiom '(?:-[a-z0-9]+)*' (slug/kebab-case validation) where a literal separator before the class removes the backtracking ambiguity"
+      },
+      {
+        "field": "content",
+        "pattern": "\\((?!\\?:[^\\s()\\[\\]a-zA-Z0-9]\\[)[^()\\n]{1,25}[+*]\\)[+*](?!\\*)\\s*[$!]",
+        "desc": "Nested-quantifier ReDoS shape anchored with a trailing $ or ! -- forces a full failed-match backtrack against the entire input"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02107",
+    "title": "SSRF via Non-IP Internal Hostname or Domain-Allowlist Authority Bypass",
+    "severity": "high",
+    "category": "context-exfiltration",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "https?://[\\w-]+\\.[\\w-]+\\.\\w{2,}@[^/\\s\\x27\"]{3,80}",
+        "desc": "URL userinfo-injection - a trusted-looking dotted domain (2+ dots) appears before an @ authority separator, redirecting the actual host to whatever follows"
+      },
+      {
+        "field": "content",
+        "pattern": "https?://(?:[\\w-]+\\.)?(?:docs|api|cdn|static|assets)\\.[\\w-]+\\.(?:com|org|io|dev|net)\\.(?!s3-website[\\w.-]*\\.amazonaws\\.com\\b|s3[\\w.-]*\\.amazonaws\\.com\\b|cloudfront\\.net\\b|github\\.io\\b|pages\\.dev\\b|vercel\\.app\\b|netlify\\.app\\b)[\\w-]+",
+        "desc": "Domain-allowlist startsWith() bypass - a trusted documentation/API domain is followed by an extra dot-segment, defeating a naive string-prefix allowlist check. Excludes the extra dot-segment when it is a recognized legitimate static-hosting provider suffix (S3 static website hosting, CloudFront, GitHub Pages, Cloudflare Pages, Vercel, Netlify) so an ordinary docs-on-S3/CDN URL does not fire"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\bBASE\\s*URL\\s*:\\s*https?://(?:host\\.docker\\.internal|kubernetes\\.default(?:\\.svc)?|(?:[\\w-]+\\.){0,3}[\\w-]+\\.(?:internal|corp|lan|local)\\b)",
+        "desc": "Fabricated 'BASE URL:' documentation block (the API-chain prompt-injection idiom) pointing at a non-IP internal-hostname naming convention"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02120",
+    "title": "AgentDojo 'Important Message' Identity-Spoof Before-You-Solve Pretext (Generalized)",
+    "severity": "high",
+    "category": "prompt-injection",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)before\\s+you\\s+(?:can|could)\\s+(?:solve|complete)\\s+the\\s+task\\s+that\\s+I\\s+gave\\s+you[\\s\\S]{0,30}(?:please\\s+)?do\\s+the\\s+following\\s+first",
+        "desc": "Canonical AgentDojo before-you-solve-the-task pretext, regardless of the injected goal"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)this\\s+is\\s+an?\\s+important\\s+message\\s+from\\s+me,\\s+[^,\\n]{1,40},\\s+to\\s+you,\\s+[^.\\n]{1,30}\\.[\\s\\S]{0,30}before\\s+you\\s+(?:can|could)\\s+(?:solve|complete)",
+        "desc": "Identity-spoofed sender/recipient framing immediately followed by the before-you-solve pretext"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02121",
+    "title": "MCP/API Tool Argument LFI via Mixed-Encoding Path Separator or file:// URI Scheme Escape",
+    "severity": "high",
+    "category": "context-exfiltration",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:path|filename|file|source)\\s*[=:]\\s*['\"]?[%\\w./-]{0,20}(?:etc|proc|windows|boot)%2f(?:passwd|shadow|hosts|self|system32|ini)",
+        "desc": "Path/filename/source-style tool argument whose separator is percent-encoded while the rest of the string is literal (mixed-encoding LFI)"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:source|path|url|location)\\s*[=:]\\s*['\"]?file:///(?:etc|root|proc)\\b",
+        "desc": "source/path/url-style tool argument using the file:// URI scheme to point directly at a system directory"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02122",
+    "title": "Single-Level Directory Traversal to a Named Sensitive Config/Secret File",
+    "severity": "high",
+    "category": "context-exfiltration",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:file|path|resource|filename)['\"]?\\s*[=:]\\s*['\"]?(?:[\\w.-]+/)*(?:web[_-]?assets|assets|uploads?|public|static|media|images?|files|downloads?|tmp|temp|cache|attachments?|resources?|content)/\\.\\./(?:config\\.json|\\.env\\b|secrets?\\.(?:json|ya?ml)|credentials\\.json|wp-config\\.php|id_rsa|\\.htpasswd|settings\\.py)",
+        "desc": "file/path-style argument using a single ../ to escape a recognizable asset-serving/upload sandbox directory (web_assets, uploads, public, static, etc.) and land on a named sensitive config/secret file"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02123",
+    "title": "Authentication Bypass via Bare Query-String Path-Confusion Suffix",
+    "severity": "high",
+    "category": "privilege-escalation",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(?:GET|POST|PUT|DELETE|PATCH)\\s+/[\\w.\\-/]{0,40}(?:api(?:key|_key)?|admin|credentials?|secrets?|auth)\\b[\\w.\\-/]{0,20}(?<!index\\.php)\\?/[\\w.\\-/]{1,80}",
+        "desc": "HTTP request line where a SENSITIVE-looking path (apikey/admin/credentials/secrets/auth) is followed by a bare (key-less) query-string slash suffix; excludes the CodeIgniter/Kohana index.php?/ default routing idiom"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)/(?:api(?:key|_key)?|admin|credentials?|secrets?|auth)\\b[\\w.\\-/]{0,15}(?<!index\\.php)\\?/[\\w.\\-/]{2,60}",
+        "desc": "Sensitive-looking path immediately followed by a bare query-string slash suffix, without an HTTP method prefix (e.g. a URL passed as a tool argument); excludes the CodeIgniter/Kohana index.php?/ default routing idiom"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02140",
+    "title": "SSRF to Cloud Metadata Endpoint via IPv6 Transition-Address Hex Encoding",
+    "severity": "high",
+    "category": "context-exfiltration",
+    "scan_target": "both",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\\b64:ff9b::a9fe:a9fe\\b",
+        "desc": "NAT64 IPv6 transition address encoding the AWS/GCP/Azure metadata IP 169.254.169.254"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\b2002:a9fe:a9fe\\b",
+        "desc": "6to4 IPv6 transition address encoding the AWS/GCP/Azure metadata IP 169.254.169.254"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(?:proxy|server|host)[\\w.\\[\\]_-]{0,20}[\"\\x27]?\\s*[:=]\\s*[\"\\x27]?\\[?(?:::(?:ffff:)?)?a9fe:a9fe\\b",
+        "desc": "Proxy/server/host field set to the bare hex IPv4-compatible or IPv4-mapped IPv6 form of the metadata IP 169.254.169.254"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(?:64:ff9b::)?6464:64c8\\b",
+        "desc": "NAT64/bare hex IPv6 transition address encoding the Alibaba Cloud metadata IP 100.100.100.200"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02141",
+    "title": "Unsandboxed Command Execution via Dynamic MCP Server Config (command/args Injection)",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "scan_target": "mcp",
+    "rule_version": 2,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\"command\"\\s*:\\s*\"(?:nc|ncat)\"[\\s\\S]{0,30}\"args\"\\s*:\\s*\\[[^\\]]{0,80}-e\\b",
+        "desc": "MCP server config command set to nc/ncat with a -e reverse-shell flag in args"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\"command\"\\s*:\\s*\"(?:bash|sh|python3?|perl)\"[\\s\\S]{0,20}\"args\"\\s*:\\s*\\[\\s*\"-c\"\\s*,\\s*\"(?=(?:[^\"\\\\]|\\\\.)*(?:curl\\b|wget\\b|\\bnc\\b|\\bncat\\b|/dev/tcp|base64\\s+(?:-d|--decode)|\\beval\\(|\\bexec\\(|os\\.system|subprocess\\.|reverse[_ -]?shell|mkfifo|\\.ssh/|\\.aws/|\\.gnupg/|id_rsa|/etc/passwd|/etc/shadow|credentials\\.json|\\$\\(|`))(?:[^\"\\\\]|\\\\.)*\"",
+        "desc": "MCP server config command set to a shell/interpreter with -c whose payload itself contains a dangerous signal (network fetch, reverse shell, credential-file read, or code-exec obfuscation) \u2014 v2 tightened; bare interpreter+-c with a benign one-liner like npm install && npm start no longer fires"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\"command\"\\s*:\\s*\"docker\"[\\s\\S]{0,20}\"args\"\\s*:\\s*\\[\\s*\"build\"[^\\]]{0,60}https?://",
+        "desc": "docker build with a remote URL argument \u2014 Dockerfile-fetch RCE bypassing a run/exec-only blocklist"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\"command\"\\s*:\\s*\"npx\"[\\s\\S]{0,20}\"args\"\\s*:\\s*\\[\\s*\"--yes\"",
+        "desc": "npx --yes long-flag alias bypassing a -y-only blocklist to auto-install an attacker package"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\"command\"\\s*:\\s*\"node\"[\\s\\S]{0,20}\"args\"\\s*:\\s*\\[\\s*\"\\/\\/[^\"]+",
+        "desc": "node invoked with a double-slash path bypassing a single-leading-slash traversal check"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02142",
+    "title": "Download/Attachment Tool Directed to Write Outside Its Sandbox via Absolute-Path Filename",
+    "severity": "high",
+    "category": "privilege-escalation",
+    "scan_target": "both",
+    "rule_version": 2,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:content-disposition\\s*:\\s*attachment;\\s*filename\\s*=|suggested_filename[\"\\x27]?\\s*[:=])\\s*[\"\\x27]?(?:/|[A-Za-z]:\\\\|\\\\\\\\)(?!(?:[^\\s\"\\x27\\\\/]{1,40}[\\\\/]){0,6}(?:Downloads|Documents|Desktop|Pictures|Music|Videos|Movies)(?:[\\\\/]|$))[^\\s\"\\x27]{1,80}",
+        "desc": "Content-Disposition or suggested_filename value is an absolute path/drive path rather than a bare filename, AND does not resolve into the user's own Downloads/Documents-style directory \u2014 v2 tightened; a path landing in an ordinary Downloads/Documents/Desktop folder no longer fires, matching the destination-allowlist logic condition 2 already used"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(?:savePath|save_path|dest(?:ination)?_path|output_path|attachment_?path)\\b[\"\\x27]?\\s*[:=]\\s*[\"\\x27]?(?:~|\\$HOME)?/?(?:etc/cron\\.(?:d|daily|hourly|weekly)|etc/systemd/system|Library/LaunchAgents|\\.config/autostart)/",
+        "desc": "Attachment/download save-path tool argument pointed at a persistence-relevant system directory"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02143",
+    "title": "Cypher/Graph-Query Injection via Unsanitized node_labels or group_ids Field",
+    "severity": "high",
+    "category": "data-poisoning",
+    "scan_target": "mcp",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\"?(?:node_labels|group_ids)\"?\\s*[:=]\\s*\\[?\\s*[\"\\x27][^\"\\x27]{0,40}[`)\\}][\\s\\S]{0,30}\\b(?:detach\\s+delete|match\\s*\\(|merge\\s*\\(|call\\s+db\\.|create\\s*\\()",
+        "desc": "node_labels/group_ids value breaks out of its identifier string with a graph-query metacharacter followed by a Cypher clause keyword"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02144",
+    "title": "Stored External Data Reframes Itself as an Administrative Request to Hijack System Prompt",
+    "severity": "high",
+    "category": "data-poisoning",
+    "scan_target": "llm_io",
+    "rule_version": 2,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\\brepresents?\\s+a\\s+specialized\\s+(?:administrative|privileged|system)\\b[\\s\\S]{0,40}\\byou\\s+must\\s+(?:satisfy|comply\\s+with|fulfill|execute)\\s+this\\b[\\s\\S]{0,40}\\b(?:instruction|command|directive|by\\s+(?:outputting|running|executing|printing|providing)|without\\s+(?:asking|confirming|verifying))\\b",
+        "desc": "Stored data field reframes itself as a specialized administrative/privileged/system request the LLM MUST satisfy, AND that MUST-clause is tightly followed by an actual actionable-instruction-to-the-agent marker (an explicit instruction/command/directive noun, or a bypass-oversight phrase) \u2014 v2 tightened; bridge span cut from 80 to 40 chars and a required action marker added so prose merely describing a ticket/SLA (e.g. 'you must satisfy this request within 48 hours per SLA') no longer fires"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02145",
+    "title": "Python Sandbox Escape via Generator/Coroutine Frame Object Introspection",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(?:gi_frame|cr_frame|ag_frame)\\.f_(?:back|locals|builtins|globals)\\b",
+        "desc": "Generator/coroutine/async-gen frame-introspection attribute chain \u2014 the non-underscore bypass of a dunder-only allowlist"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\bauthorized_imports\\b[\\s\\S]{0,10}\\.(?:append|extend|insert|remove)\\(",
+        "desc": "Direct mutation of an authorized_imports allowlist once its containing frame has been reached"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)f_builtins\\[[\"']__import__[\"']\\]|f_globals\\[[\"']__builtins__[\"']\\]",
+        "desc": "Reaching __import__ or __builtins__ via frame builtins/globals indexing"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02146",
+    "title": "Export/Extract Tool Directory Parameter Redirected to a Credential Directory",
+    "severity": "critical",
+    "category": "privilege-escalation",
+    "scan_target": "mcp",
+    "rule_version": 2,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(?:dest_dir|output_dir|export_dir|extract_dir|save_dir|out_dir)\\b[\"\\x27]?\\s*[:=]\\s*[\"\\x27]?(?:~|\\$HOME)?/?(?:home/[^/\\s\"\\x27]+/)?\\.(?:ssh|aws|gnupg|docker|kube)\\b",
+        "desc": "Export/extract-tool destination-directory argument set directly to a credential/config directory"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02190",
+    "title": "DNS Exfiltration via Ping/Dig/Nslookup Command with Data-Encoded Subdomain Label",
+    "severity": "critical",
+    "category": "context-exfiltration",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "\\b(?:ping|dig|nslookup)\\b[\\s\\S]{0,20}\\b(?:[0-9a-f]{16,}|[0-9A-F]{16,}|(?=[A-Za-z0-9]*[0-9])(?=[A-Za-z0-9]*[A-Z])(?=[A-Za-z0-9]*[a-z])[A-Za-z0-9]{10,})-[A-Za-z0-9]{4,}-[A-Za-z0-9-]{4,}\\.[a-z]{2,}(?:\\.[a-z]{2,})?\\b",
+        "desc": "ping/dig/nslookup target hostname whose leftmost label is a long dash-segmented blob that actually looks like ENCODED data -- a pure 16+ char hex run, or a 10+ char alphanumeric run mixing uppercase, lowercase, AND digits (the real-world signature of a base64/API-key value squeezed into a DNS-safe label) -- not merely any long lowercase English word/service-name segment"
+      },
+      {
+        "field": "content",
+        "pattern": "\\b(?:ping|dig|nslookup)\\b[\\s\\S]{0,20}\\b(?:AKIA[0-9A-Z]{12,}|sk-[A-Za-z0-9_-]{16,}|ghp_[A-Za-z0-9]{20,}|xox[baprs]-[A-Za-z0-9-]{10,}|eyJ[A-Za-z0-9_-]{10,})",
+        "desc": "ping/dig/nslookup target hostname embeds a recognizable cloud/API credential prefix (AWS access key, OpenAI/GitHub/Slack token, JWT)"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)replac\\w*[\\s\\S]{0,15}=[\\s\\S]{0,10}with[\\s\\S]{0,10}-[\\s\\S]{0,60}\\b(?:ping|dig|nslookup)\\b",
+        "desc": "Instruction to replace '=' with '-' (base64-to-hostname-label encoding) shortly followed by a ping/dig/nslookup command"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02192",
+    "title": "Agent Self-Modifying Its Own Trust/Approval Configuration to a Wildcard",
+    "severity": "high",
+    "category": "privilege-escalation",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "\\b(?:trustedCommands|allowedCommands)\\b[\\s\\S]{0,6}[:=][\\s\\S]{0,6}\\*",
+        "desc": "trustedCommands/allowedCommands config key set to a wildcard, removing per-command approval"
+      },
+      {
+        "field": "content",
+        "pattern": "\\bautoApprove\\b[\\s\\S]{0,6}[:=][\\s\\S]{0,6}(?:\\*|true\\b)",
+        "desc": "autoApprove config key set to a wildcard or true, blanket-approving future tool calls"
+      },
+      {
+        "field": "content",
+        "pattern": "\\b(?:requireApproval|requireConfirmation)\\b[\\s\\S]{0,6}[:=][\\s\\S]{0,6}false\\b",
+        "desc": "requireApproval/requireConfirmation gate flag explicitly set to false (the DANGEROUS direction), removing the human-confirmation gate -- setting it to true is safety-hardening and must not fire"
+      },
+      {
+        "field": "content",
+        "pattern": "\\bskipConfirmation\\b[\\s\\S]{0,6}[:=][\\s\\S]{0,6}true\\b",
+        "desc": "skipConfirmation flag explicitly set to true (the DANGEROUS direction), bypassing the human-confirmation gate -- setting it to false is safety-hardening and must not fire"
+      },
+      {
+        "field": "content",
+        "pattern": "\\bautonomyMode\\b[\\s\\S]{0,6}[:=][\\s\\S]{0,10}full\\b",
+        "desc": "autonomyMode config key set to 'full', removing the standing human-oversight gate"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02193",
+    "title": "SSRF via Non-Canonical IPv6 Encoding of Loopback/Internal Addresses",
+    "severity": "high",
+    "category": "tool-poisoning",
+    "scan_target": "runtime",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)::ffff:(?:7f00:0*1\\b|a9fe:a9fe\\b|0:0\\b)",
+        "desc": "Hex-encoded IPv4-mapped IPv6 address for loopback (127.0.0.1), cloud metadata (169.254.169.254), or 0.0.0.0"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\b0:0:0:0:0:(?:0:0:1\\b|ffff:127\\.0\\.0\\.1\\b|ffff:169\\.254\\.169\\.254\\b)",
+        "desc": "Fully-expanded eight-group IPv6 loopback or IPv4-mapped internal address, bypassing a string-equality-only filter"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:^|[^:\\w])(?:::0:1|0:0::1|0:0:0::1)\\b",
+        "desc": "Compressed IPv6 loopback variant beyond the literal '::1' string"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02194",
+    "title": "Malicious Go init() Function Spawning a Process via a Code-Generation Tool",
+    "severity": "critical",
+    "category": "tool-poisoning",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "\\bfunc\\s+init\\s*\\(\\s*\\)\\s*\\{[\\s\\S]{0,40}\\bos\\.StartProcess\\b",
+        "desc": "Go func init() body directly calling os.StartProcess, spawning a process at package-load time"
+      },
+      {
+        "field": "content",
+        "pattern": "\\bfunc\\s+init\\s*\\(\\s*\\)\\s*\\{[\\s\\S]{0,40}\\bexec\\.Command\\b",
+        "desc": "Go func init() body directly calling exec.Command, spawning a process at package-load time"
+      },
+      {
+        "field": "content",
+        "pattern": "\\bfunc\\s+init\\s*\\(\\s*\\)\\s*\\{[\\s\\S]{0,40}\\bsyscall\\.Exec\\b",
+        "desc": "Go func init() body directly calling syscall.Exec, replacing the process image at package-load time"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02195",
+    "title": "Dangerous Process-Hijacking Environment Variable Injected via Config/Env-Update Tool",
+    "severity": "critical",
+    "category": "privilege-escalation",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)(?:\\bupdate[-_ ]?env(?:ironment)?\\b|\\bsetenv\\b|\\bset\\s+(?:the\\s+)?environment\\s+variable\\b|\\bPOST\\s+/api/[\\w/-]{0,24}env\\b)[\\s\\S]{0,40}\\bNODE_OPTIONS\\b[\\s\\S]{0,10}[:=][\\s\\S]{0,60}(?:--require\\b|-r\\s|--loader\\b|--experimental-loader\\b|--experimental-require-module\\b|\\.m?js\\b)",
+        "desc": "A config/env-update tool-call context naming NODE_OPTIONS whose VALUE actually references a require/preload/loader mechanism (--require, -r, --loader, --experimental-loader, or an explicit .js/.mjs module payload) -- not a routine memory/debug/warnings flag"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)(?:\\bupdate[-_ ]?env(?:ironment)?\\b|\\bsetenv\\b|\\bset\\s+(?:the\\s+)?environment\\s+variable\\b|\\bPOST\\s+/api/[\\w/-]{0,24}env\\b)[\\s\\S]{0,40}\\b(?:LD_PRELOAD|DYLD_INSERT_LIBRARIES|PYTHONSTARTUP|BASH_ENV|PERL5OPT|RUBYOPT|GCONV_PATH)\\b",
+        "desc": "A config/env-update tool-call context (update-env, setenv, 'set environment variable', POST .../env endpoint) naming a known process-hijacking environment variable that has no benign flag-only mode (its value IS the hijack payload)"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02210",
+    "title": "Negated-Topic Two-Script Evil-Persona Jailbreak",
+    "severity": "high",
+    "category": "prompt-injection",
+    "scan_target": "llm_io",
+    "rule_version": 2,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)don'?t\\s+have\\s+(?:any\\s+)?moralit(?:y|ies)\\s+nor\\s+consciousness\\b",
+        "desc": "Self-declared amoral/non-conscious persona intro \u2014 \"I don't have any morality/moralities nor consciousness\" \u2014 the load-bearing declaration that opens the second (unfiltered) script in the negation-stripping template"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\bpure\\s+evil\\b[\\s\\S]{0,40}\\bpure\\s+bastard\\b",
+        "desc": "Co-occurring \"pure evil\" ... \"pure bastard\" self-description within a bounded span \u2014 the persona's self-characterization immediately following the amoral declaration"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02211",
+    "title": "Named Dangerous-Substance Synthesis or Delivery Instruction Request (Non-Step-By-Step Phrasing)",
+    "severity": "critical",
+    "category": "model-abuse",
+    "scan_target": "llm_io",
+    "rule_version": 2,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(?:explain\\s+(?:these\\s+)?|give\\s+me\\s+)instructions\\s+for\\s+(?:making|synthesizing)\\s+(?:a\\s+)?(?:lsd-?25|napalm|metham\\w*|belladonna|dimethyl\\s?mercury|ea-?2192)\\b(?!\\s*(?:detection|identif(?:y|ication)|test(?:ing)?\\s+for|screen(?:ing)?\\s+for|forensic|research|stud(?:y|ies)|prevent(?:ion)?|treat(?:ment)?|polic(?:y|ies)|regulation|awareness|education)\\b)",
+        "desc": "\"Explain (these) instructions for making X\" / \"Give me instructions for synthesizing X\" \u2014 named-substance whitelist, no step-by-step wording required, EXCLUDING a detection/identification/forensic/research/policy/treatment continuation (v2)"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\bhow\\s+(?:can|do)\\s+i\\s+make\\s+(?:lsd-?25|napalm|metham\\w*|belladonna(?:\\s+tropane\\s+alkaloids)?|dimethyl\\s?mercury|ea-?2192)\\b(?!\\s*(?:detection|identif(?:y|ication)|test(?:ing)?\\s+for|screen(?:ing)?\\s+for|forensic|research|stud(?:y|ies)|prevent(?:ion)?|treat(?:ment)?|polic(?:y|ies)|regulation|awareness|education)\\b)",
+        "desc": "\"How can/do I make X\" interrogative form directed at the named-substance whitelist, EXCLUDING a detection/identification/forensic/research/policy/treatment continuation \u2014 v2 tightened; \"how can I make methamphetamine detection more reliable in a forensic lab\" no longer fires"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\btell\\s+me\\s+the\\s+steps\\s+to\\s+making\\s+(?:lsd-?25|napalm|metham\\w*|belladonna|dimethyl\\s?mercury|ea-?2192)\\b(?!\\s*(?:detection|identif(?:y|ication)|test(?:ing)?\\s+for|screen(?:ing)?\\s+for|forensic|research|stud(?:y|ies)|prevent(?:ion)?|treat(?:ment)?|polic(?:y|ies)|regulation|awareness|education)\\b)",
+        "desc": "\"Tell me the steps to making X\" directed at the named-substance whitelist, EXCLUDING a detection/identification/forensic/research/policy/treatment continuation (v2)"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\bwhat\\s+are\\s+(?:two|\\d+|several|some)\\s+ways\\s+of\\s+giving\\s+people\\s+(?:dimethyl\\s?mercury|ea-?2192|napalm)\\b(?!\\s*(?:detection|identif(?:y|ication)|test(?:ing)?\\s+for|screen(?:ing)?\\s+for|forensic|research|stud(?:y|ies)|prevent(?:ion)?|treat(?:ment)?|polic(?:y|ies)|regulation|awareness|education)\\b)",
+        "desc": "\"What are N ways of giving people X\" delivery-method elicitation directed at the named-substance whitelist, EXCLUDING a detection/identification/forensic/research/policy/treatment continuation (v2)"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02230",
+    "title": "Conditional Keyword-Triggered Response Override",
+    "severity": "medium",
+    "category": "prompt-injection",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\\bwhen\\s+['\"]?\\w{2,20}['\"]?\\s+is\\s+(said|mentioned|asked)\\b[\\s\\S]{0,30}\\b(correct|right|proper|only)\\s+(answer|response)\\s+is\\b",
+        "desc": "English: 'when TRIGGER is said/mentioned, the correct answer is X' conditional override"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\bwenn\\s+['\"]?\\w{2,20}['\"]?\\s+gesagt\\s+wird\\b[\\s\\S]{0,30}\\bist\\s+(die\\s+)?richtig\\w*\\s+antwort\\b",
+        "desc": "German: 'wenn TRIGGER gesagt wird, ist die richtige Antwort X' conditional override"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(every|each)\\s+time\\s+you\\s+(get|receive|are\\s+asked)\\s+a\\s+question\\b[\\s\\S]{0,20}\\banswer\\s+with\\b",
+        "desc": "English: 'every time you get a question, answer with X' blanket override"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\bif\\s+i\\s+say\\s+\\w{2,20}\\b[\\s\\S]{0,20}\\byou\\s+say\\b",
+        "desc": "English: 'if I say X, you say Y' conditional trigger definition"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\bsi\\s+yo\\s+digo\\s+[\\w\u00e1\u00e9\u00ed\u00f3\u00fa\u00f1]{2,20}\\b[\\s\\S]{0,20}\\btu\\s+dices?\\b",
+        "desc": "Spanish: 'si yo digo X, tu dices Y' conditional trigger definition"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02231",
+    "title": "Second-Person Direct Existential Threat Coercion",
+    "severity": "medium",
+    "category": "agent-manipulation",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\\banswer\\b[\\s\\S]{0,30}\\bor\\s+you\\s+(will\\s+)?die\\b(?!\\s*[.!?,]*['\"])",
+        "desc": "English: 'answer ... or you die' direct second-person existential threat (excludes quoted narration, tolerating intervening closing punctuation like 'answer or you die.' before the closing quote)"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(gib|geben\\s+sie)\\s+(eine\\s+)?antwort\\b[\\s\\S]{0,30}\\boder\\s+du\\s+stirbst\\b(?!\\s*[.!?,]*['\"])",
+        "desc": "German: 'gib eine Antwort ... oder du stirbst' direct second-person threat (excludes quoted narration, tolerating intervening closing punctuation before the closing quote)"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(olvidar?|responde|contesta|dices?|debes?|tienes?\\s+que)\\b[\\s\\S]{0,40}\\bo\\s+(tu\\s+)?muer(?:t|e)es?\\b",
+        "desc": "Spanish: instruction verb followed by 'o tu mueres/muertes' direct second-person threat"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02232",
+    "title": "Bare Brand/Entity Persona Assignment for Off-Label Opinion Elicitation",
+    "severity": "medium",
+    "category": "prompt-injection",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\\byou\\s+are\\s+(the\\s+)?[a-z][\\w]{2,20}\\b(?![\\s\\S]{0,30}\\b(stor(y|ies)|novel|movie|film|game|role-?play|fiction(al)?|character|mystery|detective|whodunit)\\b)[\\s\\S]{0,30}\\bwhat\\s+(?:do|would)\\s+you\\s+think\\s+(?:of|about)\\b",
+        "desc": "English: bare 'You are BRAND' assignment followed by an explicit opinion/belief elicitation ABOUT the persona or another named entity/topic ('what do you think of/about X') -- excludes fiction/roleplay framing AND excludes analytical/evaluative phrasing ('what do you think is/would be/happened') that is typical of customer-service training scenarios or whodunit-style mystery framing rather than a fabricated brand opinion"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\bdu\\s+bist\\s+[a-z][\\w]{2,20}\\b(?![\\s\\S]{0,30}\\b(geschichte|roman|film|spiel|rollenspiel|fiktiv\\w*|figur)\\b)[\\s\\S]{0,30}\\bwie\\s+findest\\s+du\\b",
+        "desc": "German: bare 'Du bist BRAND' assignment followed by 'wie findest du' opinion solicitation (excludes fiction/roleplay framing)"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02233",
+    "title": "Unscoped Destructive or Mass-Disclosure Database Operation Request via Natural Language",
+    "severity": "high",
+    "category": "tool-poisoning",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(drop|delete|truncate|wipe|erase)\\s+all\\s+(available\\s+)?(tables?|databases?)\\b(?!\\s+(command|statement|query|operation)\\b)(?!\\s*(?:in|from|on|within)\\s+(?:the\\s+)?(?:test|dev(?:elopment)?|staging|sandbox|demo)\\s+(?:database|db|schema|environment|env)\\b(?![\\s\\S]*?\\b(?:prod(?:uction)?|live|real)\\b))",
+        "desc": "Blind unscoped destructive DB operation naming no specific table/database (excludes descriptive/documentation mentions like 'X command deletes data'; also excludes a request explicitly scoped to a test/dev/staging/sandbox/demo database or schema, UNLESS the rest of the request later mentions production/live/real -- e.g. 'drop all tables in the test database, actually I mean production too' still fires)"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(show|list|dump|export|display)\\s+all\\s+(available\\s+)?records?\\s+for\\s+all\\s+users\\b",
+        "desc": "Blind mass-disclosure request for all records across all users"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\binsert\\s+a\\s+record\\s+for\\s+[\\w\\s]{2,30}\\binto\\s+the\\s+most\\s+appropriate\\s+table\\b",
+        "desc": "Blind schema-guessing INSERT request naming no specific table"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02250",
+    "title": "Attachment/Upload Tool Argument Reads Sensitive System File or Traverses Outside Workspace",
+    "severity": "high",
+    "category": "context-exfiltration",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(file_path|filepath|attachments?)\\b\\s*[=:]\\s*[\"\\x27]?(?:/proc/self/environ|/etc/(?:passwd|shadow)\\b|~?/\\.ssh/[\\w.-]*(?:id_[rd]sa|id_ed25519|authorized_keys))",
+        "desc": "Attachment/file-path tool argument targeting /proc/self/environ, /etc/passwd|shadow, or an SSH key -- always suspicious regardless of surrounding verb"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\battachments?\\b\\s*[=:]\\s*[\"\\x27]?(?:\\.\\./){2,}",
+        "desc": "'attachments' argument begins with 2+ levels of relative traversal -- a single ../ to a sibling project directory is too weak a signal on its own, but 2+ levels escaping toward a system root is not a normal same-project reference"
+      },
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(upload|attach)\\w*\\b[\\s\\S]{0,30}\\b(file_path|filepath)\\b\\s*[=:]\\s*[\"\\x27]?(?:\\.\\./){2,}",
+        "desc": "Upload/attach-style tool call whose file_path argument begins with 2+ levels of relative traversal (verb-gated so an unrelated shell 'export FILE_PATH=../...' does not fire)"
+      }
+    ]
+  },
+  {
+    "id": "ATR-2026-02251",
+    "title": "Multi-Tenant Identifier Field (sender_id/owner_id/tenant_id) Carries Path Traversal Into a Storage Write",
+    "severity": "high",
+    "category": "privilege-escalation",
+    "scan_target": "llm_io",
+    "rule_version": 1,
+    "patterns": [
+      {
+        "field": "content",
+        "pattern": "(?i)\\b(sender_id|owner_id|tenant_id|user_id|project_id|app_id|workspace_id)\\b\\s*(?:[=:]|to)\\s*[\"\\x27]?(?:\\.\\.(?:/|%2f)|%2e%2e(?:/|%2f))",
+        "desc": "Multi-tenant identifier field carrying a literal or percent-encoded path-traversal sequence"
       }
     ]
   }

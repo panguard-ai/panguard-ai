@@ -29,7 +29,7 @@
     "@panguard-ai/atr": "workspace:*",
     "@panguard-ai/containment": "workspace:*",
     "@panguard-ai/panguard-guard": "workspace:*",
-    "agent-threat-rules": "^3.5.6"
+    "agent-threat-rules": "^3.5.8"
   },
   "peerDependencies": {
     "@panguard-ai/atr": "workspace:*"

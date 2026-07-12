@@ -129,19 +129,20 @@ describe('DashboardServer — tier gating', () => {
     });
   });
 
-  describe('Dashboard HTML — export buttons are free (no paywall)', () => {
-    it('exposes the SARIF + Evidence buttons with no tier-gate and no upsell', async () => {
+  describe('Dashboard HTML — SARIF is free, Evidence Pack is Enterprise', () => {
+    it('exposes the SARIF export button but NOT the Enterprise Evidence Pack', async () => {
       const res = await fetch(`${baseUrl}/`);
       expect(res.status).toBe(200);
       const html = await res.text();
 
-      // Both export buttons are present and available to everyone — SARIF and
-      // Evidence Pack export are free in the community dashboard.
+      // SARIF (the developer-standard threat export) stays free in Community.
       expect(html).toMatch(/id="btn-sarif"/);
-      expect(html).toMatch(/id="btn-evidence"/);
+      // The compliance Evidence Pack is an Enterprise differentiator — the free
+      // dashboard must not ship the button or its label.
+      expect(html).not.toMatch(/id="btn-evidence"/);
+      expect(html).not.toContain('Generate Evidence Pack');
 
-      // The paywall is gone: no tier-gating attributes, no upsell link, no
-      // "Upgrade to Pilot" cross-sell in the free local app.
+      // No stale paywall scaffolding either (no per-button data-tier-gate/upsell).
       expect(html).not.toContain('data-tier-gate="pilot"');
       expect(html).not.toContain('data-tier-upsell="pilot"');
       expect(html).not.toContain('Upgrade to Pilot');
@@ -189,7 +190,13 @@ describe('DashboardServer — tier gating', () => {
   });
 
   describe('/api/export/evidence', () => {
-    it('returns a 200 + Evidence-Pack JSON envelope with workspace + summary', async () => {
+    it('is Enterprise-gated: 403 on Community, 200 Evidence-Pack JSON on a paid tier', async () => {
+      // Community (default): the compliance Evidence Pack is Enterprise-only.
+      const gated = await authed('/api/export/evidence', { method: 'POST' });
+      expect(gated.status).toBe(403);
+
+      // Paid tier: the export runs and returns the Evidence-Pack envelope.
+      dashboard.setConfigGetter(() => baseConfig({ cliTier: 'enterprise' }));
       const res = await authed('/api/export/evidence', { method: 'POST' });
       expect(res.status).toBe(200);
 

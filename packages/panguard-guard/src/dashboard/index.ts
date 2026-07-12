@@ -7,7 +7,6 @@
  * - Event timeline / 事件時間軸
  * - Threat map visualization / 威脅地圖視覺化
  * - Configuration management / 配置管理
- * - Language toggle (EN/ZH) / 語言切換
  *
  * Uses only Node.js built-in http module with native WebSocket handshake.
  *
@@ -827,6 +826,20 @@ export class DashboardServer {
         break;
       case '/api/export/evidence':
         if (req.method === 'POST') {
+          // Evidence Pack = signed compliance-audit-evidence generation = an
+          // Enterprise feature. Gate server-side (not just hiding the button) so
+          // a local process cannot POST this endpoint on a free Community install.
+          if (!this.isPaidTier()) {
+            this.jsonResponse(
+              res,
+              {
+                error:
+                  'Evidence Pack export is an Enterprise feature. See https://panguard.ai/pricing',
+              },
+              403
+            );
+            break;
+          }
           this.handleEvidenceExport(res).catch((err: unknown) => {
             logger.error(
               `handleEvidenceExport error: ${err instanceof Error ? err.message : String(err)}`
@@ -1146,8 +1159,15 @@ export class DashboardServer {
             : 'no rules loaded — pattern detection off; reinstall ATR rules',
       },
       b: {
+        // Heuristic correlation runs whenever detection is active. Don't claim a
+        // "behavioral baseline" that doesn't exist yet — say plainly whether the
+        // baseline has formed (baselineConfidence) instead of a flat green claim.
         state: running ? 'active' : 'idle',
-        detail: 'heuristic + behavioral baseline',
+        detail: !running
+          ? 'idle — detection not active'
+          : (this.status.baselineConfidence ?? 0) > 0
+            ? 'heuristic correlation + behavioral baseline'
+            : 'heuristic correlation; behavioral baseline still forming',
       },
       c: this.computeLayerC(aiConfigured),
     };
@@ -1274,6 +1294,14 @@ export class DashboardServer {
       return lower;
     }
     return 'community';
+  }
+
+  /** True only for paid tiers (pilot/enterprise/pro) — gates Enterprise-only
+   *  features like compliance Evidence Pack export. */
+  private isPaidTier(): boolean {
+    const cfg = this.getConfig?.();
+    const tier = this.normalizeLicenseTier(cfg?.cliTier ?? this.status.licenseTier ?? 'community');
+    return tier === 'pilot' || tier === 'enterprise' || tier === 'pro';
   }
 
   /**
@@ -1550,10 +1578,13 @@ export class DashboardServer {
           },
           invocations: [
             {
-              executionSuccessful: true,
+              // Real outcome: false when the durable audit chain failed to verify
+              // (integrity TAMPERED), not an unconditional 'true'. workingDirectory
+              // omitted rather than a fabricated fixed path. Times reflect when the
+              // report was generated (the export snapshot), not a fake scan window.
+              executionSuccessful: durable.verify.ok,
               startTimeUtc: generatedAt,
               endTimeUtc: generatedAt,
-              workingDirectory: { uri: 'file:///opt/panguard-guard' },
             },
           ],
           properties: {
@@ -1977,7 +2008,6 @@ export class DashboardServer {
       atrDrafterPatterns: this.status.atrDrafterPatterns ?? 0,
       atrDrafterSubmitted: this.status.atrDrafterSubmitted ?? 0,
       lastSync,
-      syncIntervalHours: 1,
       // Consent-gated, default OFF — not endpoint presence (the endpoint has a
       // hardcoded default, which made this read "enabled" for every user).
       threatCloudEnabled: config?.threatCloudUploadEnabled === true,
