@@ -48,7 +48,7 @@ export default function PricingContent() {
           <FadeInUp delay={0.1}>
             <p className="text-base sm:text-lg text-text-secondary max-w-2xl mx-auto mt-6 leading-[1.85]">
               {isZh
-                ? '自架完整堆疊永久免費。當你要在銀行或企業資安審查中證明 agent 安全性時,再升級到付費方案。'
+                ? '自架完整堆疊永久免費。當你要在銀行或企業資安審查中證明 agent 安全性時，再升級到付費方案。'
                 : 'Self-host the full stack free forever. Upgrade to a paid plan when you need to prove your agents are secure inside a bank or enterprise security review.'}
             </p>
           </FadeInUp>
@@ -78,7 +78,7 @@ export default function PricingContent() {
               </div>
               <p className="text-sm text-text-secondary leading-[1.85] mt-4">
                 {isZh
-                  ? '個人開發者、小團隊,以及任何想自架完整堆疊的組織。'
+                  ? '個人開發者、小團隊，以及任何想自架完整堆疊的組織。'
                   : 'Individual developers, small teams, and anyone who wants to self-host the full stack.'}
               </p>
               <div className="my-7 flex-1">
@@ -87,7 +87,7 @@ export default function PricingContent() {
                     ? [
                         `${STATS.atrRules} 條 ATR 偵測規則(MIT 授權)`,
                         'agents / endpoints / tenants 無上限',
-                        '5 層已上線:稽核 · 防護 · 偵測 · 誘捕 · 反應',
+                        '5 層已上線：稽核 · 防護 · 偵測 · 誘捕 · 反應',
                         'Threat Cloud 規則更新(< 24 小時)',
                         'GitHub + Discord 社群支援',
                         'pga CLI:scan · audit · guard · status',
@@ -201,8 +201,8 @@ export default function PricingContent() {
                 <ul className="space-y-2.5">
                   {(isZh
                     ? [
-                        'Enterprise:Scan + Guard + 支援,on-prem / airgap / SSO / SIEM',
-                        'Migrator Pro:活的簽章合規證據,轉 15 種舊格式',
+                        'Enterprise：Scan + Guard + 支援，on-prem / airgap / SSO / SIEM',
+                        'Migrator Pro：活的簽章合規證據，轉 15 種舊格式',
                         'Sovereign:國家級離網部署($5-20M / 國)',
                         'OEM:廠商內建 ATR 規則包(Cisco / 微軟級)',
                       ]

@@ -26,6 +26,7 @@
     "@panguard-ai/scan-core": "workspace:*",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
+    "budoux": "^0.8.4",
     "framer-motion": "^12.34.3",
     "js-yaml": "^4.1.0",
     "lucide-react": "^0.575.0",

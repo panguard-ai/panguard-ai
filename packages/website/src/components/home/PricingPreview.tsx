@@ -88,11 +88,11 @@ export default function PricingPreview() {
       <FadeInUp>
         <Eyebrow>{isZh ? '定價' : 'PRICING'}</Eyebrow>
         <SectionTitleV2>
-          {isZh ? '免費開始,需要時再升級' : 'Free to start, paid when you must prove it'}
+          {isZh ? '免費開始，需要時再升級' : 'Free to start, paid when you must prove it'}
         </SectionTitleV2>
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-text-secondary sm:text-lg">
           {isZh
-            ? '自架完整堆疊永久免費。要在銀行或企業資安審查中證明 agent 安全時,$25K Founding Pilot 自助下單即可開始;更大的部署走洽談。'
+            ? '自架完整堆疊永久免費。要在銀行或企業資安審查中證明 agent 安全時，$25K Founding Pilot 自助下單即可開始；更大的部署走洽談。'
             : 'Self-host the full stack free forever. When you must prove agent security in a bank or enterprise review, the $25K Founding Pilot is self-serve; larger deployments are sales-led.'}
         </p>
       </FadeInUp>
