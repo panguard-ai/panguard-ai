@@ -5,21 +5,25 @@ import Footer from '@/components/Footer';
 import InstallHero from '@/components/home/InstallHero';
 import { RuleStatsProvider } from '@/contexts/RuleStatsContext';
 
+const TheGap = dynamic(() => import('@/components/home/v2/TheGap'));
 const RealIncidents = dynamic(() => import('@/components/home/RealIncidents'));
-const PositioningSplit = dynamic(() => import('@/components/home/v4/PositioningSplit'));
+const Flywheel = dynamic(() => import('@/components/home/v2/Flywheel'));
+const AtrRulebook = dynamic(() => import('@/components/home/v2/AtrRulebook'));
+const ProofTerminal = dynamic(() => import('@/components/home/v2/ProofTerminal'));
 const ProofBand = dynamic(() => import('@/components/home/v4/ProofBand'));
-const ArchitectureBeat = dynamic(() => import('@/components/home/v4/ArchitectureBeat'));
+const ProtectProve = dynamic(() => import('@/components/home/v2/ProtectProve'));
 const DemoShowcase = dynamic(() => import('@/components/home/DemoShowcase'));
-const CrystallizeMission = dynamic(() => import('@/components/home/v4/CrystallizeMission'));
 const PricingPreview = dynamic(() => import('@/components/home/PricingPreview'));
 const FinalCta = dynamic(() => import('@/components/home/v4/FinalCta'));
 
 /**
- * Homepage — researched 10-beat blueprint (2026-07-05):
- * hero(scanner+FX) → why-now band → positioning split → proof band
- * → architecture bento+table → demo → migrator → crystallization+mission
- * → pricing → final CTA. Classic arc: problem → solution → proof →
- * product → price → close. Each claim and stat appears exactly once.
+ * Homepage — seed-deck narrative arc (2026-07-12), consumer voice.
+ * hero(install) → 01 the gap (three eras, no shared standard)
+ * → 02 why now (real incidents) → 03 defense accumulates faster (flywheel)
+ * → 04 the rulebook exists: ATR (free, MIT) → 05 it runs (real catch)
+ * → adoption proof band → 06 free rulebook vs audit-ready PanGuard
+ * → dashboard visual → pricing (Community first) → install close.
+ * Each claim and stat appears exactly once.
  */
 export default async function Home() {
   const t = await getTranslations('home');
@@ -31,23 +35,27 @@ export default async function Home() {
           <p id="definition" className="sr-only">
             {t('srDefinition')}
           </p>
-          {/* 1. Hero — the scanner, with scan-beam / radar-ping / entrance FX */}
+          {/* Hero — one-command install terminal (unchanged) */}
           <InstallHero />
-          {/* 2. Why now — real incidents, full-bleed accent band */}
+          {/* 01. The gap — a brilliant new hire you handed the keys to */}
+          <TheGap />
+          {/* 02. Why now — real incidents, full-bleed accent band */}
           <RealIncidents />
-          {/* 3. Positioning — one platform, both procurement gates (two-col) */}
-          <PositioningSplit />
-          {/* 4. Proof — single credibility band (adopters + verified stats) */}
+          {/* 03. How defense wins — accumulate faster than attacks multiply */}
+          <Flywheel />
+          {/* 04. The rulebook exists — ATR, MIT, free forever */}
+          <AtrRulebook />
+          {/* 05. It runs — a real attack getting caught */}
+          <ProofTerminal />
+          {/* Adoption proof — adopters + verified stats */}
           <ProofBand />
-          {/* 5. Architecture — 7-layer bento + honest coverage table */}
-          <ArchitectureBeat />
-          {/* 6. Product visual — Guard dashboard */}
+          {/* 06. Two ways to run it — free rulebook vs audit-ready PanGuard */}
+          <ProtectProve />
+          {/* Product visual — Guard dashboard */}
           <DemoShowcase />
-          {/* 7. Threat crystallization + the one mission moment */}
-          <CrystallizeMission />
-          {/* 8. Pricing */}
+          {/* Pricing — Community first */}
           <PricingPreview />
-          {/* 9. Close — install command + scan CTA */}
+          {/* Close — install command + scan CTA */}
           <FinalCta />
         </main>
       </RuleStatsProvider>

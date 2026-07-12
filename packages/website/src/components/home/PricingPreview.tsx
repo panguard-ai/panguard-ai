@@ -99,7 +99,7 @@ export default function PricingPreview() {
 
       <div className="mt-14 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
         {tiers.map((tier, i) => {
-          const emphasized = tier.id === 'pilot';
+          const emphasized = tier.id === 'community';
           const ctaClass = emphasized ? PRIMARY_CTA : SECONDARY_CTA;
           return (
             <FadeInUp key={tier.id} delay={i * 0.06} className="h-full">
