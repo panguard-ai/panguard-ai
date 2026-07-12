@@ -53,6 +53,11 @@ export function buildGuardPlist(node: string, script: string, dataDir = DATA_DIR
   // launchd hands a process a minimal PATH; give the daemon the interpreter's
   // own dir plus standard locations so it can spawn npx/node for TC sync.
   const path = [dirname(node), '/opt/homebrew/bin', '/usr/local/bin', '/usr/bin', '/bin'].join(':');
+  // Pin HOME explicitly. launchd normally sets HOME for a GUI agent, but making
+  // it explicit guarantees the daemon's ~/.panguard-guard (dashboard token,
+  // config, logs) resolves to the SAME dir the installing CLI reads — so
+  // `pga up`/`pga status` always find the launch token instead of falsely
+  // reporting "Dashboard not available / Guard not running".
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -65,6 +70,8 @@ ${programArgs}
   </array>
   <key>EnvironmentVariables</key>
   <dict>
+    <key>HOME</key>
+    <string>${xmlEscape(dirname(dataDir))}</string>
     <key>PATH</key>
     <string>${xmlEscape(path)}</string>
   </dict>
