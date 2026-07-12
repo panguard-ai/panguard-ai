@@ -1595,6 +1595,75 @@
           <div class="hp-fixes" id="posture-deductions"></div>
         </div>
 
+        <!-- Automatic-response control. IMPORTANT (honesty): this toggle governs
+             ONLY the daemon's automatic OS-level responses (block IP / isolate
+             file / kill process), by flipping guard mode protection<->report-only.
+             It does NOT control tool-call blocking: detection (Layer A/B) and the
+             blocking of malicious tool calls run ALWAYS — the MCP proxy and the
+             built-in-tool PreToolUse hook hard-deny critical/high calls regardless
+             of this switch. So arming/disarming here never turns protection on or
+             off; it only decides whether Guard may take autonomous OS actions
+             (all of which stay off until separately configured under
+             enforcementPolicy — which is why arming shows MONITORING, not green
+             PROTECTED). Driven from live status.mode via updateArmControl();
+             CSP-safe (no inline handler — wired below). -->
+        <div
+          class="fs"
+          id="arm-card"
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+          "
+        >
+          <div style="flex: 1; min-width: 240px">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+              <span class="live-dot" id="arm-dot" style="background: var(--text-muted)"></span>
+              <strong id="arm-headline" style="font-size: 15px">Automatic response</strong>
+              <span
+                id="arm-rec"
+                style="
+                  font-size: 11px;
+                  color: var(--sage);
+                  border: 1px solid var(--sage);
+                  border-radius: 999px;
+                  padding: 1px 8px;
+                "
+                >On by default</span
+              >
+            </div>
+            <div
+              id="arm-sub"
+              style="
+                font-size: 12px;
+                color: var(--text-muted);
+                line-height: 1.6;
+                margin-top: 6px;
+                max-width: 640px;
+              "
+            >
+              Detection and blocking of malicious tool calls are <strong>always on</strong> &mdash;
+              Guard blocks the critical / high-confidence calls it detects whether this is armed or
+              not. This switch controls only Guard&rsquo;s <strong>automatic OS-level responses</strong>
+              (block IP, isolate file, kill process): armed lets them run, disarmed keeps Guard to
+              detect-and-log for those. Each such response stays off until you configure it under
+              enforcementPolicy, so arming is safe by default.
+            </div>
+          </div>
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="arm-btn"
+            aria-pressed="false"
+            disabled
+            style="min-width: 150px"
+          >
+            &mdash;
+          </button>
+        </div>
+
         <!-- 2 KPI cards. "Threat Cloud rules synced" was dropped from Overview:
              collective defense is OFF by default on Community, so it was a
              permanent 0 / "--" that read as a dead metric. The real synced count
@@ -2588,6 +2657,18 @@
         }
         var uPl = document.getElementById('posture-label');
         if (uPl) uPl.textContent = 'Not authenticated';
+        // Neutralize the arm control: an unauthenticated page has no live mode,
+        // so the button must never look actionable (a click would 401 anyway).
+        var uArm = document.getElementById('arm-btn');
+        if (uArm) {
+          uArm.disabled = true;
+          uArm.textContent = '—';
+          uArm.setAttribute('aria-pressed', 'false');
+        }
+        var uArmDot = document.getElementById('arm-dot');
+        if (uArmDot) uArmDot.style.background = 'var(--text-muted)';
+        var uArmHead = document.getElementById('arm-headline');
+        if (uArmHead) uArmHead.textContent = 'Protection';
         var ov = document.getElementById('unauth-overlay');
         if (ov) {
           ov.style.display = 'flex';
@@ -2920,6 +3001,136 @@
         _lastStatus = s;
         renderPosture(s);
         applyTierGates(s);
+        updateArmControl(s);
+      }
+      /* Automatic-response control (Overview) — the daemon OS-response mode.
+         ARM  = raise guard mode to 'protection': Guard MAY run its automatic
+                OS-level responses (kill / block-IP / isolate / disable) — each of
+                which is still individually gated by enforcementPolicy (all off by
+                default), so arming with no policy configured does nothing yet.
+         DISARM = drop to 'report-only': Guard runs no automatic OS response.
+         It does NOT govern tool-call blocking: the MCP proxy + built-in-tool hook
+         hard-deny critical/high tool calls in BOTH states, always — so arm/disarm
+         here never turns protection on or off. It never touches enforcementPolicy,
+         so one click can't itself enable a destructive action. Button state is
+         derived from the LIVE status.mode (never an optimistic guess). */
+      var _armBusy = false;
+      function armedFromMode(mode) {
+        return mode === 'protection';
+      }
+      function updateArmControl(s) {
+        var btn = document.getElementById('arm-btn');
+        var dot = document.getElementById('arm-dot');
+        var head = document.getElementById('arm-headline');
+        var rec = document.getElementById('arm-rec');
+        if (!btn || !dot || !head) return;
+        if (_armBusy) return; // an in-flight toggle owns the button — don't fight it
+        var mode = s && s.mode;
+        // No real mode = don't offer a control that would POST a guess. Stay
+        // neutral + disabled until a genuine live status arrives.
+        if (mode !== 'protection' && mode !== 'report-only' && mode !== 'learning') {
+          btn.disabled = true;
+          btn.textContent = '—';
+          btn.setAttribute('aria-pressed', 'false');
+          dot.style.background = 'var(--text-muted)';
+          head.textContent = 'Automatic response';
+          if (rec) rec.style.display = 'none';
+          return;
+        }
+        var armed = armedFromMode(mode);
+        btn.disabled = false;
+        btn.style.minWidth = '150px';
+        btn.setAttribute('aria-pressed', armed ? 'true' : 'false');
+        if (armed) {
+          btn.textContent = 'Disarm';
+          btn.className = 'btn btn-secondary';
+          // Calm sage, not emerald: armed here means the OS-response mode is on,
+          // NOT green PROTECTED (the hero stays MONITORING until an OS response
+          // is actually configured). Keep the two indicators telling one story.
+          dot.style.background = 'var(--sage)';
+          head.textContent = 'Automatic response: ARMED';
+          if (rec) rec.style.display = '';
+        } else {
+          btn.textContent = 'Arm response';
+          btn.className = 'btn btn-primary';
+          dot.style.background = 'var(--text-muted)';
+          head.textContent =
+            mode === 'learning'
+              ? 'Automatic response: OFF (learning)'
+              : 'Automatic response: OFF (report-only)';
+          if (rec) rec.style.display = 'none';
+        }
+      }
+      function toggleArm() {
+        if (_armBusy) return;
+        var s = _lastStatus || {};
+        var armed = armedFromMode(s.mode);
+        if (!armed) {
+          if (
+            !window.confirm(
+              'Arm automatic response?\n\n' +
+                'Detection and tool-call blocking are already on and are NOT changed by this — ' +
+                'Guard keeps blocking the malicious tool calls it detects either way.\n\n' +
+                'Arming lets Guard also run its automatic OS-level responses (block IP, isolate ' +
+                'file, kill process) when it detects a critical threat. Only responses you have ' +
+                'configured under enforcementPolicy will fire; none are configured by default, so ' +
+                'arming is safe until you set one up.'
+            )
+          ) {
+            return;
+          }
+        } else if (
+          !window.confirm(
+            'Disarm automatic response?\n\n' +
+              'Guard keeps detecting and blocking malicious tool calls — that never stops. ' +
+              'Disarming only prevents Guard from running automatic OS-level responses ' +
+              '(block IP / isolate / kill) on its own; it drops to detect-and-log for those.'
+          )
+        ) {
+          return;
+        }
+        var next = !armed;
+        var btn = document.getElementById('arm-btn');
+        _armBusy = true;
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = next ? 'Arming…' : 'Disarming…';
+        }
+        af('/api/enforce', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ armed: next }),
+        })
+          .then(function (r) {
+            return r.json().then(function (d) {
+              return { ok: r.ok, d: d };
+            });
+          })
+          .then(function (res) {
+            _armBusy = false;
+            if (res.ok && res.d && res.d.success) {
+              toast(
+                next
+                  ? 'Automatic response armed. Tool-call blocking was already on; Guard can now ' +
+                      'also run any OS-level responses you have configured. Restart Guard to fully arm.'
+                  : 'Automatic response off — Guard still detects and blocks malicious tool calls; ' +
+                      'it just won’t run automatic OS-level responses.'
+              );
+              // Optimistically reflect the new mode so the button flips instantly,
+              // then re-read /api/status for the authoritative state.
+              if (_lastStatus) _lastStatus.mode = next ? 'protection' : 'report-only';
+              updateArmControl(_lastStatus);
+              loadStatus();
+            } else {
+              toast((res.d && res.d.error) || 'Could not change automatic response');
+              updateArmControl(_lastStatus);
+            }
+          })
+          .catch(function () {
+            _armBusy = false;
+            toast('Network error');
+            updateArmControl(_lastStatus);
+          });
       }
       /* Posture score — one honest number from real local state, with each
          deduction offering a one-click jump to fix it. Formula (founder-set
@@ -4626,6 +4837,8 @@
             if (btn) selectMode(btn.getAttribute('data-mode'));
           });
         }
+        // Overview protection arm/disarm button.
+        on('arm-btn', 'click', toggleArm);
         var postureDed = document.getElementById('posture-deductions');
         if (postureDed) {
           postureDed.addEventListener('click', function (e) {

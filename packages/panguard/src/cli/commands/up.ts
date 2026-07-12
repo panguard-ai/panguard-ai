@@ -17,6 +17,7 @@ import { detectLang } from '../interactive/lang.js';
 import { ensureTelemetryConsent } from '../consent.js';
 import { installFor, toHookPlatform } from './hook.js';
 import { ensurePersistentService, type PersistResult } from './persist.js';
+import { buildSkillAuditProposal } from './atr-proposal.js';
 import { isFirstRun, markInitialized } from '../first-run.js';
 import { readAuthenticatedDashboardUrl, dashboardBaseUrl } from '../dashboard-url.js';
 import { recordScanResults, readFlaggedSkills, type RiskLevel } from '../flagged-skills.js';
@@ -685,8 +686,30 @@ export function upCommand(): Command {
                   `    ${c.caution(`Built-in tools will be guarded on ${done.length} platform(s) after you restart the agent`)} ` +
                     `${c.dim(`(${done.join(', ')})`)}`
                 );
+                // The agent only reads its hook config at startup, so tell the
+                // user the EXACT restart action per platform — "restart the
+                // agent" alone leaves them guessing which key/menu to press.
+                const RESTART_HINTS: Record<string, string> = {
+                  'claude-code': 'quit and relaunch Claude Code (a new session loads the hook)',
+                  'claude-desktop': 'quit and reopen Claude Desktop',
+                  cursor: 'Reload Window — Cmd/Ctrl+Shift+P → "Reload Window" — or restart Cursor',
+                  codex: 'restart the Codex CLI',
+                  gemini: 'restart the Gemini CLI',
+                  continue: 'Reload Window in VS Code — Cmd/Ctrl+Shift+P → "Reload Window"',
+                  cline: 'Reload Window in VS Code — Cmd/Ctrl+Shift+P → "Reload Window"',
+                  'vscode-copilot': 'Reload Window in VS Code — Cmd/Ctrl+Shift+P → "Reload Window"',
+                  'roo-code': 'Reload Window in VS Code — Cmd/Ctrl+Shift+P → "Reload Window"',
+                  windsurf: 'Reload Window, or restart Windsurf',
+                  zed: 'restart Zed',
+                };
+                console.log(`    ${c.dim('To activate now:')}`);
+                for (const hp of done) {
+                  console.log(
+                    `      ${c.dim('•')} ${c.bold(hp)} — ${c.dim(RESTART_HINTS[hp] ?? 'restart the agent')}`
+                  );
+                }
                 console.log(
-                  `    ${c.dim('Guarded = critical/high-confidence threats blocked, the rest advisory. `pga hook install --enforce` blocks everything.')}`
+                  `    ${c.dim('Guarded = critical/high-confidence threats blocked, the rest advisory. `pga hook install --enforce` blocks everything. Verify anytime: `pga doctor`.')}`
                 );
               }
             }
@@ -1034,7 +1057,16 @@ async function submitToTC(
   report: {
     riskScore: number;
     riskLevel: string;
-    findings: ReadonlyArray<{ id: string; category: string; severity: string; title: string }>;
+    findings: ReadonlyArray<{
+      id: string;
+      category: string;
+      severity: string;
+      title: string;
+      // Optional real-evidence fields — forwarded into the ATR proposal when the
+      // scan captured them (source snippet is the genuine attack pattern).
+      location?: string;
+      explain?: { snippet?: string };
+    }>;
   }
 ): Promise<void> {
   // Defense-in-depth: never let a raw filesystem path become the uploaded skill
@@ -1042,7 +1074,7 @@ async function submitToTC(
   // separators + cap length so a path-like name can't leak a local directory tree.
   skillName = skillName.replace(/[\\/]/g, '_').slice(0, 80);
   const { ThreatCloudClient } = await import('@panguard-ai/panguard-guard');
-  const { contentHash, patternHash } = await import('@panguard-ai/scan-core');
+  const { contentHash } = await import('@panguard-ai/scan-core');
   const { readFileSync: rf, existsSync: fe } = await import('node:fs');
 
   const dataDir = join(homedir(), '.panguard-guard');
@@ -1070,75 +1102,25 @@ async function submitToTC(
     (report.riskLevel === 'HIGH' || report.riskLevel === 'CRITICAL') &&
     report.findings.length > 0
   ) {
-    const highFindings = report.findings
-      .filter((f) => f.severity === 'critical' || f.severity === 'high')
-      .slice(0, 5);
-    const findingSummary = highFindings.map((f) => f.title).join('; ');
-    const pHash = patternHash(skillName, findingSummary);
-    const severity = report.riskLevel === 'CRITICAL' ? 'critical' : 'high';
-    const date = new Date().toISOString().slice(0, 10).replace(/-/g, '/');
-
-    // Sanitize scan-derived text before interpolating into the generated YAML.
-    // A malicious skill could embed YAML-breaking characters (quotes, newlines,
-    // colons) in a finding title; strip them so the proposal can't be hijacked.
-    const yamlSafe = (s: string): string =>
-      s
-        .replace(/\p{Cc}/gu, ' ') // strip control chars + newlines (YAML structure breakers)
-        .replace(/\\/g, '\\\\')
-        .replace(/"/g, '\\"')
-        .replace(/\s+/g, ' ')
-        .trim();
-
-    const conditions = highFindings
-      .map((f, idx) => {
-        const keywords = f.title
-          .split(/\s+/)
-          .filter((w) => w.length > 4)
-          .slice(0, 4);
-        if (keywords.length === 0) return null;
-        const regex = keywords.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('.*');
-        return `    - field: content\n      operator: regex\n      value: "(?i)${regex}"\n      description: "Pattern ${idx + 1}: ${yamlSafe(f.title.slice(0, 80))}"`;
-      })
-      .filter(Boolean);
-
-    if (conditions.length > 0) {
-      const ruleContent = `title: "CLI Audit: ${yamlSafe(highFindings[0]?.title.slice(0, 60) ?? skillName)}"
-id: ATR-2026-DRAFT-${pHash.slice(0, 8)}
-status: draft
-description: |
-  Auto-generated from pga up scan of "${yamlSafe(skillName)}".
-  Findings: ${yamlSafe(findingSummary.slice(0, 200))}
-author: "PanGuard CLI (pga up)"
-date: "${date}"
-schema_version: "0.1"
-detection_tier: pattern
-maturity: experimental
-severity: ${severity}
-tags:
-  category: skill-compromise
-  subcategory: cli-scan
-  confidence: medium
-detection:
-  conditions:
-${conditions.join('\n')}
-  condition: any
-response:
-  actions: [alert, snapshot]`;
-
-      await tc.submitATRProposal({
-        patternHash: pHash,
-        ruleContent,
-        llmProvider: 'cli-auditor',
-        llmModel: 'pga-up-scan',
-        selfReviewVerdict: JSON.stringify({
-          approved: true,
-          source: 'pga-up',
-          skillName,
-          riskLevel: report.riskLevel,
-          findingCount: highFindings.length,
-        }),
-      });
-    }
+    // Emit a VALID draft-request proposal (real evidence + needsLLMDraft), never
+    // a rule fabricated from the finding-title keywords. See atr-proposal.ts for
+    // why the old title-keyword regex was scrapped (it detected our own report
+    // text and had no precision test). The server/Guard drafter turns this into a
+    // real, test-backed rule via the Rule Creation Standard.
+    const proposal = buildSkillAuditProposal({
+      skillName,
+      riskLevel: report.riskLevel === 'CRITICAL' ? 'CRITICAL' : 'HIGH',
+      source: 'pga-up',
+      findings: report.findings.map((f) => ({
+        id: f.id,
+        title: f.title,
+        severity: f.severity,
+        category: f.category,
+        location: f.location,
+        snippet: f.explain?.snippet,
+      })),
+    });
+    if (proposal) await tc.submitATRProposal(proposal);
   }
 
   // 3. Report scan event for metrics

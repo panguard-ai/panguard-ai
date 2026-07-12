@@ -904,6 +904,13 @@ export class DashboardServer {
           this.handleThreatCloudGet(res);
         }
         break;
+      case '/api/enforce':
+        if (req.method === 'POST') {
+          this.handleEnforcePost(req, res);
+        } else {
+          this.jsonResponse(res, { error: 'Method not allowed' }, 405);
+        }
+        break;
       case '/api/loaded-rules':
         this.handleLoadedRulesApi(res);
         break;
@@ -2098,6 +2105,62 @@ export class DashboardServer {
     });
     req.on('end', () => {
       void this.finishThreatCloudPost(body, aborted, res);
+    });
+  }
+
+  /**
+   * POST /api/enforce { armed: boolean } — the dashboard "Arm protection" toggle.
+   *
+   * Arm  => mode 'protection': the PreToolUse hook + MCP proxy BLOCK critical /
+   *         high-confidence threats (the offending tool call is denied and simply
+   *         does not run — fully reversible, nothing is deleted or killed).
+   * Disarm => mode 'report-only': detection + logging stay on, nothing is blocked.
+   *
+   * Deliberately does NOT touch enforcementPolicy, so the destructive OS actions
+   * (kill process / block IP / isolate file / disable account) remain off unless
+   * the user configures them separately. Arming can never do something
+   * irreversible. Persists to disk AND applies to the live engine (same
+   * merge-from-disk pattern as the threat-cloud consent save, so two saves
+   * compose instead of clobbering each other).
+   */
+  private handleEnforcePost(req: IncomingMessage, res: ServerResponse): void {
+    if (!this.getConfig) {
+      this.jsonResponse(res, { error: 'Config not available' }, 503);
+      return;
+    }
+    let body = '';
+    let aborted = false;
+    req.on('data', (chunk: Buffer) => {
+      body += chunk.toString();
+      if (body.length > 2_000) {
+        aborted = true;
+        res.writeHead(413, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Payload too large' }));
+        req.destroy();
+      }
+    });
+    req.on('end', () => {
+      if (aborted) return;
+      try {
+        const update = JSON.parse(body || '{}') as { armed?: unknown };
+        if (typeof update.armed !== 'boolean') {
+          this.jsonResponse(res, { error: 'Missing boolean "armed"' }, 400);
+          return;
+        }
+        const nextMode: GuardConfig['mode'] = update.armed ? 'protection' : 'report-only';
+        const live = this.getConfig!();
+        const configPath = join(
+          live.dataDir ?? join(homedir(), '.panguard-guard'),
+          'config.json'
+        );
+        const config: GuardConfig = existsSync(configPath) ? loadConfig(configPath) : live;
+        const updatedConfig: GuardConfig = { ...config, mode: nextMode };
+        saveConfig(updatedConfig);
+        if (this.configApplier) this.configApplier(updatedConfig);
+        this.jsonResponse(res, { success: true, armed: update.armed, mode: nextMode });
+      } catch {
+        this.jsonResponse(res, { error: 'Invalid JSON' }, 400);
+      }
     });
   }
 
