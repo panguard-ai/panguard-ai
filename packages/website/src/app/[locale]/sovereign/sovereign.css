@@ -63,6 +63,30 @@
   .sv .nchip .ncode{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--dim)}
   .sv .nchip .nname{font-size:12px;color:var(--muted)}
 
+  /* ============ strategic frame: the sovereign stack (three pillars) ============ */
+  .sv .stackframe{padding:58px 0 62px;border-bottom:1px solid var(--hair)}
+  .sv .sfeye{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--sage);margin-bottom:16px}
+  .sv .sfh2{font-size:clamp(23px,3vw,33px);line-height:1.14;letter-spacing:-.022em;max-width:27ch;margin:0 0 32px;font-family:var(--disp);font-weight:600}
+  .sv .pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+  .sv .pil{background:var(--s1);padding:26px 26px 22px;display:flex;flex-direction:column}
+  .sv .pil.on{background:rgba(139,154,142,.08);box-shadow:inset 0 0 0 1px rgba(139,154,142,.45)}
+  .sv .pil .piln{font-family:var(--mono);font-size:10px;letter-spacing:.13em;color:var(--sage);margin-bottom:14px}
+  .sv .pil .pilt{font-size:17px;font-weight:600;letter-spacing:-.01em;margin-bottom:9px;font-family:var(--disp)}
+  .sv .pil .pild{color:var(--dim);font-size:13.5px;line-height:1.56;flex:1;margin-bottom:16px}
+  .sv .pil .pilm{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--hair);padding-top:12px}
+  .sv .pil.on .pilm{color:var(--sage-l);border-top-color:rgba(139,154,142,.28)}
+  .sv .sfline{font-size:clamp(15px,1.8vw,18.5px);color:var(--ink);max-width:74ch;margin:30px 0 0;line-height:1.6;font-family:var(--disp);font-weight:500}
+  .sv .sfline{position:relative;padding-left:18px}
+  .sv .sfline::before{content:"";position:absolute;left:0;top:4px;bottom:4px;width:2px;background:var(--sage)}
+
+  /* regulatory clock (why-now timeline) */
+  .sv .regclock{margin-top:36px;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+  .sv .rceye{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--sage);background:rgba(237,231,220,.02);padding:13px 22px;border-bottom:1px solid var(--hair2)}
+  .sv .rcrow{display:flex;gap:20px;background:var(--s1);padding:13px 22px;border-bottom:1px solid var(--hair);align-items:baseline}
+  .sv .regclock .rcrow:last-child{border-bottom:none}
+  .sv .rcrow .rcd{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--sage-l);flex:0 0 42px}
+  .sv .rcrow .rct{font-size:13.5px;color:var(--dim);line-height:1.5}
+
   /* ============ sections ============ */
   .sv section{padding:78px 0;position:relative;border-bottom:1px solid var(--hair)}
   .sv .shead{display:flex;align-items:center;gap:16px;margin-bottom:30px;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase}
@@ -206,7 +230,7 @@
     .sv .docref{display:none}
     .sv section{padding:56px 0}
     .sv .hero{padding:54px 0 48px}
-    .sv .matrix,.sv .principles,.sv .engage,.sv .stages,.sv .parties,.sv .threecol,.sv .nextsteps{grid-template-columns:1fr}
+    .sv .matrix,.sv .principles,.sv .engage,.sv .stages,.sv .parties,.sv .threecol,.sv .nextsteps,.sv .pillars{grid-template-columns:1fr}
     .sv .modelnote .mk{flex-basis:80px}
     .sv .proofrow{flex-direction:column;gap:6px}
     .sv .ctrl{grid-template-columns:1fr 1fr}

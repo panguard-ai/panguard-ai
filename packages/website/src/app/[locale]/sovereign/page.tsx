@@ -101,7 +101,7 @@ const BRIEF_HTML = `<div class="sv">
         <span class="wm">AI</span>
         <span class="sov">Sovereign</span>
       </a>
-      <div class="docref">Capability Brief · Rev 0.4</div>
+      <div class="docref">Capability Brief · Rev 0.5</div>
     </div>
   </div>
 
@@ -123,6 +123,19 @@ const BRIEF_HTML = `<div class="sv">
     </div>
   </header>
 
+  <div class="stackframe">
+    <div class="wrap">
+      <div class="sfeye reveal">The sovereign AI stack</div>
+      <h2 class="sfh2 reveal">Sovereign AI has three pillars. Two are being built worldwide. This is the third.</h2>
+      <div class="pillars">
+        <div class="pil reveal"><div class="piln">PILLAR 01</div><div class="pilt">Sovereign compute</div><div class="pild">Whose hardware runs the inference — chips and data centres under national control.</div><div class="pilm">Being built worldwide</div></div>
+        <div class="pil reveal"><div class="piln">PILLAR 02</div><div class="pilt">Sovereign models</div><div class="pild">Whose weights — models trained and hosted inside the jurisdiction.</div><div class="pilm">Being built worldwide</div></div>
+        <div class="pil on reveal"><div class="piln">PILLAR 03 · WHERE PANGUARD SITS</div><div class="pilt">Sovereign agent control &amp; proof</div><div class="pild">National policy enforced at every agent action, with evidence any auditor verifies offline. The pillar that decides whether autonomous AI can be trusted with sovereign work.</div><div class="pilm">Under-served today</div></div>
+      </div>
+      <p class="sfline reveal">Platform sovereignty asks an institution to trust a foreign vendor. PanGuard Sovereign is control the institution can verify — which is what sovereignty means.</p>
+    </div>
+  </div>
+
   <div class="roster-sec">
     <div class="wrap">
       <div class="roster-h reveal">Nations advancing sovereign AI capability</div>
@@ -139,6 +152,13 @@ const BRIEF_HTML = `<div class="sv">
         <div class="tc reveal"><div class="tcn">01 · AUTONOMY</div><h3>The risk is the action, not the model</h3><p>Prompt injection, tool poisoning, and over-autonomy can turn or over-reach an agent — it exfiltrates, escalates, or destroys in milliseconds, with no human in the loop. A safer model does not govern what the agent is permitted to do.</p></div>
         <div class="tc reveal"><div class="tcn">02 · ENFORCEMENT</div><h3>National policy never reaches the decision</h3><p>Policy exists on paper, but nothing enforces it at the point each agent acts — and supply-chain and advanced-model risks enter the decision unseen. Governing on any external hyperscaler puts the keys, the policy, and the audit trail beyond your reach in a crisis.</p></div>
         <div class="tc reveal"><div class="tcn">03 · PROOF</div><h3>Black-box decisions you cannot audit</h3><p>High-risk systems must produce demonstrable proof of what agents did and were allowed to do — for a regulator, an allied state, or an EU AI Act / NIST AI RMF obligation. &ldquo;Trust us&rdquo; is not a control.</p></div>
+      </div>
+      <div class="regclock reveal">
+        <div class="rceye">The regulatory clock &nbsp;·&nbsp; 2026</div>
+        <div class="rcrow"><span class="rcd">JAN</span><span class="rct">Korea&rsquo;s AI Basic Law enters force — the second comprehensive national AI law after the EU.</span></div>
+        <div class="rcrow"><span class="rcd">JUN</span><span class="rct">The EU defines four sovereign-cloud tiers (CADA) — sovereignty grading becomes institutional.</span></div>
+        <div class="rcrow"><span class="rcd">AUG</span><span class="rct">EU AI Act high-risk obligations become enforceable — logging and human-oversight duties bind.</span></div>
+        <div class="rcrow"><span class="rcd">NOW</span><span class="rct">National regulators flag autonomous agents as an unmanaged risk (Dutch DPA; French ANSSI).</span></div>
       </div>
     </div>
   </section>
@@ -380,9 +400,9 @@ const BRIEF_HTML = `<div class="sv">
 
   <section>
     <div class="wrap">
-      <div class="shead reveal"><span class="snum">Appendix</span><span class="slabel">Where this sits</span></div>
-      <h2 class="reveal">Sovereign AI has three pillars. Two are being built. This is the third.</h2>
-      <p class="sub reveal">Most sovereign-AI investment today buys compute and models — whose hardware runs the inference, and whose weights. A second market secures enterprise agents inside a vendor's cloud. PanGuard Sovereign occupies a third position: the assurance layer over agent behaviour itself, on infrastructure the institution controls.</p>
+      <div class="shead reveal"><span class="snum">Appendix</span><span class="slabel">Set against the adjacent categories</span></div>
+      <h2 class="reveal">The categories a sovereign team is already evaluating — and the gap they share.</h2>
+      <p class="sub reveal">Sovereign compute and models answer whose hardware and whose weights. Enterprise agent-security platforms secure corporate agents inside a vendor's cloud. Sovereign agent platforms build and run agents on-premises. Each answers a real question — and each leaves the same one open: governing what an autonomous agent may do with sovereign data, and proving it to an auditor afterwards.</p>
       <div class="ctable reveal" style="overflow-x:auto">
         <table>
           <thead><tr><th>Category</th><th>What it answers</th><th>What it does not</th></tr></thead>
@@ -394,7 +414,7 @@ const BRIEF_HTML = `<div class="sv">
           </tbody>
         </table>
       </div>
-      <p class="sub reveal" style="margin-top:14px">Platform sovereignty asks an institution to trust a foreign vendor. This is control the institution can verify — which is what sovereignty means.</p>
+      <p class="sub reveal" style="margin-top:14px">Occupying a distinct position is not the same as leading a mature market. This is an early, verifiable implementation of that third pillar, at design-partner stage — offered for evaluation, not as a finished category.</p>
     </div>
   </section>
 
@@ -402,12 +422,12 @@ const BRIEF_HTML = `<div class="sv">
     <div class="wrap">
       <div class="ctrl reveal">
         <div><div class="lab">Document</div><div class="val">Sovereign Capability Brief</div></div>
-        <div><div class="lab">Revision</div><div class="val">0.4</div></div>
+        <div><div class="lab">Revision</div><div class="val">0.5</div></div>
         <div><div class="lab">Classification</div><div class="val">Unrestricted</div></div>
         <div><div class="lab">Contact</div><div class="val">adam@agentthreatrule.org</div></div>
       </div>
       <div class="reveal" style="margin-top:22px"><a class="btn ghost" href="/">&#8592; panguard.ai — PanGuard main site</a></div>
-      <p class="disclaimer reveal">PanGuard Sovereign is a reference architecture at design-partner stage, built on the open Agent Threat Rules standard. This brief describes a working prototype under active development — not a generally-available, certified, or accredited product. Framework references indicate design intent and traceability, not certification. Maturity and capability statements are current as of Revision 0.4 and are subject to independent verification.</p>
+      <p class="disclaimer reveal">PanGuard Sovereign is a reference architecture at design-partner stage, built on the open Agent Threat Rules standard. This brief describes a working prototype under active development — not a generally-available, certified, or accredited product. Framework references indicate design intent and traceability, not certification. Maturity and capability statements are current as of Revision 0.5 and are subject to independent verification.</p>
     </div>
   </div>
 </div>`;
