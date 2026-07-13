@@ -2,6 +2,59 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.12] - 2026-07-13
+
+Built-in-tool hook false-positive fix (supersedes the aborted 1.8.11, whose
+publish never reached npm).
+
+- **The built-in-tool PreToolUse hook no longer false-blocks legitimate agent
+  shell commands.** Guarding the agent's OWN native shell (Bash/Edit/Write/
+  WebFetch), the hook was hard-denying ordinary commands like
+  `echo x; curl localhost` because MCP-tool-ARGUMENT rules (`scan_target: mcp` —
+  e.g. "Shell Metacharacter Injection in Tool Arguments", "Parameter Injection")
+  key on shell metacharacters (`;` `|` `$()`) that are anomalous inside an MCP
+  argument but the NORMAL grammar of a real shell. Those rules only reach a
+  tool_call at all via the engine's mcp-over-tool exception. The hook now degrades
+  an `mcp`-scoped match to an `ask` advisory on this surface (the posture warns,
+  never bricks the agent), while rules scoped to the shell's real domain
+  (`tool_args` / `skill` / `host` / `code` / `any`) still HARD-BLOCK — so
+  credential exfil (`cat ~/.ssh/id_rsa | curl`, `env | curl`) and reverse shells
+  are caught regardless. Verified against the full 747-rule bundle: 0/10 legit
+  commands blocked, credential exfil 2/2 still denied.
+- The gate keys on `scan_target` (a rule's intrinsic scope), not `maturity`, so it
+  never drifts as the rule corpus churns daily. The MCP proxy is unchanged: on a
+  genuine MCP argument, `; curl` really is injection and still denies.
+
+## [1.8.10] - 2026-07-13
+
+- **Dashboard Coverage/Skills tabs no longer hang ~9s.** `/api/agents` ran a
+  blocking `claude mcp list` (~4.5s, freezing the event loop) on every poll. MCP
+  detection is now cached (5-min TTL, stale-while-revalidate, in-flight dedup), so
+  the tab renders in ~40ms.
+
+## [1.8.9] - 2026-07-13
+
+- **Non-Overview dashboard tabs no longer render empty.** Embedding/proxying
+  browsers intermittently drop the HttpOnly launch-token cookie, producing a
+  single transient 401 that blanked Threats/Rules/Coverage/Skills. `af()` now
+  retries a transient 401 (4×, 250ms) before showing the unauthenticated state,
+  and self-heals on success.
+
+## [1.8.8] - 2026-07-13
+
+- **Dashboard "Automatic response" control (arm/disarm), honest copy.** The
+  posture hero gained a control over the OS-response layer (kill/block-IP/isolate).
+  Copy was corrected: detection and blocking are ALWAYS on (proxy + hook enforce
+  regardless of mode); this control governs only the automatic OS-level response,
+  never whether threats are caught.
+- **Connecting to Threat Cloud uploads VALID draft-request proposals.** The
+  up/audit flywheel now emits honest draft-requests carrying a real snippet +
+  `needsLLMDraft`, with secret values scrubbed — instead of title-keyword regex
+  (the discredited ATR-PRED-* anti-pattern).
+- **npm provenance fix.** `@panguard-ai/security-hardening` lacked a `repository`
+  field, which aborted `pnpm -r publish` mid-run under provenance (E422). The field
+  was added so every publishable package attaches signed build provenance.
+
 ## [1.8.7] - 2026-07-12
 
 Guard reliability + supply-chain.

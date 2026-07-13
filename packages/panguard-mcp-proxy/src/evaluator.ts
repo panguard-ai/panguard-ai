@@ -65,6 +65,10 @@ interface RuleLike {
   readonly severity: string;
   readonly maturity?: string;
   readonly confirm?: string;
+  /** ATR scan_target lives on the parsed rule under tags (rich vocab: mcp /
+   *  tool_args / skill / host / code / any / llm_io / ...). Used by the built-in-
+   *  tool surface gate to skip MCP-argument rules on a native shell command. */
+  readonly tags?: { readonly scan_target?: string };
 }
 
 /**
@@ -84,21 +88,26 @@ interface RuleLike {
  * Pure + exported so the policy is unit-tested independently of which live rule
  * happens to match (the rule corpus changes daily; this policy must not).
  */
-export function shouldHardDeny(rule: RuleLike, requireStable = false): boolean {
+export function shouldHardDeny(rule: RuleLike, builtinToolSurface = false): boolean {
   if (rule.confirm === 'embedding') return false;
-  if (requireStable) {
-    // Enforce-lane discipline for a HIGH-FALSE-POSITIVE surface — the built-in-
-    // tool hook evaluating the agent's OWN shell command. There, broad
-    // tool-argument-injection rules (scan_target:mcp shell-escape / parameter-
-    // injection, all maturity:test) key on shell metacharacters (`;` `|` `$()`)
-    // that are NORMAL in a real shell, so a `critical`+`test` rule false-blocks
-    // legitimate commands like `echo x; curl localhost`. On this surface only a
-    // wild-corpus-VALIDATED rule (maturity:stable — the enforce lane) may
-    // hard-block; every unvalidated rule degrades to an 'ask' advisory instead
-    // (the caller warns, never bricks the agent). Promote a rule to stable via
-    // the flywheel to re-arm it here. The MCP proxy keeps requireStable=false:
-    // on an actual MCP tool ARGUMENT, `; curl` really is injection.
-    return (rule.severity === 'critical' || rule.severity === 'high') && rule.maturity === 'stable';
+  if (builtinToolSurface && rule.tags?.scan_target === 'mcp') {
+    // FALSE-POSITIVE gate for the built-in-tool hook, which guards the agent's
+    // OWN native shell (Bash/Edit/Write/WebFetch). Rules scoped scan_target:mcp
+    // are MCP-tool-ARGUMENT rules — e.g. ATR-2026-00111 "Shell Metacharacter
+    // Injection in Tool Arguments" / ATR-2026-00066 "Parameter Injection" — that
+    // key on shell metacharacters (`;` `|` `$()`). Inside an MCP argument those
+    // are anomalous and rightly deny; but they are the NORMAL grammar of a real
+    // shell, so matched against the agent's own `echo x; curl localhost` they
+    // false-block legitimate work (they only reach a tool_call event at all via
+    // the engine's mcp-over-tool exception). On this surface an mcp-scoped rule
+    // therefore DEGRADES to an 'ask' advisory — the caller warns, never bricks
+    // the agent. Semantic exfil/RCE rules scoped to the shell's real domain
+    // (tool_args / skill / host / code / any) still hard-block, so credential
+    // exfil (`cat ~/.ssh/id_rsa | curl`, `env | curl`) is caught regardless of
+    // this gate. The MCP proxy leaves builtinToolSurface=false: on a genuine MCP
+    // ARGUMENT, `; curl` really is injection. This keys on scan_target (a rule's
+    // intrinsic scope), NOT maturity — so it never drifts with the daily corpus.
+    return false;
   }
   if (rule.severity === 'critical') return true;
   return rule.severity === 'high' && rule.maturity === 'stable';
@@ -243,9 +252,11 @@ export class ProxyEvaluator {
     args: Record<string, unknown>,
     eventType: AgentEvent['type'] = 'mcp_exchange',
     // The built-in-tool hook (guarding the agent's OWN Bash/Edit/Write) passes
-    // true: on that high-FP surface only a validated stable rule may hard-block;
-    // unvalidated rules advise. The MCP proxy leaves it false (default).
-    requireStable = false
+    // true: on that high-FP surface an MCP-argument rule (scan_target:mcp shell-
+    // metacharacter rule) advises instead of hard-blocking a real shell command.
+    // The MCP proxy leaves it false (default) — on a genuine MCP argument those
+    // rules correctly deny.
+    builtinToolSurface = false
   ): Promise<EvalResult> {
     const start = Date.now();
 
@@ -274,7 +285,7 @@ export class ProxyEvaluator {
       },
     };
 
-    return this.evaluate(event, start, requireStable);
+    return this.evaluate(event, start, builtinToolSurface);
   }
 
   /**
@@ -314,7 +325,7 @@ export class ProxyEvaluator {
   private async evaluate(
     event: AgentEvent,
     start: number,
-    requireStable = false
+    builtinToolSurface = false
   ): Promise<EvalResult> {
     try {
       const matches = this.engine.evaluate(event);
@@ -351,7 +362,7 @@ export class ProxyEvaluator {
       // Bundled/trusted rules are unaffected. This is the arm gate for the
       // enforce path.
       const blockMatch = matches.find(
-        (m) => shouldHardDeny(m.rule, requireStable) && !this.adviseOnlyIds.has(m.rule.id)
+        (m) => shouldHardDeny(m.rule, builtinToolSurface) && !this.adviseOnlyIds.has(m.rule.id)
       );
       const askMatch =
         blockMatch ??
