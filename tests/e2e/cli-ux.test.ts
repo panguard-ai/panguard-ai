@@ -60,12 +60,13 @@ describe('Install & Version Check', () => {
     const r = run(['--help']);
     expect(r.status).toBe(0);
     const out = output(r);
-    // Core commands must be present
+    // Slim default help: only the 5 commands a normal user needs (advanced
+    // commands still work but are hidden from top-level help).
+    expect(out).toMatch(/\bup\b/);
     expect(out).toMatch(/scan/);
-    expect(out).toMatch(/guard/);
     expect(out).toMatch(/status/);
     expect(out).toMatch(/doctor/);
-    expect(out).toMatch(/config/);
+    expect(out).toMatch(/upgrade/);
   });
 
   it('pga --help contains no Chinese characters', () => {
