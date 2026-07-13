@@ -17,7 +17,7 @@ const DEMOS: readonly { key: string; image: string; alt: string; width: number; 
     {
       key: 'runtime',
       image: '/demo/dashboard-runtime.png',
-      alt: 'PanGuard Runtime — live allow / deny / ask decisions from the MCP proxy as agents call tools; quiet when healthy, a row appears only on a real evaluation',
+      alt: 'PanGuard Runtime — live allow / deny / ask decisions from the MCP proxy as agents call tools: two blocked attacks (credential exfiltration and SSRF to the cloud metadata endpoint) among allowed file reads and database queries, each row timestamped with a confidence score',
       width: 1920,
       height: 1080,
     },
