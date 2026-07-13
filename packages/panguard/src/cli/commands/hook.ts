@@ -655,10 +655,18 @@ export async function runHook(
     // tool_call rule set (shell injection, credential theft, SSRF, RCE) plus
     // mcp_exchange rules — a built-in tool call is neither multi-agent comms
     // nor an LLM prompt, so those rule families are correctly skipped.
+    // requireStable=true: this guards the agent's OWN shell/editor, where broad
+    // tool-argument-injection rules (scan_target:mcp, maturity:test) key on shell
+    // metacharacters that are NORMAL here and false-blocked legit commands like
+    // `echo x; curl localhost` (verified). Only a wild-corpus-validated (stable)
+    // rule may HARD-BLOCK the agent; every unvalidated rule degrades to an 'ask'
+    // advisory the posture surfaces (guarded warns; --enforce still blocks it for
+    // users who opt into the higher-FP posture).
     const result = await evaluator.evaluateToolCall(
       'command',
       { input: norm.content },
-      'tool_call'
+      'tool_call',
+      true
     );
 
     // Validate the evaluator outcome. An unexpected/unknown value must DENY

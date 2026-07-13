@@ -2,53 +2,55 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.11] - 2026-07-13
+
+Fix — the built-in-tool hook false-blocked legitimate shell commands.
+
+- **The PreToolUse hook that guards the agent's own Bash/Edit/Write blocked
+  ordinary commands** like `echo x; curl localhost`, `lsof | grep`, `$((i+1))`
+  as a critical "Parameter Injection". Root cause: it ran broad
+  tool-argument-injection rules (`scan_target: mcp`, `maturity: test`) that key
+  on shell metacharacters — which are an attack in an MCP tool argument but
+  perfectly normal in the agent's own shell. The hook now hard-blocks ONLY on
+  wild-corpus-validated `stable` rules (the enforce lane); every unvalidated
+  rule degrades to an advisory it surfaces but never blocks (`--enforce` still
+  blocks everything for users who accept the higher false-positive rate). The
+  MCP proxy — scanning actual MCP tool arguments, where those metacharacters
+  really are injection — is unchanged.
+
 ## [1.8.10] - 2026-07-13
 
 Dashboard performance — Coverage and Skills tabs no longer hang.
 
-- **Fixed: the Coverage and Skills tabs sat blank for ~9 seconds and the whole
-  dashboard periodically froze.** Platform/skill detection runs a `claude mcp
-list` subprocess (~4.5s) that blocks the server's event loop, and it ran on
-  every `/api/agents` and `/api/installed-skills` request — which the Overview
-  tab polls. Those results are now cached (5-minute TTL, refreshed in the
-  background), so `/api/agents` drops from ~9s to ~40ms once warm and the
-  dashboard stays responsive. Coverage and Skills now populate real data
-  promptly instead of appearing broken.
+- **The Coverage and Skills tabs sat blank ~9s and the dashboard periodically
+  froze.** Platform/skill detection runs a `claude mcp list` subprocess (~4.5s)
+  that blocks the event loop, and it ran on every `/api/agents` and
+  `/api/installed-skills` request — which Overview polls. Those results are now
+  cached (5-minute TTL, background refresh), so `/api/agents` drops from ~9s to
+  ~40ms once warm and the dashboard stays responsive.
 
 ## [1.8.9] - 2026-07-13
 
 Dashboard reliability — every tab loads through a cookie flap.
 
-- **Fixed: only the Overview tab showed live data; Rules / Skills / Coverage /
-  Runtime / Settings loaded to empty.** A proxying or embedded browser can drop
-  the dashboard's HttpOnly SameSite=Strict launch cookie for a single request, so
-  one `/api/*` call returns 401 even though the session is valid — the next one
-  succeeds. Overview hid this because it polls; the other tabs load once when you
-  open them, so a single 401 in that window left them blank with no retry. The
-  dashboard now retries a transient 401 (safe — a 401 is rejected before the
-  handler runs, so the request has no effect) and heals itself when a later call
-  succeeds. Rules, Skills, Coverage, Runtime and Settings now populate reliably.
+- **Only the Overview tab showed live data; Rules / Skills / Coverage / Runtime /
+  Settings loaded to empty** in a proxying or embedded browser that intermittently
+  drops the HttpOnly SameSite=Strict launch cookie for a single request. `af()`
+  now retries a transient 401 (safe — a 401 is rejected before the handler runs)
+  and heals the UI when a later call succeeds.
 
 ## [1.8.8] - 2026-07-13
 
 Dashboard control + Threat Cloud flywheel honesty.
 
-- **New "Automatic response" control on the dashboard Overview.** A one-click
-  toggle (`POST /api/enforce`) flips the daemon between `protection` and
-  `report-only` — i.e. whether Guard runs its automatic OS-level responses
-  (block IP / isolate file / kill process). It never touches `enforcementPolicy`,
-  so a single click can't enable a destructive action. The copy is explicit that
-  detection and tool-call blocking (MCP proxy + built-in-tool hook) run **always**,
-  independent of this switch, so the control never over- or under-claims what
-  protection is active. Posture still reads MONITORING (not a green PROTECTED)
-  until an OS response is actually configured.
+- **New "Automatic response" control on the Overview** (`POST /api/enforce`),
+  flipping the daemon between `protection` and `report-only` (its automatic
+  OS-level responses). Copy is explicit that detection + tool-call blocking run
+  always, independent of this switch.
 - **Threat Cloud rule proposals now carry real evidence, not report text.** The
-  `pga up` / `pga audit` flywheel used to synthesize a "rule" whose detection was
-  a regex built from the finding's title keywords — it matched PanGuard's own
-  report text, not the attack, and shipped no test cases. Proposals are now honest
-  draft-requests carrying the actual matched evidence (`needsLLMDraft`), which the
-  drafter turns into a real, test-backed rule. Any secret embedded in a matched
-  snippet is masked before upload.
+  `pga up` / `pga audit` flywheel no longer fabricates a rule from the finding's
+  title keywords; it emits an honest draft-request with the matched evidence,
+  and any secret in a snippet is masked before upload.
 
 ## [1.8.7] - 2026-07-12
 

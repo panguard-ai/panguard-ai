@@ -32,4 +32,29 @@ describe('shouldHardDeny — proxy hard-deny policy', () => {
     expect(shouldHardDeny({ severity: 'low', maturity: 'stable' })).toBe(false);
     expect(shouldHardDeny({ severity: 'informational', maturity: 'stable' })).toBe(false);
   });
+
+  // requireStable=true is the built-in-tool hook's enforce-lane gate: guarding
+  // the agent's OWN shell, an unvalidated (test/experimental) rule must NOT
+  // hard-block — even at critical severity — because broad tool-arg-injection
+  // rules key on shell metacharacters that are normal there (`echo x; curl y`).
+  // Only a wild-corpus-validated stable rule may hard-block; the rest advise.
+  describe('requireStable — built-in-tool hook enforce-lane gate', () => {
+    it('a critical rule hard-blocks ONLY when stable', () => {
+      expect(shouldHardDeny({ severity: 'critical', maturity: 'stable' }, true)).toBe(true);
+      expect(shouldHardDeny({ severity: 'critical', maturity: 'test' }, true)).toBe(false);
+      expect(shouldHardDeny({ severity: 'critical', maturity: 'experimental' }, true)).toBe(false);
+    });
+    it('a high rule still hard-blocks only when stable', () => {
+      expect(shouldHardDeny({ severity: 'high', maturity: 'stable' }, true)).toBe(true);
+      expect(shouldHardDeny({ severity: 'high', maturity: 'test' }, true)).toBe(false);
+    });
+    it('still never hard-blocks a broad confirm:embedding rule', () => {
+      expect(
+        shouldHardDeny({ severity: 'critical', maturity: 'stable', confirm: 'embedding' }, true)
+      ).toBe(false);
+    });
+    it('default (requireStable=false, the MCP proxy) is unchanged — critical always hard-denies', () => {
+      expect(shouldHardDeny({ severity: 'critical', maturity: 'test' })).toBe(true);
+    });
+  });
 });

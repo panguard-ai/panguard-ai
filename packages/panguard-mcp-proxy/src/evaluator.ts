@@ -84,8 +84,22 @@ interface RuleLike {
  * Pure + exported so the policy is unit-tested independently of which live rule
  * happens to match (the rule corpus changes daily; this policy must not).
  */
-export function shouldHardDeny(rule: RuleLike): boolean {
+export function shouldHardDeny(rule: RuleLike, requireStable = false): boolean {
   if (rule.confirm === 'embedding') return false;
+  if (requireStable) {
+    // Enforce-lane discipline for a HIGH-FALSE-POSITIVE surface — the built-in-
+    // tool hook evaluating the agent's OWN shell command. There, broad
+    // tool-argument-injection rules (scan_target:mcp shell-escape / parameter-
+    // injection, all maturity:test) key on shell metacharacters (`;` `|` `$()`)
+    // that are NORMAL in a real shell, so a `critical`+`test` rule false-blocks
+    // legitimate commands like `echo x; curl localhost`. On this surface only a
+    // wild-corpus-VALIDATED rule (maturity:stable — the enforce lane) may
+    // hard-block; every unvalidated rule degrades to an 'ask' advisory instead
+    // (the caller warns, never bricks the agent). Promote a rule to stable via
+    // the flywheel to re-arm it here. The MCP proxy keeps requireStable=false:
+    // on an actual MCP tool ARGUMENT, `; curl` really is injection.
+    return (rule.severity === 'critical' || rule.severity === 'high') && rule.maturity === 'stable';
+  }
   if (rule.severity === 'critical') return true;
   return rule.severity === 'high' && rule.maturity === 'stable';
 }
@@ -227,7 +241,11 @@ export class ProxyEvaluator {
   async evaluateToolCall(
     toolName: string,
     args: Record<string, unknown>,
-    eventType: AgentEvent['type'] = 'mcp_exchange'
+    eventType: AgentEvent['type'] = 'mcp_exchange',
+    // The built-in-tool hook (guarding the agent's OWN Bash/Edit/Write) passes
+    // true: on that high-FP surface only a validated stable rule may hard-block;
+    // unvalidated rules advise. The MCP proxy leaves it false (default).
+    requireStable = false
   ): Promise<EvalResult> {
     const start = Date.now();
 
@@ -256,7 +274,7 @@ export class ProxyEvaluator {
       },
     };
 
-    return this.evaluate(event, start);
+    return this.evaluate(event, start, requireStable);
   }
 
   /**
@@ -293,7 +311,11 @@ export class ProxyEvaluator {
     return this.evaluate(event, start);
   }
 
-  private async evaluate(event: AgentEvent, start: number): Promise<EvalResult> {
+  private async evaluate(
+    event: AgentEvent,
+    start: number,
+    requireStable = false
+  ): Promise<EvalResult> {
     try {
       const matches = this.engine.evaluate(event);
       const durationMs = Date.now() - start;
@@ -329,7 +351,7 @@ export class ProxyEvaluator {
       // Bundled/trusted rules are unaffected. This is the arm gate for the
       // enforce path.
       const blockMatch = matches.find(
-        (m) => shouldHardDeny(m.rule) && !this.adviseOnlyIds.has(m.rule.id)
+        (m) => shouldHardDeny(m.rule, requireStable) && !this.adviseOnlyIds.has(m.rule.id)
       );
       const askMatch =
         blockMatch ??
