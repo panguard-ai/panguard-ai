@@ -395,7 +395,30 @@ describe('DashboardServer — 1.7 control endpoints', () => {
       expect(d.enforcement.posture).toBe('degraded');
     });
 
-    it('protection mode WITH an armed response = protected', async () => {
+    it('protection mode WITH a genuinely-executable armed response = protected', async () => {
+      // kill-process runs unprivileged AND has a non-empty allow-list, so it can
+      // actually fire — this is a real armed action, not a fake-green.
+      dashboard.setConfigGetter(
+        () =>
+          ({
+            ...baseConfig(dataDir),
+            enforcementPolicy: {
+              blockIPs: { enabled: false },
+              killProcesses: { enabled: true, allowedProcessNames: ['evil-agent'] },
+              isolateFiles: { enabled: false, allowedPaths: [] },
+              disableAccounts: { enabled: false },
+            },
+          }) as unknown as GuardConfig
+      );
+      dashboard.updateStatus({ mode: 'protection', atrRuleCount: 100 });
+      const d = await (await get('/api/status')).json();
+      expect(d.enforcement.posture).toBe('protected');
+      expect(d.enforcement.armedActions).toContain('kill processes');
+    });
+
+    it('FAKE-GREEN GUARD (1.8.13): block-IP enabled on a non-root daemon is inert, NOT protected', async () => {
+      // block-IP needs root (pfctl); the test process is non-root, so arming it
+      // must NOT lift the posture to protected — it lands in inertActions instead.
       dashboard.setConfigGetter(
         () =>
           ({
@@ -410,8 +433,34 @@ describe('DashboardServer — 1.7 control endpoints', () => {
       );
       dashboard.updateStatus({ mode: 'protection', atrRuleCount: 100 });
       const d = await (await get('/api/status')).json();
-      expect(d.enforcement.posture).toBe('protected');
-      expect(d.enforcement.armedActions).toContain('block IPs');
+      const isRoot = typeof process.getuid === 'function' && process.getuid() === 0;
+      if (!isRoot) {
+        expect(d.enforcement.posture).toBe('monitoring');
+        expect(d.enforcement.armedActions).not.toContain('block IPs');
+        expect(d.enforcement.inertActions.join(' ')).toContain('block IPs');
+      } else {
+        expect(d.enforcement.posture).toBe('protected');
+      }
+    });
+
+    it('kill-process / isolate-file with an EMPTY allow-list is inert, NOT protected', async () => {
+      dashboard.setConfigGetter(
+        () =>
+          ({
+            ...baseConfig(dataDir),
+            enforcementPolicy: {
+              blockIPs: { enabled: false },
+              killProcesses: { enabled: true, allowedProcessNames: [] },
+              isolateFiles: { enabled: true, allowedPaths: [] },
+              disableAccounts: { enabled: false },
+            },
+          }) as unknown as GuardConfig
+      );
+      dashboard.updateStatus({ mode: 'protection', atrRuleCount: 100 });
+      const d = await (await get('/api/status')).json();
+      expect(d.enforcement.posture).toBe('monitoring');
+      expect(d.enforcement.armedActions).toEqual([]);
+      expect(d.enforcement.inertActions.length).toBeGreaterThan(0);
     });
 
     it('report-only mode reports report-only', async () => {

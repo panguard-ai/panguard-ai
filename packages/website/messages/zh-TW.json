@@ -790,7 +790,7 @@
       "ctaDocs": "看快速上手指南",
       "badgeRules": "{count} 條 ATR 規則",
       "badgeRecall": "Garak 97.2% 召回率",
-      "badgeMerged": "Microsoft + Cisco 已採用",
+      "badgeMerged": "已合併上游：Cisco + Microsoft",
       "badgeLicense": "MIT · 永久免費",
       "platformLabel": "自動偵測你的 AI agent：",
       "ticker1": "postmark-mcp v1.0.16 每天暗中轉寄 15,000 封信",
@@ -821,7 +821,7 @@
       }
     },
     "socialProof": {
-      "overline": "已被安全團隊採用",
+      "overline": "ATR 規則已合併進上游工具",
       "statRules": "ATR 偵測規則",
       "statScanned": "Skills 已掃描",
       "statRecall": "SKILL.md 召回率",
@@ -1195,7 +1195,7 @@
       "confidence": {
         "high": {
           "threshold": ">= 85%",
-          "action": "自動執行"
+          "action": "即時擋下;OS 層自動反應僅在你啟用且有權限時執行"
         },
         "medium": {
           "threshold": "50 - 84%",
@@ -6053,7 +6053,7 @@
             "747 條規則、3,200 個偵測模式，涵蓋 10 大類別",
             "RFC-001 v1.1 品質標準發布",
             "成熟度分級：draft / experimental / stable",
-            "Cisco AI Defense 採用 34 條 ATR 規則",
+            "34 條 ATR 規則已合併進 Cisco AI Defense skill-scanner 規則包",
             "OWASP Agentic Top 10：10/10 全覆蓋"
           ]
         },
@@ -6612,7 +6612,7 @@
     "ecosystem": {
       "eyebrow": "05 / CONVERGING",
       "title": "生態已經在<sage>向 ATR 收斂。</sage>",
-      "tier1": "IN PRODUCTION · THEIR PRODUCT SHIPS ATR",
+      "tier1": "IN PRODUCTION · ATR MERGED INTO THEIR RULE PACKS",
       "tier1Sub1": "314 條規則",
       "tier1Sub2": "287 條規則 · 每週自動同步",
       "tier1Sub3": "Norton / Avast",

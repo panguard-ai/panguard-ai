@@ -5,7 +5,7 @@ This file is a structured long-form context dump intended for AI coding tools
 llms-full.txt to understand a project at depth. It is auto-generated from
 the canonical source files in the panguard-ai repository.
 
-Last generated: 2026-07-13T10:17:56.109Z
+Last generated: 2026-07-13T19:16:58.869Z
 Sources of truth:
 - src/lib/stats.ts (product stats)
 - src/lib/atr-rules-compiled.ts (ATR rule index)
@@ -1000,7 +1000,7 @@ counterpart at panguard.ai/zh-TW/blog/{slug}-zh.
 ### ATR Implements the Detection Layer the NSA Identified as Missing in MCP
 - URL: https://panguard.ai/blog/nsa-mcp-csi-atr-detection-layer
 - Date: 2026-05-27
-- Excerpt: The NSA published 17 pages on MCP security risks in May 2026. It named zero detection frameworks. ATR fills that layer -- 433 rules covering all five NSA risk categories, in production at Microsoft, Cisco, MISP, and OWASP.
+- Excerpt: The NSA published 17 pages on MCP security risks in May 2026. It named zero detection frameworks. ATR fills that layer -- 433 rules covering all five NSA risk categories, merged upstream at Microsoft (AGT community-rules examples), Cisco (skill-scanner rule packs), MISP, and OWASP.
 
 ### The Guardrail Company Got Owned. Skill Provenance Is the Layer Below.
 - URL: https://panguard.ai/blog/guardrail-company-got-owned

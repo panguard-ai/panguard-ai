@@ -2,6 +2,42 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.13] - 2026-07-14
+
+GA-readiness honesty pass — an adversarial multi-dimension audit found the engine
+genuinely detects all claimed attack classes, but several posture/status surfaces
+claimed protection that could not actually execute. These are fixed so the cockpit
+never shows green for something it will not do.
+
+- **Posture executability (fake-green fix).** `computeEnforcement` claimed
+  `PROTECTED` from `enforcementPolicy.*.enabled` flags alone. It now verifies each
+  armed action can actually run before counting it: block-IP / disable-account need
+  root (the daemon installs per-user, non-root) so they no longer lift the posture
+  on a non-root host; kill-process / isolate-file count as armed only with a
+  non-empty allow-list. Actions the user enabled but that cannot fire are surfaced
+  as `inertActions` ("armed but inert") instead of a green PROTECTED.
+- **Built-in-tool hook credential-read gap.** The 1.8.12 `scan_target:mcp` gate was
+  too broad — it degraded the whole MCP-scoped rule class on the agent's own shell,
+  which silently downgraded a private-key read to a non-blocking advisory at the
+  default guarded posture. The gate now suppresses ONLY the shell-metacharacter
+  subcategories (shell-escape / parameter-injection); every other rule
+  (credential-theft, env-harvesting, …) hard-blocks again. Regression test added.
+- **Layer C health honesty.** The dashboard showed "Connected · advisory" whenever a
+  provider was configured, even when it was unreachable at startup and zero semantic
+  calls ever happened. Startup resolution now feeds health → shows degraded when the
+  configured model does not resolve.
+- **Hook self-removal detection (S5).** Removing the built-in-tool PreToolUse hook
+  from the agent settings no longer leaves the cockpit reporting a healthy posture —
+  the hook is sealed as tamper-evident self-state, so its removal flips the posture
+  to tampered (previously only `pga doctor` caught it).
+- **Threat Cloud "what is shared" honesty.** Corrected the collective-defense consent
+  copy: threat signatures are end-to-end sealed, but flagged-skill contributions
+  (skill names, finding titles, draft rules) travel over encrypted HTTPS (readable by
+  the backend), not sealed E2E. Sealing those paths too is tracked as a follow-up.
+- **Install one-liner fixed.** `npm install -g panguard` now exposes both `panguard`
+  and `pga` (the wrapper's bin map gained `pga`), so the documented headline
+  `npm install -g panguard && pga up` works on a fresh machine.
+
 ## [1.8.12] - 2026-07-13
 
 Built-in-tool hook false-positive fix (supersedes the aborted 1.8.11, whose

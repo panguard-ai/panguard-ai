@@ -133,12 +133,12 @@ export const LAYERS: readonly Layer[] = [
       zh: '一個惡意 skill 安裝 = agent 被劫持。postmark-mcp 事件安靜轉發 15,000 封 email/天數月才被發現。在 agent 執行那段程式碼前先掃過。',
     },
     how: {
-      en: 'Regex-first ATR engine with optional LLM semantic layer. Rules stored as YAML with versioned lifecycle (draft → experimental → stable). Web scanner at panguard.ai/ and CLI `pga scan <url-or-path>`. Microsoft AGT + Cisco AI Defense ship these rules as their reference detection pack.',
-      zh: '以 regex 為主的 ATR 引擎，可選 LLM 語意層。規則以 YAML 儲存，有版本生命週期(draft → experimental → stable)。Web scanner 在 panguard.ai/,CLI `pga scan <url-or-path>`。Microsoft AGT + Cisco AI Defense 已把這些規則當作參考偵測包。',
+      en: 'Regex-first ATR engine with optional LLM semantic layer. Rules stored as YAML with versioned lifecycle (draft → experimental → stable). Web scanner at panguard.ai/ and CLI `pga scan <url-or-path>`. ATR rules merged upstream into Cisco AI Defense skill-scanner rule packs (PR #99, in production) and Microsoft AGT community-rules examples (PR #1277) — maintainer-accepted contributions, not vendor endorsements.',
+      zh: '以 regex 為主的 ATR 引擎，可選 LLM 語意層。規則以 YAML 儲存，有版本生命週期(draft → experimental → stable)。Web scanner 在 panguard.ai/,CLI `pga scan <url-or-path>`。ATR 規則已上游合併進 Cisco AI Defense skill-scanner 規則包(PR #99,生產環境)與 Microsoft AGT community-rules 範例(PR #1277)— 由維護者接受的貢獻,非廠商背書。',
     },
     proof: {
-      en: `${STATS.totalRulesDisplay} ATR rules (MIT licensed) · ${STATS.benchmark.garak.recall}% recall on NVIDIA Garak (${STATS.benchmark.garak.samples} adversarial prompts) · ${STATS.benchmark.skill.recall}% recall / ${STATS.benchmark.skill.precision}% precision on ${STATS.benchmark.skill.samples} real-world SKILL.md samples · 0.48% FP (enforce lane) on 3,115 wild Skills.sh packages, hunt lane higher · Cisco AI Defense ships the full pack via PR #79 + #99; Microsoft AGT ships ${STATS.adoption.microsoftRulesMerged} rules via PR #908 + #1277.`,
-      zh: `${STATS.totalRulesDisplay} 條 ATR 規則（MIT 授權）· NVIDIA Garak ${STATS.benchmark.garak.recall}% 召回（${STATS.benchmark.garak.samples} 個對抗 prompt）· ${STATS.benchmark.skill.samples} 個真實 SKILL.md 樣本 ${STATS.benchmark.skill.recall}% 召回 / ${STATS.benchmark.skill.precision}% 精度 · 3,115 個野外 Skills.sh 套件 0.48% FP（enforce lane，hunt lane 較高）· Cisco AI Defense 透過 PR #79 + #99 引入完整規則包；Microsoft AGT 透過 PR #908 + #1277 引入 ${STATS.adoption.microsoftRulesMerged} 條。`,
+      en: `${STATS.totalRulesDisplay} ATR rules (MIT licensed) · ${STATS.benchmark.garak.recall}% recall on NVIDIA Garak (${STATS.benchmark.garak.samples} adversarial prompts) · ${STATS.benchmark.skill.recall}% recall / ${STATS.benchmark.skill.precision}% precision on ${STATS.benchmark.skill.samples} real-world SKILL.md samples · 0.48% FP (enforce lane) on 3,115 wild Skills.sh packages, hunt lane higher · Merged upstream: full ATR pack into Cisco AI Defense skill-scanner rule packs, in production (PR #79 + #99); ${STATS.adoption.microsoftRulesMerged} rules into Microsoft AGT community-rules examples (PR #908 + #1277) — maintainer-accepted contributions, not vendor endorsements.`,
+      zh: `${STATS.totalRulesDisplay} 條 ATR 規則（MIT 授權）· NVIDIA Garak ${STATS.benchmark.garak.recall}% 召回（${STATS.benchmark.garak.samples} 個對抗 prompt）· ${STATS.benchmark.skill.samples} 個真實 SKILL.md 樣本 ${STATS.benchmark.skill.recall}% 召回 / ${STATS.benchmark.skill.precision}% 精度 · 3,115 個野外 Skills.sh 套件 0.48% FP（enforce lane，hunt lane 較高）· 上游合併:完整 ATR 規則包進入 Cisco AI Defense skill-scanner 規則包(生產環境,PR #79 + #99);${STATS.adoption.microsoftRulesMerged} 條進入 Microsoft AGT community-rules 範例(PR #908 + #1277)— 由維護者接受的貢獻,非廠商背書。`,
     },
     proofShort: {
       en: `${STATS.totalRulesDisplay} rules · ${STATS.benchmark.garak.recall}% Garak recall · 0.48% FP (enforce lane)`,
@@ -182,8 +182,8 @@ export const LAYERS: readonly Layer[] = [
         label: 'Microsoft Agent Governance Toolkit #908 + #1277',
         href: 'https://github.com/microsoft/agent-governance-toolkit/pull/1277',
         context: {
-          en: 'Merged: 287 ATR rules + weekly auto-sync workflow into AGT production',
-          zh: '已合併：287 條 ATR 規則 + 每週自動同步 workflow 進入 AGT 生產環境',
+          en: 'Merged: 287 ATR rules + weekly auto-sync workflow into AGT community-rules examples (examples/atr-community-rules/) — maintainer-accepted, not product core',
+          zh: '已合併：287 條 ATR 規則 + 每週自動同步 workflow 進入 AGT community-rules 範例(examples/atr-community-rules/)— 維護者接受,非產品核心',
         },
       },
       {

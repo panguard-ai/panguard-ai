@@ -137,14 +137,14 @@ export default function EnterpriseContent() {
                         '五大合規框架自動對照：EU AI Act、NIST AI RMF、ISO/IEC 42001、OWASP Agentic、OWASP LLM Top 10',
                         '稽核證據包附 SHA-256 與 Merkle tree 簽章',
                         '6 分頁 Web Dashboard、地端部署',
-                        '客戶貢獻的規則可回流到 ATR 上游，被 Cisco、Microsoft 等下游廠商採用',
+                        '客戶貢獻的規則可回流到 ATR 上游——即 ATR 規則被合併進 Cisco、Microsoft repo 的同一條路徑（維護者接受的貢獻，非廠商背書）',
                       ]
                     : [
                         'Joint LLM and human refinement at the quality level of Cisco-merged PRs',
                         'Auto-mapping to five compliance frameworks: EU AI Act, NIST AI RMF, ISO/IEC 42001, OWASP Agentic, OWASP LLM Top 10',
                         'Audit evidence packs signed with SHA-256 and Merkle tree',
                         '6-tab Web Dashboard with on-prem deployment',
-                        'Customer-contributed rules can flow back upstream into ATR and be adopted by Cisco, Microsoft, and other downstream vendors',
+                        'Customer-contributed rules can flow back upstream into ATR — the same path by which ATR rules were merged into Cisco and Microsoft repos (maintainer-accepted contributions, not vendor endorsements)',
                       ]
                   ).map((f) => (
                     <li key={f} className="flex items-start gap-2.5">
@@ -228,8 +228,8 @@ export default function EnterpriseContent() {
               <div className="space-y-4 text-[14px] text-text-secondary leading-[1.85]">
                 <p>
                   {isZh
-                    ? '客戶可在 draft 規則公開前 30 天即取得，便於在攻擊曝光前完成內部部署測試。客戶在 Migrator 中精修出來的規則，也可以選擇回流到 ATR 上游——一旦 merge，這些規則會被 Cisco AI Defense、Microsoft AGT 等下游廠商共同採用，等於把貴公司的偵測知識資產推廣到整個生態系。'
-                    : 'Customers receive draft rules 30 days before public release, allowing internal deployment testing before attacks become public. Rules refined inside Migrator can also be sent back upstream — once merged into ATR, those rules ship across the ecosystem to Cisco AI Defense, Microsoft AGT, and others, effectively distributing your detection IP across the industry.'}
+                    ? '客戶可在 draft 規則公開前 30 天即取得，便於在攻擊曝光前完成內部部署測試。客戶在 Migrator 中精修出來的規則，也可以選擇回流到 ATR 上游——一旦 merge，便走上 ATR 規則被合併進 Cisco AI Defense（production skill-scanner 規則包，PR #99）與 Microsoft AGT（community-rules 範例，PR #1277）的同一條上游路徑，協助把貴公司的偵測知識資產推廣到採用 ATR 的各 repo——維護者接受的貢獻，非廠商背書。'
+                    : 'Customers receive draft rules 30 days before public release, allowing internal deployment testing before attacks become public. Rules refined inside Migrator can also be sent back upstream — once merged into ATR, they travel the same upstream path by which ATR rules were merged into Cisco AI Defense (production skill-scanner rule packs, PR #99) and Microsoft AGT (community-rules examples, PR #1277), helping distribute your detection IP across repos that consume ATR — maintainer-accepted contributions, not vendor endorsements.'}
                 </p>
               </div>
 
@@ -241,13 +241,13 @@ export default function EnterpriseContent() {
                   {(isZh
                     ? [
                         'Draft 規則公開前 30 天即可取得',
-                        '客戶貢獻規則的回流機制：可被 Cisco、Microsoft 等下游廠商採用',
+                        '客戶貢獻規則的回流機制：規則可提交至 ATR 上游——ATR 規則已被合併進 Cisco、Microsoft repo（維護者接受，非廠商背書）',
                         '優先規則更新 SLA：4 小時內（Community 為 24 小時內）',
                         'Roadmap 投票權與季度高階主管 review',
                       ]
                     : [
                         'Early access to draft rules 30 days before public release',
-                        'Upstream contribution path: customer rules can be adopted by Cisco, Microsoft, and other downstream vendors',
+                        'Upstream contribution path: customer rules can be submitted to ATR, whose rules have been merged into Cisco and Microsoft repos (maintainer-accepted, not vendor endorsements)',
                         'Priority rule update SLA within 4 hours (Community SLA is within 24 hours)',
                         'Roadmap vote and quarterly executive review',
                       ]
@@ -275,7 +275,7 @@ export default function EnterpriseContent() {
                       'On-prem、VPC、airgap 部署',
                       'SAML SSO、SCIM、SIEM webhook、稽核日誌匯出',
                       'AIAM（agent identity、scope、delegation）—— 預計 2026 Q3 上線',
-                      'F500 Logo 計畫，與 Cisco、Microsoft、NVIDIA 生態系 co-sell',
+                      'F500 Logo 計畫與生態系 co-sell 規劃',
                       '專屬 Customer Success Manager',
                       'PanGuard Inc. SOC 2 Type 1 認證進行中（目標 2026 Q3）',
                       'SOC 2 Type II 目標 2027 H2',
@@ -285,7 +285,7 @@ export default function EnterpriseContent() {
                       'On-prem, VPC, and airgap deployment',
                       'SAML SSO, SCIM, SIEM webhook, audit log export',
                       'AIAM — agent identity, scope, and delegation (target Q3 2026)',
-                      'F500 Logo program; co-sell with Cisco, Microsoft, and NVIDIA ecosystem',
+                      'F500 Logo program and ecosystem co-sell motion',
                       'Dedicated Customer Success Manager',
                       'PanGuard Inc. SOC 2 Type 1 in flight (target Q3 2026)',
                       'SOC 2 Type II target H2 2027',
@@ -486,8 +486,8 @@ export default function EnterpriseContent() {
             }
             subtitle={
               isZh
-                ? `Cisco AI Defense 已採用完整 ${STATS.totalRulesDisplay} 條 ATR 規則包；Microsoft AGT 採用 ${STATS.adoption.microsoftRulesMerged} 條並啟用每週自動同步；NVIDIA garak 的整合正在進行中。若貴公司的產品需要精修到 Cisco 已合併 PR 品質的版本——包含 draft 規則的早期存取、五大框架合規 metadata，以及白標部署——OEM tier 是為這個情境設計的方案。`
-                : `Cisco AI Defense ships the full ${STATS.totalRulesDisplay}-rule ATR pack. Microsoft AGT ships ${STATS.adoption.microsoftRulesMerged} rules with weekly auto-sync. NVIDIA garak integration is in flight. For vendors who need the Cisco-merge-PR-quality enriched version — early access to draft rules, five-framework compliance metadata, white-label deployment — the OEM tier is purpose-built for that scenario.`
+                ? `ATR 規則已被合併進上游廠商的規則包——由維護者接受的貢獻，非廠商背書。${STATS.totalRulesDisplay} 條 ATR 規則包已合併進 Cisco AI Defense skill-scanner 規則包並用於 production（PR #99）；${STATS.adoption.microsoftRulesMerged} 條已合併進 Microsoft AGT 的 community-rules 範例（PR #1277）；NVIDIA garak 的整合正在進行中。若貴公司的產品需要精修到 Cisco 已合併 PR 品質的版本——包含 draft 規則的早期存取、五大框架合規 metadata，以及白標部署——OEM tier 是為這個情境設計的方案。`
+                : `ATR rules have been merged upstream into vendor rule packs — maintainer-accepted contributions, not vendor endorsements. The ${STATS.totalRulesDisplay}-rule ATR pack is merged into Cisco AI Defense skill-scanner rule packs, in production (PR #99); ${STATS.adoption.microsoftRulesMerged} rules are merged into Microsoft AGT community-rules examples (PR #1277); NVIDIA garak integration is in flight. For vendors who need the Cisco-merge-PR-quality enriched version — early access to draft rules, five-framework compliance metadata, white-label deployment — the OEM tier is purpose-built for that scenario.`
             }
           />
 

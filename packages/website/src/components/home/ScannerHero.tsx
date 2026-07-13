@@ -519,7 +519,7 @@ function ScannerHeroSkeleton() {
             Garak {STATS.benchmark.garak.recall}% recall
           </span>
           <span className="rounded-full border border-border bg-surface-1 px-3 py-1 font-mono text-[10px] uppercase tracking-micro text-text-muted">
-            Microsoft + Cisco merged
+            Rules merged upstream
           </span>
           <span className="rounded-full border border-border bg-surface-1 px-3 py-1 font-mono text-[10px] uppercase tracking-micro text-text-muted">
             MIT licensed

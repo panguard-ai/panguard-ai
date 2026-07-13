@@ -225,6 +225,10 @@ interface EnforcementStatus {
     | 'degraded';
   readonly osActionsArmed: boolean;
   readonly armedActions: string[];
+  /** Actions the user ENABLED in config that cannot actually fire on this host
+   *  (root-only action on a non-root daemon, or an empty allow-list). Surfaced so
+   *  the cockpit can say "armed but inert" instead of a fake-green PROTECTED. */
+  readonly inertActions?: string[];
   /** S5: config-integrity + self-removal verdict surfaced to the cockpit. */
   readonly integrity?: {
     readonly status: string;
@@ -1256,11 +1260,34 @@ export class DashboardServer {
     const cfg = this.getConfig?.();
     const mode = this.status.mode ?? 'learning';
     const ep = cfg?.enforcementPolicy;
+    // FAKE-GREEN GUARD (S2): an OS action counts as EFFECTIVELY armed — and can
+    // lift the posture to PROTECTED — only if it can ACTUALLY execute on this host.
+    // Reporting a config flag as armed when the action can never fire is the exact
+    // "says PROTECTED, prevents nothing" overclaim the honesty doctrine forbids.
+    //  - block-IP / disable-account shell to pfctl|iptables / dscl|usermod, which
+    //    need ROOT. The daemon installs per-user (non-root by design), so on a
+    //    non-root install they physically cannot run.
+    //  - kill-process / isolate-file run unprivileged, but safety-rules rejects
+    //    EVERY target when the allow-list is empty, so an empty allow-list is inert.
+    const isRoot = typeof process.getuid === 'function' && process.getuid() === 0;
     const armed: string[] = [];
-    if (ep?.blockIPs?.enabled) armed.push('block IPs');
-    if (ep?.killProcesses?.enabled) armed.push('kill processes');
-    if (ep?.isolateFiles?.enabled) armed.push('isolate files');
-    if (ep?.disableAccounts?.enabled) armed.push('disable accounts');
+    const inertActions: string[] = [];
+    if (ep?.blockIPs?.enabled) {
+      if (isRoot) armed.push('block IPs');
+      else inertActions.push('block IPs (needs root — daemon runs unprivileged)');
+    }
+    if (ep?.killProcesses?.enabled) {
+      if ((ep.killProcesses.allowedProcessNames?.length ?? 0) > 0) armed.push('kill processes');
+      else inertActions.push('kill processes (no processes allow-listed)');
+    }
+    if (ep?.isolateFiles?.enabled) {
+      if ((ep.isolateFiles.allowedPaths?.length ?? 0) > 0) armed.push('isolate files');
+      else inertActions.push('isolate files (no paths allow-listed)');
+    }
+    if (ep?.disableAccounts?.enabled) {
+      if (isRoot) armed.push('disable accounts');
+      else inertActions.push('disable accounts (needs root — daemon runs unprivileged)');
+    }
     const osActionsArmed = mode === 'protection' && armed.length > 0;
     let posture: EnforcementStatus['posture'];
     if (mode === 'protection') posture = osActionsArmed ? 'protected' : 'monitoring';
@@ -1300,7 +1327,7 @@ export class DashboardServer {
         /* integrity is best-effort — never break the status response */
       }
     }
-    return { mode, posture, osActionsArmed, armedActions: armed, integrity };
+    return { mode, posture, osActionsArmed, armedActions: armed, inertActions, integrity };
   }
 
   private normalizeLicenseTier(t: string): 'community' | 'pilot' | 'enterprise' | 'free' | 'pro' {

@@ -16,12 +16,12 @@ import { Eyebrow } from './v2/primitives';
 const ADOPTERS: readonly { name: string; detail: string; highlight?: boolean }[] = [
   {
     name: 'Cisco AI Defense',
-    detail: `${STATS.adoption.ciscoRulesMerged} ATR rules merged (PR #79 + #99)`,
+    detail: `${STATS.adoption.ciscoRulesMerged} rules merged · skill-scanner packs (PR #79 + #99)`,
     highlight: true,
   },
   {
     name: 'Microsoft AGT',
-    detail: `${STATS.adoption.microsoftRulesMerged} ATR rules merged (PR #908 + #1277)`,
+    detail: `${STATS.adoption.microsoftRulesMerged} rules merged · community-rules examples (PR #908 + #1277)`,
     highlight: true,
   },
   { name: 'NVIDIA Garak', detail: `${STATS.benchmark.garak.recall}% recall · PR open` },

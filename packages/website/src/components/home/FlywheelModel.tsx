@@ -67,7 +67,7 @@ const EN: FlywheelCopy = {
     {
       n: '01',
       title: 'The standard is spreading',
-      body: 'New agent attacks surface in the wild and become open ATR rules — MIT-licensed, growing roughly twice a day. Already adopted by Microsoft, Cisco and MISP. The wider the agent world adopts it, the more it becomes the default way to describe an agent threat.',
+      body: 'New agent attacks surface in the wild and become open ATR rules — MIT-licensed, growing roughly twice a day. Merged upstream into Microsoft, Cisco and MISP. The wider the agent world adopts it, the more it becomes the default way to describe an agent threat.',
     },
     {
       n: '02',
@@ -116,7 +116,7 @@ const ZH: FlywheelCopy = {
     {
       n: '01',
       title: '標準正在擴散',
-      body: '新的 agent 攻擊在野外冒出，變成開放的 ATR 規則——MIT 授權，大約每天兩條地長。已被 Microsoft、Cisco、MISP 採用。agent 世界採用得越廣，它就越成為描述 agent 威脅的預設方式。',
+      body: '新的 agent 攻擊在野外冒出，變成開放的 ATR 規則——MIT 授權，大約每天兩條地長。已向 Microsoft、Cisco、MISP 上游合入。agent 世界採用得越廣，它就越成為描述 agent 威脅的預設方式。',
     },
     {
       n: '02',

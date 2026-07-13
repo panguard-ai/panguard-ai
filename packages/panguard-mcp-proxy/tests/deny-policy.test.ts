@@ -34,21 +34,32 @@ describe('shouldHardDeny — proxy hard-deny policy', () => {
   });
 
   // builtinToolSurface=true is the built-in-tool hook's FP gate: guarding the
-  // agent's OWN native shell, a rule scoped scan_target:mcp (an MCP-tool-ARGUMENT
-  // rule, e.g. "Shell Metacharacter Injection in Tool Arguments") must NOT
-  // hard-block — those key on shell metacharacters (`;` `|`) that are the normal
-  // grammar of a shell (`echo x; curl localhost`). Rules scoped to the shell's
-  // real domain (tool_args/skill/host/code/any) still hard-block, so credential
-  // exfil is caught regardless. The gate keys on scan_target (a rule's intrinsic
-  // scope), NOT maturity — so it never drifts with the daily rule corpus.
-  describe('builtinToolSurface — built-in-tool hook scan_target:mcp gate', () => {
-    it('an mcp-scoped rule does NOT hard-block on the built-in surface (advises)', () => {
+  // agent's OWN native shell, ONLY the shell-metacharacter-injection subcategories
+  // (shell-escape / parameter-injection) degrade — those key on `;` `|` `$()`
+  // grammar that is normal in a shell (`echo x; curl localhost`). Every OTHER
+  // scan_target:mcp rule (credential-theft, env-var-harvesting, tool-poisoning)
+  // detects malicious SEMANTICS illegitimate on any shell and MUST keep blocking —
+  // 1.8.12's whole-class gate wrongly degraded `cat ~/.ssh/id_rsa` to advisory.
+  describe('builtinToolSurface — built-in-tool hook shell-metacharacter gate', () => {
+    it('mcp shell-escape / parameter-injection rules degrade on the built-in surface (the real FP)', () => {
+      expect(
+        shouldHardDeny({ severity: 'critical', maturity: 'test', tags: { scan_target: 'mcp', subcategory: 'shell-escape' } }, true)
+      ).toBe(false);
+      expect(
+        shouldHardDeny({ severity: 'critical', maturity: 'stable', tags: { scan_target: 'mcp', subcategory: 'parameter-injection' } }, true)
+      ).toBe(false);
+    });
+    it('REGRESSION (1.8.13): mcp credential-theft / env-harvesting STILL hard-block on the built-in surface (cat ~/.ssh/id_rsa)', () => {
+      expect(
+        shouldHardDeny({ severity: 'critical', maturity: 'test', tags: { scan_target: 'mcp', subcategory: 'credential-theft' } }, true)
+      ).toBe(true);
+      expect(
+        shouldHardDeny({ severity: 'critical', maturity: 'test', tags: { scan_target: 'mcp', subcategory: 'env-var-harvesting' } }, true)
+      ).toBe(true);
+      // an mcp rule with no/other subcategory is NOT a metacharacter FP -> still blocks
       expect(
         shouldHardDeny({ severity: 'critical', maturity: 'test', tags: { scan_target: 'mcp' } }, true)
-      ).toBe(false);
-      expect(
-        shouldHardDeny({ severity: 'critical', maturity: 'stable', tags: { scan_target: 'mcp' } }, true)
-      ).toBe(false);
+      ).toBe(true);
     });
     it('a shell-domain rule (tool_args/skill/host/code) still hard-blocks on the built-in surface', () => {
       expect(

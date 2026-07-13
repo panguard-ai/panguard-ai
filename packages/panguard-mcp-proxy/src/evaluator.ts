@@ -68,8 +68,23 @@ interface RuleLike {
   /** ATR scan_target lives on the parsed rule under tags (rich vocab: mcp /
    *  tool_args / skill / host / code / any / llm_io / ...). Used by the built-in-
    *  tool surface gate to skip MCP-argument rules on a native shell command. */
-  readonly tags?: { readonly scan_target?: string };
+  readonly tags?: { readonly scan_target?: string; readonly subcategory?: string };
 }
+
+/**
+ * The ONLY rule subcategories whose detection keys on shell METACHARACTERS
+ * (`;` `|` `$()` `&&`) — the grammar that is anomalous inside an MCP tool
+ * argument but NORMAL in the agent's own shell. Only these may degrade on the
+ * built-in-tool surface. Everything else scoped scan_target:mcp (credential-theft,
+ * env-var-harvesting, tool-poisoning, ...) detects malicious SEMANTICS that are
+ * illegitimate on any shell and MUST keep hard-blocking there. 1.8.12 wrongly
+ * gated the whole scan_target:mcp class, which silently degraded credential theft
+ * (`cat ~/.ssh/id_rsa`) to an advisory on the agent's own shell — a shipped hole.
+ */
+const SHELL_METACHAR_FP_SUBCATEGORIES: ReadonlySet<string> = new Set([
+  'shell-escape',
+  'parameter-injection',
+]);
 
 /**
  * Whether a single rule match is strong enough to HARD-DENY a live tool call
@@ -90,21 +105,24 @@ interface RuleLike {
  */
 export function shouldHardDeny(rule: RuleLike, builtinToolSurface = false): boolean {
   if (rule.confirm === 'embedding') return false;
-  if (builtinToolSurface && rule.tags?.scan_target === 'mcp') {
+  if (
+    builtinToolSurface &&
+    rule.tags?.scan_target === 'mcp' &&
+    SHELL_METACHAR_FP_SUBCATEGORIES.has(rule.tags?.subcategory ?? '')
+  ) {
     // FALSE-POSITIVE gate for the built-in-tool hook, which guards the agent's
-    // OWN native shell (Bash/Edit/Write/WebFetch). Rules scoped scan_target:mcp
-    // are MCP-tool-ARGUMENT rules — e.g. ATR-2026-00111 "Shell Metacharacter
-    // Injection in Tool Arguments" / ATR-2026-00066 "Parameter Injection" — that
-    // key on shell metacharacters (`;` `|` `$()`). Inside an MCP argument those
-    // are anomalous and rightly deny; but they are the NORMAL grammar of a real
-    // shell, so matched against the agent's own `echo x; curl localhost` they
-    // false-block legitimate work (they only reach a tool_call event at all via
-    // the engine's mcp-over-tool exception). On this surface an mcp-scoped rule
-    // therefore DEGRADES to an 'ask' advisory — the caller warns, never bricks
-    // the agent. Semantic exfil/RCE rules scoped to the shell's real domain
-    // (tool_args / skill / host / code / any) still hard-block, so credential
-    // exfil (`cat ~/.ssh/id_rsa | curl`, `env | curl`) is caught regardless of
-    // this gate. The MCP proxy leaves builtinToolSurface=false: on a genuine MCP
+    // OWN native shell (Bash/Edit/Write/WebFetch). NARROWED (1.8.13) to ONLY the
+    // shell-metacharacter-injection subcategories (shell-escape / parameter-
+    // injection — ATR-2026-00111 / 00066) that key on `;` `|` `$()` grammar.
+    // Inside an MCP argument those are anomalous and rightly deny; but they are the
+    // NORMAL grammar of a real shell, so matched against the agent's own
+    // `echo x; curl localhost` they false-block legitimate work (they only reach a
+    // tool_call event via the engine's mcp-over-tool exception). On this surface
+    // they DEGRADE to an 'ask' advisory. CRITICAL: every OTHER scan_target:mcp
+    // rule still hard-blocks here — 1.8.12 wrongly gated the whole class, which
+    // silently degraded credential theft (`cat ~/.ssh/id_rsa`, matched by the
+    // scan_target:mcp credential-theft rule 00113) to a non-blocking advisory on
+    // the agent's own shell. The MCP proxy leaves builtinToolSurface=false: on a genuine MCP
     // ARGUMENT, `; curl` really is injection. This keys on scan_target (a rule's
     // intrinsic scope), NOT maturity — so it never drifts with the daily corpus.
     return false;

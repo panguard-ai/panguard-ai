@@ -6,7 +6,8 @@
  * Merges the two previously duplicated proof sections:
  *   - SocialProof.tsx (adopter strip)
  *   - RegulatedIndustriesPositioning.tsx sub-section A
- *     ("The same rules Cisco and Microsoft already ship in production.")
+ *     (ATR rules merged upstream into Cisco AI Defense + Microsoft AGT —
+ *      maintainer-accepted contributions, not vendor endorsements.)
  *
  * Adopter rules (inherited from SocialProof — strict, do not relax):
  * - Listed merges must be in the upstream's *official* repo.
@@ -49,7 +50,7 @@ const ADOPTERS: readonly { name: string; detail: string; highlight?: boolean }[]
   },
   {
     name: 'Gen Digital',
-    detail: 'Norton / Avast — ships ATR in production',
+    detail: 'Norton / Avast — ATR rules merged upstream',
     highlight: false,
   },
 ];
@@ -84,13 +85,13 @@ export default function ProofBand() {
           <Eyebrow>
             {isZh ? (
               <>
-                Cisco 跟 Microsoft 已經放進產品的，
-                <span className="text-brand-sage">就是這套規則。</span>
+                ATR 規則已上游合併進 Cisco AI Defense 與 Microsoft AGT——
+                <span className="text-brand-sage">維護者接受的貢獻，非廠商背書。</span>
               </>
             ) : (
               <>
-                The same rules Cisco and Microsoft{' '}
-                <span className="text-brand-sage">already ship in production.</span>
+                ATR rules merged upstream into Cisco AI Defense and Microsoft AGT —{' '}
+                <span className="text-brand-sage">maintainer-accepted contributions, not vendor endorsements.</span>
               </>
             )}
           </Eyebrow>

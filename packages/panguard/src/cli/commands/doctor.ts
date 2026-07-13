@@ -66,7 +66,7 @@ function checkInstallation(): CheckResult {
     status: hasVersion ? 'pass' : 'fail',
     label: 'Installation integrity',
     detail: hasVersion ? `Binary OK, v${PANGUARD_VERSION}` : 'Cannot determine version',
-    fix: hasVersion ? undefined : 'Reinstall panguard: npm install -g @panguard-ai/panguard',
+    fix: hasVersion ? undefined : 'Reinstall the CLI: npm install -g @panguard-ai/panguard',
   };
 }
 
@@ -630,7 +630,7 @@ function checkHookProtection(): CheckResult {
         : `Hook failed CLOSED (blocked a tool call) — ${status.reason} on host protocol "${
             status.platform || 'unknown'
           }"${status.at ? ` at ${status.at}` : ''}`,
-      fix: 'If PanGuard or the host agent was updated, re-register the hook with "pga hook install". A manual or test invocation also records this; the marker clears on the next healthy run',
+      fix: 'If the guard or the host agent was updated, re-register the hook with "pga hook install". A manual or test invocation also records this; the marker clears on the next healthy run',
     };
   }
   if (status.degraded) {

@@ -2205,20 +2205,21 @@
                 <div class="cd-box-title">What is shared (and what is never shared)</div>
                 <ul class="cd-list">
                   <li>
-                    Shared: the matched rule ID(s), attack category + MITRE technique, a coarse
-                    country region, and a truncated IP (last two octets zeroed).
+                    <strong>Threat signatures &mdash; end-to-end sealed:</strong> the matched rule
+                    ID(s), attack category + MITRE technique, a coarse country region, and a
+                    truncated IP (last two octets zeroed). Sealed before it leaves this machine
+                    &mdash; only the Threat Cloud backend can open these, not the network or a relay.
                   </li>
                   <li>
-                    Never shared: your prompts, code, file contents, secrets, file paths, hostname,
-                    or username.
+                    <strong>Flagged-skill contributions &mdash; over encrypted HTTPS (not E2E):</strong>
+                    when a skill is flagged, its name, the matched finding titles, and draft rule
+                    content, plus a stable pseudonymous install ID, are sent over TLS to help draft
+                    new community rules. These are readable by the Threat Cloud service (treat them
+                    as visible to the backend, not sealed end-to-end).
                   </li>
                   <li>
-                    Sealed with end-to-end encryption before it leaves this machine — only the
-                    Threat Cloud backend can open it, not the network or a relay.
-                  </li>
-                  <li>
-                    A stable random install ID links your own submissions (pseudonymous) — raw
-                    samples never leave this machine.
+                    <strong>Never shared:</strong> your prompts, code, file contents, secrets, file
+                    paths, hostname, or username.
                   </li>
                 </ul>
               </div>
@@ -4334,12 +4335,13 @@
         if (!isOn) {
           var ok = window.confirm(
             'Turn on collective defense?\n\n' +
-              'When Guard blocks an attack on this machine, it will share a minimal signature ' +
-              '(the matched rule ID + attack category + a coarse region + a truncated IP) with the ATR ' +
-              'network.\n\nSealed with end-to-end encryption before it leaves this machine — only ' +
-              'the Threat Cloud backend can open it, not the network or a relay.\n\nNever shared: ' +
-              'your prompts, code, file contents, secrets, file paths, hostname, or username.\n\n' +
-              'You can turn this off anytime.'
+              'When Guard blocks an attack, it shares a minimal signature (matched rule ID + ' +
+              'attack category + coarse region + truncated IP), sealed end-to-end — only the ' +
+              'Threat Cloud backend can open it.\n\nWhen a skill is flagged, its name + finding ' +
+              'titles + draft rule content (plus a pseudonymous install ID) are also sent, over ' +
+              'encrypted HTTPS — readable by the Threat Cloud service, not sealed end-to-end.\n\n' +
+              'Never shared: your prompts, code, file contents, secrets, file paths, hostname, or ' +
+              'username.\n\nYou can turn this off anytime.'
           );
           if (!ok) return;
         }

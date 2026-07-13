@@ -410,6 +410,18 @@ export class GuardEngine {
       this.llm?.setLayerCOutcomeSink?.((ok, error) =>
         this.dashboard?.reportLayerCOutcome(ok, error)
       );
+      // FAKE-GREEN GUARD (P0-6): config.ai present but autoDetectLLM() returned
+      // null means the configured provider was unreachable/invalid at startup
+      // (expired key, wrong model, Ollama offline). Without this, layerCHealth
+      // stays null forever and the dashboard shows a permanent green
+      // 'Connected · advisory' while ZERO semantic calls ever happen. Seed a
+      // degraded health so the cockpit tells the truth: configured but not resolving.
+      if (!this.llm && this.config.ai) {
+        this.dashboard?.reportLayerCOutcome(
+          false,
+          'Configured LLM provider did not resolve at startup — re-check the key / model / Ollama'
+        );
+      }
       await this.dashboard.start();
 
       // Set startTime early so the immediate status push shows valid uptime

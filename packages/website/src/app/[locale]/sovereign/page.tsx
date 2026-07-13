@@ -330,20 +330,20 @@ const BRIEF_HTML = `<div class="sv">
       <div class="threecol" style="margin-top:30px">
         <div class="tc reveal"><div class="tcn">SOVEREIGN</div><h3>Runs where you control it</h3><p>On-premise or air-gapped, on infrastructure the institution owns. No outbound dependency, no phone-home, no foreign cloud in the trust path. The signing keys never leave your control.</p></div>
         <div class="tc reveal"><div class="tcn">VERIFIABLE</div><h3>Operator-zero-trust evidence</h3><p>Every decision is public-key signed; an auditor verifies it offline holding only a public key — without trusting the operator, the log, or us. Not &ldquo;trust us&rdquo;: prove it.</p></div>
-        <div class="tc reveal"><div class="tcn">OPEN STANDARD</div><h3>Vendor-neutral, no lock-in</h3><p>Built on the open Agent Threat Rules standard — vendor-neutral, not tied to any single foreign hyperscaler — and already shipping in production. Your evidence outlives any one supplier.</p></div>
+        <div class="tc reveal"><div class="tcn">OPEN STANDARD</div><h3>Vendor-neutral, no lock-in</h3><p>Built on the open Agent Threat Rules standard — vendor-neutral, not tied to any single foreign hyperscaler — with rules contributed to and merged upstream by maintainers. Your evidence outlives any one supplier.</p></div>
       </div>
     </div>
   </section>
 
   <section>
     <div class="wrap">
-      <div class="shead reveal"><span class="snum">§ 04</span><span class="slabel">Adoption — in production</span></div>
-      <h2 class="reveal">The open standard underneath is already deployed at scale</h2>
-      <p class="sub reveal">PanGuard Sovereign is built on Agent Threat Rules (748 rules) — the open detection standard adopted, through merged public contributions, by leading security vendors and standards bodies. Every entry below is independently verifiable.</p>
+      <div class="shead reveal"><span class="snum">§ 04</span><span class="slabel">Ecosystem — merged upstream</span></div>
+      <h2 class="reveal">The open standard underneath is contributed to and merged upstream</h2>
+      <p class="sub reveal">PanGuard Sovereign is built on Agent Threat Rules (748 rules) — the open detection standard whose rules have been contributed to and merged upstream into projects maintained by leading security vendors and standards bodies — maintainer-accepted contributions, not vendor endorsements. Every entry below is independently verifiable.</p>
       <div class="proof reveal">
-        <div class="proofrow"><span class="plab">In production</span><span class="pnames">Microsoft (Agent Governance Toolkit) &nbsp;·&nbsp; Cisco (AI Defense) &nbsp;·&nbsp; Gen Digital (Norton / Avast)</span></div>
+        <div class="proofrow"><span class="plab">Merged upstream</span><span class="pnames">Microsoft AGT (community-rules examples) &nbsp;·&nbsp; Cisco AI Defense (skill-scanner rule packs) &nbsp;·&nbsp; Gen Digital (Norton / Avast)</span></div>
         <div class="proofrow"><span class="plab">Standards bodies</span><span class="pnames">MISP / CIRCL &nbsp;·&nbsp; OWASP &nbsp;·&nbsp; FINOS (Linux Foundation) &nbsp;·&nbsp; SigmaHQ</span></div>
-        <div class="proofrow"><span class="plab">Also shipping</span><span class="pnames">AMD (GAIA) &nbsp;·&nbsp; Microsoft PyRIT &nbsp;·&nbsp; AG2 (AutoGen) &nbsp;·&nbsp; rulezet / CIRCL</span></div>
+        <div class="proofrow"><span class="plab">Also merged</span><span class="pnames">AMD (GAIA) &nbsp;·&nbsp; Microsoft PyRIT &nbsp;·&nbsp; AG2 (AutoGen) &nbsp;·&nbsp; rulezet / CIRCL</span></div>
         <div class="proofrow"><span class="plab">In review</span><span class="pnames">NVIDIA (garak · NeMo Guardrails) &nbsp;·&nbsp; OpenAI Guardrails &nbsp;·&nbsp; Splunk &nbsp;·&nbsp; OpenTelemetry GenAI SIG</span></div>
       </div>
       <div><a class="btn ghost" href="https://agentthreatrule.org/ecosystem" target="_blank" rel="noopener noreferrer">Verify independently at agentthreatrule.org/ecosystem <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>

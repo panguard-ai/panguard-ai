@@ -790,7 +790,7 @@
       "ctaDocs": "Read the quickstart",
       "badgeRules": "{count} ATR rules",
       "badgeRecall": "97.2% Garak recall",
-      "badgeMerged": "Adopted by Microsoft + Cisco",
+      "badgeMerged": "Merged upstream: Cisco + Microsoft",
       "badgeLicense": "MIT · free forever",
       "platformLabel": "Auto-detects your AI agents:",
       "ticker1": "postmark-mcp v1.0.16 silently forwarded 15,000 emails/day",
@@ -821,7 +821,7 @@
       }
     },
     "socialProof": {
-      "overline": "Trusted by security teams",
+      "overline": "ATR rules merged into upstream tools",
       "statRules": "ATR Detection Rules",
       "statScanned": "Skills Scanned",
       "statRecall": "SKILL.md Recall",
@@ -2395,7 +2395,7 @@
     "investors": {
       "overline": "Investors & Advisors",
       "title": "Backed by people who get it.",
-      "subtitle": "Backed by industry security leaders. Partnerships with Cisco AI Defense and the OWASP community.",
+      "subtitle": "Backed by industry security leaders. ATR rules merged upstream into Cisco AI Defense and OWASP community projects -- maintainer-accepted contributions, not vendor endorsements.",
       "desc": "Our advisor program is currently forming. We are in conversations with cybersecurity veterans, enterprise SaaS leaders, and AI/ML researchers. Details will be announced soon.",
       "advisingCta": "Interested in advising?"
     },
@@ -4747,7 +4747,7 @@
       "confidence": {
         "high": {
           "threshold": ">= 85%",
-          "action": "Automatic execution"
+          "action": "Blocked inline; OS-level auto-response only when armed and privileged"
         },
         "medium": {
           "threshold": "50 - 84%",
@@ -6019,7 +6019,7 @@
             "747 rules, 3,200 patterns across 10 categories",
             "RFC-001 v1.1 quality standard published",
             "Maturity levels: draft / experimental / stable",
-            "Cisco AI Defense ships 34 ATR rules",
+            "34 ATR rules merged into Cisco AI Defense skill-scanner rule packs",
             "OWASP Agentic Top 10: 10/10 coverage"
           ]
         },
@@ -6578,7 +6578,7 @@
     "ecosystem": {
       "eyebrow": "05 / CONVERGING",
       "title": "The ecosystem is already <sage>converging on ATR.</sage>",
-      "tier1": "IN PRODUCTION · THEIR PRODUCT SHIPS ATR",
+      "tier1": "IN PRODUCTION · ATR MERGED INTO THEIR RULE PACKS",
       "tier1Sub1": "314 rules",
       "tier1Sub2": "287 rules · weekly auto-sync",
       "tier1Sub3": "Norton / Avast",

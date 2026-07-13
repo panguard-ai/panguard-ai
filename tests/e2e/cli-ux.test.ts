@@ -181,8 +181,11 @@ describe('Doctor Command', { timeout: 15000 }, () => {
       .split('\n')
       .filter((l) => l.includes('Would run') || l.includes('fix:') || l.includes('Run "'));
     const combined = fixLines.join('\n');
-    // "panguard" as a standalone command (not part of "panguard-ai" branding) must not appear
-    expect(combined).not.toMatch(/\bpanguard\b(?!\s*\[#\]|\s*AI|-ai)/i);
+    // "panguard" as a standalone COMMAND must not appear — suggestions should say
+    // "pga …". Excludes non-command tokens: "panguard [#] AI" branding, the
+    // "@panguard-ai" scope, and the "~/.panguard-guard" data-dir PATH / package
+    // name (a path is not a wrong command).
+    expect(combined).not.toMatch(/\bpanguard\b(?!\s*\[#\]|\s*AI|-ai|-guard|\/)/i);
   });
 
   it('pga doctor license check says "Open source — no license required"', () => {

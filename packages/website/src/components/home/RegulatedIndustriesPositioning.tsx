@@ -38,13 +38,13 @@ export default function RegulatedIndustriesPositioning() {
           <SectionTitleV2>
             {isZh ? (
               <>
-                Cisco 跟 Microsoft 已經放進產品的，
-                <span className="text-brand-sage">就是這套規則。</span>
+                Cisco 與 Microsoft 維護者已合併進上游的，
+                <span className="text-brand-sage">就是這套 ATR 規則。</span>
               </>
             ) : (
               <>
-                The same rules Cisco and Microsoft{' '}
-                <span className="text-brand-sage">already ship in production.</span>
+                The same ATR rules Cisco and Microsoft maintainers{' '}
+                <span className="text-brand-sage">merged upstream.</span>
               </>
             )}
           </SectionTitleV2>
@@ -65,8 +65,8 @@ export default function RegulatedIndustriesPositioning() {
             <span className="text-text-muted">·</span>
             <span className="font-mono text-[11px] uppercase tracking-micro text-text-muted">
               {isZh
-                ? '7 個 production PR 已合進 6 個生態系（含 Cisco 與 Microsoft）'
-                : '7 production PRs merged across 6 ecosystems (incl. Cisco + Microsoft)'}
+                ? '7 個 PR 已合進 6 個生態系上游（含 Cisco 與 Microsoft）— 維護者接受的貢獻，非廠商背書'
+                : '7 PRs merged upstream across 6 ecosystems (incl. Cisco + Microsoft) — maintainer-accepted contributions, not endorsements'}
             </span>
           </div>
         </FadeInUp>

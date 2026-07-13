@@ -383,6 +383,28 @@ export function collectSelfState(): SelfStateRef[] {
       });
     }
   }
+
+  // S4 built-in-tool PreToolUse hook — the primary Bash/Edit/Write/WebFetch
+  // interceptor for the agent's own tools. Sealing it as self-state means
+  // checkSelfState() catches its removal (marker-gone) so the cockpit can no
+  // longer report a healthy posture after the main interceptor is stripped from
+  // ~/.claude/settings.json (previously only `pga doctor` caught this). Recorded
+  // only when present at seal time, so a guard-only (no-hook) install never
+  // false-alarms. Self-contained (reads the JSON directly) to avoid a reverse
+  // dependency on the panguard CLI package.
+  const claudeSettings = join(homedir(), '.claude', 'settings.json');
+  try {
+    if (existsSync(claudeSettings) && readFileSync(claudeSettings, 'utf-8').includes('pga hook run')) {
+      refs.push({
+        kind: 'hook',
+        path: claudeSettings,
+        marker: 'pga hook run',
+        label: 'built-in-tool PreToolUse hook',
+      });
+    }
+  } catch {
+    /* best-effort — presence of the launchagent still guards the daemon */
+  }
   return refs;
 }
 

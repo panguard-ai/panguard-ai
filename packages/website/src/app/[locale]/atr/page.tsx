@@ -24,7 +24,7 @@ export default function ATRPage() {
         data={[
           definedTermSchema({
             name: 'Agent Threat Rules (ATR)',
-            description: `Open detection standard for AI agent security threats. ${STATS.atrRules} YAML-based rules across 10 threat categories, mapped to OWASP Agentic Top 10 (10/10 covered), MITRE ATLAS, and NIST AI RMF. MIT licensed. Already shipping in Microsoft AGT, Cisco AI Defense, MISP, and OWASP A-S-R-H.`,
+            description: `Open detection standard for AI agent security threats. ${STATS.atrRules} YAML-based rules across 10 threat categories, mapped to OWASP Agentic Top 10 (10/10 covered), MITRE ATLAS, and NIST AI RMF. MIT licensed. ATR rules merged upstream as maintainer-accepted contributions (not vendor endorsements): Cisco AI Defense skill-scanner rule packs, in production (PR #99); Microsoft AGT community-rules examples (PR #1277); MISP; and OWASP ASRH.`,
             url: 'https://panguard.ai/atr',
             termCode: 'ATR',
           }),
@@ -33,7 +33,7 @@ export default function ATRPage() {
             '@type': 'SoftwareSourceCode',
             name: 'agent-threat-rules',
             description:
-              'Open source detection rule standard for AI agent security threats. YAML rule format, multi-vendor adoption, MIT licensed.',
+              'Open source detection rule standard for AI agent security threats. YAML rule format, rules merged upstream into multiple maintainer repos as accepted contributions (not vendor endorsements), MIT licensed.',
             codeRepository: 'https://github.com/Agent-Threat-Rule/agent-threat-rules',
             programmingLanguage: 'YAML',
             license: 'https://opensource.org/licenses/MIT',
