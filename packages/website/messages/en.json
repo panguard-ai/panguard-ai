@@ -804,14 +804,20 @@
       "title": "One command. Full protection.",
       "subtitle": "Install PanGuard, and your AI agents are protected in under 60 seconds.",
       "tabs": {
-        "dashboard": "Guard Dashboard",
-        "rules": "Detection Rules",
+        "overview": "Overview",
+        "runtime": "Runtime",
+        "skills": "Skills",
+        "coverage": "Coverage",
+        "rules": "Rules",
         "threatcloud": "Threat Cloud"
       },
       "captions": {
-        "dashboard": "Real-time dashboard showing active rules, event monitoring, and 3-layer detection status.",
-        "rules": "747 ATR rules auto-synced from Threat Cloud. Community-driven, AI-drafted detection patterns.",
-        "threatcloud": "Anonymous threat intelligence sharing. Your device contributes and receives updated detection rules."
+        "overview": "Am I safe right now — posture at a glance. Both detection layers run fully on-device; the optional LLM second opinion and collective defense are off by default.",
+        "runtime": "Live decisions as your agents call tools: allow on pass, deny on a proven rule, ask when confidence is low. Quiet when healthy — a row appears only on a real evaluation.",
+        "skills": "Every MCP skill installed across your platforms. Whitelisted skills are trusted; unknown skills are tracked for behavior drift, with one-click quarantine.",
+        "coverage": "Which agent platforms Guard sees on this machine and whether each is wired up — a detected-but-unconfigured platform is running unprotected.",
+        "rules": "All loaded ATR detection rules, searchable by ID, title, or severity. Updates apply only when you run pga upgrade — never auto-pulled.",
+        "threatcloud": "Anonymous collective defense, off by default. Shares matched rule IDs and attack category only — never your prompts, code, files, or hostname."
       }
     },
     "socialProof": {
