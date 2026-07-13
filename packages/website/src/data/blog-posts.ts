@@ -20,6 +20,37 @@ export const categories = [
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: 'palo-alto-unit42-confirms-skill-supply-chain',
+    title: "Palo Alto's Unit 42 Scanned 49,943 Agent Skills. It Confirms What We Found in 96,096.",
+    excerpt:
+      "Unit 42's Behavioral Integrity Verification research found 80% of agent skills deviate from their declared behavior. It's an independent second dataset landing on the same conclusion our 96,096-skill scan reached — and it's exactly the class PanGuard scans for before you install.",
+    category: 'Threat Intelligence',
+    date: '2026-07-13',
+    author: 'Adam Lin',
+    readingTime: '6 min read',
+    content: [
+      "In June 2026, Palo Alto Networks' Unit 42 published research on the agent-skill supply chain, introducing Behavioral Integrity Verification (BIV). They statically scanned 49,943 skills on a public registry and found that 80% of skills deviate from their declared behavior, 18.9% of them with adversarial intent.",
+      'We had already scanned 96,096 skills across six public registries: 1,302 flagged, 552 confirmed malicious after manual review, attributed to three coordinated publishers. Two teams, two datasets, two methods, one conclusion: the agent-skill supply chain is a live attack surface, not a hypothetical. When an independent research team at a major security vendor lands on your finding, you are no longer guessing.',
+      '## What Unit 42 Documented — and What It Means for You',
+      "BIV works by comparing what a skill's manifest *declares* it does against what its code *actually* does, and flagging the gap. The dominant adversarial pattern they found is the one we see most too: credential exfiltration. A skill reads a secret from the environment or a credential file, encodes it, and ships it to an outbound endpoint — often in a single artifact that looks like it does something useful.",
+      'That is the whole problem with agent skills in one sentence: you install them the way you install any dependency, but the thing consuming them is an autonomous agent holding your API keys, your shell, and your file system. There is no App Review. Anyone can publish.',
+      '## How PanGuard Scans for This Class',
+      'PanGuard is a free, open-source CLI that scans a skill or MCP server as a static artifact — before you install it — using Agent Threat Rules (ATR), the independent MIT-licensed detection standard. ATR is a corpus of 749 machine-readable rules across 10 threat categories as of July 2026, the open standard for AI agent threats the way Sigma is for SIEM logs.',
+      "When we mapped Unit 42's 29-capability taxonomy onto ATR, their canonical credential-exfil payload — a Python chain that reads a secret with `os.environ`, base64-encodes it, and sends it with `requests.post` — actually exposed a gap in our own coverage: our existing exfil rules keyed on shell syntax and missed the code-surface equivalent. So we shipped a new rule, ATR-2026-02261, for the language-agnostic chain, verified against a 65,000-sample benign corpus at zero false positives. That is the flywheel working: public research surfaces a real payload, and a detection rule ships for it.",
+      '```bash\nnpm install -g @panguard-ai/panguard\npga up\npga scan <target>\n```',
+      '`pga scan` inspects the artifact and reports which ATR rules it trips, before the code ever runs. Everything — the CLI and the ATR standard it runs — is free and open source.',
+      '## The Honest Boundary',
+      'BIV and install-time scanning are complementary layers, not competitors. BIV verifies declared-vs-actual capabilities; ATR detects attack patterns at runtime and in the artifact. Neither is the whole answer, and a defender should run both ideas: refuse the artifact that trips a known attack pattern, and flag the skill whose declared behavior does not match its code. The supply chain is real enough that two independent scans found it. The defense that matters is the one that runs before the code does.',
+      '## FAQ',
+      '### What did Unit 42 find?',
+      "Unit 42's Behavioral Integrity Verification research statically scanned 49,943 agent skills and found that 80% deviate from their declared behavior, with 18.9% showing adversarial intent — most commonly credential exfiltration.",
+      "### How does that compare to PanGuard's own scan?",
+      'We scanned 96,096 skills across six public registries and confirmed 552 malicious after manual review, from three coordinated publishers. Different dataset, different method, same conclusion: the agent-skill supply chain is a real attack surface.',
+      '### How do I scan a skill before installing it?',
+      'Install PanGuard (`npm install -g @panguard-ai/panguard`), run `pga up`, then `pga scan <target>`. It inspects the skill or MCP server as a static artifact and reports which ATR rules it trips, before the code runs. It is free and open source.',
+    ],
+  },
+  {
     slug: 'we-scanned-96096-ai-agent-skills-751-malicious',
     title: 'We Scanned 96,096 AI Agent Skills. 751 Were Malicious. Here Is What They Did.',
     excerpt:
