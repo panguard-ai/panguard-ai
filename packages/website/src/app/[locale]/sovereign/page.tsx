@@ -16,19 +16,35 @@ export const dynamic = 'force-dynamic';
 const escapeHtml = (s: string): string =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+// The page is read by two audiences: national institutions (default) and the
+// in-country delivery partners who prime the contract. `?view=partner` flips the
+// framing without leaving the page — same architecture, read from each side.
+type View = 'gov' | 'partner';
+const resolveView = (v?: string): View => (v === 'partner' ? 'partner' : 'gov');
+
+/** Segmented control that flips the reading, preserving any selected jurisdiction. */
+function viewToggle(view: View, c?: string): string {
+  const cq = c ? `c=${encodeURIComponent(c)}&` : '';
+  return `<div class="viewtoggle reveal" role="tablist" aria-label="Choose your perspective">
+    <a class="vtopt${view === 'gov' ? ' on' : ''}" role="tab" aria-selected="${view === 'gov'}" href="?${cq}view=gov">For national institutions</a>
+    <a class="vtopt${view === 'partner' ? ' on' : ''}" role="tab" aria-selected="${view === 'partner'}" href="?${cq}view=partner">For delivery partners</a>
+  </div>`;
+}
+
 /**
  * Build the §03 section for a resolved jurisdiction: a country selector, the
  * deployment profile (algorithm / HSM / residency / air-gap / retention), and
  * the compliance crosswalk in that country's own framework vocabulary. All data
  * is author-controlled display copy (see countries.ts) — escaped defensively.
  */
-function crosswalkSection(country: SovereignCountry): string {
+function crosswalkSection(country: SovereignCountry, view: View): string {
   const isGeneric = country.code === GENERIC_COUNTRY.code;
+  const viewQ = view === 'partner' ? '&view=partner' : '';
   const chips = [...COUNTRY_ORDER.map((code) => SOVEREIGN_COUNTRIES[code]!), GENERIC_COUNTRY]
     .map((c) => {
       const active = c.code === country.code ? ' active' : '';
       const param = c.code === GENERIC_COUNTRY.code ? 'gen' : c.code;
-      return `<a class="cchip${active}" href="?c=${param}"><span class="cf">${escapeHtml(c.code)}</span>${escapeHtml(c.name)}</a>`;
+      return `<a class="cchip${active}" href="?c=${param}${viewQ}"><span class="cf">${escapeHtml(c.code)}</span>${escapeHtml(c.name)}</a>`;
     })
     .join('');
   const rows = country.crosswalk
@@ -72,6 +88,119 @@ function crosswalkSection(country: SovereignCountry): string {
   </section>`;
 }
 
+// ---- View-specific copy (swapped into BRIEF_HTML at render) --------------
+const GOV_EYEBROW = 'Capability Brief · For National Institutions &amp; Sovereign AI Teams';
+const PARTNER_EYEBROW = 'For System Integrators &amp; National Delivery Partners';
+
+const GOV_ABSTRACT = `As nations bring AI capability in-house, the governing question is no longer which model to procure, but how autonomous agents may act on sovereign data — and how that control is demonstrated to a regulator, an auditor, or an allied state. PanGuard Sovereign is a governance and assurance layer that enforces national policy at every agent action and produces cryptographic evidence of every decision. It operates in front of any model or agent framework, on infrastructure the institution controls — built on an open, vendor-neutral standard, so sovereignty does not mean trading one foreign dependency for another. Any sovereign nation can deploy it.`;
+const PARTNER_ABSTRACT = `Autonomous agents are entering the institutions you already serve. PanGuard Sovereign is the control-and-proof layer they will need — and it reaches the customer through you. We supply the technology and the open standard; you hold the government relationship and the contract vehicle, deliver locally, and keep the account. What follows is the same architecture a national buyer sees, read from the partner's side.`;
+
+const PDF_BTN = `<a class="btn ghost" href="/PanGuard-Sovereign-Capability-Brief.pdf" target="_blank" rel="noopener">Download the brief (PDF) <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2V11M8 11L4.5 7.5M8 11L11.5 7.5M3 13.5H13" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>`;
+const GOV_HEROACTIONS = `<a class="btn" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20technical%20briefing">Request a technical briefing <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>${PDF_BTN}`;
+const PARTNER_HEROACTIONS = `<a class="btn" href="mailto:partners@panguard.ai?subject=PanGuard%20Sovereign%20—%20partnership%20enquiry">Explore a partnership <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>${PDF_BTN}`;
+
+// §09 — swapped: gov sees the evaluation path; partner sees the opportunity.
+const GOV_ENGAGEMENT = `<section>
+    <div class="wrap">
+      <div class="shead reveal"><span class="snum">§ 09</span><span class="slabel">Engagement path</span></div>
+      <h2 class="reveal">A staged path from evaluation to a deployment you operate</h2>
+      <p class="sub reveal">Each stage is bounded and low-commitment; you can stop after any one. Nothing requires a purchase to evaluate, and no data leaves your environment at any stage.</p>
+      <div class="stages">
+        <div class="stg reveal">
+          <div class="sn">STAGE 01</div>
+          <h4>Technical evaluation</h4>
+          <p>An asynchronous evaluation, under NDA where required. You receive the evaluation kit: a reference architecture, a compliance crosswalk for your own jurisdiction, an honest statement of maturity and boundaries, and a demonstration you can run yourself — drive an agent through the governed layer, then verify the signed decision ledger offline holding only a public key.</p>
+          <div class="meta">Commitment &nbsp;<b>None</b></div>
+        </div>
+        <div class="stg reveal">
+          <div class="sn">STAGE 02</div>
+          <h4>Reference deployment</h4>
+          <p>A single deployment in a controlled environment you choose, in your jurisdiction and language. Delivered air-gapped and verified before install. You receive a running, governed reference case, plus the human-signed acceptance and decision evidence you can put in front of a regulator or auditor.</p>
+          <div class="meta">Commitment &nbsp;<b>Scoped pilot</b></div>
+        </div>
+        <div class="stg reveal">
+          <div class="sn">STAGE 03</div>
+          <h4>Production path</h4>
+          <p>Scope the requirements only an external party can satisfy — certification via an accredited path, and a validated hardware module where a jurisdiction mandates one — with support, service levels, and responsibilities defined against the concrete deployment rather than a brochure.</p>
+          <div class="meta">Commitment &nbsp;<b>Framework agreement</b></div>
+        </div>
+      </div>
+    </div>
+  </section>`;
+const PARTNER_ENGAGEMENT = `<section>
+    <div class="wrap">
+      <div class="shead reveal"><span class="snum">§ 09</span><span class="slabel">The opportunity</span></div>
+      <h2 class="reveal">A category opening inside the institutions you already serve</h2>
+      <p class="sub reveal">Every sovereign-AI programme in your market is buying two things: sovereign compute and sovereign models. Almost none has the third — enforceable control over what autonomous agents do with sovereign data, and cryptographic proof of every decision. That layer has to be delivered locally, and that is your ground, not a foreign vendor's.</p>
+      <div class="threecol">
+        <div class="tc reveal"><div class="tcn">01 · DEMAND</div><h3>The need is already in your accounts</h3><p>Autonomous agents are entering the ministries, operators, and critical-infrastructure customers you already serve. The control-and-proof layer is a requirement they will have to meet — under the EU AI Act, national AI laws, and their own regulators.</p></div>
+        <div class="tc reveal"><div class="tcn">02 · POSITION</div><h3>Delivered locally, or not at all</h3><p>On the institution's own infrastructure, in its language, under its contract vehicle, integrated with the detection assets its SOC already runs. A foreign vendor cannot be in that trust path. You can.</p></div>
+        <div class="tc reveal"><div class="tcn">03 · SUPPLY</div><h3>You hold the customer; we stay upstream</h3><p>PanGuard provides the runtime and the open Agent Threat Rules standard. You own the relationship, the contract, and the deployment. We do not compete for your account.</p></div>
+      </div>
+    </div>
+  </section>`;
+
+// §12 — swapped: gov sees next steps; partner sees partnership fit + terms + CTA.
+const GOV_NEXTSTEPS = `<section>
+    <div class="wrap">
+      <div class="shead reveal"><span class="snum">§ 12</span><span class="slabel">Next steps</span></div>
+      <h2 class="reveal">Start with a briefing — proceed to a pilot when you are ready</h2>
+      <p class="sub reveal">Three ways to engage, each bounded and low-commitment. Choose the one that fits where your institution is.</p>
+      <div class="nextsteps reveal">
+        <a class="nstep" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20technical%20briefing"><span class="nsn">01</span><span class="nst">Schedule a technical briefing</span><span class="nsd">Async, under NDA where required · architecture, honest boundaries, a verifiable demo · no commitment</span></a>
+        <a class="nstep" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20design-partner%20pilot"><span class="nsn">02</span><span class="nst">Design-partner pilot</span><span class="nsd">A reference deployment in a controlled environment you choose, in your jurisdiction and language</span></a>
+        <a class="nstep" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20sovereign%20PoC"><span class="nsn">03</span><span class="nst">Sovereign PoC</span><span class="nsd">Prove it air-gapped on your own infrastructure — signed delivery, human-signed acceptance, offline-verifiable evidence</span></a>
+      </div>
+      <div class="engage" style="margin-top:1px">
+        <div class="path reveal">
+          <h3>National institutions &amp; sovereign AI teams</h3>
+          <p>For AI safety and security institutes, AI offices, ministries, sovereign-AI programmes, and operators of defense and critical infrastructure — in any jurisdiction. Begin at Stage 01: an asynchronous technical evaluation with the kit above, under NDA where required, with no commercial commitment.</p>
+          <div><a class="btn" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20sovereign%20briefing">Book a sovereign briefing <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+        </div>
+        <div class="path reveal">
+          <h3>In-country partners</h3>
+          <p>For system integrators and national laboratories with public-sector relationships. Deploy locally, in the customer's jurisdiction and language. PanGuard supplies the runtime and signing stack; the partner owns the relationship and the deployment.</p>
+          <div><a class="btn ghost" href="?view=partner">Read the partner brief</a></div>
+        </div>
+      </div>
+    </div>
+  </section>`;
+const PARTNER_NEXTSTEPS = `<section>
+    <div class="wrap">
+      <div class="shead reveal"><span class="snum">§ 12</span><span class="slabel">Partnering with PanGuard</span></div>
+      <h2 class="reveal">What a strong partner looks like — and what you carry to market</h2>
+      <p class="sub reveal">We work with a small number of established integrators per jurisdiction. The fit is usually clear on the first call.</p>
+      <div class="parties" style="grid-template-columns:1fr 1fr">
+        <div class="party reveal">
+          <div class="phdr"><div class="pname">A strong partner</div><div class="prole">What we look for</div></div>
+          <div class="prow"><div class="pk">Relationship</div><div class="pv">An existing security- or systems-delivery relationship with government or critical-infrastructure buyers.</div></div>
+          <div class="prow"><div class="pk">Local standing</div><div class="pv">In-country staff, language, and support — and, where mandated, the local-content or accreditation standing to prime a public contract.</div></div>
+          <div class="prow"><div class="pk">Integration</div><div class="pv">The ability to integrate an enforcement layer into a customer's existing detection stack — SIEM, SOC, or national detection corpora.</div></div>
+          <div class="prow"><div class="pk">Valued</div><div class="pv own">A cryptographic, PKI, or validated-hardware-module capability to anchor the offline-evidence layer to national requirements — welcomed, not required.</div></div>
+        </div>
+        <div class="party reveal">
+          <div class="phdr"><div class="pname">What you carry</div><div class="prole">The offering</div></div>
+          <div class="prow"><div class="pk">Differentiation</div><div class="pv">A standards-based offering, built on the open ATR standard, in a category your competitors do not yet cover.</div></div>
+          <div class="prow"><div class="pk">Ownership</div><div class="pv">You own the customer relationship and the contract; PanGuard remains the upstream supplier, not a rival for the account.</div></div>
+          <div class="prow"><div class="pk">Support</div><div class="pv">Deployment tooling, integration support, and the compliance crosswalk for your jurisdiction.</div></div>
+          <div class="prow"><div class="pk">Terms</div><div class="pv own">Commercial terms scoped per engagement. At design-partner stage — early partners help shape the model rather than inherit a fixed one.</div></div>
+        </div>
+      </div>
+      <div class="engage" style="margin-top:1px">
+        <div class="path reveal">
+          <h3>Explore a partnership</h3>
+          <p>If you deliver security or digital systems to government or critical infrastructure in your country, we should talk. Asynchronous, under NDA where needed — no obligation to evaluate.</p>
+          <div><a class="btn" href="mailto:partners@panguard.ai?subject=PanGuard%20Sovereign%20—%20partnership%20enquiry">Explore a partnership <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+        </div>
+        <div class="path reveal">
+          <h3>Serve a national institution?</h3>
+          <p>If you are the buyer rather than the delivery partner, the same architecture reads from the institution's side — evaluation kit, staged path, and honest boundaries.</p>
+          <div><a class="btn ghost" href="?view=gov">Read the institution brief</a></div>
+        </div>
+      </div>
+    </div>
+  </section>`;
+
 export const metadata: Metadata = {
   title: 'Sovereign AI — Capability Brief',
   description:
@@ -105,16 +234,15 @@ const BRIEF_HTML = `<div class="sv">
     </div>
   </div>
 
+  <!--VIEWTOGGLE-->
+
   <header class="hero">
     <div class="wrap">
-      <div class="eyebrow reveal">Capability Brief · For National Institutions &amp; Sovereign AI Teams</div>
+      <div class="eyebrow reveal"><!--HERO_EYEBROW--></div>
       <h1 class="reveal"><span class="em">Sovereign</span> control over autonomous AI systems.</h1>
       <div class="register reveal">Enforced at every agent action &nbsp;·&nbsp; Cryptographic proof of every decision &nbsp;·&nbsp; Verifiable offline, without trust in the supplier</div>
-      <p class="abstract reveal">As nations bring AI capability in-house, the governing question is no longer which model to procure, but how autonomous agents may act on sovereign data — and how that control is demonstrated to a regulator, an auditor, or an allied state. PanGuard Sovereign is a governance and assurance layer that enforces national policy at every agent action and produces cryptographic evidence of every decision. It operates in front of any model or agent framework, on infrastructure the institution controls — built on an open, vendor-neutral standard, so sovereignty does not mean trading one foreign dependency for another. Any sovereign nation can deploy it.</p>
-      <div class="heroactions reveal">
-        <a class="btn" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20technical%20briefing">Request a technical briefing <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <a class="btn ghost" href="/PanGuard-Sovereign-Capability-Brief.pdf" target="_blank" rel="noopener">Download the brief (PDF) <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2V11M8 11L4.5 7.5M8 11L11.5 7.5M3 13.5H13" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-      </div>
+      <p class="abstract reveal"><!--HERO_ABSTRACT--></p>
+      <div class="heroactions reveal"><!--HERO_ACTIONS--></div>
       <div class="controlline reveal">
         <span>STATUS &nbsp;<b>Reference architecture · design-partner stage</b></span>
         <span>MATURITY &nbsp;<b>Laboratory-validated prototype (≈ TRL 4)</b></span>
@@ -300,33 +428,7 @@ const BRIEF_HTML = `<div class="sv">
     </div>
   </section>
 
-  <section>
-    <div class="wrap">
-      <div class="shead reveal"><span class="snum">§ 09</span><span class="slabel">Engagement path</span></div>
-      <h2 class="reveal">A staged path from evaluation to a deployment you operate</h2>
-      <p class="sub reveal">Each stage is bounded and low-commitment; you can stop after any one. Nothing requires a purchase to evaluate, and no data leaves your environment at any stage.</p>
-      <div class="stages">
-        <div class="stg reveal">
-          <div class="sn">STAGE 01</div>
-          <h4>Technical evaluation</h4>
-          <p>An asynchronous evaluation, under NDA where required. You receive the evaluation kit: a reference architecture, a compliance crosswalk for your own jurisdiction, an honest statement of maturity and boundaries, and a demonstration you can run yourself — drive an agent through the governed layer, then verify the signed decision ledger offline holding only a public key.</p>
-          <div class="meta">Commitment &nbsp;<b>None</b></div>
-        </div>
-        <div class="stg reveal">
-          <div class="sn">STAGE 02</div>
-          <h4>Reference deployment</h4>
-          <p>A single deployment in a controlled environment you choose, in your jurisdiction and language. Delivered air-gapped and verified before install. You receive a running, governed reference case, plus the human-signed acceptance and decision evidence you can put in front of a regulator or auditor.</p>
-          <div class="meta">Commitment &nbsp;<b>Scoped pilot</b></div>
-        </div>
-        <div class="stg reveal">
-          <div class="sn">STAGE 03</div>
-          <h4>Production path</h4>
-          <p>Scope the requirements only an external party can satisfy — certification via an accredited path, and a validated hardware module where a jurisdiction mandates one — with support, service levels, and responsibilities defined against the concrete deployment rather than a brochure.</p>
-          <div class="meta">Commitment &nbsp;<b>Framework agreement</b></div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <!--ENGAGEMENT-->
 
   <section>
     <div class="wrap">
@@ -373,30 +475,7 @@ const BRIEF_HTML = `<div class="sv">
     </div>
   </section>
 
-  <section>
-    <div class="wrap">
-      <div class="shead reveal"><span class="snum">§ 12</span><span class="slabel">Next steps</span></div>
-      <h2 class="reveal">Start with a briefing — proceed to a pilot when you are ready</h2>
-      <p class="sub reveal">Three ways to engage, each bounded and low-commitment. Choose the one that fits where your institution is.</p>
-      <div class="nextsteps reveal">
-        <a class="nstep" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20technical%20briefing"><span class="nsn">01</span><span class="nst">Schedule a technical briefing</span><span class="nsd">Async, under NDA where required · architecture, honest boundaries, a verifiable demo · no commitment</span></a>
-        <a class="nstep" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20design-partner%20pilot"><span class="nsn">02</span><span class="nst">Design-partner pilot</span><span class="nsd">A reference deployment in a controlled environment you choose, in your jurisdiction and language</span></a>
-        <a class="nstep" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20sovereign%20PoC"><span class="nsn">03</span><span class="nst">Sovereign PoC</span><span class="nsd">Prove it air-gapped on your own infrastructure — signed delivery, human-signed acceptance, offline-verifiable evidence</span></a>
-      </div>
-      <div class="engage" style="margin-top:1px">
-        <div class="path reveal">
-          <h3>National institutions &amp; sovereign AI teams</h3>
-          <p>For AI safety and security institutes, AI offices, ministries, sovereign-AI programmes, and operators of defense and critical infrastructure — in any jurisdiction. Begin at Stage 01: an asynchronous technical evaluation with the kit above, under NDA where required, with no commercial commitment.</p>
-          <div><a class="btn" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20sovereign%20briefing">Book a sovereign briefing <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="#B4C1B7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
-        </div>
-        <div class="path reveal">
-          <h3>In-country partners</h3>
-          <p>For system integrators and national laboratories with public-sector relationships. Deploy locally, in the customer's jurisdiction and language. PanGuard supplies the runtime and signing stack; the partner owns the relationship and the deployment.</p>
-          <div><a class="btn ghost" href="mailto:adam@agentthreatrule.org?subject=PanGuard%20Sovereign%20—%20in-country%20partner">Establish a partnership</a></div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <!--NEXTSTEPS-->
 
   <section>
     <div class="wrap">
@@ -435,10 +514,19 @@ const BRIEF_HTML = `<div class="sv">
 export default async function SovereignPage({
   searchParams,
 }: {
-  searchParams: Promise<{ c?: string }>;
+  searchParams: Promise<{ c?: string; view?: string }>;
 }) {
   const [sp, hdrs] = await Promise.all([searchParams, headers()]);
   const country = resolveCountry(sp?.c, hdrs.get('x-vercel-ip-country'));
-  const html = BRIEF_HTML.replace('<!--CROSSWALK-->', crosswalkSection(country));
+  const view = resolveView(sp?.view);
+  const isPartner = view === 'partner';
+  const html = BRIEF_HTML
+    .replace('<!--VIEWTOGGLE-->', viewToggle(view, sp?.c))
+    .replace('<!--HERO_EYEBROW-->', isPartner ? PARTNER_EYEBROW : GOV_EYEBROW)
+    .replace('<!--HERO_ABSTRACT-->', isPartner ? PARTNER_ABSTRACT : GOV_ABSTRACT)
+    .replace('<!--HERO_ACTIONS-->', isPartner ? PARTNER_HEROACTIONS : GOV_HEROACTIONS)
+    .replace('<!--ENGAGEMENT-->', isPartner ? PARTNER_ENGAGEMENT : GOV_ENGAGEMENT)
+    .replace('<!--NEXTSTEPS-->', isPartner ? PARTNER_NEXTSTEPS : GOV_NEXTSTEPS)
+    .replace('<!--CROSSWALK-->', crosswalkSection(country, view));
   return <div dangerouslySetInnerHTML={{ __html: html }} />;
 }
