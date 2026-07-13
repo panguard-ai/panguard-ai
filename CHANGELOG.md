@@ -2,6 +2,23 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.14] - 2026-07-14
+
+Make it work, and make it simple.
+
+- **A default install now reads PROTECTED — because it actually protects.** The
+  dashboard posture was gated on an armed OS-response action (block-IP / kill /
+  isolate), which needs root or an allow-list, so a normal `pga up` showed only
+  "monitoring". But the REAL protection — the built-in-tool hook + MCP proxy
+  DENYING hard-deny threats in real time — is on by default and needs no root.
+  Posture now reflects that: protection mode = PROTECTED. The OS-auto-response
+  actions are an optional advanced layer, shown separately as armed / inert, and a
+  stripped hook still flips the posture to tampered (so PROTECTED can't lie).
+- **The CLI went from 17 visible commands to 5.** `pga --help` now shows only what a
+  human needs — `up`, `scan`, `status`, `doctor`, `upgrade`. Everything else
+  (setup / guard / hook / config / skills / audit / …) still works but is hidden
+  from the default help; `pga up` already does setup + hook install + guard for you.
+
 ## [1.8.13] - 2026-07-14
 
 GA-readiness honesty pass — an adversarial multi-dimension audit found the engine

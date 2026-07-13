@@ -101,39 +101,35 @@ program
   .description('Panguard AI - Security for AI Agents')
   .version(PANGUARD_VERSION);
 
-// ── Core commands (shown in help) ──
-program.addCommand(upCommand());
-program.addCommand(setupCommand());
-program.addCommand(auditCommand());
-program.addCommand(skillsCommand());
-program.addCommand(scanCommand());
-program.addCommand(guardCommand());
-program.addCommand(statusCommand());
-program.addCommand(sensorCommand());
-program.addCommand(upgradeCommand());
-
-// ── Account / auth commands (shown in help) ──
-program.addCommand(loginCommand());
-program.addCommand(logoutCommand());
-program.addCommand(whoamiCommand());
-
-// ── Secondary commands (shown in help) ──
-program.addCommand(chatCommand());
-program.addCommand(configCommand());
-program.addCommand(doctorCommand());
-program.addCommand(hookCommand());
-// report (AI Compliance Audit Evidence generator) is the enterprise tier's
-// core differentiator and is NOT released in the free community plan. It stays
-// hidden until the paid tier launches behind a license gate. Do not register it
-// in the free CLI. (Re-enable: restore the import + this addCommand.)
-// program.addCommand(reportCommand());
-
-// ── Trap (honeypot) is a first-class command — wired to the real
-//    panguard-trap engine via @panguard-ai/panguard-trap/cli ──
-program.addCommand(trapCommand());
-
-// ── Advanced commands (hidden from help, still usable) ──
 const hidden = { hidden: true };
+
+// ── The commands a normal user actually needs (shown in help) ──
+//    `pga up` is the whole product in one line: scan → start protection → open
+//    the dashboard. Everything else is reachable from the dashboard, so we keep
+//    the default help tiny. Every hidden command below still works if you type it.
+program.addCommand(upCommand()); // scan → protect → dashboard (the one command)
+program.addCommand(scanCommand()); // scan a skill / path before you install it
+program.addCommand(statusCommand()); // am I protected right now?
+program.addCommand(doctorCommand()); // diagnose + fix problems
+program.addCommand(upgradeCommand()); // update to the latest rules + engine
+
+// ── Power-user / advanced — fully functional, hidden from the default help so
+//    the surface stays small. `pga up` already does setup + hook install + guard.
+program.addCommand(setupCommand(), hidden);
+program.addCommand(auditCommand(), hidden);
+program.addCommand(skillsCommand(), hidden);
+program.addCommand(guardCommand(), hidden);
+program.addCommand(sensorCommand(), hidden);
+program.addCommand(loginCommand(), hidden);
+program.addCommand(logoutCommand(), hidden);
+program.addCommand(whoamiCommand(), hidden);
+program.addCommand(chatCommand(), hidden);
+program.addCommand(configCommand(), hidden);
+program.addCommand(hookCommand(), hidden);
+program.addCommand(trapCommand(), hidden);
+// report (enterprise-tier AI Compliance Audit Evidence generator) is NOT in the
+// free community CLI. (Re-enable behind a license gate: restore import + addCommand.)
+// program.addCommand(reportCommand());
 program.addCommand(threatCommand(), hidden);
 program.addCommand(demoCommand(), hidden);
 program.addCommand(initCommand(), hidden);

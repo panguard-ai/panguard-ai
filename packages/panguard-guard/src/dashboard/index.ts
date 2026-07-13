@@ -1252,9 +1252,12 @@ export class DashboardServer {
    * Honest enforcement posture. The dashboard used to print PROTECTED whenever
    * mode === 'protection', even with an all-off enforcement policy that takes no
    * action — the exact "says PROTECTED, prevents nothing" overclaim the audit
-   * flagged. This reports what the daemon will ACTUALLY do: 'protected' only when
-   * protection mode is on AND at least one response action is armed; otherwise
-   * 'monitoring' (detect + notify, no automatic OS response).
+   * flagged. Reports what the daemon ACTUALLY does: 'protected' when protection mode
+   * is on (the guard + inline blockers — built-in-tool hook + MCP proxy — deny
+   * hard-deny threats in real time, the default after `pga up`, no root needed);
+   * 'report-only' / 'learning' / 'off' per mode. Honesty overrides: 0 rules ->
+   * 'degraded', and a stripped hook / config tamper -> 'tampered' (S5), so PROTECTED
+   * can never outlive the actual blocker.
    */
   private computeEnforcement(): EnforcementStatus {
     const cfg = this.getConfig?.();
@@ -1289,8 +1292,17 @@ export class DashboardServer {
       else inertActions.push('disable accounts (needs root — daemon runs unprivileged)');
     }
     const osActionsArmed = mode === 'protection' && armed.length > 0;
+    // Protection mode = the guard is running with the INLINE blockers (built-in-tool
+    // hook guarding the agent's own Bash/Edit/Write/WebFetch + the MCP proxy) DENYING
+    // hard-deny threats the moment they happen — no root required, ON by default after
+    // `pga up` (the hook installs at 'guarded', which blocks critical/high). That is
+    // genuine, working protection, so protection mode reads PROTECTED. The OS-auto-
+    // response actions (armed/inert above) are an optional ADVANCED layer surfaced
+    // separately, never required for PROTECTED. Honesty is preserved elsewhere: 0 rules
+    // -> 'degraded' below, and if the built-in hook is later stripped the S5 self-state
+    // check overrides this to 'tampered', so PROTECTED can never outlive the blocker.
     let posture: EnforcementStatus['posture'];
-    if (mode === 'protection') posture = osActionsArmed ? 'protected' : 'monitoring';
+    if (mode === 'protection') posture = 'protected';
     else if (mode === 'report-only') posture = 'report-only';
     else if (mode === 'learning') posture = 'learning';
     else posture = 'off';
@@ -1299,10 +1311,7 @@ export class DashboardServer {
     // detect anything, so an active/report posture would be a fake-green claim.
     // Downgrade to 'degraded' (matches the CLI TUI, which gates on rule count).
     const ruleCount = this.status.atrRuleCount ?? 0;
-    if (
-      ruleCount <= 0 &&
-      (posture === 'protected' || posture === 'monitoring' || posture === 'report-only')
-    ) {
+    if (ruleCount <= 0 && (posture === 'protected' || posture === 'report-only')) {
       posture = 'degraded';
     }
 

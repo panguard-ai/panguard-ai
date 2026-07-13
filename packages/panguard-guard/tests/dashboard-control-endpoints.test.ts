@@ -340,11 +340,11 @@ describe('DashboardServer — 1.7 control endpoints', () => {
           headers: { Authorization: `Bearer ${liveToken}` },
         })
       ).json();
-      // protection mode + NO enforcementPolicy armed = monitoring, not a green
-      // 'protected'. The button must not silently arm destructive OS actions.
+      // Arming = protection mode with the inline blockers live = PROTECTED, but the
+      // toggle must NOT silently enable destructive OS-auto-response actions.
       expect(status.enforcement.mode).toBe('protection');
       expect(status.enforcement.osActionsArmed).toBe(false);
-      expect(status.enforcement.posture).toBe('monitoring');
+      expect(status.enforcement.posture).toBe('protected');
       // The persisted config carries no armed enforcementPolicy.
       const cfg = await (
         await fetch(`${liveUrl}/api/config`, {
@@ -379,11 +379,13 @@ describe('DashboardServer — 1.7 control endpoints', () => {
     });
   });
 
-  describe('enforcement posture — PROTECTED only when it will actually act', () => {
-    it('protection mode with NO armed response = monitoring, not protected', async () => {
+  describe('enforcement posture — PROTECTED in protection mode; OS-response executability shown as armed/inert', () => {
+    it('protection mode = protected (inline hook + MCP proxy block in real time, no root needed)', async () => {
       dashboard.updateStatus({ mode: 'protection', atrRuleCount: 100 });
       const d = await (await get('/api/status')).json();
-      expect(d.enforcement.posture).toBe('monitoring');
+      // The default `pga up` state: no OS-auto-response armed, but the inline
+      // blockers ARE denying hard-deny threats — that is genuine protection.
+      expect(d.enforcement.posture).toBe('protected');
       expect(d.enforcement.osActionsArmed).toBe(false);
     });
 
@@ -434,12 +436,14 @@ describe('DashboardServer — 1.7 control endpoints', () => {
       dashboard.updateStatus({ mode: 'protection', atrRuleCount: 100 });
       const d = await (await get('/api/status')).json();
       const isRoot = typeof process.getuid === 'function' && process.getuid() === 0;
+      // posture stays PROTECTED (inline blocking is on) — but block-IP is reported
+      // INERT, never as an armed OS action, so the OS-response claim stays honest.
+      expect(d.enforcement.posture).toBe('protected');
       if (!isRoot) {
-        expect(d.enforcement.posture).toBe('monitoring');
         expect(d.enforcement.armedActions).not.toContain('block IPs');
         expect(d.enforcement.inertActions.join(' ')).toContain('block IPs');
       } else {
-        expect(d.enforcement.posture).toBe('protected');
+        expect(d.enforcement.armedActions).toContain('block IPs');
       }
     });
 
@@ -458,7 +462,7 @@ describe('DashboardServer — 1.7 control endpoints', () => {
       );
       dashboard.updateStatus({ mode: 'protection', atrRuleCount: 100 });
       const d = await (await get('/api/status')).json();
-      expect(d.enforcement.posture).toBe('monitoring');
+      expect(d.enforcement.posture).toBe('protected'); // inline blocking on; the OS actions are merely inert
       expect(d.enforcement.armedActions).toEqual([]);
       expect(d.enforcement.inertActions.length).toBeGreaterThan(0);
     });
