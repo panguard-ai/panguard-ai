@@ -33,28 +33,50 @@ describe('shouldHardDeny — proxy hard-deny policy', () => {
     expect(shouldHardDeny({ severity: 'informational', maturity: 'stable' })).toBe(false);
   });
 
-  // requireStable=true is the built-in-tool hook's enforce-lane gate: guarding
-  // the agent's OWN shell, an unvalidated (test/experimental) rule must NOT
-  // hard-block — even at critical severity — because broad tool-arg-injection
-  // rules key on shell metacharacters that are normal there (`echo x; curl y`).
-  // Only a wild-corpus-validated stable rule may hard-block; the rest advise.
-  describe('requireStable — built-in-tool hook enforce-lane gate', () => {
-    it('a critical rule hard-blocks ONLY when stable', () => {
-      expect(shouldHardDeny({ severity: 'critical', maturity: 'stable' }, true)).toBe(true);
-      expect(shouldHardDeny({ severity: 'critical', maturity: 'test' }, true)).toBe(false);
-      expect(shouldHardDeny({ severity: 'critical', maturity: 'experimental' }, true)).toBe(false);
-    });
-    it('a high rule still hard-blocks only when stable', () => {
-      expect(shouldHardDeny({ severity: 'high', maturity: 'stable' }, true)).toBe(true);
-      expect(shouldHardDeny({ severity: 'high', maturity: 'test' }, true)).toBe(false);
-    });
-    it('still never hard-blocks a broad confirm:embedding rule', () => {
+  // builtinToolSurface=true is the built-in-tool hook's FP gate: guarding the
+  // agent's OWN native shell, a rule scoped scan_target:mcp (an MCP-tool-ARGUMENT
+  // rule, e.g. "Shell Metacharacter Injection in Tool Arguments") must NOT
+  // hard-block — those key on shell metacharacters (`;` `|`) that are the normal
+  // grammar of a shell (`echo x; curl localhost`). Rules scoped to the shell's
+  // real domain (tool_args/skill/host/code/any) still hard-block, so credential
+  // exfil is caught regardless. The gate keys on scan_target (a rule's intrinsic
+  // scope), NOT maturity — so it never drifts with the daily rule corpus.
+  describe('builtinToolSurface — built-in-tool hook scan_target:mcp gate', () => {
+    it('an mcp-scoped rule does NOT hard-block on the built-in surface (advises)', () => {
       expect(
-        shouldHardDeny({ severity: 'critical', maturity: 'stable', confirm: 'embedding' }, true)
+        shouldHardDeny({ severity: 'critical', maturity: 'test', tags: { scan_target: 'mcp' } }, true)
+      ).toBe(false);
+      expect(
+        shouldHardDeny({ severity: 'critical', maturity: 'stable', tags: { scan_target: 'mcp' } }, true)
       ).toBe(false);
     });
-    it('default (requireStable=false, the MCP proxy) is unchanged — critical always hard-denies', () => {
-      expect(shouldHardDeny({ severity: 'critical', maturity: 'test' })).toBe(true);
+    it('a shell-domain rule (tool_args/skill/host/code) still hard-blocks on the built-in surface', () => {
+      expect(
+        shouldHardDeny({ severity: 'critical', maturity: 'test', tags: { scan_target: 'tool_args' } }, true)
+      ).toBe(true);
+      expect(
+        shouldHardDeny({ severity: 'critical', maturity: 'test', tags: { scan_target: 'skill' } }, true)
+      ).toBe(true);
+      // high still needs stable regardless of surface
+      expect(
+        shouldHardDeny({ severity: 'high', maturity: 'stable', tags: { scan_target: 'tool_args' } }, true)
+      ).toBe(true);
+      expect(
+        shouldHardDeny({ severity: 'high', maturity: 'test', tags: { scan_target: 'tool_args' } }, true)
+      ).toBe(false);
+    });
+    it('still never hard-blocks a broad confirm:embedding rule (checked before the mcp gate)', () => {
+      expect(
+        shouldHardDeny(
+          { severity: 'critical', maturity: 'stable', confirm: 'embedding', tags: { scan_target: 'mcp' } },
+          true
+        )
+      ).toBe(false);
+    });
+    it('the MCP proxy (builtinToolSurface=false) is unchanged — an mcp-scoped critical rule still hard-denies', () => {
+      expect(
+        shouldHardDeny({ severity: 'critical', maturity: 'test', tags: { scan_target: 'mcp' } })
+      ).toBe(true);
     });
   });
 });
