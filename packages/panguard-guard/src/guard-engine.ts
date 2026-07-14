@@ -492,6 +492,10 @@ export class GuardEngine {
     // Periodic status update
     this.statusTimer = setInterval(() => {
       this.updateDashboardStatus();
+      // Self-heal a vanished dashboard launch token: if the file was removed from
+      // under this running daemon, rewrite it so the dashboard stays reachable
+      // (authenticated) instead of 401ing forever until a manual restart.
+      this.dashboard?.ensureTokenPersisted();
       this.eventCallback?.('status', {
         eventsProcessed: this.eventsProcessed,
         threatsDetected: this.threatsDetected,

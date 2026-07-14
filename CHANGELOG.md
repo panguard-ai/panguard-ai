@@ -2,6 +2,33 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.16] - 2026-07-15
+
+Dashboard reliability + one-command self-heal.
+
+- **The Guard dashboard can no longer get stuck on a 401.** A daemon can be alive
+  and holding :3100 yet serve only "Invalid token" — a stale instance left running
+  from before an upgrade, or one whose launch token went missing from disk. `pga up`
+  used to leave such a daemon untouched and poll forever for a token that never
+  lands. Now the running daemon RE-PERSISTS its launch token on its status tick if
+  the file vanishes, and `pga up` detects a dashboard that cannot authenticate and
+  restarts the daemon so a fresh token is written. After `pga up`,
+  `curl -H "Authorization: Bearer $(cat ~/.panguard-guard/dashboard-token)"
+  http://127.0.0.1:3100/api/status` returns real status.
+- **`pga up` reliably auto-starts the Guard daemon on every install layout.** The
+  guard binary is now located by walking the Node resolution paths (hoisted, nested,
+  and global-npm layouts) instead of a `require.resolve` that threw
+  `ERR_PACKAGE_PATH_NOT_EXPORTED` on non-nested installs and silently skipped the
+  daemon start.
+- **`pga guard config --set <key>=<value>` works** for the Threat Cloud / telemetry
+  booleans (`threatCloudUploadEnabled`, `threatCloudRuleSyncEnabled`,
+  `telemetryEnabled`, `showUploadData`), so the "enable it later" hint the CLI
+  prints is a runnable command instead of an `unknown option` error.
+
+## [1.8.15] - 2026-07-14
+
+- Pull agent-threat-rules 3.5.10 (false-positive fixes) into the bundled ruleset.
+
 ## [1.8.14] - 2026-07-14
 
 Make it work, and make it simple.

@@ -101,10 +101,12 @@ export function guardCommand(): Command {
 
   cmd
     .command('config')
-    .description('Show current configuration')
+    .description('Show current configuration, or set a value with --set key=value')
     .option('--data-dir <path>', 'Data directory')
-    .action(async (opts: { dataDir?: string }) => {
+    .option('--set <keyValue>', 'Set a config value, e.g. --set threatCloudUploadEnabled=true')
+    .action(async (opts: { dataDir?: string; set?: string }) => {
       const args = ['config'];
+      if (opts.set) args.push('--set', opts.set);
       if (opts.dataDir) args.push('--data-dir', opts.dataDir);
       await runCLI(args);
     });

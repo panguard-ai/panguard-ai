@@ -556,9 +556,24 @@ export function setupCommand(): Command {
               // "/package.json") directly throws ERR_PACKAGE_PATH_NOT_EXPORTED.
               // Resolve the exported package root ("." → dist/index.js) instead,
               // then derive the CLI entry: dist/index.js → dist → dist/cli/index.js.
-              const { dirname, join: rjoin } = await import('node:path');
-              const guardRootEntry = require.resolve('@panguard-ai/panguard-guard');
-              guardBin = rjoin(dirname(guardRootEntry), 'cli', 'index.js');
+              const { join: rjoin } = await import('node:path');
+              const { existsSync: feMain } = await import('node:fs');
+              // The package's exports map exposes no resolvable "." for
+              // require.resolve (it throws ERR_PACKAGE_PATH_NOT_EXPORTED), so
+              // locate the package directory by walking the node resolution
+              // paths. Covers hoisted (npm/pnpm sibling), nested, and global
+              // layouts — the previous require.resolve threw on every layout,
+              // which is why `pga up` never auto-started the guard daemon.
+              let resolvedBin: string | null = null;
+              for (const base of require.resolve.paths('@panguard-ai/panguard-guard') ?? []) {
+                const cand = rjoin(base, '@panguard-ai', 'panguard-guard', 'dist', 'cli', 'index.js');
+                if (feMain(cand)) {
+                  resolvedBin = cand;
+                  break;
+                }
+              }
+              if (!resolvedBin) throw new Error('panguard-guard not found in resolution paths');
+              guardBin = resolvedBin;
             } catch {
               // Fallback: search common paths for npm global / local installs
               const { existsSync: fe } = await import('node:fs');

@@ -2,6 +2,50 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.16] - 2026-07-15
+
+Dashboard reliability + one-command self-heal.
+
+- **The Guard dashboard can no longer get stuck on a 401.** A daemon can be alive
+  and holding :3100 yet serve only "Invalid token" — a stale instance left running
+  from before an upgrade, or one whose launch token went missing from disk. `pga up`
+  used to leave such a daemon untouched and poll forever for a token that never
+  lands. Now the running daemon RE-PERSISTS its launch token on its status tick if
+  the file vanishes, and `pga up` detects a dashboard that cannot authenticate and
+  restarts the daemon so a fresh token is written. After `pga up`,
+  `curl -H "Authorization: Bearer $(cat ~/.panguard-guard/dashboard-token)"
+  http://127.0.0.1:3100/api/status` returns real status.
+- **`pga up` reliably auto-starts the Guard daemon on every install layout.** The
+  guard binary is now located by walking the Node resolution paths (hoisted, nested,
+  and global-npm layouts) instead of a `require.resolve` that threw
+  `ERR_PACKAGE_PATH_NOT_EXPORTED` on non-nested installs and silently skipped the
+  daemon start.
+- **`pga guard config --set <key>=<value>` works** for the Threat Cloud / telemetry
+  booleans (`threatCloudUploadEnabled`, `threatCloudRuleSyncEnabled`,
+  `telemetryEnabled`, `showUploadData`), so the "enable it later" hint the CLI
+  prints is a runnable command instead of an `unknown option` error.
+
+## [1.8.15] - 2026-07-14
+
+- Pull agent-threat-rules 3.5.10 (false-positive fixes) into the bundled ruleset.
+
+## [1.8.14] - 2026-07-14
+
+Make it work, and make it simple.
+
+- **A default install now reads PROTECTED — because it actually protects.** The
+  dashboard posture was gated on an armed OS-response action (block-IP / kill /
+  isolate), which needs root or an allow-list, so a normal `pga up` showed only
+  "monitoring". But the REAL protection — the built-in-tool hook + MCP proxy
+  DENYING hard-deny threats in real time — is on by default and needs no root.
+  Posture now reflects that: protection mode = PROTECTED. The OS-auto-response
+  actions are an optional advanced layer, shown separately as armed / inert, and a
+  stripped hook still flips the posture to tampered (so PROTECTED can't lie).
+- **The CLI went from 17 visible commands to 5.** `pga --help` now shows only what a
+  human needs — `up`, `scan`, `status`, `doctor`, `upgrade`. Everything else
+  (setup / guard / hook / config / skills / audit / …) still works but is hidden
+  from the default help; `pga up` already does setup + hook install + guard for you.
+
 ## [1.8.13] - 2026-07-14
 
 GA-readiness honesty pass — an adversarial multi-dimension audit found the engine

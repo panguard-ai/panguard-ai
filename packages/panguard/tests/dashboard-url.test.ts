@@ -7,7 +7,7 @@
  * http://127.0.0.1:PORT that lands on a 401 "Invalid token" page.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const mockExistsSync = vi.fn();
 const mockReadFileSync = vi.fn();
@@ -25,6 +25,7 @@ import {
   readDashboardPort,
   dashboardBaseUrl,
   readAuthenticatedDashboardUrl,
+  isDashboardHealthy,
 } from '../src/cli/dashboard-url.js';
 
 const CONFIG = '/tmp/test-home/.panguard-guard/config.json';
@@ -79,6 +80,62 @@ describe('dashboard-url helpers', () => {
         p === TOKEN ? 'secret-token-xyz\n' : JSON.stringify({ dashboardPort: 3100 })
       );
       expect(readAuthenticatedDashboardUrl()).toBe('http://127.0.0.1:3100/?token=secret-token-xyz');
+    });
+  });
+
+  // `pga up` self-heal gate: a running daemon whose dashboard cannot authenticate
+  // (no token, mismatched token, or unreachable) must be treated as unhealthy so
+  // `pga up` restarts it instead of polling forever for a token that never lands.
+  describe('isDashboardHealthy', () => {
+    const realFetch = globalThis.fetch;
+    afterEach(() => {
+      globalThis.fetch = realFetch;
+    });
+
+    it('returns false (and never calls fetch) when the token file is absent', async () => {
+      mockExistsSync.mockReturnValue(false);
+      const fetchMock = vi.fn();
+      globalThis.fetch = fetchMock as unknown as typeof fetch;
+      expect(await isDashboardHealthy()).toBe(false);
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('returns false (and never calls fetch) when the token file is empty', async () => {
+      mockExistsSync.mockImplementation((p: string) => p === TOKEN);
+      mockReadFileSync.mockReturnValue('   ');
+      const fetchMock = vi.fn();
+      globalThis.fetch = fetchMock as unknown as typeof fetch;
+      expect(await isDashboardHealthy()).toBe(false);
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('returns true and authenticates with Bearer against /api/status when the daemon answers 200', async () => {
+      mockExistsSync.mockImplementation((p: string) => p === TOKEN || p === CONFIG);
+      mockReadFileSync.mockImplementation((p: string) =>
+        p === TOKEN ? 'tok-abc\n' : JSON.stringify({ dashboardPort: 3100 })
+      );
+      const fetchMock = vi.fn().mockResolvedValue({ ok: true } as Response);
+      globalThis.fetch = fetchMock as unknown as typeof fetch;
+      expect(await isDashboardHealthy()).toBe(true);
+      const [url, opts] = fetchMock.mock.calls[0] as [string, RequestInit];
+      expect(url).toBe('http://127.0.0.1:3100/api/status');
+      expect((opts.headers as Record<string, string>)['Authorization']).toBe('Bearer tok-abc');
+    });
+
+    it('returns false on a non-200 (daemon serving but token mismatch → 401)', async () => {
+      mockExistsSync.mockImplementation((p: string) => p === TOKEN);
+      mockReadFileSync.mockReturnValue('tok');
+      globalThis.fetch = vi.fn().mockResolvedValue({ ok: false } as Response) as unknown as typeof fetch;
+      expect(await isDashboardHealthy()).toBe(false);
+    });
+
+    it('returns false when the dashboard is unreachable (fetch rejects)', async () => {
+      mockExistsSync.mockImplementation((p: string) => p === TOKEN);
+      mockReadFileSync.mockReturnValue('tok');
+      globalThis.fetch = vi
+        .fn()
+        .mockRejectedValue(new Error('ECONNREFUSED')) as unknown as typeof fetch;
+      expect(await isDashboardHealthy()).toBe(false);
     });
   });
 });

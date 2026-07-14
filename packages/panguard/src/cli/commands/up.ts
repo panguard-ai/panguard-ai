@@ -19,7 +19,11 @@ import { installFor, toHookPlatform } from './hook.js';
 import { ensurePersistentService, type PersistResult } from './persist.js';
 import { buildSkillAuditProposal } from './atr-proposal.js';
 import { isFirstRun, markInitialized } from '../first-run.js';
-import { readAuthenticatedDashboardUrl, dashboardBaseUrl } from '../dashboard-url.js';
+import {
+  readAuthenticatedDashboardUrl,
+  dashboardBaseUrl,
+  isDashboardHealthy,
+} from '../dashboard-url.js';
 import { recordScanResults, readFlaggedSkills, type RiskLevel } from '../flagged-skills.js';
 
 type Lang = 'en' | 'zh-TW';
@@ -52,6 +56,25 @@ function isGuardRunning(): boolean {
     return true;
   } catch {
     return false;
+  }
+}
+
+/**
+ * SIGTERM a running Guard daemon by its PID file so `pga up` can REPLACE a daemon
+ * whose dashboard cannot authenticate (stale/tokenless instance, or a pre-upgrade
+ * daemon). The daemon removes its own launch token in its graceful SIGTERM
+ * shutdown and releases the dashboard port before exiting; the replacement
+ * (launchd KeepAlive respawn, or a fresh ephemeral spawn by the caller) then binds
+ * the freed port and writes a new token. Best-effort: a missing/dead PID is a
+ * no-op — the caller re-checks isGuardRunning() afterwards.
+ */
+function stopGuardDaemon(): void {
+  const pidPath = join(homedir(), '.panguard-guard', 'panguard-guard.pid');
+  try {
+    const pid = parseInt(readFileSync(pidPath, 'utf-8').trim(), 10);
+    if (pid > 0) process.kill(pid, 'SIGTERM');
+  } catch {
+    /* no pid file / already gone — nothing to stop */
   }
 }
 
@@ -728,7 +751,29 @@ export function upCommand(): Command {
 
         // ── Summary + Start Guard ─────────────────────────────
         const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-        const guardAlreadyRunning = isGuardRunning();
+        let guardAlreadyRunning = isGuardRunning();
+
+        // Self-heal an unauthenticated dashboard (GA hardening). A daemon can be
+        // alive and holding the dashboard port yet serve only 401s — a stale
+        // instance that never persisted a launch token, or one still running from
+        // before an upgrade. `pga up` used to leave such a daemon untouched and
+        // then poll forever for a token that never lands, so the dashboard 401'd
+        // on every visit. If the running daemon's dashboard cannot authenticate,
+        // stop it here so the start logic below (launchd KeepAlive respawn, or a
+        // fresh ephemeral spawn) re-mints the token and the dashboard becomes
+        // reachable. Only when a dashboard is expected (opts.dashboard).
+        if (guardAlreadyRunning && opts.dashboard && !(await isDashboardHealthy())) {
+          console.log(
+            `  ${c.dim(t(lang, 'Refreshing the dashboard (restarting Guard)…', '重新整理儀表板(重啟 Guard)…'))}`
+          );
+          stopGuardDaemon();
+          // Wait for the old daemon to exit and release the port (up to ~4s) so
+          // the replacement can bind cleanly and write a fresh token.
+          for (let i = 0; i < 40 && isGuardRunning(); i++) {
+            await new Promise((r) => setTimeout(r, 100));
+          }
+          guardAlreadyRunning = isGuardRunning();
+        }
 
         // Persistence: on macOS install a user-level LaunchAgent (no sudo) so
         // protection survives reboot like an antivirus. The service IS the daemon

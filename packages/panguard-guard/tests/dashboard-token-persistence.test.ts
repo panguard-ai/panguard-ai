@@ -109,4 +109,51 @@ describe('Dashboard launch-token persistence', () => {
     expect(existsSync(TOKEN_PATH)).toBe(false);
     expect(() => removeDashboardToken()).not.toThrow();
   });
+
+  // ── Self-heal (GA hardening) ────────────────────────────────────────────
+  // A live dashboard whose token file vanishes (stray cleanup, a stop that raced
+  // a KeepAlive respawn, a leftover pre-upgrade daemon) would 401 every visit with
+  // no recovery short of a restart. ensureTokenPersisted() lets the running daemon
+  // rewrite the token on its periodic status tick so it self-heals.
+
+  it('ensureTokenPersisted() rewrites the token if it vanished while listening', async () => {
+    const port = await pickFreePort();
+    dashboard = new DashboardServer(port);
+    await dashboard.start();
+    const live = dashboard.getAuthToken();
+    expect(readFileSync(TOKEN_PATH, 'utf-8')).toBe(live);
+
+    // Simulate a stray cleanup removing the file under a running daemon.
+    rmSync(TOKEN_PATH, { force: true });
+    expect(existsSync(TOKEN_PATH)).toBe(false);
+
+    dashboard.ensureTokenPersisted();
+    expect(existsSync(TOKEN_PATH)).toBe(true);
+    expect(readFileSync(TOKEN_PATH, 'utf-8')).toBe(live);
+    // Healed file must keep the owner-only mode.
+    expect(statSync(TOKEN_PATH).mode & 0o777).toBe(0o600);
+  });
+
+  it('ensureTokenPersisted() rewrites a mismatched token (another daemon left one behind)', async () => {
+    const port = await pickFreePort();
+    dashboard = new DashboardServer(port);
+    await dashboard.start();
+    const live = dashboard.getAuthToken();
+
+    // A different daemon's token is on disk — a visitor using it would 401.
+    writeFileSync(TOKEN_PATH, 'not-our-token-value', { mode: 0o600 });
+    dashboard.ensureTokenPersisted();
+    expect(readFileSync(TOKEN_PATH, 'utf-8')).toBe(live);
+  });
+
+  it('ensureTokenPersisted() is a no-op when the dashboard is not listening', () => {
+    // A never-started dashboard must not create a token file — nothing is serving,
+    // so a token on disk would point `pga up` at a dead port.
+    const port = 3199;
+    dashboard = new DashboardServer(port);
+    // Intentionally do NOT start().
+    dashboard.ensureTokenPersisted();
+    expect(existsSync(TOKEN_PATH)).toBe(false);
+    dashboard = null; // nothing to stop
+  });
 });

@@ -48,6 +48,40 @@ export function dashboardBaseUrl(): string {
 }
 
 /**
+ * Whether a running daemon's dashboard is actually reachable AND authenticated —
+ * not merely that a process is alive. A daemon can be up and holding the port yet
+ * serve only 401s: a stale instance that never persisted a launch token, one left
+ * over from before an upgrade, or one whose dashboard hit EADDRINUSE at birth and
+ * never bound. `pga up` uses this to decide whether to restart the daemon so a
+ * fresh token is written, instead of polling forever for a token that never lands.
+ *
+ * Checks BOTH that the token file exists AND that GET /api/status authenticated
+ * with it returns 200 — a present-but-mismatched token (another daemon's) still
+ * fails the request, so this catches it too. Returns false on any error
+ * (unreadable token / unreachable / timeout / non-200) so the caller fails toward
+ * "restart it" rather than assuming health it cannot prove.
+ */
+export async function isDashboardHealthy(): Promise<boolean> {
+  let token = '';
+  try {
+    if (!existsSync(DASHBOARD_TOKEN_PATH)) return false;
+    token = readFileSync(DASHBOARD_TOKEN_PATH, 'utf-8').trim();
+  } catch {
+    return false;
+  }
+  if (!token) return false;
+  try {
+    const res = await fetch(`${dashboardBaseUrl()}/api/status`, {
+      headers: { Authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(1500),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Build the AUTHENTICATED dashboard launch URL, or null if the daemon has not
  * (yet) persisted its launch token.
  *

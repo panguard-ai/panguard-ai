@@ -151,9 +151,40 @@ export async function runCLI(args: string[]): Promise<void> {
     case 'uninstall':
       await commandUninstall(dataDir);
       break;
-    case 'config':
+    case 'config': {
+      // `config --set key=value` (or `config set key value`) mutates a
+      // whitelisted setting, so the "enable it later" hint the CLI prints is a
+      // real, runnable command — previously it errored (unknown option --set).
+      const setKV =
+        extractOption(args, '--set') ??
+        (args[1] === 'set' && args[2] ? `${args[2]}=${args[3] ?? 'true'}` : undefined);
+      if (setKV) {
+        const eq = setKV.indexOf('=');
+        const key = eq >= 0 ? setKV.slice(0, eq) : setKV;
+        const rawVal = eq >= 0 ? setKV.slice(eq + 1) : 'true';
+        const BOOL_KEYS = new Set([
+          'threatCloudUploadEnabled',
+          'threatCloudRuleSyncEnabled',
+          'telemetryEnabled',
+          'showUploadData',
+        ]);
+        if (!BOOL_KEYS.has(key)) {
+          console.log(`  ${symbols.fail} Unknown or non-settable key: ${c.sage(key)}`);
+          console.log(`  ${c.dim('Settable: ' + [...BOOL_KEYS].join(', '))}`);
+          break;
+        }
+        const val = rawVal === 'true' || rawVal === '1';
+        const cfgPath = join(dataDir, 'config.json');
+        const cfg = loadConfig(cfgPath);
+        (cfg as unknown as Record<string, unknown>)[key] = val;
+        saveConfig(cfg, cfgPath);
+        console.log(`  ${symbols.pass} ${key} = ${c.sage(String(val))}`);
+        console.log(`  ${c.dim('Restart guard to apply: pga guard restart')}`);
+        break;
+      }
       commandConfig(dataDir);
       break;
+    }
     case 'generate-key': {
       const tier = (args[1] ?? 'pro') as 'free' | 'pro' | 'enterprise';
       const key = generateTestLicenseKey(tier);

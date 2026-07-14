@@ -648,6 +648,31 @@ export class DashboardServer {
   }
 
   /**
+   * Re-persist the launch token if it vanished (or no longer matches ours) while
+   * the dashboard is still listening. A stray cleanup, a `pga guard stop` that
+   * raced a KeepAlive respawn, or a leftover pre-upgrade daemon can leave a LIVE
+   * dashboard with no token file on disk — every visit then 401s ("Invalid
+   * token") with no way to recover short of a restart. The engine calls this on
+   * its periodic status tick so a running dashboard self-heals back to an
+   * authenticated, reachable state. No-op when the token file is present and
+   * already matches this daemon's token.
+   */
+  ensureTokenPersisted(): void {
+    if (!this.listening) return;
+    try {
+      if (
+        existsSync(DASHBOARD_TOKEN_PATH) &&
+        readFileSync(DASHBOARD_TOKEN_PATH, 'utf-8') === this.authToken
+      ) {
+        return; // present and ours — nothing to heal
+      }
+    } catch {
+      /* unreadable — fall through and rewrite */
+    }
+    this.persistAuthToken();
+  }
+
+  /**
    * Persist the launch token to ~/.panguard-guard/dashboard-token with 0o600 so
    * a separate `pga up` invocation (rerun, already-running daemon, headless,
    * copied URL) can construct the authenticated launch URL. The token is the
