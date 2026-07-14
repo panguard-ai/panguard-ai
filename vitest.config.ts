@@ -30,7 +30,19 @@ export default defineConfig({
       'security-hardening/tests/**/*.test.ts',
       'scripts/__tests__/**/*.test.ts',
     ],
-    exclude: ['**/node_modules/**', 'node_modules', 'dist', 'packages/website/**'],
+    exclude: [
+      '**/node_modules/**',
+      'node_modules',
+      'dist',
+      'packages/website/**',
+      // The installer E2E does a full source build + `npm i -g` (60-90s per case).
+      // Running it in the shared vitest worker pool intermittently trips
+      // "[vitest-worker]: Timeout calling onTaskUpdate" — a reporter RPC timeout
+      // that fails the run even though every test passes, which has aborted npm
+      // publishes. It has its own dedicated workflow (installer-e2e.yml); keep it
+      // out of the unit/integration gate so a green suite means a reliable publish.
+      'tests/installer/**',
+    ],
   },
   resolve: {
     alias: {
