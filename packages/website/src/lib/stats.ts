@@ -31,7 +31,7 @@ export const STATS = {
    * bundle (src/lib/atr-rules-compiled.json) ships the 650 production rules
    * only — draft/deprecated are excluded to mirror the runtime engine.
    */
-  atrVersion: '3.5.10',
+  atrVersion: '3.5.11',
   /**
    * Full ATR corpus (agent-threat-rules v3.5.8 on npm = 747 YAML rules) —
    * auditable by `npm i agent-threat-rules@3.5.8 && find rules -name '*.yaml' | wc -l`.
