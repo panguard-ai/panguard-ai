@@ -632,11 +632,23 @@ export function auditCommand(): Command {
               })),
             });
             if (proposal) {
-              await tc.submitATRProposal(proposal);
+              // Report the REAL result — submitATRProposal returns false when the
+              // backend rejects it (e.g. the evidence-only draft-request does not
+              // yet meet the rule quality bar). Never print "submitted" on a
+              // rejected/offline POST (that was a fake-green). The accepted
+              // contribution is the skill-threat shared above; the community rule
+              // is drafted from repeated reports.
+              const proposalAccepted = await tc.submitATRProposal(proposal);
               if (!options.json) {
-                console.log(
-                  `  ${c.green(symbols.pass)} ${c.dim('ATR rule proposal submitted to Threat Cloud')}`
-                );
+                if (proposalAccepted) {
+                  console.log(
+                    `  ${c.green(symbols.pass)} ${c.dim('ATR rule proposal submitted to Threat Cloud')}`
+                  );
+                } else if (options.verbose) {
+                  console.log(
+                    `  ${c.dim(`${symbols.info} ATR proposal not accepted yet (needs community drafting); skill threat shared above`)}`
+                  );
+                }
               }
             }
           } catch {

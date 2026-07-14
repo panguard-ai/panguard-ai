@@ -2,6 +2,23 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.18] - 2026-07-15
+
+Threat Cloud honesty + the auditor's local-AI layer works with any Ollama model.
+
+- **`pga audit` no longer claims an ATR proposal was submitted when the backend
+  rejected it.** `submitATRProposal` returns false when Threat Cloud rejects the
+  evidence-only draft (it does not yet meet the rule quality bar), but the CLI
+  printed "ATR rule proposal submitted" unconditionally — a fake-green. It now
+  reports the real result; the accepted contribution is the anonymized skill
+  threat (verified reaching the backend), from which the community drafts a rule
+  after repeated reports.
+- **The skill auditor's local-AI (Ollama) layer no longer hard-codes `llama3`.**
+  It checked that the Ollama *server* was up but not that the model was pulled, so
+  a user running a different model (qwen2.5, mistral, …) hit a silent 404 "model
+  not found" and the AI layer degraded to ATR-only. It now detects an installed
+  model via the Ollama API (or honors `PANGUARD_LLM_MODEL`).
+
 ## [1.8.17] - 2026-07-15
 
 Honest `panguard_block_ip` (kill a fake-green).
