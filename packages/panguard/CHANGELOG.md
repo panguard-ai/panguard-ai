@@ -2,6 +2,20 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.17] - 2026-07-15
+
+Honest `panguard_block_ip` (kill a fake-green).
+
+- **The `panguard_block_ip` MCP tool no longer claims a block it never made.** It
+  used to return `status: "blocked"` while applying no firewall rule and queuing
+  nothing that anything consumes — a fake-green in a security product. It now
+  applies a REAL firewall rule via the shared, whitelist-guarded IP blocker and
+  reports the truthful outcome: `not_enforced` when OS-level blocking is off
+  (`enforcementPolicy.blockIPs.enabled`, the safe default), a real `blocked` only
+  when armed and the rule is actually applied, or an honest `failed` (e.g. needs
+  `sudo`) when it cannot be. `IPBlocker` is now exported from
+  `@panguard-ai/panguard-guard` so the tool reuses the tested executor.
+
 ## [1.8.16] - 2026-07-15
 
 Dashboard reliability + one-command self-heal.

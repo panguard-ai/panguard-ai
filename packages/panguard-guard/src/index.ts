@@ -97,6 +97,11 @@ export {
 // Guard Engine / 守護引擎
 export { GuardEngine } from './guard-engine.js';
 
+// The IP-blocking executor (whitelist-guarded, platform-aware firewall rule,
+// honest success/failure result). Exported so the MCP `panguard_block_ip` tool
+// applies a REAL firewall rule via the same tested path instead of faking one.
+export { IPBlocker } from './response/ip-blocker.js';
+
 // Multi-Agent Pipeline / 多代理管線
 export { DetectAgent, AnalyzeAgent, RespondAgent, ReportAgent } from './agent/index.js';
 export type { ReportRecord } from './agent/index.js';

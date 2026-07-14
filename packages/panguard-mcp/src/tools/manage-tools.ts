@@ -22,6 +22,14 @@ const IPV4_REGEX = /^(\d{1,3}\.){3}\d{1,3}$/;
 /** IPv6 validation regex — accepts compressed and full forms */
 const IPV6_REGEX = /^[0-9a-fA-F:]+$/;
 
+/** Parse a human duration ("1h", "30m", "24h", "60s", "7d") to milliseconds. */
+function parseDurationMs(s: string): number | undefined {
+  const m = /^(\d+)\s*([smhd])?$/.exec(s.trim());
+  if (!m) return undefined;
+  const mult: Record<string, number> = { s: 1000, m: 60_000, h: 3_600_000, d: 86_400_000 };
+  return Number(m[1]) * (mult[m[2] ?? 'm'] ?? 60_000);
+}
+
 /** Directories that are safe for Panguard to write into. */
 const SAFE_BASES = [
   os.homedir(),
@@ -91,28 +99,94 @@ export async function executeBlockIP(args: Record<string, unknown>) {
     };
   }
 
-  logger.info(`Blocking IP: ${ip} for ${duration} — Reason: ${reason}`);
+  // OS-level IP blocking is a privileged action, OFF by default
+  // (enforcementPolicy.blockIPs.enabled). NEVER report an IP as blocked unless a
+  // firewall rule was actually applied — the old stub returned status:'blocked'
+  // while doing nothing (no firewall call, no queue anything consumes).
+  const dataDir = resolveDataDir(args);
+  let armed = false;
+  try {
+    const cfg = JSON.parse(await fs.readFile(path.join(dataDir, 'config.json'), 'utf-8')) as {
+      enforcementPolicy?: { blockIPs?: { enabled?: boolean } };
+    };
+    armed = cfg.enforcementPolicy?.blockIPs?.enabled === true;
+  } catch {
+    // No/unreadable config → treat as not armed (fail safe: never fake a block).
+  }
 
-  return {
-    content: [
-      {
-        type: 'text' as const,
-        text: JSON.stringify(
-          {
-            status: 'blocked',
-            ip,
-            duration,
-            reason,
-            timestamp: new Date().toISOString(),
-            message: `IP ${ip} has been queued for blocking for ${duration}.`,
-            note: 'Ensure Panguard Guard is running for the block to take effect.',
-          },
-          null,
-          2
-        ),
-      },
-    ],
-  };
+  if (!armed) {
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify(
+            {
+              status: 'not_enforced',
+              ip,
+              duration,
+              reason,
+              timestamp: new Date().toISOString(),
+              message: `IP ${ip} was NOT blocked: OS-level IP blocking is off (enforcementPolicy.blockIPs.enabled=false).`,
+              howToEnable:
+                'Set enforcementPolicy.blockIPs.enabled=true in ~/.panguard-guard/config.json and run Panguard Guard with firewall privileges (sudo). Once armed, Panguard also blocks malicious IPs automatically on network-sourced threats.',
+            },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
+
+  // Armed: apply a REAL firewall rule via the shared, whitelist-guarded executor.
+  // Returns an honest result — a real block on success, or a truthful failure
+  // (e.g. needs elevated privileges) rather than a fabricated 'blocked'.
+  logger.info(`Blocking IP: ${ip} for ${duration} — Reason: ${reason}`);
+  try {
+    const { IPBlocker } = await import('@panguard-ai/panguard-guard');
+    const blocker = new IPBlocker();
+    const result = await blocker.block(ip, reason, parseDurationMs(duration));
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify(
+            {
+              status: result.success ? 'blocked' : 'failed',
+              ip,
+              duration,
+              reason,
+              timestamp: new Date().toISOString(),
+              message: result.message,
+              ...(result.success
+                ? {}
+                : {
+                    note: 'No firewall rule was applied. IP blocking needs the process to run with firewall privileges (sudo).',
+                  }),
+            },
+            null,
+            2
+          ),
+        },
+      ],
+      ...(result.success ? {} : { isError: true }),
+    };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify(
+            { status: 'failed', ip, error: msg, message: `Could not apply IP block: ${msg}` },
+            null,
+            2
+          ),
+        },
+      ],
+      isError: true,
+    };
+  }
 }
 
 /**

@@ -224,33 +224,38 @@ describe('panguard_block_ip', () => {
     expect(result.isError).toBe(true);
   });
 
-  it('blocks valid IPv4 address successfully', async () => {
+  // OS-level IP blocking is OFF by default (enforcementPolicy.blockIPs.enabled),
+  // so with no armed config the tool must NOT claim a block — it honestly reports
+  // 'not_enforced'. (The armed / real-block / privileged-failure paths are covered
+  // deterministically in manage-block-ip.test.ts.)
+  it('accepts a valid IPv4 but does not fake a block when enforcement is off', async () => {
     const result = await dispatchTool('panguard_block_ip', { ip: '192.168.1.1' });
     const parsed = parseResult(result);
 
     expect(result.isError).toBeFalsy();
-    expect(parsed['status']).toBe('blocked');
+    expect(parsed['status']).toBe('not_enforced');
+    expect(parsed['status']).not.toBe('blocked');
     expect(parsed['ip']).toBe('192.168.1.1');
     expect(parsed['duration']).toBe('1h'); // default
   });
 
-  it('blocks valid IPv6 address successfully', async () => {
+  it('accepts a valid IPv6 but does not fake a block when enforcement is off', async () => {
     const result = await dispatchTool('panguard_block_ip', { ip: '::1' });
     const parsed = parseResult(result);
 
     expect(result.isError).toBeFalsy();
-    expect(parsed['status']).toBe('blocked');
+    expect(parsed['status']).toBe('not_enforced');
     expect(parsed['ip']).toBe('::1');
   });
 
-  it('blocks full IPv6 address', async () => {
+  it('accepts a full IPv6 address but does not fake a block when enforcement is off', async () => {
     const result = await dispatchTool('panguard_block_ip', {
       ip: '2001:0db8:85a3:0000:0000:8a2e:0370:7334',
     });
     const parsed = parseResult(result);
 
     expect(result.isError).toBeFalsy();
-    expect(parsed['status']).toBe('blocked');
+    expect(parsed['status']).toBe('not_enforced');
   });
 
   it('includes custom duration in response', async () => {
