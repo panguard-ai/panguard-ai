@@ -526,9 +526,15 @@ export function upCommand(): Command {
                       const skillDir = join(homedir(), '.claude', 'skills', skill.name);
                       if (!existsSync(skillDir)) continue;
 
-                      // Fast path: skip AI/semgrep for panguard up (ATR regex only, ~50ms/skill)
-                      // Users can run `pga audit --deep` for full analysis
-                      const report = await auditSkill(skillDir, { skipAI: true });
+                      // Fast path: ATR regex only for `pga up` — skip both the AI
+                      // layer AND the code scan (semgrep's ~3-4s per-skill startup
+                      // times the number of installed skills turns `pga up` into a
+                      // multi-minute hang). Users run `pga audit --deep <skill>` for
+                      // the full SAST + secrets + AI analysis.
+                      const report = await auditSkill(skillDir, {
+                        skipAI: true,
+                        skipCode: true,
+                      });
                       if (report.riskLevel === 'HIGH' || report.riskLevel === 'CRITICAL') {
                         threats.push({
                           name: skill.name,

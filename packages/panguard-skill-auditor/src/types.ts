@@ -43,6 +43,14 @@ export interface AuditOptions {
   skipAI?: boolean;
   /** Skip ATR pattern detection */
   skipATR?: boolean;
+  /**
+   * Skip the code security scan (SAST/semgrep + secrets file walk). Use for a
+   * FAST bulk scan (e.g. `pga up` across every installed skill) where the
+   * per-skill semgrep startup (~3-4s) and a project-style skill's file tree make
+   * the full scan impractical — the ATR pattern check on the manifest still runs.
+   * Users get the full code scan on demand via `pga audit --deep <skill>`.
+   */
+  skipCode?: boolean;
   /** Additional ATR rules fetched from Threat Cloud */
   cloudRules?: Array<{ id: string; title: string; detection: unknown; [key: string]: unknown }>;
 }

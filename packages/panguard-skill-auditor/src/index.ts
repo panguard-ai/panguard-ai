@@ -62,8 +62,13 @@ export async function auditSkill(skillDir: string, options?: AuditOptions): Prom
     checks.push(await checkWithATR(manifest, options?.cloudRules));
   }
 
-  // Code security (SAST + secrets)
-  checks.push(await checkCode(skillDir));
+  // Code security (SAST + secrets). Skippable for a fast bulk scan — the
+  // per-skill semgrep startup (~3-4s) makes it impractical to run across every
+  // installed skill (e.g. `pga up`); the full scan is available via
+  // `pga audit --deep <skill>`.
+  if (!options?.skipCode) {
+    checks.push(await checkCode(skillDir));
+  }
 
   // Layer 2: AI semantic analysis (default-on, auto-detects LLM if not provided)
   if (manifest && !options?.skipAI) {

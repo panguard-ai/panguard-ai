@@ -105,7 +105,13 @@ export async function scanInstalledSkills(
 
     if (skillDir) {
       try {
-        audit = await auditSkill(skillDir, { skipAI: options?.skipAI ?? true });
+        // Bulk first-run scan across every installed skill: ATR-only (skip the AI
+        // layer AND the per-skill semgrep code scan, whose ~3-4s startup times the
+        // skill count would hang setup). Full scan on demand via `pga audit --deep`.
+        audit = await auditSkill(skillDir, {
+          skipAI: options?.skipAI ?? true,
+          skipCode: true,
+        });
       } catch {
         // Audit failed — treat as unknown
       }

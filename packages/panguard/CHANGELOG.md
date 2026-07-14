@@ -2,6 +2,23 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.19] - 2026-07-15
+
+`pga up` no longer hangs scanning large skills.
+
+- **The bulk skill scan (`pga up`, first-run setup) is ATR-only again.** It was
+  running the full per-skill semgrep SAST + secrets walk, whose ~3-4s startup
+  times the number of installed skills turned `pga up` into a multi-minute hang —
+  worse for a project-style skill bundling node_modules + built binaries, where a
+  single scan took a minute. The bulk scan now runs the fast ATR pattern check on
+  the manifest and skips the code scan (the code's own comment always said it
+  should); the full SAST + secrets + AI analysis is on demand via
+  `pga audit --deep <skill>`. A 152-skill scan drops from ~10 min to ~75s.
+- **The on-demand code scan skips dependency trees and build output.** Semgrep ran
+  with `--no-git-ignore` and no excludes, so it scanned `node_modules`, `dist`, and
+  vendored binaries; it now excludes those and caps per-file size, cutting a large
+  skill's deep scan from ~60s to ~15s.
+
 ## [1.8.18] - 2026-07-15
 
 Threat Cloud honesty + the auditor's local-AI layer works with any Ollama model.

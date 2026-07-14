@@ -28,6 +28,28 @@ const execFileAsync = promisify(execFile);
 const SEMGREP_TIMEOUT_MS = 60_000;
 
 /**
+ * Paths never worth SAST-scanning inside a skill: dependency trees, build output,
+ * VCS metadata, minified bundles, and sourcemaps. Scanning them turned a
+ * project-style skill (node_modules + built dist binaries) into a multi-minute
+ * hang without adding any real coverage of the skill's own code. Passed to
+ * semgrep as repeated --exclude globs.
+ */
+const SEMGREP_EXCLUDES: readonly string[] = [
+  'node_modules',
+  '.git',
+  'dist',
+  'build',
+  'out',
+  'vendor',
+  '.venv',
+  'venv',
+  '__pycache__',
+  '*.min.js',
+  '*.map',
+  '*.lock',
+];
+
+/**
  * Semgrep JSON result item structure
  * Semgrep JSON 結果項目結構
  */
@@ -241,7 +263,15 @@ async function runSemgrep(targetDir: string): Promise<Finding[]> {
         '--json',
         '--config=p/security-audit',
         '--config=p/secrets',
+        // --no-git-ignore so a skill's gitignored SOURCE is still scanned, but
+        // then explicitly skip the bulk that turns a scan of a project-style skill
+        // (e.g. one bundling node_modules + built dist binaries — 1GB+, 18k files)
+        // into a multi-minute hang. These are never the skill's own attack surface.
         '--no-git-ignore',
+        ...SEMGREP_EXCLUDES.flatMap((pattern) => ['--exclude', pattern]),
+        // Cap per-file size so a vendored binary/bundle can't stall the scan.
+        '--max-target-bytes',
+        '1000000',
         '--timeout=60',
         targetDir,
       ],
