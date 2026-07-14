@@ -2,6 +2,16 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.20] - 2026-07-15
+
+- **`pga up` / `pga audit` no longer hang after finishing when Threat Cloud is
+  enabled.** The Threat Cloud client's periodic flush timer was not `unref`'d, so a
+  one-shot CLI that created a client to submit a single threat kept the Node event
+  loop alive and never returned to the shell after printing its summary (the
+  protection was fully up — the process just would not exit). The timer is now
+  `unref`'d; the long-running daemon still flushes on schedule via its other
+  handles.
+
 ## [1.8.19] - 2026-07-15
 
 `pga up` no longer hangs scanning large skills.

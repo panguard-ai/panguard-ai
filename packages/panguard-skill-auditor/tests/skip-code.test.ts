@@ -29,10 +29,17 @@ afterEach(() => {
 });
 
 describe('auditSkill skipCode', () => {
-  it('runs the code security check by default', async () => {
-    const report = await auditSkill(makeSkill('Just a friendly helper.'), { skipAI: true });
-    expect(hasCodeCheck(report)).toBe(true);
-  });
+  it(
+    'runs the code security check by default',
+    async () => {
+      const report = await auditSkill(makeSkill('Just a friendly helper.'), { skipAI: true });
+      expect(hasCodeCheck(report)).toBe(true);
+    },
+    // Generous timeout: the default path invokes semgrep, whose cold start alone
+    // is a few seconds and slower under CI/host load — the whole point of the
+    // sibling skipCode test is that a fast bulk scan must NOT pay this cost.
+    30_000
+  );
 
   it('skips the code security check when skipCode is set (fast bulk path)', async () => {
     const report = await auditSkill(makeSkill('Just a friendly helper.'), {

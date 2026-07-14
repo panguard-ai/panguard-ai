@@ -135,10 +135,16 @@ export class ThreatCloudClient {
       this.status = 'offline';
       logger.info('Threat Cloud in offline mode (no endpoint configured) / 威脅雲離線模式');
     } else {
-      // Start periodic flush timer
+      // Start periodic flush timer. unref() it so it never keeps a short-lived
+      // process alive on its own: a one-shot CLI (`pga up`, `pga audit`) that
+      // creates a client to submit one threat used to HANG after printing its
+      // summary because this interval kept the Node event loop from draining. The
+      // long-running daemon stays alive via its server/watchers regardless, so
+      // unref() does not stop periodic flushing there.
       this.flushTimer = setInterval(() => {
         void this.flushBuffer();
       }, ThreatCloudClient.FLUSH_INTERVAL);
+      this.flushTimer.unref?.();
     }
   }
 

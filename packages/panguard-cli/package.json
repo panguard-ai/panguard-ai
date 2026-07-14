@@ -1,6 +1,6 @@
 {
   "name": "panguard",
-  "version": "1.8.19",
+  "version": "1.8.20",
   "license": "MIT",
   "description": "AI security for agents and servers -- one command to protect everything",
   "bin": {
