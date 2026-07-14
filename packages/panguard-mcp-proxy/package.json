@@ -1,6 +1,6 @@
 {
   "name": "@panguard-ai/panguard-mcp-proxy",
-  "version": "1.8.14",
+  "version": "1.8.15",
   "description": "MCP Proxy — runtime interception for AI agent tool calls using ATR rules",
   "type": "module",
   "main": "./dist/index.js",
@@ -29,7 +29,7 @@
     "@panguard-ai/atr": "workspace:*",
     "@panguard-ai/containment": "workspace:*",
     "@panguard-ai/panguard-guard": "workspace:*",
-    "agent-threat-rules": "^3.5.8"
+    "agent-threat-rules": "^3.5.10"
   },
   "peerDependencies": {
     "@panguard-ai/atr": "workspace:*"

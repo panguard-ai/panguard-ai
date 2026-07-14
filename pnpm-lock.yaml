@@ -277,8 +277,8 @@ importers:
         specifier: workspace:*
         version: link:../../security-hardening
       agent-threat-rules:
-        specifier: ^3.5.8
-        version: 3.5.8(zod@3.25.76)
+        specifier: ^3.5.10
+        version: 3.5.10(zod@3.25.76)
       jose:
         specifier: ^5.9.0
         version: 5.10.0
@@ -345,8 +345,8 @@ importers:
         specifier: workspace:*
         version: link:../panguard-guard
       agent-threat-rules:
-        specifier: ^3.5.8
-        version: 3.5.8(zod@3.25.76)
+        specifier: ^3.5.10
+        version: 3.5.10(zod@3.25.76)
 
   packages/panguard-scan:
     dependencies:
@@ -2317,6 +2317,11 @@ packages:
   agent-base@7.1.4:
     resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
     engines: {node: '>= 14'}
+
+  agent-threat-rules@3.5.10:
+    resolution: {integrity: sha512-qhcN3c2Kf/f7WHtTkHaunuuS/wjstQZHn/W/z8emcRp5n9x0P09/bxh3lgOhBZJhqwy/Wki6hSXgQ1x8RtBhRQ==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
 
   agent-threat-rules@3.5.8:
     resolution: {integrity: sha512-HsIOq7p+5HAFq7MzLG0SifrYuLUWF5iyniHApSYnOx/Olxg0p0pB97yJF0aYVCrZjBFYwZjvNfB0S2HlL1DR1Q==}
@@ -6799,6 +6804,15 @@ snapshots:
     optional: true
 
   agent-base@7.1.4: {}
+
+  agent-threat-rules@3.5.10(zod@3.25.76):
+    dependencies:
+      '@modelcontextprotocol/sdk': 1.29.0(zod@3.25.76)
+      js-yaml: 4.1.1
+    transitivePeerDependencies:
+      - '@cfworker/json-schema'
+      - supports-color
+      - zod
 
   agent-threat-rules@3.5.8(zod@3.25.76):
     dependencies:
