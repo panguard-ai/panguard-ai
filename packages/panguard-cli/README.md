@@ -1,6 +1,6 @@
 # panguard
 
-AI security for agents and servers — one command to protect everything.
+AI security for agents and servers — one command to start monitoring and guarding your agents.
 
 The unified Panguard CLI orchestrator, bundling Guard, Scan, Chat, and all community security tools.
 

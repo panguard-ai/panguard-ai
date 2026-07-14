@@ -2,13 +2,35 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.21] - 2026-07-15
+
+Honesty pass — remove overclaims from user-facing copy (no code behaviour change).
+
+- **No stale rule count in the README.** It hard-coded "747 detection rules"
+  (three times); the shipped ATR count changes multiple times a day. Now reads
+  "hundreds of continuously-updated rules".
+- **The README no longer implies paid features are free.** "All features available
+  in Community" now reads "Every Community feature is free forever; cryptographic
+  rule signing and SOC 2 evidence are Enterprise-only."
+- **Dropped the unsubstantiated "Layer 1 catches ~70% of attacks" line** from
+  `pga up` — there is no measured 70% figure to cite. It now describes the tier
+  without a made-up percentage, and "each attack you block can become a rule" is
+  reworded to the aggregate community path.
+- **Scoped the Threat Cloud encryption claim.** The setup consent implied
+  everything is "end-to-end encrypted"; only the anonymized threat-signature
+  telemetry is E2E-sealed — skill-audit findings and rule proposals go over TLS.
+  The consent text now says so.
+- **Dashboard "always on" copy now notes the agent-restart caveat** (built-in tools
+  are guarded after the agent restarts to load the hook); "one command to protect
+  everything" and "--enforce to block all" are reworded to match reality.
+
 ## [1.8.20] - 2026-07-15
 
 - **`pga up` / `pga audit` no longer hang after finishing when Threat Cloud is
   enabled.** The Threat Cloud client's periodic flush timer was not `unref`'d, so a
   one-shot CLI that created a client to submit a single threat kept the Node event
-  loop alive and never returned to the shell after printing its summary (the
-  protection was fully up — the process just would not exit). The timer is now
+  loop alive and never returned to the shell after printing its summary (protection was
+  running — the process just would not exit). The timer is now
   `unref`'d; the long-running daemon still flushes on schedule via its other
   handles.
 
@@ -23,11 +45,11 @@ All notable changes to Panguard AI will be documented in this file.
   single scan took a minute. The bulk scan now runs the fast ATR pattern check on
   the manifest and skips the code scan (the code's own comment always said it
   should); the full SAST + secrets + AI analysis is on demand via
-  `pga audit --deep <skill>`. A 152-skill scan drops from ~10 min to ~75s.
+  `pga audit --deep <skill>`. In our testing, a 152-skill scan dropped from ~10 min to ~75s.
 - **The on-demand code scan skips dependency trees and build output.** Semgrep ran
   with `--no-git-ignore` and no excludes, so it scanned `node_modules`, `dist`, and
   vendored binaries; it now excludes those and caps per-file size, cutting a large
-  skill's deep scan from ~60s to ~15s.
+  skill's deep scan from ~60s to ~15s in our testing.
 
 ## [1.8.18] - 2026-07-15
 
@@ -73,7 +95,7 @@ Dashboard reliability + one-command self-heal.
   restarts the daemon so a fresh token is written. After `pga up`,
   `curl -H "Authorization: Bearer $(cat ~/.panguard-guard/dashboard-token)"
   http://127.0.0.1:3100/api/status` returns real status.
-- **`pga up` reliably auto-starts the Guard daemon on every install layout.** The
+- **`pga up` auto-starts the Guard daemon across common install layouts.** The
   guard binary is now located by walking the Node resolution paths (hoisted, nested,
   and global-npm layouts) instead of a `require.resolve` that threw
   `ERR_PACKAGE_PATH_NOT_EXPORTED` on non-nested installs and silently skipped the

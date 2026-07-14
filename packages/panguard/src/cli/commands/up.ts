@@ -1052,7 +1052,7 @@ export function upCommand(): Command {
         }
         console.log('');
         console.log(
-          `  ${c.dim(t(lang, 'Layer 1 (regex) catches ~70% of attacks at zero cost.', 'Layer 1 (正則) 零成本攔截約 70% 攻擊。'))}`
+          `  ${c.dim(t(lang, 'Layer 1 (regex) blocks known attack patterns instantly at zero cost.', 'Layer 1 (正則) 零成本即時攔截已知攻擊模式。'))}`
         );
         console.log(
           `  ${c.dim(t(lang, 'Add Layer 2 (local AI) or 3 (cloud AI) for deeper detection.', '加入 Layer 2 (本地 AI) 或 Layer 3 (雲端 AI) 提升偵測深度。'))}`
@@ -1078,7 +1078,7 @@ export function upCommand(): Command {
             `  ${c.dim(t(lang, 'Collective defense is OFF — nothing leaves this machine.', '集體防禦目前關閉 — 沒有任何資料離開這台機器。'))}`
           );
           console.log(
-            `  ${c.dim(t(lang, 'Want to help? Each attack you block can become a new ATR rule that protects', '想幫忙嗎？你擋下的每次攻擊，都能變成一條保護所有人的新 ATR 規則，'))}`
+            `  ${c.dim(t(lang, 'Want to help? The attacks you block feed the community threat pool that protects', '想幫忙嗎？你擋下的攻擊會匯入保護所有人的社群威脅池，'))}`
           );
           console.log(
             `  ${c.dim(t(lang, 'everyone — and you get community rules back faster. Shared: only the matched', '而你也能更快收到社群回流的規則。分享的只有命中的規則 ID、'))}`

@@ -1,8 +1,8 @@
 {
   "name": "panguard",
-  "version": "1.8.20",
+  "version": "1.8.21",
   "license": "MIT",
-  "description": "AI security for agents and servers -- one command to protect everything",
+  "description": "AI security for agents and servers -- one command to start monitoring and guarding your agents",
   "bin": {
     "panguard": "./bin/panguard.js",
     "pga": "./bin/panguard.js"

@@ -579,8 +579,13 @@ describe('DashboardServer — 1.7 control endpoints', () => {
       // the daemon's automatic OS-level responses, NOT tool-call blocking (which
       // the MCP proxy + built-in hook do ALWAYS). The copy must say so and must
       // NOT resurrect the old lie that disarming lets blocked actions through.
-      expect(html).toContain('always on'); // detection + tool-call blocking are always on
+      // Tool-call blocking is independent of the arm switch...
+      expect(html).toContain('whether this is armed or not');
+      // ...and the arm switch governs ONLY the automatic OS-level responses.
       expect(html).toContain('automatic OS-level responses');
+      // ...but be honest that built-in-tool coverage needs the agent restarted to
+      // load the hook (do not resurrect a bare "always on" that hides that caveat).
+      expect(html).toContain('restart the agent');
       // The scrapped arm-control overclaims must not come back (these strings
       // were unique to the old dishonest arm copy).
       expect(html).not.toContain('Guard now blocks detected threats');

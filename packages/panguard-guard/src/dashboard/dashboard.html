@@ -1644,9 +1644,11 @@
                 max-width: 640px;
               "
             >
-              Detection and blocking of malicious tool calls are <strong>always on</strong> &mdash;
-              Guard blocks the critical / high-confidence calls it detects whether this is armed or
-              not. This switch controls only Guard&rsquo;s <strong>automatic OS-level responses</strong>
+              Detection and blocking of high-confidence malicious tool calls run
+              <strong>automatically once Guard is up</strong> &mdash; Guard blocks the critical /
+              high-confidence calls it detects whether this is armed or not. (Your agent&rsquo;s
+              built-in tools are guarded after you restart the agent to load the hook.)
+              This switch controls only Guard&rsquo;s <strong>automatic OS-level responses</strong>
               (block IP, isolate file, kill process): armed lets them run, disarmed keeps Guard to
               detect-and-log for those. Each such response stays off until you configure it under
               enforcementPolicy, so arming is safe by default.
@@ -1689,7 +1691,7 @@
             <span data-i18n="layer_title">Detection Layers</span>
           </h3>
           <div class="desc">
-            Layers A and B are deterministic and always on. Layer C is optional — bring your own LLM
+            Layers A and B are deterministic and run automatically once Guard is up (your agent's built-in tools after you restart the agent to load the hook). Layer C is optional — bring your own LLM
             (cloud API or local model). It is advisory (flags for review, never auto-blocks) and
             stays off until you connect one. It runs only on events A and B already flagged, not on
             every action, so cloud use is typically a few cents a month — and a local model (Ollama)

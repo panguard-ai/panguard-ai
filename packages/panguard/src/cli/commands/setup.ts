@@ -796,9 +796,14 @@ export function setupCommand(): Command {
             );
             console.log(c.dim('      community can turn a novel attack into a new rule,'));
             console.log(
-              c.dim('    · anonymize it on your machine, then END-TO-END ENCRYPT it — sealed so')
+              c.dim('    · anonymize it on your machine, then END-TO-END SEAL the threat')
             );
-            console.log(c.dim('      only the Threat Cloud backend can read it, not the network,'));
+            console.log(
+              c.dim('      signatures (only the Threat Cloud backend can read them, not the')
+            );
+            console.log(
+              c.dim('      network); skill-audit findings & rule proposals go over TLS,')
+            );
             console.log(c.dim('    · auto-update your detection rules from the community.'));
             console.log(
               c.dim('    NEVER shared: prompts, code, file contents, secrets, paths, hostname.')
