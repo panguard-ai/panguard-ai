@@ -23,6 +23,16 @@ vi.mock('node:fs', async () => {
   };
 });
 
+// The last-scan section reads the flagged-skills store (lastScanAt + readFlaggedSkills)
+// that `pga scan` / `pga up` actually write. Default to "no scan" so the existing
+// no-config assertions (lastScan: null) hold; individual tests override.
+const mockLastScanAt = vi.fn(() => null as string | null);
+const mockReadFlaggedSkills = vi.fn(() => [] as Array<{ riskLevel: string; normalizedName?: string }>);
+vi.mock('../src/cli/flagged-skills.js', () => ({
+  lastScanAt: () => mockLastScanAt(),
+  readFlaggedSkills: () => mockReadFlaggedSkills(),
+}));
+
 vi.mock('@panguard-ai/core', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@panguard-ai/core')>();
   return {
@@ -200,6 +210,35 @@ describe('statusCommand', () => {
       const parsed = JSON.parse(jsonOutput);
       expect(parsed.ai).toEqual({ preference: 'cloud_ai', provider: 'claude' });
       expect(parsed.notifications).toEqual({ channel: 'slack', configured: true });
+    });
+
+    // Regression (1.8.22): readLastScan used to read ~/.panguard/last-scan.json,
+    // which NO command writes, so lastScan was ALWAYS null even right after a scan
+    // flagged skills. It now sources the flagged-skills store; a scan with flagged
+    // skills must surface here with a risk score derived from the worst severity.
+    it('populates lastScan from the flagged-skills store, not a never-written file', async () => {
+      mockReadConfig.mockReturnValue({
+        modules: { guard: true, scan: true, chat: false, trap: false, report: true, dashboard: true },
+        guard: { mode: 'protection', learningDays: 7 },
+        notifications: { channel: 'none', configured: false },
+        trap: { enabled: false, services: [] },
+        ai: { preference: 'rules_only', provider: 'none' },
+        meta: { language: 'en' },
+      });
+      mockLastScanAt.mockReturnValue('2026-07-15T00:00:00.000Z');
+      mockReadFlaggedSkills.mockReturnValue([
+        { riskLevel: 'MEDIUM', normalizedName: 'meh-skill' },
+        { riskLevel: 'HIGH', normalizedName: 'sketchy-skill' },
+      ]);
+      const cmd = statusCommand();
+      await cmd.parseAsync(['--json'], { from: 'user' });
+      const parsed = JSON.parse(consoleSpy.mock.calls[0]![0] as string);
+
+      expect(parsed.lastScan).not.toBeNull();
+      expect(parsed.lastScan.timestamp).toBe('2026-07-15T00:00:00.000Z');
+      expect(parsed.lastScan.findings).toBe(2);
+      // Worst severity is HIGH → 70 (not a fabricated aggregate of both).
+      expect(parsed.lastScan.riskScore).toBe(70);
     });
   });
 

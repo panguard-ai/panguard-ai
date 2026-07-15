@@ -23,6 +23,14 @@ vi.mock('node:os', () => ({
   homedir: () => '/tmp/test-home',
 }));
 
+// updateGuardConfig re-seals the integrity manifest via the guard's
+// resealConfigManifest after writing. Stub it so the dynamic import resolves
+// and we can assert the re-seal happens (the fix for the false "config tampered").
+const mockReseal = vi.fn();
+vi.mock('@panguard-ai/panguard-guard', () => ({
+  resealConfigManifest: (...args: unknown[]) => mockReseal(...args),
+}));
+
 import { loadGuardConfig, updateGuardConfig } from '../src/cli/guard-config.js';
 
 describe('loadGuardConfig', () => {
@@ -92,5 +100,29 @@ describe('updateGuardConfig', () => {
     const writtenJson = mockWriteFileSync.mock.calls[0][1] as string;
     const parsed = JSON.parse(writtenJson);
     expect(parsed).toEqual({ telemetryEnabled: true, mode: 'monitor', dashboardPort: 3000 });
+  });
+
+  // Regression (1.8.22): a plain write left the integrity manifest stale, so a
+  // legitimate telemetry / Threat-Cloud toggle made the NEXT `pga doctor` falsely
+  // report "config tampered". updateGuardConfig must re-seal after writing.
+  it('re-seals the integrity manifest after writing (config, guard dir)', async () => {
+    mockExistsSync.mockReturnValue(true);
+    await updateGuardConfig({ telemetryEnabled: true });
+
+    expect(mockReseal).toHaveBeenCalledTimes(1);
+    expect(mockReseal).toHaveBeenCalledWith(
+      { telemetryEnabled: true },
+      '/tmp/test-home/.panguard-guard'
+    );
+  });
+
+  it('writes BEFORE it re-seals (a re-seal failure must never lose the write)', async () => {
+    mockExistsSync.mockReturnValue(true);
+    const order: string[] = [];
+    mockWriteFileSync.mockImplementation(() => order.push('write'));
+    mockReseal.mockImplementation(() => order.push('reseal'));
+    await updateGuardConfig({ telemetryEnabled: false });
+
+    expect(order).toEqual(['write', 'reseal']);
   });
 });
