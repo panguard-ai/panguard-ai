@@ -12,8 +12,8 @@ try {
   const pkgJson = r.resolve('@panguard-ai/panguard/package.json');
   pkgDir = dirname(pkgJson);
 } catch {
-  console.error('Error: @panguard-ai/panguard is not installed.');
-  console.error('Run: npm install -g @panguard-ai/panguard');
+  console.error('Error: the panguard CLI core is not installed or is corrupted.');
+  console.error('Reinstall with: npm install -g panguard');
   process.exit(1);
 }
 

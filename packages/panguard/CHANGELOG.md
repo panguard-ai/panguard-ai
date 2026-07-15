@@ -2,6 +2,30 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.23] - 2026-07-16
+
+One canonical install package — fixes an npm bin collision found by an
+end-to-end install dogfood from panguard.ai.
+
+- **`panguard` is now the single canonical package for the `panguard` / `pga`
+  bins.** The scoped `@panguard-ai/panguard` no longer declares a `bin` — it is a
+  pure library dependency of the `panguard` wrapper. Previously BOTH packages
+  registered the global `panguard` + `pga` bins, so `npm install -g @panguard-ai/panguard`
+  failed with `EEXIST: /opt/homebrew/bin/panguard` on any machine that already had
+  `panguard` (and vice-versa). The website hero installer + curl|bash script fell
+  back to a prebuilt binary and self-healed, but the npm path was broken and a user
+  who mixed channels (install via curl, then `pga upgrade`) hit the conflict.
+- **Every install/upgrade instruction now points at `panguard`.** The get.panguard.ai
+  installer (`scripts/installer/install.sh`, `packages/website/public/install.sh`),
+  the website CTAs + docs, the README, and the wrapper's own error message all use
+  `npm install -g panguard`. `pga upgrade` already targeted `panguard` (1.8.22).
+  `@panguard-ai/panguard-guard` / `-scan` / `-mcp` install commands are unchanged
+  (different packages).
+- **Migration:** if you previously installed the scoped package directly
+  (`npm install -g @panguard-ai/panguard`), switch once with
+  `npm rm -g @panguard-ai/panguard && npm install -g panguard`. Nothing changes for
+  users who installed via `panguard` or the curl|bash installer.
+
 ## [1.8.22] - 2026-07-15
 
 Correctness + honesty pass across the CLI (found by an adversarial sweep for

@@ -21,7 +21,7 @@ export default function FreeForever() {
       </p>
 
       <div className="mt-10 flex flex-wrap gap-3">
-        <CopyCommand command="npm install -g @panguard-ai/panguard" copiedLabel={t('copied')} />
+        <CopyCommand command="npm install -g panguard" copiedLabel={t('copied')} />
         <CopyCommand command="panguard setup" copiedLabel={t('copied')} />
       </div>
 

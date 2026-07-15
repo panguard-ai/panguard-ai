@@ -102,7 +102,7 @@ When the user asks about security, skill auditing, or threat protection:
 If panguard is not installed, install it:
 
 ```bash
-npm install -g @panguard-ai/panguard
+npm install -g panguard
 ```
 
 Then configure for all AI agent platforms:

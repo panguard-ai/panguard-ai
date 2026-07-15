@@ -14,7 +14,7 @@ AI-powered security for agents and servers — detect threats in real-time, on-d
 ## Quick Start
 
 ```bash
-npm install -g @panguard-ai/panguard
+npm install -g panguard
 # or run without installing:
 npx @panguard-ai/panguard
 

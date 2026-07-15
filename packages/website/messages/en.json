@@ -6417,7 +6417,7 @@
       "title": "Installation & Setup",
       "q1": {
         "q": "How do I get started?",
-        "a": "One command:\n\nnpm install -g @panguard-ai/panguard && panguard setup\n\nSetup auto-detects Claude Code, Cursor, and 5 other AI platforms. It injects MCP config so your AI agent can call Panguard tools via natural language -- \"audit this skill\", \"scan my system\", \"what threats were blocked today\".\n\nNo accounts, no API keys required. Rules-only mode works out of the box. Add an LLM key later if you want AI-enhanced analysis."
+        "a": "One command:\n\nnpm install -g panguard && panguard setup\n\nSetup auto-detects Claude Code, Cursor, and 5 other AI platforms. It injects MCP config so your AI agent can call Panguard tools via natural language -- \"audit this skill\", \"scan my system\", \"what threats were blocked today\".\n\nNo accounts, no API keys required. Rules-only mode works out of the box. Add an LLM key later if you want AI-enhanced analysis."
       },
       "q2": {
         "q": "What can I do after installing?",

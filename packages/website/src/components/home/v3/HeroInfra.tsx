@@ -55,10 +55,7 @@ export default function HeroInfra() {
             </div>
 
             <div className="hero-entrance mt-5 [animation-delay:.4s]">
-              <CopyCommand
-                command="npm install -g @panguard-ai/panguard"
-                copiedLabel={t('copied')}
-              />
+              <CopyCommand command="npm install -g panguard" copiedLabel={t('copied')} />
             </div>
           </div>
 

@@ -51,7 +51,7 @@ const INSTALL_OPTIONS: Record<Platform, InstallOption[]> = {
     {
       method: 'npm',
       label: 'npm',
-      command: 'npm install -g @panguard-ai/panguard && pga up',
+      command: 'npm install -g panguard && pga up',
       note: 'Requires Node.js 20+. Works on both Apple Silicon and Intel Mac.',
       noteZh: '需要 Node.js 20+。Apple Silicon 與 Intel Mac 皆可使用。',
     },
@@ -71,7 +71,7 @@ const INSTALL_OPTIONS: Record<Platform, InstallOption[]> = {
       label: 'npm',
       prereq:
         '# Ubuntu / Debian\ncurl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -\nsudo apt-get install -y nodejs\n\n# CentOS / RHEL\ncurl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -\nsudo yum install -y nodejs',
-      command: 'npm install -g @panguard-ai/panguard && pga up',
+      command: 'npm install -g panguard && pga up',
     },
   ],
   windows: [
@@ -82,7 +82,7 @@ const INSTALL_OPTIONS: Record<Platform, InstallOption[]> = {
       recommended: true,
       prereq:
         '# Install Node.js first (pick one):\nwinget install OpenJS.NodeJS.LTS\n# Or download from https://nodejs.org (v20+ LTS)',
-      command: 'npm install -g @panguard-ai/panguard && pga up',
+      command: 'npm install -g panguard && pga up',
     },
     {
       method: 'curl',
@@ -388,10 +388,7 @@ export default function GettingStartedContent() {
                     <strong className="text-text-primary">{isZh ? '步驟 1：' : 'Step 1:'}</strong>
                     {isZh ? '打開終端機' : ' Open your terminal'}
                   </p>
-                  <CodeBlock
-                    code="npm install -g @panguard-ai/panguard && pga up"
-                    label="Install"
-                  />
+                  <CodeBlock code="npm install -g panguard && pga up" label="Install" />
                   <p>
                     <strong className="text-text-primary">{isZh ? '步驟 2：' : 'Step 2:'}</strong>
                     {isZh ? '自動設定 Claude Code' : ' Auto-configure Claude Code'}
@@ -435,10 +432,7 @@ export default function GettingStartedContent() {
                     <strong className="text-text-primary">{isZh ? '步驟 1：' : 'Step 1:'}</strong>
                     {isZh ? '安裝 PanGuard' : ' Install PanGuard'}
                   </p>
-                  <CodeBlock
-                    code="npm install -g @panguard-ai/panguard && pga up"
-                    label="Install"
-                  />
+                  <CodeBlock code="npm install -g panguard && pga up" label="Install" />
                   <p>
                     <strong className="text-text-primary">{isZh ? '步驟 2：' : 'Step 2:'}</strong>
                     {isZh ? '自動設定 OpenClaw' : ' Auto-configure OpenClaw'}

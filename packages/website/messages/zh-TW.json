@@ -6451,7 +6451,7 @@
       "title": "安裝與設定",
       "q1": {
         "q": "怎麼開始使用？",
-        "a": "一行指令：\n\nnpm install -g @panguard-ai/panguard && panguard setup\n\nSetup 自動偵測 Claude Code、Cursor 和其他 5 個 AI 平台。它會注入 MCP 設定，讓你的 AI Agent 可以用自然語言呼叫 Panguard 工具——「審計這個 skill」、「掃描我的系統」、「今天擋了什麼威脅」。\n\n不需要帳號、不需要 API Key。純規則模式開箱即用。之後想要 AI 增強分析再加 LLM Key 就好。"
+        "a": "一行指令：\n\nnpm install -g panguard && panguard setup\n\nSetup 自動偵測 Claude Code、Cursor 和其他 5 個 AI 平台。它會注入 MCP 設定，讓你的 AI Agent 可以用自然語言呼叫 Panguard 工具——「審計這個 skill」、「掃描我的系統」、「今天擋了什麼威脅」。\n\n不需要帳號、不需要 API Key。純規則模式開箱即用。之後想要 AI 增強分析再加 LLM Key 就好。"
       },
       "q2": {
         "q": "裝好之後可以做什麼？",

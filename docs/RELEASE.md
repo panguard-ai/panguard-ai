@@ -111,7 +111,7 @@ Every release must pass ALL checks before declaring success.
 ```bash
 # --- npm ---
 npm info @panguard-ai/panguard version
-npm install -g @panguard-ai/panguard && pga --version
+npm install -g panguard && pga --version
 
 # --- curl ---
 curl -fsSL https://get.panguard.ai | bash
@@ -161,7 +161,7 @@ For a coordinated release (ATR + PanGuard):
 
 ### Phase 4: Verify (ALL must pass)
 
-- [ ] `npm install -g @panguard-ai/panguard` works
+- [ ] `npm install -g panguard` works
 - [ ] `curl -fsSL https://get.panguard.ai | bash` works
 - [ ] `brew upgrade panguard` works
 - [ ] panguard.ai loads correctly

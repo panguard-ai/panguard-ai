@@ -54,7 +54,7 @@ export default function HeroThesis() {
             {t('installLabel')}
           </span>
           <CopyCommand
-            command="npm install -g @panguard-ai/panguard"
+            command="npm install -g panguard"
             copiedLabel={t('copied')}
             className="hidden md:inline-flex"
           />

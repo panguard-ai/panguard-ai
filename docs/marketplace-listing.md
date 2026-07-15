@@ -70,7 +70,7 @@ security, audit, mcp, skill-auditor, threat-detection, guard, monitoring, atr
 
 1. Go to https://pulsemcp.com/submit
 2. Fill in the submission form
-3. Include npm install command: `npm install -g @panguard-ai/panguard`
+3. Include npm install command: `npm install -g panguard`
 
 ### 6. OpenClaw Hub / Chinese Ecosystem
 

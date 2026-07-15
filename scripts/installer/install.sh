@@ -715,7 +715,7 @@ main() {
   # Strategy: npm first (fastest & most reliable), then prebuilt binary, then source build
   if command -v npm &>/dev/null; then
     info "Installing via npm..."
-    if npm install -g @panguard-ai/panguard 2>/dev/null; then
+    if npm install -g panguard 2>/dev/null; then
       success "Panguard AI installed via npm"
       NPM_INSTALLED=true
     else

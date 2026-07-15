@@ -1084,7 +1084,7 @@ async function showFirstRunWelcome(dashboardPort: number, atrRuleCount: number):
   console.log(
     `  ${c.dim('Tip: for the full experience (the')} ${c.sage('pga')} ${c.dim('command, interactive menu, audits),')}`
   );
-  console.log(`  ${c.dim('install the CLI:')} ${c.sage('npm install -g @panguard-ai/panguard')}`);
+  console.log(`  ${c.dim('install the CLI:')} ${c.sage('npm install -g panguard')}`);
   console.log('');
   console.log(`  ${c.bold('What Guard does:')}`);
   console.log(`    ${symbols.pass} Monitors new skill installations in real-time`);

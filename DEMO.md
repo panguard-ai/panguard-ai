@@ -9,7 +9,7 @@
 ## 安裝 / Install
 
 ```bash
-npm install -g @panguard-ai/panguard
+npm install -g panguard
 pga --version
 ```
 

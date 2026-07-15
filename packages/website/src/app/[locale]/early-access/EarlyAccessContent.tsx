@@ -266,7 +266,7 @@ export default function EarlyAccessContent() {
           <FadeInUp delay={0.15}>
             <div className="mt-10 bg-surface-2 border border-border rounded-xl p-6">
               <code className="block text-sm text-brand-sage font-mono mb-6">
-                npm install -g @panguard-ai/panguard && pga up
+                npm install -g panguard && pga up
               </code>
               <ul className="space-y-2.5">
                 {copy.todayList.map((item) => {

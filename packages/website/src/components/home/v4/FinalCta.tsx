@@ -12,7 +12,7 @@ import FadeInUp from '@/components/FadeInUp';
  * the hero owns all numbers.
  */
 
-const INSTALL_COMMAND = 'npm install -g @panguard-ai/panguard && pga up';
+const INSTALL_COMMAND = 'npm install -g panguard && pga up';
 const COPY_FEEDBACK_MS = 2000;
 const GITHUB_URL = 'https://github.com/panguard-ai/panguard-ai';
 

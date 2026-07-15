@@ -34,7 +34,7 @@
 | Linux    | ARM64                 | curl one-liner or npm           |
 | Windows  | x64                   | npm (recommended) or PowerShell |
 
-> **Intel Mac users**: The curl installer downloads the ARM64 binary. Either install via npm (`npm install -g @panguard-ai/panguard`), or enable Rosetta 2 first (`softwareupdate --install-rosetta`) before using the curl installer.
+> **Intel Mac users**: The curl installer downloads the ARM64 binary. Either install via npm (`npm install -g panguard`), or enable Rosetta 2 first (`softwareupdate --install-rosetta`) before using the curl installer.
 
 ---
 
@@ -55,7 +55,7 @@ powershell -ExecutionPolicy Bypass -Command "irm https://get.panguard.ai/windows
 ### Using npm (all platforms)
 
 ```bash
-npm install -g @panguard-ai/panguard && pga up
+npm install -g panguard && pga up
 ```
 
 ### From Source (Development)

@@ -10,7 +10,7 @@ export default function GetStarted() {
   const t = useTranslations('homeV3.start');
 
   const steps = [
-    { n: '01', label: t('step1'), cmd: 'npm install -g @panguard-ai/panguard' },
+    { n: '01', label: t('step1'), cmd: 'npm install -g panguard' },
     { n: '02', label: t('step2'), cmd: 'panguard setup' },
     { n: '03', label: t('step3'), cmd: 'pga scan ./skill.md' },
   ];
