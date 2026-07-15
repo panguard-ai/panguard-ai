@@ -400,6 +400,11 @@ setup_path() {
   if mkdir -p "$bin_dir" 2>/dev/null; then
     printf '#!/usr/bin/env bash\nexec "%s" "$@"\n' "$bin_source" > "${bin_dir}/panguard" 2>/dev/null
     chmod +x "${bin_dir}/panguard" 2>/dev/null
+    # Always (re)write the `pga` alias too so it never diverges from `panguard`.
+    # A pre-existing stale pga wrapper (e.g. an older install pointing at a removed
+    # binary) would otherwise keep resolving to the wrong target after a reinstall.
+    printf '#!/usr/bin/env bash\nexec "%s" "$@"\n' "$bin_source" > "${bin_dir}/pga" 2>/dev/null
+    chmod +x "${bin_dir}/pga" 2>/dev/null
     if [ -x "${bin_dir}/panguard" ]; then
       success "Installed to ${bin_dir}/panguard (no sudo required)"
       symlink_created=true

@@ -1001,12 +1001,23 @@ export function upCommand(): Command {
             `  ${c.sage(t(lang, 'Threats', '威脅'))}       ${c.critical(`${threatCount} ${t(lang, 'flagged', '個標記')}`)}`
           );
         }
-        const tcStatusLine =
-          tcStatus === 'connected'
-            ? `${t(lang, 'connected', '已連線')}${sensorShortId ? ` · ${t(lang, 'sensor', '感測器')} ${c.sage(sensorShortId)}` : ''}`
-            : telemetryDisabled
-              ? t(lang, 'disabled (opt-out)', '已停用(選擇退出)')
-              : t(lang, 'offline (will sync when online)', '離線(上線時自動同步)');
+        // `tcStatus === 'connected'` only means rules were pulled IN (rule-sync);
+        // it does NOT mean anything is shared OUT. Sharing is the opt-in
+        // (threatCloudUploadEnabled, i.e. !telemetryDisabled). Gate the label on
+        // the SHARING state first so a receive-only default install never reads as
+        // "connected" next to "nothing leaves this machine".
+        const synced = tcStatus === 'connected';
+        const tcStatusLine = telemetryDisabled
+          ? synced
+            ? t(lang, 'receive-only · rules synced, nothing shared', '僅接收 · 規則已同步,不分享')
+            : t(lang, 'off · not sharing', '關閉 · 不分享')
+          : synced
+            ? `${t(lang, 'sharing on', '分享中')}${sensorShortId ? ` · ${t(lang, 'sensor', '感測器')} ${c.sage(sensorShortId)}` : ''}`
+            : t(
+                lang,
+                'sharing on · offline (will sync when online)',
+                '分享中 · 離線(上線時自動同步)'
+              );
         console.log(`  ${c.sage('Threat Cloud')}  ${tcStatusLine}`);
         console.log('');
 

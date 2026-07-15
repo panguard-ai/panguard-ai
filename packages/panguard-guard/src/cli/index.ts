@@ -1255,6 +1255,32 @@ async function commandInstall(dataDir: string): Promise<void> {
     // on Windows where the script has no shebang to self-execute.
     const result = await installService([process.execPath, execPath], dataDir);
     sp.succeed(`Service installed: ${c.sage(result)}`);
+    // An explicit install/reinstall is a TRUST event: re-baseline the sealed
+    // LaunchAgent ref to the plist installService just wrote. A legitimate reinstall
+    // that changed the service path (e.g. npm install → curl prebuilt binary, or an
+    // upgrade) otherwise leaves `checkSelfState` reporting "launchagent tampered"
+    // forever — the daemon's re-seal deliberately refuses to launder a changed
+    // LaunchAgent, and `pga up` can't clear it. Re-bless ONLY the LaunchAgent (which
+    // we just legitimately wrote), never the hook/proxy refs, so a concurrent hijack
+    // of those stays detected. Best-effort + only when a baseline already exists.
+    try {
+      const {
+        wasInitialized,
+        readSelfStateRefs,
+        forgetSelfState,
+        collectSelfState,
+        sealConfigManifest,
+      } = await import('../integrity.js');
+      if (wasInitialized(dataDir)) {
+        const keptNonLaunchAgent = forgetSelfState(readSelfStateRefs(dataDir), ['launchagent']);
+        const currentLaunchAgent = collectSelfState().filter((r) => r.kind === 'launchagent');
+        const rebased = [...keptNonLaunchAgent, ...currentLaunchAgent];
+        const cfg = loadConfig(join(dataDir, 'config.json'));
+        sealConfigManifest(cfg as unknown as Record<string, unknown>, rebased, dataDir);
+      }
+    } catch {
+      /* re-baseline is best-effort — the service is already installed */
+    }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     sp.fail(`Install failed: ${msg}`);

@@ -2,6 +2,27 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.24] - 2026-07-16
+
+GA-polish pass — the three honesty / robustness edges the install dogfood surfaced.
+
+- **`pga up` no longer prints "Threat Cloud connected" when sharing is OFF.** The
+  label keyed off the rule-sync cache (rules pulled IN), so a default receive-only
+  install showed "connected" right next to "Collective defense is OFF — nothing
+  leaves this machine". It now reflects the SHARING opt-in: "receive-only · rules
+  synced, nothing shared" when off, "sharing on · sensor …" when opted in.
+- **A legitimate reinstall no longer leaves `pga doctor` stuck on "launchagent
+  tampered".** When a reinstall/upgrade changes the service path (e.g. npm → curl
+  prebuilt binary), the daemon's re-seal correctly refuses to launder the changed
+  LaunchAgent, but `pga up` then couldn't clear it. `pga guard install` now
+  re-baselines ONLY the LaunchAgent it just wrote (hook/proxy refs stay sealed, so a
+  real hijack of those is still caught), and doctor's fix hint points at the command
+  that actually works.
+- **The installer keeps `pga` and `panguard` pointing at the same binary.**
+  `setup_path` wrote the `panguard` wrapper but never the `pga` alias, so a
+  pre-existing stale `pga` wrapper could resolve to a different (older) binary after
+  a reinstall. It now (re)writes both.
+
 ## [1.8.23] - 2026-07-16
 
 One canonical install package — fixes an npm bin collision found by an

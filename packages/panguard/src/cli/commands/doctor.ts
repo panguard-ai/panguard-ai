@@ -164,7 +164,7 @@ function checkConfigIntegrity(): CheckResult {
       status: 'fail',
       label: 'Config integrity',
       detail: parts.join('; '),
-      fix: 'If this change was yours, run "pga up" to re-seal. Otherwise protection may have been weakened — review the config and reinstall.',
+      fix: 'If you changed this yourself: a config change re-seals with "pga up"; a service/hook change after a reinstall or upgrade re-establishes trust with "pga guard install". If it was NOT you, protection may have been weakened — reinstall the CLI.',
     };
   } catch {
     return { status: 'warn', label: 'Config integrity', detail: 'integrity check unavailable' };
