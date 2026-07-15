@@ -130,6 +130,9 @@ function evaluateATR(
     severity: m.rule.severity,
     responseActions: m.rule.response?.actions ?? [],
     confidence: m.confidence,
+    // Maturity gates auto-blocking: only enforce-lane (stable) rules may auto-block,
+    // matching the documented lane model (hunt/test rules alert, they do not block).
+    maturity: (m.rule as { maturity?: string }).maturity ?? 'test',
   }));
 
   if (detection) {

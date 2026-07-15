@@ -270,6 +270,8 @@ export interface DetectionResult {
     responseActions?: string[];
     /** ATR match confidence score (0-1) */
     confidence?: number;
+    /** Rule maturity — only 'stable' (enforce lane) may auto-block; others alert only */
+    maturity?: string;
   }>;
   /**
    * ADVISORY-ONLY detection: a behavioral/anomaly signal with NO rule, threat-intel,

@@ -421,11 +421,20 @@ function pickATRAction(
 ): ResponseAction | null {
   const mapped: ResponseAction[] = [];
 
+  // Only enforce-lane (maturity:stable) rules may auto-block — this is the
+  // documented lane model ("the enforce lane holds rules that are allowed to
+  // block"). A hunt/test rule (~9% FP) that matches must still SURFACE the threat,
+  // but its blocking action is downgraded to a non-blocking 'notify' so it cannot
+  // auto-block on the higher false-positive rate. Stable rules (~0.24% FP) keep
+  // their full action.
+  const NON_BLOCKING = new Set<ResponseAction>(['notify', 'log_only']);
   for (const match of atrMatches) {
     if (!match.responseActions?.length) continue;
+    const isEnforceLane = (match as { maturity?: string }).maturity === 'stable';
     for (const action of match.responseActions) {
       const resolved = ATR_ACTION_MAP[action];
-      if (resolved) mapped.push(resolved);
+      if (!resolved) continue;
+      mapped.push(isEnforceLane || NON_BLOCKING.has(resolved) ? resolved : 'notify');
     }
   }
 
