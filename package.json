@@ -40,7 +40,7 @@
     "cli": "node packages/panguard/dist/cli/index.js",
     "website:dev": "pnpm --filter @panguard-ai/website dev",
     "website:build": "pnpm --filter @panguard-ai/website build",
-    "test:installer": "vitest run tests/installer",
+    "test:installer": "vitest run --config tests/installer/vitest.config.ts",
     "website:start": "pnpm --filter @panguard-ai/website start",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
