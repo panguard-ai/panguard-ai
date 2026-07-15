@@ -57,7 +57,9 @@ describe('autoDetectSkillLLM — Ollama model auto-detection', () => {
   });
 
   it('returns null when Ollama is unreachable', async () => {
-    globalThis.fetch = vi.fn().mockRejectedValue(new Error('ECONNREFUSED')) as unknown as typeof fetch;
+    globalThis.fetch = vi
+      .fn()
+      .mockRejectedValue(new Error('ECONNREFUSED')) as unknown as typeof fetch;
     const { autoDetectSkillLLM } = await import('../src/checks/llm-auto-detect.js');
     expect(await autoDetectSkillLLM()).toBeNull();
   });

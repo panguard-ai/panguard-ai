@@ -219,7 +219,9 @@ export default function LayerDetailContent({ layer }: { layer: Layer }) {
                 {isZh ? '生態系整合' : 'ECOSYSTEM INTEGRATIONS'}
               </p>
               <h2 className="text-[clamp(20px,3vw,32px)] font-bold text-text-primary">
-                {isZh ? '我們的規則已合併進其他平台的上游' : 'Our rules, merged upstream into other platforms'}
+                {isZh
+                  ? '我們的規則已合併進其他平台的上游'
+                  : 'Our rules, merged upstream into other platforms'}
               </h2>
             </FadeInUp>
             <div className="mt-10 space-y-3">

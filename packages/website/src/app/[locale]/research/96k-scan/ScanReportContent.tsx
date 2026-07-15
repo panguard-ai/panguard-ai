@@ -353,9 +353,9 @@ dGFycmQzdHh3KSI=' | base64 -D | bash`}</code>
               <div className="bg-surface-2 rounded-xl border border-border p-5">
                 <p className="text-xs text-text-muted mb-1">Merged upstream</p>
                 <p className="text-sm text-text-primary font-semibold mb-2">
-                  Cisco AI Defense skill-scanner rule packs (
-                  {STATS.adoption.ciscoRulesMerged} ATR rules merged); mapped to OWASP Agentic
-                  Top 10. Maintainer-accepted contributions, not vendor endorsements.
+                  Cisco AI Defense skill-scanner rule packs ({STATS.adoption.ciscoRulesMerged} ATR
+                  rules merged); mapped to OWASP Agentic Top 10. Maintainer-accepted contributions,
+                  not vendor endorsements.
                 </p>
                 <a
                   href="https://github.com/cisco-ai-defense/skill-scanner/pull/79"

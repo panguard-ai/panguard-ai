@@ -91,7 +91,9 @@ export default function ProofBand() {
             ) : (
               <>
                 ATR rules merged upstream into Cisco AI Defense and Microsoft AGT —{' '}
-                <span className="text-brand-sage">maintainer-accepted contributions, not vendor endorsements.</span>
+                <span className="text-brand-sage">
+                  maintainer-accepted contributions, not vendor endorsements.
+                </span>
               </>
             )}
           </Eyebrow>

@@ -79,9 +79,8 @@ export function guardCommand(): Command {
       // so `start` sees the new process and misreports "already running" while the
       // restart may not have applied cleanly. Restart via the service manager
       // instead; only fall back to stop+start for an ephemeral (non-service) daemon.
-      const { isPersistentServiceInstalled, restartPersistentService } = await import(
-        './persist.js'
-      );
+      const { isPersistentServiceInstalled, restartPersistentService } =
+        await import('./persist.js');
       if (isPersistentServiceInstalled() && restartPersistentService()) {
         console.log(
           `  ${symbols.pass} ${c.safe('Guard service restarted')} ${c.dim('— it reloads config + rules on start.')}`

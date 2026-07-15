@@ -117,7 +117,8 @@ export const COMPARE: ComparisonEntry[] = [
         feature: 'Ecosystem footprint',
         featureZh: '生態足跡',
         atr: 'ATR rules merged upstream — Cisco AI Defense skill-scanner (in production), Microsoft AGT community examples, MISP, OWASP A-S-R-H — maintainer-accepted contributions, not vendor endorsements',
-        atrZh: 'ATR 規則已 merge 上游——Cisco AI Defense skill-scanner（生產環境）、Microsoft AGT community 範例、MISP、OWASP A-S-R-H——維護者接受的貢獻，非廠商背書',
+        atrZh:
+          'ATR 規則已 merge 上游——Cisco AI Defense skill-scanner（生產環境）、Microsoft AGT community 範例、MISP、OWASP A-S-R-H——維護者接受的貢獻，非廠商背書',
         other: 'Splunk, Elastic, Microsoft Sentinel, Sumo Logic, every SIEM',
         otherZh: 'Splunk、Elastic、Microsoft Sentinel、Sumo Logic 及所有 SIEM',
         winner: 'other',

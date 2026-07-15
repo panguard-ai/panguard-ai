@@ -566,7 +566,14 @@ export function setupCommand(): Command {
               // which is why `pga up` never auto-started the guard daemon.
               let resolvedBin: string | null = null;
               for (const base of require.resolve.paths('@panguard-ai/panguard-guard') ?? []) {
-                const cand = rjoin(base, '@panguard-ai', 'panguard-guard', 'dist', 'cli', 'index.js');
+                const cand = rjoin(
+                  base,
+                  '@panguard-ai',
+                  'panguard-guard',
+                  'dist',
+                  'cli',
+                  'index.js'
+                );
                 if (feMain(cand)) {
                   resolvedBin = cand;
                   break;

@@ -125,7 +125,9 @@ describe('dashboard-url helpers', () => {
     it('returns false on a non-200 (daemon serving but token mismatch → 401)', async () => {
       mockExistsSync.mockImplementation((p: string) => p === TOKEN);
       mockReadFileSync.mockReturnValue('tok');
-      globalThis.fetch = vi.fn().mockResolvedValue({ ok: false } as Response) as unknown as typeof fetch;
+      globalThis.fetch = vi
+        .fn()
+        .mockResolvedValue({ ok: false } as Response) as unknown as typeof fetch;
       expect(await isDashboardHealthy()).toBe(false);
     });
 

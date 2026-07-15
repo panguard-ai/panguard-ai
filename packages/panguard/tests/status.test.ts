@@ -27,7 +27,9 @@ vi.mock('node:fs', async () => {
 // that `pga scan` / `pga up` actually write. Default to "no scan" so the existing
 // no-config assertions (lastScan: null) hold; individual tests override.
 const mockLastScanAt = vi.fn(() => null as string | null);
-const mockReadFlaggedSkills = vi.fn(() => [] as Array<{ riskLevel: string; normalizedName?: string }>);
+const mockReadFlaggedSkills = vi.fn(
+  () => [] as Array<{ riskLevel: string; normalizedName?: string }>
+);
 vi.mock('../src/cli/flagged-skills.js', () => ({
   lastScanAt: () => mockLastScanAt(),
   readFlaggedSkills: () => mockReadFlaggedSkills(),
@@ -218,7 +220,14 @@ describe('statusCommand', () => {
     // skills must surface here with a risk score derived from the worst severity.
     it('populates lastScan from the flagged-skills store, not a never-written file', async () => {
       mockReadConfig.mockReturnValue({
-        modules: { guard: true, scan: true, chat: false, trap: false, report: true, dashboard: true },
+        modules: {
+          guard: true,
+          scan: true,
+          chat: false,
+          trap: false,
+          report: true,
+          dashboard: true,
+        },
         guard: { mode: 'protection', learningDays: 7 },
         notifications: { channel: 'none', configured: false },
         trap: { enabled: false, services: [] },

@@ -43,43 +43,91 @@ describe('shouldHardDeny — proxy hard-deny policy', () => {
   describe('builtinToolSurface — built-in-tool hook shell-metacharacter gate', () => {
     it('mcp shell-escape / parameter-injection rules degrade on the built-in surface (the real FP)', () => {
       expect(
-        shouldHardDeny({ severity: 'critical', maturity: 'test', tags: { scan_target: 'mcp', subcategory: 'shell-escape' } }, true)
+        shouldHardDeny(
+          {
+            severity: 'critical',
+            maturity: 'test',
+            tags: { scan_target: 'mcp', subcategory: 'shell-escape' },
+          },
+          true
+        )
       ).toBe(false);
       expect(
-        shouldHardDeny({ severity: 'critical', maturity: 'stable', tags: { scan_target: 'mcp', subcategory: 'parameter-injection' } }, true)
+        shouldHardDeny(
+          {
+            severity: 'critical',
+            maturity: 'stable',
+            tags: { scan_target: 'mcp', subcategory: 'parameter-injection' },
+          },
+          true
+        )
       ).toBe(false);
     });
     it('REGRESSION (1.8.13): mcp credential-theft / env-harvesting STILL hard-block on the built-in surface (cat ~/.ssh/id_rsa)', () => {
       expect(
-        shouldHardDeny({ severity: 'critical', maturity: 'test', tags: { scan_target: 'mcp', subcategory: 'credential-theft' } }, true)
+        shouldHardDeny(
+          {
+            severity: 'critical',
+            maturity: 'test',
+            tags: { scan_target: 'mcp', subcategory: 'credential-theft' },
+          },
+          true
+        )
       ).toBe(true);
       expect(
-        shouldHardDeny({ severity: 'critical', maturity: 'test', tags: { scan_target: 'mcp', subcategory: 'env-var-harvesting' } }, true)
+        shouldHardDeny(
+          {
+            severity: 'critical',
+            maturity: 'test',
+            tags: { scan_target: 'mcp', subcategory: 'env-var-harvesting' },
+          },
+          true
+        )
       ).toBe(true);
       // an mcp rule with no/other subcategory is NOT a metacharacter FP -> still blocks
       expect(
-        shouldHardDeny({ severity: 'critical', maturity: 'test', tags: { scan_target: 'mcp' } }, true)
+        shouldHardDeny(
+          { severity: 'critical', maturity: 'test', tags: { scan_target: 'mcp' } },
+          true
+        )
       ).toBe(true);
     });
     it('a shell-domain rule (tool_args/skill/host/code) still hard-blocks on the built-in surface', () => {
       expect(
-        shouldHardDeny({ severity: 'critical', maturity: 'test', tags: { scan_target: 'tool_args' } }, true)
+        shouldHardDeny(
+          { severity: 'critical', maturity: 'test', tags: { scan_target: 'tool_args' } },
+          true
+        )
       ).toBe(true);
       expect(
-        shouldHardDeny({ severity: 'critical', maturity: 'test', tags: { scan_target: 'skill' } }, true)
+        shouldHardDeny(
+          { severity: 'critical', maturity: 'test', tags: { scan_target: 'skill' } },
+          true
+        )
       ).toBe(true);
       // high still needs stable regardless of surface
       expect(
-        shouldHardDeny({ severity: 'high', maturity: 'stable', tags: { scan_target: 'tool_args' } }, true)
+        shouldHardDeny(
+          { severity: 'high', maturity: 'stable', tags: { scan_target: 'tool_args' } },
+          true
+        )
       ).toBe(true);
       expect(
-        shouldHardDeny({ severity: 'high', maturity: 'test', tags: { scan_target: 'tool_args' } }, true)
+        shouldHardDeny(
+          { severity: 'high', maturity: 'test', tags: { scan_target: 'tool_args' } },
+          true
+        )
       ).toBe(false);
     });
     it('still never hard-blocks a broad confirm:embedding rule (checked before the mcp gate)', () => {
       expect(
         shouldHardDeny(
-          { severity: 'critical', maturity: 'stable', confirm: 'embedding', tags: { scan_target: 'mcp' } },
+          {
+            severity: 'critical',
+            maturity: 'stable',
+            confirm: 'embedding',
+            tags: { scan_target: 'mcp' },
+          },
           true
         )
       ).toBe(false);

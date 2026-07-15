@@ -394,7 +394,10 @@ export function collectSelfState(): SelfStateRef[] {
   // dependency on the panguard CLI package.
   const claudeSettings = join(homedir(), '.claude', 'settings.json');
   try {
-    if (existsSync(claudeSettings) && readFileSync(claudeSettings, 'utf-8').includes('pga hook run')) {
+    if (
+      existsSync(claudeSettings) &&
+      readFileSync(claudeSettings, 'utf-8').includes('pga hook run')
+    ) {
       refs.push({
         kind: 'hook',
         path: claudeSettings,

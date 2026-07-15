@@ -99,7 +99,7 @@ Threat Cloud honesty + the auditor's local-AI layer works with any Ollama model.
   threat (verified reaching the backend), from which the community drafts a rule
   after repeated reports.
 - **The skill auditor's local-AI (Ollama) layer no longer hard-codes `llama3`.**
-  It checked that the Ollama *server* was up but not that the model was pulled, so
+  It checked that the Ollama _server_ was up but not that the model was pulled, so
   a user running a different model (qwen2.5, mistral, …) hit a silent 404 "model
   not found" and the AI layer degraded to ATR-only. It now detects an installed
   model via the Ollama API (or honors `PANGUARD_LLM_MODEL`).
@@ -130,7 +130,7 @@ Dashboard reliability + one-command self-heal.
   the file vanishes, and `pga up` detects a dashboard that cannot authenticate and
   restarts the daemon so a fresh token is written. After `pga up`,
   `curl -H "Authorization: Bearer $(cat ~/.panguard-guard/dashboard-token)"
-  http://127.0.0.1:3100/api/status` returns real status.
+http://127.0.0.1:3100/api/status` returns real status.
 - **`pga up` auto-starts the Guard daemon across common install layouts.** The
   guard binary is now located by walking the Node resolution paths (hoisted, nested,
   and global-npm layouts) instead of a `require.resolve` that threw
@@ -246,7 +246,7 @@ publish never reached npm).
 - **Connecting to Threat Cloud uploads VALID draft-request proposals.** The
   up/audit flywheel now emits honest draft-requests carrying a real snippet +
   `needsLLMDraft`, with secret values scrubbed — instead of title-keyword regex
-  (the discredited ATR-PRED-* anti-pattern).
+  (the discredited ATR-PRED-\* anti-pattern).
 - **npm provenance fix.** `@panguard-ai/security-hardening` lacked a `repository`
   field, which aborted `pnpm -r publish` mid-run under provenance (E422). The field
   was added so every publishable package attaches signed build provenance.

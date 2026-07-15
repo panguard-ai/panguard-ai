@@ -429,14 +429,16 @@ function DetailedComparisons() {
       title: 'ATR vs OWASP Agentic Top 10',
       blurb:
         'Executable rules vs taxonomy. ATR rules merged into OWASP A-S-R-H as a community contribution, not an OWASP endorsement.',
-      blurbZh: '可執行規則 vs 分類框架。ATR 規則已 merge 進 OWASP A-S-R-H（社群貢獻，非 OWASP 官方背書）。',
+      blurbZh:
+        '可執行規則 vs 分類框架。ATR 規則已 merge 進 OWASP A-S-R-H（社群貢獻，非 OWASP 官方背書）。',
     },
     {
       slug: 'atr-vs-cisco-defenseclaw',
       title: 'PanGuard vs Cisco DefenseClaw',
       blurb:
         'Open standard plus commercial platform vs enterprise bundle. ATR rules merged into Cisco AI Defense skill-scanner rule packs, in production (PR #99).',
-      blurbZh: '開放標準加商業平台 vs 企業 bundle。ATR 規則已 merge 進 Cisco AI Defense 的 skill-scanner 規則包（生產環境，PR #99）。',
+      blurbZh:
+        '開放標準加商業平台 vs 企業 bundle。ATR 規則已 merge 進 Cisco AI Defense 的 skill-scanner 規則包（生產環境，PR #99）。',
     },
   ];
 

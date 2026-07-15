@@ -26,8 +26,7 @@ const mockIsPersistentServiceInstalled = vi.fn();
 const mockRestartPersistentService = vi.fn();
 
 vi.mock('../src/cli/commands/persist.js', () => ({
-  isPersistentServiceInstalled: (...args: unknown[]) =>
-    mockIsPersistentServiceInstalled(...args),
+  isPersistentServiceInstalled: (...args: unknown[]) => mockIsPersistentServiceInstalled(...args),
   restartPersistentService: (...args: unknown[]) => mockRestartPersistentService(...args),
   ensurePersistentService: vi.fn(() => 'installed'),
 }));

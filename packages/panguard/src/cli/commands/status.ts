@@ -462,7 +462,13 @@ function readLastScan(): SystemStatus['lastScan'] {
   const flagged = readFlaggedSkills();
   const worst = flagged.reduce((rank, f) => {
     const r =
-      f.riskLevel === 'CRITICAL' ? 90 : f.riskLevel === 'HIGH' ? 70 : f.riskLevel === 'MEDIUM' ? 40 : 10;
+      f.riskLevel === 'CRITICAL'
+        ? 90
+        : f.riskLevel === 'HIGH'
+          ? 70
+          : f.riskLevel === 'MEDIUM'
+            ? 40
+            : 10;
     return Math.max(rank, r);
   }, 0);
   const riskScore = flagged.length === 0 ? 0 : worst;

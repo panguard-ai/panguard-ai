@@ -520,8 +520,7 @@ export default async function SovereignPage({
   const country = resolveCountry(sp?.c, hdrs.get('x-vercel-ip-country'));
   const view = resolveView(sp?.view);
   const isPartner = view === 'partner';
-  const html = BRIEF_HTML
-    .replace('<!--VIEWTOGGLE-->', viewToggle(view, sp?.c))
+  const html = BRIEF_HTML.replace('<!--VIEWTOGGLE-->', viewToggle(view, sp?.c))
     .replace('<!--HERO_EYEBROW-->', isPartner ? PARTNER_EYEBROW : GOV_EYEBROW)
     .replace('<!--HERO_ABSTRACT-->', isPartner ? PARTNER_ABSTRACT : GOV_ABSTRACT)
     .replace('<!--HERO_ACTIONS-->', isPartner ? PARTNER_HEROACTIONS : GOV_HEROACTIONS)
