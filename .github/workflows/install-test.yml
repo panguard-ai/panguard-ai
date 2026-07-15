@@ -68,7 +68,7 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: Install via npm
-        run: npm install -g @panguard-ai/panguard@latest || echo "npm install failed (known issue on Node ${{ matrix.node }})"
+        run: npm install -g panguard@latest || echo "npm install failed (known issue on Node ${{ matrix.node }})"
 
       - name: Verify version
         run: panguard --version || echo "panguard not found (install failed)"

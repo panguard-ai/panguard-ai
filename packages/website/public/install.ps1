@@ -86,7 +86,7 @@ $NpmInstalled = $false
 
 Write-Info "Installing Panguard AI via npm..."
 try {
-    npm install -g @panguard-ai/panguard 2>$null
+    npm install -g panguard 2>$null
     $NpmInstalled = $true
     Write-Ok "Panguard AI installed via npm"
 } catch {

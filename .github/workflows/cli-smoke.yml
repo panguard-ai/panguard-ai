@@ -20,7 +20,7 @@ jobs:
           node-version: '20'
 
       - name: Install CLI from npm
-        run: npm install -g @panguard-ai/panguard@latest
+        run: npm install -g panguard@latest
 
       - name: Verify panguard is in PATH
         run: panguard --version
