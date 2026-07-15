@@ -66,7 +66,7 @@ function checkInstallation(): CheckResult {
     status: hasVersion ? 'pass' : 'fail',
     label: 'Installation integrity',
     detail: hasVersion ? `Binary OK, v${PANGUARD_VERSION}` : 'Cannot determine version',
-    fix: hasVersion ? undefined : 'Reinstall the CLI: npm install -g @panguard-ai/panguard',
+    fix: hasVersion ? undefined : 'Reinstall the CLI: npm install -g panguard',
   };
 }
 
@@ -315,7 +315,7 @@ async function checkGuardEngine(): Promise<CheckResult> {
       status: 'fail',
       label: 'Guard engine',
       detail: `Daemon running (PID ${pid}) but 0 detection rules loaded — protection is NOT active`,
-      fix: 'Run "pga upgrade" to reinstall the bundled detection rules (agent-threat-rules)',
+      fix: 'Reload rules by restarting the daemon: "pga guard restart" (it loads rules at startup, so a running daemon will not pick them up otherwise). If it still shows 0, refresh the bundle: "pga upgrade" then "pga guard restart".',
     };
   }
 
@@ -890,6 +890,15 @@ export function doctorCommand(): Command {
       const lang: Lang = opts.lang === 'zh-TW' ? 'zh-TW' : 'en';
       const results = await runAllChecks();
 
+      // Reflect health in the exit code for EVERY output mode (json / fix /
+      // default) so a CI or monitoring script gating on `pga doctor [--json]`
+      // sees a real failure. The --json and --fix paths used to return early,
+      // before the exit-code logic, so a broken system (daemon down, 0 rules,
+      // config tampered) always exited 0 — a green exit code that lied.
+      if (results.some((r) => r.status === 'fail')) {
+        process.exitCode = 1;
+      }
+
       if (opts.json) {
         console.log(JSON.stringify(results, null, 2));
         return;
@@ -930,12 +939,7 @@ export function doctorCommand(): Command {
         return;
       }
 
-      // Default: same as interactive display
+      // Default: same as interactive display (exit code already set above).
       await runDoctor(lang);
-
-      const hasFailure = results.some((r) => r.status === 'fail');
-      if (hasFailure) {
-        process.exitCode = 1;
-      }
     });
 }

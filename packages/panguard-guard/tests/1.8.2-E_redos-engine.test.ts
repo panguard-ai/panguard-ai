@@ -29,6 +29,22 @@ function matchMs(source: string, input: string): number {
   return performance.now() - start;
 }
 
+/**
+ * Best-of-`runs` wall-clock ms. The catastrophic-backtracking signal lives in the
+ * fastest run (pure compute, no preemption); OS scheduling jitter only ever ADDS
+ * time. Taking the minimum strips that additive noise so a ratio comparison
+ * reflects true exponential growth, not a context switch — the fix for this test
+ * flaking under a loaded CI/dev machine where a near-constant per-call overhead
+ * compressed the short-vs-long ratio.
+ */
+function minMatchMs(source: string, input: string, runs = 5): number {
+  let best = Infinity;
+  for (let i = 0; i < runs; i++) {
+    best = Math.min(best, matchMs(source, input));
+  }
+  return best;
+}
+
 describe('isSafeRegex — catastrophic nested-quantifier ReDoS gate', () => {
   // The exact patterns the audit finding proved catastrophic + accepted by the
   // old gate. These are the must-not-recur cases.
@@ -101,8 +117,8 @@ describe('isSafeRegex — timing proof the gate targets real blowup', () => {
     // Small n kept intentionally low so the runner never hangs: even here the
     // blowup is stark. A non-[a-z] terminator forces maximal backtracking.
     // Each +4 filler chars roughly quadruples the time (exponential doubling).
-    const tShort = matchMs(src, 'a'.repeat(16) + '!');
-    const tLong = matchMs(src, 'a'.repeat(22) + '!');
+    const tShort = minMatchMs(src, 'a'.repeat(16) + '!');
+    const tLong = minMatchMs(src, 'a'.repeat(22) + '!');
     // Assert clear super-linear growth so the pattern is demonstrably worth
     // gating, with a floor on the long run so the ratio is not measuring noise.
     expect(tLong).toBeGreaterThan(1);

@@ -41,7 +41,7 @@ export function configCommand(): Command {
     .description('Set a guard config value')
     .argument('<key>', 'Config key: telemetry, threat-cloud, lang')
     .argument('<value>', 'Config value (true/false, or en/zh-TW for lang)')
-    .action((key: string, value: string) => {
+    .action(async (key: string, value: string) => {
       const validKeys = ['telemetry', 'threat-cloud', 'lang'];
       if (!validKeys.includes(key)) {
         console.log(
@@ -77,10 +77,10 @@ export function configCommand(): Command {
       }
       const boolValue = truthy.includes(v);
       if (key === 'telemetry') {
-        updateGuardConfig({ ...config, telemetryEnabled: boolValue });
+        await updateGuardConfig({ ...config, telemetryEnabled: boolValue });
         console.log(`  ${c.safe('telemetryEnabled')} set to ${c.bold(String(boolValue))}`);
       } else if (key === 'threat-cloud') {
-        updateGuardConfig({ ...config, threatCloudUploadEnabled: boolValue });
+        await updateGuardConfig({ ...config, threatCloudUploadEnabled: boolValue });
         console.log(`  ${c.safe('threatCloudUploadEnabled')} set to ${c.bold(String(boolValue))}`);
       }
     });

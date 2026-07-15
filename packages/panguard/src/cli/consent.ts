@@ -117,7 +117,7 @@ export async function askTelemetryConsent(): Promise<boolean> {
   // upload gate blocks. Opt in by setting the flags in config for headless use.
   if (!process.stdin.isTTY) {
     const config = loadGuardConfig();
-    updateGuardConfig({
+    await updateGuardConfig({
       ...config,
       telemetryEnabled: false,
       threatCloudUploadEnabled: false,
@@ -135,7 +135,7 @@ export async function askTelemetryConsent(): Promise<boolean> {
   const config = loadGuardConfig();
   // A single "I agree" wires the whole loop: contribute (upload) AND receive
   // (rule sync). Declining leaves every flag off — nothing connects, nothing syncs.
-  updateGuardConfig({
+  await updateGuardConfig({
     ...config,
     telemetryEnabled: answer,
     threatCloudUploadEnabled: answer,

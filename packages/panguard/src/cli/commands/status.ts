@@ -24,7 +24,7 @@ import type { StatusItem, TableColumn } from '@panguard-ai/core';
 import { readConfig } from '../../init/config-writer.js';
 import { loadGuardConfig } from '../guard-config.js';
 import { readAuthenticatedDashboardUrl, dashboardBaseUrl } from '../dashboard-url.js';
-import { readFlaggedSkills } from '../flagged-skills.js';
+import { readFlaggedSkills, lastScanAt } from '../flagged-skills.js';
 import type { Lang } from '../../init/types.js';
 
 const GUARD_CONFIG_PATH = join(homedir(), '.panguard-guard', 'config.json');
@@ -448,21 +448,30 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
   }
 }
 
-/** Read the most recent scan summary, shared by both config and guard-only paths. */
+/**
+ * Read the most recent scan summary from the flagged-skills store that
+ * `pga scan` / `pga up` actually write (recordScanResults → lastScanAt +
+ * readFlaggedSkills), the same source `pga doctor` uses. The old
+ * ~/.panguard/last-scan.json was never written by any command, so this section
+ * was always empty and `--json` always emitted lastScan:null. The risk figure is
+ * derived from the WORST flagged severity (not a fabricated aggregate).
+ */
 function readLastScan(): SystemStatus['lastScan'] {
-  const scanResultPath = join(homedir(), '.panguard', 'last-scan.json');
-  if (!existsSync(scanResultPath)) return null;
-  try {
-    const scanData = JSON.parse(readFileSync(scanResultPath, 'utf-8'));
-    return {
-      timestamp: scanData.scannedAt ?? new Date().toISOString(),
-      riskScore: scanData.riskScore ?? 0,
-      findings: scanData.findings?.length ?? 0,
-      grade: scoreToGrade(scanData.riskScore ?? 0),
-    };
-  } catch {
-    return null;
-  }
+  const scannedAt = lastScanAt();
+  if (!scannedAt) return null;
+  const flagged = readFlaggedSkills();
+  const worst = flagged.reduce((rank, f) => {
+    const r =
+      f.riskLevel === 'CRITICAL' ? 90 : f.riskLevel === 'HIGH' ? 70 : f.riskLevel === 'MEDIUM' ? 40 : 10;
+    return Math.max(rank, r);
+  }, 0);
+  const riskScore = flagged.length === 0 ? 0 : worst;
+  return {
+    timestamp: scannedAt,
+    riskScore,
+    findings: flagged.length,
+    grade: scoreToGrade(riskScore),
+  };
 }
 
 function collectStatus(config: ReturnType<typeof readConfig>): SystemStatus {

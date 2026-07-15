@@ -74,6 +74,21 @@ export function guardCommand(): Command {
     .option('--data-dir <path>', 'Data directory')
     .option('--verbose', 'Verbose output', false)
     .action(async (opts: { dataDir?: string; verbose: boolean }) => {
+      // A reboot-surviving launchd service has KeepAlive=true: a plain stop+start
+      // races the respawn (launchd relaunches the daemon between the two steps),
+      // so `start` sees the new process and misreports "already running" while the
+      // restart may not have applied cleanly. Restart via the service manager
+      // instead; only fall back to stop+start for an ephemeral (non-service) daemon.
+      const { isPersistentServiceInstalled, restartPersistentService } = await import(
+        './persist.js'
+      );
+      if (isPersistentServiceInstalled() && restartPersistentService()) {
+        console.log(
+          `  ${symbols.pass} ${c.safe('Guard service restarted')} ${c.dim('— it reloads config + rules on start.')}`
+        );
+        return;
+      }
+
       const stopArgs = ['stop'];
       if (opts.dataDir) stopArgs.push('--data-dir', opts.dataDir);
       await runCLI(stopArgs);
@@ -704,7 +719,18 @@ async function showDetailedStatus(dataDirOverride?: string): Promise<void> {
   } else {
     const provider = String(aiConfig['provider']);
     const model = typeof aiConfig['model'] === 'string' ? aiConfig['model'] : 'default';
-    aiStatus = c.sage(`${provider} connected (${model})`);
+    // Honest posture: a configured provider is NOT a live Layer C. Only say
+    // "active" when the engine is running AND a usable credential exists (llm.enc
+    // for a local model, an API key for cloud). Otherwise it is a config echo —
+    // saying "connected" gave false confidence that semantic detection was on.
+    const usable =
+      existsSync(join(homedir(), '.panguard', 'llm.enc')) ||
+      !!(process.env['ANTHROPIC_API_KEY'] || process.env['OPENAI_API_KEY']);
+    aiStatus = !processRunning
+      ? c.caution(`${provider} configured (engine stopped)`)
+      : usable
+        ? c.sage(`${provider} active (${model})`)
+        : c.caution(`${provider} configured (inactive — run "pga guard setup-ai")`);
   }
 
   // ── Log stats ─────────────────────────────────────────────────────────────
@@ -716,6 +742,16 @@ async function showDetailedStatus(dataDirOverride?: string): Promise<void> {
     : c.critical('stopped');
 
   const cloudHost = cloudEndpoint.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+  // Honest: "connected" claimed an active integration off nothing but the process
+  // being up. Threat Cloud is OPT-IN and default OFF — say "disabled" when not
+  // opted in, and "enabled" (not "connected") when it is, since actual connectivity
+  // depends on the network the daemon reaches.
+  const tcEnabled = config?.['threatCloudUploadEnabled'] === true;
+  const cloudStatus = !tcEnabled
+    ? c.dim(`disabled (opt in: pga config set threat-cloud true)`)
+    : processRunning
+      ? c.safe(`enabled · ${cloudHost}`)
+      : c.caution(`enabled (engine stopped) · ${cloudHost}`);
 
   const lines = [
     `${c.bold('Process:   ')} ${processLine}`,
@@ -723,7 +759,7 @@ async function showDetailedStatus(dataDirOverride?: string): Promise<void> {
     `${c.bold('AI Layer:  ')} ${aiStatus}`,
     `${c.bold('Events:    ')} ${c.sage(events.toLocaleString())} processed | ${threats > 0 ? c.caution(String(threats)) : c.dim(String(threats))} threats`,
     `${c.bold('Mode:      ')} ${c.sage(mode)}`,
-    `${c.bold('Cloud:     ')} ${processRunning ? c.safe(`connected to ${cloudHost}`) : c.dim(cloudHost)}`,
+    `${c.bold('Cloud:     ')} ${cloudStatus}`,
   ].join('\n');
 
   process.stdout.write('\n');

@@ -381,12 +381,22 @@ export function saveConfig(config: GuardConfig, configPath?: string): void {
     /* best effort — platforms without POSIX permissions */
   }
   logger.info(`Saved config to ${path}`);
-  // Re-seal the integrity manifest so this LEGITIMATE write re-establishes trust,
-  // rather than later reading as tampering on the next start. Merge the recorded
-  // self-state refs with the guard's currently-present artifacts: this preserves a
-  // recorded-but-now-missing artifact (so its removal is still flagged) while
-  // folding in any newly-installed one. Best-effort: a seal failure must never
-  // fail a save.
+  resealConfigManifest(config as unknown as Record<string, unknown>, dir);
+}
+
+/**
+ * Re-seal the integrity manifest so a LEGITIMATE config write re-establishes trust,
+ * rather than later reading as tampering on the next start. Merge the recorded
+ * self-state refs with the guard's currently-present artifacts: this preserves a
+ * recorded-but-now-missing artifact (so its removal is still flagged) while folding
+ * in any newly-installed one. Best-effort: a seal failure must never fail the caller.
+ *
+ * Exported so CLI-side config writers that do their own file write (e.g. the
+ * `panguard` wrapper's updateGuardConfig / telemetry-consent path) can re-seal
+ * WITHOUT re-writing config.json — a plain write left the manifest stale and made
+ * the next `pga doctor` falsely report "config tampered".
+ */
+export function resealConfigManifest(config: Record<string, unknown>, dir: string): void {
   try {
     // Re-baselining self-state from the CURRENT artifacts is only safe when they
     // are untampered. If checkSelfState reports an active tamper (e.g. a hijacked
@@ -399,7 +409,7 @@ export function saveConfig(config: GuardConfig, configPath?: string): void {
     const selfState = tampered
       ? readSelfStateRefs(dir)
       : mergeSelfState(readSelfStateRefs(dir), collectSelfState());
-    sealConfigManifest(config as unknown as Record<string, unknown>, selfState, dir);
+    sealConfigManifest(config, selfState, dir);
   } catch {
     /* best-effort — integrity sealing must not block a config save */
   }

@@ -33,10 +33,22 @@ export function loadGuardConfig(): GuardConfigSubset {
   }
 }
 
-/** Write updated guard config to ~/.panguard-guard/config.json */
-export function updateGuardConfig(config: GuardConfigSubset): void {
-  // 0o700 dir + 0o600 file: the config can carry threatCloudApiKey and
-  // notification secrets — never world/group-readable on shared machines.
+/**
+ * Write updated guard config to ~/.panguard-guard/config.json AND re-seal the
+ * integrity manifest, so a legitimate CLI write (telemetry opt-in via `pga up`,
+ * `pga config set …`) does not later read as "config tampered" on `pga doctor`.
+ *
+ * The file write is done here directly (0o600 + chmod), keeping the exact on-disk
+ * behaviour CLI callers rely on. We then re-seal the integrity manifest via the
+ * guard's resealConfigManifest(), which uses the same self-state logic the daemon
+ * uses — a plain write left the manifest stale and made the next `pga doctor`
+ * falsely report "config tampered". The re-seal is best-effort: it must never
+ * fail the write, and if the guard module can't be loaded the write still lands
+ * (the manifest simply refreshes on the next daemon-side save).
+ */
+export async function updateGuardConfig(config: GuardConfigSubset): Promise<void> {
+  // 0o700 dir + 0o600 file: the config can carry an API key and notification
+  // webhooks — never world/group-readable on shared machines.
   if (!existsSync(GUARD_CONFIG_DIR)) {
     mkdirSync(GUARD_CONFIG_DIR, { recursive: true, mode: 0o700 });
   }
@@ -44,10 +56,17 @@ export function updateGuardConfig(config: GuardConfigSubset): void {
     encoding: 'utf-8',
     mode: 0o600,
   });
-  // chmod even if the file already existed, to tighten a loosely-created file.
   try {
     chmodSync(GUARD_CONFIG_PATH, 0o600);
   } catch {
     /* best effort — platforms without POSIX permissions */
+  }
+  // Re-seal so this legitimate write re-establishes trust instead of tripping the
+  // tamper check on the next start / `pga doctor`.
+  try {
+    const { resealConfigManifest } = await import('@panguard-ai/panguard-guard');
+    resealConfigManifest(config as unknown as Record<string, unknown>, GUARD_CONFIG_DIR);
+  } catch {
+    /* guard module unavailable — write already landed; manifest refreshes later */
   }
 }

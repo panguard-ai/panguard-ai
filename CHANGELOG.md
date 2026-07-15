@@ -2,6 +2,42 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.8.22] - 2026-07-15
+
+Correctness + honesty pass across the CLI (found by an adversarial sweep for
+siblings of the two edge bugs the honesty pass surfaced).
+
+- **`pga config set` / `pga up` opt-in no longer trip a false "config tampered".**
+  updateGuardConfig wrote config.json without re-sealing the integrity manifest, so
+  a legitimate telemetry / Threat-Cloud toggle made the next `pga doctor` report a
+  tamper. It now re-seals the manifest via the guard's own self-state logic (the
+  same the daemon uses), covering every CLI config-write path.
+- **`pga doctor --json` and `--fix` now exit non-zero on failure.** Both returned
+  before the exit-code logic, so a CI / monitoring script gating on the exit code
+  saw a broken system (daemon down, 0 rules, config tampered) as healthy — a green
+  exit code that lied.
+- **`pga guard restart` is service-aware.** Against the KeepAlive launchd service a
+  plain stop+start races the respawn and misreported "already running"; it now uses
+  `launchctl kickstart -k` and reports honestly.
+- **`pga status` shows the last scan again.** It read a `~/.panguard/last-scan.json`
+  that no command writes; it now reads the flagged-skills store `pga scan` / `pga up`
+  actually write (the same source `pga doctor` uses).
+- **`pga guard status --detailed` no longer fakes "connected".** The AI-layer line
+  echoed the configured provider as "connected" with no probe; the Cloud line said
+  "connected" off nothing but the process being up. Both now reflect real state
+  (AI "active" only when the engine runs AND is keyed; Cloud "enabled" only when
+  opted in).
+- **`pga upgrade` upgrades the right package and verifies it.** It ran
+  `npm i -g @panguard-ai/panguard@latest` (a dependency, not the `panguard` wrapper
+  the README installs) and always printed success; it now upgrades `panguard` and
+  reports the actual resulting version.
+- **`pga setup` verifies the daemon came up before reporting `running`.** It set
+  `running: true` right after installing the service; it now polls the PID and
+  reports the real state.
+- **Doctor fix hints corrected:** reinstall points at `panguard` (not the
+  dependency), and the "0 rules loaded" remedy says to restart the daemon (it loads
+  rules at startup, so a running daemon won't pick up a reinstall otherwise).
+
 ## [1.8.21] - 2026-07-15
 
 Honesty pass — remove overclaims from user-facing copy (no code behaviour change).

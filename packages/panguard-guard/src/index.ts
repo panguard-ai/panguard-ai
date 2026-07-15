@@ -89,6 +89,7 @@ export { DEFAULT_ACTION_POLICY, TIER_FEATURES } from './types.js';
 export {
   loadConfig,
   saveConfig,
+  resealConfigManifest,
   ensureDataDir,
   DEFAULT_DATA_DIR,
   DEFAULT_GUARD_CONFIG,

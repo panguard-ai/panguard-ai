@@ -14,7 +14,7 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { homedir, platform } from 'node:os';
-import { execFile } from 'node:child_process';
+import { execFile, execFileSync } from 'node:child_process';
 
 /**
  * launchd label — matches the proven installed service so installs are idempotent.
@@ -98,6 +98,38 @@ export type PersistResult = 'installed' | 'already' | 'failed' | 'unsupported';
  * over the dashboard port). Never throws: a persistence failure must not break
  * `pga up`.
  */
+/** Whether the reboot-surviving LaunchAgent is installed (macOS only). */
+export function isPersistentServiceInstalled(): boolean {
+  return platform() === 'darwin' && existsSync(plistPath());
+}
+
+/**
+ * Restart the reboot-surviving Guard service IN PLACE. For a launchd KeepAlive
+ * service a plain "stop then start" is wrong: launchd respawns the daemon between
+ * the two steps, so `start` sees the relaunched process and prints the misleading
+ * "PanguardGuard is already running" — the daemon does restart, but the CLI
+ * reports as if nothing happened. `launchctl kickstart -k` kills and restarts the
+ * job atomically. Returns true if a service restart was issued (caller should NOT
+ * also stop+start), false if there is no service to restart. Never throws.
+ */
+export function restartPersistentService(): boolean {
+  if (platform() !== 'darwin') return false;
+  try {
+    if (!existsSync(plistPath())) return false;
+    const uid = typeof process.getuid === 'function' ? process.getuid() : null;
+    if (uid === null) return false;
+    // -k: kill the running instance first, then (re)start it. Synchronous so the
+    // caller can then poll for the fresh daemon + dashboard token.
+    execFileSync('/bin/launchctl', ['kickstart', '-k', `gui/${uid}/${SERVICE_LABEL}`], {
+      stdio: 'ignore',
+      timeout: 10_000,
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function ensurePersistentService(): PersistResult {
   if (platform() !== 'darwin') return 'unsupported';
   try {

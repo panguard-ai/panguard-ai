@@ -680,28 +680,62 @@ export function setupCommand(): Command {
                         ? 'Windows Service'
                         : 'system service';
 
+                // The service is installed, but verify the daemon actually CAME UP
+                // before claiming it runs — RunAtLoad can succeed while the daemon
+                // then fails to bind (bad ruleset / port held / crash on start).
+                // Poll the PID file briefly instead of reporting running:true blind.
+                const guardPidPath = join(dataDir, 'panguard-guard.pid');
+                const daemonUp = (): boolean => {
+                  try {
+                    const p = parseInt(readFileSync(guardPidPath, 'utf-8').trim(), 10);
+                    process.kill(p, 0);
+                    return true;
+                  } catch {
+                    return false;
+                  }
+                };
+                let guardRunning = false;
+                for (let i = 0; i < 120 && !guardRunning; i++) {
+                  guardRunning = daemonUp();
+                  if (!guardRunning) await new Promise((r) => setTimeout(r, 100));
+                }
+
                 if (!options.json) {
                   console.log(
                     c.green(`  ${symbols.pass} Guard installed as ${serviceType} service.`)
                   );
                   console.log(c.dim(`    ${servicePath}`));
-                  console.log(
-                    c.green(`  ${symbols.pass} Guard will auto-start on boot and restart on crash.`)
-                  );
+                  if (guardRunning) {
+                    console.log(
+                      c.green(`  ${symbols.pass} Guard is running and will auto-start on boot.`)
+                    );
+                  } else {
+                    console.log(
+                      c.yellow(
+                        `  ${symbols.warn} Service installed, but the daemon has not come up yet.`
+                      )
+                    );
+                    console.log(
+                      c.dim(
+                        '    Run "pga doctor" or see ~/.panguard-guard/panguard-guard.log — it may still be starting.'
+                      )
+                    );
+                  }
                   console.log(c.dim('    Run "pga guard status" to check.'));
                   console.log(c.dim('    Run "pga guard uninstall" to remove.'));
                 }
 
                 jsonOutput['guard'] = {
                   installed: true,
-                  running: true,
+                  running: guardRunning,
                   service_type: serviceType,
                   service_path: servicePath,
                   dashboard_url: dashUrl,
                 };
 
-                // Open Dashboard in browser (skip in JSON mode — AI agent will show URL)
-                if (!options.json) {
+                // Open Dashboard in browser only once the daemon is actually up
+                // (skip in JSON mode — the agent shows the URL).
+                if (!options.json && guardRunning) {
                   await openDashboard();
                 }
               } catch (err) {
