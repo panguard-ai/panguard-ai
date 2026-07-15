@@ -62,3 +62,11 @@ threat-cloud.db-shm
 threat-cloud.db-wal
 scripts/__tests__/setup-stripe-test.test.ts
 panguard-scan-report.pdf
+
+# Supabase CLI local link/temp state — never commit (exposes project ref / pooler URL)
+supabase/.temp/
+# Playwright test reports — build artifacts, contain local machine paths
+packages/website/playwright-report-local/
+packages/website/playwright-report-live/
+# Internal validation reports — not for the public repo
+validation-w1/
