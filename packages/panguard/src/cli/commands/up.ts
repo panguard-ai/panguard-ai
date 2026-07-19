@@ -24,7 +24,12 @@ import {
   dashboardBaseUrl,
   isDashboardHealthy,
 } from '../dashboard-url.js';
-import { recordScanResults, readFlaggedSkills, type RiskLevel } from '../flagged-skills.js';
+import {
+  recordScanResults,
+  readFlaggedSkills,
+  toEvidence,
+  type RiskLevel,
+} from '../flagged-skills.js';
 
 type Lang = 'en' | 'zh-TW';
 
@@ -508,6 +513,8 @@ export function upCommand(): Command {
                   platform: string;
                   riskLevel: string;
                   riskScore: number;
+                  /** Which rules fired — so status can say WHY, not just THAT. */
+                  evidence: ReturnType<typeof toEvidence>;
                 }> = [];
 
                 try {
@@ -541,6 +548,7 @@ export function upCommand(): Command {
                           platform: skill.platformId,
                           riskLevel: report.riskLevel,
                           riskScore: report.riskScore,
+                          evidence: toEvidence(report.findings),
                         });
                       }
 
@@ -574,6 +582,7 @@ export function upCommand(): Command {
                     name: t.name,
                     platform: t.platform,
                     riskLevel: t.riskLevel as RiskLevel,
+                    evidence: t.evidence,
                   })),
                   scannedAt: new Date().toISOString(),
                 });

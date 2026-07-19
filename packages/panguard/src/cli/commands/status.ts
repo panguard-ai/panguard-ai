@@ -326,8 +326,10 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
     // severity (CRITICAL/HIGH), not "UNKNOWN". A flag wins over the whitelist:
     // a just-flagged CRITICAL skill is auto-revoked from the whitelist anyway.
     const flaggedByName = new Map<string, string>();
+    const verdictByName = new Map<string, ReturnType<typeof readFlaggedSkills>[number]>();
     for (const f of readFlaggedSkills()) {
       flaggedByName.set(f.normalizedName, f.riskLevel);
+      verdictByName.set(f.normalizedName, f);
     }
 
     console.log(
@@ -395,7 +397,12 @@ async function showStatus(opts: { json?: boolean; lang?: string }): Promise<void
       if (skillRows.length > 20) {
         console.log(c.dim(`  ... and ${skillRows.length - 20} more`));
       }
-      console.log('');
+
+      // WHY, not just THAT. A verdict the user cannot interrogate leaves them
+      // with blind obedience: delete something they rely on, or ignore a real
+      // warning. Name the rule that fired so they can go read it and disagree.
+      // (Prints its own trailing blank line when there is anything to say.)
+      if (!printFlagReasons(installedSkills, verdictByName, lang)) console.log('');
     }
   } catch (skillErr) {
     // MCP package not available — show hint
@@ -602,3 +609,77 @@ function collectStatus(config: ReturnType<typeof readConfig>): SystemStatus {
 
 // scoreToGrade imported from @panguard-ai/core
 // Uses canonical thresholds: A>=90, B>=75, C>=60, D>=40, F<40
+
+/** Worst first: a user triaging a list reads from the top and stops. */
+const RISK_ORDER: readonly string[] = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
+
+/**
+ * Print WHY each flagged skill was flagged: the rules that fired, worst first.
+ *
+ * Without this, `pga status` can only say a skill is CRITICAL — the user's sole
+ * recourse is deleting something they may depend on, or ignoring the warning.
+ * Naming the rule turns that into a decision: every ATR rule id is a public YAML
+ * file, so a user can read the rule and disagree with it.
+ *
+ * Entries scanned before the evidence layer existed carry no rules; they get a
+ * re-scan hint instead of a silent blank.
+ */
+export function printFlagReasons(
+  installedSkills: readonly { name: string }[],
+  verdictByName: ReadonlyMap<string, ReturnType<typeof readFlaggedSkills>[number]>,
+  lang: Lang
+): boolean {
+  const flagged = installedSkills
+    .map((s) => verdictByName.get(s.name.toLowerCase()))
+    .filter((v): v is NonNullable<typeof v> => !!v)
+    .sort((a, b) => RISK_ORDER.indexOf(a.riskLevel) - RISK_ORDER.indexOf(b.riskLevel));
+
+  if (flagged.length === 0) return false;
+
+  console.log('');
+  console.log(`  ${c.bold(lang === 'zh-TW' ? '為什麼被標記' : 'Why these were flagged')}`);
+  console.log('');
+
+  for (const v of flagged) printOneFlagReason(v, lang);
+
+  console.log(
+    `  ${c.dim(
+      lang === 'zh-TW'
+        ? '每條規則都是公開 YAML：agentthreatrule.org/rules'
+        : 'every rule is public YAML: agentthreatrule.org/rules'
+    )}`
+  );
+  console.log('');
+  return true;
+}
+
+/** One skill's block: the rules that fired, then how to see the matching lines. */
+function printOneFlagReason(v: ReturnType<typeof readFlaggedSkills>[number], lang: Lang): void {
+  const level = v.riskLevel === 'CRITICAL' ? c.critical(v.riskLevel) : c.caution(v.riskLevel);
+  console.log(`  ${level}  ${c.bold(v.name)}`);
+
+  if (v.evidence && v.evidence.length > 0) {
+    for (const e of v.evidence) {
+      console.log(`    ${c.dim(e.ruleId ?? '—')}  ${e.title}`);
+    }
+  } else {
+    // Verdicts written before the evidence layer, or by a producer that has no
+    // per-rule data. Re-scanning DOES populate this now, so the hint is honest.
+    console.log(
+      `    ${c.dim(
+        lang === 'zh-TW'
+          ? '此筆判定早於規則紀錄，重新掃描即可取得原因'
+          : 'verdict predates rule recording — re-scan to record which rules fire'
+      )}`
+    );
+  }
+
+  console.log(
+    `    ${c.dim('→')} ${c.dim(
+      lang === 'zh-TW'
+        ? `看命中的那幾行：pga audit ~/.claude/skills/${v.name} --verbose`
+        : `see the matching lines: pga audit ~/.claude/skills/${v.name} --verbose`
+    )}`
+  );
+  console.log('');
+}
