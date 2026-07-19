@@ -22,7 +22,7 @@ import {
 } from './setup-skill-scan.js';
 import { markInitialized } from '../first-run.js';
 import { readAuthenticatedDashboardUrl, dashboardBaseUrl } from '../dashboard-url.js';
-import { recordScanResults, type RiskLevel } from '../flagged-skills.js';
+import { recordScanResults, toEvidence, type RiskLevel } from '../flagged-skills.js';
 
 /** Open URL in the default browser (cross-platform) */
 function openBrowser(url: string): void {
@@ -410,6 +410,9 @@ export function setupCommand(): Command {
                   name: r.entry.name,
                   platform: r.entry.platformId,
                   riskLevel: (r.audit?.riskLevel ?? 'HIGH') as RiskLevel,
+                  // First run is where a user first meets a flag; carry the rules
+                  // that fired so status can explain it instead of just asserting.
+                  evidence: toEvidence(r.audit?.findings ?? []),
                 })),
                 scannedAt: new Date().toISOString(),
               });

@@ -148,6 +148,13 @@ function buildToolCallEvent(
 
 /**
  * Convert ATR matches to AuditFinding[], deduplicating by rule ID.
+ *
+ * CALLER BEWARE: `ATRMatch.matchedPatterns` holds the RAW text that tripped the
+ * rule, so `location` here can embed the very credential the rule fired on. It
+ * stays raw on purpose — showing a user what matched in their OWN file is the
+ * point of `--verbose`. Any consumer that LOGS, PERSISTS, or UPLOADS it must
+ * redact first (ATR ships `redactMatchedValue()`; the guard ships
+ * `scrubSecretValues()`). The flagged-skills store does this at its write path.
  */
 function matchesToFindings(matches: readonly ATRMatch[]): AuditFinding[] {
   const seen = new Set<string>();

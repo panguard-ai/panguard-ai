@@ -18,12 +18,64 @@ import { join, dirname } from 'node:path';
 
 export type RiskLevel = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
 
+/**
+ * WHY a skill was flagged: which rule fired, and how bad it is.
+ *
+ * Deliberately carries NO matched text. An auditor finding's `snippet` — and,
+ * for ATR findings, its `location` ("Matched: <raw text that tripped the rule>")
+ * — hold the source that matched, so a credential rule hands over the credential
+ * itself. This file persists to disk indefinitely, so neither is stored. Showing
+ * a user the matching line in their OWN file is legitimate and still happens, on
+ * the live path: `pga audit <path> --verbose` re-scans and prints it to stdout,
+ * where it is never written down.
+ *
+ * What remains is enough to triage: the rule id is a public YAML file, so the
+ * user can go read it and disagree.
+ */
+export interface FlaggedEvidence {
+  /** ATR rule id, e.g. ATR-2026-00162 — readable at agentthreatrule.org. */
+  ruleId?: string;
+  title: string;
+  severity: string;
+}
+
 export interface FlaggedSkill {
   name: string;
   normalizedName: string;
   platform: string;
   riskLevel: RiskLevel;
   scannedAt: string;
+  /** Absent on entries written before the evidence layer existed. */
+  evidence?: readonly FlaggedEvidence[];
+}
+
+/** Cap per skill: enough to explain a verdict, not enough to bloat the store. */
+const MAX_EVIDENCE = 5;
+
+/**
+ * Copy ONLY the known evidence fields onto a fresh object.
+ *
+ * Callers hand us raw auditor findings, which carry `snippet` and `location` —
+ * both of which embed matched source. Allow-listing (rather than deleting known
+ * bad keys) is what keeps that off disk: a field the auditor grows later is
+ * excluded by default instead of leaking until someone notices. Findings with no
+ * title are dropped; an untitled row explains nothing.
+ */
+function sanitizeEvidence(input: unknown): FlaggedEvidence[] | undefined {
+  if (!Array.isArray(input)) return undefined;
+  const out: FlaggedEvidence[] = [];
+  for (const raw of input) {
+    if (!raw || typeof raw !== 'object') continue;
+    const f = raw as Record<string, unknown>;
+    if (typeof f['title'] !== 'string' || typeof f['severity'] !== 'string') continue;
+    out.push({
+      ...(typeof f['ruleId'] === 'string' ? { ruleId: f['ruleId'] } : {}),
+      title: f['title'],
+      severity: f['severity'],
+    });
+    if (out.length >= MAX_EVIDENCE) break;
+  }
+  return out.length > 0 ? out : undefined;
 }
 
 interface FlaggedStore {
@@ -32,6 +84,47 @@ interface FlaggedStore {
 }
 
 const EMPTY: FlaggedStore = { lastScanAt: null, flagged: [] };
+
+/** New object without `evidence` — keeps the field absent rather than undefined. */
+function omitEvidence(f: FlaggedSkill): FlaggedSkill {
+  const { evidence: _evidence, ...rest } = f;
+  return rest;
+}
+
+/** Worst first, so the MAX_EVIDENCE cap keeps the findings that matter. */
+const SEVERITY_ORDER: readonly string[] = ['critical', 'high', 'medium', 'low', 'info'];
+
+/**
+ * The skill auditor namespaces ATR findings as `atr-<ATR rule id>`. Recover the
+ * bare rule id so the UI can point at a public YAML file; non-ATR checks (code
+ * scan, secrets) have no rule id and get none.
+ */
+function atrRuleId(findingId: unknown): string | undefined {
+  if (typeof findingId !== 'string') return undefined;
+  const m = /^atr-(ATR-[\w-]+)$/i.exec(findingId);
+  return m?.[1];
+}
+
+/**
+ * Shape auditor findings into storable evidence: worst-severity first, rule id
+ * recovered, and every matched-source field (location, snippet) left behind.
+ * Producers (`pga up`, `pga setup`) call this so the mapping lives in one place.
+ */
+export function toEvidence(
+  findings: readonly { id?: unknown; title?: unknown; severity?: unknown }[]
+): FlaggedEvidence[] {
+  return [...findings]
+    .filter((f) => typeof f.title === 'string' && typeof f.severity === 'string')
+    .sort(
+      (a, b) =>
+        SEVERITY_ORDER.indexOf(String(a.severity)) - SEVERITY_ORDER.indexOf(String(b.severity))
+    )
+    .map((f) => ({
+      ...(atrRuleId(f.id) ? { ruleId: atrRuleId(f.id) } : {}),
+      title: String(f.title),
+      severity: String(f.severity),
+    }));
+}
 
 /** Default data dir, matching status.ts / the guard (~/.panguard-guard). */
 export function defaultDataDir(): string {
@@ -51,10 +144,17 @@ export function readFlaggedStore(dataDir: string = defaultDataDir()): FlaggedSto
   try {
     const parsed = JSON.parse(readFileSync(path, 'utf-8')) as Partial<FlaggedStore>;
     const flagged = Array.isArray(parsed.flagged)
-      ? parsed.flagged.filter(
-          (f): f is FlaggedSkill =>
-            !!f && typeof f.name === 'string' && typeof f.riskLevel === 'string'
-        )
+      ? parsed.flagged
+          .filter(
+            (f): f is FlaggedSkill =>
+              !!f && typeof f.name === 'string' && typeof f.riskLevel === 'string'
+          )
+          // Re-sanitize on READ too: the file is user-writable, and an entry
+          // hand-edited to carry a snippet must not resurface in the UI.
+          .map((f) => {
+            const evidence = sanitizeEvidence(f.evidence);
+            return evidence ? { ...f, evidence } : omitEvidence(f);
+          })
       : [];
     return {
       lastScanAt: typeof parsed.lastScanAt === 'string' ? parsed.lastScanAt : null,
@@ -85,7 +185,10 @@ export function lastScanAt(dataDir: string = defaultDataDir()): string | null {
  */
 export function recordScanResults(opts: {
   scannedNames: readonly string[];
-  flagged: readonly Omit<FlaggedSkill, 'normalizedName' | 'scannedAt'>[];
+  flagged: readonly (Omit<FlaggedSkill, 'normalizedName' | 'scannedAt' | 'evidence'> & {
+    /** Auditor findings; allow-listed before write (no snippet reaches disk). */
+    evidence?: readonly FlaggedEvidence[];
+  })[];
   scannedAt: string;
   dataDir?: string;
 }): void {
@@ -95,13 +198,17 @@ export function recordScanResults(opts: {
     const scannedSet = new Set(opts.scannedNames.map(norm));
     // Keep prior flags only for skills this scan did NOT look at.
     const kept = prev.flagged.filter((f) => !scannedSet.has(f.normalizedName));
-    const fresh: FlaggedSkill[] = opts.flagged.map((f) => ({
-      name: f.name,
-      normalizedName: norm(f.name),
-      platform: f.platform,
-      riskLevel: f.riskLevel,
-      scannedAt: opts.scannedAt,
-    }));
+    const fresh: FlaggedSkill[] = opts.flagged.map((f) => {
+      const evidence = sanitizeEvidence(f.evidence);
+      return {
+        name: f.name,
+        normalizedName: norm(f.name),
+        platform: f.platform,
+        riskLevel: f.riskLevel,
+        scannedAt: opts.scannedAt,
+        ...(evidence ? { evidence } : {}),
+      };
+    });
     // Dedupe by normalizedName (a fresh flag wins over any survivor collision).
     const byName = new Map<string, FlaggedSkill>();
     for (const f of kept) byName.set(f.normalizedName, f);

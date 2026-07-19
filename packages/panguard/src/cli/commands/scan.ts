@@ -30,7 +30,7 @@ import {
   discoverLocalSkillCount,
   getLocalPlatform,
 } from '../telemetry.js';
-import { recordScanResults } from '../flagged-skills.js';
+import { recordScanResults, toEvidence } from '../flagged-skills.js';
 
 /**
  * Count threats in the bundled ATR CLI's `--json` output. ATR's schema is
@@ -53,6 +53,41 @@ function countAtrThreats(jsonText: string): number {
     return 0;
   } catch {
     return -1;
+  }
+}
+
+/**
+ * Extract WHICH rules fired from the same ATR `--json` payload `countAtrThreats`
+ * counts, so `pga scan --all` records evidence rather than a bare HIGH verdict.
+ *
+ * SECRET DISCIPLINE: an `ATRMatch` also carries `matchedPatterns` — the raw text
+ * that tripped the rule, which for a credential rule IS the credential. Only
+ * `rule.id` / `rule.title` / `rule.severity` are read here, and `toEvidence`
+ * allow-lists again before anything reaches disk.
+ */
+export function atrMatchesToEvidence(jsonText: string): ReturnType<typeof toEvidence> {
+  try {
+    const j = JSON.parse(jsonText) as {
+      results?: Array<{
+        matches?: Array<{ rule?: { id?: unknown; title?: unknown; severity?: unknown } }>;
+      }>;
+    };
+    if (!Array.isArray(j.results)) return [];
+    const seen = new Set<string>();
+    const flat: Array<{ id: string; title: unknown; severity: unknown }> = [];
+    for (const r of j.results) {
+      for (const m of Array.isArray(r.matches) ? r.matches : []) {
+        const id = m?.rule?.id;
+        if (typeof id !== 'string' || seen.has(id)) continue;
+        seen.add(id);
+        // toEvidence recovers the bare rule id from the auditor's `atr-` form;
+        // the CLI reports it bare, so re-prefix to reuse one mapping.
+        flat.push({ id: `atr-${id}`, title: m?.rule?.title, severity: m?.rule?.severity });
+      }
+    }
+    return toEvidence(flat);
+  } catch {
+    return [];
   }
 }
 
@@ -245,6 +280,9 @@ export function scanCommand(): Command {
           // never has its prior flag wrongly cleared.
           const flaggedNames: string[] = [];
           const scannedOkNames: string[] = [];
+          // Which rules fired, per skill, so `pga status` can explain a flag
+          // rather than only asserting it.
+          const evidenceByName = new Map<string, ReturnType<typeof atrMatchesToEvidence>>();
           for (const skill of skills) {
             const skillPath = join(skillsDir, skill.name);
             try {
@@ -269,6 +307,7 @@ export function scanCommand(): Command {
               if (n > 0) {
                 threats++;
                 flaggedNames.push(skill.name);
+                evidenceByName.set(skill.name, atrMatchesToEvidence(result.toString()));
                 console.log(`  ${c.critical('!!')} ${c.bold(skill.name)} — ${n} finding(s)`);
               } else {
                 clean++;
@@ -279,6 +318,7 @@ export function scanCommand(): Command {
                 // ATR exits 1 when findings exist — parse them
                 const n = countAtrThreats(e.stdout.toString());
                 scannedOkNames.push(skill.name);
+                evidenceByName.set(skill.name, atrMatchesToEvidence(e.stdout.toString()));
                 if (n !== 0) {
                   threats++;
                   flaggedNames.push(skill.name);
@@ -304,6 +344,7 @@ export function scanCommand(): Command {
               name,
               platform: 'claude-code',
               riskLevel: 'HIGH' as const,
+              evidence: evidenceByName.get(name) ?? [],
             })),
             scannedAt: new Date().toISOString(),
           });
