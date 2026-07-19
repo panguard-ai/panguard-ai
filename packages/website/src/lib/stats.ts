@@ -23,7 +23,7 @@
  */
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
-  cliVersion: '1.8.25',
+  cliVersion: '1.8.26',
   /**
    * Synced from agent-threat-rules by: pnpm update agent-threat-rules ->
    * node scripts/compile-atr-rules.mjs -> node scripts/apply-atr-stats.mjs.
@@ -208,6 +208,38 @@ export const STATS = {
       defaultLane: 'hunt' as const,
     },
     asOf: '2026-07-04',
+  },
+  /**
+   * 2026-04 wild scan of published agent skills.
+   *
+   * CALIBER DISCIPLINE — these numbers have DIFFERENT denominators and must never
+   * be mixed. The scan report's own per-registry table is the arithmetic proof:
+   *
+   *   OpenClaw          56,480 scanned →   751 flagged  (1.33%)
+   *   Other sources (4) 39,616 scanned →   551 flagged  (1.39%)
+   *   Total             96,096 scanned → 1,302 flagged  (1.35%)
+   *
+   * So 751 is the OpenClaw-ONLY flag count, and it is a FLAG count, not a
+   * confirmed-malware count. Pairing "751" with "96,096" — as the site and the
+   * launch copy did until 2026-07-19 — overstates by using one registry's
+   * numerator against every registry's denominator, and calls a flag a
+   * confirmation. `confirmedMalware` (552) is the post-manual-review figure and
+   * is the only one that belongs next to `skillsScanned`.
+   *
+   * KNOWN GAP: the curation from raw flags to these published counts
+   * (1,434 → 1,302; OpenClaw 1,376 → 751) has no recorded methodology. If asked
+   * how the filter worked, say it was not written down at the time — do not
+   * reconstruct a rationale.
+   */
+  wildScan: {
+    skillsScanned: 96_096,
+    registries: 4,
+    flagged: 1_302,
+    confirmedMalware: 552,
+    threatActors: 3,
+    /** Worst single registry, on its OWN denominator. Never pair with skillsScanned. */
+    openClaw: { scanned: 56_480, flagged: 751 },
+    asOf: '2026-04-16',
   },
   /** Standards coverage */
   coverage: {
