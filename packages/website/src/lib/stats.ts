@@ -23,7 +23,7 @@
  */
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
-  cliVersion: '1.8.24',
+  cliVersion: '1.8.25',
   /**
    * Synced from agent-threat-rules by: pnpm update agent-threat-rules ->
    * node scripts/compile-atr-rules.mjs -> node scripts/apply-atr-stats.mjs.
