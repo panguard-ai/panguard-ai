@@ -154,6 +154,12 @@ PUBLISH_ORDER=(
   "packages/panguard-mcp"
   "packages/panguard-guard"
   "packages/panguard"
+  # The CANONICAL install target. `npm i -g panguard` resolves here, not to the
+  # scoped package — @panguard-ai/panguard had its `bin` removed in 1.8.23 so the
+  # two could not both claim the `panguard`/`pga` bin names (EEXIST on install).
+  # Publish it LAST: it depends on the scoped package being on the registry.
+  # Leaving it out of this list is what shipped a bin-less panguard@1.8.25.
+  "packages/panguard-cli"
 )
 
 FAILED=()
@@ -203,6 +209,44 @@ if [ -d "packages/migrator-community" ]; then
   echo "  migrator-community: $MC_CURRENT → $MC_NEW"
   pnpm publish --access public --no-git-checks 2>&1 | tail -1 && echo "  [OK] @panguard-ai/migrator-community@$MC_NEW" || echo "  [!!] migrator-community FAILED"
   cd "$ROOT"
+fi
+
+echo ""
+
+# ── Verify what the registry ACTUALLY serves ─────────────
+# `npm i -g panguard` is the one command every install path funnels into, and a
+# publish reporting success tells you nothing about whether that command works.
+# v1.8.25 published "fine" and installed no binary at all, because the tarball
+# came from a package whose `bin` had been removed. Fetch the real artifact and
+# assert the bins exist before tagging a release around it.
+echo "=== VERIFY PUBLISHED ARTIFACT ==="
+echo ""
+VERIFY_DIR="$(mktemp -d)"
+if node -e "
+  const https = require('https');
+  https.get('https://registry.npmjs.org/panguard', (r) => {
+    let b = ''; r.on('data', (d) => (b += d));
+    r.on('end', () => {
+      const v = JSON.parse(b).versions['$NEW'];
+      if (!v) { console.error('  [!!] panguard@$NEW is NOT on the registry'); process.exit(1); }
+      const bin = v.bin || {};
+      if (!bin.panguard || !bin.pga) {
+        console.error('  [!!] panguard@$NEW ships NO bin — \`npm i -g panguard\` would install nothing');
+        console.error('       bin field: ' + JSON.stringify(bin));
+        process.exit(1);
+      }
+      console.log('  [OK] panguard@$NEW exposes bins: ' + Object.keys(bin).join(', '));
+    });
+  }).on('error', (e) => { console.error('  [!!] registry check failed: ' + e.message); process.exit(1); });
+"; then
+  rm -rf "$VERIFY_DIR"
+else
+  rm -rf "$VERIFY_DIR"
+  echo ""
+  echo "ERROR: the published canonical package is broken. NOT tagging this release."
+  echo "       Leave the 'latest' dist-tag on the previous good version:"
+  echo "         npm dist-tag add panguard@$CURRENT latest"
+  exit 1
 fi
 
 echo ""
