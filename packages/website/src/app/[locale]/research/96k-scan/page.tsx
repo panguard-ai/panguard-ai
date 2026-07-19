@@ -6,19 +6,19 @@ import { datasetSchema, techArticleSchema } from '@/lib/schema';
 import ScanReportContent from './ScanReportContent';
 
 export const metadata: Metadata = {
-  title: '96,096 AI Agent Skills Scanned. 751 Were Malware. | ATR Research Report',
+  title: '96,096 AI Agent Skills Scanned. 552 Were Malware. | ATR Research Report',
   description:
-    'The largest security scan of AI agent skills ever conducted. 96,096 skills across OpenClaw, Hermes, Skills.sh, ClawHub. 751 confirmed malware from 3 coordinated attackers. C2 server, base64 reverse shells, password-protected zip payloads.',
+    'The largest security scan of AI agent skills ever conducted. 96,096 skills across OpenClaw, Hermes, Skills.sh, ClawHub. 1,302 flagged, 552 confirmed malware after manual review, from 3 coordinated attackers. C2 server, base64 reverse shells, password-protected zip payloads.',
   openGraph: {
-    title: '96,096 AI Agent Skills Scanned. 751 Were Malware.',
+    title: '96,096 AI Agent Skills Scanned. 552 Were Malware.',
     description:
-      '3 coordinated attackers. 751 poisoned skills. Base64-encoded reverse shells. The largest AI agent security scan ever conducted.',
+      '3 coordinated attackers. 1,302 skills flagged, 552 confirmed malicious. The largest AI agent security scan ever conducted.',
     type: 'article',
   },
   twitter: {
     card: 'summary_large_image',
-    title: '96,096 AI Agent Skills Scanned. 751 Were Malware.',
-    description: '3 coordinated attackers. 751 poisoned skills. Base64-encoded reverse shells.',
+    title: '96,096 AI Agent Skills Scanned. 552 Were Malware.',
+    description: '3 coordinated attackers. 552 confirmed malicious skills out of 96,096 scanned.',
   },
 };
 
@@ -30,7 +30,7 @@ export default function ScanReportPage() {
           datasetSchema({
             name: 'PanGuard 96K AI Agent Skill Wild Scan (2026-04)',
             description:
-              'Full ecosystem audit of AI agent skills. Crawled and scanned 96,096 skills across OpenClaw (56,503), ClawHub (36,378), Skills.sh (3,115), and a Hermes-protocol sample (100). Result: 751 confirmed malicious skills, 249 triple-threat packages (shell + network + filesystem access).',
+              'Full ecosystem audit of AI agent skills. Crawled and scanned 96,096 skills across OpenClaw (56,503), ClawHub (36,378), Skills.sh (3,115), and a Hermes-protocol sample (100). Result: 1,302 flagged and 552 confirmed malicious after manual review, 249 triple-threat packages (shell + network + filesystem access).',
             url: 'https://panguard.ai/research/96k-scan',
             datePublished: '2026-04-14',
             variableMeasured: [
@@ -43,7 +43,7 @@ export default function ScanReportPage() {
             doi: '10.5281/zenodo.19178002',
           }),
           techArticleSchema({
-            headline: '96,096 AI Agent Skills Scanned. 751 Were Malware.',
+            headline: '96,096 AI Agent Skills Scanned. 552 Were Malware.',
             description:
               'The largest security scan of AI agent skills ever conducted. Methodology, raw findings, and reproducibility scripts.',
             url: 'https://panguard.ai/research/96k-scan',

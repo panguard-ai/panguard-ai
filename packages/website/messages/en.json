@@ -5101,7 +5101,7 @@
     },
     "founder": {
       "title": "Built by a founder who saw the gap firsthand",
-      "desc": "PanGuard started when our founder -- a cross-disciplinary builder with backgrounds in sales, marketing (300M+ Threads impressions), and hip-hop festival production -- taught himself to code and discovered that AI agents were installing tools with full system access and zero security review. Within months, ATR grew to 747 detection rules, got merged into Cisco AI Defense, scanned 96,096 skills in the wild (751 confirmed malicious), and achieved 100% recall on our 498-sample SKILL.md corpus (97% precision, 0.2% FP). Based in Taiwan, shipping globally."
+      "desc": "PanGuard started when our founder -- a cross-disciplinary builder with backgrounds in sales, marketing (300M+ Threads impressions), and hip-hop festival production -- taught himself to code and discovered that AI agents were installing tools with full system access and zero security review. Within months, ATR grew to 747 detection rules, got merged into Cisco AI Defense, scanned 96,096 skills in the wild (1,302 flagged, 552 confirmed malicious), and achieved 100% recall on our 498-sample SKILL.md corpus (97% precision, 0.2% FP). Based in Taiwan, shipping globally."
     }
   },
   "openSource": {

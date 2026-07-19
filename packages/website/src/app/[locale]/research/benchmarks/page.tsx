@@ -19,8 +19,8 @@ export async function generateMetadata(props: {
       ? 'ATR Benchmark 結果 — Garak, SKILL.md, PINT, Wild Scan'
       : 'ATR Benchmark Results — Garak, SKILL.md, PINT, Wild Scan',
     description: isZh
-      ? `${STATS.totalRulesDisplay} 條 ATR 規則在公開對抗式語料庫上的實測結果。Garak ${STATS.benchmark.garak.recall}% recall, SKILL.md ${STATS.benchmark.skill.recall}% recall + ${STATS.benchmark.skill.precision}% precision, PINT ${STATS.benchmark.pint.recall}% recall（自建 PINT 格式語料庫）， Wild Scan 96,096 個 skill 中 751 個確認惡意。可重現方法、原始資料、Zenodo DOI。Benign-gate 誤報採 lane 化統計：65K 樣本上 enforce lane 約 ${STATS.benchmark.benignLanes.enforceFp}%、hunt lane 約 ${STATS.benchmark.benignLanes.huntFp}%。`
-      : `Public benchmark results for ${STATS.totalRulesDisplay} ATR rules against adversarial corpora. Garak ${STATS.benchmark.garak.recall}% recall, SKILL.md ${STATS.benchmark.skill.recall}% recall + ${STATS.benchmark.skill.precision}% precision, PINT ${STATS.benchmark.pint.recall}% recall (self-built PINT-format corpus), Wild Scan 751 confirmed malware of 96,096 skills. Reproducible methodology, raw data, Zenodo DOI. Benign-gate false positives are lane-based: ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt on 65K samples.`,
+      ? `${STATS.totalRulesDisplay} 條 ATR 規則在公開對抗式語料庫上的實測結果。Garak ${STATS.benchmark.garak.recall}% recall, SKILL.md ${STATS.benchmark.skill.recall}% recall + ${STATS.benchmark.skill.precision}% precision, PINT ${STATS.benchmark.pint.recall}% recall（自建 PINT 格式語料庫）， Wild Scan 96,096 個 skill 中 1,302 個被標記、人工複審後 552 個確認惡意。可重現方法、原始資料、Zenodo DOI。Benign-gate 誤報採 lane 化統計：65K 樣本上 enforce lane 約 ${STATS.benchmark.benignLanes.enforceFp}%、hunt lane 約 ${STATS.benchmark.benignLanes.huntFp}%。`
+      : `Public benchmark results for ${STATS.totalRulesDisplay} ATR rules against adversarial corpora. Garak ${STATS.benchmark.garak.recall}% recall, SKILL.md ${STATS.benchmark.skill.recall}% recall + ${STATS.benchmark.skill.precision}% precision, PINT ${STATS.benchmark.pint.recall}% recall (self-built PINT-format corpus), Wild Scan 1,302 flagged and 552 confirmed malware of 96,096 skills. Reproducible methodology, raw data, Zenodo DOI. Benign-gate false positives are lane-based: ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt on 65K samples.`,
     alternates: buildAlternates('/research/benchmarks', params.locale),
   };
 }
@@ -141,17 +141,26 @@ const BENCHMARKS: Benchmark[] = [
     name: 'Wild Scan (full ecosystem audit)',
     zhName: 'Wild Scan（完整生態系稽核）',
     description:
-      'Live audit of every AI agent skill we could crawl across ClawHub, OpenClaw, Skills.sh. Not a curated benchmark — actual production skills shipped by real authors. Result: 751 confirmed malware skills out of 96,096 scanned.',
+      'Live audit of every AI agent skill we could crawl across ClawHub, OpenClaw, Skills.sh. Not a curated benchmark — actual production skills shipped by real authors. Result: 1,302 flagged out of 96,096 scanned, 552 confirmed malware after manual review.',
     zhDescription:
-      '對 ClawHub、OpenClaw、Skills.sh 上每一個能爬到的 AI agent skill 做實測。不是策展過的 benchmark——是真實作者上架的生產級 skill。結果：96,096 個被掃描的 skill 中，751 個確認為惡意程式。',
+      '對 ClawHub、OpenClaw、Skills.sh 上每一個能爬到的 AI agent skill 做實測。不是策展過的 benchmark——是真實作者上架的生產級 skill。結果：96,096 個被掃描的 skill 中 1,302 個被標記，人工複審後 552 個確認為惡意程式。',
     date: '2026-04-14',
     source: {
       label: 'PanGuard Wild Scan Report',
       url: 'https://panguard.ai/research/96k-scan',
     },
     results: [
-      { label: 'Skills scanned', zhLabel: '掃描 skill 數', value: '96,096' },
-      { label: 'Confirmed malware', zhLabel: '確認惡意', value: '751' },
+      {
+        label: 'Skills scanned',
+        zhLabel: '掃描 skill 數',
+        value: STATS.wildScan.skillsScanned.toLocaleString(),
+      },
+      { label: 'Flagged', zhLabel: '被標記', value: STATS.wildScan.flagged.toLocaleString() },
+      {
+        label: 'Confirmed malware',
+        zhLabel: '確認惡意',
+        value: STATS.wildScan.confirmedMalware.toLocaleString(),
+      },
       {
         label: 'Triple-threat packages',
         zhLabel: '三重威脅套件',

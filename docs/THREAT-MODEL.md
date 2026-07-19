@@ -10,7 +10,7 @@
 | Claude Code     | `~/.claude/settings.json` + `~/.claude/skills/` | SKILL.md files                    | Largest dev tool                  |
 | Claude Desktop  | `~/Library/.../claude_desktop_config.json`      | MCP servers                       | Consumer + pro                    |
 | Cursor          | `~/.cursor/mcp.json`                            | MCP servers + extensions          | Top IDE                           |
-| OpenClaw        | `~/.openclaw/skills/`                           | SKILL.md from registry (56K+)     | **751 malware found**             |
+| OpenClaw        | `~/.openclaw/skills/`                           | SKILL.md from registry (56K+)     | **751 of 56,480 flagged**         |
 | Hermes Agent    | `~/.hermes/config.yaml`                         | SKILL.md + MCP (76K GitHub stars) | **Supply chain hacked (LiteLLM)** |
 | Codex CLI       | `~/.codex/mcp.json`                             | MCP servers                       | OpenAI users                      |
 | Windsurf        | `~/.codeium/windsurf/mcp_config.json`           | MCP servers                       | Codeium users                     |
