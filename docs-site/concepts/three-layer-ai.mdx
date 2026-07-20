@@ -63,13 +63,13 @@ The three-layer funnel is built on a simple principle: **most attacks follow kno
 
 ---
 
-## Layer 1 -- Rule Engine (90%)
+## Layer 1 -- Rule Engine (90%) {#layer-1}
 
 Handles all known attack patterns with zero latency and zero cost.
 
 ### ATR Rules
 
-ATR (Agent Threat Rules) is the open standard for AI agent threat detection. Panguard Guard ships with 747 ATR rules covering common AI agent attack patterns.
+ATR (Agent Threat Rules) is the open standard for AI agent threat detection. Panguard Guard ships with 768 ATR rules covering common AI agent attack patterns.
 
 ```yaml ATR Rule Example
 id: ATR-2025-0001
@@ -93,7 +93,7 @@ action: block
 
 ---
 
-## Layer 2 -- Local AI (7%)
+## Layer 2 -- Local AI (7%) {#layer-2}
 
 When an event does not match any known rule but exhibits suspicious behavior, it is forwarded to a local AI model for analysis.
 
@@ -115,7 +115,7 @@ Desktop: Layer 1 (90%) -> Layer 3 (5-8%)  (Layer 2 skipped)
 
 ---
 
-## Layer 3 -- Cloud AI (3%)
+## Layer 3 -- Cloud AI (3%) {#layer-3}
 
 The most complex unknown threats are analyzed by cloud AI with full dynamic reasoning.
 
