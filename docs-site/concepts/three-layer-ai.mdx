@@ -28,7 +28,7 @@ The three-layer funnel is built on a simple principle: **most attacks follow kno
        v
   +-----------+
   | Layer 1   |  ATR Rule Engine
-  | 90% events|  Latency < 1ms | Cost = \$0
+  | 90% events|  Latency < 1ms | Cost = $0
   +-----------+
        |
     Unmatched (10%)
@@ -36,7 +36,7 @@ The three-layer funnel is built on a simple principle: **most attacks follow kno
        v
   +-----------+
   | Layer 2   |  Local AI (Ollama)
-  | 7% events |  Latency < 5s  | Cost = \$0 (on-device)
+  | 7% events |  Latency < 5s  | Cost = $0 (on-device)
   +-----------+
        |
     Needs deeper analysis (3%)
@@ -44,7 +44,7 @@ The three-layer funnel is built on a simple principle: **most attacks follow kno
        v
   +-----------+
   | Layer 3   |  Cloud AI (Claude / OpenAI)
-  | 3% events |  Latency < 30s | Cost ~ \$0.01/event
+  | 3% events |  Latency < 30s | Cost ~ $0.01/event
   +-----------+
 ```
 
@@ -56,7 +56,7 @@ The three-layer funnel is built on a simple principle: **most attacks follow kno
 | -------------------- | --------------------- | -------------------- | ---------------------- |
 | **Event share**      | ~90%                  | ~7%                  | ~3%                    |
 | **Latency**          | < 1 ms                | < 5 s                | < 30 s                 |
-| **Cost per event**   | \$0                    | \$0                   | ~\$0.01                 |
+| **Cost per event**   | $0                    | $0                   | ~$0.01                 |
 | **Requires network** | No                    | No                   | Yes                    |
 | **Technology**       | ATR Rules             | Ollama (llama3)      | Claude / OpenAI        |
 | **Best for**         | Known attack patterns | Behavioral anomalies | Novel, complex threats |
@@ -69,7 +69,7 @@ Handles all known attack patterns with zero latency and zero cost.
 
 ### ATR Rules
 
-ATR (Agent Threat Rules) is the open standard for AI agent threat detection. Panguard Guard ships with 768 ATR rules covering common AI agent attack patterns.
+ATR (Agent Threat Rules) is the open standard for AI agent threat detection. Panguard Guard ships with 747 ATR rules covering common AI agent attack patterns.
 
 ```yaml ATR Rule Example
 id: ATR-2025-0001
