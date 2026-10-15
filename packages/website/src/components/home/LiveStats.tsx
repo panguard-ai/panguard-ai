@@ -19,7 +19,7 @@ export default function LiveStats() {
       value: STATS.benchmark.garak.samples.toLocaleString(),
     },
     {
-      label: isZh ? 'Garak recall' : 'Garak recall',
+      label: isZh ? 'garak recall（hunt lane）' : 'garak recall (hunt lane)',
       value: `${STATS.benchmark.garak.recall}%`,
     },
     {

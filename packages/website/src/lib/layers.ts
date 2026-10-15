@@ -137,12 +137,12 @@ export const LAYERS: readonly Layer[] = [
       zh: '以 regex 為主的 ATR 引擎，可選 LLM 語意層。規則以 YAML 儲存，有版本生命週期(draft → experimental → stable)。Web scanner 在 panguard.ai/,CLI `pga scan <url-or-path>`。ATR 規則已上游合併進 Cisco AI Defense skill-scanner 規則包(PR #99,生產環境)與 Microsoft AGT community-rules 範例(PR #1277)— 由維護者接受的貢獻,非廠商背書。',
     },
     proof: {
-      en: `${STATS.totalRulesDisplay} ATR rules (MIT licensed) · ${STATS.benchmark.garak.recall}% recall on NVIDIA Garak (${STATS.benchmark.garak.samples} adversarial prompts) · ${STATS.benchmark.skill.recall}% recall / ${STATS.benchmark.skill.precision}% precision on ${STATS.benchmark.skill.samples} real-world SKILL.md samples · 0.48% FP (enforce lane) on 3,115 wild Skills.sh packages, hunt lane higher · Merged upstream: full ATR pack into Cisco AI Defense skill-scanner rule packs, in production (PR #79 + #99); ${STATS.adoption.microsoftRulesMerged} rules into Microsoft AGT community-rules examples (PR #908 + #1277) — maintainer-accepted contributions, not vendor endorsements.`,
-      zh: `${STATS.totalRulesDisplay} 條 ATR 規則（MIT 授權）· NVIDIA Garak ${STATS.benchmark.garak.recall}% 召回（${STATS.benchmark.garak.samples} 個對抗 prompt）· ${STATS.benchmark.skill.samples} 個真實 SKILL.md 樣本 ${STATS.benchmark.skill.recall}% 召回 / ${STATS.benchmark.skill.precision}% 精度 · 3,115 個野外 Skills.sh 套件 0.48% FP（enforce lane，hunt lane 較高）· 上游合併:完整 ATR 規則包進入 Cisco AI Defense skill-scanner 規則包(生產環境,PR #79 + #99);${STATS.adoption.microsoftRulesMerged} 條進入 Microsoft AGT community-rules 範例(PR #908 + #1277)— 由維護者接受的貢獻,非廠商背書。`,
+      en: `${STATS.totalRulesDisplay} ATR rules (MIT licensed) · ${STATS.benchmark.garak.recall}% hunt-lane recall on NVIDIA garak's in-the-wild jailbreaks (${STATS.benchmark.garak.samples} prompts, partly closed-book) · ${STATS.benchmark.skill.recall}% hunt-lane recall on ${STATS.benchmark.skill.samples} labeled SKILL.md samples (in-sample) · Merged upstream: the ATR rule pack in the open-source cisco-ai-defense/skill-scanner repository (PR #79 + #99) and ATR example directories in Microsoft AGT (PR #2308 + #3025) — maintainer-accepted contributions, not vendor endorsements.`,
+      zh: `${STATS.totalRulesDisplay} 條 ATR 規則（MIT 授權）· NVIDIA garak 實戰越獄集 hunt lane 召回 ${STATS.benchmark.garak.recall}%（${STATS.benchmark.garak.samples} 個 prompt，部分 closed-book）· ${STATS.benchmark.skill.samples} 個已標註 SKILL.md 樣本 hunt lane 召回 ${STATS.benchmark.skill.recall}%（樣本內）· 上游合併：ATR 規則包進入開源 cisco-ai-defense/skill-scanner repo（PR #79 + #99），以及 Microsoft AGT 內的 ATR 範例目錄（PR #2308 + #3025）——由維護者接受的貢獻，非廠商背書。`,
     },
     proofShort: {
-      en: `${STATS.totalRulesDisplay} rules · ${STATS.benchmark.garak.recall}% Garak recall · 0.48% FP (enforce lane)`,
-      zh: `${STATS.totalRulesDisplay} 條規則 · Garak ${STATS.benchmark.garak.recall}% 召回 · 0.48% FP（enforce lane）`,
+      en: `${STATS.totalRulesDisplay} rules · ${STATS.benchmark.garak.recall}% garak recall (hunt lane)`,
+      zh: `${STATS.totalRulesDisplay} 條規則 · garak 召回 ${STATS.benchmark.garak.recall}%（hunt lane）`,
     },
     tryIt: {
       intro: {

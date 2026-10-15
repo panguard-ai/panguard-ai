@@ -12,6 +12,16 @@ import BilingualArticle from '@/components/blog/BilingualArticle';
 import { getAllPosts } from '@/lib/blog-store';
 import { notFound } from 'next/navigation';
 
+// Benchmark figures ATR has since withdrawn or narrowed. Posts stay as
+// published; a dated correction is shown above any post that quotes them.
+const WITHDRAWN_FIGURES =
+  /65,000|65K benign|0\.24%|0\.48% FP|0\.2% (?:FP|false|誤報)|0\.20% FP|97% precision|97\.1%|97\.2%/;
+
+const ERRATUM = {
+  en: 'Some figures in this post have since been withdrawn or narrowed. The lane-based false-positive rates on a "65,000-sample benign gate" (about 0.24% enforce, about 9% hunt) were withdrawn on 2026-09-19: the sample count was mislabelled, the benign corpus contained real jailbreak samples until 2026-08-04, and the hunt figure cannot be reproduced. The SKILL.md precision and false-positive figures are in-sample, measured on the benign set the rules are tuned against. Recall figures are hunt-lane, and the garak figures are partly closed-book. The post is otherwise left as published.',
+  zh: '本文的部分數字已撤回或需要加註。以「65,000 筆 benign gate」為名的分 lane 誤報率（enforce 約 0.24%、hunt 約 9%）已於 2026-09-19 撤回：樣本數標示錯誤、benign 語料在 2026-08-04 前混有真實越獄樣本，而 hunt 數字無法重現。SKILL.md 的 precision 與誤報率是樣本內數字，量測用的 benign 集合就是規則調校用的那一組。recall 都是 hunt lane 數字，garak 數字部分是 closed-book。除此之外，本文保留原樣。',
+} as const;
+
 /* ─── All blog pages are SSR to support dynamic JSON posts ─── */
 export const dynamic = 'force-dynamic';
 
@@ -83,6 +93,11 @@ export default async function BlogPostPage(props: {
   }
 
   const zhPost = allPosts.find((p) => p.slug === `${post.slug}-zh`) ?? null;
+
+  const showZh = params.locale === 'zh-TW' || isZhSlug;
+  const quotesWithdrawnFigures = [post.excerpt, ...(post.content ?? []), ...(zhPost?.content ?? [])]
+    .filter(Boolean)
+    .some((block) => WITHDRAWN_FIGURES.test(block));
 
   const nonce = await getNonce();
 
@@ -202,6 +217,22 @@ export default async function BlogPostPage(props: {
                 <p className="text-lg text-text-secondary leading-relaxed">{post.excerpt}</p>
               </div>
             </FadeInUp>
+
+            {quotesWithdrawnFigures ? (
+              <FadeInUp delay={0.18}>
+                <aside className="mt-8 rounded-xl border border-border bg-surface-1 p-5 text-sm leading-relaxed text-text-secondary">
+                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-sage">
+                    {showZh ? '更正 · 2026-10-16' : 'Correction · 2026-10-16'}
+                  </p>
+                  <p>
+                    {showZh ? ERRATUM.zh : ERRATUM.en}{' '}
+                    <Link href="/research/benchmarks" className="text-brand-sage underline">
+                      {showZh ? '現行數字與限制' : 'Current figures and caveats'}
+                    </Link>
+                  </p>
+                </aside>
+              </FadeInUp>
+            ) : null}
 
             {/* ───────────── Article Content or Coming Soon ───────────── */}
             {post.content ? (

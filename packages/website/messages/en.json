@@ -773,8 +773,7 @@
       "badgePlatforms": "15 agent runtimes",
       "badgeLicense": "MIT · free forever",
       "badgeScanned": "{count} Skills Scanned",
-      "badgeRecall": "97.2% Garak recall",
-      "badgeCisco": "7 organizations merged · NIST OSCAL submission in review",
+      "badgeCisco": "Rules merged upstream",
       "badgeSafeMcp": "SAFE-MCP 91.8% coverage"
     },
     "installHero": {
@@ -789,7 +788,6 @@
       "ctaScan": "Scan a skill first →",
       "ctaDocs": "Read the quickstart",
       "badgeRules": "{count} ATR rules",
-      "badgeRecall": "97.2% Garak recall",
       "badgeMerged": "Merged upstream: Cisco + Microsoft",
       "badgeLicense": "MIT · free forever",
       "platformLabel": "Auto-detects your AI agents:",
@@ -5101,7 +5099,7 @@
     },
     "founder": {
       "title": "Built by a founder who saw the gap firsthand",
-      "desc": "PanGuard started when our founder -- a cross-disciplinary builder with backgrounds in sales, marketing (300M+ Threads impressions), and hip-hop festival production -- taught himself to code and discovered that AI agents were installing tools with full system access and zero security review. Within months, ATR grew to 747 detection rules, got merged into Cisco AI Defense, scanned 96,096 skills in the wild (1,302 flagged, 552 confirmed malicious), and achieved 100% recall on our 498-sample SKILL.md corpus (97% precision, 0.2% FP). Based in Taiwan, shipping globally."
+      "desc": "PanGuard started when our founder -- a cross-disciplinary builder with backgrounds in sales, marketing (300M+ Threads impressions), and hip-hop festival production -- taught himself to code and discovered that AI agents were installing tools with full system access and zero security review. That became Agent Threat Rules (ATR), an open, MIT-licensed detection rule set whose rules have been merged into open-source projects, including Cisco's skill-scanner. Based in Taiwan, shipping globally."
     }
   },
   "openSource": {
@@ -6536,7 +6534,7 @@
       "card1Kicker": "ATR",
       "card1Title": "The rules",
       "card1Tag": "the Sigma layer",
-      "card1Body": "{count} executable detection rules. Deterministic, local-first, signed output.",
+      "card1Body": "{count} executable detection rules. Deterministic and local-first.",
       "card2Kicker": "ATD",
       "card2Title": "The taxonomy",
       "card2Tag": "the ATT&CK layer",
@@ -6544,7 +6542,7 @@
       "card3Kicker": "ENGINE",
       "card3Title": "Runs anywhere",
       "card3Tag": "deterministic · local-first",
-      "card3Body": "No telemetry, signed output — even sovereign buyers run their own detection without a foreign vendor.",
+      "card3Body": "No telemetry — even sovereign buyers run their own detection without a foreign vendor.",
       "crosswalks": "Crosswalks to 10 frameworks: EU AI Act · NIST AI RMF · ISO/IEC 42001 · OWASP Agentic · OWASP LLM · MITRE ATLAS · SAFE-MCP · CWE · Five Eyes · CISA KEV",
       "cta": "Read the standard"
     },
@@ -6552,11 +6550,11 @@
       "eyebrow": "05 / IT RUNS",
       "title": "It runs. Here's the attack <sage>getting caught.</sage>",
       "terminalCaption": "Real pga scan output on a confirmed-malicious skill from a live agent ecosystem (OpenClaw) — captured 2026-07-02 on the ATR v3.5.3 bundle, not a mockup. The rulebook has grown since.",
-      "b1Label": "HackAPrompt recall vs 28.6% baseline · 100% precision",
-      "b2Label": "PINT-format corpus precision (63.6% recall)",
-      "b3Label": "Garak recall",
-      "b4Label": "SKILL.md recall / false-positive",
-      "honesty": "Corpus-level, Layer-1 measurements, re-verified before every external use. On the 65,000-sample benign gate, false positives are lane-based: ~0.24% in enforce, ~9% in hunt (the default). There is no single blended number, so we don't quote one.",
+      "b1Label": "HackAPrompt recall vs 28.6% baseline · attack-only corpus, so precision is undefined",
+      "b2Label": "Precision on our self-built PINT-format corpus ({recall}% recall)",
+      "b3Label": "garak recall · hunt lane, partly closed-book",
+      "b4Label": "SKILL.md recall · hunt lane, in-sample",
+      "honesty": "Corpus-level, Layer-1 measurements, re-verified before every external use. Recall figures are hunt-lane (the default, all rules); the enforce lane, used when blocking is on, catches far fewer. The garak figure is partly closed-book: some rules were written from that corpus. The SKILL.md figure is in-sample. The benign-gate false-positive rates we used to quote were withdrawn on 2026-09-19 pending re-measurement.",
       "kicker": "DETECTION — MEASURED, NOT CLAIMED",
       "cta": "See the benchmarks"
     },
@@ -6693,11 +6691,11 @@
     "measured": {
       "eyebrow": "MEASURED, NOT CLAIMED",
       "title": "Detection you can <sage>re-run yourself.</sage>",
-      "b1Label": "HackAPrompt recall vs 28.6% baseline · 100% precision",
-      "b2Label": "PINT-format corpus precision (63.6% recall)",
-      "b3Label": "Garak recall",
-      "b4Label": "SKILL.md recall / false-positive",
-      "honesty": "Corpus-level, Layer-1 measurements, re-verified before every external use. On the 65,000-sample benign gate, false positives are lane-based: ~0.24% in enforce, ~9% in hunt (the default). There is no single blended number, so we don't quote one.",
+      "b1Label": "HackAPrompt recall vs 28.6% baseline · attack-only corpus, so precision is undefined",
+      "b2Label": "Precision on our self-built PINT-format corpus ({recall}% recall)",
+      "b3Label": "garak recall · hunt lane, partly closed-book",
+      "b4Label": "SKILL.md recall · hunt lane, in-sample",
+      "honesty": "Corpus-level, Layer-1 measurements, re-verified before every external use. Recall figures are hunt-lane (the default, all rules); the enforce lane, used when blocking is on, catches far fewer. The garak figure is partly closed-book: some rules were written from that corpus. The SKILL.md figure is in-sample. The benign-gate false-positive rates we used to quote were withdrawn on 2026-09-19 pending re-measurement.",
       "cta": "Methodology & raw data"
     },
     "platforms": {

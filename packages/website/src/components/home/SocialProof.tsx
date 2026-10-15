@@ -24,7 +24,6 @@ const ADOPTERS: readonly { name: string; detail: string; highlight?: boolean }[]
     detail: `${STATS.adoption.microsoftRulesMerged} rules merged · community-rules examples (PR #908 + #1277)`,
     highlight: true,
   },
-  { name: 'NVIDIA Garak', detail: `${STATS.benchmark.garak.recall}% recall · PR open` },
 ];
 
 export default function SocialProof() {

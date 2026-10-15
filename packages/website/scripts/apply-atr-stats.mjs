@@ -194,9 +194,9 @@ const candidates = [
     have: !!pintBench,
   },
   {
-    re: /skill:\s*\{\s*recall:\s*[\d.]+,\s*precision:\s*[\d.]+,\s*fp:\s*[\d.]+,\s*samples:\s*[\d_]+\s*\}/,
-    val: () =>
-      `skill: { recall: ${pct(skillBench.recall)}, precision: ${pct(skillBench.precision)}, fp: ${pct(skillBench.fp_rate)}, samples: ${skillBench.samples} }`,
+    // SKILL.md precision and FP are in-sample, so stats.ts carries recall only.
+    re: /skill:\s*\{\s*recall:\s*[\d.]+,\s*samples:\s*[\d_]+\s*\}/,
+    val: () => `skill: { recall: ${pct(skillBench.recall)}, samples: ${skillBench.samples} }`,
     needs: 'benchmarks[source=skill-benchmark]',
     have: !!skillBench,
   },

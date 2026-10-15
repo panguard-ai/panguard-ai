@@ -417,19 +417,16 @@ function ScannerHeroInner() {
         {/* Trust badges — 4 strongest signals only */}
         <motion.div variants={heroVariants.childLast} className="mt-8">
           <div className="flex flex-wrap justify-center gap-2">
-            {[
-              t('badgeRules', { count: eco.atrRules }),
-              t('badgeRecall'),
-              t('badgeCisco'),
-              t('badgeLicense'),
-            ].map((badge) => (
-              <span
-                key={badge}
-                className="rounded-full border border-border bg-surface-1 px-3 py-1 font-mono text-[10px] uppercase tracking-micro text-text-muted"
-              >
-                {badge}
-              </span>
-            ))}
+            {[t('badgeRules', { count: eco.atrRules }), t('badgeCisco'), t('badgeLicense')].map(
+              (badge) => (
+                <span
+                  key={badge}
+                  className="rounded-full border border-border bg-surface-1 px-3 py-1 font-mono text-[10px] uppercase tracking-micro text-text-muted"
+                >
+                  {badge}
+                </span>
+              )
+            )}
           </div>
         </motion.div>
 
@@ -514,9 +511,6 @@ function ScannerHeroSkeleton() {
         <div className="flex flex-wrap justify-center gap-2 pt-4">
           <span className="rounded-full border border-border bg-surface-1 px-3 py-1 font-mono text-[10px] uppercase tracking-micro text-text-muted">
             {STATS.totalRulesDisplay} ATR rules
-          </span>
-          <span className="rounded-full border border-border bg-surface-1 px-3 py-1 font-mono text-[10px] uppercase tracking-micro text-text-muted">
-            Garak {STATS.benchmark.garak.recall}% recall
           </span>
           <span className="rounded-full border border-border bg-surface-1 px-3 py-1 font-mono text-[10px] uppercase tracking-micro text-text-muted">
             Rules merged upstream
