@@ -66,6 +66,14 @@ jobs:
           CNT=$(node -e "const fs=require('fs'),path=require('path');let n=0;(function walk(d){for(const e of fs.readdirSync(d,{withFileTypes:true})){const p=path.join(d,e.name);if(e.isDirectory()){walk(p);continue;}if(!e.name.endsWith('.yaml'))continue;const m=fs.readFileSync(p,'utf8').match(/^status:\s*['\"]?([a-z]+)/m);const s=m?m[1]:'';if(s!=='draft'&&s!=='deprecated')n++;}})('/tmp/package/rules');console.log(n);")
           node -e "const fs=require('fs');const p='/tmp/atr-stats.json';const j=JSON.parse(fs.readFileSync(p,'utf8'));j.version='${VER}';j.rules=j.rules||{};j.rules.total=${CNT};fs.writeFileSync(p,JSON.stringify(j,null,2));"
           echo "Pinned ATR stats to shipped npm v${VER} (${CNT} effective rules)"
+          # Detection conditions across the same effective rules, for STATS.atrPatterns.
+          # Best effort: if js-yaml cannot be installed, the field is left as it is.
+          npm install --prefix /tmp/yaml-tool --no-save --silent js-yaml@4 >/dev/null 2>&1 || true
+          PAT=$(node -e "let y;try{y=require('/tmp/yaml-tool/node_modules/js-yaml');}catch{process.exit(0);}const fs=require('fs'),path=require('path');let n=0;(function walk(d){for(const e of fs.readdirSync(d,{withFileTypes:true})){const p=path.join(d,e.name);if(e.isDirectory()){walk(p);continue;}if(!e.name.endsWith('.yaml'))continue;const doc=y.load(fs.readFileSync(p,'utf8'));if(!doc||doc.status==='draft'||doc.status==='deprecated')continue;const c=doc.detection&&doc.detection.conditions;if(Array.isArray(c))n+=c.length;}})('/tmp/package/rules');console.log(n);" 2>/dev/null || true)
+          if [ -n "$PAT" ]; then
+            node -e "const fs=require('fs');const p='/tmp/atr-stats.json';const j=JSON.parse(fs.readFileSync(p,'utf8'));j.rules.patterns=${PAT};fs.writeFileSync(p,JSON.stringify(j,null,2));"
+            echo "Detection conditions across effective rules: ${PAT}"
+          fi
 
       - name: Rewrite stats.ts shared fields
         run: |

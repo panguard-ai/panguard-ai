@@ -171,8 +171,8 @@ export default function DemoContent() {
                   </p>
                   <h3 className="text-text-primary font-semibold text-lg">ATR Adopters</h3>
                   <p className="mt-2 text-sm text-text-secondary leading-relaxed">
-                    7 production PR merges across 6 ecosystems (Microsoft AGT · Cisco AI Defense ·
-                    MISP · OWASP A-S-R-H · Gen Digital Sage). Each adoption links to the merged PR.
+                    Merged PRs in Microsoft AGT examples, the open-source Cisco AI Defense
+                    skill-scanner, MISP, OWASP A-S-R-H and Gen Digital Sage, each linked to its PR.
                   </p>
                   <p className="mt-4 text-sm font-semibold text-brand-sage group-hover:text-brand-sage-light">
                     See adopters →

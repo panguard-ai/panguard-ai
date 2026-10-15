@@ -8,7 +8,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: string
   return {
     title: 'ATR Adopters — Microsoft, Cisco, MISP, OWASP, Gen Digital',
     description:
-      'Production deployments of ATR: 7 merged PRs across 6 ecosystems including Microsoft Agent Governance Toolkit, Cisco AI Defense, MISP (CIRCL), OWASP Agent-Security-Regression-Harness, and Gen Digital Sage. Plus 4 awesome-list inclusions.',
+      'Maintainer-accepted ATR contributions, not vendor endorsements: merged PRs in Microsoft Agent Governance Toolkit examples, the open-source Cisco AI Defense skill-scanner, MISP (CIRCL), OWASP Agent-Security-Regression-Harness and Gen Digital Sage, plus awesome-list inclusions.',
     alternates: buildAlternates('/atr/adopters', params.locale),
   };
 }

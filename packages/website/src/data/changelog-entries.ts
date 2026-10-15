@@ -11,6 +11,9 @@ export interface ChangelogEntry {
   titleZh?: string;
   description: string;
   descriptionZh?: string;
+  /** A dated correction shown with the entry; the entry text itself stays as published. */
+  notice?: string;
+  noticeZh?: string;
   changes: ChangelogChange[];
 }
 
@@ -24,6 +27,10 @@ export const changelogEntries: ChangelogEntry[] = [
       'ATR upgraded to v2.1.0 with 330 detection rules and 100% NIST AI RMF mapping (1,566 mappings across 16 subcategories). Migrator Community v0.1.0 shipped on npm under MIT. Cisco AI Defense expanded to the full 330-rule pack via PR #99; Microsoft AGT now ships 287 rules + weekly auto-sync via PR #1277.',
     descriptionZh:
       'ATR 升級至 v2.1.0，內含 330 條偵測規則並完成 100% NIST AI RMF 對應（16 個子類別共 1,566 條對應）。Migrator Community v0.1.0 以 MIT 授權發布於 npm。Cisco AI Defense 透過 PR #99 擴張至完整 330 條規則包；Microsoft AGT 透過 PR #1277 內建 287 條規則並設定每週自動同步。',
+    notice:
+      'Correction (2026-10-16): several claims in this entry have since been withdrawn. "100% NIST AI RMF" meant every rule carried a self-assigned NIST AI RMF mapping; the rules map to a subset of the framework, and NIST has not reviewed it. Separately, ATR offered AI RMF profile examples (not its rule mappings) to NIST\'s OSCAL content repository (usnistgov/oscal-content#338), which is open and awaiting NIST review. The Cisco rule pack was merged into the open-source cisco-ai-defense/skill-scanner repository, not a Cisco product, and PR #99 took it to 314 rules. The Microsoft AGT rule pack was removed upstream on 2026-07-30. The garak 97.1% (646/666) was partly closed-book and the SKILL.md 0.20% false-positive rate was in-sample; current figures are on the benchmarks page.',
+    noticeZh:
+      '更正（2026-10-16）：本則有數項說法已撤回。「100% NIST AI RMF」指每條規則都帶有 ATR 自行標註的 NIST AI RMF 對應；規則只對應框架的一部分，NIST 也未審查。另外，ATR 向 NIST 的 OSCAL content repo 提交的是 AI RMF profile 範例（不是規則對應，usnistgov/oscal-content#338），目前仍開著、等待 NIST 審查。Cisco 規則包是合併進開源的 cisco-ai-defense/skill-scanner repo，不是 Cisco 產品，PR #99 合併時為 314 條。Microsoft AGT 的規則包已於 2026-07-30 被上游移除。garak 97.1%（646/666）部分是 closed-book，SKILL.md 0.20% 誤報率是樣本內數字；現行數字請見 benchmark 頁。',
     changes: [
       {
         type: 'feature',

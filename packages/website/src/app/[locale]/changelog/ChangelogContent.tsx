@@ -144,6 +144,11 @@ export default function ChangelogContent() {
                     <p className="text-text-secondary text-sm mt-2 leading-relaxed">
                       {isZh && entry.descriptionZh ? entry.descriptionZh : entry.description}
                     </p>
+                    {entry.notice ? (
+                      <aside className="mt-4 rounded-xl border border-border bg-surface-2 p-4 text-xs leading-relaxed text-text-secondary">
+                        {isZh && entry.noticeZh ? entry.noticeZh : entry.notice}
+                      </aside>
+                    ) : null}
 
                     <ul className="mt-5 space-y-3">
                       {entry.changes.map((change, cIdx) => (

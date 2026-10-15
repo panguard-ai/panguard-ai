@@ -3,22 +3,27 @@ import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import JsonLd from '@/components/seo/JsonLd';
 import { datasetSchema, techArticleSchema } from '@/lib/schema';
+import { STATS } from '@/lib/stats';
 import ScanReportContent from './ScanReportContent';
 
+const WS = STATS.wildScan;
+const SCANNED = WS.skillsScanned.toLocaleString('en-US');
+const FLAGGED = WS.flagged.toLocaleString('en-US');
+const ENGINE = `scan engine ${WS.engineVersion} (${WS.engineRules} ATR rules)`;
+const HEADLINE = `${SCANNED} AI Agent Skills and MCP Servers Scanned, ${FLAGGED} Flagged (scan engine ${WS.engineVersion})`;
+
 export const metadata: Metadata = {
-  title: '96,096 AI Agent Skills Scanned. 552 Were Malware. | ATR Research Report',
-  description:
-    'The largest security scan of AI agent skills ever conducted. 96,096 skills across OpenClaw, Hermes, Skills.sh, ClawHub. 1,302 flagged, 552 confirmed malware after manual review, from 3 coordinated attackers. C2 server, base64 reverse shells, password-protected zip payloads.',
+  title: `AI Agent Skill Wild Scan (scan engine ${WS.engineVersion}): ${SCANNED} Scanned, ${FLAGGED} Flagged | ATR Research Report`,
+  description: `April 2026 scan of ${SCANNED} AI agent skills and MCP servers from five public sources (OpenClaw, ClawHub, Skills.sh, Hermes Agent, and an MCP server crawl) with ${ENGINE}: ${FLAGGED} flagged. Payloads among them include base64 reverse shells, a C2 server and password-protected zip droppers. A flag is a rule match, not a confirmed verdict.`,
   openGraph: {
-    title: '96,096 AI Agent Skills Scanned. 552 Were Malware.',
-    description:
-      '3 coordinated attackers. 1,302 skills flagged, 552 confirmed malicious. The largest AI agent security scan ever conducted.',
+    title: HEADLINE,
+    description: `April 2026 wild scan across five public sources with ${ENGINE}. A flag is a rule match, not a confirmed verdict.`,
     type: 'article',
   },
   twitter: {
     card: 'summary_large_image',
-    title: '96,096 AI Agent Skills Scanned. 552 Were Malware.',
-    description: '3 coordinated attackers. 552 confirmed malicious skills out of 96,096 scanned.',
+    title: HEADLINE,
+    description: `April 2026 wild scan with ${ENGINE}. A flag is a rule match, not a confirmed verdict.`,
   },
 };
 
@@ -28,27 +33,20 @@ export default function ScanReportPage() {
       <JsonLd
         data={[
           datasetSchema({
-            name: 'PanGuard 96K AI Agent Skill Wild Scan (2026-04)',
-            description:
-              'Full ecosystem audit of AI agent skills. Crawled and scanned 96,096 skills across OpenClaw (56,503), ClawHub (36,378), Skills.sh (3,115), and a Hermes-protocol sample (100). Result: 1,302 flagged and 552 confirmed malicious after manual review, 249 triple-threat packages (shell + network + filesystem access).',
+            name: 'PanGuard AI Agent Skill Wild Scan (2026-04)',
+            description: `Scan of ${SCANNED} AI agent skills and MCP servers from five public sources (OpenClaw, ClawHub, Skills.sh, Hermes Agent, and an MCP server crawl of Glama, npm, GitHub, awesome-lists and mcp.so), run ${WS.scannedOn} with ${ENGINE}: ${FLAGGED} flagged. A flag is a rule match, not a confirmed-malicious verdict. The flagged-file list (paths and rule ids, no content) is data/full-scan-v2-2026-04-14.json in the agent-threat-rules repository.`,
             url: 'https://panguard.ai/research/96k-scan',
             datePublished: '2026-04-14',
-            variableMeasured: [
-              'skill threat verdict',
-              'attack pattern category',
-              'severity classification',
-              'postinstall script presence',
-            ],
-            recordCount: 96096,
-            doi: '10.5281/zenodo.19178002',
+            variableMeasured: ['ATR rule matches per skill', 'source registry'],
+            recordCount: WS.skillsScanned,
           }),
           techArticleSchema({
-            headline: '96,096 AI Agent Skills Scanned. 552 Were Malware.',
+            headline: HEADLINE,
             description:
-              'The largest security scan of AI agent skills ever conducted. Methodology, raw findings, and reproducibility scripts.',
+              'April 2026 wild scan of AI agent skills and MCP servers across five public sources: the payloads found among flagged skills, and what the scan can and cannot tell you.',
             url: 'https://panguard.ai/research/96k-scan',
             datePublished: '2026-04-14',
-            dateModified: '2026-04-21',
+            dateModified: '2026-10-16',
             proficiencyLevel: 'Expert',
           }),
         ]}

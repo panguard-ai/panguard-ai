@@ -28,14 +28,6 @@ import { Link } from '@/navigation';
 import { STATS } from '@/lib/stats';
 import { Eyebrow, StatV2 } from '../v2/primitives';
 
-/**
- * Verbatim source claim (RegulatedIndustriesPositioning sub-section A):
- * "7 production PRs merged across 6 ecosystems (incl. Cisco + Microsoft)".
- * The 6 comes from STATS.adoption.externalOrgs; the 7 is the source's
- * production-qualified subset (STATS.adoption.externalPRMerges counts all 13).
- */
-const PRODUCTION_PR_MERGES = 7;
-
 /** Adopter entries — names + detail sub-lines exactly as in SocialProof.tsx */
 const ADOPTERS: readonly { name: string; detail: string; highlight?: boolean }[] = [
   {
@@ -45,7 +37,7 @@ const ADOPTERS: readonly { name: string; detail: string; highlight?: boolean }[]
   },
   {
     name: 'Microsoft AGT',
-    detail: `${STATS.adoption.microsoftRulesMerged} ATR rules merged (PR #908 + #1277)`,
+    detail: 'ATR example adapters merged (PR #2308 + #3025)',
     highlight: true,
   },
   {
@@ -61,8 +53,8 @@ export default function ProofBand() {
 
   const stats: readonly { value: string; label: string }[] = [
     {
-      value: `${PRODUCTION_PR_MERGES}`,
-      label: isZh ? 'Production PR 已合併' : 'Production PRs merged',
+      value: STATS.coverage.owaspAgentic,
+      label: isZh ? 'OWASP Agentic Top 10 類別已對應' : 'OWASP Agentic Top 10 categories mapped',
     },
     {
       value: `${STATS.adoption.externalOrgs}`,
@@ -85,12 +77,13 @@ export default function ProofBand() {
           <Eyebrow>
             {isZh ? (
               <>
-                ATR 規則已上游合併進 Cisco AI Defense 與 Microsoft AGT——
+                ATR 規則已上游合併進開源的 Cisco AI Defense skill-scanner 與 Microsoft AGT 範例——
                 <span className="text-brand-sage">維護者接受的貢獻，非廠商背書。</span>
               </>
             ) : (
               <>
-                ATR rules merged upstream into Cisco AI Defense and Microsoft AGT —{' '}
+                ATR rules merged upstream into the open-source Cisco AI Defense skill-scanner and
+                Microsoft AGT examples —{' '}
                 <span className="text-brand-sage">
                   maintainer-accepted contributions, not vendor endorsements.
                 </span>

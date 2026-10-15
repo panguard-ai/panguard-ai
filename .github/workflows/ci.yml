@@ -64,6 +64,8 @@ jobs:
       # (best-effort — does not block CI).
       - name: Run tests (excluding installer E2E — has its own workflow)
         run: pnpm exec vitest run --exclude 'tests/installer/**'
+      - name: Website outward-figure guards (the root vitest run excludes packages/website)
+        run: pnpm --filter @panguard-ai/website exec vitest run --config vitest.guards.config.ts
       - name: Generate coverage report (best effort — non-blocking)
         run: pnpm exec vitest run --coverage --exclude 'tests/installer/**' || echo "::warning::Coverage report generation hit known brace-expansion issue; tests already passed above"
         continue-on-error: true
@@ -98,8 +100,8 @@ jobs:
       - name: Verify ATR rules compiled files are up to date
         run: |
           node scripts/compile-atr-rules.mjs
-          if ! git diff --exit-code packages/website/src/lib/atr-rules-compiled.json packages/website/src/lib/atr-rules-compiled.ts; then
-            echo "::error::ATR rules compiled files are out of date. Run: node scripts/compile-atr-rules.mjs"
+          if ! git diff --exit-code packages/website/src/lib/atr-rules-compiled.json packages/website/src/lib/atr-rules-compiled.ts packages/website/src/lib/stats.ts; then
+            echo "::error::ATR rules compiled files (or STATS.scanner in stats.ts) are out of date. Run: node scripts/compile-atr-rules.mjs"
             exit 1
           fi
       - name: Build all packages

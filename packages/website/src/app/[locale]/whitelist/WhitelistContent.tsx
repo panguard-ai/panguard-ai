@@ -6,7 +6,7 @@ import { ArrowRight, CheckCircle } from 'lucide-react';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
 import { ShieldIcon } from '@/components/ui/BrandIcons';
-import { useEcosystemStats } from '@/hooks/useEcosystemStats';
+import { formatCount, useEcosystemStats } from '@/hooks/useEcosystemStats';
 
 const STEPS = ['step1', 'step2', 'step3'] as const;
 
@@ -14,21 +14,19 @@ export default function WhitelistContent() {
   const t = useTranslations('whitelistPage');
   const stats = useEcosystemStats();
 
-  // Funnel: Total Scanned -> Community-Verified Safe -> Confirmed Malicious.
-  // Three distinct counts that reconcile against each other (no derived
-  // percentage disconnected from the visible numbers).
+  // Live Threat Cloud counts only; a count Threat Cloud has not answered shows as a dash.
   const STAT_CARDS = [
     {
       key: 'totalScanned' as const,
-      value: stats.skillsScanned.toLocaleString(),
+      value: formatCount(stats.skillsScanned),
     },
     {
       key: 'safeSkills' as const,
-      value: stats.whitelistedSkills.toLocaleString(),
+      value: formatCount(stats.whitelistedSkills),
     },
     {
-      key: 'confirmedMalicious' as const,
-      value: stats.blacklistedSkills.toLocaleString(),
+      key: 'blacklisted' as const,
+      value: formatCount(stats.blacklistedSkills),
     },
   ];
 
@@ -59,6 +57,9 @@ export default function WhitelistContent() {
               </div>
             ))}
           </div>
+          {stats.status !== 'loading' && STAT_CARDS.some((card) => card.value === '—') && (
+            <p className="text-xs text-text-muted text-center mt-4">{t('stats.unavailable')}</p>
+          )}
         </FadeInUp>
       </SectionWrapper>
 

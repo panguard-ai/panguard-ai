@@ -22,9 +22,9 @@ const ADOPTERS: readonly Adopter[] = [
     org: 'Microsoft Agent Governance Toolkit',
     category: 'big-tech',
     noteEn:
-      '287-rule expansion in production with weekly auto-sync workflow. Microsoft Copilot SWE Agent opened AGT#1981 with regression-test fixtures presuming ATR detection (2026-05-11).',
+      'ATR example adapters in the AGT repository (examples/atr-import, PR #2308, and examples/acs-atr-annotator, PR #3025). The rule-pack YAML that the earlier example PRs #908 and #1277 added was removed upstream on 2026-07-30.',
     noteZh:
-      '287 條規則進入 production，並設定每週自動同步。Microsoft Copilot SWE Agent 在 2026-05-11 開了 AGT#1981 並提交 regression-test fixtures 預設使用 ATR 偵測。',
+      'AGT repo 收錄了 ATR 範例 adapter（examples/atr-import，PR #2308；examples/acs-atr-annotator，PR #3025）。先前範例 PR #908 與 #1277 加入的規則包 YAML 已於 2026-07-30 被上游移除。',
     prs: [
       {
         number: 908,
@@ -34,17 +34,31 @@ const ADOPTERS: readonly Adopter[] = [
       },
       {
         number: 1277,
-        titleEn: '287-rule expansion + weekly auto-sync',
-        titleZh: '287 條擴張 + 每週自動同步',
+        titleEn: '287-rule expansion + weekly auto-sync (rule pack later removed upstream)',
+        titleZh: '287 條擴張 + 每週自動同步（規則包後來被上游移除）',
         date: '2026-04-26',
+      },
+      {
+        number: 2308,
+        titleEn: 'atr-import example: compile ATR YAML into AGT policies',
+        titleZh: 'atr-import 範例：把 ATR YAML 編譯成 AGT 政策',
+        date: '2026-05-18',
+      },
+      {
+        number: 3025,
+        titleEn: 'ACS + ATR annotator example',
+        titleZh: 'ACS + ATR annotator 範例',
+        date: '2026-06-15',
       },
     ],
   },
   {
     org: 'Cisco AI Defense',
     category: 'big-tech',
-    noteEn: `Full ${STATS.totalRulesDisplay}-rule pack in skill-scanner production. Auto-syncs to latest ATR release.`,
-    noteZh: `完整 ${STATS.totalRulesDisplay} 條規則進入 skill-scanner production，並自動同步至最新 ATR 發行。`,
+    noteEn:
+      'ATR rule pack merged into the open-source cisco-ai-defense/skill-scanner repository. This describes that repository, not any Cisco product.',
+    noteZh:
+      'ATR 規則包已合併進開源的 cisco-ai-defense/skill-scanner repo。此處指該 repo，不代表任何 Cisco 產品。',
     prs: [
       {
         number: 79,
@@ -56,8 +70,8 @@ const ADOPTERS: readonly Adopter[] = [
       {
         number: 99,
         repo: 'cisco-ai-defense/skill-scanner',
-        titleEn: `Full rule pack (auto-syncs to ${STATS.totalRulesDisplay})`,
-        titleZh: `完整規則包（自動同步至 ${STATS.totalRulesDisplay}）`,
+        titleEn: 'ATR rule pack merged',
+        titleZh: 'ATR 規則包合併',
         date: '2026-04-22',
       },
     ],
@@ -139,12 +153,9 @@ const AWESOME_LISTS = [
 const STANDARDS_PIPELINE_OPEN = [
   {
     org: 'NIST AI RMF (OSCAL)',
-    status: 'Submission in review (oscal-content #338 open)',
-    detail: 'Community OSCAL catalog covering all 4 AI RMF functions',
+    status: 'oscal-content #338 open, awaiting NIST review',
+    detail: 'Community AI RMF profile examples (CC0), not produced or endorsed by NIST',
   },
-  { org: 'NVIDIA garak', status: 'PR #1676 open' },
-  { org: 'OWASP LLM Top 10', status: 'Issue #814 open' },
-  { org: 'meta-llama/PurpleLlama', status: 'PR #206 open' },
   { org: 'promptfoo/promptfoo', status: 'PR #8529 open' },
 ];
 
@@ -152,15 +163,12 @@ export default function AdoptersContent() {
   const locale = useLocale();
   const isZh = locale.startsWith('zh');
 
-  // Honest breakdown (CLAUDE.md feedback_f500_framing_correction):
-  //   7 production merges across 2 F500 companies (Microsoft + Cisco)
-  //   3 standards-body merges (MISP x2, OWASP A-S-R-H) + 1 enterprise (Gen Digital Sage)
-  //   4 awesome-list inclusions (not production)
-  //   Total: 7 production + 4 standards/enterprise + 4 awesome-list = 15 across ~10 orgs
-  //   Tier-1 in conversation: 6 (Microsoft, Cisco, Gen Digital, MISP, OWASP, NVIDIA — IBM dropped, PR #4109 closed without merge)
-  const productionMerges = 7;
-  const awesomeListInclusions = 4;
-  const ecosystemsLabel = '6';
+  // Counts come from the lists on this page, so the summary cannot drift from them.
+  const mergedPrs = ADOPTERS.reduce((total, adopter) => total + adopter.prs.length, 0);
+  const awesomeListInclusions = AWESOME_LISTS.length;
+  const mergedList = ADOPTERS.map(
+    (adopter) => `${adopter.org} (${adopter.prs.map((pr) => `#${pr.number}`).join(' + ')})`
+  ).join(isZh ? '、' : ', ');
   const standardsBody = STATS.adoption.standardsBodyMerges;
   const tier1 = STATS.adoption.tier1Institutions;
 
@@ -169,7 +177,7 @@ export default function AdoptersContent() {
       <header className="mb-12 max-w-3xl">
         <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-panguard-green/30 bg-panguard-green/10 px-3 py-1 text-xs font-medium text-panguard-green">
           <CheckCircle2 className="h-3 w-3" aria-hidden />
-          {isZh ? '正式採用 · 證據可驗證' : 'Production adoption · evidence verifiable'}
+          {isZh ? '已合併上游 · 證據可驗證' : 'Merged upstream · evidence verifiable'}
         </div>
         <h1 className="mb-4 text-4xl font-semibold tracking-tight text-text-primary sm:text-5xl">
           {isZh ? 'ATR 採用者' : 'ATR Adopters'}
@@ -182,23 +190,20 @@ export default function AdoptersContent() {
       </header>
 
       <div className="mb-12 grid grid-cols-2 gap-4 md:grid-cols-4">
-        <StatBox
-          label={isZh ? 'Production 合併' : 'Production merges'}
-          value={String(productionMerges)}
-        />
-        <StatBox label={isZh ? '生態系' : 'Ecosystems'} value={ecosystemsLabel} />
+        <StatBox label={isZh ? '已合併 PR' : 'Merged PRs'} value={String(mergedPrs)} />
+        <StatBox label={isZh ? '組織' : 'Organizations'} value={String(ADOPTERS.length)} />
         <StatBox label={isZh ? '標準制定機構' : 'Standards bodies'} value={String(standardsBody)} />
         <StatBox label={isZh ? 'Tier-1 在談機構' : 'Tier-1 engaged'} value={String(tier1)} />
       </div>
 
       <p className="-mt-8 mb-12 text-xs leading-relaxed text-text-muted">
         {isZh
-          ? `Production 合併：Microsoft AGT(PR #908 + #1277)+ Cisco AI Defense(PR #79 + #99)+ MISP taxonomies #323 + MISP galaxy #1207 + OWASP A-S-R-H #74 + Gen Digital Sage #33，共 7 件，跨 6 個生態系。另有 ${awesomeListInclusions} 件 awesome-list 收錄（不視為 production 採用）。`
-          : `Production merges: Microsoft AGT (PR #908 + #1277) + Cisco AI Defense (PR #79 + #99) + MISP taxonomies #323 + MISP galaxy #1207 + OWASP A-S-R-H #74 + Gen Digital Sage #33 — 7 PRs across 6 ecosystems. Plus ${awesomeListInclusions} awesome-list inclusions (not counted as production adoption).`}
+          ? `已合併 PR：${mergedList}，共 ${mergedPrs} 件，涉及 ${ADOPTERS.length} 個組織。Microsoft AGT 透過 #908 + #1277 加入的規則包已於 2026-07-30 被上游移除。另有 ${awesomeListInclusions} 件 awesome-list 收錄（不視為採用）。`
+          : `Merged PRs: ${mergedList} — ${mergedPrs} PRs across ${ADOPTERS.length} organizations. The rule pack Microsoft AGT received through #908 + #1277 was removed upstream on 2026-07-30. Plus ${awesomeListInclusions} awesome-list inclusions (not counted as adoption).`}
       </p>
 
       <SectionTitle
-        title={isZh ? '正式採用' : 'Production Adoption'}
+        title={isZh ? '已合併的貢獻' : 'Merged Contributions'}
         subtitle={isZh ? '由外部維護者審閱並合併' : 'Reviewed and merged by external maintainers'}
       />
 
@@ -213,8 +218,8 @@ export default function AdoptersContent() {
           title={isZh ? 'Awesome List 收錄' : 'Listed in Awesome Lists'}
           subtitle={
             isZh
-              ? '收錄並非 production 採用，但代表社群可見度'
-              : 'Listing is not production adoption, but reflects community visibility'
+              ? '收錄不等於採用，但代表社群可見度'
+              : 'Listing is not adoption, but reflects community visibility'
           }
         />
         <div className="mt-6 grid gap-3 md:grid-cols-2">

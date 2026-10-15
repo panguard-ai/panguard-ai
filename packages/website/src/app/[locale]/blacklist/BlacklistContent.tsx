@@ -5,7 +5,7 @@ import { Link } from '@/navigation';
 import { ArrowRight, AlertTriangle, ShieldOff } from 'lucide-react';
 import FadeInUp from '@/components/FadeInUp';
 import SectionWrapper from '@/components/ui/SectionWrapper';
-import { useEcosystemStats } from '@/hooks/useEcosystemStats';
+import { formatCount, useEcosystemStats } from '@/hooks/useEcosystemStats';
 
 const STEPS = ['step1', 'step2', 'step3'] as const;
 
@@ -13,23 +13,21 @@ export default function BlacklistContent() {
   const t = useTranslations('blacklistPage');
   const stats = useEcosystemStats();
 
-  // Hero funnel: Total Scanned -> Threats Detected -> Malicious Blocked.
-  // Each number is distinct and reconciles with the Severity Breakdown below:
-  //   threatsDetected == breakdown "High" total, blacklistedSkills == breakdown "Critical".
+  // Live Threat Cloud counts only; a count Threat Cloud has not answered shows as a dash.
   const STAT_CARDS = [
     {
       key: 'totalScanned' as const,
-      value: stats.skillsScanned.toLocaleString(),
+      value: formatCount(stats.skillsScanned),
       color: 'text-text-primary',
     },
     {
       key: 'threatsDetected' as const,
-      value: stats.threatsDetected.toLocaleString(),
+      value: formatCount(stats.threatsDetected),
       color: 'text-orange-400',
     },
     {
-      key: 'maliciousBlocked' as const,
-      value: stats.blacklistedSkills.toLocaleString(),
+      key: 'blacklisted' as const,
+      value: formatCount(stats.blacklistedSkills),
       color: 'text-red-400',
     },
   ];
@@ -61,6 +59,9 @@ export default function BlacklistContent() {
               </div>
             ))}
           </div>
+          {stats.status !== 'loading' && STAT_CARDS.some((card) => card.value === '—') && (
+            <p className="text-xs text-text-muted text-center mt-4">{t('stats.unavailable')}</p>
+          )}
         </FadeInUp>
       </SectionWrapper>
 
@@ -97,9 +98,6 @@ export default function BlacklistContent() {
                   <span className="text-sm font-bold text-red-400 uppercase">
                     {t('severity.critical')}
                   </span>
-                  <span className="text-2xl font-extrabold text-red-400 ml-auto">
-                    {stats.blacklistedSkills}
-                  </span>
                 </div>
                 <p className="text-xs text-text-muted">{t('severity.criticalDesc')}</p>
               </div>
@@ -109,9 +107,6 @@ export default function BlacklistContent() {
                   <AlertTriangle className="w-5 h-5 text-orange-400" />
                   <span className="text-sm font-bold text-orange-400 uppercase">
                     {t('severity.high')}
-                  </span>
-                  <span className="text-2xl font-extrabold text-orange-400 ml-auto">
-                    {stats.threatsDetected.toLocaleString()}
                   </span>
                 </div>
                 <p className="text-xs text-text-muted">{t('severity.highDesc')}</p>

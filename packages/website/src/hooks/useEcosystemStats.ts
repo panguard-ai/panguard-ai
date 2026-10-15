@@ -1,27 +1,35 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { STATS } from '@/lib/stats';
 
+/**
+ * Live Threat Cloud registry counts. Every count is null until Threat Cloud
+ * answers, and stays null if it does not: the site never substitutes a stored
+ * snapshot for a live number, so an unreachable Threat Cloud reads as
+ * unavailable instead of as old figures presented as current.
+ */
 export interface EcosystemStats {
-  skillsScanned: number;
-  threatsDetected: number;
-  agentsProtected: number;
-  atrRules: number;
-  whitelistedSkills: number;
-  blacklistedSkills: number;
-  sources: {
-    bulk: { skills: number; findings: number };
-    cli: { skills: number; findings: number; devices: number };
-    web: { skills: number; findings: number };
-  };
-  lastUpdated: string;
+  /** loading until the first answer (or cached result); unavailable when Threat Cloud fails. */
+  status: 'loading' | 'live' | 'unavailable';
+  skillsScanned: number | null;
+  threatsDetected: number | null;
+  whitelistedSkills: number | null;
+  blacklistedSkills: number | null;
 }
 
-const CACHE_KEY = 'panguard-ecosystem-stats';
+type Payload = Record<string, unknown>;
+
+const CACHE_KEY = 'panguard-ecosystem-stats-v2';
 const CACHE_TTL = 60_000; // 60 seconds (ecosystem data changes frequently)
 
 const TC_URL = process.env.NEXT_PUBLIC_THREAT_CLOUD_URL ?? 'https://tc.panguard.ai';
+
+const NO_COUNTS: Omit<EcosystemStats, 'status'> = {
+  skillsScanned: null,
+  threatsDetected: null,
+  whitelistedSkills: null,
+  blacklistedSkills: null,
+};
 
 interface CachedData {
   data: EcosystemStats;
@@ -51,28 +59,31 @@ function setCache(data: EcosystemStats): void {
   }
 }
 
-/** Static fallback from stats.ts (SSR and before fetch) */
-const FALLBACK: EcosystemStats = {
-  skillsScanned: STATS.ecosystem.skillsScanned,
-  threatsDetected: STATS.ecosystem.maliciousFound,
-  agentsProtected: STATS.adoption.agentsProtected,
-  atrRules: STATS.atrRules,
-  whitelistedSkills: STATS.ecosystem.whitelistedSkills,
-  blacklistedSkills: STATS.ecosystem.blacklistedSkills,
-  sources: {
-    bulk: { skills: STATS.ecosystem.skillsScanned, findings: STATS.ecosystem.maliciousFound },
-    cli: { skills: 0, findings: 0, devices: 0 },
-    web: { skills: 0, findings: 0 },
-  },
-  lastUpdated: STATS.lastUpdated,
-};
+/** A non-negative finite number, or null for anything else. */
+function toCount(value: unknown): number | null {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : null;
+}
+
+/** The `data` object of a Threat Cloud `{ ok, data }` envelope, or null. */
+async function readData(res: Response | null): Promise<Payload | null> {
+  if (!res?.ok) return null;
+  const json = (await res.json().catch(() => null)) as { ok?: boolean; data?: unknown } | null;
+  return json?.ok && json.data !== null && typeof json.data === 'object'
+    ? (json.data as Payload)
+    : null;
+}
+
+/** Display helper: a count with thousands separators, or an em dash when unknown. */
+export function formatCount(value: number | null): string {
+  return value === null ? '—' : value.toLocaleString();
+}
 
 /**
- * Fetches live ecosystem metrics from Threat Cloud /api/metrics + /api/stats.
- * Updates every 60 seconds. Falls back to static STATS on error.
+ * Fetches live registry counts from Threat Cloud /api/metrics + /api/stats.
+ * Re-fetches at most every 60 seconds per session.
  */
 export function useEcosystemStats(): EcosystemStats {
-  const [stats, setStats] = useState<EcosystemStats>(FALLBACK);
+  const [stats, setStats] = useState<EcosystemStats>({ status: 'loading', ...NO_COUNTS });
 
   useEffect(() => {
     const cached = getFromCache();
@@ -84,73 +95,33 @@ export function useEcosystemStats(): EcosystemStats {
     let cancelled = false;
 
     async function fetchStats() {
-      try {
-        // Fetch both endpoints in parallel
-        const [metricsRes, statsRes] = await Promise.all([
-          fetch(`${TC_URL}/api/metrics`).catch(() => null),
-          fetch(`${TC_URL}/api/stats`).catch(() => null),
-        ]);
-
-        if (cancelled) return;
-
-        const live = { ...FALLBACK };
-
-        // /api/metrics -- scan event aggregation
-        if (metricsRes?.ok) {
-          const metricsJson = (await metricsRes.json()) as {
-            ok: boolean;
-            data?: {
-              totalSkillsScanned: number;
-              totalAgentsProtected: number;
-              totalThreatsDetected: number;
-              totalAtrRules: number;
-              sources: EcosystemStats['sources'];
-              lastUpdated: string;
-            };
-          };
-          if (metricsJson.ok && metricsJson.data) {
-            const m = metricsJson.data;
-            live.skillsScanned = Math.max(m.totalSkillsScanned, FALLBACK.skillsScanned);
-            live.agentsProtected = m.totalAgentsProtected;
-            live.threatsDetected = Math.max(m.totalThreatsDetected, FALLBACK.threatsDetected);
-            live.atrRules = Math.max(m.totalAtrRules, FALLBACK.atrRules);
-            live.whitelistedSkills =
-              ((m as Record<string, unknown>)['whitelistedSkills'] as number) ??
-              FALLBACK.whitelistedSkills;
-            live.blacklistedSkills =
-              ((m as Record<string, unknown>)['blacklistedSkills'] as number) ??
-              FALLBACK.blacklistedSkills;
-            live.sources = m.sources;
-            live.lastUpdated = m.lastUpdated;
-          }
-        }
-
-        // /api/stats -- skill blacklist/whitelist + proposal counts
-        if (statsRes?.ok) {
-          const statsJson = (await statsRes.json()) as {
-            ok: boolean;
-            data?: {
-              skillBlacklistTotal?: number;
-              skillThreatsTotal?: number;
-              proposalStats?: { pending: number; confirmed: number; total: number };
-            };
-          };
-          if (statsJson.ok && statsJson.data) {
-            live.blacklistedSkills = statsJson.data.skillBlacklistTotal ?? 0;
-            // Use skillThreatsTotal as rough whitelist proxy if no direct count
-            const proposalConfirmed = statsJson.data.proposalStats?.confirmed ?? 0;
-            live.atrRules = Math.max(live.atrRules, FALLBACK.atrRules + proposalConfirmed);
-          }
-        }
-
-        setStats(live);
-        setCache(live);
-      } catch {
-        // Keep fallback
+      const [metricsRes, statsRes] = await Promise.all([
+        fetch(`${TC_URL}/api/metrics`).catch(() => null),
+        fetch(`${TC_URL}/api/stats`).catch(() => null),
+      ]);
+      const [metrics, registry] = await Promise.all([readData(metricsRes), readData(statsRes)]);
+      if (cancelled) return;
+      if (!metrics && !registry) {
+        setStats({ status: 'unavailable', ...NO_COUNTS });
+        return;
       }
+
+      const next: EcosystemStats = {
+        status: 'live',
+        skillsScanned: toCount(metrics?.['totalSkillsScanned']),
+        threatsDetected: toCount(metrics?.['totalThreatsDetected']),
+        whitelistedSkills: toCount(metrics?.['whitelistedSkills']),
+        blacklistedSkills: toCount(
+          registry?.['skillBlacklistTotal'] ?? metrics?.['blacklistedSkills']
+        ),
+      };
+      setStats(next);
+      setCache(next);
     }
 
-    void fetchStats();
+    fetchStats().catch(() => {
+      if (!cancelled) setStats({ status: 'unavailable', ...NO_COUNTS });
+    });
 
     return () => {
       cancelled = true;
