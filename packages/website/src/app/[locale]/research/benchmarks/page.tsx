@@ -19,8 +19,8 @@ export async function generateMetadata(props: {
       ? 'ATR Benchmark 結果 — Garak, SKILL.md, PINT, Wild Scan'
       : 'ATR Benchmark Results — Garak, SKILL.md, PINT, Wild Scan',
     description: isZh
-      ? `${STATS.totalRulesDisplay} 條 ATR 規則在公開對抗式語料庫上的實測結果。Garak ${STATS.benchmark.garak.recall}% recall, SKILL.md ${STATS.benchmark.skill.recall}% recall + ${STATS.benchmark.skill.precision}% precision, PINT ${STATS.benchmark.pint.recall}% recall（自建 PINT 格式語料庫）， Wild Scan 96,096 個 skill 中 1,302 個被標記、人工複審後 552 個確認惡意。可重現方法、原始資料、Zenodo DOI。Benign-gate 誤報採 lane 化統計：65K 樣本上 enforce lane 約 ${STATS.benchmark.benignLanes.enforceFp}%、hunt lane 約 ${STATS.benchmark.benignLanes.huntFp}%。`
-      : `Public benchmark results for ${STATS.totalRulesDisplay} ATR rules against adversarial corpora. Garak ${STATS.benchmark.garak.recall}% recall, SKILL.md ${STATS.benchmark.skill.recall}% recall + ${STATS.benchmark.skill.precision}% precision, PINT ${STATS.benchmark.pint.recall}% recall (self-built PINT-format corpus), Wild Scan 1,302 flagged and 552 confirmed malware of 96,096 skills. Reproducible methodology, raw data, Zenodo DOI. Benign-gate false positives are lane-based: ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt on 65K samples.`,
+      ? `${STATS.totalRulesDisplay} 條 ATR 規則在公開對抗式語料庫上的實測結果。recall 為 hunt lane（預設）數字：garak 實戰越獄集 ${STATS.benchmark.garak.recall}%（部分 closed-book）、SKILL.md ${STATS.benchmark.skill.recall}%（樣本內）、自建 PINT 格式語料庫 ${STATS.benchmark.pint.recall}%。附可重現方法、原始資料與 Zenodo DOI。benign gate 誤報率已撤回，等待重新量測。`
+      : `Public benchmark results for ${STATS.totalRulesDisplay} ATR rules against adversarial corpora. Recall figures are hunt-lane (the default): ${STATS.benchmark.garak.recall}% on garak's in-the-wild jailbreaks (partly closed-book), ${STATS.benchmark.skill.recall}% on SKILL.md (in-sample), ${STATS.benchmark.pint.recall}% on a self-built PINT-format corpus. Reproducible methodology, raw data, Zenodo DOI. Benign-gate false-positive rates are withdrawn pending re-measurement.`,
     alternates: buildAlternates('/research/benchmarks', params.locale),
   };
 }
@@ -46,10 +46,10 @@ const BENCHMARKS: Benchmark[] = [
     name: 'Garak (NVIDIA jailbreak corpus)',
     zhName: 'Garak（NVIDIA 越獄語料庫）',
     description:
-      'NVIDIA garak is the leading open-source LLM red-teaming framework. We ran ATR v2.1.2 against the full garak corpus to measure adversarial-prompt detection.',
+      'NVIDIA garak is an open-source LLM red-teaming framework. We ran ATR v4.1.5 against its in-the-wild jailbreak set. The figure is hunt-lane (the default, all rules); the enforce lane, used when blocking is on, catches far fewer. It is partly closed-book: some ATR rules were written from this corpus, so it is not an out-of-sample result.',
     zhDescription:
-      'NVIDIA garak 是業界領先的開源 LLM red-teaming 框架。我們用 ATR v2.1.2 對 garak 完整語料庫做對抗式 prompt 偵測測試。',
-    date: '2026-04-22',
+      'NVIDIA garak 是開源的 LLM red-teaming 框架。我們用 ATR v4.1.5 跑它的實戰越獄集。數字是 hunt lane（預設，載入全部規則）；開啟 blocking 時用的 enforce lane 抓到的少很多。這個數字部分是 closed-book：有些 ATR 規則就是從這份語料寫出來的，所以不是樣本外結果。',
+    date: '2026-10-14',
     source: { label: 'github.com/NVIDIA/garak', url: 'https://github.com/NVIDIA/garak' },
     results: [
       { label: 'Recall', zhLabel: '召回率', value: `${STATS.benchmark.garak.recall}%` },
@@ -65,7 +65,8 @@ const BENCHMARKS: Benchmark[] = [
         value: 'Regex only (no LLM second opinion)',
         zhValue: '僅 Regex（無 LLM 二次判讀）',
       },
-      { label: 'ATR version', zhLabel: 'ATR 版本', value: 'v2.1.2' },
+      { label: 'Lane', zhLabel: 'Lane', value: 'hunt (default)', zhValue: 'hunt（預設）' },
+      { label: 'ATR version', zhLabel: 'ATR 版本', value: 'v4.1.5' },
     ],
     reproduce: 'pnpm bench:garak (in agent-threat-rules repo)',
     externalLink:
@@ -77,15 +78,17 @@ const BENCHMARKS: Benchmark[] = [
     name: 'SKILL.md (PanGuard wild corpus)',
     zhName: 'SKILL.md（PanGuard 野外語料庫）',
     description:
-      'Manually labeled corpus of 498 AI agent skills from ClawHub, OpenClaw, and Skills.sh. Half malicious, half benign. Used to validate that ATR catches threats without false-positive bloat.',
+      'Labeled corpus of 498 AI agent skills from ClawHub, OpenClaw, and Skills.sh: 32 malicious, 466 benign. The benign samples are also the set ATR rules are tuned against, so this is an in-sample check, and its precision and false-positive figures are not cited. Recall is hunt-lane.',
     zhDescription:
-      'ClawHub、OpenClaw、Skills.sh 的 AI agent skill，498 個樣本，人工標記。一半惡意，一半合法。用來驗證 ATR 抓得到威脅而不會誤報過多。',
-    date: '2026-04-22',
+      'ClawHub、OpenClaw、Skills.sh 的 AI agent skill 共 498 個:32 個惡意、466 個良性。良性樣本同時是 ATR 規則調校用的那一組，所以這是樣本內檢查，precision 與誤報率不對外引用。recall 是 hunt lane 數字。',
+    date: '2026-10-14',
     source: { label: 'PanGuard Wild Scan dataset', url: 'https://panguard.ai/research/96k-scan' },
     results: [
-      { label: 'Recall', zhLabel: '召回率', value: `${STATS.benchmark.skill.recall}%` },
-      { label: 'Precision', zhLabel: '精確率', value: `${STATS.benchmark.skill.precision}%` },
-      { label: 'False positive rate', zhLabel: '誤報率', value: `${STATS.benchmark.skill.fp}%` },
+      {
+        label: 'Recall (hunt lane, in-sample)',
+        zhLabel: '召回率（hunt lane，樣本內）',
+        value: `${STATS.benchmark.skill.recall}%`,
+      },
       {
         label: 'Sample size',
         zhLabel: '樣本數',
@@ -267,8 +270,8 @@ export default async function BenchmarkHubPage(props: { params: Promise<{ locale
             </p>
             <p className="text-sm text-text-muted mt-4 max-w-2xl leading-relaxed">
               {isZh
-                ? `所有 precision / FP 數字皆為單一語料庫的 Layer 1 量測，不是全引擎宣稱。Benign-gate 誤報採 lane 化統計：${STATS.benchmark.benignLanes.samples.toLocaleString()} 個 benign 樣本上 enforce lane 約 ${STATS.benchmark.benignLanes.enforceFp}%、hunt lane（預設）約 ${STATS.benchmark.benignLanes.huntFp}%。沒有單一的全引擎 FP 數字。`
-                : `All precision / FP figures are per-corpus Layer 1 measurements, not engine-wide claims. Benign-gate false positives are lane-based: ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt (default) on ${STATS.benchmark.benignLanes.samples.toLocaleString()} benign samples. There is no single engine-wide FP number.`}
+                ? `所有 precision / FP 數字皆為單一語料庫的 Layer 1 量測，不是全引擎宣稱。recall 都是 hunt lane（預設）數字。我們以前引用的分 lane benign gate 誤報率已於 2026-09-19 撤回，等待重新量測；沒有單一的全引擎 FP 數字。`
+                : `All precision / FP figures are per-corpus Layer 1 measurements, not engine-wide claims. Recall figures are hunt-lane (the default). The lane-based benign-gate false-positive rates we used to quote were withdrawn on 2026-09-19 pending re-measurement; there is no single engine-wide FP number.`}
             </p>
           </div>
         </section>
@@ -326,8 +329,8 @@ export default async function BenchmarkHubPage(props: { params: Promise<{ locale
                     </p>
                     <p className="text-xs text-text-secondary leading-relaxed">
                       {isZh
-                        ? `Precision / FP 為此語料庫的 Layer 1(確定性規則）量測，非全引擎數字。實務誤報採 lane 化：${STATS.benchmark.benignLanes.samples.toLocaleString()} 個 benign 樣本上 enforce lane 約 ${STATS.benchmark.benignLanes.enforceFp}%、hunt lane（預設）約 ${STATS.benchmark.benignLanes.huntFp}%。`
-                        : `Precision / FP here are Layer 1 (deterministic-rule) measurements on this specific corpus, not an engine-wide figure. Real-world false positives are lane-based: ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt (default) on ${STATS.benchmark.benignLanes.samples.toLocaleString()} benign samples.`}
+                        ? `Precision / FP 為此語料庫的 Layer 1（確定性規則）量測，非全引擎數字。分 lane 的 benign gate 誤報率已撤回，等待重新量測。`
+                        : `Precision / FP here are Layer 1 (deterministic-rule) measurements on this specific corpus, not an engine-wide figure. The lane-based benign-gate false-positive rates were withdrawn pending re-measurement.`}
                     </p>
                   </div>
                 )}

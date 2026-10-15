@@ -161,17 +161,17 @@ export default async function EvidencePackPage({
                 value={`${STATS.benchmark.garak.recall}%`}
                 caption={
                   isZh
-                    ? `${STATS.benchmark.garak.samples} Garak 樣本`
-                    : `${STATS.benchmark.garak.samples} Garak samples`
+                    ? `${STATS.benchmark.garak.samples} 個 garak 樣本 · hunt lane，部分 closed-book`
+                    : `${STATS.benchmark.garak.samples} garak samples · hunt lane, partly closed-book`
                 }
               />
               <Stat
-                label={isZh ? 'False positive' : 'False positive'}
-                value={`${STATS.benchmark.skill.fp}%`}
+                label={isZh ? 'Precision' : 'Precision'}
+                value={`${STATS.benchmark.pint.precision}%`}
                 caption={
                   isZh
-                    ? `${STATS.benchmark.skill.samples} 樣本 SKILL.md 語料；65K benign-gate 為 lane 制 ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt`
-                    : `${STATS.benchmark.skill.samples}-sample SKILL.md corpus; 65K benign-gate FP is lane-based ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt`
+                    ? `自建 ${STATS.benchmark.pint.samples} 筆 PINT 格式語料（非 Lakera 官方 PINT）`
+                    : `self-built ${STATS.benchmark.pint.samples}-sample PINT-format corpus (not Lakera's official PINT)`
                 }
               />
               <Stat
@@ -191,8 +191,8 @@ export default async function EvidencePackPage({
               <ul className="space-y-2.5 text-sm text-text-secondary leading-relaxed">
                 <Bullet>
                   {isZh
-                    ? `偵測：${STATS.totalRulesDisplay} 條 ATR 規則 + Garak ${STATS.benchmark.garak.recall}% recall(${STATS.benchmark.garak.samples} 樣本);${STATS.benchmark.skill.fp}% FP 於 ${STATS.benchmark.skill.samples} 樣本 SKILL.md 語料，65K benign-gate 為 lane 制 ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt——LLM 0 個 token`
-                    : `Detection: ${STATS.totalRulesDisplay} ATR rules with ${STATS.benchmark.garak.recall}% Garak recall (${STATS.benchmark.garak.samples} samples); ${STATS.benchmark.skill.fp}% FP on the ${STATS.benchmark.skill.samples}-sample SKILL.md corpus, and lane-based benign-gate FP of ~${STATS.benchmark.benignLanes.enforceFp}% enforce / ~${STATS.benchmark.benignLanes.huntFp}% hunt — zero LLM tokens`}
+                    ? `偵測：${STATS.totalRulesDisplay} 條 ATR 規則；garak 實戰越獄集 hunt lane 召回 ${STATS.benchmark.garak.recall}%（${STATS.benchmark.garak.samples} 個樣本，部分 closed-book）；benign gate 誤報率重新量測中——LLM 0 個 token`
+                    : `Detection: ${STATS.totalRulesDisplay} ATR rules; ${STATS.benchmark.garak.recall}% hunt-lane recall on garak's in-the-wild jailbreaks (${STATS.benchmark.garak.samples} samples, partly closed-book); benign-gate false-positive rates are being re-measured — zero LLM tokens`}
                 </Bullet>
                 <Bullet>
                   {isZh

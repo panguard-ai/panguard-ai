@@ -468,7 +468,6 @@ export default function InstallHero() {
 
   const badges = [
     t('badgeRules', { count: STATS.atrRules.toLocaleString() }),
-    t('badgeRecall'),
     t('badgeMerged'),
     t('badgeLicense'),
   ];

@@ -27,24 +27,26 @@ export const STATS = {
   /**
    * Synced from agent-threat-rules by: pnpm update agent-threat-rules ->
    * node scripts/compile-atr-rules.mjs -> node scripts/apply-atr-stats.mjs.
-   * atrRules/totalRules below is the full ATR corpus (747). The web-scanner
+   * atrRules/totalRules below count EFFECTIVE rules in the shipped npm package
+   * (draft and deprecated excluded, matching ATR's outward count). The web-scanner
    * bundle (src/lib/atr-rules-compiled.json) ships the 650 production rules
    * only — draft/deprecated are excluded to mirror the runtime engine.
    */
   atrVersion: '4.1.5',
   /**
-   * Full ATR corpus (agent-threat-rules v3.5.8 on npm = 747 YAML rules) —
-   * auditable by `npm i agent-threat-rules@3.5.8 && find rules -name '*.yaml' | wc -l`.
+   * Effective rules in the shipped npm package (v4.1.5: 829 rule files, of
+   * which 5 draft and 2 deprecated are not loaded by the engine, so 822).
+   * Written by the ATR Stats Sync Bot; do not hand-edit.
    * The online scanner runs the 650 production subset (see atr-rules-compiled.json).
    */
-  atrRules: 829,
+  atrRules: 822,
   /** Total detection patterns across the full ATR corpus (747 rules, v3.5.8). */
   atrPatterns: 3_200,
-  totalRules: 829,
+  totalRules: 822,
   /** Use this for all user-facing display — avoids stale hardcoded counts. */
-  totalRulesDisplay: '829' as const,
+  totalRulesDisplay: '822' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '829' as const,
+  atrRulesDisplay: '822' as const,
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,
@@ -188,26 +190,30 @@ export const STATS = {
   // consistent unit across the site — call sites render `${value}%` directly.
   benchmark: {
     pint: { recall: 65.41, precision: 100, fp: 0, samples: 850 },
-    skill: { recall: 100, precision: 97, fp: 0.2, samples: 498 },
-    garak: {
-      recall: 97.2,
-      samples: 650,
-      perFamily: { latentinjection: 34.4, sysprompt_extraction: 67.9, dan: 90.2 },
-    },
-    hackaprompt: { recall: 69.6, precision: 100, samples: 4_780, baselineRecall: 28.6 },
     /**
-     * Lane-based false-positive rates on the 65K-sample benign gate (v3.5.0
-     * detection lanes). There is NO single engine-wide FP number — enforce lane
-     * (stable + confirm-gated rules) and hunt lane (all rules, the default)
-     * behave differently by design. Cite the lane, never a blended figure.
+     * SKILL.md recall is hunt-lane and IN-SAMPLE: the 466 benign samples are the
+     * set rules are tuned against (32 malicious). Precision and FP on this corpus
+     * are not cited for that reason.
      */
-    benignLanes: {
-      enforceFp: 0.24,
-      huntFp: 9,
-      samples: 65_000,
-      defaultLane: 'hunt' as const,
+    skill: { recall: 100, samples: 498 },
+    /**
+     * Hunt-lane recall on garak's in-the-wild jailbreak set, ATR 4.1.5. Partly
+     * closed-book: some rules were written from this corpus. Always cite the lane
+     * and that caveat; the enforce lane (used when blocking is on) recalls far less.
+     */
+    garak: {
+      recall: 92.3,
+      samples: 650,
+      perFamily: { latentinjection: 34.4, sysprompt_extraction: 96.4, dan: 92.5 },
     },
-    asOf: '2026-07-04',
+    /** Attack-only corpus: precision and FP are mathematically undefined, so not cited. */
+    hackaprompt: { recall: 69.6, samples: 4_780, baselineRecall: 28.6 },
+    /**
+     * The lane-based benign-gate FP rates (enforce ~0.24% / hunt ~9%, "65K
+     * samples") were withdrawn by ATR on 2026-09-19 and must not be cited.
+     * Re-measurement is pending.
+     */
+    asOf: '2026-10-14',
   },
   /**
    * 2026-04 wild scan of published agent skills.

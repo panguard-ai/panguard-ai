@@ -773,8 +773,7 @@
       "badgePlatforms": "15 種 agent runtime",
       "badgeLicense": "MIT · 永久免費",
       "badgeScanned": "已掃 {count} Skills",
-      "badgeRecall": "Garak 97.2% 召回率",
-      "badgeCisco": "7 個組織已 merge · NIST OSCAL 提交審查中",
+      "badgeCisco": "規則已合併上游",
       "badgeSafeMcp": "SAFE-MCP 91.8% coverage"
     },
     "installHero": {
@@ -789,7 +788,6 @@
       "ctaScan": "先掃一個 skill 試試 →",
       "ctaDocs": "看快速上手指南",
       "badgeRules": "{count} 條 ATR 規則",
-      "badgeRecall": "Garak 97.2% 召回率",
       "badgeMerged": "已合併上游：Cisco + Microsoft",
       "badgeLicense": "MIT · 永久免費",
       "platformLabel": "自動偵測你的 AI agent：",
@@ -1553,7 +1551,7 @@
     },
     "founder": {
       "title": "一個看到缺口的創辦人，從零開始建造",
-      "desc": "PanGuard 的起點是創辦人——一個跨領域背景的 builder（業務、行銷、嘻哈音樂節製作人）——自學寫程式後發現：AI Agent 正在安裝有完整系統存取權的工具，卻零安全審查。幾個月內，ATR 成長到 747 條偵測規則、被 Cisco AI Defense 採用、在野掃描了 96,096 個 Skills(1,302 個被標記、552 個確認惡意)、並在自建的 498 筆 SKILL.md 語料上達到 100% 召回率（97% 精確率、0.2% 誤報率）。立足台灣，服務全球。"
+      "desc": "PanGuard 的起點是創辦人——一個跨領域背景的 builder（業務、行銷、嘻哈音樂節製作人）——自學寫程式後發現：AI Agent 正在安裝有完整系統存取權的工具，卻零安全審查。這成了 Agent Threat Rules（ATR）：一套 MIT 授權的開放偵測規則，規則已被合併進多個開源專案，包括 Cisco 的 skill-scanner。立足台灣，服務全球。"
     }
   },
   "openSource": {
@@ -6570,7 +6568,7 @@
       "card1Kicker": "ATR",
       "card1Title": "規則",
       "card1Tag": "the Sigma layer",
-      "card1Body": "{count} 條可執行偵測規則。確定性、本地優先、簽章輸出。",
+      "card1Body": "{count} 條可執行偵測規則。確定性、本地優先。",
       "card2Kicker": "ATD",
       "card2Title": "分類法",
       "card2Tag": "the ATT&CK layer",
@@ -6578,7 +6576,7 @@
       "card3Kicker": "ENGINE",
       "card3Title": "隨處可跑",
       "card3Tag": "deterministic · local-first",
-      "card3Body": "零遙測、簽章輸出——政府與主權單位也能自己跑偵測，不用經過任何外國廠商。",
+      "card3Body": "零遙測——政府與主權單位也能自己跑偵測，不用經過任何外國廠商。",
       "crosswalks": "對映 10 個框架：EU AI Act · NIST AI RMF · ISO/IEC 42001 · OWASP Agentic · OWASP LLM · MITRE ATLAS · SAFE-MCP · CWE · Five Eyes · CISA KEV",
       "cta": "讀標準全文"
     },
@@ -6586,11 +6584,11 @@
       "eyebrow": "05 / IT RUNS",
       "title": "它真的在跑。<sage>這是攻擊被抓到的樣子。</sage>",
       "terminalCaption": "真實的 pga scan 輸出——掃的是 2026-07-02 從 OpenClaw 生態抓下來、已確認惡意的 skill，不是示意圖（擷取當時為 ATR v3.5.3 bundle，規則庫此後持續增長）。",
-      "b1Label": "HackAPrompt recall（基線 28.6%）· 100% precision",
-      "b2Label": "PINT 格式語料 precision（recall 63.6%）",
-      "b3Label": "Garak recall",
-      "b4Label": "SKILL.md recall / 誤報率",
-      "honesty": "全部是語料庫層級、Layer 1（確定性規則）的實測，每次對外引用前重驗。在 65,000 筆 benign 樣本的 gate 上，誤報率分 lane：enforce ~0.24%、hunt（預設）~9%——不存在單一混合數字，我們也不硬湊一個。",
+      "b1Label": "HackAPrompt recall（基線 28.6%）· 純攻擊語料，precision 無定義",
+      "b2Label": "自建 PINT 格式語料的 precision（recall {recall}%）",
+      "b3Label": "garak recall · hunt lane，部分 closed-book",
+      "b4Label": "SKILL.md recall · hunt lane，樣本內",
+      "honesty": "全部是語料庫層級、Layer 1（確定性規則）的實測，每次對外引用前重驗。recall 都是 hunt lane（預設，載入全部規則）的數字；開啟 blocking 時用的 enforce lane 抓到的少很多。garak 數字部分是 closed-book：有些規則就是從這份語料寫出來的。SKILL.md 數字是樣本內量測。我們以前引用的 benign gate 誤報率已於 2026-09-19 撤回，等待重新量測。",
       "kicker": "DETECTION — MEASURED, NOT CLAIMED",
       "cta": "看完整 benchmark"
     },
@@ -6727,11 +6725,11 @@
     "measured": {
       "eyebrow": "MEASURED, NOT CLAIMED",
       "title": "偵測數字，<sage>你可以自己重跑。</sage>",
-      "b1Label": "HackAPrompt recall（基線 28.6%）· 100% precision",
-      "b2Label": "PINT 格式語料 precision(recall 63.6%)",
-      "b3Label": "Garak recall",
-      "b4Label": "SKILL.md recall / 誤報率",
-      "honesty": "全部是語料庫層級、Layer 1（確定性規則）的實測，每次對外引用前重驗。在 65,000 筆 benign 樣本的 gate 上，誤報率分 lane:enforce ~0.24%、hunt（預設）~9%——不存在單一混合數字，我們也不硬湊一個。",
+      "b1Label": "HackAPrompt recall（基線 28.6%）· 純攻擊語料，precision 無定義",
+      "b2Label": "自建 PINT 格式語料的 precision（recall {recall}%）",
+      "b3Label": "garak recall · hunt lane，部分 closed-book",
+      "b4Label": "SKILL.md recall · hunt lane，樣本內",
+      "honesty": "全部是語料庫層級、Layer 1（確定性規則）的實測，每次對外引用前重驗。recall 都是 hunt lane（預設，載入全部規則）的數字；開啟 blocking 時用的 enforce lane 抓到的少很多。garak 數字部分是 closed-book：有些規則就是從這份語料寫出來的。SKILL.md 數字是樣本內量測。我們以前引用的 benign gate 誤報率已於 2026-09-19 撤回，等待重新量測。",
       "cta": "方法論與原始資料"
     },
     "platforms": {

@@ -238,8 +238,8 @@ export const COMPARE: ComparisonEntry[] = [
       {
         feature: 'Garak benchmark recall',
         featureZh: 'Garak benchmark 召回率',
-        atr: `${STATS.benchmark.garak.recall}% on ${STATS.benchmark.garak.samples}-sample corpus`,
-        atrZh: `${STATS.benchmark.garak.samples} 個樣本語料庫上 ${STATS.benchmark.garak.recall}%`,
+        atr: `${STATS.benchmark.garak.recall}% on ${STATS.benchmark.garak.samples}-sample in-the-wild set (hunt lane, partly closed-book)`,
+        atrZh: `${STATS.benchmark.garak.samples} 個樣本的實戰越獄集上 ${STATS.benchmark.garak.recall}%（hunt lane，部分 closed-book）`,
         other: '—',
         winner: 'atr',
       },
