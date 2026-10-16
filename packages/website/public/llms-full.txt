@@ -7,7 +7,7 @@ is generated on every site build from the panguard-ai repository:
 - src/lib/atr-rules-compiled.ts (the rule index)
 - src/data/blog-posts.ts (recent writing)
 
-Last generated: 2026-10-15T22:01:15.520Z
+Last generated: 2026-10-16T19:35:53.152Z
 To regenerate: `pnpm gen:llms` in packages/website/.
 
 ---
