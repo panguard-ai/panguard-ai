@@ -228,8 +228,8 @@ export default function EnterpriseContent() {
               <div className="space-y-4 text-[14px] text-text-secondary leading-[1.85]">
                 <p>
                   {isZh
-                    ? '客戶可在 draft 規則公開前 30 天即取得，便於在攻擊曝光前完成內部部署測試。客戶在 Migrator 中精修出來的規則，也可以選擇回流到 ATR 上游——一旦 merge，便走上 ATR 規則被合併進 Cisco AI Defense（production skill-scanner 規則包，PR #99）與 Microsoft AGT（community-rules 範例，PR #1277）的同一條上游路徑，協助把貴公司的偵測知識資產推廣到採用 ATR 的各 repo——維護者接受的貢獻，非廠商背書。'
-                    : 'Customers receive draft rules 30 days before public release, allowing internal deployment testing before attacks become public. Rules refined inside Migrator can also be sent back upstream — once merged into ATR, they travel the same upstream path by which ATR rules were merged into Cisco AI Defense (production skill-scanner rule packs, PR #99) and Microsoft AGT (community-rules examples, PR #1277), helping distribute your detection IP across repos that consume ATR — maintainer-accepted contributions, not vendor endorsements.'}
+                    ? '客戶可在 draft 規則公開前 30 天即取得，便於在攻擊曝光前完成內部部署測試。客戶在 Migrator 中精修出來的規則，也可以選擇回流到 ATR 上游——一旦 merge，便走上 ATR 規則被合併進開源 cisco-ai-defense/skill-scanner repo（PR #99）與 Microsoft AGT 範例（PR #2308 + #3025）的同一條上游路徑，協助把貴公司的偵測知識資產推廣到採用 ATR 的各 repo——維護者接受的貢獻，非廠商背書。'
+                    : 'Customers receive draft rules 30 days before public release, allowing internal deployment testing before attacks become public. Rules refined inside Migrator can also be sent back upstream — once merged into ATR, they travel the same upstream path by which ATR rules were merged into the open-source cisco-ai-defense/skill-scanner repository (PR #99) and Microsoft AGT examples (PR #2308 + #3025), helping distribute your detection IP across repos that consume ATR — maintainer-accepted contributions, not vendor endorsements.'}
                 </p>
               </div>
 
@@ -486,8 +486,8 @@ export default function EnterpriseContent() {
             }
             subtitle={
               isZh
-                ? `ATR 規則已被合併進上游廠商的規則包——由維護者接受的貢獻，非廠商背書。${STATS.totalRulesDisplay} 條 ATR 規則包已合併進 Cisco AI Defense skill-scanner 規則包並用於 production（PR #99）；${STATS.adoption.microsoftRulesMerged} 條已合併進 Microsoft AGT 的 community-rules 範例（PR #1277）；NVIDIA garak 的整合正在進行中。若貴公司的產品需要精修到 Cisco 已合併 PR 品質的版本——包含 draft 規則的早期存取、五大框架合規 metadata，以及白標部署——OEM tier 是為這個情境設計的方案。`
-                : `ATR rules have been merged upstream into vendor rule packs — maintainer-accepted contributions, not vendor endorsements. The ${STATS.totalRulesDisplay}-rule ATR pack is merged into Cisco AI Defense skill-scanner rule packs, in production (PR #99); ${STATS.adoption.microsoftRulesMerged} rules are merged into Microsoft AGT community-rules examples (PR #1277); NVIDIA garak integration is in flight. For vendors who need the Cisco-merge-PR-quality enriched version — early access to draft rules, five-framework compliance metadata, white-label deployment — the OEM tier is purpose-built for that scenario.`
+                ? 'ATR 規則已合併進上游的開源 repo——由維護者接受的貢獻，不是廠商背書：Cisco AI Defense 開源的 skill-scanner repo 收錄了 ATR 規則包（PR #99），Microsoft Agent Governance Toolkit 收錄了 ATR 範例 adapter（PR #2308 + #3025）。若貴公司的產品需要精修版本——包含 draft 規則的早期存取、五大框架合規 metadata，以及白標部署——OEM tier 是為這個情境設計的方案。'
+                : "ATR rules have been merged upstream into open-source repositories — maintainer-accepted contributions, not vendor endorsements: an ATR rule pack in the open-source Cisco AI Defense skill-scanner repository (PR #99) and ATR example adapters in Microsoft's Agent Governance Toolkit (PR #2308 + #3025). For vendors who need an enriched version — early access to draft rules, five-framework compliance metadata, white-label deployment — the OEM tier is purpose-built for that scenario."
             }
           />
 

@@ -23,8 +23,10 @@ export default function LiveStats() {
       value: `${STATS.benchmark.garak.recall}%`,
     },
     {
-      label: isZh ? '已掃描技能' : 'Skills scanned',
-      value: STATS.ecosystem.skillsScanned.toLocaleString(),
+      label: isZh
+        ? `2026-04 野外掃描技能數（引擎 ${STATS.wildScan.engineVersion}）`
+        : `Skills in the 2026-04 wild scan (engine ${STATS.wildScan.engineVersion})`,
+      value: STATS.wildScan.skillsScanned.toLocaleString('en-US'),
     },
   ];
 

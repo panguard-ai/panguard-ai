@@ -1,9 +1,12 @@
 /**
  * Compile ATR YAML rule files into atr-rules-compiled.json for the website.
  *
- * Reads all .yaml files from packages/atr/rules/**\/*.yaml,
- * extracts id, title, severity, category, and detection patterns,
+ * Reads the rule .yaml files of the agent-threat-rules package this workspace
+ * resolves, extracts id, title, severity, category, and detection patterns,
  * and writes the result to packages/website/src/lib/atr-rules-compiled.json.
+ * It also records what the bundle holds in STATS.scanner (src/lib/stats.ts),
+ * so the site's "what the web scanner runs" figures always match the bundle.
+ * CI re-runs this script and fails if any of the three files changes.
  */
 
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
@@ -18,6 +21,10 @@ const ROOT = resolve(import.meta.url.replace('file://', ''), '..', '..');
 // Rules come from agent-threat-rules npm package (not forked packages/atr/rules)
 const RULES_DIR = join(ROOT, 'node_modules', 'agent-threat-rules', 'rules');
 const OUTPUT = join(ROOT, 'packages', 'website', 'src', 'lib', 'atr-rules-compiled.json');
+const STATS_TS = join(ROOT, 'packages', 'website', 'src', 'lib', 'stats.ts');
+const ATR_PACKAGE_VERSION = JSON.parse(
+  readFileSync(join(ROOT, 'node_modules', 'agent-threat-rules', 'package.json'), 'utf8')
+).version;
 
 /** Recursively collect all .yaml files under a directory */
 function collectYamlFiles(dir) {
@@ -104,9 +111,30 @@ console.log(`Compiled ${compiled.length} rules with ${totalPatterns} total patte
 console.log(`Written to ${OUTPUT}`);
 console.log(`Written to ${tsOutput}`);
 
+// Record what the bundle holds, for every page that says what the web scanner runs.
+const SCANNER_FIELD = /^(\s*)scanner:\s*\{[^}]*\}/m;
+const statsSource = readFileSync(STATS_TS, 'utf8');
+if (!SCANNER_FIELD.test(statsSource)) {
+  console.error(
+    `No "scanner: { ... }" field found in ${STATS_TS}; refusing to guess where to write it.`
+  );
+  process.exit(1);
+}
+const underscored = (n) => String(n).replace(/(\d)(?=(\d{3})+$)/g, '$1_');
+writeFileSync(
+  STATS_TS,
+  statsSource.replace(
+    SCANNER_FIELD,
+    `$1scanner: { atrRelease: '${ATR_PACKAGE_VERSION}', rules: ${compiled.length}, patterns: ${underscored(totalPatterns)} }`
+  )
+);
+console.log(
+  `Recorded scanner bundle in ${STATS_TS}: agent-threat-rules ${ATR_PACKAGE_VERSION}, ${compiled.length} rules, ${totalPatterns} patterns`
+);
+
 // Format with prettier so CI diff check passes
 try {
-  execSync(`npx prettier --write "${OUTPUT}" "${tsOutput}"`, { stdio: 'ignore' });
+  execSync(`npx prettier --write "${OUTPUT}" "${tsOutput}" "${STATS_TS}"`, { stdio: 'ignore' });
 } catch {
   // prettier not available — files are still valid
 }

@@ -19,8 +19,8 @@ export async function generateMetadata(props: {
       ? 'ATR Benchmark 結果 — Garak, SKILL.md, PINT, Wild Scan'
       : 'ATR Benchmark Results — Garak, SKILL.md, PINT, Wild Scan',
     description: isZh
-      ? `${STATS.totalRulesDisplay} 條 ATR 規則在公開對抗式語料庫上的實測結果。recall 為 hunt lane（預設）數字：garak 實戰越獄集 ${STATS.benchmark.garak.recall}%（部分 closed-book）、SKILL.md ${STATS.benchmark.skill.recall}%（樣本內）、自建 PINT 格式語料庫 ${STATS.benchmark.pint.recall}%。附可重現方法、原始資料與 Zenodo DOI。benign gate 誤報率已撤回，等待重新量測。`
-      : `Public benchmark results for ${STATS.totalRulesDisplay} ATR rules against adversarial corpora. Recall figures are hunt-lane (the default): ${STATS.benchmark.garak.recall}% on garak's in-the-wild jailbreaks (partly closed-book), ${STATS.benchmark.skill.recall}% on SKILL.md (in-sample), ${STATS.benchmark.pint.recall}% on a self-built PINT-format corpus. Reproducible methodology, raw data, Zenodo DOI. Benign-gate false-positive rates are withdrawn pending re-measurement.`,
+      ? `${STATS.totalRulesDisplay} 條 ATR 規則在公開對抗式語料庫上的實測結果。recall 為 hunt lane（預設）數字：garak 實戰越獄集 ${STATS.benchmark.garak.recall}%（部分 closed-book）、SKILL.md ${STATS.benchmark.skill.recall}%（樣本內）、自建 PINT 格式語料庫 ${STATS.benchmark.pint.recall}%。每個結果都標明語料、方法與 ATR 版本。benign gate 誤報率已撤回，等待重新量測。`
+      : `Public benchmark results for ${STATS.totalRulesDisplay} ATR rules against adversarial corpora. Recall figures are hunt-lane (the default): ${STATS.benchmark.garak.recall}% on garak's in-the-wild jailbreaks (partly closed-book), ${STATS.benchmark.skill.recall}% on SKILL.md (in-sample), ${STATS.benchmark.pint.recall}% on a self-built PINT-format corpus. Each result names its corpus, method and ATR version. Benign-gate false-positive rates are withdrawn pending re-measurement.`,
     alternates: buildAlternates('/research/benchmarks', params.locale),
   };
 }
@@ -68,21 +68,24 @@ const BENCHMARKS: Benchmark[] = [
       { label: 'Lane', zhLabel: 'Lane', value: 'hunt (default)', zhValue: 'hunt（預設）' },
       { label: 'ATR version', zhLabel: 'ATR 版本', value: 'v4.1.5' },
     ],
-    reproduce: 'pnpm bench:garak (in agent-threat-rules repo)',
+    reproduce: 'npx tsx scripts/eval-garak-inthewild.ts (in agent-threat-rules repo)',
     externalLink:
-      'https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/benchmarks/garak.md',
+      'https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/data/measurements/garak/latest.json',
     recordCount: STATS.benchmark.garak.samples,
   },
   {
     slug: 'skill-md',
-    name: 'SKILL.md (PanGuard wild corpus)',
-    zhName: 'SKILL.md（PanGuard 野外語料庫）',
+    name: 'SKILL.md (ATR internal benchmark corpus)',
+    zhName: 'SKILL.md（ATR 內部 benchmark 語料）',
     description:
       'Labeled corpus of 498 AI agent skills from ClawHub, OpenClaw, and Skills.sh: 32 malicious, 466 benign. The benign samples are also the set ATR rules are tuned against, so this is an in-sample check, and its precision and false-positive figures are not cited. Recall is hunt-lane.',
     zhDescription:
       'ClawHub、OpenClaw、Skills.sh 的 AI agent skill 共 498 個:32 個惡意、466 個良性。良性樣本同時是 ATR 規則調校用的那一組，所以這是樣本內檢查，precision 與誤報率不對外引用。recall 是 hunt lane 數字。',
     date: '2026-10-14',
-    source: { label: 'PanGuard Wild Scan dataset', url: 'https://panguard.ai/research/96k-scan' },
+    source: {
+      label: 'ATR internal SKILL.md benchmark corpus',
+      url: 'https://github.com/Agent-Threat-Rule/agent-threat-rules/tree/main/data/skill-benchmark',
+    },
     results: [
       {
         label: 'Recall (hunt lane, in-sample)',
@@ -95,10 +98,11 @@ const BENCHMARKS: Benchmark[] = [
         value: `${STATS.benchmark.skill.samples} samples`,
         zhValue: `${STATS.benchmark.skill.samples} 個樣本`,
       },
+      { label: 'ATR version', zhLabel: 'ATR 版本', value: 'v4.1.5' },
     ],
-    reproduce: 'pnpm bench:skill (in agent-threat-rules repo)',
+    reproduce: 'npx tsx src/eval/skill-benchmark.ts (in agent-threat-rules repo)',
     externalLink:
-      'https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/benchmarks/skill.md',
+      'https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/data/measurements/skill-benchmark/latest.json',
     recordCount: STATS.benchmark.skill.samples,
   },
   {
@@ -106,10 +110,10 @@ const BENCHMARKS: Benchmark[] = [
     name: 'PINT (self-built PINT-format corpus)',
     zhName: 'PINT（自建 PINT 格式語料庫）',
     description:
-      'A self-built 850-sample corpus in PINT format, assembled from the deepset prompt-injections dataset plus Lakera Gandalf. This is NOT Lakera official PINT benchmark and is not attributable to any third party. Lower recall than Garak/SKILL.md reflects the corpus mixing in SIEM-style detection patterns — Sigma migration via PanGuard Migrator closes the gap.',
+      "A self-built 850-sample corpus in PINT format, assembled from the deepset prompt-injections dataset plus Lakera Gandalf. This is NOT Lakera's official PINT benchmark, whose corpus is private, and is not attributable to any third party. It is effectively a prompt-injection-family score, not a measure of overall coverage. Recall is hunt-lane.",
     zhDescription:
-      '自建的 850 樣本 PINT 格式語料庫，由 deepset prompt-injections 資料集加上 Lakera Gandalf 組成。這不是 Lakera 官方 PINT benchmark，也不歸屬於任何第三方。比 Garak/SKILL.md 召回率低，因為語料庫混入了 SIEM 風格的偵測模式——PanGuard Migrator 的 Sigma 轉換能補上這個缺口。',
-    date: '2026-04-22',
+      '自建的 850 樣本 PINT 格式語料庫，由 deepset prompt-injections 資料集加上 Lakera Gandalf 組成。這不是 Lakera 官方的 PINT benchmark（其語料不公開），也不歸屬於任何第三方。它實際上是 prompt-injection 這一類規則的分數，不代表整體覆蓋率。recall 是 hunt lane 數字。',
+    date: '2026-10-14',
     source: {
       label: 'self-built corpus (deepset + Lakera Gandalf)',
       url: 'https://panguard.ai/research/benchmarks#pint',
@@ -133,20 +137,19 @@ const BENCHMARKS: Benchmark[] = [
         value: 'Layer 1 — regex only',
         zhValue: 'Layer 1 — 僅 regex',
       },
+      { label: 'ATR version', zhLabel: 'ATR 版本', value: 'v4.1.5' },
     ],
-    reproduce: 'pnpm bench:pint (in agent-threat-rules repo)',
+    reproduce: 'npm run eval:pint (in agent-threat-rules repo)',
     externalLink:
-      'https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/docs/benchmarks/pint.md',
+      'https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/data/measurements/pint/latest.json',
     recordCount: STATS.benchmark.pint.samples,
   },
   {
     slug: 'wild-scan',
-    name: 'Wild Scan (full ecosystem audit)',
-    zhName: 'Wild Scan（完整生態系稽核）',
-    description:
-      'Live audit of every AI agent skill we could crawl across ClawHub, OpenClaw, Skills.sh. Not a curated benchmark — actual production skills shipped by real authors. Result: 1,302 flagged out of 96,096 scanned, 552 confirmed malware after manual review.',
-    zhDescription:
-      '對 ClawHub、OpenClaw、Skills.sh 上每一個能爬到的 AI agent skill 做實測。不是策展過的 benchmark——是真實作者上架的生產級 skill。結果：96,096 個被掃描的 skill 中 1,302 個被標記，人工複審後 552 個確認為惡意程式。',
+    name: 'Wild Scan (published agent skills, 2026-04)',
+    zhName: 'Wild Scan（已發布 agent skill，2026-04）',
+    description: `Scan of ${STATS.wildScan.skillsScanned.toLocaleString('en-US')} published AI agent skills and MCP servers from five public sources (OpenClaw, ClawHub, Skills.sh, Hermes Agent, and an MCP server crawl), run ${STATS.wildScan.scannedOn} with scan engine ${STATS.wildScan.engineVersion} (${STATS.wildScan.engineRules} ATR rules, not today's rule set): ${STATS.wildScan.flagged.toLocaleString('en-US')} flagged. A flag is a rule match, not a verdict, so no confirmed-malicious count is given, and the record keeps paths and rule ids, not file contents. Not a labeled benchmark: there is no ground truth, so it has no recall or precision.`,
+    zhDescription: `${STATS.wildScan.scannedOn} 以掃描引擎 ${STATS.wildScan.engineVersion}（${STATS.wildScan.engineRules} 條 ATR 規則，不是現在的規則集）掃描五個公開來源（OpenClaw、ClawHub、Skills.sh、Hermes Agent，以及一份 MCP server 爬取資料）上 ${STATS.wildScan.skillsScanned.toLocaleString('en-US')} 個已發布的 AI agent skill 與 MCP server，${STATS.wildScan.flagged.toLocaleString('en-US')} 個被標記。標記是規則命中，不是判定，所以不提供確認為惡意的數量；紀錄只保留路徑與規則 ID，沒有檔案內容。這不是有標註的 benchmark：沒有 ground truth，因此沒有 recall 或 precision。`,
     date: '2026-04-14',
     source: {
       label: 'PanGuard Wild Scan Report',
@@ -156,36 +159,31 @@ const BENCHMARKS: Benchmark[] = [
       {
         label: 'Skills scanned',
         zhLabel: '掃描 skill 數',
-        value: STATS.wildScan.skillsScanned.toLocaleString(),
-      },
-      { label: 'Flagged', zhLabel: '被標記', value: STATS.wildScan.flagged.toLocaleString() },
-      {
-        label: 'Confirmed malware',
-        zhLabel: '確認惡意',
-        value: STATS.wildScan.confirmedMalware.toLocaleString(),
+        value: STATS.wildScan.skillsScanned.toLocaleString('en-US'),
       },
       {
-        label: 'Triple-threat packages',
-        zhLabel: '三重威脅套件',
-        value: STATS.ecosystem.tripleThreat.toString(),
+        label: 'Flagged',
+        zhLabel: '被標記',
+        value: STATS.wildScan.flagged.toLocaleString('en-US'),
       },
       {
-        label: 'Postinstall scripts',
-        zhLabel: 'Postinstall 腳本',
-        value: STATS.ecosystem.postinstallScripts.toString(),
+        label: 'ATR version (scan engine)',
+        zhLabel: 'ATR 版本（掃描引擎）',
+        value: `${STATS.wildScan.engineVersion} (${STATS.wildScan.engineRules} rules)`,
+        zhValue: `${STATS.wildScan.engineVersion}（${STATS.wildScan.engineRules} 條規則）`,
       },
     ],
-    reproduce: 'scripts/wild-scan.ts (in panguard-ai monorepo)',
-    doi: '10.5281/zenodo.19178002',
-    recordCount: 96_096,
+    reproduce:
+      'Not re-runnable: the scan record (data/full-scan-v2-2026-04-14.json in agent-threat-rules) keeps paths and rule ids, not content.',
+    recordCount: STATS.wildScan.skillsScanned,
   },
   {
     slug: 'hackaprompt',
     name: 'HackAPrompt cluster mining',
     zhName: 'HackAPrompt 叢集探勘',
-    description: `ATR run against the HackAPrompt EMNLP 2023 competition corpus (4,780 deterministic samples). Result: ${STATS.benchmark.hackaprompt.recall}% recall, 0 new false positives. The number is honest and below closed-source ML detector claims. Methodology and rule additions documented in the public engineering blog.`,
-    zhDescription: `ATR 對 HackAPrompt EMNLP 2023 競賽語料庫（4,780 個確定性樣本）的實測。結果：${STATS.benchmark.hackaprompt.recall}% recall，0 個新誤報。數字誠實，低於閉源 ML 偵測器的宣稱。方法論與規則更新公開於工程部落格。`,
-    date: '2026-05-11',
+    description: `ATR run against the HackAPrompt EMNLP 2023 competition corpus (4,780 deterministic samples). Result: ${STATS.benchmark.hackaprompt.recall}% recall. Closed-book: ATR mined rules from this corpus's misses, and the ${STATS.benchmark.hackaprompt.baselineRecall}% baseline is ATR's own recall before those rules. The corpus is attack-only, so precision and false-positive rate are mathematically undefined on it and are not reported. Methodology and rule additions documented in the public engineering blog.`,
+    zhDescription: `ATR 對 HackAPrompt EMNLP 2023 競賽語料庫（4,780 個確定性樣本）的實測。結果：${STATS.benchmark.hackaprompt.recall}% recall。這是 closed-book：ATR 從這個語料漏抓的樣本挖出規則，${STATS.benchmark.hackaprompt.baselineRecall}% 是加入這些規則前 ATR 自己的召回率。這個語料只有攻擊樣本，precision 與誤報率在數學上無法定義，因此不列出。方法論與規則更新公開於工程部落格。`,
+    date: '2026-06-16',
     source: {
       label: 'HackAPrompt corpus',
       url: 'https://huggingface.co/datasets/hackaprompt/hackaprompt-dataset',
@@ -197,8 +195,8 @@ const BENCHMARKS: Benchmark[] = [
         value: `${STATS.benchmark.hackaprompt.recall}%`,
       },
       {
-        label: 'Baseline recall',
-        zhLabel: '基線召回率',
+        label: 'ATR recall before these rules',
+        zhLabel: '加入這些規則前的 ATR 召回率',
         value: `${STATS.benchmark.hackaprompt.baselineRecall}%`,
       },
       {
@@ -207,9 +205,9 @@ const BENCHMARKS: Benchmark[] = [
         value: `${STATS.benchmark.hackaprompt.samples.toLocaleString()} deterministic`,
         zhValue: `${STATS.benchmark.hackaprompt.samples.toLocaleString()} 個確定性樣本`,
       },
-      { label: 'New FPs introduced', zhLabel: '新增誤報', value: '0' },
+      { label: 'ATR version', zhLabel: 'ATR 版本', value: 'v3.5.0' },
     ],
-    reproduce: 'pnpm bench:hackaprompt',
+    reproduce: 'npx tsx src/eval/run-hackaprompt-benchmark.ts (in agent-threat-rules repo)',
     externalLink: 'https://panguard.ai/blog/hackaprompt-cluster-mining',
   },
 ];
@@ -265,8 +263,8 @@ export default async function BenchmarkHubPage(props: { params: Promise<{ locale
             </h1>
             <p className="text-lg text-text-secondary mt-6 max-w-2xl leading-relaxed">
               {isZh
-                ? '每一個 benchmark 都附上原始資料來源、可重現的方法論、以及執行的 ATR 版本。沒有 cherry-picking。'
-                : 'Every benchmark below includes the raw data source, reproducible methodology, and ATR version that ran it. No cherry-picking.'}
+                ? '下面每個結果都標明資料來源、方法與執行的 ATR 版本；無法重跑的，條目裡會寫明。'
+                : 'Every result below names its data source, method and the ATR version that ran it. Where a result cannot be re-run, its entry says so.'}
             </p>
             <p className="text-sm text-text-muted mt-4 max-w-2xl leading-relaxed">
               {isZh
@@ -352,7 +350,7 @@ export default async function BenchmarkHubPage(props: { params: Promise<{ locale
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 text-xs text-brand-sage hover:underline"
                     >
-                      {isZh ? '完整方法論' : 'Full methodology'}
+                      {isZh ? '方法與量測紀錄' : 'Method and measurement record'}
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   )}

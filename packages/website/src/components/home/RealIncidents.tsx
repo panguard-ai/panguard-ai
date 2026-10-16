@@ -4,7 +4,6 @@ import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import FadeInUp from '@/components/FadeInUp';
 import { Eyebrow, SectionTitleV2 } from '@/components/home/v2/primitives';
-import { useEcosystemStats } from '@/hooks/useEcosystemStats';
 import { STATS } from '@/lib/stats';
 
 type Severity = 'CRITICAL' | 'HIGH';
@@ -82,12 +81,6 @@ const ease = [0.22, 1, 0.36, 1] as const;
  */
 export default function RealIncidents() {
   const t = useTranslations('home.realIncidents');
-  const eco = useEcosystemStats();
-
-  const scannedSkills = STATS.ecosystem.skillsScanned;
-  const criticalHigh = STATS.ecosystem.findingsCritical + STATS.ecosystem.findingsHigh;
-  const riskPercent =
-    eco.skillsScanned > 0 ? ((criticalHigh / scannedSkills) * 100).toFixed(1) : '13.5';
 
   function handleScanClick() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -164,8 +157,10 @@ export default function RealIncidents() {
         <FadeInUp delay={0.5} className="mt-14 border-t border-border-subtle pt-8">
           <p className="max-w-2xl text-sm leading-relaxed text-text-secondary">
             {t('scanCount', {
-              count: eco.skillsScanned.toLocaleString(),
-              percent: riskPercent,
+              scanned: STATS.wildScan.skillsScanned.toLocaleString('en-US'),
+              flagged: STATS.wildScan.flagged.toLocaleString('en-US'),
+              engine: STATS.wildScan.engineVersion,
+              rules: STATS.wildScan.engineRules,
             })}
           </p>
           <button

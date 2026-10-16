@@ -60,11 +60,11 @@ export const COMPARE: ComparisonEntry[] = [
     framing: {
       en: [
         'Sigma is the open detection standard for SIEM (Security Information and Event Management). Rules describe log patterns — Windows Event ID 4625 with logon type 3 and source IP outside the allowlist — and SIEM engines (Splunk, ELK, Microsoft Sentinel) load and evaluate them. Sigma is a decade old, has thousands of community rules, and is the de-facto language for detection engineering.',
-        `ATR is the open detection standard for AI agents. Rules describe agent-context patterns — \`tool_call.arguments\` containing a base64-encoded reverse shell, \`model_output\` containing markdown image references with credential parameters, \`agent_event.event_type\` of unauthorized_file_read — and ATR engines like PanGuard Guard load and evaluate them (ATR rules are also merged upstream into Cisco AI Defense's skill-scanner rule packs, in production, and Microsoft AGT's community-rules examples). ATR is two years old, has ${STATS.totalRulesDisplay} rules, and is becoming the de-facto language for AI agent detection.`,
+        `ATR is the open detection standard for AI agents. Rules describe agent-context patterns — \`tool_call.arguments\` containing a base64-encoded reverse shell, \`model_output\` containing markdown image references with credential parameters, \`agent_event.event_type\` of unauthorized_file_read — and ATR engines like PanGuard Guard load and evaluate them (ATR rules are also merged upstream into the open-source Cisco AI Defense skill-scanner repository and Microsoft AGT's examples). ATR is two years old, has ${STATS.totalRulesDisplay} rules, and is becoming the de-facto language for AI agent detection.`,
       ],
       zh: [
         'Sigma 是 SIEM（Security Information and Event Management）的開放偵測標準。規則描述 log 模式——Windows Event ID 4625 加上 logon type 3 加上來源 IP 在 allowlist 之外——SIEM 引擎（Splunk、ELK、Microsoft Sentinel）載入並執行。Sigma 已經十年，有數千條社群規則，是偵測工程的事實標準語言。',
-        `ATR 是 AI agent 的開放偵測標準。規則描述 agent-context 模式——\`tool_call.arguments\` 包含 base64 編碼的 reverse shell、\`model_output\` 包含夾帶憑證參數的 markdown 圖片參照、\`agent_event.event_type\` 為 unauthorized_file_read——ATR 引擎（如 PanGuard Guard）載入並執行（ATR 規則也已 merge 上游進 Cisco AI Defense skill-scanner 的規則包，運行於生產環境，以及 Microsoft AGT 的 community-rules 範例）。ATR 兩年歷史，${STATS.totalRulesDisplay} 條規則，正在成為 AI agent 偵測的事實標準語言。`,
+        `ATR 是 AI agent 的開放偵測標準。規則描述 agent-context 模式——\`tool_call.arguments\` 包含 base64 編碼的 reverse shell、\`model_output\` 包含夾帶憑證參數的 markdown 圖片參照、\`agent_event.event_type\` 為 unauthorized_file_read——ATR 引擎（如 PanGuard Guard）載入並執行（ATR 規則也已 merge 上游進開源的 Cisco AI Defense skill-scanner repo，以及 Microsoft AGT 的範例）。ATR 兩年歷史，${STATS.totalRulesDisplay} 條規則，正在成為 AI agent 偵測的事實標準語言。`,
       ],
     },
     rows: [
@@ -116,9 +116,9 @@ export const COMPARE: ComparisonEntry[] = [
       {
         feature: 'Ecosystem footprint',
         featureZh: '生態足跡',
-        atr: 'ATR rules merged upstream — Cisco AI Defense skill-scanner (in production), Microsoft AGT community examples, MISP, OWASP A-S-R-H — maintainer-accepted contributions, not vendor endorsements',
+        atr: 'ATR rules merged upstream — the open-source Cisco AI Defense skill-scanner repository, Microsoft AGT examples, MISP, OWASP A-S-R-H — maintainer-accepted contributions, not vendor endorsements',
         atrZh:
-          'ATR 規則已 merge 上游——Cisco AI Defense skill-scanner（生產環境）、Microsoft AGT community 範例、MISP、OWASP A-S-R-H——維護者接受的貢獻，非廠商背書',
+          'ATR 規則已 merge 上游——開源的 Cisco AI Defense skill-scanner repo、Microsoft AGT 範例、MISP、OWASP A-S-R-H——維護者接受的貢獻，非廠商背書',
         other: 'Splunk, Elastic, Microsoft Sentinel, Sumo Logic, every SIEM',
         otherZh: 'Splunk、Elastic、Microsoft Sentinel、Sumo Logic 及所有 SIEM',
         winner: 'other',
@@ -246,8 +246,8 @@ export const COMPARE: ComparisonEntry[] = [
       {
         feature: 'Integration',
         featureZh: '整合',
-        atr: 'PanGuard Guard, Microsoft AGT, Cisco AI Defense',
-        atrZh: 'PanGuard Guard、Microsoft AGT、Cisco AI Defense',
+        atr: 'PanGuard Guard, Microsoft AGT examples, the open-source cisco-ai-defense/skill-scanner repository',
+        atrZh: 'PanGuard Guard、Microsoft AGT 範例、開源的 cisco-ai-defense/skill-scanner repo',
         other: 'CLI tool, GitHub Actions',
         otherZh: 'CLI 工具、GitHub Actions',
         winner: 'tie',
@@ -350,8 +350,8 @@ export const COMPARE: ComparisonEntry[] = [
       },
     ],
     chooseAtr: {
-      en: 'You are operating an AI agent in production and need to detect exploits in real time. ATR runs at sub-millisecond per rule and integrates with PanGuard Guard, Microsoft AGT, Cisco AI Defense, and any runtime that can evaluate YAML.',
-      zh: '你在生產環境跑 AI agent，需要即時偵測 exploit。ATR 以亞毫秒級每規則執行，可整合到 PanGuard Guard、Microsoft AGT、Cisco AI Defense、以及任何能評估 YAML 的 runtime。',
+      en: 'You are operating an AI agent in production and need to detect exploits in real time. ATR runs at sub-millisecond per rule in PanGuard Guard or any runtime that can evaluate YAML; ATR rules have also been merged into Microsoft AGT examples and the open-source cisco-ai-defense/skill-scanner repository.',
+      zh: '你在生產環境跑 AI agent，需要即時偵測 exploit。ATR 以亞毫秒級每規則執行，可用於 PanGuard Guard 或任何能評估 YAML 的 runtime；ATR 規則也已合併進 Microsoft AGT 範例與開源的 cisco-ai-defense/skill-scanner repo。',
     },
     chooseOther: {
       en: 'You are running a red-team program against an AI system. You need to author attack campaigns, manage targets, and measure success rates. PyRIT is the Python-native framework Microsoft uses internally and it is the most mature open-source option.',
@@ -479,27 +479,27 @@ export const COMPARE: ComparisonEntry[] = [
       zh: 'PanGuard AI vs Cisco DefenseClaw — 開放標準 vs 企業平台',
     },
     oneLiner: {
-      en: `Cisco DefenseClaw is a full enterprise AI security platform. PanGuard AI is the open standard plus commercial platform — same scope, different starting point. ATR rules are merged into Cisco AI Defense's skill-scanner rule packs, in production (PR #99, now ${STATS.totalRulesDisplay} rules via auto-sync) — a maintainer-accepted upstream contribution, not a vendor endorsement — so there is no peer competition at the rule layer.`,
-      zh: `Cisco DefenseClaw 是完整企業 AI 安全平台。PanGuard AI 是開放標準加商業平台——範圍相同，起點不同。ATR 規則已 merge 進 Cisco AI Defense 的 skill-scanner 規則包、運行於生產環境（PR #99，經自動同步現為 ${STATS.totalRulesDisplay} 條）——這是維護者接受的上游貢獻，非廠商背書——所以規則層沒有 peer 競爭。`,
+      en: `Cisco DefenseClaw is a full enterprise AI security platform. PanGuard AI is the open standard plus commercial platform — same scope, different starting point. An ATR rule pack was merged into the open-source cisco-ai-defense/skill-scanner repository (PR #99) — a maintainer-accepted upstream contribution, not a vendor endorsement, and not a statement about DefenseClaw.`,
+      zh: `Cisco DefenseClaw 是完整企業 AI 安全平台。PanGuard AI 是開放標準加商業平台——範圍相同，起點不同。ATR 規則包已透過 PR #99 合併進開源的 cisco-ai-defense/skill-scanner repo——這是維護者接受的上游貢獻，非廠商背書，也不代表 DefenseClaw 的任何情況。`,
     },
     framing: {
       en: [
         "Cisco DefenseClaw (positioned at RSA 2026) is a packaged enterprise AI security platform — runtime, dashboard, integrations, SLA, the works. It is sold to F500-grade buyers as a single product with Cisco's sales motion behind it. The differentiator is enterprise infrastructure integration and Cisco's existing customer relationships.",
-        `PanGuard AI takes a different approach: ship the open rule standard (ATR) first, build the commercial platform on top. ATR is MIT-licensed, and its rules are merged into Cisco AI Defense's skill-scanner rule packs, in production, via PR #99 (merged 2026-04-22, auto-syncs to latest, ${STATS.totalRulesDisplay} rules) — a maintainer-accepted upstream contribution, not a vendor endorsement. So this is not really a competition at the rule layer. The competition is at the platform layer: who has the better runtime, compliance evidence, and migration tooling.`,
+        `PanGuard AI takes a different approach: ship the open rule standard (ATR) first, build the commercial platform on top. ATR is MIT-licensed, and an ATR rule pack was merged into the open-source cisco-ai-defense/skill-scanner repository via PR #99 (2026-04-22) — a maintainer-accepted upstream contribution, not a vendor endorsement, and not a statement about DefenseClaw. The comparison that matters is at the platform layer: who has the better runtime, compliance evidence, and migration tooling.`,
       ],
       zh: [
         'Cisco DefenseClaw （RSA 2026 推出） 是打包好的企業 AI 安全平台——runtime、dashboard、整合、SLA，一應俱全。賣給 F500 級買家的單一產品，背後有 Cisco 的銷售動能。差異化點是企業基礎設施整合與 Cisco 既有客戶關係。',
-        `PanGuard AI 採不同路徑：先 ship 開放規則標準（ATR），再在上面建商業平台。ATR 是 MIT 授權，其規則已 merge 進 Cisco AI Defense 的 skill-scanner 規則包、運行於生產環境，透過 PR #99（2026-04-22 合併，自動同步至最新，${STATS.totalRulesDisplay} 條）——這是維護者接受的上游貢獻，非廠商背書。所以這在規則層其實不算競爭。競爭在平台層：誰有更好的 runtime、合規 evidence、migration 工具。`,
+        `PanGuard AI 採不同路徑：先 ship 開放規則標準（ATR），再在上面建商業平台。ATR 是 MIT 授權，ATR 規則包已透過 PR #99（2026-04-22）合併進開源的 cisco-ai-defense/skill-scanner repo——這是維護者接受的上游貢獻，非廠商背書，也不代表 DefenseClaw 的任何情況。真正該比較的是平台層：誰有更好的 runtime、合規 evidence、migration 工具。`,
       ],
     },
     rows: [
       {
         feature: 'Rule standard',
         featureZh: '規則標準',
-        atr: `ATR (open, MIT, ${STATS.totalRulesDisplay} rules) — merged into Cisco AI Defense skill-scanner (PR #99)`,
-        atrZh: `ATR（開放、MIT、${STATS.totalRulesDisplay} 條規則）——已 merge 進 Cisco AI Defense skill-scanner（PR #99）`,
-        other: 'Same rule pack — merged into Cisco AI Defense skill-scanner (PR #99)',
-        otherZh: '相同規則包——已 merge 進 Cisco AI Defense skill-scanner（PR #99）',
+        atr: `ATR (open, MIT, ${STATS.totalRulesDisplay} rules) — a rule pack merged into the open-source Cisco AI Defense skill-scanner repository (PR #99)`,
+        atrZh: `ATR（開放、MIT、${STATS.totalRulesDisplay} 條規則）——規則包已合併進開源的 Cisco AI Defense skill-scanner repo（PR #99）`,
+        other: "Cisco's own detection content",
+        otherZh: 'Cisco 自有的偵測內容',
         winner: 'tie',
       },
       {
@@ -575,8 +575,8 @@ export const COMPARE: ComparisonEntry[] = [
       zh: '你是 Cisco 用戶。Cisco 在你的 DR、SD-WAN、XDR。DefenseClaw 接到既有的 Cisco 基礎設施，你的採購、支援、SLA 關係已經在 Cisco。企業整合成本近乎零。',
     },
     bottomLine: {
-      en: "These are not actually competitors at the layer that matters. ATR's rules are merged into Cisco AI Defense's skill-scanner rule packs, in production (PR #99) — a maintainer-accepted upstream contribution, not a vendor endorsement — so both platforms operate on the same rule set. The choice is between Cisco's commercial bundle (heavyweight, integrated, expensive) and PanGuard's open-plus-commercial model (lightweight, vendor-neutral, scales from $0 to $20M). If you are already a Cisco customer, the integration advantage probably wins. Everyone else benefits more from PanGuard's open posture.",
-      zh: '在關鍵的那一層，這兩家其實不算對手。ATR 規則已 merge 進 Cisco AI Defense 的 skill-scanner 規則包、運行於生產環境（PR #99）——這是維護者接受的上游貢獻，非廠商背書——所以兩個平台運行的是同一套規則集。選擇在於 Cisco 的商業 bundle（重量級、整合、貴）vs PanGuard 的開放+商業模式（輕量、廠商中立、從 $0 規模到 $20M）。如果你已經是 Cisco 客戶，整合優勢大概會贏。其他人從 PanGuard 的開放姿態獲益更多。',
+      en: "At the rule layer ATR is open: an ATR rule pack was merged into the open-source Cisco AI Defense skill-scanner repository (PR #99), a maintainer-accepted upstream contribution rather than a vendor endorsement, and not a claim about DefenseClaw. The choice is between Cisco's commercial bundle (heavyweight, integrated, expensive) and PanGuard's open-plus-commercial model (lightweight, vendor-neutral, scales from $0 to $20M). If you are already a Cisco customer, the integration advantage probably wins. Everyone else benefits more from PanGuard's open posture.",
+      zh: '在規則層，ATR 是開放的：ATR 規則包已合併進開源的 Cisco AI Defense skill-scanner repo（PR #99），這是維護者接受的上游貢獻，不是廠商背書，也不代表 DefenseClaw 的任何情況。選擇在於 Cisco 的商業 bundle（重量級、整合、貴）vs PanGuard 的開放+商業模式（輕量、廠商中立、從 $0 規模到 $20M）。如果你已經是 Cisco 客戶，整合優勢大概會贏。其他人從 PanGuard 的開放姿態獲益更多。',
     },
     references: [
       {
@@ -584,7 +584,7 @@ export const COMPARE: ComparisonEntry[] = [
         url: 'https://www.cisco.com/site/us/en/products/security/ai-defense/',
       },
       {
-        label: 'Cisco skill-scanner PR #99 (ATR adoption)',
+        label: 'Cisco skill-scanner PR #99 (ATR rule pack merged)',
         url: 'https://github.com/cisco-ai-defense/skill-scanner/pull/99',
       },
       { label: 'PanGuard AI', url: 'https://panguard.ai' },

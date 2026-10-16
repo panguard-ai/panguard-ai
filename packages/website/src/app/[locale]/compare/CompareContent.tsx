@@ -264,8 +264,8 @@ function EvidenceSection() {
         overline={isZh ? '真實數據' : 'Real data'}
         title={
           isZh
-            ? `我們掃描了 ${STATS.ecosystem.skillsScanned.toLocaleString()} 個 MCP skill。這是我們的發現。`
-            : `We scanned ${STATS.ecosystem.skillsScanned.toLocaleString()} MCP skills. Here's what we found.`
+            ? '2026 年 3 月 MCP 生態系掃描的真實發現'
+            : 'Real findings from our March 2026 MCP ecosystem scan'
         }
         subtitle={
           isZh
@@ -297,23 +297,12 @@ function EvidenceSection() {
           ))}
         </div>
         <p className="text-center text-sm text-text-muted mt-6">
-          {isZh ? (
-            <>
-              掃描 {STATS.ecosystem.skillsScanned.toLocaleString()} 個 skill，發現{' '}
-              {STATS.ecosystem.findingsCritical} 個 CRITICAL + {STATS.ecosystem.findingsHigh} 個
-              HIGH。{STATS.ecosystem.findingsClean.toLocaleString()} 個 skill（
-              {((STATS.ecosystem.findingsClean / STATS.ecosystem.skillsScanned) * 100).toFixed(1)}
-              %）為乾淨。
-            </>
-          ) : (
-            <>
-              {STATS.ecosystem.findingsCritical} CRITICAL + {STATS.ecosystem.findingsHigh} HIGH
-              findings out of {STATS.ecosystem.skillsScanned.toLocaleString()} skills scanned.{' '}
-              {STATS.ecosystem.findingsClean.toLocaleString()} skills (
-              {((STATS.ecosystem.findingsClean / STATS.ecosystem.skillsScanned) * 100).toFixed(1)}
-              %) are clean.
-            </>
-          )}
+          <Link
+            href="/research/mcp-ecosystem-scan"
+            className="text-brand-sage underline underline-offset-2"
+          >
+            {isZh ? '完整報告：方法與數字' : 'Full report: method and numbers'}
+          </Link>
         </p>
       </FadeInUp>
     </SectionWrapper>
@@ -436,9 +425,9 @@ function DetailedComparisons() {
       slug: 'atr-vs-cisco-defenseclaw',
       title: 'PanGuard vs Cisco DefenseClaw',
       blurb:
-        'Open standard plus commercial platform vs enterprise bundle. ATR rules merged into Cisco AI Defense skill-scanner rule packs, in production (PR #99).',
+        'Open standard plus commercial platform vs enterprise bundle. An ATR rule pack is merged into the open-source Cisco AI Defense skill-scanner repository (PR #99).',
       blurbZh:
-        '開放標準加商業平台 vs 企業 bundle。ATR 規則已 merge 進 Cisco AI Defense 的 skill-scanner 規則包（生產環境，PR #99）。',
+        '開放標準加商業平台 vs 企業 bundle。ATR 規則包已合併進開源的 Cisco AI Defense skill-scanner repo（PR #99）。',
     },
   ];
 

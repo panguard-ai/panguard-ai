@@ -10,7 +10,7 @@ const DEMOS: readonly { key: string; image: string; alt: string; width: number; 
     {
       key: 'overview',
       image: '/demo/dashboard-overview.png',
-      alt: 'PanGuard dashboard Overview — PROTECTED posture at a glance, 747 ATR rules active, both detection layers on-device and active, optional Layer C and collective defense off by default',
+      alt: 'PanGuard dashboard Overview — PROTECTED posture at a glance, ATR rules active, both detection layers on-device and active, optional Layer C and collective defense off by default',
       width: 1920,
       height: 1080,
     },
@@ -38,7 +38,7 @@ const DEMOS: readonly { key: string; image: string; alt: string; width: number; 
     {
       key: 'rules',
       image: '/demo/dashboard-rules.png',
-      alt: 'PanGuard Rules — all 747 loaded ATR detection rules with severity, searchable; updates apply only on pga upgrade, never auto-pulled',
+      alt: 'PanGuard Rules — the loaded ATR detection rules with severity, searchable; updates apply only on pga upgrade, never auto-pulled',
       width: 1920,
       height: 1080,
     },
