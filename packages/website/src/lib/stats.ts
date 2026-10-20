@@ -318,7 +318,7 @@ export const STATS = {
     upstreamMerged: ['Microsoft AGT', 'Cisco AI Defense'] as const,
   },
   /** Written by the ATR Stats Sync Bot. */
-  lastUpdated: '2026-10-15T20:51:49.269Z',
+  lastUpdated: '2026-10-19T18:21:56.335Z',
 } as const;
 
 export type Stats = typeof STATS;
