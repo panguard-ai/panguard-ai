@@ -33,23 +33,23 @@ export const STATS = {
    * outward count. They describe the ATR standard. The panguard.ai web scanner
    * runs a separate, older bundle: see `scanner` below.
    */
-  atrVersion: '4.2.0',
+  atrVersion: '4.2.1',
   /**
    * Effective rules in the shipped npm package (v4.1.5: 829 rule files, of
    * which 5 draft and 2 deprecated are not loaded by the engine, so 822).
    * Written by the ATR Stats Sync Bot; do not hand-edit.
    */
-  atrRules: 835,
+  atrRules: 836,
   /**
    * Detection conditions across the same effective rules (npm 4.1.5: 3,416).
    * Written by the ATR Stats Sync Bot alongside atrRules; do not hand-edit.
    */
-  atrPatterns: 3_445,
-  totalRules: 835,
+  atrPatterns: 3_453,
+  totalRules: 836,
   /** Use this for all user-facing display — avoids stale hardcoded counts. */
-  totalRulesDisplay: '835' as const,
+  totalRulesDisplay: '836' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '835' as const,
+  atrRulesDisplay: '836' as const,
   /**
    * What the panguard.ai web scanner (/api/scan) runs: src/lib/atr-rules-compiled.json,
    * the effective rules of the agent-threat-rules release this workspace resolves,
@@ -318,7 +318,7 @@ export const STATS = {
     upstreamMerged: ['Microsoft AGT', 'Cisco AI Defense'] as const,
   },
   /** Written by the ATR Stats Sync Bot. */
-  lastUpdated: '2026-10-23T19:35:29.646Z',
+  lastUpdated: '2026-10-24T01:49:19.354Z',
 } as const;
 
 export type Stats = typeof STATS;
