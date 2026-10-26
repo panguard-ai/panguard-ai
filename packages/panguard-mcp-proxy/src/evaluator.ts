@@ -8,7 +8,7 @@
  */
 
 import { ATREngine } from '@panguard-ai/atr';
-import type { AgentEvent } from '@panguard-ai/atr';
+import type { AgentEvent, ATRRule } from '@panguard-ai/atr';
 import { resolve, dirname, join } from 'node:path';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
@@ -131,8 +131,38 @@ export function shouldHardDeny(rule: RuleLike, builtinToolSurface = false): bool
   return rule.severity === 'high' && rule.maturity === 'stable';
 }
 
+/** What the verdict reads from one engine match. */
+export interface EvaluatorMatch {
+  readonly rule: RuleLike & { readonly id: string; readonly title: string };
+  readonly confidence: number;
+}
+
+/**
+ * The slice of an ATR engine this evaluator drives. The workspace engine
+ * (@panguard-ai/atr) satisfies it, and so does the ATREngine of another
+ * agent-threat-rules release that a caller pins and injects (the Open Responses
+ * gateway runs 4.x, whose tool-definition scope the workspace 3.5.x lacks).
+ */
+export interface EvaluatorEngine {
+  loadRules(): Promise<number>;
+  evaluate(event: AgentEvent): readonly EvaluatorMatch[];
+  getRules(): readonly { readonly id: string }[];
+  addRule(rule: ATRRule): void;
+}
+
+export interface ProxyEvaluatorOptions {
+  /**
+   * Engine to evaluate with. Default: the workspace ATR engine over the rules
+   * of the installed agent-threat-rules package. The deny policy, advise-only
+   * gate, blocklist and fail-closed handling below apply to either.
+   */
+  readonly engine?: EvaluatorEngine;
+  /** Guard blocklist file. Default: ~/.panguard-guard/blocked-tools.json. */
+  readonly blocklistPath?: string;
+}
+
 export class ProxyEvaluator {
-  private readonly engine: ATREngine;
+  private readonly engine: EvaluatorEngine;
   private rulesLoaded = false;
   private ruleCount = 0;
   /**
@@ -149,16 +179,16 @@ export class ProxyEvaluator {
   private blocklistMtime = 0;
   private blocklistSize = 0;
 
-  constructor() {
-    const rulesDir = findRulesDir();
+  constructor(options: ProxyEvaluatorOptions = {}) {
     // 'hunt' detection (every rule) so we never MISS an attack in a tool call —
     // incl. the broad workhorse rule ATR-2026-00001 (stable but confirm:embedding,
     // which an 'enforce' sync lane would silently drop since this proxy ships no
     // embedding model). FP-safety is enforced at the DENY gate instead: a match
     // only HARD-denies a live tool call when it is a proven rule (see evaluate());
     // unproven matches degrade to 'ask' rather than breaking the agent.
-    this.engine = new ATREngine({ rulesDir });
-    this.blocklistPath = join(homedir(), '.panguard-guard', 'blocked-tools.json');
+    this.engine = options.engine ?? new ATREngine({ rulesDir: findRulesDir() });
+    this.blocklistPath =
+      options.blocklistPath ?? join(homedir(), '.panguard-guard', 'blocked-tools.json');
     this.refreshBlocklist();
   }
 
@@ -279,17 +309,8 @@ export class ProxyEvaluator {
     const start = Date.now();
 
     // Check Guard blocklist first (instant deny, no regex needed)
-    this.refreshBlocklist();
-    if (this.blockedTools.has(toolName.toLowerCase())) {
-      return {
-        outcome: 'deny',
-        reason: `Tool "${toolName}" is on the Guard blocklist`,
-        matchedRules: ['guard-blocklist'],
-        confidence: 100,
-        durationMs: Date.now() - start,
-        adviseOnly: false,
-      };
-    }
+    const blocked = this.blocklistDeny(toolName, start);
+    if (blocked) return blocked;
 
     // Flatten args into natural text so ATR regexes can match content like paths and commands
     const flatContent = `${toolName} ${this.flattenArgs(args)}`;
@@ -338,6 +359,45 @@ export class ProxyEvaluator {
     };
 
     return this.evaluate(event, start);
+  }
+
+  /**
+   * Evaluate an event the caller has already built.
+   *
+   * For callers that hold the raw call: build the event the way ATR's own
+   * hook-handler (src/hook-handler.ts) does, which is also the shape ATR's
+   * benign-corpus FP gate measures. A tool_call event carries content = the
+   * arguments' `content` string when there is one, else the JSON arguments, and
+   * fields tool_name / tool_args (JSON) / content; a tool_response event carries
+   * the tool output as content and adds tool_response. evaluateToolCall does not
+   * fit them: flattenArgs rewrites the arguments into `key: value` lines and
+   * files them under tool_input, a field one rule reads, instead of tool_args.
+   *
+   * A tool_call whose tool_name is on the Guard blocklist is denied before any
+   * rule runs, as in evaluateToolCall.
+   */
+  async evaluateEvent(event: AgentEvent): Promise<EvalResult> {
+    const start = Date.now();
+    const toolName = event.fields?.['tool_name'];
+    if (event.type === 'tool_call' && toolName) {
+      const blocked = this.blocklistDeny(toolName, start);
+      if (blocked) return blocked;
+    }
+    return this.evaluate(event, start);
+  }
+
+  /** A deny verdict when the tool is on the Guard blocklist, else null. */
+  private blocklistDeny(toolName: string, start: number): EvalResult | null {
+    this.refreshBlocklist();
+    if (!this.blockedTools.has(toolName.toLowerCase())) return null;
+    return {
+      outcome: 'deny',
+      reason: `Tool "${toolName}" is on the Guard blocklist`,
+      matchedRules: ['guard-blocklist'],
+      confidence: 100,
+      durationMs: Date.now() - start,
+      adviseOnly: false,
+    };
   }
 
   private async evaluate(
