@@ -1,0 +1,47 @@
+{
+  "name": "@panguard-ai/panguard-gateway",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Open Responses gateway: checks agent tool calls, tool results and model text against ATR rules between an agent and its model provider",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "bin": {
+    "panguard-gateway": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "start": "node dist/cli.js",
+    "conformance": "bash scripts/conformance.sh"
+  },
+  "dependencies": {
+    "@panguard-ai/panguard-guard": "workspace:*",
+    "@panguard-ai/panguard-mcp-proxy": "workspace:*",
+    "agent-threat-rules": "^4.2.1",
+    "ws": "^8.21.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@types/ws": "^8.18.1",
+    "typescript": "~5.7.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/panguard-ai/panguard-ai.git",
+    "directory": "packages/panguard-gateway"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}

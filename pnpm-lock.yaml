@@ -253,6 +253,34 @@ importers:
         specifier: ^1.4.5
         version: 1.4.7(@anthropic-ai/sdk@0.78.0(zod@3.25.76))(openai@6.25.0(ws@8.21.0)(zod@3.25.76))(typescript@5.7.3)
 
+  packages/panguard-gateway:
+    dependencies:
+      '@panguard-ai/panguard-guard':
+        specifier: workspace:*
+        version: link:../panguard-guard
+      '@panguard-ai/panguard-mcp-proxy':
+        specifier: workspace:*
+        version: link:../panguard-mcp-proxy
+      agent-threat-rules:
+        specifier: ^4.2.1
+        version: 4.2.1(zod@3.25.76)
+      ws:
+        specifier: ^8.21.0
+        version: 8.21.0
+      zod:
+        specifier: ^3.24.0
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^22.14.0
+        version: 22.19.13
+      '@types/ws':
+        specifier: ^8.18.1
+        version: 8.18.1
+      typescript:
+        specifier: ~5.7.3
+        version: 5.7.3
+
   packages/panguard-guard:
     dependencies:
       '@panguard-ai/atr':
@@ -1606,6 +1634,7 @@ packages:
 
   '@panguard-ai/threat-cloud@1.4.0':
     resolution: {integrity: sha512-hyJDRWNugnX3VI/vSIpLvQtolRvUi+l4s01BYDKhJJcb/xpgBkLHbsGH3wcOiOz0BWEcXe7QwYLvpV/LqSgkrQ==}
+    deprecated: Internal backend package, not for public use. The PanGuard CLI and Guard connect to the hosted Threat Cloud automatically.
     hasBin: true
 
   '@parcel/watcher-android-arm64@2.5.6':
@@ -2325,6 +2354,11 @@ packages:
 
   agent-threat-rules@3.5.8:
     resolution: {integrity: sha512-HsIOq7p+5HAFq7MzLG0SifrYuLUWF5iyniHApSYnOx/Olxg0p0pB97yJF0aYVCrZjBFYwZjvNfB0S2HlL1DR1Q==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
+
+  agent-threat-rules@4.2.1:
+    resolution: {integrity: sha512-D3TccqAcJWiQu2SxN9Vb0Qwn0ZWFKP9ckieyttdCtaSOBUXX/ONZjytbGYHvJpqwLsF7igl23eFvvxqFzMtqDQ==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -6815,6 +6849,15 @@ snapshots:
       - zod
 
   agent-threat-rules@3.5.8(zod@3.25.76):
+    dependencies:
+      '@modelcontextprotocol/sdk': 1.29.0(zod@3.25.76)
+      js-yaml: 4.1.1
+    transitivePeerDependencies:
+      - '@cfworker/json-schema'
+      - supports-color
+      - zod
+
+  agent-threat-rules@4.2.1(zod@3.25.76):
     dependencies:
       '@modelcontextprotocol/sdk': 1.29.0(zod@3.25.76)
       js-yaml: 4.1.1
