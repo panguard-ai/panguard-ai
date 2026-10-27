@@ -52,13 +52,17 @@ export async function inspectResponseBody(
     calls = [...calls, ...result.calls];
     stop = result.stop;
   }
-  const verdict = verdictField([...ctx.requestDecisions, ...decisions], {
-    ...ctx.notInspected,
-    // Only the provider's own items: the gateway's refusal messages are not model output.
-    unscanned_output_parts:
-      ctx.notInspected.unscanned_output_parts +
-      unscannedParts(kept.filter((k) => items.includes(k))),
-  });
+  const verdict = verdictField(
+    [...ctx.requestDecisions, ...decisions],
+    {
+      ...ctx.notInspected,
+      // Only the provider's own items: the gateway's refusal messages are not model output.
+      unscanned_output_parts:
+        ctx.notInspected.unscanned_output_parts +
+        unscannedParts(kept.filter((k) => items.includes(k))),
+    },
+    ctx.evaluatedWith
+  );
   const body: JsonObject = {
     ...response,
     output: kept,

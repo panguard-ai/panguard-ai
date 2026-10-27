@@ -46,7 +46,7 @@ export interface WindowedResult {
 }
 
 export type WorkerMessage =
-  | { readonly kind: 'ready'; readonly rules: RuleCounts }
+  | { readonly kind: 'ready'; readonly rules: RuleCounts; readonly atrVersion: string }
   | { readonly kind: 'fatal'; readonly error: string }
   | { readonly kind: 'result'; readonly id: number; readonly result: WindowedResult }
   | { readonly kind: 'error'; readonly id: number; readonly error: string };

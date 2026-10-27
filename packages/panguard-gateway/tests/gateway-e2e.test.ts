@@ -3,7 +3,7 @@
  * HTTP JSON, SSE and WebSocket, the ledger across turns, and the audit chain.
  */
 import { randomBytes } from 'node:crypto';
-import { mkdtempSync } from 'node:fs';
+import { mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -31,13 +31,17 @@ let gateway: Gateway;
 let incomplete: Gateway;
 let holdback: Gateway;
 
+let auditLog = '';
+
 async function start(overrides: Partial<GatewayConfigInput> = {}): Promise<Gateway> {
   const dir = mkdtempSync(join(tmpdir(), 'pg-gateway-audit-'));
+  const log = join(dir, 'gateway-verdicts.jsonl');
+  if (Object.keys(overrides).length === 0) auditLog = log;
   return startGateway(
     resolveConfig({
       upstream: mock.url,
       port: 0,
-      auditLog: join(dir, 'gateway-verdicts.jsonl'),
+      auditLog: log,
       auditKey: randomBytes(32),
       evaluation: { blocklistPath: NO_BLOCKLIST, timeoutMs: 10_000 },
       ...overrides,
@@ -274,6 +278,23 @@ describe('WebSocket', () => {
 });
 
 describe('audit', () => {
+  it('names the ATR release, lane and spec version on the verdict and in the chain', async () => {
+    const installed = (
+      JSON.parse(
+        readFileSync(
+          new URL('../node_modules/agent-threat-rules/package.json', import.meta.url),
+          'utf8'
+        )
+      ) as { version: string }
+    ).version;
+    const expected = { agent_threat_rules: installed, lane: 'hunt', open_responses: '2026-04-24' };
+    const { body } = await postJson(gateway.url, { model: 'm', input: 'hello' });
+    expect(verdict(body)['evaluated_with']).toEqual(expected);
+    const lines = readFileSync(auditLog, 'utf8').trim().split('\n');
+    const last = JSON.parse(lines[lines.length - 1] ?? '{}') as { payload?: Json };
+    expect(last.payload?.['evaluated_with']).toEqual(expected);
+  });
+
   it('chains every decision and verifies', async () => {
     const result = await gateway.audit.verify();
     expect(result?.ok).toBe(true);

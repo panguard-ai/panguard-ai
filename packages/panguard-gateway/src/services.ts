@@ -12,13 +12,14 @@ import type { Evaluator } from './evaluator-pool.js';
 import type { InspectContext } from './request-inspector.js';
 import type { VerdictLedger } from './ledger.js';
 import type { TurnContext, TurnOutcome } from './turn-processor.js';
-import type { NotInspected } from './verdict-field.js';
+import type { EvaluatedWith, NotInspected } from './verdict-field.js';
 
 export interface GatewayServices {
   readonly config: GatewayConfig;
   readonly evaluator: Evaluator;
   readonly ledger: VerdictLedger;
   readonly audit: AuditSink;
+  readonly evaluatedWith: EvaluatedWith;
 }
 
 export function inspectContext(services: GatewayServices): InspectContext {
@@ -37,6 +38,7 @@ export function turnContext(
     declared,
     requestDecisions,
     notInspected,
+    evaluatedWith: services.evaluatedWith,
   };
 }
 

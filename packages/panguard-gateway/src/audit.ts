@@ -19,6 +19,7 @@ import {
   type VerifyResult,
 } from '@panguard-ai/panguard-guard/audit';
 import type { Decision } from './decision.js';
+import type { EvaluatedWith } from './verdict-field.js';
 
 export const DEFAULT_AUDIT_LOG = join(homedir(), '.panguard-guard', 'gateway-verdicts.jsonl');
 
@@ -44,15 +45,21 @@ export const NO_AUDIT: AuditSink = {
 
 export class ChainAuditSink implements AuditSink {
   private readonly chain: AuditChain;
+  private readonly evaluatedWith: EvaluatedWith;
 
-  private constructor(chain: AuditChain) {
+  private constructor(chain: AuditChain, evaluatedWith: EvaluatedWith) {
     this.chain = chain;
+    this.evaluatedWith = evaluatedWith;
   }
 
   /** Open the chain. Without a key, the machine's audit key is resolved (keychain first). */
-  static async open(logPath: string, key?: Buffer): Promise<ChainAuditSink> {
+  static async open(
+    logPath: string,
+    evaluatedWith: EvaluatedWith,
+    key?: Buffer
+  ): Promise<ChainAuditSink> {
     const auditKey = key ?? (await getAuditKey());
-    return new ChainAuditSink(new AuditChain(logPath, { key: auditKey }));
+    return new ChainAuditSink(new AuditChain(logPath, { key: auditKey }), evaluatedWith);
   }
 
   record(context: AuditContext, decisions: readonly Decision[]): void {
@@ -61,6 +68,7 @@ export class ChainAuditSink implements AuditSink {
         ...decision,
         transport: context.transport,
         phase: context.phase,
+        evaluated_with: this.evaluatedWith,
         ...(context.response_id !== undefined ? { response_id: context.response_id } : {}),
         ...(context.previous_response_id !== undefined
           ? { previous_response_id: context.previous_response_id }

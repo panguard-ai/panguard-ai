@@ -114,6 +114,7 @@ export class WorkerEvaluatorPool implements Evaluator {
   private recoveryTimer: NodeJS.Timeout | undefined;
   private recoveryDelay = RECOVERY_BASE_MS;
   private rules: RuleCounts = { runtime: 0, toolDefinitions: 0 };
+  private atrVersion = 'unknown';
   private counters = { timeouts: 0, restarts: 0, crashes: 0 };
 
   constructor(options: EvaluatorPoolOptions) {
@@ -147,6 +148,11 @@ export class WorkerEvaluatorPool implements Evaluator {
 
   getRuleCounts(): RuleCounts {
     return this.rules;
+  }
+
+  /** The agent-threat-rules release the workers loaded. */
+  getAtrVersion(): string {
+    return this.atrVersion;
   }
 
   stats(): Readonly<{
@@ -229,6 +235,7 @@ export class WorkerEvaluatorPool implements Evaluator {
           clearTimeout(startup);
           this.failedRespawns = 0;
           this.updateSlot(key, (slot) => ({ ...slot, ready: true }));
+          this.atrVersion = message.atrVersion;
           resolve(message.rules);
           this.dispatch();
         } else if (message.kind === 'fatal') {

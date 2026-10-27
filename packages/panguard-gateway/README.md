@@ -54,7 +54,9 @@ and re-serialized so `tool_args` matches `JSON.stringify` output.
 Every event the client receives is renumbered from 0 and the terminal event carries a complete
 response snapshot. The gateway adds no events or items of its own: the official conformance suite
 validates both against closed unions. Its verdict travels in the terminal response's
-`panguard:verdict` field (outcome, every non-allow decision with rule ids, what was not inspected),
+`panguard:verdict` field (outcome, every non-allow decision with rule ids, what was not inspected,
+and `evaluated_with`: the agent-threat-rules release, lane and Open Responses version the verdict was
+reached with, so a result can be reproduced against the same rules),
 and every decision, allow included, is appended to a tamper-evident `AuditChain`
 (`~/.panguard-guard/gateway-verdicts.jsonl`).
 

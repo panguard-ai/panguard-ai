@@ -37,6 +37,7 @@ function context(
     declared,
     requestDecisions: [],
     notInspected: NOTHING_UNINSPECTED,
+    evaluatedWith: { agent_threat_rules: 'test', lane: 'hunt', open_responses: '2026-04-24' },
   };
 }
 

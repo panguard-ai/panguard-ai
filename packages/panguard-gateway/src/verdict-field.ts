@@ -40,6 +40,20 @@ export const NOTHING_UNINSPECTED: NotInspected = {
   dropped_events: 0,
 };
 
+/** The Open Responses specification version the gateway implements. */
+export const OPEN_RESPONSES_SPEC = '2026-04-24';
+
+/**
+ * What a verdict was reached with. Rules change with every ATR release, so a
+ * verdict is reproducible only against the release and lane named here.
+ */
+export interface EvaluatedWith {
+  /** agent-threat-rules release the rules came from ('external' for an injected evaluator). */
+  readonly agent_threat_rules: string;
+  readonly lane: string;
+  readonly open_responses: string;
+}
+
 export interface VerdictField {
   readonly outcome: 'pass' | 'flagged' | 'blocked' | 'failed';
   /** Checks run for this turn, request side included. */
@@ -47,11 +61,13 @@ export interface VerdictField {
   /** Every decision other than a plain allow. The audit chain has all of them. */
   readonly decisions: readonly Decision[];
   readonly not_inspected: NotInspected;
+  readonly evaluated_with: EvaluatedWith;
 }
 
 export function verdictField(
   decisions: readonly Decision[],
-  notInspected: NotInspected
+  notInspected: NotInspected,
+  evaluatedWith: EvaluatedWith
 ): VerdictField {
   const has = (d: Decision['disposition']): boolean => decisions.some((x) => x.disposition === d);
   const outcome = has('fault')
@@ -66,5 +82,6 @@ export function verdictField(
     checks: decisions.length,
     decisions: decisions.filter((d) => d.disposition !== 'allow'),
     not_inspected: notInspected,
+    evaluated_with: evaluatedWith,
   };
 }

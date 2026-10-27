@@ -17,6 +17,7 @@ import type { JsonObject } from './json.js';
 import { VerdictLedger } from './ledger.js';
 import type { GatewayServices } from './services.js';
 import type { RuleCounts } from './worker/protocol.js';
+import { OPEN_RESPONSES_SPEC, type EvaluatedWith } from './verdict-field.js';
 import { WsSession } from './ws-session.js';
 
 export interface Gateway {
@@ -50,23 +51,29 @@ export async function startGateway(
           : {}),
       });
   const rules: RuleCounts = pool ? await pool.start() : { runtime: 0, toolDefinitions: 0 };
+  const evaluatedWith: EvaluatedWith = {
+    agent_threat_rules: pool ? pool.getAtrVersion() : 'external',
+    lane: config.lane,
+    open_responses: OPEN_RESPONSES_SPEC,
+  };
   try {
     const audit =
       config.auditLog === null
         ? NO_AUDIT
-        : await ChainAuditSink.open(config.auditLog, config.auditKey);
+        : await ChainAuditSink.open(config.auditLog, evaluatedWith, config.auditKey);
     const services: GatewayServices = {
       config,
       evaluator: new CachingEvaluator(overrides.evaluator ?? pool!),
       ledger: new VerdictLedger(config.ledger),
       audit,
+      evaluatedWith,
     };
     const health = (): JsonObject => {
       const evaluator = pool?.stats();
       return {
         // No live ATR worker means every check fails (and fails closed by default).
         status: evaluator && evaluator.alive === 0 ? 'degraded' : 'ok',
-        lane: config.lane,
+        evaluated_with: evaluatedWith,
         rules,
         policy: config.policy,
         ledger_responses: services.ledger.size(),

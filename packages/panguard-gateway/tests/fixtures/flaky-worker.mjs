@@ -10,7 +10,11 @@ if (marker && existsSync(marker)) {
   parentPort.postMessage({ kind: 'fatal', error: 'simulated startup failure' });
 } else {
   if (marker) writeFileSync(marker, '1');
-  parentPort.postMessage({ kind: 'ready', rules: { runtime: 5, toolDefinitions: 5 } });
+  parentPort.postMessage({
+    kind: 'ready',
+    rules: { runtime: 5, toolDefinitions: 5 },
+    atrVersion: 'test',
+  });
   parentPort.on('message', (req) => {
     if (req.event.content === 'hang') return;
     parentPort.postMessage({

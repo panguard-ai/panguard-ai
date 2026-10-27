@@ -37,7 +37,12 @@ import { isFunctionCall, isHostedToolReceipt } from './items.js';
 import { isObject, num, obj, str, type JsonObject } from './json.js';
 import type { CallRecordInput } from './ledger.js';
 import { TextGate } from './text-gate.js';
-import { VERDICT_FIELD, verdictField, type NotInspected } from './verdict-field.js';
+import {
+  VERDICT_FIELD,
+  verdictField,
+  type EvaluatedWith,
+  type NotInspected,
+} from './verdict-field.js';
 
 export interface TurnContext {
   readonly evaluator: Evaluator;
@@ -45,6 +50,7 @@ export interface TurnContext {
   /** Function names this request allows (from request-side R1/R2). */
   readonly declared: ReadonlySet<string>;
   readonly requestDecisions: readonly Decision[];
+  readonly evaluatedWith: EvaluatedWith;
   readonly notInspected: NotInspected;
 }
 
@@ -480,11 +486,15 @@ export class TurnProcessor {
 
   private verdict(): JsonObject {
     return {
-      ...verdictField([...this.ctx.requestDecisions, ...this.decisions], {
-        ...this.ctx.notInspected,
-        unscanned_output_parts: this.ctx.notInspected.unscanned_output_parts + this.unscanned,
-        dropped_events: this.ctx.notInspected.dropped_events + this.dropped,
-      }),
+      ...verdictField(
+        [...this.ctx.requestDecisions, ...this.decisions],
+        {
+          ...this.ctx.notInspected,
+          unscanned_output_parts: this.ctx.notInspected.unscanned_output_parts + this.unscanned,
+          dropped_events: this.ctx.notInspected.dropped_events + this.dropped,
+        },
+        this.ctx.evaluatedWith
+      ),
     };
   }
 

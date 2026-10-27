@@ -13,6 +13,9 @@
  * @module @panguard-ai/panguard-gateway/worker/atr-worker
  */
 
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { parentPort, workerData } from 'node:worker_threads';
 import { ATREngine } from 'agent-threat-rules';
 import {
@@ -38,6 +41,19 @@ const init = workerData as WorkerInit;
 
 function post(message: WorkerMessage): void {
   port?.postMessage(message);
+}
+
+/** The agent-threat-rules release this worker evaluates with (its exports hide package.json). */
+function atrVersion(): string {
+  try {
+    const main = fileURLToPath(import.meta.resolve('agent-threat-rules'));
+    const pkg = JSON.parse(readFileSync(join(dirname(main), '..', 'package.json'), 'utf8')) as {
+      version?: unknown;
+    };
+    return typeof pkg.version === 'string' ? pkg.version : 'unknown';
+  } catch {
+    return 'unknown';
+  }
 }
 
 function isEngineError(result: EvalResult): boolean {
@@ -71,7 +87,11 @@ async function boot(): Promise<{ runtime: ProxyEvaluator; definitions: ProxyEval
   await definitions.evaluateEvent(
     toolDefinitionEvent({ name: 'warm_up', description: 'warm-up' }, now)
   );
-  post({ kind: 'ready', rules: { runtime: runtimeRules, toolDefinitions: definitionRules } });
+  post({
+    kind: 'ready',
+    rules: { runtime: runtimeRules, toolDefinitions: definitionRules },
+    atrVersion: atrVersion(),
+  });
   return { runtime, definitions };
 }
 
