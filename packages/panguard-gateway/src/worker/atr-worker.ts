@@ -28,7 +28,7 @@ import {
   toolDefinitionEvent,
   userMessageEvent,
 } from '../atr-events.js';
-import { mergeEvalResults, windowedEvents } from '../windows.js';
+import { mergeEvalResults, scanPlan } from '../windows.js';
 import type { EvaluateRequest, WindowedResult, WorkerInit, WorkerMessage } from './protocol.js';
 
 const port = parentPort;
@@ -76,13 +76,13 @@ async function boot(): Promise<{ runtime: ProxyEvaluator; definitions: ProxyEval
 }
 
 async function evaluate(evaluator: ProxyEvaluator, req: EvaluateRequest): Promise<WindowedResult> {
-  const plan = windowedEvents(req.event, init.windows);
+  const plan = scanPlan(req.event, init.maxScanChars);
   const results: EvalResult[] = [];
   for (const event of plan.events) results.push(await evaluator.evaluateEvent(event));
   const healthy = results.filter((r) => !isEngineError(r));
   return {
     result: mergeEvalResults(healthy),
-    windows: plan.events.length,
+    windows: plan.windows,
     coverage: plan.coverage,
     engineError: healthy.length < results.length,
   };

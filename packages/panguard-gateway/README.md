@@ -77,7 +77,11 @@ PANGUARD_GATEWAY_UPSTREAM=https://provider.example/v1 node packages/panguard-gat
 evaluation deadline, audit log, blocklist, allowed browser origins). Requests that carry a browser
 `Origin` header, HTTP and WebSocket alike, are refused unless the origin is allowed; agents and
 SDKs send none. ATR runs in worker threads with a hard deadline per
-evaluation; fields over 100,000 characters, which ATR would skip, are scanned in overlapping windows.
+evaluation. Texts over 100,000 characters, which ATR would skip, are scanned the way the MCP proxy
+scans long tool responses (`ProxyEvaluator.evaluateEvent`: 90,000-character windows overlapping by
+10,000), and in that range only maturity=stable rules block; other critical hits are flagged. Per text
+at most 400,000 characters are scanned, the head plus the final window; a longer text counts as
+partially scanned and is blocked under fail-closed.
 
 ## Tests
 
@@ -106,5 +110,8 @@ official repository.
 - Model refusals and reasoning text are relayed unscanned and counted (`unscanned_output_parts`).
 - With text hold-back 0 (the default), text the model streamed before a hit has reached the client
   by the time the response is cut.
+- Past 100,000 characters only maturity=stable rules block (shared with the MCP proxy, because the
+  broad test-maturity rules block large benign files there). An attack padded past that length and
+  caught only by non-stable rules is flagged, not blocked.
 - Items that appear only in the provider's terminal event, never streamed, are left out of the
   terminal response the client receives.

@@ -8,7 +8,7 @@
 import { z } from 'zod';
 import { DEFAULT_AUDIT_LOG } from './audit.js';
 import { DEFAULT_LEDGER, type LedgerOptions } from './ledger.js';
-import { DEFAULT_WINDOWS, ENGINE_MAX_EVAL_LENGTH, type WindowOptions } from './windows.js';
+import { DEFAULT_MAX_SCAN_CHARS, ENGINE_MAX_EVAL_LENGTH } from './windows.js';
 import type { FailMode } from './decision.js';
 import type { Lane } from './worker/protocol.js';
 
@@ -64,7 +64,11 @@ export interface GatewayConfig {
   readonly evaluation: {
     readonly workers: number;
     readonly timeoutMs: number;
-    readonly windows: WindowOptions;
+    /**
+     * Characters scanned per text. Longer texts are scanned head plus last
+     * window and the result counts as partial (see windows.ts).
+     */
+    readonly maxScanChars: number;
     readonly blocklistPath?: string;
   };
   readonly ledger: LedgerOptions;
@@ -91,14 +95,6 @@ export const DEFAULT_POLICY: GatewayPolicy = {
   text: { window: 256, holdback: 0, overlap: 4_096 },
 };
 
-const windowsSchema = z
-  .object({
-    size: z.number().int().min(1_000).max(ENGINE_MAX_EVAL_LENGTH),
-    overlap: z.number().int().min(0),
-    maxChars: z.number().int().min(ENGINE_MAX_EVAL_LENGTH),
-  })
-  .refine((w) => w.overlap < w.size, { message: 'overlap must be smaller than size' });
-
 const configSchema = z.object({
   upstream: z
     .string()
@@ -121,7 +117,7 @@ const configSchema = z.object({
   evaluation: z.object({
     workers: z.number().int().min(1).max(64),
     timeoutMs: z.number().int().min(10),
-    windows: windowsSchema,
+    maxScanChars: z.number().int().min(ENGINE_MAX_EVAL_LENGTH),
     blocklistPath: z.string().optional(),
   }),
   ledger: z.object({
@@ -160,7 +156,7 @@ export function resolveConfig(input: GatewayConfigInput): GatewayConfig {
     evaluation: {
       workers: 1,
       timeoutMs: 2_000,
-      windows: DEFAULT_WINDOWS,
+      maxScanChars: DEFAULT_MAX_SCAN_CHARS,
       ...input.evaluation,
     },
     ledger: { ...DEFAULT_LEDGER, ...input.ledger },

@@ -42,7 +42,7 @@ export async function startGateway(
     ? undefined
     : new WorkerEvaluatorPool({
         lane: config.lane,
-        windows: config.evaluation.windows,
+        maxScanChars: config.evaluation.maxScanChars,
         size: config.evaluation.workers,
         timeoutMs: config.evaluation.timeoutMs,
         ...(config.evaluation.blocklistPath !== undefined

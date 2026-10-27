@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { Worker } from 'node:worker_threads';
 import type { AgentEvent } from 'agent-threat-rules';
 import type { EvalResult } from '@panguard-ai/panguard-mcp-proxy/evaluator';
-import type { Coverage, WindowOptions } from './windows.js';
+import type { Coverage } from './windows.js';
 import type {
   EngineKind,
   EvaluateRequest,
@@ -40,7 +40,8 @@ export interface Evaluator {
 
 export interface EvaluatorPoolOptions {
   readonly lane: Lane;
-  readonly windows: WindowOptions;
+  /** Characters scanned per text (see windows.ts). */
+  readonly maxScanChars: number;
   /** Worker threads; each holds both engines (about 0.3 s to load on hunt). */
   readonly size: number;
   /** Hard deadline for one evaluation, measured from dispatch to the worker. */
@@ -210,7 +211,7 @@ export class WorkerEvaluatorPool implements Evaluator {
     const key = this.nextSlot++;
     const init: WorkerInit = {
       lane: this.options.lane,
-      windows: this.options.windows,
+      maxScanChars: this.options.maxScanChars,
       ...(this.options.blocklistPath !== undefined
         ? { blocklistPath: this.options.blocklistPath }
         : {}),

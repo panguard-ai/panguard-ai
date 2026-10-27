@@ -14,7 +14,8 @@ import {
   userMessageEvent,
 } from '../src/atr-events.js';
 import { WorkerEvaluatorPool, type Evaluation } from '../src/evaluator-pool.js';
-import { DEFAULT_WINDOWS } from '../src/windows.js';
+import { eventWindows } from '@panguard-ai/panguard-mcp-proxy/evaluator';
+import { DEFAULT_MAX_SCAN_CHARS } from '../src/windows.js';
 
 const NO_BLOCKLIST = '/nonexistent/panguard-gateway-test-blocklist.json';
 const TS = '2026-10-26T00:00:00.000Z';
@@ -33,7 +34,7 @@ describe('WorkerEvaluatorPool with ATR 4.2.1 (hunt lane)', () => {
   beforeAll(async () => {
     pool = new WorkerEvaluatorPool({
       lane: 'hunt',
-      windows: DEFAULT_WINDOWS,
+      maxScanChars: DEFAULT_MAX_SCAN_CHARS,
       size: 1,
       timeoutMs: 10_000,
       blocklistPath: NO_BLOCKLIST,
@@ -122,15 +123,14 @@ describe('WorkerEvaluatorPool with ATR 4.2.1 (hunt lane)', () => {
   it('finds an injection beyond 100,000 characters by scanning windows', async () => {
     const long = FILLER.repeat(1_900) + INJECTION;
     expect(long.length).toBeGreaterThan(100_000);
-    const evaluation = await pool.evaluate(
-      'runtime',
-      functionCallOutputEvent(
-        { name: 'fetch_url', args: canonicalArgs('{"url":"https://example.com"}') },
-        long,
-        TS
-      )
+    const event = functionCallOutputEvent(
+      { name: 'fetch_url', args: canonicalArgs('{"url":"https://example.com"}') },
+      long,
+      TS
     );
-    expect(evaluation.kind === 'result' && evaluation.windows).toBe(3);
+    const evaluation = await pool.evaluate('runtime', event);
+    expect(evaluation.kind === 'result' && evaluation.windows).toBe(eventWindows(event).length);
+    // Past the engine limit only stable rules block; this payload hits ATR-2026-00511 (stable).
     expect(outcome(evaluation)).toBe('deny');
   });
 
@@ -154,7 +154,7 @@ describe('WorkerEvaluatorPool hard deadline', () => {
   it('terminates a worker that misses the deadline, replaces it, and keeps serving', async () => {
     const pool = new WorkerEvaluatorPool({
       lane: 'hunt',
-      windows: DEFAULT_WINDOWS,
+      maxScanChars: DEFAULT_MAX_SCAN_CHARS,
       size: 1,
       timeoutMs: 200,
       blocklistPath: NO_BLOCKLIST,
@@ -179,7 +179,7 @@ describe('WorkerEvaluatorPool hard deadline', () => {
   it('fails to start when the worker cannot load, and then evaluates nothing', async () => {
     const pool = new WorkerEvaluatorPool({
       lane: 'hunt',
-      windows: DEFAULT_WINDOWS,
+      maxScanChars: DEFAULT_MAX_SCAN_CHARS,
       size: 1,
       timeoutMs: 100,
       workerUrl: new URL('file:///nonexistent/atr-worker.js'),
@@ -194,7 +194,7 @@ describe('WorkerEvaluatorPool hard deadline', () => {
     process.env['FLAKY_WORKER_MARKER'] = marker;
     const pool = new WorkerEvaluatorPool({
       lane: 'hunt',
-      windows: DEFAULT_WINDOWS,
+      maxScanChars: DEFAULT_MAX_SCAN_CHARS,
       size: 1,
       timeoutMs: 200,
       startupTimeoutMs: 2_000,

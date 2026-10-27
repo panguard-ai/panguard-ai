@@ -6,7 +6,7 @@
 
 import type { AgentEvent } from 'agent-threat-rules';
 import type { EvalResult } from '@panguard-ai/panguard-mcp-proxy/evaluator';
-import type { Coverage, WindowOptions } from '../windows.js';
+import type { Coverage } from '../windows.js';
 
 export type Lane = 'hunt' | 'alert' | 'enforce';
 
@@ -20,7 +20,7 @@ export type EngineKind = 'runtime' | 'tool-definitions';
 
 export interface WorkerInit {
   readonly lane: Lane;
-  readonly windows: WindowOptions;
+  readonly maxScanChars: number;
   /** Guard blocklist; undefined keeps ProxyEvaluator's default path. */
   readonly blocklistPath?: string;
 }
@@ -37,11 +37,11 @@ export interface RuleCounts {
 }
 
 export interface WindowedResult {
-  /** Verdict over the windows the engine evaluated; undefined if none did. */
+  /** Verdict over the parts the engine evaluated; undefined if none did. */
   readonly result: EvalResult | undefined;
   readonly windows: number;
   readonly coverage: Coverage;
-  /** At least one window hit an engine error (ProxyEvaluator's fail-closed sentinel). */
+  /** At least one part hit an engine error (ProxyEvaluator's fail-closed sentinel). */
   readonly engineError: boolean;
 }
 

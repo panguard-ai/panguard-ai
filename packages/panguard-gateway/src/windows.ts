@@ -1,93 +1,80 @@
 /**
- * Windowed scanning for long fields.
+ * How much of a long input the gateway scans.
  *
  * agent-threat-rules skips any input longer than its MAX_EVAL_LENGTH (100,000
- * characters in 3.5.10 and 4.2.1): the whole field matches nothing. A 120K tool
- * output carrying an injection at its end measured 0 matches directly and 12
- * when cut into 60K windows that overlap by 4K. Until ATR scans long inputs in
- * segments itself (ATR #726), the gateway cuts them.
+ * characters): the whole field matches nothing. ProxyEvaluator.evaluateEvent
+ * scans such input window by window (90K windows overlapping by 10K, shared
+ * with the MCP proxy's tool-response scan), and past that length only
+ * maturity=stable rules hard-deny. What it does not do is bound the cost: a
+ * multi-megabyte tool output would run past the gateway's evaluation deadline.
+ * So per text the gateway scans at most `maxChars` characters, the head up to
+ * that limit plus the final window, where appended payloads land, and reports
+ * the result as partial.
  *
  * @module @panguard-ai/panguard-gateway/windows
  */
 
 import type { AgentEvent } from 'agent-threat-rules';
-import type { EvalResult } from '@panguard-ai/panguard-mcp-proxy/evaluator';
+import {
+  ENGINE_MAX_EVAL_LENGTH,
+  RESPONSE_WINDOW_CHARS,
+  eventWindows,
+  type EvalResult,
+} from '@panguard-ai/panguard-mcp-proxy/evaluator';
 
-/** agent-threat-rules MAX_EVAL_LENGTH: longer inputs are not evaluated at all. */
-export const ENGINE_MAX_EVAL_LENGTH = 100_000;
+export { ENGINE_MAX_EVAL_LENGTH };
 
-export interface WindowOptions {
-  /** Window length; must stay under ENGINE_MAX_EVAL_LENGTH. */
-  readonly size: number;
-  /** Characters shared by consecutive windows, so a pattern on a seam is seen whole. */
-  readonly overlap: number;
-  /**
-   * Characters scanned per field. Past this the head up to the limit and the
-   * final window are scanned and the result is marked partial.
-   */
-  readonly maxChars: number;
-}
-
-export const DEFAULT_WINDOWS: WindowOptions = { size: 60_000, overlap: 4_000, maxChars: 400_000 };
+/** Characters scanned per text by default: about five windows plus the tail. */
+export const DEFAULT_MAX_SCAN_CHARS = 400_000;
 
 export type Coverage = 'full' | 'partial';
 
-export interface TextWindows {
-  readonly windows: readonly string[];
-  readonly partial: boolean;
-}
-
-export function windowsOf(text: string, opts: WindowOptions): TextWindows {
-  if (text.length <= ENGINE_MAX_EVAL_LENGTH) return { windows: [text], partial: false };
-  const step = opts.size - opts.overlap;
-  const limit = Math.min(text.length, opts.maxChars);
-  const windows: string[] = [];
-  for (let start = 0; start < limit; start += step) {
-    windows.push(text.slice(start, start + opts.size));
-    if (start + opts.size >= text.length) return { windows, partial: false };
-  }
-  // Past maxChars: the tail is where appended payloads land, so it is always read.
-  return { windows: [...windows, text.slice(text.length - opts.size)], partial: true };
-}
-
-export interface WindowedEvents {
+export interface ScanPlan {
+  /** Events to evaluate: the event itself, or its head and its tail. */
   readonly events: readonly AgentEvent[];
   readonly coverage: Coverage;
+  /** Engine evaluations the plan costs (windows over all events). */
+  readonly windows: number;
 }
 
 /**
- * One event per window. Every value longer than the engine limit is replaced
- * by its i-th window; fields holding the same text as `content` (the hook puts
- * the output in content, tool_response and fields.content) stay aligned.
+ * The event itself when every text fits `maxChars`; otherwise two events, one
+ * with each long text cut to its first `maxChars` characters and one with each
+ * cut to its last window. Texts that are the same string stay aligned.
  */
-export function windowedEvents(event: AgentEvent, opts: WindowOptions): WindowedEvents {
-  const values = [event.content, ...Object.values(event.fields ?? {})];
-  const long = [...new Set(values.filter((v) => v.length > ENGINE_MAX_EVAL_LENGTH))];
-  if (long.length === 0) return { events: [event], coverage: 'full' };
-
-  const split = new Map(long.map((text) => [text, windowsOf(text, opts)]));
-  const count = Math.max(...[...split.values()].map((w) => w.windows.length));
-  const pick = (value: string, i: number): string => {
-    const w = split.get(value);
-    if (!w) return value;
-    return w.windows[Math.min(i, w.windows.length - 1)] ?? '';
-  };
-  const events = Array.from({ length: count }, (_, i): AgentEvent => {
-    const fields = event.fields
-      ? Object.fromEntries(Object.entries(event.fields).map(([k, v]) => [k, pick(v, i)]))
-      : undefined;
-    return { ...event, content: pick(event.content, i), ...(fields ? { fields } : {}) };
+export function scanPlan(event: AgentEvent, maxChars: number): ScanPlan {
+  const texts = [event.content, ...Object.values(event.fields ?? {})];
+  if (texts.every((t) => t.length <= maxChars)) {
+    return { events: [event], coverage: 'full', windows: eventWindows(event).length };
+  }
+  const cut = (pick: (text: string) => string): AgentEvent => ({
+    ...event,
+    content: event.content.length > maxChars ? pick(event.content) : event.content,
+    ...(event.fields
+      ? {
+          fields: Object.fromEntries(
+            Object.entries(event.fields).map(([k, v]) => [k, v.length > maxChars ? pick(v) : v])
+          ),
+        }
+      : {}),
   });
-  const partial = [...split.values()].some((w) => w.partial);
-  return { events, coverage: partial ? 'partial' : 'full' };
+  const events = [
+    cut((t) => t.slice(0, maxChars)),
+    cut((t) => t.slice(t.length - RESPONSE_WINDOW_CHARS)),
+  ];
+  return {
+    events,
+    coverage: 'partial',
+    windows: events.reduce((sum, e) => sum + eventWindows(e).length, 0),
+  };
 }
 
 const OUTCOME_RANK: Readonly<Record<EvalResult['outcome'], number>> = { allow: 0, ask: 1, deny: 2 };
 
 /**
- * One verdict over all windows of an event: the strongest outcome wins and the
- * matched rules are the union. An 'ask' stays advise-only only if every asking
- * window was advise-only.
+ * One verdict over the head and tail of a capped input: the strongest outcome
+ * wins and the matched rules are the union. An 'ask' stays advise-only only if
+ * every asking part was advise-only.
  */
 export function mergeEvalResults(results: readonly EvalResult[]): EvalResult | undefined {
   const [first, ...rest] = results;

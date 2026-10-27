@@ -36,4 +36,4 @@ export { VerdictLedger, type LedgerCall, type LedgerOptions } from './ledger.js'
 export { ChainAuditSink, DEFAULT_AUDIT_LOG, NO_AUDIT, type AuditSink } from './audit.js';
 export { GATEWAY_RULES, type Decision, type Disposition } from './decision.js';
 export { VERDICT_FIELD, type VerdictField } from './verdict-field.js';
-export { DEFAULT_WINDOWS, ENGINE_MAX_EVAL_LENGTH, windowedEvents } from './windows.js';
+export { DEFAULT_MAX_SCAN_CHARS, ENGINE_MAX_EVAL_LENGTH, scanPlan } from './windows.js';
