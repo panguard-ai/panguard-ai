@@ -203,6 +203,31 @@ function mergeMatches<T extends MatchLike>(matches: readonly T[]): T[] {
   return [...best.values()].sort((a, b) => rank(a) - rank(b) || b.confidence - a.confidence);
 }
 
+/**
+ * An event as the engine can take it: the event itself when every text in it
+ * fits ENGINE_MAX_EVAL_LENGTH, else one event per window (responseWindows),
+ * each long text replaced by its window of the same index. Texts that are the
+ * same string (the hook puts a tool output in content, tool_response and
+ * fields.content) stay aligned window for window.
+ */
+export function eventWindows(event: AgentEvent): AgentEvent[] {
+  const texts = [event.content, ...Object.values(event.fields ?? {})];
+  const long = [...new Set(texts.filter((t) => t.length > ENGINE_MAX_EVAL_LENGTH))];
+  if (long.length === 0) return [event];
+  const split = new Map(long.map((t) => [t, responseWindows(t)] as const));
+  const count = Math.max(...[...split.values()].map((w) => w.length));
+  const pick = (text: string, i: number): string => {
+    const windows = split.get(text);
+    return windows ? (windows[Math.min(i, windows.length - 1)] ?? '') : text;
+  };
+  return Array.from({ length: count }, (_, i): AgentEvent => {
+    const fields = event.fields
+      ? Object.fromEntries(Object.entries(event.fields).map(([k, v]) => [k, pick(v, i)]))
+      : undefined;
+    return { ...event, content: pick(event.content, i), ...(fields ? { fields } : {}) };
+  });
+}
+
 /** What the verdict reads from one engine match. */
 export interface EvaluatorMatch {
   readonly rule: RuleLike & { readonly id: string; readonly title: string };
@@ -459,6 +484,11 @@ export class ProxyEvaluator {
    *
    * A tool_call whose tool_name is on the Guard blocklist is denied before any
    * rule runs, as in evaluateToolCall.
+   *
+   * Long input is handled as in evaluateToolResponse: an event whose texts the
+   * engine can take whole is one event; otherwise it is evaluated window by
+   * window (eventWindows), and in that range only a maturity=stable rule
+   * hard-denies.
    */
   async evaluateEvent(event: AgentEvent): Promise<EvalResult> {
     const start = Date.now();
@@ -467,7 +497,8 @@ export class ProxyEvaluator {
       const blocked = this.blocklistDeny(toolName, start);
       if (blocked) return blocked;
     }
-    return this.evaluate([event], start);
+    const events = eventWindows(event);
+    return this.evaluate(events, start, { stableOnlyDeny: events.length > 1 });
   }
 
   /** A deny verdict when the tool is on the Guard blocklist, else null. */

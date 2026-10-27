@@ -9,8 +9,11 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { AgentEvent } from '@panguard-ai/atr';
 import {
+  ENGINE_MAX_EVAL_LENGTH,
   EVALUATION_ERROR_SENTINEL,
+  LONG_RESPONSE_ADVISORY,
   ProxyEvaluator,
+  eventWindows,
   type EvaluatorEngine,
   type EvaluatorMatch,
 } from '../src/evaluator.js';
@@ -119,6 +122,46 @@ describe('ProxyEvaluator.evaluateEvent with an injected engine', () => {
     });
     const result = await evaluator.evaluateEvent(toolCallEvent('x', {}));
     expect(result).toMatchObject({ outcome: 'deny', matchedRules: [EVALUATION_ERROR_SENTINEL] });
+  });
+});
+
+describe('ProxyEvaluator.evaluateEvent on input past the engine limit', () => {
+  const longOutput = (needle: string): AgentEvent => {
+    const text = 'x'.repeat(ENGINE_MAX_EVAL_LENGTH) + needle;
+    return {
+      type: 'tool_response',
+      timestamp: new Date().toISOString(),
+      content: text,
+      fields: { tool_name: 'read_file', tool_args: '{}', content: text, tool_response: text },
+    };
+  };
+
+  it('evaluates window by window, keeping fields that hold the same text aligned', async () => {
+    const { engine, seen } = stubEngine(() => []);
+    const evaluator = new ProxyEvaluator({ engine, blocklistPath: NO_BLOCKLIST });
+    await evaluator.evaluateEvent(longOutput('NEEDLE'));
+    expect(seen.length).toBe(eventWindows(longOutput('NEEDLE')).length);
+    expect(seen.length).toBeGreaterThan(1);
+    for (const event of seen) {
+      expect(event.content.length).toBeLessThanOrEqual(ENGINE_MAX_EVAL_LENGTH);
+      expect(event.fields?.['tool_response']).toBe(event.content);
+      expect(event.fields?.['tool_name']).toBe('read_file');
+    }
+    expect(seen.some((event) => event.content.endsWith('NEEDLE'))).toBe(true);
+  });
+
+  it('holds a critical test-maturity match back to an advisory; a stable one still denies', async () => {
+    const hit = (maturity: string) =>
+      new ProxyEvaluator({
+        engine: stubEngine((event) =>
+          event.content.includes('NEEDLE') ? [match('C', 'critical', maturity)] : []
+        ).engine,
+        blocklistPath: NO_BLOCKLIST,
+      });
+    const advisory = await hit('test').evaluateEvent(longOutput('NEEDLE'));
+    expect(advisory.outcome).toBe('ask');
+    expect(advisory.reason.endsWith(LONG_RESPONSE_ADVISORY)).toBe(true);
+    expect((await hit('stable').evaluateEvent(longOutput('NEEDLE'))).outcome).toBe('deny');
   });
 });
 
