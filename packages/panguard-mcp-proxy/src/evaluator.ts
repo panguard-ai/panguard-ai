@@ -84,10 +84,18 @@ interface RuleLike {
  * illegitimate on any shell and MUST keep hard-blocking there. 1.8.12 wrongly
  * gated the whole scan_target:mcp class, which silently degraded credential theft
  * (`cat ~/.ssh/id_rsa`) to an advisory on the agent's own shell — a shipped hole.
+ *
+ * command-injection joined with agent-threat-rules 4.2: ATR-2026-01980 (an
+ * MCP argument value that breaks out of its quote, then `;` and a chained
+ * command or `$()`) hard-denied 66 of 3,900 PreToolUse calls sampled from real
+ * Claude Code sessions, all ordinary `"..."; cmd` and `$(...)` shell. It is the
+ * only scan_target:mcp rule in that subcategory, and like the other two it
+ * judges grammar, not what the command does.
  */
 const SHELL_METACHAR_FP_SUBCATEGORIES: ReadonlySet<string> = new Set([
   'shell-escape',
   'parameter-injection',
+  'command-injection',
 ]);
 
 /**
@@ -117,7 +125,8 @@ export function shouldHardDeny(rule: RuleLike, builtinToolSurface = false): bool
     // FALSE-POSITIVE gate for the built-in-tool hook, which guards the agent's
     // OWN native shell (Bash/Edit/Write/WebFetch). NARROWED (1.8.13) to ONLY the
     // shell-metacharacter-injection subcategories (shell-escape / parameter-
-    // injection — ATR-2026-00111 / 00066) that key on `;` `|` `$()` grammar.
+    // injection / command-injection — ATR-2026-00111 / 00066 / 01980) that key on
+    // `;` `|` `$()` and quote-breakout grammar.
     // Inside an MCP argument those are anomalous and rightly deny; but they are the
     // NORMAL grammar of a real shell, so matched against the agent's own
     // `echo x; curl localhost` they false-block legitimate work (they only reach a
