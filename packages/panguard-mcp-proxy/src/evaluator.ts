@@ -131,6 +131,78 @@ export function shouldHardDeny(rule: RuleLike, builtinToolSurface = false): bool
   return rule.severity === 'high' && rule.maturity === 'stable';
 }
 
+/**
+ * The ATR engine's MAX_EVAL_LENGTH: it refuses to run a regex over a longer
+ * field (safeRegexTest() returns false), so every condition on that field
+ * silently misses. A tool response past this length used to be not scanned at
+ * all, and padding a poisoned response past it evaded the indirect-injection scan.
+ */
+export const ENGINE_MAX_EVAL_LENGTH = 100_000;
+
+/**
+ * A response longer than ENGINE_MAX_EVAL_LENGTH is scanned in overlapping
+ * windows. A response the engine can take whole stays one event, exactly as
+ * before, so windowing adds no seams there.
+ *
+ * The window leaves headroom under the engine limit because the engine also
+ * tests the Unicode-normalised text, which can be longer than the raw window
+ * (NFKC can expand crafted input far beyond this headroom; the raw text is
+ * still tested). A match that fits in the 10,000-char overlap always lies whole
+ * inside one window, which exceeds the longest bounded gap a bundled rule
+ * allows. A rule whose conditions match farther apart than the overlap can
+ * still miss across a window boundary.
+ */
+export const RESPONSE_WINDOW_CHARS = 90_000;
+export const RESPONSE_WINDOW_OVERLAP_CHARS = 10_000;
+
+/** Appended to the reason when a long response's hard-deny match was held back to an advisory. */
+export const LONG_RESPONSE_ADVISORY =
+  ' [advisory: response over 100,000 chars, only stable rules block]';
+
+/** Overlapping windows covering `text`, each at most `size` chars (the text itself when it fits). */
+export function responseWindows(
+  text: string,
+  size = RESPONSE_WINDOW_CHARS,
+  overlap = RESPONSE_WINDOW_OVERLAP_CHARS
+): string[] {
+  if (overlap < 0 || overlap >= size) {
+    throw new RangeError(`window overlap (${overlap}) must be in [0, size=${size})`);
+  }
+  if (text.length <= size) return [text];
+  const step = size - overlap;
+  const count = Math.ceil((text.length - overlap) / step);
+  return Array.from({ length: count }, (_, i) => text.slice(i * step, i * step + size));
+}
+
+const SEVERITY_RANK: ReadonlyMap<string, number> = new Map([
+  ['critical', 0],
+  ['high', 1],
+  ['medium', 2],
+  ['low', 3],
+  ['informational', 4],
+]);
+
+interface MatchLike {
+  readonly rule: { readonly id: string; readonly severity: string };
+  readonly confidence: number;
+}
+
+/**
+ * One match per rule (the most confident one), ordered the way the engine
+ * orders a single evaluate(): severity first, then confidence. A rule that fires
+ * in two windows counts once, and the verdict, reason and confidence of a
+ * windowed response do not depend on which window a match came from.
+ */
+function mergeMatches<T extends MatchLike>(matches: readonly T[]): T[] {
+  const best = new Map<string, T>();
+  for (const m of matches) {
+    const prev = best.get(m.rule.id);
+    if (!prev || m.confidence > prev.confidence) best.set(m.rule.id, m);
+  }
+  const rank = (m: T) => SEVERITY_RANK.get(m.rule.severity) ?? 4;
+  return [...best.values()].sort((a, b) => rank(a) - rank(b) || b.confidence - a.confidence);
+}
+
 /** What the verdict reads from one engine match. */
 export interface EvaluatorMatch {
   readonly rule: RuleLike & { readonly id: string; readonly title: string };
@@ -324,7 +396,7 @@ export class ProxyEvaluator {
       },
     };
 
-    return this.evaluate(event, start, builtinToolSurface);
+    return this.evaluate([event], start, { builtinToolSurface });
   }
 
   /**
@@ -345,20 +417,32 @@ export class ProxyEvaluator {
    * eventSourceType is undefined: the source-type filter is bypassed (llm_io rules
    * run) but getFieldValue leaves user_input/agent_output undefined, so those rules
    * silently match nothing — defeating the entire indirect-injection scan.
+   *
+   * A response the engine can take whole (ENGINE_MAX_EVAL_LENGTH) is one such
+   * event, exactly as before. A longer one used to be not scanned at all; it is
+   * now one event per window (see responseWindows), merged before the deny
+   * policy runs. In that newly covered range only a proven (maturity: stable)
+   * rule hard-denies: the broad test-maturity rules fire on large benign
+   * documents (compiled JS, type definitions, lockfiles), so there they surface
+   * as an 'ask' advisory instead of blocking the tool.
    */
   async evaluateToolResponse(toolName: string, response: string): Promise<EvalResult> {
     const start = Date.now();
-    const event: AgentEvent = {
-      type: 'tool_response',
-      timestamp: new Date().toISOString(),
-      content: response,
-      fields: {
-        tool_name: toolName,
-        tool_response: response,
-      },
-    };
+    const windowed = response.length > ENGINE_MAX_EVAL_LENGTH;
+    const timestamp = new Date().toISOString();
+    const events = (windowed ? responseWindows(response) : [response]).map(
+      (text): AgentEvent => ({
+        type: 'tool_response',
+        timestamp,
+        content: text,
+        fields: {
+          tool_name: toolName,
+          tool_response: text,
+        },
+      })
+    );
 
-    return this.evaluate(event, start);
+    return this.evaluate(events, start, { stableOnlyDeny: windowed });
   }
 
   /**
@@ -383,7 +467,7 @@ export class ProxyEvaluator {
       const blocked = this.blocklistDeny(toolName, start);
       if (blocked) return blocked;
     }
-    return this.evaluate(event, start);
+    return this.evaluate([event], start);
   }
 
   /** A deny verdict when the tool is on the Guard blocklist, else null. */
@@ -401,12 +485,15 @@ export class ProxyEvaluator {
   }
 
   private async evaluate(
-    event: AgentEvent,
+    events: readonly AgentEvent[],
     start: number,
-    builtinToolSurface = false
+    {
+      builtinToolSurface = false,
+      stableOnlyDeny = false,
+    }: { readonly builtinToolSurface?: boolean; readonly stableOnlyDeny?: boolean } = {}
   ): Promise<EvalResult> {
     try {
-      const matches = this.engine.evaluate(event);
+      const matches = mergeMatches(events.flatMap((event) => this.engine.evaluate(event)));
       const durationMs = Date.now() - start;
 
       if (matches.length === 0) {
@@ -439,9 +526,14 @@ export class ProxyEvaluator {
       // 'ask' advisory below, but it can never silently block the user's tool.
       // Bundled/trusted rules are unaffected. This is the arm gate for the
       // enforce path.
+      // A windowed long response (stableOnlyDeny) additionally needs a
+      // maturity=stable rule to hard-deny; see evaluateToolResponse.
+      const canHardDeny = (m: (typeof matches)[number]) =>
+        shouldHardDeny(m.rule, builtinToolSurface) && !this.adviseOnlyIds.has(m.rule.id);
       const blockMatch = matches.find(
-        (m) => shouldHardDeny(m.rule, builtinToolSurface) && !this.adviseOnlyIds.has(m.rule.id)
+        (m) => canHardDeny(m) && (!stableOnlyDeny || m.rule.maturity === 'stable')
       );
+      const heldBack = !blockMatch && stableOnlyDeny && matches.some(canHardDeny);
       const askMatch =
         blockMatch ??
         matches.find((m) => m.rule.severity === 'high' || m.rule.severity === 'critical');
@@ -466,7 +558,7 @@ export class ProxyEvaluator {
         reason:
           outcome === 'allow'
             ? `No actionable threat (low-severity match suppressed: ${topMatch.rule.title}, ${topMatch.rule.severity})`
-            : `${topMatch.rule.title} (${topMatch.rule.severity})`,
+            : `${topMatch.rule.title} (${topMatch.rule.severity})${heldBack ? LONG_RESPONSE_ADVISORY : ''}`,
         matchedRules: matches.map((m) => m.rule.id),
         confidence: outcome === 'allow' ? 0 : topMatch.confidence,
         durationMs,
