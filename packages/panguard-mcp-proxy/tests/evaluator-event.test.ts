@@ -123,6 +123,12 @@ describe('ProxyEvaluator.evaluateEvent with an injected engine', () => {
     const result = await evaluator.evaluateEvent(toolCallEvent('x', {}));
     expect(result).toMatchObject({ outcome: 'deny', matchedRules: [EVALUATION_ERROR_SENTINEL] });
   });
+
+  it('runs an injected engine inline and refuses worker isolation for it', () => {
+    const { engine } = stubEngine(() => []);
+    expect(() => new ProxyEvaluator({ engine, isolation: 'worker' })).toThrow(RangeError);
+    expect(new ProxyEvaluator({ engine, blocklistPath: NO_BLOCKLIST }).isolation).toBe('inline');
+  });
 });
 
 describe('ProxyEvaluator.evaluateEvent on input past the engine limit', () => {
