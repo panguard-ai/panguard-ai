@@ -80,9 +80,9 @@ evaluation deadline, audit log, blocklist, allowed browser origins). Requests th
 `Origin` header, HTTP and WebSocket alike, are refused unless the origin is allowed; agents and
 SDKs send none. ATR runs in worker threads with a hard deadline per
 evaluation. Texts over 100,000 characters, which ATR would skip, are scanned the way the MCP proxy
-scans long tool responses (`ProxyEvaluator.evaluateEvent`: 90,000-character windows overlapping by
-10,000), and in that range only maturity=stable rules block; other critical hits are flagged. Per text the gateway scans the
-first 400,000 characters and the last 90,000; a longer text counts as partially scanned and is
+scans long tool responses (`ProxyEvaluator.evaluateEvent`: 30,000-character windows overlapping by
+6,000), and in that range only maturity=stable rules block; other critical hits are flagged. Per text the gateway scans the
+first 400,000 characters and the last 30,000; a longer text counts as partially scanned and is
 blocked under fail-closed.
 
 ## Tests
@@ -115,5 +115,9 @@ official repository.
 - Past 100,000 characters only maturity=stable rules block (shared with the MCP proxy, because the
   broad test-maturity rules block large benign files there). An attack padded past that length and
   caught only by non-stable rules is flagged, not blocked.
+- Evaluation time grows with text length, and a text of a few hundred thousand characters can miss
+  the default 2,000 ms deadline. Under fail-closed the gateway then refuses it as its own fault
+  (`panguard-gateway:evaluation-failed`); under fail-open it passes, flagged. The deadline and the
+  400,000-character bound have not been tuned against real traffic.
 - Items that appear only in the provider's terminal event, never streamed, are left out of the
   terminal response the client receives.

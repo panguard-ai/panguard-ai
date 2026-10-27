@@ -3,7 +3,7 @@
  *
  * agent-threat-rules skips any input longer than its MAX_EVAL_LENGTH (100,000
  * characters): the whole field matches nothing. ProxyEvaluator.evaluateEvent
- * scans such input window by window (90K windows overlapping by 10K, shared
+ * scans such input window by window (30K windows overlapping by 6K, shared
  * with the MCP proxy's tool-response scan), and past that length only
  * maturity=stable rules hard-deny. What it does not do is bound the cost: a
  * multi-megabyte tool output would run past the gateway's evaluation deadline.
@@ -23,7 +23,7 @@ import {
 
 export { ENGINE_MAX_EVAL_LENGTH };
 
-/** Characters scanned per text by default: about five windows plus the tail. */
+/** Characters scanned per text by default: 17 windows, plus one for the tail. */
 export const DEFAULT_MAX_SCAN_CHARS = 400_000;
 
 export type Coverage = 'full' | 'partial';

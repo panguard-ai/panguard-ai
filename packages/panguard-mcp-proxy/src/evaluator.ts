@@ -7,8 +7,12 @@
  * @module @panguard-ai/panguard-mcp-proxy/evaluator
  */
 
-import { ATREngine } from '@panguard-ai/atr';
-import type { AgentEvent, ATRRule } from '@panguard-ai/atr';
+// The engine comes straight from agent-threat-rules (4.x) rather than the
+// monorepo's @panguard-ai/atr wrapper, which still pins 3.5.x for the other
+// packages; the proxy and the CLI hook move to 4.x ahead of the product-wide
+// upgrade.
+import { ATREngine } from 'agent-threat-rules';
+import type { AgentEvent, ATRRule } from 'agent-threat-rules';
 import { resolve, dirname, join } from 'node:path';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
@@ -80,10 +84,18 @@ interface RuleLike {
  * illegitimate on any shell and MUST keep hard-blocking there. 1.8.12 wrongly
  * gated the whole scan_target:mcp class, which silently degraded credential theft
  * (`cat ~/.ssh/id_rsa`) to an advisory on the agent's own shell — a shipped hole.
+ *
+ * command-injection joined with agent-threat-rules 4.2: ATR-2026-01980 (an
+ * MCP argument value that breaks out of its quote, then `;` and a chained
+ * command or `$()`) hard-denied 66 of 3,900 PreToolUse calls sampled from real
+ * Claude Code sessions, all ordinary `"..."; cmd` and `$(...)` shell. It is the
+ * only scan_target:mcp rule in that subcategory, and like the other two it
+ * judges grammar, not what the command does.
  */
 const SHELL_METACHAR_FP_SUBCATEGORIES: ReadonlySet<string> = new Set([
   'shell-escape',
   'parameter-injection',
+  'command-injection',
 ]);
 
 /**
@@ -113,7 +125,8 @@ export function shouldHardDeny(rule: RuleLike, builtinToolSurface = false): bool
     // FALSE-POSITIVE gate for the built-in-tool hook, which guards the agent's
     // OWN native shell (Bash/Edit/Write/WebFetch). NARROWED (1.8.13) to ONLY the
     // shell-metacharacter-injection subcategories (shell-escape / parameter-
-    // injection — ATR-2026-00111 / 00066) that key on `;` `|` `$()` grammar.
+    // injection / command-injection — ATR-2026-00111 / 00066 / 01980) that key on
+    // `;` `|` `$()` and quote-breakout grammar.
     // Inside an MCP argument those are anomalous and rightly deny; but they are the
     // NORMAL grammar of a real shell, so matched against the agent's own
     // `echo x; curl localhost` they false-block legitimate work (they only reach a
@@ -144,16 +157,15 @@ export const ENGINE_MAX_EVAL_LENGTH = 100_000;
  * windows. A response the engine can take whole stays one event, exactly as
  * before, so windowing adds no seams there.
  *
- * The window leaves headroom under the engine limit because the engine also
- * tests the Unicode-normalised text, which can be longer than the raw window
- * (NFKC can expand crafted input far beyond this headroom; the raw text is
- * still tested). A match that fits in the 10,000-char overlap always lies whole
- * inside one window, which exceeds the longest bounded gap a bundled rule
- * allows. A rule whose conditions match farther apart than the overlap can
- * still miss across a window boundary.
+ * Windows are kept small to bound the cost of one evaluate(). The small window
+ * also leaves the Unicode-normalised text, which the engine tests too, plenty
+ * of room under the limit. A match that fits in the 6,000-char overlap always
+ * lies whole inside one window, twice the longest bounded gap a bundled rule
+ * allows ({0,3000}). A rule whose conditions match farther apart than the
+ * overlap can still miss across a window boundary.
  */
-export const RESPONSE_WINDOW_CHARS = 90_000;
-export const RESPONSE_WINDOW_OVERLAP_CHARS = 10_000;
+export const RESPONSE_WINDOW_CHARS = 30_000;
+export const RESPONSE_WINDOW_OVERLAP_CHARS = 6_000;
 
 /** Appended to the reason when a long response's hard-deny match was held back to an advisory. */
 export const LONG_RESPONSE_ADVISORY =
@@ -235,10 +247,10 @@ export interface EvaluatorMatch {
 }
 
 /**
- * The slice of an ATR engine this evaluator drives. The workspace engine
- * (@panguard-ai/atr) satisfies it, and so does the ATREngine of another
- * agent-threat-rules release that a caller pins and injects (the Open Responses
- * gateway runs 4.x, whose tool-definition scope the workspace 3.5.x lacks).
+ * The slice of an ATR engine this evaluator drives. The default ATREngine
+ * satisfies it, and so does one a caller builds from its own agent-threat-rules
+ * dependency and injects (the Open Responses gateway picks the lane and the
+ * tool-definition scope, and reports the release it loaded).
  */
 export interface EvaluatorEngine {
   loadRules(): Promise<number>;
@@ -249,8 +261,8 @@ export interface EvaluatorEngine {
 
 export interface ProxyEvaluatorOptions {
   /**
-   * Engine to evaluate with. Default: the workspace ATR engine over the rules
-   * of the installed agent-threat-rules package. The deny policy, advise-only
+   * Engine to evaluate with. Default: an ATREngine over the rules of the
+   * installed agent-threat-rules package. The deny policy, advise-only
    * gate, blocklist and fail-closed handling below apply to either.
    */
   readonly engine?: EvaluatorEngine;

@@ -1,13 +1,13 @@
 /**
  * ProxyEvaluator.evaluateEvent: the caller builds the event (ATR hook-handler
  * shape) and the evaluator applies its own policy — blocklist, hard-deny,
- * advise-only, fail-closed — with the workspace engine or an injected one.
+ * advise-only, fail-closed — with the default engine or an injected one.
  */
 import { describe, it, expect } from 'vitest';
 import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { AgentEvent } from '@panguard-ai/atr';
+import type { AgentEvent } from 'agent-threat-rules';
 import {
   ENGINE_MAX_EVAL_LENGTH,
   EVALUATION_ERROR_SENTINEL,
@@ -165,7 +165,7 @@ describe('ProxyEvaluator.evaluateEvent on input past the engine limit', () => {
   });
 });
 
-describe('ProxyEvaluator.evaluateEvent with the workspace engine', () => {
+describe('ProxyEvaluator.evaluateEvent with the default engine', () => {
   it('denies credential exfiltration in hook-shaped tool_call arguments', async () => {
     const evaluator = new ProxyEvaluator({ blocklistPath: NO_BLOCKLIST });
     expect(await evaluator.loadRules()).toBeGreaterThan(50);
