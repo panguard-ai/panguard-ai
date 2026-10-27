@@ -52,7 +52,13 @@ export async function inspectResponseBody(
     calls = [...calls, ...result.calls];
     stop = result.stop;
   }
-  const verdict = verdictField([...ctx.requestDecisions, ...decisions], ctx.notInspected);
+  const verdict = verdictField([...ctx.requestDecisions, ...decisions], {
+    ...ctx.notInspected,
+    // Only the provider's own items: the gateway's refusal messages are not model output.
+    unscanned_output_parts:
+      ctx.notInspected.unscanned_output_parts +
+      unscannedParts(kept.filter((k) => items.includes(k))),
+  });
   const body: JsonObject = {
     ...response,
     output: kept,
@@ -186,6 +192,15 @@ async function inspectReceipt(item: JsonObject, ctx: TurnContext): Promise<ItemR
     ],
     calls: [],
   };
+}
+
+/** Model refusals and reasoning items: relayed, not scanned (design S8). */
+function unscannedParts(items: readonly JsonObject[]): number {
+  return items.reduce((sum, item) => {
+    if (str(item, 'type') === 'reasoning') return sum + 1;
+    const content = isMessage(item) ? list(item, 'content') : undefined;
+    return sum + objects(content).filter((p) => str(p, 'type') === 'refusal').length;
+  }, 0);
 }
 
 function failedStop(judgement: Judgement): Stop {

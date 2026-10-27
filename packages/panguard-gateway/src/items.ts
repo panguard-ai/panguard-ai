@@ -56,6 +56,33 @@ export function isFunctionCallOutput(item: JsonObject): boolean {
 }
 
 /**
+ * Results of tools other than functions (provider tools such as a local shell
+ * or computer use, prefixed or not). They reach the model like a function
+ * output does, so they are scanned the same way.
+ */
+export function isOtherToolOutput(item: JsonObject): boolean {
+  const type = str(item, 'type') ?? '';
+  return type !== 'function_call_output' && type.endsWith('_output');
+}
+
+/** Input item types the gateway reads or knowingly cannot read. */
+const KNOWN_INPUT_TYPES: ReadonlySet<string> = new Set([
+  'message',
+  'function_call',
+  'function_call_output',
+  'reasoning',
+  'compaction',
+  'item_reference',
+]);
+
+/** An input item of a type the gateway neither scans nor recognizes. */
+export function isUnknownInputItem(item: JsonObject): boolean {
+  const type = str(item, 'type');
+  if (type === undefined) return !isMessage(item);
+  return !KNOWN_INPUT_TYPES.has(type) && !isOtherToolOutput(item);
+}
+
+/**
  * Provider-hosted tool receipts: provider-prefixed item types (`slug:*`) and
  * `*_call` items other than function_call. The provider ran these tools; the
  * gateway sees only what it reports afterwards.

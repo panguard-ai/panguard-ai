@@ -12,7 +12,7 @@ import { ChainAuditSink, NO_AUDIT, type AuditSink } from './audit.js';
 import type { GatewayConfig } from './config.js';
 import { CachingEvaluator } from './evaluation-cache.js';
 import { WorkerEvaluatorPool, type Evaluator } from './evaluator-pool.js';
-import { createHttpHandler } from './http-handler.js';
+import { createHttpHandler, originAllowed } from './http-handler.js';
 import type { JsonObject } from './json.js';
 import { VerdictLedger } from './ledger.js';
 import type { GatewayServices } from './services.js';
@@ -61,20 +61,29 @@ export async function startGateway(
       ledger: new VerdictLedger(config.ledger),
       audit,
     };
-    const health = (): JsonObject => ({
-      status: 'ok',
-      lane: config.lane,
-      rules,
-      policy: config.policy,
-      ledger_responses: services.ledger.size(),
-      evaluator: pool ? pool.stats() : 'external',
-    });
+    const health = (): JsonObject => {
+      const evaluator = pool?.stats();
+      return {
+        // No live ATR worker means every check fails (and fails closed by default).
+        status: evaluator && evaluator.alive === 0 ? 'degraded' : 'ok',
+        lane: config.lane,
+        rules,
+        policy: config.policy,
+        ledger_responses: services.ledger.size(),
+        evaluator: evaluator ?? 'external',
+      };
+    };
     const server = createServer(createHttpHandler(services, health));
     const sockets = new WebSocketServer({ noServer: true });
     server.on('upgrade', (req, socket, head) => {
       const path = new URL(req.url ?? '/', 'http://gateway').pathname.replace(/\/+$/, '');
       if (path !== '/v1/responses') {
         socket.destroy();
+        return;
+      }
+      if (!originAllowed(req.headers.origin, config.allowedOrigins)) {
+        // A web page may open a WebSocket to any host; only allowed origins get one here.
+        socket.end('HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n');
         return;
       }
       sockets.handleUpgrade(req, socket, head, (client) => new WsSession(client, req, services));

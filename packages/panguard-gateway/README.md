@@ -17,8 +17,12 @@ Request side, before anything reaches the provider:
 | `tools[]` function definitions  | `mcp_exchange`, tool-definition scope, `inputSchema` naming  | tool removed from `tools` and `allowed_tools` (or 400) |
 | `function_call_output`          | `tool_response` (PostToolUse shape), call resolved by ledger | output replaced, `call_id` kept (or 400)               |
 | role=user messages              | `llm_input`                                                  | 400 `policy_violation`                                 |
+| other tool outputs (`*_output`) | `tool_response`                                              | 400 `policy_violation` (their shape is the provider's) |
 | `previous_response_id`          | ledger lookup                                                | synthetic output for each call the gateway withheld    |
 | system/developer, images, files | not scanned                                                  | counted under `not_inspected`                          |
+
+The input of `/responses/compact` gets the same checks: the compacted window comes back encrypted
+and is never readable again.
 
 Stream and JSON responses:
 
@@ -26,10 +30,11 @@ Stream and JSON responses:
 | ----------------------------------- | ------------------------------------------------------------------------------------------ |
 | `output_item.added` (function_call) | the whole item is held, `added` included                                                   |
 | `function_call_arguments.done`      | main check: declared tool scope, Guard blocklist, ATR `tool_call`                          |
-| `output_item.done` (function_call)  | arguments must equal those checked                                                         |
-| `output_text.delta` / `.done`       | trailing text checked every 256 characters and at the end                                  |
-| text repeated in `.done` events     | carries the text that was streamed and checked; unstreamed text is checked when it appears |
+| `output_item.done` (function_call)  | name, `call_id`, every `arguments.done` and the joined deltas must match what was checked  |
+| `output_text.delta` / `.done`       | all new text (plus 4K of context) checked every 256 characters and at the end              |
+| text in any other carrier           | pre-filled `added` content, `text` parts, differing `.done` text: checked before it leaves |
 | provider-hosted tool receipts       | scanned and recorded, never blocked (the tool already ran)                                 |
+| events outside the spec's set       | dropped and counted (their content cannot be inspected)                                    |
 
 Event shapes follow ATR's own builders (`src/hook-handler.ts`, `src/cli/mcp-tools-document.ts`,
 `src/corpus-event.ts`), the shapes ATR's false-positive gate measures rules on. Arguments are parsed
@@ -39,9 +44,9 @@ and re-serialized so `tool_args` matches `JSON.stringify` output.
 
 - **Refusal (default, A):** the blocked `function_call` never reaches the client; a refusal message
   takes its output slot and the response still completes, so the agent loop keeps going.
-- **Incomplete (B):** the response ends as `incomplete` with `incomplete_details.reason:
-"content_filter"`. Text the model already streamed cannot be recalled, so a text hit always ends
-  this way; set `PANGUARD_GATEWAY_TEXT_HOLDBACK` to keep that many characters back until checked.
+- **Incomplete (B):** the response ends as `incomplete`, reason `content_filter`. Text the model
+  already streamed cannot be recalled, so a text hit always ends this way; set
+  `PANGUARD_GATEWAY_TEXT_HOLDBACK` to keep that many characters back until checked.
 - **Rewritten tool output (E):** `[PanGuard] tool output withheld: <rule ids>`, same `call_id`.
 - **Failed:** reserved for the gateway's own faults under fail-closed (an evaluation that errors or
   passes its deadline): `error` event, then `response.failed`, code `gateway_evaluation_failed`.
@@ -69,7 +74,9 @@ PANGUARD_GATEWAY_UPSTREAM=https://provider.example/v1 node packages/panguard-gat
 ```
 
 `node dist/cli.js --help` lists the settings (lane, fail mode, block style, text hold-back,
-evaluation deadline, audit log, blocklist). ATR runs in worker threads with a hard deadline per
+evaluation deadline, audit log, blocklist, allowed browser origins). Requests that carry a browser
+`Origin` header, HTTP and WebSocket alike, are refused unless the origin is allowed; agents and
+SDKs send none. ATR runs in worker threads with a hard deadline per
 evaluation; fields over 100,000 characters, which ATR would skip, are scanned in overlapping windows.
 
 ## Tests
@@ -91,7 +98,13 @@ official repository.
 - Hunt-lane false positives on real Open Responses traffic have not been measured.
 - The ledger is per process and in memory. `background: true` is refused (400): its results come
   back through provider routes the gateway never sees.
-- Only client-executed function tools can be stopped before they run; provider-hosted tools are
-  seen as receipts afterwards. Provider-prefixed `*_call` items are all treated as such receipts, so
-  a provider tool that the client executes (a local shell or computer-use action, say) is not held
-  back yet; that needs a per-provider list of client-executed item types.
+- Only client-executed function tools can be stopped before they run. Every other `*_call` item is
+  treated as the receipt of a tool the provider already ran: scanned and recorded, not held. A
+  provider tool that the client executes (a local shell or computer-use action, say) therefore is
+  not stopped yet; that needs a per-provider list of client-executed item types. Their results
+  are scanned on the next request.
+- Model refusals and reasoning text are relayed unscanned and counted (`unscanned_output_parts`).
+- With text hold-back 0 (the default), text the model streamed before a hit has reached the client
+  by the time the response is cut.
+- Items that appear only in the provider's terminal event, never streamed, are left out of the
+  terminal response the client receives.

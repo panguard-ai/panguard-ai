@@ -24,7 +24,7 @@ import {
   wsErrorEnvelope,
   type Rejection,
 } from './errors.js';
-import { isObject, num, parseJson, str, type JsonObject } from './json.js';
+import { isObject, num, parseJson, str, stringifyJson, type JsonObject } from './json.js';
 import { inspectRequest } from './request-inspector.js';
 import {
   auditResponse,
@@ -37,12 +37,19 @@ import { TurnProcessor } from './turn-processor.js';
 import { forwardHeaders, upstreamWsUrl } from './upstream.js';
 
 const TERMINAL = new Set(['response.completed', 'response.incomplete', 'response.failed']);
+/** response.create messages a client may queue behind the running turn. */
+const MAX_PENDING_TURNS = 16;
+/** Evicted response ids remembered per connection. */
+const MAX_EVICTED = 1_000;
+/** How long a turn the gateway cut may keep draining upstream before the session closes. */
+const DRAIN_LIMIT_MS = 60_000;
 
 interface ActiveTurn {
   readonly processor: TurnProcessor;
   readonly previousId: string | undefined;
   readonly audit: Omit<AuditContext, 'phase' | 'session' | 'response_id'>;
   readonly clientDone: boolean;
+  readonly drainTimer?: NodeJS.Timeout;
 }
 
 export class WsSession {
@@ -73,12 +80,24 @@ export class WsSession {
         .catch((err: unknown) => this.fail(`upstream event handling failed: ${errorText(err)}`));
     });
     this.upstream.on('close', () => {
-      this.upstreamChain = this.upstreamChain.then(() => this.onUpstreamClosed());
+      this.upstreamChain = this.upstreamChain
+        .then(() => this.onUpstreamClosed())
+        .catch((err: unknown) => this.fail(`closing the turn failed: ${errorText(err)}`));
     });
     this.upstream.on('error', (err) => {
       process.stderr.write(`[panguard-gateway] upstream WebSocket error: ${err.message}\n`);
     });
     this.client.on('message', (data) => {
+      if (this.pending.length >= MAX_PENDING_TURNS) {
+        this.sendError({
+          status: 429,
+          type: 'too_many_requests',
+          code: 'too_many_pending_turns',
+          message: `At most ${MAX_PENDING_TURNS} response.create messages may wait on one connection.`,
+          param: null,
+        });
+        return;
+      }
       this.pending = [...this.pending, rawText(data)];
       this.next();
     });
@@ -143,7 +162,12 @@ export class WsSession {
       inspection.notInspected
     );
     this.active = { processor: new TurnProcessor(ctx), previousId, audit, clientDone: false };
-    this.upstream.send(JSON.stringify(inspection.body));
+    const forwarded = stringifyJson(inspection.body);
+    if (forwarded === undefined) {
+      this.active = undefined;
+      return this.sendError(invalidRequest('invalid_json', 'Request nested too deeply.', null));
+    }
+    this.upstream.send(forwarded);
   }
 
   private async onUpstream(data: RawData): Promise<void> {
@@ -165,7 +189,13 @@ export class WsSession {
     const out = await turn.processor.push(event);
     if (!turn.clientDone) for (const message of out) this.send(message);
     if (!turn.clientDone && turn.processor.isEnded()) {
-      this.active = { ...turn, clientDone: true };
+      // The client has its terminal event; the provider keeps streaming the cut
+      // turn, which must finish before the next one starts on this connection.
+      const drainTimer = setTimeout(
+        () => this.fail(`upstream did not finish a cut response within ${DRAIN_LIMIT_MS} ms`),
+        DRAIN_LIMIT_MS
+      );
+      this.active = { ...turn, clientDone: true, drainTimer };
       recordLedger(this.services, turn.processor.outcome());
     }
     if (TERMINAL.has(str(event, 'type') ?? '')) this.endTurn();
@@ -182,15 +212,23 @@ export class WsSession {
     const turn = this.active;
     this.active = undefined;
     if (turn) {
-      const outcome = turn.processor.outcome();
-      recordLedger(this.services, outcome);
-      auditResponse(this.services, turn.audit, this.id, outcome);
+      clearTimeout(turn.drainTimer);
+      try {
+        const outcome = turn.processor.outcome();
+        recordLedger(this.services, outcome);
+        auditResponse(this.services, turn.audit, this.id, outcome);
+      } catch (err) {
+        process.stderr.write(
+          `[panguard-gateway] WebSocket session ${this.id}: recording the turn failed: ${errorText(err)}\n`
+        );
+      }
     }
     this.next();
   }
 
   private evict(responseId: string): void {
-    this.evicted = new Set([...this.evicted, responseId]);
+    const kept = [...this.evicted].slice(-(MAX_EVICTED - 1));
+    this.evicted = new Set([...kept, responseId]);
   }
 
   private sendError(rejection: Rejection): void {
@@ -198,7 +236,13 @@ export class WsSession {
   }
 
   private send(message: JsonObject): void {
-    if (this.client.readyState === WebSocket.OPEN) this.client.send(JSON.stringify(message));
+    if (this.client.readyState !== WebSocket.OPEN) return;
+    const text = stringifyJson(message);
+    if (text === undefined) {
+      this.fail('an event could not be serialized');
+      return;
+    }
+    this.client.send(text);
   }
 
   private fail(reason: string): void {

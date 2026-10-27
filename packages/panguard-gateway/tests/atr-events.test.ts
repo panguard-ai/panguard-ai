@@ -23,6 +23,11 @@ describe('canonicalArgs', () => {
     expect(args).toEqual({ canonical: '{not json', object: undefined, valid: false });
   });
 
+  it('falls back to the raw string when the JSON is nested too deep to re-serialize', () => {
+    const deep = '['.repeat(20_000) + ']'.repeat(20_000);
+    expect(canonicalArgs(deep)).toEqual({ canonical: deep, object: undefined, valid: false });
+  });
+
   it('serializes non-object JSON but exposes no object', () => {
     expect(canonicalArgs('[1, 2]')).toEqual({ canonical: '[1,2]', object: undefined, valid: true });
   });

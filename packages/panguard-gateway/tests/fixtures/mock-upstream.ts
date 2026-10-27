@@ -32,6 +32,8 @@ export interface MockUpstream {
   readonly url: string;
   /** Request bodies received on /v1/responses (HTTP and WebSocket), oldest first. */
   requests(): readonly Json[];
+  /** Request bodies received on /v1/responses/compact, oldest first. */
+  compactRequests(): readonly Json[];
   close(): Promise<void>;
 }
 
@@ -302,6 +304,7 @@ export async function startMockUpstream(options: MockOptions = {}): Promise<Mock
   const argChunk = options.argChunk ?? 8;
   const persisted: Store = new Map();
   const received: Json[] = [];
+  const compacted: Json[] = [];
 
   async function handleCreate(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const body = await readJson(req);
@@ -343,6 +346,7 @@ export async function startMockUpstream(options: MockOptions = {}): Promise<Mock
 
   async function handleCompact(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const body = await readJson(req);
+    compacted.push(body);
     if (!body['model'])
       return jsonError(
         res,
@@ -472,6 +476,7 @@ export async function startMockUpstream(options: MockOptions = {}): Promise<Mock
   return {
     url: `http://127.0.0.1:${port}/v1`,
     requests: () => [...received],
+    compactRequests: () => [...compacted],
     close: async () => {
       for (const client of sockets.clients) client.terminate();
       sockets.close();

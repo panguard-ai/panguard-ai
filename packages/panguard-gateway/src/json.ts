@@ -46,3 +46,16 @@ export function parseJson(text: string): unknown {
     return undefined;
   }
 }
+
+/**
+ * JSON.stringify, or undefined when the value cannot be serialized. JSON.parse
+ * accepts nesting thousands of levels deep that JSON.stringify then rejects
+ * with a RangeError, and such input can come from the model.
+ */
+export function stringifyJson(value: unknown): string | undefined {
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return undefined;
+  }
+}

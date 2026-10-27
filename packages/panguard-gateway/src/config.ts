@@ -27,8 +27,11 @@ export interface TextPolicy {
   readonly window: number;
   /** Characters held back from the client until a check has covered them. */
   readonly holdback: number;
-  /** Characters of trailing text each check reads. */
-  readonly tail: number;
+  /**
+   * Characters of already-checked text each check reads again, so a pattern
+   * that straddles two checks is seen whole. New text is always read in full.
+   */
+  readonly overlap: number;
 }
 
 export interface GatewayPolicy {
@@ -72,6 +75,12 @@ export interface GatewayConfig {
   readonly maxBodyBytes: number;
   /** Request headers forwarded upstream besides the built-in list. */
   readonly forwardHeaders: readonly string[];
+  /**
+   * Browser origins allowed to call the gateway. Requests carrying any other
+   * Origin header (HTTP and WebSocket upgrades) are refused; clients that send
+   * no Origin, such as agents and SDKs, are unaffected.
+   */
+  readonly allowedOrigins: readonly string[];
 }
 
 export const DEFAULT_POLICY: GatewayPolicy = {
@@ -79,7 +88,7 @@ export const DEFAULT_POLICY: GatewayPolicy = {
   blockStyle: 'refusal',
   requestMode: 'rewrite',
   binding: 'flag',
-  text: { window: 256, holdback: 0, tail: 4_096 },
+  text: { window: 256, holdback: 0, overlap: 4_096 },
 };
 
 const windowsSchema = z
@@ -106,7 +115,7 @@ const configSchema = z.object({
     text: z.object({
       window: z.number().int().min(1),
       holdback: z.number().int().min(0),
-      tail: z.number().int().min(64).max(ENGINE_MAX_EVAL_LENGTH),
+      overlap: z.number().int().min(0).max(ENGINE_MAX_EVAL_LENGTH),
     }),
   }),
   evaluation: z.object({
@@ -124,6 +133,7 @@ const configSchema = z.object({
   auditKey: z.instanceof(Buffer).optional(),
   maxBodyBytes: z.number().int().min(1_024),
   forwardHeaders: z.array(z.string().min(1)),
+  allowedOrigins: z.array(z.string().min(1)),
 });
 
 export type GatewayConfigInput = Pick<GatewayConfig, 'upstream'> &
@@ -158,6 +168,7 @@ export function resolveConfig(input: GatewayConfigInput): GatewayConfig {
     ...(input.auditKey !== undefined ? { auditKey: input.auditKey } : {}),
     maxBodyBytes: input.maxBodyBytes ?? 20 * 1024 * 1024,
     forwardHeaders: input.forwardHeaders ?? [],
+    allowedOrigins: input.allowedOrigins ?? [],
   };
   const parsed = configSchema.safeParse(candidate);
   if (!parsed.success) {
@@ -217,6 +228,7 @@ export function configFromEnv(env: NodeJS.ProcessEnv = process.env): GatewayConf
   const port = envNumber(env, 'PORT');
   const lane = envEnum(env, 'LANE', ['hunt', 'alert', 'enforce'] as const);
   const headers = envString(env, 'FORWARD_HEADERS');
+  const origins = envString(env, 'ALLOWED_ORIGINS');
   return resolveConfig({
     upstream,
     ...(host !== undefined ? { host } : {}),
@@ -240,6 +252,14 @@ export function configFromEnv(env: NodeJS.ProcessEnv = process.env): GatewayConf
     ...(audit !== undefined ? { auditLog: audit === 'off' ? null : audit } : {}),
     ...(headers !== undefined
       ? { forwardHeaders: headers.split(',').map((h) => h.trim().toLowerCase()) }
+      : {}),
+    ...(origins !== undefined
+      ? {
+          allowedOrigins: origins
+            .split(',')
+            .map((o) => o.trim())
+            .filter((o) => o !== ''),
+        }
       : {}),
   });
 }

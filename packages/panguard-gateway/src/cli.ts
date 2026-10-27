@@ -27,7 +27,14 @@ Environment:
   PANGUARD_GATEWAY_AUDIT_LOG        audit chain path, or "off"
   PANGUARD_GATEWAY_BLOCKLIST        Guard blocklist path
   PANGUARD_GATEWAY_FORWARD_HEADERS  extra request headers to forward, comma-separated
+  PANGUARD_GATEWAY_ALLOWED_ORIGINS  browser origins allowed to call the gateway, comma-separated
 `;
+
+process.on('unhandledRejection', (err: unknown) => {
+  process.stderr.write(
+    `[panguard-gateway] unhandled rejection (gateway keeps serving): ${err instanceof Error ? (err.stack ?? err.message) : String(err)}\n`
+  );
+});
 
 async function main(): Promise<void> {
   if (process.argv.includes('--help') || process.argv.includes('-h')) {

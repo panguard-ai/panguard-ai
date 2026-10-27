@@ -2,7 +2,10 @@
  * The ATR worker pool against the real agent-threat-rules 4.2.1 corpus. Uses
  * the compiled worker (dist/), which the CI build step produces before tests.
  */
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
   canonicalArgs,
   functionCallEvent,
@@ -185,4 +188,31 @@ describe('WorkerEvaluatorPool hard deadline', () => {
     const after = await pool.evaluate('runtime', userMessageEvent('hello', TS));
     expect(outcome(after)).toMatch(/^failure/);
   });
+
+  it('fails fast once workers keep failing to start, and reports no live worker', async () => {
+    const marker = join(mkdtempSync(join(tmpdir(), 'pg-flaky-worker-')), 'marker');
+    process.env['FLAKY_WORKER_MARKER'] = marker;
+    const pool = new WorkerEvaluatorPool({
+      lane: 'hunt',
+      windows: DEFAULT_WINDOWS,
+      size: 1,
+      timeoutMs: 200,
+      startupTimeoutMs: 2_000,
+      workerUrl: new URL('./fixtures/flaky-worker.mjs', import.meta.url),
+    });
+    try {
+      await pool.start();
+      const hang = await pool.evaluate('runtime', userMessageEvent('hang', TS));
+      expect(hang.kind).toBe('failure');
+      await vi.waitFor(() => expect(pool.stats().exhausted).toBe(true), { timeout: 10_000 });
+      const started = Date.now();
+      const after = await pool.evaluate('runtime', userMessageEvent('hello', TS));
+      expect(outcome(after)).toBe('failure: no ATR worker available');
+      expect(Date.now() - started).toBeLessThan(200);
+      expect(pool.stats().alive).toBe(0);
+    } finally {
+      delete process.env['FLAKY_WORKER_MARKER'];
+      await pool.close();
+    }
+  }, 30_000);
 });

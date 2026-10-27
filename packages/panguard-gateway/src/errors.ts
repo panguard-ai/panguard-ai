@@ -12,7 +12,7 @@
 
 export interface Rejection {
   readonly status: number;
-  readonly type: 'invalid_request' | 'not_found' | 'server_error';
+  readonly type: 'invalid_request' | 'not_found' | 'server_error' | 'too_many_requests';
   readonly code: string;
   readonly message: string;
   readonly param: string | null;

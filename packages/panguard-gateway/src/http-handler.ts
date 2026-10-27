@@ -9,7 +9,7 @@
 import { once } from 'node:events';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { httpErrorBody, invalidRequest, type Rejection } from './errors.js';
-import { isObject, parseJson, str, type JsonObject } from './json.js';
+import { isObject, parseJson, str, stringifyJson, type JsonObject } from './json.js';
 import { inspectRequest } from './request-inspector.js';
 import { inspectResponseBody } from './response-inspector.js';
 import {
@@ -64,9 +64,12 @@ async function route(
   health: HealthReport
 ): Promise<void> {
   const path = new URL(req.url ?? '/', 'http://gateway').pathname.replace(/\/+$/, '');
+  if (!originAllowed(req.headers.origin, services.config.allowedOrigins)) {
+    return sendJson(res, 403, originRefused());
+  }
   if (req.method === 'POST' && path === '/v1/responses') return handleResponses(req, res, services);
   if (req.method === 'POST' && path === '/v1/responses/compact')
-    return passThrough(req, res, services);
+    return handleCompact(req, res, services);
   if (req.method === 'GET' && path === '/healthz') return sendJson(res, 200, health());
   sendJson(res, 404, {
     error: {
@@ -83,15 +86,11 @@ async function handleResponses(
   res: ServerResponse,
   services: GatewayServices
 ): Promise<void> {
-  const raw = await readBody(req, services.config.maxBodyBytes);
-  if (typeof raw !== 'string') return sendRejection(res, raw);
-  const body = parseJson(raw);
-  if (!isObject(body)) {
-    return sendRejection(
-      res,
-      invalidRequest('invalid_json', 'Request body must be a JSON object.', null)
-    );
-  }
+  const body = await readJsonBody(req, res, services);
+  if (!body) return;
+  // Linked before anything slow: a client that leaves must not keep an upstream call running.
+  const abort = new AbortController();
+  const link = linkAbort(res, abort);
   const streaming = body['stream'] === true;
   const previousId = str(body, 'previous_response_id');
   const auditBase: AuditBase = {
@@ -110,14 +109,11 @@ async function handleResponses(
   );
   if (inspection.kind === 'reject') return sendRejection(res, inspection.rejection);
 
-  const abort = new AbortController();
-  const upstream = await callUpstream(
-    req,
-    services,
-    '/responses',
-    JSON.stringify(inspection.body),
-    abort
-  );
+  const forwarded = stringifyJson(inspection.body);
+  if (forwarded === undefined) {
+    return sendRejection(res, invalidRequest('invalid_json', 'Request nested too deeply.', null));
+  }
+  const upstream = await callUpstream(req, services, '/responses', forwarded, abort);
   if (!upstream) return sendRejection(res, upstreamUnavailable());
   if (!upstream.ok) return relay(res, upstream);
 
@@ -129,7 +125,7 @@ async function handleResponses(
   );
   const isSse = (upstream.headers.get('content-type') ?? '').includes('text/event-stream');
   if (streaming && isSse && upstream.body) {
-    return streamTurn(res, upstream, ctx, services, auditBase, abort);
+    return streamTurn(res, upstream, ctx, services, auditBase, { abort, keep: link.keepUpstream });
   }
   const payload = parseJson(await upstream.text());
   if (!isObject(payload)) return sendRejection(res, upstreamInvalid());
@@ -146,17 +142,14 @@ async function streamTurn(
   ctx: TurnContext,
   services: GatewayServices,
   auditBase: AuditBase,
-  abort: AbortController
+  upstreamCall: { readonly abort: AbortController; readonly keep: () => void }
 ): Promise<void> {
+  const { abort } = upstreamCall;
   const turn = new TurnProcessor(ctx);
   res.writeHead(200, {
     'content-type': 'text/event-stream',
     'cache-control': 'no-cache',
     connection: 'keep-alive',
-  });
-  res.on('close', () => {
-    // Client gone mid-stream: stop paying for tokens nobody will read.
-    if (!turn.isEnded()) abort.abort();
   });
   let drainTimer: NodeJS.Timeout | undefined;
   try {
@@ -172,6 +165,8 @@ async function streamTurn(
       if (!wasEnded && turn.isEnded()) {
         // A fast continuation must already find this turn's withheld calls.
         recordLedger(services, turn.outcome());
+        // The client has its terminal event; keep reading upstream to complete the ledger.
+        upstreamCall.keep();
         await closeStream(res);
         drainTimer = setTimeout(() => abort.abort(), DRAIN_LIMIT_MS);
       }
@@ -208,23 +203,89 @@ async function closeStream(res: ServerResponse): Promise<void> {
   res.end();
 }
 
-/** /responses/compact returns an encrypted compaction window: forwarded unchanged. */
-async function passThrough(
+/**
+ * /responses/compact turns the input into an encrypted window the gateway can
+ * never read again, so the input gets the request-side checks first (tool
+ * outputs and user messages); the compacted result is relayed as it comes.
+ */
+async function handleCompact(
   req: IncomingMessage,
   res: ServerResponse,
   services: GatewayServices
 ): Promise<void> {
-  const raw = await readBody(req, services.config.maxBodyBytes);
-  if (typeof raw !== 'string') return sendRejection(res, raw);
-  const upstream = await callUpstream(
-    req,
-    services,
-    '/responses/compact',
-    raw,
-    new AbortController()
+  const body = await readJsonBody(req, res, services);
+  if (!body) return;
+  const inspection = await inspectRequest(body, inspectContext(services));
+  services.audit.record(
+    { transport: 'http', phase: 'request', session: 'compact' },
+    inspection.decisions
   );
+  if (inspection.kind === 'reject') return sendRejection(res, inspection.rejection);
+  const forwarded = stringifyJson(inspection.body);
+  if (forwarded === undefined) {
+    return sendRejection(res, invalidRequest('invalid_json', 'Request nested too deeply.', null));
+  }
+  const abort = new AbortController();
+  linkAbort(res, abort);
+  const upstream = await callUpstream(req, services, '/responses/compact', forwarded, abort);
   if (!upstream) return sendRejection(res, upstreamUnavailable());
   return relay(res, upstream);
+}
+
+/** The request body as a JSON object, or undefined once a rejection was sent. */
+async function readJsonBody(
+  req: IncomingMessage,
+  res: ServerResponse,
+  services: GatewayServices
+): Promise<JsonObject | undefined> {
+  const raw = await readBody(req, services.config.maxBodyBytes);
+  if (typeof raw !== 'string') {
+    sendRejection(res, raw);
+    return undefined;
+  }
+  const body = parseJson(raw);
+  if (!isObject(body)) {
+    sendRejection(res, invalidRequest('invalid_json', 'Request body must be a JSON object.', null));
+    return undefined;
+  }
+  return body;
+}
+
+/**
+ * Abort the upstream call when the client goes away, unless the gateway ended
+ * the client's stream itself and keeps reading upstream to complete the ledger.
+ */
+function linkAbort(res: ServerResponse, abort: AbortController): { keepUpstream: () => void } {
+  let keep = false;
+  res.on('close', () => {
+    if (!keep) abort.abort();
+  });
+  return {
+    keepUpstream: () => {
+      keep = true;
+    },
+  };
+}
+
+/**
+ * Browsers send Origin; agents and SDKs do not. A page must not be able to
+ * drive the gateway (and a credential-free local provider behind it) unless
+ * its origin is allowed.
+ */
+export function originAllowed(origin: string | undefined, allowed: readonly string[]): boolean {
+  return origin === undefined || allowed.includes(origin);
+}
+
+function originRefused(): Record<string, unknown> {
+  return {
+    error: {
+      type: 'invalid_request',
+      code: 'origin_not_allowed',
+      message:
+        '[PanGuard] requests from a browser origin are refused unless that origin is allowed',
+      param: null,
+    },
+  };
 }
 
 async function callUpstream(

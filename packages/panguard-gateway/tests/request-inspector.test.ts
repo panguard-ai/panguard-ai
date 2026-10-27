@@ -335,6 +335,9 @@ describe('R4/R5/R7: messages', () => {
       content_parts: 1,
       opaque_items: 1,
       developer_messages: 3,
+      unknown_items: 0,
+      unscanned_output_parts: 0,
+      dropped_events: 0,
     });
   });
 
@@ -365,5 +368,57 @@ describe('R4/R5/R7: messages', () => {
       code: 'unsupported_parameter',
       param: 'background',
     });
+  });
+});
+
+describe('review regressions: other tool outputs, unknown items, deep definitions', () => {
+  it('scans a non-function tool output and rejects it on a hit', async () => {
+    const result = await inspectRequest(
+      {
+        model: 'm',
+        input: [{ type: 'local_shell_call_output', call_id: 'ls_1', output: INJECTION }],
+      },
+      ctx()
+    );
+    expect(result.kind).toBe('reject');
+    if (result.kind === 'reject') {
+      expect(result.decisions[0]).toMatchObject({
+        checkpoint: 'tool_output',
+        tool: 'local_shell_call_output',
+      });
+    }
+  });
+
+  it('counts input items it does not know', async () => {
+    const result = await inspectRequest(
+      {
+        model: 'm',
+        input: [
+          { type: 'acme:memory', text: 'remember this' },
+          { type: 'message', role: 'user', content: 'hi' },
+        ],
+      },
+      ctx()
+    );
+    expect(result.kind === 'forward' && result.notInspected.unknown_items).toBe(1);
+  });
+
+  it('strips a tool definition nested too deep to inspect', async () => {
+    let schema: Record<string, unknown> = { type: 'string' };
+    for (let i = 0; i < 20_000; i += 1) schema = { items: schema };
+    const result = await inspectRequest(
+      {
+        model: 'm',
+        input: 'hi',
+        tools: [{ ...WEATHER, name: 'deep', parameters: schema }, WEATHER],
+      },
+      ctx()
+    );
+    expect(result.kind).toBe('forward');
+    if (result.kind !== 'forward') return;
+    expect([...result.declared]).toEqual(['get_weather']);
+    expect(result.decisions.find((d) => d.tool === 'deep')?.rules).toEqual([
+      GATEWAY_RULES.uninspectable,
+    ]);
   });
 });

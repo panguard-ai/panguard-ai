@@ -23,21 +23,22 @@ export interface NotInspected {
   readonly opaque_items: number;
   /** System and developer messages plus `instructions`: not scanned as user input. */
   readonly developer_messages: number;
+  /** Request items of a type the gateway does not know. */
+  readonly unknown_items: number;
+  /** Model refusals and reasoning in the response: relayed, not scanned (design S8). */
+  readonly unscanned_output_parts: number;
+  /** Provider streaming events outside the spec's set: dropped, not relayed. */
+  readonly dropped_events: number;
 }
 
 export const NOTHING_UNINSPECTED: NotInspected = {
   content_parts: 0,
   opaque_items: 0,
   developer_messages: 0,
+  unknown_items: 0,
+  unscanned_output_parts: 0,
+  dropped_events: 0,
 };
-
-export function addNotInspected(a: NotInspected, b: NotInspected): NotInspected {
-  return {
-    content_parts: a.content_parts + b.content_parts,
-    opaque_items: a.opaque_items + b.opaque_items,
-    developer_messages: a.developer_messages + b.developer_messages,
-  };
-}
 
 export interface VerdictField {
   readonly outcome: 'pass' | 'flagged' | 'blocked' | 'failed';

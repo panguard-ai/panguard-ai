@@ -14,7 +14,7 @@
  */
 
 import type { AgentEvent } from 'agent-threat-rules';
-import { isObject, parseJson, type JsonObject } from './json.js';
+import { isObject, parseJson, stringifyJson, type JsonObject } from './json.js';
 
 export interface CanonicalArgs {
   /** JSON.stringify of the parsed arguments; the raw string when they are not JSON. */
@@ -32,12 +32,10 @@ export interface CanonicalArgs {
  */
 export function canonicalArgs(argumentsJson: string): CanonicalArgs {
   const parsed = parseJson(argumentsJson);
-  if (parsed === undefined) return { canonical: argumentsJson, object: undefined, valid: false };
-  return {
-    canonical: JSON.stringify(parsed),
-    object: isObject(parsed) ? parsed : undefined,
-    valid: true,
-  };
+  // Not JSON, or nested too deep to re-serialize: rules read the raw string.
+  const canonical = parsed === undefined ? undefined : stringifyJson(parsed);
+  if (canonical === undefined) return { canonical: argumentsJson, object: undefined, valid: false };
+  return { canonical, object: isObject(parsed) ? parsed : undefined, valid: true };
 }
 
 /** The hook's input text: the `content` argument when it is a string, else the JSON args. */
@@ -125,7 +123,8 @@ export function toolDefinitionEvent(tool: JsonObject, timestamp: string): AgentE
   return {
     type: 'mcp_exchange',
     timestamp,
-    content: JSON.stringify(definition),
+    // A definition too deep to serialize keeps only its name and description fields.
+    content: stringifyJson(definition) ?? '',
     ...(Object.keys(fields).length > 0 ? { fields } : {}),
   };
 }
@@ -135,7 +134,7 @@ export function toolDefinitionEvent(tool: JsonObject, timestamp: string): AgentE
  * so this is only scanned and recorded, never blocked.
  */
 export function hostedReceiptEvent(item: JsonObject, timestamp: string): AgentEvent {
-  const text = JSON.stringify(item);
+  const text = stringifyJson(item) ?? '';
   const type = typeof item['type'] === 'string' ? item['type'] : '';
   return {
     type: 'tool_response',

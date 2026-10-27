@@ -50,6 +50,8 @@ export interface EvaluatorPoolOptions {
   readonly maxQueue?: number;
   /** Deadline for a worker to load its rules. */
   readonly startupTimeoutMs?: number;
+  /** Longest an evaluation may wait for a free worker; default 4 x timeoutMs, at least 10 s. */
+  readonly maxWaitMs?: number;
   /** Worker entry; defaults to the compiled worker next to this module. */
   readonly workerUrl?: URL;
 }
@@ -58,6 +60,7 @@ interface Job {
   readonly request: EvaluateRequest;
   readonly resolve: (evaluation: Evaluation) => void;
   readonly queuedAt: number;
+  readonly waitTimer: NodeJS.Timeout;
 }
 
 interface Slot {
@@ -70,6 +73,9 @@ const DEFAULT_MAX_QUEUE = 1_000;
 const DEFAULT_STARTUP_TIMEOUT_MS = 30_000;
 /** Respawns allowed in a row without a worker reaching ready. */
 const MAX_FAILED_RESPAWNS = 3;
+/** First and longest pause before trying to bring workers back after giving up. */
+const RECOVERY_BASE_MS = 5_000;
+const RECOVERY_MAX_MS = 60_000;
 
 /**
  * The worker runs compiled JavaScript: next to this module in dist/, or, when
@@ -102,6 +108,10 @@ export class WorkerEvaluatorPool implements Evaluator {
   private failedRespawns = 0;
   private started = false;
   private closed = false;
+  /** Gave up respawning: evaluations fail at once until a recovery attempt succeeds. */
+  private exhausted = false;
+  private recoveryTimer: NodeJS.Timeout | undefined;
+  private recoveryDelay = RECOVERY_BASE_MS;
   private rules: RuleCounts = { runtime: 0, toolDefinitions: 0 };
   private counters = { timeouts: 0, restarts: 0, crashes: 0 };
 
@@ -138,27 +148,53 @@ export class WorkerEvaluatorPool implements Evaluator {
     return this.rules;
   }
 
-  stats(): Readonly<{ timeouts: number; restarts: number; crashes: number; queued: number }> {
-    return { ...this.counters, queued: this.queue.length };
+  stats(): Readonly<{
+    timeouts: number;
+    restarts: number;
+    crashes: number;
+    queued: number;
+    alive: number;
+    exhausted: boolean;
+  }> {
+    const alive = [...this.slots.values()].filter((slot) => slot.ready).length;
+    return { ...this.counters, queued: this.queue.length, alive, exhausted: this.exhausted };
   }
 
   evaluate(engine: EngineKind, event: AgentEvent): Promise<Evaluation> {
     if (this.closed) return Promise.resolve(failure('evaluator closed', 0));
+    if (this.exhausted && this.slots.size === 0) {
+      return Promise.resolve(failure('no ATR worker available', 0));
+    }
     if (this.queue.length >= (this.options.maxQueue ?? DEFAULT_MAX_QUEUE)) {
       return Promise.resolve(failure('evaluator overloaded: queue full', 0));
     }
     return new Promise((resolve) => {
       const request: EvaluateRequest = { id: this.nextId++, engine, event };
-      this.queue = [...this.queue, { request, resolve, queuedAt: Date.now() }];
+      const maxWait = this.options.maxWaitMs ?? Math.max(4 * this.options.timeoutMs, 10_000);
+      // The hard deadline starts at dispatch; this bounds the wait before it.
+      const waitTimer = setTimeout(() => this.expire(request.id, maxWait), maxWait);
+      this.queue = [...this.queue, { request, resolve, queuedAt: Date.now(), waitTimer }];
       this.dispatch();
     });
   }
 
+  /** A queued evaluation waited too long for a worker. */
+  private expire(id: number, maxWait: number): void {
+    const job = this.queue.find((j) => j.request.id === id);
+    if (!job) return;
+    this.queue = this.queue.filter((j) => j !== job);
+    job.resolve(failure(`waited ${maxWait} ms for an ATR worker`, Date.now() - job.queuedAt));
+  }
+
   async close(): Promise<void> {
     this.closed = true;
+    clearTimeout(this.recoveryTimer);
     const pending = this.queue;
     this.queue = [];
-    for (const job of pending) job.resolve(failure('evaluator closed', 0));
+    for (const job of pending) {
+      clearTimeout(job.waitTimer);
+      job.resolve(failure('evaluator closed', 0));
+    }
     const slots = [...this.slots.values()];
     this.slots = new Map();
     for (const slot of slots) {
@@ -242,6 +278,7 @@ export class WorkerEvaluatorPool implements Evaluator {
       const [job, ...rest] = this.queue;
       if (!job) return;
       this.queue = rest;
+      clearTimeout(job.waitTimer);
       const sentAt = Date.now();
       const timer = setTimeout(() => this.timeout(key), this.options.timeoutMs);
       this.setSlot(key, { ...slot, job: { ...job, timer, sentAt } });
@@ -288,7 +325,9 @@ export class WorkerEvaluatorPool implements Evaluator {
     if (!slot.ready) this.failedRespawns += 1;
     else this.counters = { ...this.counters, crashes: this.counters.crashes + 1 };
     if (this.failedRespawns > MAX_FAILED_RESPAWNS) {
+      this.exhausted = true;
       this.failQueueIfNoWorker(`ATR workers keep failing to start (${reason})`);
+      this.scheduleRecovery();
       return;
     }
     this.counters = { ...this.counters, restarts: this.counters.restarts + 1 };
@@ -304,7 +343,32 @@ export class WorkerEvaluatorPool implements Evaluator {
     if (this.slots.size > 0) return;
     const pending = this.queue;
     this.queue = [];
-    for (const job of pending) job.resolve(failure(reason, Date.now() - job.queuedAt));
+    for (const job of pending) {
+      clearTimeout(job.waitTimer);
+      job.resolve(failure(reason, Date.now() - job.queuedAt));
+    }
+  }
+
+  /**
+   * After giving up, try one worker again later, backing off up to a minute.
+   * A failed attempt comes back through retire(), which schedules the next one.
+   */
+  private scheduleRecovery(): void {
+    if (this.closed || this.recoveryTimer) return;
+    const delay = this.recoveryDelay;
+    this.recoveryDelay = Math.min(delay * 2, RECOVERY_MAX_MS);
+    this.recoveryTimer = setTimeout(() => {
+      this.recoveryTimer = undefined;
+      this.spawn().then(
+        () => {
+          this.exhausted = false;
+          this.failedRespawns = 0;
+          this.recoveryDelay = RECOVERY_BASE_MS;
+        },
+        () => undefined
+      );
+    }, delay);
+    this.recoveryTimer.unref();
   }
 }
 

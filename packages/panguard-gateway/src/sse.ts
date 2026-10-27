@@ -12,7 +12,8 @@ export interface SseMessage {
 
 /**
  * Parse an SSE byte stream (WHATWG rules: CR, LF or CRLF line ends, `data`
- * lines joined with LF, comment lines ignored, a blank line dispatches).
+ * lines joined with LF, comment lines ignored, a blank line dispatches, an
+ * unfinished event at the end is dropped).
  */
 export async function* readSse(body: AsyncIterable<Uint8Array>): AsyncGenerator<SseMessage> {
   const decoder = new TextDecoder();
@@ -21,19 +22,16 @@ export async function* readSse(body: AsyncIterable<Uint8Array>): AsyncGenerator<
   let data: string[] = [];
   let skipLf = false;
 
-  const lines = function* (final: boolean): Generator<string> {
+  const lines = function* (): Generator<string> {
     for (;;) {
-      if (skipLf && buffer.startsWith('\n')) buffer = buffer.slice(1);
-      skipLf = false;
-      const end = buffer.search(/[\r\n]/);
-      if (end === -1) {
-        if (final && buffer !== '') {
-          const rest = buffer;
-          buffer = '';
-          yield rest;
-        }
-        return;
+      // A CR ends a line; an LF right after it belongs to the same line end,
+      // even when it arrives in the next chunk.
+      if (skipLf && buffer.length > 0) {
+        if (buffer.startsWith('\n')) buffer = buffer.slice(1);
+        skipLf = false;
       }
+      const end = buffer.search(/[\r\n]/);
+      if (end === -1) return;
       const line = buffer.slice(0, end);
       skipLf = buffer[end] === '\r';
       buffer = buffer.slice(end + 1);
@@ -64,18 +62,17 @@ export async function* readSse(body: AsyncIterable<Uint8Array>): AsyncGenerator<
 
   for await (const chunk of body) {
     buffer += decoder.decode(chunk, { stream: true });
-    for (const line of lines(false)) {
+    for (const line of lines()) {
       const message = take(line);
       if (message) yield message;
     }
   }
   buffer += decoder.decode();
-  for (const line of lines(true)) {
+  for (const line of lines()) {
     const message = take(line);
     if (message) yield message;
   }
-  const last = take('');
-  if (last) yield last;
+  // An event the stream ended in the middle of is not dispatched (WHATWG).
 }
 
 /** One event in the form the spec's examples use: `event:` then `data:`. */

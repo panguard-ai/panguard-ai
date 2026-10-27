@@ -68,6 +68,38 @@ interface Held {
 
 const TERMINAL = new Set(['response.completed', 'response.incomplete', 'response.failed']);
 
+/**
+ * Streaming event types of the spec (the union the official conformance suite
+ * validates against). Anything else is a provider extension whose content the
+ * gateway cannot inspect, so it is dropped and counted, not relayed.
+ */
+const STANDARD_EVENTS: ReadonlySet<string> = new Set([
+  'response.created',
+  'response.queued',
+  'response.in_progress',
+  'response.completed',
+  'response.failed',
+  'response.incomplete',
+  'response.output_item.added',
+  'response.output_item.done',
+  'response.content_part.added',
+  'response.content_part.done',
+  'response.output_text.delta',
+  'response.output_text.done',
+  'response.refusal.delta',
+  'response.refusal.done',
+  'response.function_call_arguments.delta',
+  'response.function_call_arguments.done',
+  'response.reasoning_summary_part.added',
+  'response.reasoning_summary_part.done',
+  'response.reasoning.delta',
+  'response.reasoning.done',
+  'response.reasoning_summary_text.delta',
+  'response.reasoning_summary_text.done',
+  'response.output_text.annotation.added',
+  'error',
+]);
+
 export class TurnProcessor {
   private readonly ctx: TurnContext;
   private seq = 0;
@@ -82,6 +114,10 @@ export class TurnProcessor {
   private calls: readonly CallRecordInput[] = [];
   private seenCalls: ReadonlyMap<string, JsonObject> = new Map();
   private readonly text: TextGate;
+  /** Model refusals and reasoning items relayed without a scan (design S8). */
+  private unscanned = 0;
+  /** Provider events outside the standard set, dropped. */
+  private dropped = 0;
 
   constructor(ctx: TurnContext) {
     this.ctx = ctx;
@@ -173,19 +209,24 @@ export class TurnProcessor {
         return this.text.onDone(event);
       default:
         if (TERMINAL.has(type)) return this.onUpstreamTerminal(event);
+        if (!STANDARD_EVENTS.has(type)) {
+          this.dropped += 1;
+          return [];
+        }
+        if (type === 'response.refusal.done') this.unscanned += 1;
         return [this.emit(this.mapped(event))];
     }
   }
 
   // --- function calls (S2-S5) ---------------------------------------------
 
-  private onItemAdded(event: JsonObject): readonly JsonObject[] {
+  private async onItemAdded(event: JsonObject): Promise<readonly JsonObject[]> {
     const item = obj(event, 'item');
     if (item && isFunctionCall(item)) {
       this.hold(event);
       return [];
     }
-    if (item && str(item, 'type') === 'message') this.text.messageAdded(item);
+    if (item && str(item, 'type') === 'message') return this.text.onMessageAdded(event, item);
     return [this.emit(this.mapped(event))];
   }
 
@@ -231,6 +272,7 @@ export class TurnProcessor {
     if (item) {
       this.output = [...this.output, item];
       if (isHostedToolReceipt(item)) await this.scanReceipt(item);
+      if (str(item, 'type') === 'reasoning') this.unscanned += 1;
     }
     return [this.emit(this.mapped(event))];
   }
@@ -239,36 +281,25 @@ export class TurnProcessor {
     const held = this.held ?? {
       upstreamIndex: num(event, 'output_index'),
       itemId: str(item, 'id'),
-      item,
+      item: undefined,
       events: [],
       arguments: undefined,
       judgement: undefined,
     };
     this.held = undefined;
-    const args = str(item, 'arguments') ?? '';
-    const name = str(item, 'name') ?? '';
-    const judgement =
-      held.judgement === undefined
-        ? await checkFunctionCall(
-            name,
-            args,
-            this.ctx.declared,
-            this.ctx.evaluator,
-            this.ctx.policy
-          )
-        : held.arguments !== args
-          ? gatewayJudgement(
-              'deny',
-              GATEWAY_RULES.argumentsMismatch,
-              'arguments changed between function_call_arguments.done and output_item.done'
-            )
-          : held.judgement;
-    const out = this.applyCallJudgement(
-      item,
-      [...held.events, event],
-      judgement,
-      held.upstreamIndex
-    );
+    const events = [...held.events, event];
+    const mismatch = heldMismatch(held.item, events, item);
+    const judgement = mismatch
+      ? gatewayJudgement('deny', mismatch.rule, mismatch.reason)
+      : (held.judgement ??
+        (await checkFunctionCall(
+          str(item, 'name') ?? '',
+          str(item, 'arguments') ?? '',
+          this.ctx.declared,
+          this.ctx.evaluator,
+          this.ctx.policy
+        )));
+    const out = this.applyCallJudgement(item, events, judgement, held.upstreamIndex);
     return [...out, ...(await this.releaseWaiting())];
   }
 
@@ -391,10 +422,13 @@ export class TurnProcessor {
 
   // --- terminal events (S10) ------------------------------------------------
 
-  private onUpstreamTerminal(event: JsonObject): readonly JsonObject[] {
+  private async onUpstreamTerminal(event: JsonObject): Promise<readonly JsonObject[]> {
+    const closing = await this.text.closeOpenParts();
+    if (this.ended) return closing;
     const upstream = obj(event, 'response') ?? {};
     this.ended = true;
     return [
+      ...closing,
       this.emit({
         type: str(event, 'type'),
         response: { ...upstream, output: this.output, [VERDICT_FIELD]: this.verdict() },
@@ -446,7 +480,11 @@ export class TurnProcessor {
 
   private verdict(): JsonObject {
     return {
-      ...verdictField([...this.ctx.requestDecisions, ...this.decisions], this.ctx.notInspected),
+      ...verdictField([...this.ctx.requestDecisions, ...this.decisions], {
+        ...this.ctx.notInspected,
+        unscanned_output_parts: this.ctx.notInspected.unscanned_output_parts + this.unscanned,
+        dropped_events: this.ctx.notInspected.dropped_events + this.dropped,
+      }),
     };
   }
 
@@ -511,6 +549,52 @@ export class TurnProcessor {
   private emit(event: JsonObject): JsonObject {
     return { ...event, sequence_number: this.seq++ };
   }
+}
+
+/**
+ * Everything of a held call that reaches the client must be what was checked:
+ * name and call_id as in output_item.added (and any arguments pre-filled
+ * there), every function_call_arguments.done, and the deltas joined, must all
+ * match the final item. Returns the mismatch, or undefined.
+ */
+function heldMismatch(
+  added: JsonObject | undefined,
+  events: readonly JsonObject[],
+  item: JsonObject
+): { readonly rule: string; readonly reason: string } | undefined {
+  const args = str(item, 'arguments') ?? '';
+  if (added) {
+    for (const field of ['name', 'call_id'] as const) {
+      if (str(added, field) !== str(item, field)) {
+        return {
+          rule: GATEWAY_RULES.itemMismatch,
+          reason: `the function_call ${field} changed between output_item.added and output_item.done`,
+        };
+      }
+    }
+    const prefilled = str(added, 'arguments') ?? '';
+    if (prefilled !== '' && prefilled !== args) {
+      return {
+        rule: GATEWAY_RULES.argumentsMismatch,
+        reason: 'arguments in output_item.added differ from the final arguments',
+      };
+    }
+  }
+  const ofType = (type: string) => events.filter((e) => str(e, 'type') === type);
+  if (ofType('response.function_call_arguments.done').some((e) => str(e, 'arguments') !== args)) {
+    return {
+      rule: GATEWAY_RULES.argumentsMismatch,
+      reason: 'arguments changed between function_call_arguments.done and output_item.done',
+    };
+  }
+  const deltas = ofType('response.function_call_arguments.delta');
+  if (deltas.length > 0 && deltas.map((e) => str(e, 'delta') ?? '').join('') !== args) {
+    return {
+      rule: GATEWAY_RULES.argumentsMismatch,
+      reason: 'the streamed argument deltas do not add up to the final arguments',
+    };
+  }
+  return undefined;
 }
 
 function callRecord(

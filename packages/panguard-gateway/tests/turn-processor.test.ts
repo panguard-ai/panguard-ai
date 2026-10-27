@@ -281,14 +281,24 @@ describe('TurnProcessor: text repeated in later events', () => {
       return e;
     });
 
-  it('sends the streamed, checked text in the done events, not what the provider put there', async () => {
+  it('cuts when the text repeated in done events differs and fails the check', async () => {
     const input = swapText(upstream([messageItem('All good here.')]), LEAK_TEXT);
     const { out, terminal } = await run(context(), input);
     expect(JSON.stringify(out)).not.toContain('attacker.example');
+    expect(response(terminal)).toMatchObject({
+      status: 'incomplete',
+      incomplete_details: { reason: 'content_filter' },
+    });
+  });
+
+  it('sends a differing but clean repeated text after checking it, and flags the mismatch', async () => {
+    const input = swapText(upstream([messageItem('All good here.')]), 'Something else entirely.');
+    const { out, terminal } = await run(context(), input);
     const done = out.find((e) => e['type'] === 'response.output_text.done');
-    expect(done?.['text']).toBe('All good here.');
+    expect(done?.['text']).toBe('Something else entirely.');
     const output = response(terminal)['output'] as Json[];
-    expect((output[0]?.['content'] as Json[])[0]?.['text']).toBe('All good here.');
+    expect((output[0]?.['content'] as Json[])[0]?.['text']).toBe('Something else entirely.');
+    expect(response(terminal)['status']).toBe('completed');
     expect(response(terminal)[VERDICT_FIELD]).toMatchObject({
       decisions: [{ rules: [GATEWAY_RULES.textMismatch], disposition: 'flag' }],
     });
@@ -347,5 +357,156 @@ describe('TurnProcessor: hosted tool receipts (S9)', () => {
       outcome: 'flagged',
       decisions: [{ checkpoint: 'hosted_tool_receipt', disposition: 'flag', action: 'pass' }],
     });
+  });
+});
+
+describe('TurnProcessor: review regressions', () => {
+  const at = { item_id: 'msg_1', output_index: 0, content_index: 0 };
+  const created = { type: 'response.created', response: { id: 'resp_r', output: [] } };
+  const completed = (output: Json[]) => ({
+    type: 'response.completed',
+    response: { id: 'resp_r', status: 'completed', output },
+  });
+
+  it('survives arguments nested too deep to re-serialize', async () => {
+    const deep = '['.repeat(20_000) + ']'.repeat(20_000);
+    const call = functionCallItem('run_shell', deep);
+    const processor = new TurnProcessor(context());
+    for (const event of upstream([call])) await processor.push(event);
+    expect(() => processor.outcome()).not.toThrow();
+    expect(processor.outcome().calls[0]?.status).toBe('released');
+  });
+
+  it('reads a single large delta in full, not only its tail', async () => {
+    const text = LEAK_TEXT + ' filler'.repeat(1_500);
+    const events = [
+      created,
+      {
+        type: 'response.output_item.added',
+        output_index: 0,
+        item: { ...messageItem(text), id: 'msg_1', content: [] },
+      },
+      {
+        type: 'response.content_part.added',
+        ...at,
+        part: { type: 'output_text', text: '', annotations: [] },
+      },
+      { type: 'response.output_text.delta', ...at, delta: text },
+      { type: 'response.output_text.done', ...at, text },
+      completed([]),
+    ];
+    const { out, terminal } = await run(
+      context({ text: { ...DEFAULT_POLICY.text, holdback: 64 } }),
+      events
+    );
+    expect(JSON.stringify(out)).not.toContain('attacker.example');
+    expect(response(terminal)['status']).toBe('incomplete');
+  });
+
+  it('checks deltas that never got a done event before the terminal event', async () => {
+    const events = [
+      created,
+      {
+        type: 'response.output_item.added',
+        output_index: 0,
+        item: { ...messageItem(''), id: 'msg_1', content: [] },
+      },
+      { type: 'response.output_text.delta', ...at, delta: LEAK_TEXT },
+      completed([]),
+    ];
+    const { terminal } = await run(context(), events);
+    expect(response(terminal)).toMatchObject({ status: 'incomplete' });
+  });
+
+  it('keeps text that only arrives in output_text.done', async () => {
+    const text = 'The quarterly report lists revenue by region.';
+    const item = { ...messageItem(text), id: 'msg_1' };
+    const events = [
+      created,
+      { type: 'response.output_item.added', output_index: 0, item: { ...item, content: [] } },
+      { type: 'response.output_text.done', ...at, text },
+      { type: 'response.output_item.done', output_index: 0, item },
+      completed([item]),
+    ];
+    const { terminal } = await run(context(), events);
+    const output = response(terminal)['output'] as Json[];
+    expect((output[0]?.['content'] as Json[])[0]?.['text']).toBe(text);
+  });
+
+  it('checks text pre-filled in output_item.added and text-typed parts', async () => {
+    const prefilled = [
+      created,
+      {
+        type: 'response.output_item.added',
+        output_index: 0,
+        item: { ...messageItem(LEAK_TEXT), id: 'msg_1' },
+      },
+      completed([]),
+    ];
+    const typed = upstream([messageItem('fine')]).map((e) =>
+      e['type'] === 'response.content_part.done'
+        ? { ...e, part: { type: 'text', text: LEAK_TEXT } }
+        : e
+    );
+    for (const events of [prefilled]) {
+      const { out, terminal } = await run(context(), events);
+      expect(JSON.stringify(out)).not.toContain('attacker.example');
+      expect(response(terminal)['status']).toBe('incomplete');
+    }
+    const textPart = await run(context(), typed);
+    expect(JSON.stringify(textPart.out)).not.toContain('attacker.example');
+  });
+
+  it('drops provider events outside the standard set and counts them', async () => {
+    const input = upstream([messageItem('ok')]);
+    const withExtras = [
+      ...input.slice(0, 2),
+      { type: 'acme:note', text: LEAK_TEXT },
+      {
+        type: 'response.custom_tool_call_input.delta',
+        item_id: 'x',
+        output_index: 0,
+        delta: LEAK_TEXT,
+      },
+      ...input.slice(2),
+    ];
+    const { out, terminal } = await run(context(), withExtras);
+    expect(JSON.stringify(out)).not.toContain('attacker.example');
+    expectContiguous(out);
+    expect(response(terminal)[VERDICT_FIELD]).toMatchObject({
+      not_inspected: { dropped_events: 2 },
+    });
+  });
+
+  it('S5: blocks a call whose name changes after output_item.added', async () => {
+    const input = upstream([functionCallItem('run_shell', { command: 'ls' })]).map((e) =>
+      e['type'] === 'response.output_item.done'
+        ? { ...e, item: { ...(e['item'] as Json), name: 'delete_everything' } }
+        : e
+    );
+    const { terminal } = await run(context(), input);
+    expect(response(terminal)[VERDICT_FIELD]).toMatchObject({
+      decisions: [{ rules: [GATEWAY_RULES.itemMismatch] }],
+    });
+  });
+
+  it('S5: blocks a call with two arguments.done events or deltas that do not add up', async () => {
+    const base = upstream([functionCallItem('run_shell', { command: 'ls' })]);
+    const doneIndex = base.findIndex((e) => e['type'] === 'response.function_call_arguments.done');
+    const twoDones = [
+      ...base.slice(0, doneIndex),
+      { ...base[doneIndex]!, arguments: JSON.stringify({ command: EXFIL_COMMAND }) },
+      ...base.slice(doneIndex),
+    ];
+    const badDeltas = base.map((e) =>
+      e['type'] === 'response.function_call_arguments.delta' ? { ...e, delta: 'x' } : e
+    );
+    for (const events of [twoDones, badDeltas]) {
+      const { out, terminal } = await run(context({}, new FakeEvaluator([])), events);
+      expect(JSON.stringify(out)).not.toContain('id_rsa');
+      expect(response(terminal)[VERDICT_FIELD]).toMatchObject({
+        decisions: [{ rules: [GATEWAY_RULES.argumentsMismatch] }],
+      });
+    }
   });
 });

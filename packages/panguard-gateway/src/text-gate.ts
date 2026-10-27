@@ -1,14 +1,16 @@
 /**
  * Model text in a streamed turn (checkpoints S6/S7).
  *
- * Deltas go out whole (so `logprobs` and `obfuscation` stay aligned), the
- * trailing text is checked every `window` characters and once more at the end,
- * and with a hold-back nothing leaves before a check has read it. Text cannot
- * be recalled once sent, so a hit ends the response as incomplete.
+ * Deltas go out whole (so `logprobs` and `obfuscation` stay aligned). Every
+ * check reads all text added since the previous check plus `overlap` characters
+ * before it, so a single large delta is read in full and a pattern straddling
+ * two checks is seen whole. Checks run every `window` characters and once more
+ * at the end; with a hold-back nothing leaves before a check has read it. Text
+ * cannot be recalled once sent, so a hit ends the response as incomplete.
  *
- * Every later event that repeats the text (output_text.done, content_part.done,
- * output_item.done) carries the text that was streamed and checked, not what
- * the provider wrote there; text that never streamed is checked when it shows up.
+ * Text that reaches the client by any other carrier is checked too: text a
+ * provider pre-fills in output_item.added or content_part.added, `text` parts,
+ * and text repeated in the done events that differs from what streamed.
  *
  * @module @panguard-ai/panguard-gateway/text-gate
  */
@@ -40,6 +42,9 @@ export interface TurnHooks {
   endFailed(code: string, reason: string): readonly JsonObject[];
 }
 
+/** Content part types that carry model text to the client. */
+const TEXT_PARTS: ReadonlySet<string> = new Set(['output_text', 'text']);
+
 interface TextState {
   /** Upstream delta events not yet sent: released whole, so logprobs stay aligned. */
   readonly pending: readonly JsonObject[];
@@ -51,6 +56,8 @@ interface TextState {
   readonly lastPass: Judgement | undefined;
   /** output_text.done seen: `emitted` is the whole checked text of the part. */
   readonly finished: boolean;
+  /** Latest event of the part: where a cut at the end of the turn closes it. */
+  readonly origin: JsonObject | undefined;
 }
 
 const EMPTY_TEXT: TextState = {
@@ -61,6 +68,7 @@ const EMPTY_TEXT: TextState = {
   lastFlag: '',
   lastPass: undefined,
   finished: false,
+  origin: undefined,
 };
 
 interface MessageState {
@@ -72,6 +80,9 @@ interface MessageState {
 const blocks = (judgement: Judgement): boolean =>
   judgement.disposition === 'deny' || judgement.disposition === 'fault';
 
+const isTextPart = (part: unknown): part is JsonObject =>
+  isObject(part) && TEXT_PARTS.has(str(part, 'type') ?? '');
+
 export class TextGate {
   private readonly turn: TurnHooks;
   private texts: ReadonlyMap<string, TextState> = new Map();
@@ -81,10 +92,29 @@ export class TextGate {
     this.turn = turn;
   }
 
-  messageAdded(item: JsonObject): void {
+  /**
+   * A message item opens. Text pre-filled in it goes out with the event, so it
+   * is checked first; on a hit the message opens empty and the response is cut.
+   */
+  async onMessageAdded(event: JsonObject, item: JsonObject): Promise<readonly JsonObject[]> {
     const id = str(item, 'id');
-    if (id !== undefined)
+    if (id !== undefined) {
       this.messages = new Map([...this.messages, [id, { item, parts: new Map() }]]);
+    }
+    const content = Array.isArray(item['content']) ? item['content'] : [];
+    const text = content
+      .filter(isTextPart)
+      .map((p) => str(p, 'text') ?? '')
+      .join('\n');
+    if (text === '') return [this.turn.emit(this.turn.mapped(event))];
+    const judgement = await this.check(text);
+    if (!blocks(judgement)) {
+      this.flagText(event, EMPTY_TEXT, judgement);
+      return [this.turn.emit(this.turn.mapped(event))];
+    }
+    const emptied = { ...item, content: [] };
+    const opened = this.turn.emit(this.turn.mapped({ ...event, item: emptied }));
+    return [opened, ...this.cutMessage(event, emptied, [], judgement)];
   }
 
   async onDelta(event: JsonObject): Promise<readonly JsonObject[]> {
@@ -94,6 +124,7 @@ export class TextGate {
       ...prior,
       pending: [...prior.pending, event],
       pendingText: prior.pendingText + (str(event, 'delta') ?? ''),
+      origin: event,
     };
     const seen = state.emitted + state.pendingText;
     const { window, holdback } = this.turn.policy.text;
@@ -116,6 +147,38 @@ export class TextGate {
     return release.map((e) => this.turn.emit(this.turn.mapped(e)));
   }
 
+  /**
+   * The turn is ending: a part that never got output_text.done still has its
+   * unchecked text checked, and held-back deltas go out only if it passes.
+   */
+  async closeOpenParts(): Promise<readonly JsonObject[]> {
+    const out: JsonObject[] = [];
+    for (const [key, state] of this.texts) {
+      if (state.finished || !state.origin) continue;
+      const seen = state.emitted + state.pendingText;
+      let settled = state;
+      if (seen.length > state.checkedUpTo) {
+        const checked = await this.checkSeen(state.origin, key, state, seen);
+        if (checked.cut) return [...out, ...checked.cut];
+        settled = checked.state;
+      }
+      out.push(...settled.pending.map((e) => this.turn.emit(this.turn.mapped(e))));
+      this.setText(key, {
+        ...settled,
+        pending: [],
+        pendingText: '',
+        emitted: seen,
+        finished: true,
+      });
+    }
+    return out;
+  }
+
+  /**
+   * End of a text part. If the provider's final text differs from what
+   * streamed (or nothing streamed), the final text goes out only after a check
+   * of the whole of it.
+   */
   async onDone(event: JsonObject): Promise<readonly JsonObject[]> {
     const key = textKey(event);
     let state = this.texts.get(key) ?? EMPTY_TEXT;
@@ -126,21 +189,26 @@ export class TextGate {
       state = checked.state;
     }
     const itemId = str(event, 'item_id');
+    const repeated = str(event, 'text');
+    let final = seen;
+    if (repeated !== undefined && repeated !== seen) {
+      const judgement = await this.check(repeated);
+      if (blocks(judgement)) return this.cutText(event, state, judgement);
+      state = this.flagText(event, state, judgement);
+      const mismatch = gatewayJudgement(
+        'flag',
+        GATEWAY_RULES.textMismatch,
+        'output_text.done differed from the streamed text; it was checked whole'
+      );
+      this.turn.decide(decisionOf('output_text', mismatch, 'pass', { item_id: itemId }));
+      final = repeated;
+    }
     if (state.lastFlag === '' && state.lastPass) {
       this.turn.decide(decisionOf('output_text', state.lastPass, 'pass', { item_id: itemId }));
     }
     const flushed = state.pending.map((e) => this.turn.emit(this.turn.mapped(e)));
-    this.setText(key, { ...state, pending: [], pendingText: '', emitted: seen, finished: true });
-    const repeated = str(event, 'text');
-    if (repeated !== undefined && repeated !== seen) {
-      const mismatch = gatewayJudgement(
-        'flag',
-        GATEWAY_RULES.textMismatch,
-        'output_text.done differed from the streamed text; the streamed text was sent'
-      );
-      this.turn.decide(decisionOf('output_text', mismatch, 'pass', { item_id: itemId }));
-    }
-    return [...flushed, this.turn.emit(this.turn.mapped({ ...event, text: seen }))];
+    this.setText(key, { ...state, pending: [], pendingText: '', emitted: final, finished: true });
+    return [...flushed, this.turn.emit(this.turn.mapped({ ...event, text: final }))];
   }
 
   /**
@@ -150,10 +218,8 @@ export class TextGate {
   async onPartAdded(event: JsonObject): Promise<readonly JsonObject[]> {
     const part = obj(event, 'part');
     const text = str(part, 'text') ?? '';
-    if (str(part, 'type') !== 'output_text' || text === '') {
-      return [this.turn.emit(this.turn.mapped(event))];
-    }
-    const judgement = await checkText(text, this.turn.evaluator, this.turn.policy);
+    if (!isTextPart(part) || text === '') return [this.turn.emit(this.turn.mapped(event))];
+    const judgement = await this.check(text);
     if (blocks(judgement)) {
       const opened = this.turn.emit(this.turn.mapped({ ...event, part: { ...part, text: '' } }));
       return [opened, ...this.cutText(event, EMPTY_TEXT, judgement)];
@@ -170,7 +236,7 @@ export class TextGate {
   /** A finished part carries the checked text; a part that never streamed is checked now. */
   async onPartDone(event: JsonObject): Promise<readonly JsonObject[]> {
     const part = obj(event, 'part');
-    if (str(part, 'type') !== 'output_text') {
+    if (!isTextPart(part)) {
       this.recordPart(event);
       return [this.turn.emit(this.turn.mapped(event))];
     }
@@ -182,7 +248,7 @@ export class TextGate {
       return [this.turn.emit(this.turn.mapped(settled))];
     }
     const text = str(part, 'text') ?? '';
-    const judgement = await checkText(text, this.turn.evaluator, this.turn.policy);
+    const judgement = await this.check(text);
     if (blocks(judgement)) return this.cutText(event, state ?? EMPTY_TEXT, judgement);
     this.setText(key, {
       ...this.flagText(event, state ?? EMPTY_TEXT, judgement),
@@ -203,7 +269,7 @@ export class TextGate {
     const content = Array.isArray(item['content']) ? item['content'] : [];
     const rebuilt: unknown[] = [];
     for (const [index, part] of content.entries()) {
-      if (!isObject(part) || str(part, 'type') !== 'output_text') {
+      if (!isTextPart(part)) {
         rebuilt.push(part);
         continue;
       }
@@ -212,8 +278,7 @@ export class TextGate {
         rebuilt.push({ ...part, text: state.emitted });
         continue;
       }
-      const text = str(part, 'text') ?? '';
-      const judgement = await checkText(text, this.turn.evaluator, this.turn.policy);
+      const judgement = await this.check(str(part, 'text') ?? '');
       if (blocks(judgement)) return this.cutMessage(event, item, rebuilt, judgement);
       if (judgement.disposition === 'flag') {
         this.turn.decide(decisionOf('output_text', judgement, 'pass', { item_id: id }));
@@ -223,6 +288,10 @@ export class TextGate {
     const settled = { ...item, content: rebuilt };
     this.turn.addOutput(settled);
     return [this.turn.emit(this.turn.mapped({ ...event, item: settled }))];
+  }
+
+  private check(text: string): Promise<Judgement> {
+    return checkText(text, this.turn.evaluator, this.turn.policy);
   }
 
   private cutMessage(
@@ -240,21 +309,25 @@ export class TextGate {
     if (fault) return this.turn.endFailed('gateway_evaluation_failed', judgement.reason);
     const closed = { ...item, status: 'incomplete', content: kept };
     this.turn.addOutput(closed);
+    const index = this.turn.mapIndex(num(event, 'output_index'));
     return [
-      this.turn.emit(this.turn.mapped({ ...event, item: closed })),
+      this.turn.emit({ type: 'response.output_item.done', output_index: index, item: closed }),
       ...this.turn.endIncomplete(),
     ];
   }
 
-  /** Check the trailing text; a deny or fault cuts the response there. */
+  /**
+   * Check everything added since the last check, plus `overlap` characters of
+   * already-checked text before it. A deny or fault cuts the response there.
+   */
   private async checkSeen(
     event: JsonObject,
     key: string,
     state: TextState,
     seen: string
   ): Promise<{ readonly state: TextState; readonly cut?: readonly JsonObject[] }> {
-    const { tail } = this.turn.policy.text;
-    const judgement = await checkText(seen.slice(-tail), this.turn.evaluator, this.turn.policy);
+    const from = Math.max(0, state.checkedUpTo - this.turn.policy.text.overlap);
+    const judgement = await this.check(seen.slice(from));
     const checked: TextState = { ...state, checkedUpTo: seen.length };
     if (blocks(judgement)) {
       this.setText(key, checked);

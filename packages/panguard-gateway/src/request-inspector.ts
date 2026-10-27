@@ -36,9 +36,11 @@ import {
   isFunctionCallOutput,
   isMessage,
   isOpaqueItem,
+  isOtherToolOutput,
+  isUnknownInputItem,
   textOf,
 } from './items.js';
-import { isObject, str, type JsonObject } from './json.js';
+import { isObject, str, stringifyJson, type JsonObject } from './json.js';
 import { sha256, type LedgerCall, type VerdictLedger } from './ledger.js';
 import { inspectTools } from './request-tools.js';
 import { NOTHING_UNINSPECTED, type NotInspected } from './verdict-field.js';
@@ -214,9 +216,13 @@ async function inspectToolOutputs(
   const checked = await Promise.all(
     items.map(
       async (item): Promise<CheckedItem> =>
-        isObject(item) && isFunctionCallOutput(item)
-          ? inspectToolOutput(item, inline, chain, ctx)
-          : { item, decisions: [] }
+        !isObject(item)
+          ? { item, decisions: [] }
+          : isFunctionCallOutput(item)
+            ? inspectToolOutput(item, inline, chain, ctx)
+            : isOtherToolOutput(item)
+              ? inspectOtherOutput(item, ctx)
+              : { item, decisions: [] }
     )
   );
   return {
@@ -295,6 +301,52 @@ async function inspectToolOutput(
     item: { ...item, output: `[PanGuard] tool output withheld: ${ruleList(judgement.rules)}` },
     decisions: [...prior, decisionOf('tool_output', judgement, 'rewrite_output', subject)],
   };
+}
+
+/**
+ * A non-function tool result (no ledger record to bind or resolve against).
+ * Its shape is the provider's, so a hit rejects the request instead of
+ * rewriting a structure the gateway does not know.
+ */
+async function inspectOtherOutput(item: JsonObject, ctx: InspectContext): Promise<CheckedItem> {
+  const output = item['output'];
+  const text =
+    typeof output === 'string' || Array.isArray(output)
+      ? textOf(output).text
+      : stringifyJson(output);
+  const subject = { call_id: str(item, 'call_id'), tool: str(item, 'type') };
+  const judgement =
+    text === undefined
+      ? gatewayJudgement(
+          'deny',
+          GATEWAY_RULES.uninspectable,
+          'tool output too deeply nested to inspect'
+        )
+      : judge(
+          await ctx.evaluator.evaluate(
+            'runtime',
+            functionCallOutputEvent(undefined, text, timestamp())
+          ),
+          ctx.policy.failMode
+        );
+  if (judgement.disposition === 'fault') {
+    return {
+      item,
+      decisions: [decisionOf('tool_output', judgement, 'reject', subject)],
+      rejection: faultRejection(`could not evaluate a ${subject.tool ?? 'tool'} output`, 'input'),
+    };
+  }
+  if (judgement.disposition === 'deny') {
+    return {
+      item,
+      decisions: [decisionOf('tool_output', judgement, 'reject', subject)],
+      rejection: policyRejection(
+        `${subject.tool ?? 'tool'} output blocked: ${judgement.reason} (${ruleList(judgement.rules)})`,
+        'input'
+      ),
+    };
+  }
+  return { item, decisions: [decisionOf('tool_output', judgement, 'pass', subject)] };
 }
 
 function bindingJudgement(
@@ -431,5 +483,6 @@ function countNotInspected(items: readonly unknown[], body: JsonObject): NotInsp
     ),
     opaque_items: objectsOnly.filter(isOpaqueItem).length,
     developer_messages: developer + (typeof body['instructions'] === 'string' ? 1 : 0),
+    unknown_items: objectsOnly.filter(isUnknownInputItem).length,
   };
 }

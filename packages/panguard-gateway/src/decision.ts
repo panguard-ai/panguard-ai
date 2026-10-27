@@ -45,6 +45,8 @@ export type Action =
 export const GATEWAY_RULES = {
   undeclaredTool: 'panguard-gateway:undeclared-tool',
   argumentsMismatch: 'panguard-gateway:arguments-mismatch',
+  itemMismatch: 'panguard-gateway:item-mismatch',
+  uninspectable: 'panguard-gateway:uninspectable',
   invalidArguments: 'panguard-gateway:arguments-not-json',
   oversize: 'panguard-gateway:oversize',
   evaluationFailed: 'panguard-gateway:evaluation-failed',

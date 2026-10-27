@@ -11,9 +11,16 @@
  */
 
 import { toolDefinitionEvent } from './atr-events.js';
-import { decisionOf, judge, ruleList, type Decision } from './decision.js';
+import {
+  GATEWAY_RULES,
+  decisionOf,
+  gatewayJudgement,
+  judge,
+  ruleList,
+  type Decision,
+} from './decision.js';
 import { faultRejection, policyRejection, type Rejection } from './errors.js';
-import { isObject, list, objects, str, type JsonObject } from './json.js';
+import { isObject, list, objects, str, stringifyJson, type JsonObject } from './json.js';
 import type { InspectContext } from './request-inspector.js';
 
 export interface ToolScope {
@@ -37,10 +44,18 @@ export async function inspectTools(body: JsonObject, ctx: InspectContext): Promi
   const judged = await Promise.all(
     functions.map(async (tool) => ({
       name: str(tool, 'name') ?? '',
-      judgement: judge(
-        await ctx.evaluator.evaluate('tool-definitions', toolDefinitionEvent(tool, now)),
-        ctx.policy.failMode
-      ),
+      // A definition too deep to serialize cannot be read, so it cannot be trusted.
+      judgement:
+        stringifyJson(tool) === undefined
+          ? gatewayJudgement(
+              'deny',
+              GATEWAY_RULES.uninspectable,
+              'tool definition too deeply nested to inspect'
+            )
+          : judge(
+              await ctx.evaluator.evaluate('tool-definitions', toolDefinitionEvent(tool, now)),
+              ctx.policy.failMode
+            ),
     }))
   );
 
