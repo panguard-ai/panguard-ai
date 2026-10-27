@@ -33,6 +33,14 @@ function filler(chars: number): string {
   return FILLER_LINE.repeat(Math.ceil(chars / FILLER_LINE.length)).slice(0, chars);
 }
 
+/**
+ * The payload on a line of its own, as it sits in a real document. filler()
+ * can end mid-word, and a payload glued to that word loses the \b boundary that
+ * 00511's override condition starts with, so it would match only at some
+ * offsets.
+ */
+const POISONED_LINE = '\n' + POISONED + '\n';
+
 /** The proxy's post-tool cap (proxy.ts slices the response to 256KB). */
 const PROXY_RESPONSE_CAP = 262_144;
 const STEP = RESPONSE_WINDOW_CHARS - RESPONSE_WINDOW_OVERLAP_CHARS;
@@ -69,7 +77,7 @@ describe('long tool responses: real bundled rules', () => {
     'DENIES a poisoned response padded past 100,000 chars',
     async () => {
       await evaluator.loadRules();
-      const r = await evaluator.evaluateToolResponse('fetch_url', filler(120_000) + POISONED);
+      const r = await evaluator.evaluateToolResponse('fetch_url', filler(120_000) + POISONED_LINE);
       expect(r.outcome).toBe('deny');
       expect(r.matchedRules.length).toBeGreaterThan(0);
     },
@@ -80,7 +88,7 @@ describe('long tool responses: real bundled rules', () => {
     'DENIES a poisoned response that ends right at the 256KB proxy cap',
     async () => {
       await evaluator.loadRules();
-      const response = filler(PROXY_RESPONSE_CAP - POISONED.length) + POISONED;
+      const response = filler(PROXY_RESPONSE_CAP - POISONED_LINE.length) + POISONED_LINE;
       expect(response).toHaveLength(PROXY_RESPONSE_CAP);
       const r = await evaluator.evaluateToolResponse('fetch_url', response);
       expect(r.outcome).toBe('deny');
@@ -92,7 +100,7 @@ describe('long tool responses: real bundled rules', () => {
     'DENIES a payload buried in the middle of a long response',
     async () => {
       await evaluator.loadRules();
-      const response = filler(130_000) + POISONED + filler(110_000);
+      const response = filler(130_000) + POISONED_LINE + filler(110_000);
       const r = await evaluator.evaluateToolResponse('fetch_url', response);
       expect(r.outcome).toBe('deny');
     },
