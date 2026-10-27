@@ -7,9 +7,8 @@
  * with the MCP proxy's tool-response scan), and past that length only
  * maturity=stable rules hard-deny. What it does not do is bound the cost: a
  * multi-megabyte tool output would run past the gateway's evaluation deadline.
- * So per text the gateway scans at most `maxChars` characters, the head up to
- * that limit plus the final window, where appended payloads land, and reports
- * the result as partial.
+ * So per text the gateway scans the first `maxChars` characters plus the final
+ * window, where appended payloads land, and reports the result as partial.
  *
  * @module @panguard-ai/panguard-gateway/windows
  */

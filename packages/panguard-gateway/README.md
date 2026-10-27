@@ -81,9 +81,9 @@ evaluation deadline, audit log, blocklist, allowed browser origins). Requests th
 SDKs send none. ATR runs in worker threads with a hard deadline per
 evaluation. Texts over 100,000 characters, which ATR would skip, are scanned the way the MCP proxy
 scans long tool responses (`ProxyEvaluator.evaluateEvent`: 90,000-character windows overlapping by
-10,000), and in that range only maturity=stable rules block; other critical hits are flagged. Per text
-at most 400,000 characters are scanned, the head plus the final window; a longer text counts as
-partially scanned and is blocked under fail-closed.
+10,000), and in that range only maturity=stable rules block; other critical hits are flagged. Per text the gateway scans the
+first 400,000 characters and the last 90,000; a longer text counts as partially scanned and is
+blocked under fail-closed.
 
 ## Tests
 
