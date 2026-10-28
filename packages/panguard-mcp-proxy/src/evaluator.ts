@@ -2,34 +2,124 @@
  * ATR Evaluator — wraps ATR engine for proxy use
  *
  * Loads rules once on startup. Evaluates tool calls and responses.
- * Returns allow/deny/ask verdict.
+ * Returns allow/deny/ask verdict. The engine runs on the calling thread, or
+ * (isolation: 'worker') in a worker thread that cuts an evaluation at a deadline.
  *
  * @module @panguard-ai/panguard-mcp-proxy/evaluator
  */
 
-import { ATREngine } from '@panguard-ai/atr';
-import type { AgentEvent } from '@panguard-ai/atr';
+// The engine comes straight from agent-threat-rules (4.x) rather than the
+// monorepo's @panguard-ai/atr wrapper, which still pins 3.5.x for the other
+// packages; the proxy and the CLI hook move to 4.x ahead of the product-wide
+// upgrade.
+import { ATREngine } from 'agent-threat-rules';
+import type { AgentEvent, ATRRule } from 'agent-threat-rules';
 import { resolve, dirname, join } from 'node:path';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { EngineWorker, EngineWorkerError, EvaluationDeadlineError } from './engine-worker.js';
+import type { EngineMatch, EngineWorkerOptions, EngineWorkerState } from './engine-worker.js';
+
+export { EngineWorkerError, EvaluationDeadlineError } from './engine-worker.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-/** Find bundled ATR rules directory from agent-threat-rules npm package.
+/** Find the agent-threat-rules npm package (the directory holding its bundled rules).
  *  Walks up from this module searching node_modules. This is more robust
  *  than require.resolve() which fails with strict ESM exports (v2.0.0+). */
-function findRulesDir(): string {
+function findAtrPackageDir(): string {
   let dir = __dirname;
   for (let i = 0; i < 10; i++) {
-    const candidate = resolve(dir, 'node_modules', 'agent-threat-rules', 'rules');
-    if (existsSync(candidate)) return candidate;
+    const candidate = resolve(dir, 'node_modules', 'agent-threat-rules');
+    if (existsSync(join(candidate, 'rules'))) return candidate;
     const parent = dirname(dir);
     if (parent === dir) break;
     dir = parent;
   }
 
   throw new Error('Cannot find ATR rules directory. Install agent-threat-rules.');
+}
+
+/**
+ * file: URL of the package's entry module, for the worker to import. Resolved
+ * here, not by name inside the worker: an eval worker resolves a bare name from
+ * the process's working directory, which for the CLI hook is the user's project.
+ */
+function engineEntryUrl(packageDir: string): string {
+  const pkg = JSON.parse(readFileSync(join(packageDir, 'package.json'), 'utf-8')) as {
+    readonly exports?: { readonly '.'?: { readonly import?: unknown } };
+    readonly main?: unknown;
+  };
+  const entry = [pkg.exports?.['.']?.import, pkg.main].find((e) => typeof e === 'string');
+  return pathToFileURL(resolve(packageDir, (entry as string | undefined) ?? 'dist/index.js')).href;
+}
+
+/** Where the engine runs. Verdicts are the same either way; only 'worker' can cut a slow evaluation. */
+export type EvaluationIsolation = 'inline' | 'worker';
+
+export interface ProxyEvaluatorOptions {
+  /**
+   * 'inline' (default) runs the engine on the calling thread. 'worker' runs it
+   * in a worker thread, and an evaluation still running at `deadlineMs` is cut:
+   * the call rejects with EvaluationDeadlineError and the caller decides what
+   * an unfinished scan means.
+   */
+  readonly isolation?: EvaluationIsolation;
+  /** Worker mode: how long one evaluation may run (default DEFAULT_EVAL_DEADLINE_MS). */
+  readonly deadlineMs?: number;
+  /**
+   * Engine to evaluate with. Default: an ATREngine over the rules of the
+   * installed agent-threat-rules package. An injected engine runs on the
+   * calling thread, so it cannot be combined with isolation 'worker'. The deny
+   * policy, advise-only gate, blocklist and fail-closed handling apply to either.
+   */
+  readonly engine?: EvaluatorEngine;
+  /** Guard blocklist file. Default: ~/.panguard-guard/blocked-tools.json. */
+  readonly blocklistPath?: string;
+}
+
+/**
+ * Large ordinary tool responses (bundled JavaScript, source maps) can take
+ * several seconds to scan. A deadline close to that would cut them on a slower
+ * machine, and under the proxy's fail-closed default that blocks them.
+ */
+export const DEFAULT_EVAL_DEADLINE_MS = 15_000;
+
+/** The engine calls the evaluator makes, served on this thread or by a worker. */
+interface EngineBackend {
+  loadRules(): Promise<number>;
+  /** Merge an auto-pulled rules directory; resolves with the ids it added. */
+  addAutoRules(rulesDir: string, adviseOnly: boolean): Promise<readonly string[]>;
+  evaluate(events: readonly AgentEvent[]): Promise<readonly EngineMatch[]>;
+  close(): Promise<void>;
+}
+
+function inlineBackend(engine: EvaluatorEngine): EngineBackend {
+  return {
+    loadRules: () => engine.loadRules(),
+    async addAutoRules(dir) {
+      const existing = new Set(engine.getRules().map((r) => r.id));
+      const sub = new ATREngine({ rulesDir: dir });
+      await sub.loadRules();
+      // An id already present (from the bundled set) keeps its bundled copy.
+      const fresh = sub.getRules().filter((rule) => !existing.has(rule.id));
+      for (const rule of fresh) engine.addRule(rule);
+      return fresh.map((rule) => rule.id);
+    },
+    evaluate: async (events) => events.flatMap((event) => engine.evaluate(event)),
+    close: async () => undefined,
+  };
+}
+
+function workerBackend(options: EngineWorkerOptions, deadlineMs: number): EngineBackend {
+  const worker = new EngineWorker(options);
+  return {
+    loadRules: async () => (await worker.start()).ruleCount,
+    addAutoRules: (dir, adviseOnly) => worker.loadAutoRules(dir, adviseOnly),
+    evaluate: (events) => worker.evaluate(events, deadlineMs),
+    close: () => worker.close(),
+  };
 }
 
 export interface EvalResult {
@@ -80,10 +170,18 @@ interface RuleLike {
  * illegitimate on any shell and MUST keep hard-blocking there. 1.8.12 wrongly
  * gated the whole scan_target:mcp class, which silently degraded credential theft
  * (`cat ~/.ssh/id_rsa`) to an advisory on the agent's own shell — a shipped hole.
+ *
+ * command-injection joined with agent-threat-rules 4.2: ATR-2026-01980 (an
+ * MCP argument value that breaks out of its quote, then `;` and a chained
+ * command or `$()`) hard-denied 66 of 3,900 PreToolUse calls sampled from real
+ * Claude Code sessions, all ordinary `"..."; cmd` and `$(...)` shell. It is the
+ * only scan_target:mcp rule in that subcategory, and like the other two it
+ * judges grammar, not what the command does.
  */
 const SHELL_METACHAR_FP_SUBCATEGORIES: ReadonlySet<string> = new Set([
   'shell-escape',
   'parameter-injection',
+  'command-injection',
 ]);
 
 /**
@@ -113,7 +211,8 @@ export function shouldHardDeny(rule: RuleLike, builtinToolSurface = false): bool
     // FALSE-POSITIVE gate for the built-in-tool hook, which guards the agent's
     // OWN native shell (Bash/Edit/Write/WebFetch). NARROWED (1.8.13) to ONLY the
     // shell-metacharacter-injection subcategories (shell-escape / parameter-
-    // injection — ATR-2026-00111 / 00066) that key on `;` `|` `$()` grammar.
+    // injection / command-injection — ATR-2026-00111 / 00066 / 01980) that key on
+    // `;` `|` `$()` and quote-breakout grammar.
     // Inside an MCP argument those are anomalous and rightly deny; but they are the
     // NORMAL grammar of a real shell, so matched against the agent's own
     // `echo x; curl localhost` they false-block legitimate work (they only reach a
@@ -131,8 +230,131 @@ export function shouldHardDeny(rule: RuleLike, builtinToolSurface = false): bool
   return rule.severity === 'high' && rule.maturity === 'stable';
 }
 
+/**
+ * The ATR engine's MAX_EVAL_LENGTH: it refuses to run a regex over a longer
+ * field (safeRegexTest() returns false), so every condition on that field
+ * silently misses. A tool response past this length used to be not scanned at
+ * all, and padding a poisoned response past it evaded the indirect-injection scan.
+ */
+export const ENGINE_MAX_EVAL_LENGTH = 100_000;
+
+/**
+ * A response longer than ENGINE_MAX_EVAL_LENGTH is scanned in overlapping
+ * windows. A response the engine can take whole stays one event, exactly as
+ * before, so windowing adds no seams there.
+ *
+ * Windows are kept small to bound the cost of one evaluate(). The small window
+ * also leaves the Unicode-normalised text, which the engine tests too, plenty
+ * of room under the limit. A match that fits in the 6,000-char overlap always
+ * lies whole inside one window, twice the longest bounded gap a bundled rule
+ * allows ({0,3000}). A rule whose conditions match farther apart than the
+ * overlap can still miss across a window boundary.
+ */
+export const RESPONSE_WINDOW_CHARS = 30_000;
+export const RESPONSE_WINDOW_OVERLAP_CHARS = 6_000;
+
+/** Appended to the reason when a long response's hard-deny match was held back to an advisory. */
+export const LONG_RESPONSE_ADVISORY =
+  ' [advisory: response over 100,000 chars, only stable rules block]';
+
+/** Overlapping windows covering `text`, each at most `size` chars (the text itself when it fits). */
+export function responseWindows(
+  text: string,
+  size = RESPONSE_WINDOW_CHARS,
+  overlap = RESPONSE_WINDOW_OVERLAP_CHARS
+): string[] {
+  if (overlap < 0 || overlap >= size) {
+    throw new RangeError(`window overlap (${overlap}) must be in [0, size=${size})`);
+  }
+  if (text.length <= size) return [text];
+  const step = size - overlap;
+  const count = Math.ceil((text.length - overlap) / step);
+  return Array.from({ length: count }, (_, i) => text.slice(i * step, i * step + size));
+}
+
+const SEVERITY_RANK: ReadonlyMap<string, number> = new Map([
+  ['critical', 0],
+  ['high', 1],
+  ['medium', 2],
+  ['low', 3],
+  ['informational', 4],
+]);
+
+interface MatchLike {
+  readonly rule: { readonly id: string; readonly severity: string };
+  readonly confidence: number;
+}
+
+/**
+ * One match per rule (the most confident one), ordered the way the engine
+ * orders a single evaluate(): severity first, then confidence. A rule that fires
+ * in two windows counts once, and the verdict, reason and confidence of a
+ * windowed response do not depend on which window a match came from.
+ */
+function mergeMatches<T extends MatchLike>(matches: readonly T[]): T[] {
+  const best = new Map<string, T>();
+  for (const m of matches) {
+    const prev = best.get(m.rule.id);
+    if (!prev || m.confidence > prev.confidence) best.set(m.rule.id, m);
+  }
+  const rank = (m: T) => SEVERITY_RANK.get(m.rule.severity) ?? 4;
+  return [...best.values()].sort((a, b) => rank(a) - rank(b) || b.confidence - a.confidence);
+}
+
+/**
+ * An event as the engine can take it: the event itself when every text in it
+ * fits ENGINE_MAX_EVAL_LENGTH, else one event per window (responseWindows),
+ * each long text replaced by its window of the same index. Texts that are the
+ * same string (the hook puts a tool output in content, tool_response and
+ * fields.content) stay aligned window for window.
+ */
+export function eventWindows(event: AgentEvent): AgentEvent[] {
+  const texts = [event.content, ...Object.values(event.fields ?? {})];
+  const long = [...new Set(texts.filter((t) => t.length > ENGINE_MAX_EVAL_LENGTH))];
+  if (long.length === 0) return [event];
+  const split = new Map(long.map((t) => [t, responseWindows(t)] as const));
+  const count = Math.max(...[...split.values()].map((w) => w.length));
+  const pick = (text: string, i: number): string => {
+    const windows = split.get(text);
+    return windows ? (windows[Math.min(i, windows.length - 1)] ?? '') : text;
+  };
+  return Array.from({ length: count }, (_, i): AgentEvent => {
+    const fields = event.fields
+      ? Object.fromEntries(Object.entries(event.fields).map(([k, v]) => [k, pick(v, i)]))
+      : undefined;
+    return { ...event, content: pick(event.content, i), ...(fields ? { fields } : {}) };
+  });
+}
+
+/** What the verdict reads from one engine match. */
+export interface EvaluatorMatch {
+  readonly rule: RuleLike & { readonly id: string; readonly title: string };
+  readonly confidence: number;
+}
+
+/**
+ * The slice of an ATR engine this evaluator drives. The default ATREngine
+ * satisfies it, and so does one a caller builds from its own agent-threat-rules
+ * dependency and injects (the Open Responses gateway picks the lane and the
+ * tool-definition scope, and reports the release it loaded). An injected engine
+ * runs inline; a caller that needs a time limit runs the evaluator in a worker
+ * of its own, as the gateway does.
+ */
+export interface EvaluatorEngine {
+  loadRules(): Promise<number>;
+  evaluate(event: AgentEvent): readonly EvaluatorMatch[];
+  getRules(): readonly { readonly id: string }[];
+  addRule(rule: ATRRule): void;
+}
+
 export class ProxyEvaluator {
-  private readonly engine: ATREngine;
+  /** Where the engine runs (see ProxyEvaluatorOptions). */
+  readonly isolation: EvaluationIsolation;
+  /** Worker mode: how long one evaluation may run before it is cut. */
+  readonly deadlineMs: number;
+  /** The engine itself (built or injected) in inline mode; in worker mode it lives in the worker. */
+  private readonly engine: EvaluatorEngine | null;
+  private readonly backend: EngineBackend;
   private rulesLoaded = false;
   private ruleCount = 0;
   /**
@@ -141,25 +363,70 @@ export class ProxyEvaluator {
    * EXCLUDED from the hard-deny decision, so a fresh rule can never silently
    * block the user's tool. Once the user trusts the bundle version, the hook
    * loads them with adviseOnly=false and they are absent from this set (i.e.
-   * they arm). Bundled/shipped rules are never in this set.
+   * they arm). Bundled/shipped rules are never in this set. In worker mode it is
+   * rebuilt from what each (re)started worker reports it loaded.
    */
-  private readonly adviseOnlyIds: Set<string> = new Set();
+  private adviseOnlyIds: ReadonlySet<string> = new Set();
   private blockedTools: Set<string> = new Set();
   private readonly blocklistPath: string;
   private blocklistMtime = 0;
   private blocklistSize = 0;
 
-  constructor() {
-    const rulesDir = findRulesDir();
+  constructor(options: ProxyEvaluatorOptions = {}) {
+    const { isolation = 'inline', deadlineMs = DEFAULT_EVAL_DEADLINE_MS } = options;
+    if (isolation !== 'inline' && isolation !== 'worker') {
+      throw new RangeError(`isolation must be 'inline' or 'worker', got ${String(isolation)}`);
+    }
+    // A Node timer fires at once for a delay over 2^31 - 1 ms.
+    if (!(deadlineMs > 0 && deadlineMs <= 2_147_483_647)) {
+      throw new RangeError(`deadlineMs must be in (0, 2147483647] ms, got ${deadlineMs}`);
+    }
+    // An injected engine is an object on this thread; a worker cannot run it.
+    if (options.engine && isolation === 'worker') {
+      throw new RangeError("an injected engine runs inline; it cannot use isolation 'worker'");
+    }
+    this.isolation = isolation;
+    this.deadlineMs = deadlineMs;
     // 'hunt' detection (every rule) so we never MISS an attack in a tool call —
     // incl. the broad workhorse rule ATR-2026-00001 (stable but confirm:embedding,
     // which an 'enforce' sync lane would silently drop since this proxy ships no
     // embedding model). FP-safety is enforced at the DENY gate instead: a match
     // only HARD-denies a live tool call when it is a proven rule (see evaluate());
     // unproven matches degrade to 'ask' rather than breaking the agent.
-    this.engine = new ATREngine({ rulesDir });
-    this.blocklistPath = join(homedir(), '.panguard-guard', 'blocked-tools.json');
+    if (options.engine) {
+      this.engine = options.engine;
+      this.backend = inlineBackend(this.engine);
+    } else {
+      const packageDir = findAtrPackageDir();
+      const rulesDir = join(packageDir, 'rules');
+      this.engine = isolation === 'inline' ? new ATREngine({ rulesDir }) : null;
+      this.backend = this.engine
+        ? inlineBackend(this.engine)
+        : workerBackend(
+            {
+              engineUrl: engineEntryUrl(packageDir),
+              rulesDir,
+              onStart: (state) => this.adoptWorkerState(state),
+            },
+            deadlineMs
+          );
+    }
+    this.blocklistPath =
+      options.blocklistPath ?? join(homedir(), '.panguard-guard', 'blocked-tools.json');
     this.refreshBlocklist();
+  }
+
+  /** A worker restarted after a cut reloads its rules; the count and advise-only marking follow what it reports. */
+  private adoptWorkerState(state: EngineWorkerState): void {
+    this.ruleCount = state.autoRules.reduce((n, load) => n + load.added.length, state.ruleCount);
+    this.adviseOnlyIds = new Set(
+      state.autoRules.flatMap((load) => (load.adviseOnly ? load.added : []))
+    );
+  }
+
+  /** Stop the worker, if there is one. A later evaluation starts a new one. */
+  close(): Promise<void> {
+    return this.backend.close();
   }
 
   /** Reload blocklist from disk if modified (called before each evaluation) */
@@ -181,7 +448,7 @@ export class ProxyEvaluator {
 
   async loadRules(): Promise<number> {
     if (this.rulesLoaded) return this.ruleCount;
-    this.ruleCount = await this.engine.loadRules();
+    this.ruleCount = await this.backend.loadRules();
     this.rulesLoaded = true;
     // 0 rules => the detection engine matches nothing, so every tool call gets
     // an 'allow' verdict (evaluate() returns allow when matches.length === 0).
@@ -212,18 +479,10 @@ export class ProxyEvaluator {
   async loadAutoRules(rulesDir: string, opts: { adviseOnly: boolean }): Promise<number> {
     try {
       if (!existsSync(rulesDir)) return 0;
-      const existing = new Set(this.engine.getRules().map((r) => r.id));
-      const sub = new ATREngine({ rulesDir });
-      await sub.loadRules();
-      let added = 0;
-      for (const rule of sub.getRules()) {
-        if (existing.has(rule.id)) continue; // already have this id from the bundled set
-        this.engine.addRule(rule);
-        if (opts.adviseOnly) this.adviseOnlyIds.add(rule.id);
-        added++;
-      }
-      this.ruleCount += added;
-      return added;
+      const added = await this.backend.addAutoRules(rulesDir, opts.adviseOnly);
+      if (opts.adviseOnly) this.adviseOnlyIds = new Set([...this.adviseOnlyIds, ...added]);
+      this.ruleCount += added.length;
+      return added.length;
     } catch (err: unknown) {
       process.stderr.write(
         `[panguard-proxy] auto-rules load skipped (ignored, bundled rules unaffected): ${err instanceof Error ? err.message : String(err)}\n`
@@ -279,17 +538,8 @@ export class ProxyEvaluator {
     const start = Date.now();
 
     // Check Guard blocklist first (instant deny, no regex needed)
-    this.refreshBlocklist();
-    if (this.blockedTools.has(toolName.toLowerCase())) {
-      return {
-        outcome: 'deny',
-        reason: `Tool "${toolName}" is on the Guard blocklist`,
-        matchedRules: ['guard-blocklist'],
-        confidence: 100,
-        durationMs: Date.now() - start,
-        adviseOnly: false,
-      };
-    }
+    const blocked = this.blocklistDeny(toolName, start);
+    if (blocked) return blocked;
 
     // Flatten args into natural text so ATR regexes can match content like paths and commands
     const flatContent = `${toolName} ${this.flattenArgs(args)}`;
@@ -303,7 +553,7 @@ export class ProxyEvaluator {
       },
     };
 
-    return this.evaluate(event, start, builtinToolSurface);
+    return this.evaluate([event], start, { builtinToolSurface });
   }
 
   /**
@@ -324,29 +574,89 @@ export class ProxyEvaluator {
    * eventSourceType is undefined: the source-type filter is bypassed (llm_io rules
    * run) but getFieldValue leaves user_input/agent_output undefined, so those rules
    * silently match nothing — defeating the entire indirect-injection scan.
+   *
+   * A response the engine can take whole (ENGINE_MAX_EVAL_LENGTH) is one such
+   * event, exactly as before. A longer one used to be not scanned at all; it is
+   * now one event per window (see responseWindows), merged before the deny
+   * policy runs. In that newly covered range only a proven (maturity: stable)
+   * rule hard-denies: the broad test-maturity rules fire on large benign
+   * documents (compiled JS, type definitions, lockfiles), so there they surface
+   * as an 'ask' advisory instead of blocking the tool.
    */
   async evaluateToolResponse(toolName: string, response: string): Promise<EvalResult> {
     const start = Date.now();
-    const event: AgentEvent = {
-      type: 'tool_response',
-      timestamp: new Date().toISOString(),
-      content: response,
-      fields: {
-        tool_name: toolName,
-        tool_response: response,
-      },
-    };
+    const windowed = response.length > ENGINE_MAX_EVAL_LENGTH;
+    const timestamp = new Date().toISOString();
+    const events = (windowed ? responseWindows(response) : [response]).map(
+      (text): AgentEvent => ({
+        type: 'tool_response',
+        timestamp,
+        content: text,
+        fields: {
+          tool_name: toolName,
+          tool_response: text,
+        },
+      })
+    );
 
-    return this.evaluate(event, start);
+    return this.evaluate(events, start, { stableOnlyDeny: windowed });
+  }
+
+  /**
+   * Evaluate an event the caller has already built.
+   *
+   * For callers that hold the raw call: build the event the way ATR's own
+   * hook-handler (src/hook-handler.ts) does, which is also the shape ATR's
+   * benign-corpus FP gate measures. A tool_call event carries content = the
+   * arguments' `content` string when there is one, else the JSON arguments, and
+   * fields tool_name / tool_args (JSON) / content; a tool_response event carries
+   * the tool output as content and adds tool_response. evaluateToolCall does not
+   * fit them: flattenArgs rewrites the arguments into `key: value` lines and
+   * files them under tool_input, a field one rule reads, instead of tool_args.
+   *
+   * A tool_call whose tool_name is on the Guard blocklist is denied before any
+   * rule runs, as in evaluateToolCall.
+   *
+   * Long input is handled as in evaluateToolResponse: an event whose texts the
+   * engine can take whole is one event; otherwise it is evaluated window by
+   * window (eventWindows), and in that range only a maturity=stable rule
+   * hard-denies.
+   */
+  async evaluateEvent(event: AgentEvent): Promise<EvalResult> {
+    const start = Date.now();
+    const toolName = event.fields?.['tool_name'];
+    if (event.type === 'tool_call' && toolName) {
+      const blocked = this.blocklistDeny(toolName, start);
+      if (blocked) return blocked;
+    }
+    const events = eventWindows(event);
+    return this.evaluate(events, start, { stableOnlyDeny: events.length > 1 });
+  }
+
+  /** A deny verdict when the tool is on the Guard blocklist, else null. */
+  private blocklistDeny(toolName: string, start: number): EvalResult | null {
+    this.refreshBlocklist();
+    if (!this.blockedTools.has(toolName.toLowerCase())) return null;
+    return {
+      outcome: 'deny',
+      reason: `Tool "${toolName}" is on the Guard blocklist`,
+      matchedRules: ['guard-blocklist'],
+      confidence: 100,
+      durationMs: Date.now() - start,
+      adviseOnly: false,
+    };
   }
 
   private async evaluate(
-    event: AgentEvent,
+    events: readonly AgentEvent[],
     start: number,
-    builtinToolSurface = false
+    {
+      builtinToolSurface = false,
+      stableOnlyDeny = false,
+    }: { readonly builtinToolSurface?: boolean; readonly stableOnlyDeny?: boolean } = {}
   ): Promise<EvalResult> {
     try {
-      const matches = this.engine.evaluate(event);
+      const matches = mergeMatches(await this.backend.evaluate(events));
       const durationMs = Date.now() - start;
 
       if (matches.length === 0) {
@@ -379,9 +689,14 @@ export class ProxyEvaluator {
       // 'ask' advisory below, but it can never silently block the user's tool.
       // Bundled/trusted rules are unaffected. This is the arm gate for the
       // enforce path.
+      // A windowed long response (stableOnlyDeny) additionally needs a
+      // maturity=stable rule to hard-deny; see evaluateToolResponse.
+      const canHardDeny = (m: (typeof matches)[number]) =>
+        shouldHardDeny(m.rule, builtinToolSurface) && !this.adviseOnlyIds.has(m.rule.id);
       const blockMatch = matches.find(
-        (m) => shouldHardDeny(m.rule, builtinToolSurface) && !this.adviseOnlyIds.has(m.rule.id)
+        (m) => canHardDeny(m) && (!stableOnlyDeny || m.rule.maturity === 'stable')
       );
+      const heldBack = !blockMatch && stableOnlyDeny && matches.some(canHardDeny);
       const askMatch =
         blockMatch ??
         matches.find((m) => m.rule.severity === 'high' || m.rule.severity === 'critical');
@@ -406,13 +721,17 @@ export class ProxyEvaluator {
         reason:
           outcome === 'allow'
             ? `No actionable threat (low-severity match suppressed: ${topMatch.rule.title}, ${topMatch.rule.severity})`
-            : `${topMatch.rule.title} (${topMatch.rule.severity})`,
+            : `${topMatch.rule.title} (${topMatch.rule.severity})${heldBack ? LONG_RESPONSE_ADVISORY : ''}`,
         matchedRules: matches.map((m) => m.rule.id),
         confidence: outcome === 'allow' ? 0 : topMatch.confidence,
         durationMs,
         adviseOnly,
       };
     } catch (err: unknown) {
+      // A scan cut at its deadline, or one a worker failure kept from running,
+      // did not crash the engine: the caller decides what an unfinished scan
+      // means (the proxy applies its fail mode).
+      if (err instanceof EvaluationDeadlineError || err instanceof EngineWorkerError) throw err;
       // Fail-closed: if evaluation crashes, deny the call (security-first)
       process.stderr.write(
         `[panguard-proxy] Evaluation error (fail-closed): ${err instanceof Error ? err.message : String(err)}\n`
@@ -426,5 +745,25 @@ export class ProxyEvaluator {
         adviseOnly: false,
       };
     }
+  }
+}
+
+/**
+ * Load the rules. When `evaluator` cannot start its worker here (a sandbox or
+ * a process limit that refuses threads), fall back to an inline evaluator, so
+ * the content is still scanned, only without the time limit. Resolves with the
+ * evaluator that holds the rules.
+ */
+export async function loadRulesOrInline(
+  evaluator: ProxyEvaluator,
+  warn: (message: string) => void
+): Promise<{ readonly evaluator: ProxyEvaluator; readonly ruleCount: number }> {
+  try {
+    return { evaluator, ruleCount: await evaluator.loadRules() };
+  } catch (err) {
+    if (!(err instanceof EngineWorkerError)) throw err;
+    warn(`${err.message}; scanning on this thread instead, without the time limit`);
+    const inline = new ProxyEvaluator();
+    return { evaluator: inline, ruleCount: await inline.loadRules() };
   }
 }
