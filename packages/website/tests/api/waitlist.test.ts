@@ -17,10 +17,11 @@ import { POST } from '../../src/app/api/waitlist/route';
 import { appendToSheet } from '@/lib/sheets';
 import { checkRateLimit } from '@/lib/rate-limit';
 
-function makeRequest(body: unknown) {
+// Real requests always carry Host; the route's CSRF check compares Origin/Referer against it.
+function makeRequest(body: unknown, headers: Record<string, string> = {}) {
   return new Request('https://example.com/api/waitlist', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Host: 'example.com', ...headers },
     body: JSON.stringify(body),
   });
 }
@@ -52,6 +53,22 @@ describe('POST /api/waitlist', () => {
       'waitlist',
       expect.arrayContaining(['test@example.com'])
     );
+  });
+
+  it('returns 403 for a cross-site Origin', async () => {
+    const res = await POST(
+      makeRequest({ email: 'test@example.com' }, { Origin: 'https://evil.example' })
+    );
+    expect(res.status).toBe(403);
+    expect(mockFetch).not.toHaveBeenCalled();
+    expect(appendToSheet).not.toHaveBeenCalled();
+  });
+
+  it('accepts a same-origin Origin', async () => {
+    const res = await POST(
+      makeRequest({ email: 'test@example.com' }, { Origin: 'https://example.com' })
+    );
+    expect(res.status).toBe(200);
   });
 
   it('returns 400 for missing email', async () => {
