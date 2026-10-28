@@ -5289,6 +5289,10 @@
       "title": "Trust Center",
       "description": "Security you can verify. Review our compliance status, security architecture, data handling practices, and subprocessor relationships."
     },
+    "trustSigningKey": {
+      "title": "Report Signing Key",
+      "description": "The Ed25519 public keys PanGuard uses to sign audit reports and technical receipts, with key IDs and offline verification steps."
+    },
     "security": {
       "title": "Security",
       "description": "We're a security company. Our own security is non-negotiable. Review our security practices, compliance frameworks, and data handling policies."
@@ -6730,9 +6734,9 @@
   "trustSigningKey": {
     "overline": "Trust Center",
     "title": "Report Signing Key",
-    "subtitle": "Every audit report PanGuard issues is signed with the Ed25519 key published on this page. Pin the key ID below and verify any report offline — no account, no API, and no trust in the delivery channel required.",
+    "subtitle": "PanGuard signs audit reports and technical receipts with separate Ed25519 keys published on this page. Pin the key ID that matches the file and verify it offline: no account, no API, and no trust in the delivery channel required.",
     "facts": {
-      "title": "Active signing key",
+      "title": "Audit report signing key",
       "statusActive": "Active",
       "issuer": "Issuer",
       "keyId": "Key ID",
@@ -6754,16 +6758,28 @@
       "steps": {
         "0": "Obtain the report in JSON format. Audit reports are delivered as HTML, Markdown and JSON sharing one hash and one signature.",
         "1": "Run the verify command below. It recomputes the report's canonical SHA-256 from the body and checks the embedded Ed25519 signature fully offline.",
-        "2": "Confirm the reported key_id matches this page. A report signed by a key not published here must not be trusted."
+        "2": "Confirm the reported key_id matches the audit report signing key above. A report signed by any other key, including the technical receipt key, must not be trusted."
       }
     },
     "wellKnown": {
       "title": "Machine-readable key pinning",
-      "desc": "Automation and CI pipelines can pin the current key set from the well-known endpoint. Keys are listed with an active or revoked status."
+      "desc": "Automation and CI pipelines can pin keys from the well-known endpoint. Each key lists a status (active or revoked) and a usage: verify a file only with an active key whose usage matches it, audit-report-signing for audit reports and technical-receipt-signing for technical receipts."
     },
     "limits": {
       "title": "What this signature is — and is not",
       "desc": "The signature proves report integrity (any modification is detectable) and issuing origin (only PanGuard holds the private key). It is an issuer-held cryptographic signature, not a certificate issued by a government-approved or qualified certification authority. Jurisdiction-specific legal framing and limitations are stated inside every signed report."
+    },
+    "receipt": {
+      "title": "Technical receipt signing key",
+      "usageValue": "Technical receipt signing (never audit reports)",
+      "desc": "A separate key signs technical receipts: per-version records of test results that an evaluator can use as one input to its own assessment. A receipt is not an audit report, a certification or an assurance. Do not trust a file that claims to be an audit report but is signed with this key.",
+      "verifyTitle": "Verify a technical receipt"
+    },
+    "a11y": {
+      "copyAuditPem": "Copy the audit report public key",
+      "copyAuditCommand": "Copy the audit report verify command",
+      "copyReceiptPem": "Copy the technical receipt public key",
+      "copyReceiptCommand": "Copy the technical receipt verify command"
     },
     "backToTrust": "Back to Trust Center"
   }

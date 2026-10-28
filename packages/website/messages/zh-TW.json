@@ -1743,6 +1743,10 @@
       "title": "Trust Center",
       "description": "可驗證的安全。查看我們的合規狀態、安全架構、資料處理實踐和次處理者關係。"
     },
+    "trustSigningKey": {
+      "title": "報告簽章金鑰",
+      "description": "PanGuard 用來簽署審計報告與技術收據的 Ed25519 公鑰，附金鑰指紋與離線驗證步驟。"
+    },
     "security": {
       "title": "安全性",
       "description": "我們是一家安全公司。我們自身的安全不容妥協。查看我們的安全實踐、合規框架和資料處理政策。"
@@ -6764,9 +6768,9 @@
   "trustSigningKey": {
     "overline": "Trust Center",
     "title": "報告簽章金鑰",
-    "subtitle": "PanGuard 出具的每份審計報告，都以本頁公布的 Ed25519 金鑰簽署。Pin 住下方的金鑰指紋，即可離線驗證任何報告——不需帳號、不需 API，也不需信任交付通道。",
+    "subtitle": "PanGuard 以本頁公布的兩把 Ed25519 金鑰，分別簽署審計報告與技術收據。Pin 住與檔案相符的金鑰指紋，即可離線驗證：不需帳號、不需 API，也不需信任交付通道。",
     "facts": {
-      "title": "現行簽章金鑰",
+      "title": "審計報告簽章金鑰",
       "statusActive": "使用中",
       "issuer": "簽發者",
       "keyId": "金鑰指紋",
@@ -6788,16 +6792,28 @@
       "steps": {
         "0": "取得 JSON 格式的報告。審計報告以 HTML、Markdown、JSON 三種格式交付，共用同一雜湊與同一簽章。",
         "1": "執行下方驗證指令：它會從報告正文重新計算 canonical SHA-256，並完全離線驗證內嵌的 Ed25519 簽章。",
-        "2": "確認回報的 key_id 與本頁一致。由未在本頁公布之金鑰簽署的報告，不應信任。"
+        "2": "確認回報的 key_id 與上方的審計報告簽章金鑰一致。由其他金鑰（包括技術收據金鑰）簽署的報告，不應信任。"
       }
     },
     "wellKnown": {
       "title": "機器可讀的金鑰 Pinning",
-      "desc": "自動化與 CI 管線可從 well-known 端點取得現行金鑰清單，金鑰標示 active 或 revoked 狀態。"
+      "desc": "自動化與 CI 管線可從 well-known 端點取得金鑰清單。每把金鑰標示狀態（active 或 revoked）與用途：只用狀態為 active、且用途與檔案相符的金鑰驗證，審計報告用 audit-report-signing，技術收據用 technical-receipt-signing。"
     },
     "limits": {
       "title": "本簽章是什麼——以及不是什麼",
       "desc": "簽章證明報告完整性（任何竄改皆可偵測）與簽發來源（私鑰僅 PanGuard 持有）。它是簽發者自持的密碼學簽章，並非政府核定或合格憑證機構簽發之憑證；各法域的法律效力聲明與限制，皆載明於每份簽章報告內。"
+    },
+    "receipt": {
+      "title": "技術收據簽章金鑰",
+      "usageValue": "技術收據簽章（不簽審計報告）",
+      "desc": "另一把金鑰專門簽技術收據：每個版本一份的測試結果紀錄，評估方可以拿來當自己評估的其中一項輸入。收據不是審計報告，也不是認證或擔保。宣稱是審計報告、卻用這把金鑰簽的檔案，不應信任。",
+      "verifyTitle": "驗證技術收據"
+    },
+    "a11y": {
+      "copyAuditPem": "複製審計報告公鑰",
+      "copyAuditCommand": "複製審計報告驗證指令",
+      "copyReceiptPem": "複製技術收據公鑰",
+      "copyReceiptCommand": "複製技術收據驗證指令"
     },
     "backToTrust": "返回 Trust Center"
   }

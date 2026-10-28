@@ -27,7 +27,7 @@ describe('useOS', () => {
     const { result } = renderHook(() => useOS());
     expect(result.current.os).toBe('mac');
     expect(result.current.prompt).toBe('$');
-    expect(result.current.installCmd).toContain('curl -fsSL https://get.panguard.ai');
+    expect(result.current.installCmd).toBe('npm install -g panguard && pga up');
   });
 
   it('detects Windows', async () => {
@@ -36,7 +36,7 @@ describe('useOS', () => {
     const { result } = renderHook(() => useOS());
     expect(result.current.os).toBe('windows');
     expect(result.current.prompt).toBe('>');
-    expect(result.current.installCmd).toContain('irm https://get.panguard.ai/windows');
+    expect(result.current.installCmd).toBe('npm install -g panguard && pga up');
   });
 
   it('defaults to linux for unknown UA', async () => {
