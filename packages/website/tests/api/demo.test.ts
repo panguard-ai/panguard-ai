@@ -56,6 +56,23 @@ describe('POST /api/demo', () => {
     expect(res.status).toBe(200);
   });
 
+  it.each([
+    ['an unparsable Origin', { Origin: 'null' }],
+    ['a look-alike host that extends the real one', { Origin: 'https://example.com.evil.example' }],
+    ['the same hostname on another port', { Origin: 'https://example.com:8443' }],
+    ['a cross-site Referer without an Origin', { Referer: 'https://evil.example/form' }],
+    ['a missing Host header', { Host: '' }],
+  ])('returns 403 for %s', async (_label, headers) => {
+    const res = await POST(makeRequest(validBody, headers));
+    expect(res.status).toBe(403);
+    expect(appendToSheet).not.toHaveBeenCalled();
+  });
+
+  it('accepts a same-origin Referer without an Origin', async () => {
+    const res = await POST(makeRequest(validBody, { Referer: 'https://example.com/demo' }));
+    expect(res.status).toBe(200);
+  });
+
   it('returns 400 for missing company', async () => {
     const res = await POST(makeRequest({ ...validBody, company: '' }));
     expect(res.status).toBe(400);

@@ -32,6 +32,7 @@ interface PublishedKey {
 
 interface SigningKeyMessages {
   facts: {
+    issuer: string;
     keyId: string;
     algorithm: string;
     created: string;
@@ -42,6 +43,7 @@ interface SigningKeyMessages {
   pem: { copy: string; copied: string };
   verify: { copy: string };
   receipt: { usageValue: string; desc: string };
+  a11y: Readonly<Record<string, string>>;
 }
 
 /** The file each key verifies, as named in its verify command ("pin the key that matches the file"). */
@@ -50,10 +52,16 @@ const VERIFY_FILE_BY_USAGE: Readonly<Record<string, string>> = {
   'technical-receipt-signing': 'receipt.json',
 };
 
-function activeKeys(): ReadonlyArray<PublishedKey> {
+function wellKnown(): { issuer: string; keys: ReadonlyArray<PublishedKey> } {
   const path = join(WEBSITE, 'public', '.well-known', 'panguard-signing-key.json');
-  const doc = JSON.parse(readFileSync(path, 'utf8')) as { keys: ReadonlyArray<PublishedKey> };
-  return doc.keys.filter((key) => key.status === 'active');
+  return JSON.parse(readFileSync(path, 'utf8')) as {
+    issuer: string;
+    keys: ReadonlyArray<PublishedKey>;
+  };
+}
+
+function activeKeys(): ReadonlyArray<PublishedKey> {
+  return wellKnown().keys.filter((key) => key.status === 'active');
 }
 
 function keyWithUsage(usage: string): PublishedKey {
@@ -106,7 +114,7 @@ function displayedNear(element: Element | null): ReadonlyArray<string> {
 }
 
 function copyButtons(t: SigningKeyMessages): ReadonlyArray<HTMLElement> {
-  const labels = new Set([t.pem.copy, t.verify.copy]);
+  const labels = new Set(Object.values(t.a11y));
   return screen.getAllByRole('button', { name: (name) => labels.has(name) });
 }
 
@@ -137,6 +145,7 @@ describe('SigningKeyContent', () => {
     '%s: shows every active key with the facts, PEM and verify command published in the well-known file',
     (locale) => {
       const { container, intlErrors, t } = renderPage(locale);
+      const { issuer } = wellKnown();
       const keys = activeKeys();
       const pems = Array.from(container.querySelectorAll('pre'), (pre) => pre.textContent);
       const commands = Array.from(container.querySelectorAll('code'), (code) => code.textContent);
@@ -146,6 +155,7 @@ describe('SigningKeyContent', () => {
         const list = screen.getByText(key.key_id, { selector: 'dd' }).closest('dl');
         expect(list, key.key_id).not.toBeNull();
         expect(readFacts(list as Element), key.key_id).toMatchObject({
+          [t.facts.issuer]: issuer,
           [t.facts.keyId]: key.key_id,
           [t.facts.algorithm]: key.alg,
           [t.facts.created]: key.created_at.slice(0, 10),
@@ -181,10 +191,17 @@ describe('SigningKeyContent', () => {
     const keys = activeKeys();
 
     expect(buttons).toHaveLength(keys.length * 2);
+    // Each button names its own target, so screen readers can tell the four apart.
+    expect(new Set(buttons.map((button) => button.getAttribute('aria-label'))).size).toBe(
+      buttons.length
+    );
     for (const button of buttons) {
       fireEvent.click(button);
       await waitFor(() => expect(button).toHaveTextContent(t.pem.copied));
     }
+    expect(screen.getAllByRole('status').map((status) => status.textContent)).toContain(
+      t.pem.copied
+    );
 
     const copied = writeText.mock.calls.map(([text]) => text);
     buttons.forEach((button, index) => {
@@ -224,4 +241,26 @@ describe('SigningKeyContent', () => {
     expect(writeText).toHaveBeenCalledWith(receiptPem);
     expect(button.textContent).toBe(t.pem.copy);
   });
+});
+
+describe('trust/signing-key page metadata', () => {
+  /**
+   * Value: protects=page.tsx generateMetadata finds metadata.trustSigningKey.title and
+   *   .description in every locale;
+   * fails_when=either key is missing, so the tab title and description render the raw key path;
+   * why_new=no test read these keys, and production rendered 'metadata.trustSigningKey.title';
+   * seam=none;
+   * no_claim=reads the locale files directly; does not run generateMetadata or the Next route.
+   */
+  it.each(['en', 'zh-TW'])(
+    '%s: has the title and description the page metadata reads',
+    (locale) => {
+      const messages = JSON.parse(
+        readFileSync(join(WEBSITE, 'messages', `${locale}.json`), 'utf8')
+      ) as { metadata: Record<string, { title?: string; description?: string } | undefined> };
+
+      expect(messages.metadata.trustSigningKey?.title).toBeTruthy();
+      expect(messages.metadata.trustSigningKey?.description).toBeTruthy();
+    }
+  );
 });

@@ -25,7 +25,7 @@ const WELL_KNOWN_PATH = '/.well-known/panguard-signing-key.json';
 
 /* Technical receipt key: a separate key that signs per-version receipts and never signs audit reports. */
 const RECEIPT_KEY = {
-  issuer: 'PanGuard AI, Inc. (technical receipts)',
+  issuer: 'PanGuard AI, Inc.',
   keyId: 'pgk1-67d0d24542b83606',
   algorithm: 'Ed25519',
   createdAt: '2026-10-28',
@@ -41,10 +41,13 @@ function CopyButton({
   text,
   label,
   copiedLabel,
+  ariaLabel,
 }: {
   text: string;
   label: string;
   copiedLabel: string;
+  /** Names what gets copied, so the page's Copy buttons are distinguishable to screen readers. */
+  ariaLabel: string;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -59,18 +62,57 @@ function CopyButton({
   }
 
   return (
-    <button
-      type="button"
-      onClick={copy}
-      aria-label={label}
-      className={`shrink-0 rounded-full border px-4 py-1.5 text-xs font-semibold transition-colors duration-200 ${
-        copied
-          ? 'border-[#22c55e]/40 text-[#22c55e]'
-          : 'border-border text-text-secondary hover:border-brand-sage hover:text-text-primary'
-      }`}
-    >
-      {copied ? copiedLabel : label}
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={copy}
+        aria-label={ariaLabel}
+        className={`shrink-0 rounded-full border px-4 py-1.5 text-xs font-semibold transition-colors duration-200 ${
+          copied
+            ? 'border-[#22c55e]/40 text-[#22c55e]'
+            : 'border-border text-text-secondary hover:border-brand-sage hover:text-text-primary'
+        }`}
+      >
+        {copied ? copiedLabel : label}
+      </button>
+      <span role="status" className="sr-only">
+        {copied ? copiedLabel : ''}
+      </span>
+    </>
+  );
+}
+
+/* Verify command with its own Copy row, so the command wraps instead of clipping the key ID */
+function CommandBox({
+  command,
+  copyLabel,
+  copiedLabel,
+  ariaLabel,
+}: {
+  command: string;
+  copyLabel: string;
+  copiedLabel: string;
+  ariaLabel: string;
+}) {
+  return (
+    <div className="mx-6 mb-5 rounded-xl border border-border bg-surface-1">
+      <div className="flex justify-end px-3 pt-2">
+        <CopyButton
+          text={command}
+          label={copyLabel}
+          copiedLabel={copiedLabel}
+          ariaLabel={ariaLabel}
+        />
+      </div>
+      <div className="flex items-start gap-3 px-4 pb-3">
+        <span aria-hidden className="select-none font-mono text-sm text-brand-sage">
+          $
+        </span>
+        <code className="min-w-0 break-all font-mono text-xs sm:text-sm text-text-secondary">
+          {command}
+        </code>
+      </div>
+    </div>
   );
 }
 
@@ -90,7 +132,9 @@ function KeyFacts({ facts }: { facts: ReadonlyArray<KeyFact> }) {
           <dt className="w-36 shrink-0 text-xs uppercase tracking-wider text-text-muted">
             {f.label}
           </dt>
-          <dd className={`text-sm text-text-primary ${f.mono ? 'font-mono' : ''} break-all`}>
+          <dd
+            className={`text-sm text-text-primary ${f.mono ? 'font-mono break-all' : 'break-words'}`}
+          >
             {f.value}
           </dd>
         </div>
@@ -152,6 +196,7 @@ export default function SigningKeyContent() {
                   text={SIGNING_KEY.publicKeyPem}
                   label={t('pem.copy')}
                   copiedLabel={t('pem.copied')}
+                  ariaLabel={t('a11y.copyAuditPem')}
                 />
               </div>
             </div>
@@ -184,21 +229,12 @@ export default function SigningKeyContent() {
                 </div>
               ))}
             </div>
-            <div className="mx-6 mb-5 flex items-center gap-3 rounded-xl border border-border bg-surface-1 px-4 py-3 overflow-x-auto">
-              <span aria-hidden className="select-none font-mono text-sm text-brand-sage">
-                $
-              </span>
-              <code className="whitespace-nowrap font-mono text-xs sm:text-sm text-text-secondary">
-                {VERIFY_COMMAND}
-              </code>
-              <div className="ml-auto pl-3">
-                <CopyButton
-                  text={VERIFY_COMMAND}
-                  label={t('verify.copy')}
-                  copiedLabel={t('pem.copied')}
-                />
-              </div>
-            </div>
+            <CommandBox
+              command={VERIFY_COMMAND}
+              copyLabel={t('verify.copy')}
+              copiedLabel={t('pem.copied')}
+              ariaLabel={t('a11y.copyAuditCommand')}
+            />
           </div>
         </FadeInUp>
 
@@ -213,7 +249,7 @@ export default function SigningKeyContent() {
               </span>
             </div>
             <KeyFacts facts={receiptFacts} />
-            <p className="px-6 py-4 border-t border-border text-xs text-text-muted leading-relaxed">
+            <p className="px-6 py-4 border-t border-border text-sm text-text-secondary leading-relaxed">
               {t('receipt.desc')}
             </p>
             <div className="flex items-center gap-3 px-6 py-4 border-y border-border bg-surface-1">
@@ -223,6 +259,7 @@ export default function SigningKeyContent() {
                   text={RECEIPT_KEY.publicKeyPem}
                   label={t('pem.copy')}
                   copiedLabel={t('pem.copied')}
+                  ariaLabel={t('a11y.copyReceiptPem')}
                 />
               </div>
             </div>
@@ -232,21 +269,12 @@ export default function SigningKeyContent() {
             <p className="px-6 pb-3 text-sm font-bold text-text-primary">
               {t('receipt.verifyTitle')}
             </p>
-            <div className="mx-6 mb-5 flex items-center gap-3 rounded-xl border border-border bg-surface-1 px-4 py-3 overflow-x-auto">
-              <span aria-hidden className="select-none font-mono text-sm text-brand-sage">
-                $
-              </span>
-              <code className="whitespace-nowrap font-mono text-xs sm:text-sm text-text-secondary">
-                {RECEIPT_VERIFY_COMMAND}
-              </code>
-              <div className="ml-auto pl-3">
-                <CopyButton
-                  text={RECEIPT_VERIFY_COMMAND}
-                  label={t('verify.copy')}
-                  copiedLabel={t('pem.copied')}
-                />
-              </div>
-            </div>
+            <CommandBox
+              command={RECEIPT_VERIFY_COMMAND}
+              copyLabel={t('verify.copy')}
+              copiedLabel={t('pem.copied')}
+              ariaLabel={t('a11y.copyReceiptCommand')}
+            />
           </div>
         </FadeInUp>
 
