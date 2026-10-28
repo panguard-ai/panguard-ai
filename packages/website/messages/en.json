@@ -6730,9 +6730,9 @@
   "trustSigningKey": {
     "overline": "Trust Center",
     "title": "Report Signing Key",
-    "subtitle": "Every audit report PanGuard issues is signed with the Ed25519 key published on this page. Pin the key ID below and verify any report offline — no account, no API, and no trust in the delivery channel required.",
+    "subtitle": "PanGuard signs audit reports and technical receipts with separate Ed25519 keys published on this page. Pin the key ID that matches the file and verify it offline: no account, no API, and no trust in the delivery channel required.",
     "facts": {
-      "title": "Active signing key",
+      "title": "Audit report signing key",
       "statusActive": "Active",
       "issuer": "Issuer",
       "keyId": "Key ID",
@@ -6764,6 +6764,12 @@
     "limits": {
       "title": "What this signature is — and is not",
       "desc": "The signature proves report integrity (any modification is detectable) and issuing origin (only PanGuard holds the private key). It is an issuer-held cryptographic signature, not a certificate issued by a government-approved or qualified certification authority. Jurisdiction-specific legal framing and limitations are stated inside every signed report."
+    },
+    "receipt": {
+      "title": "Technical receipt signing key",
+      "usageValue": "Technical receipt signing (never audit reports)",
+      "desc": "A separate key signs technical receipts: per-version records of test results that an evaluator can use as one input to its own assessment. A receipt is not an audit report, a certification or an assurance. Do not trust a file that claims to be an audit report but is signed with this key.",
+      "verifyTitle": "Verify a technical receipt"
     },
     "backToTrust": "Back to Trust Center"
   }

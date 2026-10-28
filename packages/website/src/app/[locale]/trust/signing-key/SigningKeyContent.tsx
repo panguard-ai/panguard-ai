@@ -23,6 +23,19 @@ const SIGNING_KEY = {
 const VERIFY_COMMAND = `pga report sign verify report.json --expect-key ${SIGNING_KEY.keyId}`;
 const WELL_KNOWN_PATH = '/.well-known/panguard-signing-key.json';
 
+/* Technical receipt key: a separate key that signs per-version receipts and never signs audit reports. */
+const RECEIPT_KEY = {
+  issuer: 'PanGuard AI, Inc. (technical receipts)',
+  keyId: 'pgk1-67d0d24542b83606',
+  algorithm: 'Ed25519',
+  createdAt: '2026-10-28',
+  payloadFormat: 'PGA-SIG-V1',
+  publicKeyPem:
+    '-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAvgoaSHeCRGxmvQYx1l/BAcUzq9tV9rYtZfJ7gQ9/cn8=\n-----END PUBLIC KEY-----',
+} as const;
+
+const RECEIPT_VERIFY_COMMAND = `pga report sign verify receipt.json --expect-key ${RECEIPT_KEY.keyId}`;
+
 /* ─── One-click copy for key material / commands ─── */
 function CopyButton({
   text,
@@ -61,19 +74,53 @@ function CopyButton({
   );
 }
 
+/* Key facts table shared by both published keys */
+type KeyFact = { label: string; value: string; mono?: boolean };
+
+function KeyFacts({ facts }: { facts: ReadonlyArray<KeyFact> }) {
+  return (
+    <dl>
+      {facts.map((f, idx) => (
+        <div
+          key={f.label}
+          className={`flex flex-wrap items-baseline gap-x-6 gap-y-1 px-6 py-3.5 ${
+            idx < facts.length - 1 ? 'border-b border-border' : ''
+          }`}
+        >
+          <dt className="w-36 shrink-0 text-xs uppercase tracking-wider text-text-muted">
+            {f.label}
+          </dt>
+          <dd className={`text-sm text-text-primary ${f.mono ? 'font-mono' : ''} break-all`}>
+            {f.value}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    Report Signing Key — the authoritative publication partners pin
    ═══════════════════════════════════════════════════════════════════ */
 export default function SigningKeyContent() {
   const t = useTranslations('trustSigningKey');
 
-  const facts: Array<{ label: string; value: string; mono?: boolean }> = [
+  const facts: ReadonlyArray<KeyFact> = [
     { label: t('facts.issuer'), value: SIGNING_KEY.issuer },
     { label: t('facts.keyId'), value: SIGNING_KEY.keyId, mono: true },
     { label: t('facts.algorithm'), value: SIGNING_KEY.algorithm, mono: true },
     { label: t('facts.created'), value: SIGNING_KEY.createdAt, mono: true },
     { label: t('facts.usage'), value: t('facts.usageValue') },
     { label: t('facts.payloadFormat'), value: SIGNING_KEY.payloadFormat, mono: true },
+  ];
+
+  const receiptFacts: ReadonlyArray<KeyFact> = [
+    { label: t('facts.issuer'), value: RECEIPT_KEY.issuer },
+    { label: t('facts.keyId'), value: RECEIPT_KEY.keyId, mono: true },
+    { label: t('facts.algorithm'), value: RECEIPT_KEY.algorithm, mono: true },
+    { label: t('facts.created'), value: RECEIPT_KEY.createdAt, mono: true },
+    { label: t('facts.usage'), value: t('receipt.usageValue') },
+    { label: t('facts.payloadFormat'), value: RECEIPT_KEY.payloadFormat, mono: true },
   ];
 
   return (
@@ -91,25 +138,7 @@ export default function SigningKeyContent() {
                 {t('facts.statusActive')}
               </span>
             </div>
-            <dl>
-              {facts.map((f, idx) => (
-                <div
-                  key={f.label}
-                  className={`flex flex-wrap items-baseline gap-x-6 gap-y-1 px-6 py-3.5 ${
-                    idx < facts.length - 1 ? 'border-b border-border' : ''
-                  }`}
-                >
-                  <dt className="w-36 shrink-0 text-xs uppercase tracking-wider text-text-muted">
-                    {f.label}
-                  </dt>
-                  <dd
-                    className={`text-sm text-text-primary ${f.mono ? 'font-mono' : ''} break-all`}
-                  >
-                    {f.value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
+            <KeyFacts facts={facts} />
           </div>
         </FadeInUp>
 
@@ -165,6 +194,54 @@ export default function SigningKeyContent() {
               <div className="ml-auto pl-3">
                 <CopyButton
                   text={VERIFY_COMMAND}
+                  label={t('verify.copy')}
+                  copiedLabel={t('pem.copied')}
+                />
+              </div>
+            </div>
+          </div>
+        </FadeInUp>
+
+        {/* -- Technical receipt key (separate key, never signs audit reports) -- */}
+        <FadeInUp delay={0.22}>
+          <div className="mt-6 max-w-3xl mx-auto rounded-2xl border border-border overflow-hidden">
+            <div className="flex items-center gap-3 px-6 py-4 border-b border-border bg-surface-1">
+              <LockIcon className="w-5 h-5 text-brand-sage" />
+              <p className="text-sm font-bold text-text-primary">{t('receipt.title')}</p>
+              <span className="ml-auto rounded-full border border-[#22c55e]/20 bg-[#22c55e]/10 px-3 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#22c55e]">
+                {t('facts.statusActive')}
+              </span>
+            </div>
+            <KeyFacts facts={receiptFacts} />
+            <p className="px-6 py-4 border-t border-border text-xs text-text-muted leading-relaxed">
+              {t('receipt.desc')}
+            </p>
+            <div className="flex items-center gap-3 px-6 py-4 border-y border-border bg-surface-1">
+              <p className="text-sm font-bold text-text-primary">{t('pem.title')}</p>
+              <div className="ml-auto">
+                <CopyButton
+                  text={RECEIPT_KEY.publicKeyPem}
+                  label={t('pem.copy')}
+                  copiedLabel={t('pem.copied')}
+                />
+              </div>
+            </div>
+            <pre className="px-6 py-5 font-mono text-xs sm:text-sm text-text-secondary overflow-x-auto leading-relaxed">
+              {RECEIPT_KEY.publicKeyPem}
+            </pre>
+            <p className="px-6 pb-3 text-sm font-bold text-text-primary">
+              {t('receipt.verifyTitle')}
+            </p>
+            <div className="mx-6 mb-5 flex items-center gap-3 rounded-xl border border-border bg-surface-1 px-4 py-3 overflow-x-auto">
+              <span aria-hidden className="select-none font-mono text-sm text-brand-sage">
+                $
+              </span>
+              <code className="whitespace-nowrap font-mono text-xs sm:text-sm text-text-secondary">
+                {RECEIPT_VERIFY_COMMAND}
+              </code>
+              <div className="ml-auto pl-3">
+                <CopyButton
+                  text={RECEIPT_VERIFY_COMMAND}
                   label={t('verify.copy')}
                   copiedLabel={t('pem.copied')}
                 />
