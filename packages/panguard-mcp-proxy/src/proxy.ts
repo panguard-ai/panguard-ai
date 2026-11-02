@@ -561,7 +561,9 @@ export class MCPProxy {
       // exactly those payloads in its args. Via the engine's mcp-over-tool
       // exception this is a superset of the mcp_exchange rules, so nothing that
       // 'mcp_exchange' caught is lost. (The old default silently skipped ~44
-      // tool_call rules on every MCP call.)
+      // tool_call rules on every MCP call.) Arguments over 100,000 chars are
+      // scanned in windows, like a long response; the evaluator's deadline
+      // bounds how long that takes.
       let preResult: EvalResult;
       const preStart = Date.now();
       try {
