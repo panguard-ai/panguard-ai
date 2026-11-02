@@ -21,6 +21,12 @@ export type EngineKind = 'runtime' | 'tool-definitions';
 export interface WorkerInit {
   readonly lane: Lane;
   readonly maxScanChars: number;
+  /**
+   * The gateway's evaluation deadline. The pool's timer enforces it; the
+   * evaluators get it too, so a long input scanned in windows stops at the same
+   * limit rather than at ProxyEvaluator's own default.
+   */
+  readonly deadlineMs: number;
   /** Guard blocklist; undefined keeps ProxyEvaluator's default path. */
   readonly blocklistPath?: string;
 }

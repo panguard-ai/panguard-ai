@@ -116,7 +116,8 @@ const configSchema = z.object({
   }),
   evaluation: z.object({
     workers: z.number().int().min(1).max(64),
-    timeoutMs: z.number().int().min(10),
+    // A Node timer fires at once for a delay over 2^31 - 1 ms.
+    timeoutMs: z.number().int().min(10).max(2_147_483_647),
     maxScanChars: z.number().int().min(ENGINE_MAX_EVAL_LENGTH),
     blocklistPath: z.string().optional(),
   }),

@@ -64,6 +64,7 @@ async function boot(): Promise<{ runtime: ProxyEvaluator; definitions: ProxyEval
   const evaluatorFor = (engine: ATREngine): ProxyEvaluator =>
     new ProxyEvaluator({
       engine,
+      deadlineMs: init.deadlineMs,
       ...(init.blocklistPath !== undefined ? { blocklistPath: init.blocklistPath } : {}),
     });
   const runtime = evaluatorFor(new ATREngine({ lane: init.lane }));

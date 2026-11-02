@@ -218,6 +218,7 @@ export class WorkerEvaluatorPool implements Evaluator {
     const init: WorkerInit = {
       lane: this.options.lane,
       maxScanChars: this.options.maxScanChars,
+      deadlineMs: this.options.timeoutMs,
       ...(this.options.blocklistPath !== undefined
         ? { blocklistPath: this.options.blocklistPath }
         : {}),
