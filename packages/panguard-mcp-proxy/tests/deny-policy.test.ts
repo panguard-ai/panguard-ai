@@ -62,6 +62,27 @@ describe('shouldHardDeny — proxy hard-deny policy', () => {
           true
         )
       ).toBe(false);
+      // ATR-2026-01980 (agent-threat-rules 4.2): quote breakout + chained command
+      // in an MCP argument, which is ordinary `"..."; cmd` grammar in a real shell.
+      expect(
+        shouldHardDeny(
+          {
+            severity: 'critical',
+            maturity: 'test',
+            tags: { scan_target: 'mcp', subcategory: 'command-injection' },
+          },
+          true
+        )
+      ).toBe(false);
+    });
+    it('an mcp command-injection rule still hard-denies on a genuine MCP argument', () => {
+      expect(
+        shouldHardDeny({
+          severity: 'critical',
+          maturity: 'test',
+          tags: { scan_target: 'mcp', subcategory: 'command-injection' },
+        })
+      ).toBe(true);
     });
     it('REGRESSION (1.8.13): mcp credential-theft / env-harvesting STILL hard-block on the built-in surface (cat ~/.ssh/id_rsa)', () => {
       expect(
