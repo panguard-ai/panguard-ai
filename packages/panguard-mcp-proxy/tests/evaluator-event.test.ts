@@ -11,6 +11,7 @@ import type { AgentEvent } from 'agent-threat-rules';
 import {
   ENGINE_MAX_EVAL_LENGTH,
   EVALUATION_ERROR_SENTINEL,
+  EvaluationDeadlineError,
   LONG_RESPONSE_ADVISORY,
   ProxyEvaluator,
   eventWindows,
@@ -168,6 +169,24 @@ describe('ProxyEvaluator.evaluateEvent on input past the engine limit', () => {
     expect(advisory.outcome).toBe('ask');
     expect(advisory.reason.endsWith(LONG_RESPONSE_ADVISORY)).toBe(true);
     expect((await hit('stable').evaluateEvent(longOutput('NEEDLE'))).outcome).toBe('deny');
+  });
+
+  it("stops an injected engine between windows once past the evaluator's deadline", async () => {
+    const slowWindow = () => {
+      const until = Date.now() + 30;
+      while (Date.now() < until) {
+        // each window takes 30 ms; the third starts past the 50 ms deadline
+      }
+      return [];
+    };
+    const evaluator = new ProxyEvaluator({
+      engine: stubEngine(slowWindow).engine,
+      blocklistPath: NO_BLOCKLIST,
+      deadlineMs: 50,
+    });
+    await expect(evaluator.evaluateEvent(longOutput('NEEDLE'))).rejects.toBeInstanceOf(
+      EvaluationDeadlineError
+    );
   });
 });
 

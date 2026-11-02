@@ -66,7 +66,11 @@ export interface ProxyEvaluatorOptions {
    * an unfinished scan means.
    */
   readonly isolation?: EvaluationIsolation;
-  /** Worker mode: how long one evaluation may run (default DEFAULT_EVAL_DEADLINE_MS). */
+  /**
+   * How long one evaluation may run (default DEFAULT_EVAL_DEADLINE_MS). In
+   * worker mode it is a hard limit; inline, a long input scanned in windows
+   * stops between windows once past it.
+   */
   readonly deadlineMs?: number;
   /**
    * Engine to evaluate with. Default: an ATREngine over the rules of the
@@ -95,7 +99,7 @@ interface EngineBackend {
   close(): Promise<void>;
 }
 
-function inlineBackend(engine: EvaluatorEngine): EngineBackend {
+function inlineBackend(engine: EvaluatorEngine, deadlineMs: number): EngineBackend {
   return {
     loadRules: () => engine.loadRules(),
     async addAutoRules(dir) {
@@ -107,7 +111,19 @@ function inlineBackend(engine: EvaluatorEngine): EngineBackend {
       for (const rule of fresh) engine.addRule(rule);
       return fresh.map((rule) => rule.id);
     },
-    evaluate: async (events) => events.flatMap((event) => engine.evaluate(event)),
+    async evaluate(events) {
+      if (events.length === 1) return engine.evaluate(events[0]!);
+      // A long input's windows run one at a time, yielding between them, and
+      // stop once past the deadline. Only a worker can cut a window midway.
+      const started = Date.now();
+      const matches: EngineMatch[] = [];
+      for (const event of events) {
+        if (Date.now() - started > deadlineMs) throw new EvaluationDeadlineError(deadlineMs);
+        matches.push(...engine.evaluate(event));
+        await new Promise((resolve) => setImmediate(resolve));
+      }
+      return matches;
+    },
     close: async () => undefined,
   };
 }
@@ -235,13 +251,14 @@ export function shouldHardDeny(rule: RuleLike, builtinToolSurface = false): bool
  * field (safeRegexTest() returns false), so every condition on that field
  * silently misses. A tool response past this length used to be not scanned at
  * all, and padding a poisoned response past it evaded the indirect-injection scan.
+ * Longer tool input is scanned in windows too (see evaluateToolCall).
  */
 export const ENGINE_MAX_EVAL_LENGTH = 100_000;
 
 /**
- * A response longer than ENGINE_MAX_EVAL_LENGTH is scanned in overlapping
- * windows. A response the engine can take whole stays one event, exactly as
- * before, so windowing adds no seams there.
+ * A response (or tool input) longer than ENGINE_MAX_EVAL_LENGTH is scanned in
+ * overlapping windows. Text the engine can take whole stays one event, exactly
+ * as before, so windowing adds no seams there.
  *
  * Windows are kept small to bound the cost of one evaluate(). The small window
  * also leaves the Unicode-normalised text, which the engine tests too, plenty
@@ -350,7 +367,7 @@ export interface EvaluatorEngine {
 export class ProxyEvaluator {
   /** Where the engine runs (see ProxyEvaluatorOptions). */
   readonly isolation: EvaluationIsolation;
-  /** Worker mode: how long one evaluation may run before it is cut. */
+  /** How long one evaluation may run before it is cut (see ProxyEvaluatorOptions). */
   readonly deadlineMs: number;
   /** The engine itself (built or injected) in inline mode; in worker mode it lives in the worker. */
   private readonly engine: EvaluatorEngine | null;
@@ -395,13 +412,13 @@ export class ProxyEvaluator {
     // unproven matches degrade to 'ask' rather than breaking the agent.
     if (options.engine) {
       this.engine = options.engine;
-      this.backend = inlineBackend(this.engine);
+      this.backend = inlineBackend(this.engine, deadlineMs);
     } else {
       const packageDir = findAtrPackageDir();
       const rulesDir = join(packageDir, 'rules');
       this.engine = isolation === 'inline' ? new ATREngine({ rulesDir }) : null;
       this.backend = this.engine
-        ? inlineBackend(this.engine)
+        ? inlineBackend(this.engine, deadlineMs)
         : workerBackend(
             {
               engineUrl: engineEntryUrl(packageDir),
@@ -523,6 +540,11 @@ export class ProxyEvaluator {
    * multi_agent_comm and llm_io rules that never apply to a shell command.
    * The old hardcoded 'mcp_exchange' both missed the tool_call attack rules
    * and false-fired multi_agent_comm rules on ordinary commands.
+   *
+   * Flattened tool input the engine can take whole (ENGINE_MAX_EVAL_LENGTH)
+   * is one event. Longer input, such as a large Write, is one event per window
+   * (see responseWindows), judged by the same deny policy as short input, so
+   * the length of the input does not change what blocks it.
    */
   async evaluateToolCall(
     toolName: string,
@@ -543,17 +565,22 @@ export class ProxyEvaluator {
 
     // Flatten args into natural text so ATR regexes can match content like paths and commands
     const flatContent = `${toolName} ${this.flattenArgs(args)}`;
-    const event: AgentEvent = {
-      type: eventType,
-      timestamp: new Date().toISOString(),
-      content: flatContent,
-      fields: {
-        tool_name: toolName,
-        tool_input: flatContent,
-      },
-    };
+    const timestamp = new Date().toISOString();
+    const texts =
+      flatContent.length > ENGINE_MAX_EVAL_LENGTH ? responseWindows(flatContent) : [flatContent];
+    const events = texts.map(
+      (text): AgentEvent => ({
+        type: eventType,
+        timestamp,
+        content: text,
+        fields: {
+          tool_name: toolName,
+          tool_input: text,
+        },
+      })
+    );
 
-    return this.evaluate([event], start, { builtinToolSurface });
+    return this.evaluate(events, start, { builtinToolSurface });
   }
 
   /**
@@ -763,7 +790,7 @@ export async function loadRulesOrInline(
   } catch (err) {
     if (!(err instanceof EngineWorkerError)) throw err;
     warn(`${err.message}; scanning on this thread instead, without the time limit`);
-    const inline = new ProxyEvaluator();
+    const inline = new ProxyEvaluator({ deadlineMs: evaluator.deadlineMs });
     return { evaluator: inline, ruleCount: await inline.loadRules() };
   }
 }
