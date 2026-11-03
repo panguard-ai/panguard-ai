@@ -33,7 +33,7 @@ export const STATS = {
    * outward count. They describe the ATR standard. The panguard.ai web scanner
    * runs a separate, older bundle: see `scanner` below.
    */
-  atrVersion: '4.2.3',
+  atrVersion: '4.2.4',
   /**
    * Effective rules in the shipped npm package (v4.1.5: 829 rule files, of
    * which 5 draft and 2 deprecated are not loaded by the engine, so 822).
