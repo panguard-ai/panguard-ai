@@ -145,6 +145,9 @@ export { ThreatCloudClient } from './threat-cloud/index.js';
 // flywheel-proposal builder so a matched code snippet can never carry a secret
 // into a Threat Cloud upload.
 export { scrubSecretValues, SECRET_MASK } from './agent/scrub-secrets.js';
+// ATR rule proposals without Threat Cloud: a local outbox plus a pre-filled ATR
+// "New Rule Proposal" issue the user submits from their own GitHub account.
+export * from './proposals/index.js';
 
 // Dashboard / 儀表板
 export { DashboardServer, removeDashboardToken } from './dashboard/index.js';

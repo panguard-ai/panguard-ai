@@ -158,6 +158,18 @@ PanGuard is on-device by default. The optional **Threat Cloud** (off until you o
 
 > Sharing is pseudonymous (a stable random install ID), transport-encrypted (TLS). End-to-end encrypted contributions — where not even our server can read a payload — are on the roadmap for regulated fleets.
 
+### Send what you catch to ATR (no Threat Cloud needed)
+
+When a scan rates a skill HIGH or CRITICAL, PanGuard keeps the matched evidence as a detection-rule proposal in `~/.panguard/proposals/` on your machine. Nothing is sent anywhere.
+
+```bash
+pga proposals list            # what is waiting
+pga proposals show <id>       # the exact text that would be published
+pga proposals submit <id>     # opens a pre-filled "New Rule Proposal" issue on the ATR repository
+```
+
+`submit` only opens your browser at a pre-filled GitHub issue form. **You** read it, edit it if you want, and press Submit from your own account; PanGuard never posts for you and needs no token. The issue is **public**, so before any text reaches the form PanGuard de-identifies it on your machine: secrets and tokens, home-directory paths, your user name and host name, email addresses and IP addresses are masked, the skill name is left out, and only the matched snippet is kept. Read it anyway before you submit. ATR's maintainers turn accepted proposals into rules through the same quality gates as any other contribution. See [docs/guides/rule-proposals.md](docs/guides/rule-proposals.md).
+
 ---
 
 ## Architecture

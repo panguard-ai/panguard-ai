@@ -94,6 +94,7 @@ import { setupCommand } from './commands/setup.js';
 import { reportCommand as reportSignCommand } from './commands/report-sign.js';
 import { startInteractive } from './interactive.js';
 import { upCommand } from './commands/up.js';
+import { proposalsCommand } from './commands/proposals.js';
 
 const program = new Command();
 
@@ -111,6 +112,7 @@ const hidden = { hidden: true };
 program.addCommand(upCommand()); // scan → protect → dashboard (the one command)
 program.addCommand(scanCommand()); // scan a skill / path before you install it
 program.addCommand(statusCommand()); // am I protected right now?
+program.addCommand(proposalsCommand()); // detection rule proposals → pre-filled ATR issue
 program.addCommand(doctorCommand()); // diagnose + fix problems
 program.addCommand(upgradeCommand()); // update to the latest rules + engine
 

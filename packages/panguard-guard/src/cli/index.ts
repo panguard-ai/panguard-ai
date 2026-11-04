@@ -35,6 +35,7 @@ import { DashboardRenderer } from './dashboard-renderer.js';
 import type { DashboardState } from './dashboard-renderer.js';
 import { removeDashboardToken } from '../dashboard/index.js';
 import { SkillWatcher } from '../engines/skill-watcher.js';
+import { withOutbox } from '../proposals/outbox.js';
 import { commandScan } from './scan-command.js';
 import {
   classifyThreatResponse,
@@ -823,10 +824,14 @@ async function commandStart(
   // !== false). Opted out => submitters stay undefined => SkillWatcher uploads
   // nothing.
   const sharingOptedIn = config.threatCloudUploadEnabled === true;
+  // ATR proposals always land in the LOCAL outbox (~/.panguard/proposals), which
+  // never leaves the machine on its own: the user reviews each one and submits it
+  // as a pre-filled public GitHub issue (`pga proposals submit <id>`). Threat
+  // Cloud stays an optional extra sink, used only when sharing is opted in.
   const skillWatcher = new SkillWatcher({
     pollInterval: 10_000,
     submitThreat: sharingOptedIn ? engine.getSkillThreatSubmitter() : undefined,
-    submitATRProposal: sharingOptedIn ? engine.getATRProposalSubmitter() : undefined,
+    submitATRProposal: withOutbox(sharingOptedIn ? engine.getATRProposalSubmitter() : undefined),
   });
 
   skillWatcher.on('skill-added', (change: { name: string; platformId: string }) => {

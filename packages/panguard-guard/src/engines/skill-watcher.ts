@@ -733,6 +733,12 @@ export class SkillWatcher extends EventEmitter {
         `ATR proposal submitted from skill audit: ${skillName} (${patternHash}) / ` +
           `技能審計 ATR 提案已提交: ${skillName}`
       );
+    } else {
+      logger.info(
+        `ATR proposal from skill audit kept in the local outbox: ${skillName} ` +
+          `(review and submit with \`pga proposals list\`) / ` +
+          `技能審計 ATR 提案已存入本機待送區: ${skillName}`
+      );
     }
   }
 }

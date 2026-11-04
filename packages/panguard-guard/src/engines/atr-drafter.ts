@@ -23,6 +23,7 @@ import { createLogger } from '@panguard-ai/core';
 import type { SecurityEvent } from '@panguard-ai/core';
 import type { AnalyzeLLM } from '../types.js';
 import type { ThreatCloudClient } from '../threat-cloud/index.js';
+import { withOutbox } from '../proposals/outbox.js';
 
 const logger = createLogger('panguard-guard:atr-drafter');
 
@@ -260,7 +261,17 @@ export class ATRDrafter {
         drafted++;
 
         if (result.selfReviewApproved) {
-          const success = await this.threatCloud.submitATRProposal({
+          // Every approved draft also lands in the local outbox, so a Threat Cloud
+          // outage no longer drops it: the user can submit it as a pre-filled ATR
+          // issue. A draft kept in the outbox counts as handled, so it is not
+          // re-drafted (and re-billed to the LLM) every cycle.
+          let savedLocally = false;
+          const submit = withOutbox((p) => this.threatCloud.submitATRProposal(p), {
+            onSaved: () => {
+              savedLocally = true;
+            },
+          });
+          const success = await submit({
             patternHash: hash,
             ruleContent: result.ruleContent,
             llmProvider: this.config.llmProvider,
@@ -268,10 +279,8 @@ export class ATRDrafter {
             selfReviewVerdict: result.selfReviewVerdict,
           });
 
-          if (success) {
-            submitted++;
-            this.submittedPatterns.add(hash);
-          }
+          if (success) submitted++;
+          if (success || savedLocally) this.submittedPatterns.add(hash);
         }
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);

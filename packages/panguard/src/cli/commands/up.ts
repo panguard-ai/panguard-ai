@@ -17,7 +17,7 @@ import { detectLang } from '../interactive/lang.js';
 import { ensureTelemetryConsent } from '../consent.js';
 import { installFor, toHookPlatform } from './hook.js';
 import { ensurePersistentService, type PersistResult } from './persist.js';
-import { buildSkillAuditProposal } from './atr-proposal.js';
+import { buildSkillAuditProposal, keepSkillAuditProposalLocally } from './atr-proposal.js';
 import { isFirstRun, markInitialized } from '../first-run.js';
 import {
   readAuthenticatedDashboardUrl,
@@ -516,6 +516,7 @@ export function upCommand(): Command {
                   /** Which rules fired — so status can say WHY, not just THAT. */
                   evidence: ReturnType<typeof toEvidence>;
                 }> = [];
+                let proposalsKept = 0;
 
                 try {
                   const { auditSkill } = await import('@panguard-ai/panguard-skill-auditor');
@@ -550,6 +551,26 @@ export function upCommand(): Command {
                           riskScore: report.riskScore,
                           evidence: toEvidence(report.findings),
                         });
+                        // Local only (no consent needed, nothing leaves the
+                        // machine): keep the evidence as an ATR rule proposal the
+                        // user can submit later with `pga proposals submit <id>`.
+                        if (
+                          keepSkillAuditProposalLocally({
+                            skillName: skill.name,
+                            riskLevel: report.riskLevel,
+                            source: 'pga-up',
+                            findings: report.findings.map((f) => ({
+                              id: f.id,
+                              title: f.title,
+                              severity: f.severity,
+                              category: f.category,
+                              location: f.location,
+                              snippet: (f as { explain?: { snippet?: string } }).explain?.snippet,
+                            })),
+                          })
+                        ) {
+                          proposalsKept++;
+                        }
                       }
 
                       // ── Flywheel: submit scan results to TC (consent-gated) ──
@@ -631,6 +652,17 @@ export function upCommand(): Command {
                         `[panguard up] Whitelist revocation failed: ${err instanceof Error ? err.message : String(err)}\n`
                       );
                     }
+                  }
+                  if (proposalsKept > 0) {
+                    console.log(
+                      `\n  ${c.dim(
+                        t(
+                          lang,
+                          `${proposalsKept} detection rule proposal(s) saved on this machine. Review and send to ATR: pga proposals list`,
+                          `${proposalsKept} 份偵測規則提案已存在本機。檢視並送給 ATR:pga proposals list`
+                        )
+                      )}`
+                    );
                   }
                   console.log('');
                 } else {
@@ -1144,7 +1176,7 @@ async function submitToTC(
   // name. discoverAllSkills() yields registry/manifest names, but strip path
   // separators + cap length so a path-like name can't leak a local directory tree.
   skillName = skillName.replace(/[\\/]/g, '_').slice(0, 80);
-  const { ThreatCloudClient } = await import('@panguard-ai/panguard-guard');
+  const { ThreatCloudClient, withOutbox } = await import('@panguard-ai/panguard-guard');
   const { contentHash } = await import('@panguard-ai/scan-core');
   const { readFileSync: rf, existsSync: fe } = await import('node:fs');
 
@@ -1191,7 +1223,9 @@ async function submitToTC(
         snippet: f.explain?.snippet,
       })),
     });
-    if (proposal) await tc.submitATRProposal(proposal);
+    // Threat Cloud is an optional extra sink; the outbox record (already kept
+    // locally during the scan) is updated with whether TC accepted it.
+    if (proposal) await withOutbox((p) => tc.submitATRProposal(p))(proposal);
   }
 
   // 3. Report scan event for metrics

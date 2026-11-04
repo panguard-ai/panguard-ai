@@ -15,7 +15,7 @@ import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { c, banner, divider, box, symbols, setLogLevel } from '@panguard-ai/core';
 import { contentHash } from '@panguard-ai/scan-core';
-import { buildSkillAuditProposal } from './atr-proposal.js';
+import { buildSkillAuditProposal, keepSkillAuditProposalLocally } from './atr-proposal.js';
 import {
   buildEventsFromAuditReport,
   getTcCorrelationHeaders,
@@ -598,6 +598,34 @@ export function auditCommand(): Command {
           }
         }
 
+        // ── ATR rule proposal, kept LOCALLY (no consent needed) ──
+        // Nothing leaves the machine here: the de-identified proposal waits in
+        // ~/.panguard/proposals until the user submits it as a pre-filled public
+        // ATR issue (`pga proposals submit <id>`). Threat Cloud, below, is optional.
+        if (
+          (report.riskLevel === 'HIGH' || report.riskLevel === 'CRITICAL') &&
+          report.findings.length > 0
+        ) {
+          const kept = keepSkillAuditProposalLocally({
+            skillName: safeSkillName(report.manifest?.name, resolvedPath),
+            riskLevel: report.riskLevel === 'CRITICAL' ? 'CRITICAL' : 'HIGH',
+            source: 'cli-auditor',
+            findings: report.findings.map((f) => ({
+              id: f.id,
+              title: f.title,
+              severity: f.severity,
+              category: f.category,
+              location: f.location,
+              snippet: (f as { explain?: { snippet?: string } }).explain?.snippet,
+            })),
+          });
+          if (kept && !options.json) {
+            console.log(
+              `  ${c.dim(`${symbols.info} Detection rule proposal saved locally (${kept.id}). Review and send to ATR: pga proposals submit ${kept.id}`)}`
+            );
+          }
+        }
+
         // ── Flywheel: submit ATR proposal for HIGH/CRITICAL findings — OPT-IN ──
         if (
           cloudUploadAllowed &&
@@ -638,7 +666,8 @@ export function auditCommand(): Command {
               // rejected/offline POST (that was a fake-green). The accepted
               // contribution is the skill-threat shared above; the community rule
               // is drafted from repeated reports.
-              const proposalAccepted = await tc.submitATRProposal(proposal);
+              const { withOutbox } = await import('@panguard-ai/panguard-guard');
+              const proposalAccepted = await withOutbox((p) => tc.submitATRProposal(p))(proposal);
               if (!options.json) {
                 if (proposalAccepted) {
                   console.log(

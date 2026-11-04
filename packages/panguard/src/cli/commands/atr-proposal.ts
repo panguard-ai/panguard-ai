@@ -21,7 +21,8 @@
  */
 
 import { patternHash } from '@panguard-ai/scan-core';
-import { scrubSecretValues } from '@panguard-ai/panguard-guard';
+import { scrubSecretValues, saveProposalToOutbox } from '@panguard-ai/panguard-guard';
+import type { OutboxRecord } from '@panguard-ai/panguard-guard';
 
 /** A single finding, reduced to what a proposal needs. */
 export interface ProposalFinding {
@@ -114,4 +115,23 @@ export function buildSkillAuditProposal(input: {
       findingCount: input.findings.length,
     }),
   };
+}
+
+/**
+ * Keep a skill-audit proposal in the LOCAL outbox (~/.panguard/proposals), with
+ * no consent needed: nothing leaves the machine. The user reviews it and submits
+ * it as a pre-filled public ATR issue with `pga proposals submit <id>`.
+ * Returns the stored record, or null when there is nothing to propose or the
+ * outbox cannot be written (never throws: a full disk must not break a scan).
+ */
+export function keepSkillAuditProposalLocally(
+  input: Parameters<typeof buildSkillAuditProposal>[0]
+): OutboxRecord | null {
+  const proposal = buildSkillAuditProposal(input);
+  if (!proposal) return null;
+  try {
+    return saveProposalToOutbox(proposal);
+  } catch {
+    return null;
+  }
 }
