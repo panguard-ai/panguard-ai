@@ -6402,7 +6402,7 @@
       },
       "q3": {
         "q": "Is it open source? Can I audit the code?",
-        "a": "100% open source, MIT license. Every line of code, every ATR rule, every detection algorithm is publicly auditable on GitHub.\n\nThere is no hidden enterprise edition. No closed-source components. No telemetry you cannot inspect. What you see in the repo is exactly what runs on your machine.\n\nWe believe security tools must be transparent. If you cannot verify what your security software does, it is not really protecting you."
+        "a": "The Community edition is 100% open source, MIT license. Every line of its code, every ATR rule, every detection algorithm is publicly auditable on GitHub.\n\nCommunity has no closed-source components and no telemetry you cannot inspect. What you see in the repo is exactly what Community runs on your machine. Paid Enterprise features, such as signed compliance evidence reporting, are separate and listed on the pricing page.\n\nWe believe security tools must be transparent. If you cannot verify what your security software does, it is not really protecting you."
       }
     },
     "deployment": {
@@ -6428,7 +6428,7 @@
       },
       "q2": {
         "q": "Who builds this?",
-        "a": "Built in Taiwan by a team that believes AI agent security should be a public good, not a premium feature.\n\nOur thesis: the flywheel model -- where every user's threat discovery strengthens every other user's defense -- only works if the tool is open and free. Paid tiers would fragment the community and weaken collective protection.\n\nAI agents are becoming the primary interface between humans and computing. The security layer for that interface must be community-owned."
+        "a": "Built in Taiwan by a team that believes AI agent security should be a public good, not a premium feature.\n\nOur thesis: the flywheel model -- where every user's threat discovery strengthens every other user's defense -- only works if the tool is open and free. That is why detection and protection stay free in the Community edition; paid plans add what organizations need to prove it, such as signed compliance evidence.\n\nAI agents are becoming the primary interface between humans and computing. The security layer for that interface must be community-owned."
       },
       "q3": {
         "q": "How can I contribute?",
