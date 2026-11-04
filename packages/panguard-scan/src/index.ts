@@ -21,6 +21,11 @@ export const CLAWSCAN_NAME = 'PanguardScan';
 export { runScan } from './scanners/index.js';
 export { checkSourceCode } from './scanners/sast-checker.js';
 export { checkHardcodedSecrets } from './scanners/secrets-checker.js';
+export {
+  checkCompiledArtifacts,
+  extractReadableStrings,
+  findDangerousNames,
+} from './scanners/compiled-artifacts.js';
 export type { ScanConfig, ScanResult, Finding } from './scanners/types.js';
 export { sortBySeverity, SEVERITY_ORDER } from './scanners/types.js';
 
