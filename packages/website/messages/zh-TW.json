@@ -22,7 +22,7 @@
     "yes": "yes",
     "no": "no",
     "copyright": "2026 Panguard AI, Inc. 版權所有。",
-    "soc2": "SOC 2 準備中",
+    "soc2": "SOC 2 規劃中",
     "gdpr": "符合 GDPR",
     "footerTagline": "AI agent 安全平台——建立在開放的 ATR 標準上。一個指令安裝，AI 守護一切。"
   },
@@ -3572,16 +3572,16 @@
     "compliance": {
       "overline": "合規狀態",
       "title": "認證與框架。",
-      "subtitle": "即時可見我們的合規態勢。我們誠實公布狀態——包括進行中的，不只是已完成的。",
+      "subtitle": "我們目前的狀態，包括還沒開始的項目。",
       "soc2": {
         "name": "SOC 2 Type 1",
-        "status": "進行中",
-        "desc": "已啟動 SOC 2 Type 1 readiness program：8 項核心 policy 公開於 panguard-ai/security-policies、subprocessor 清單即時更新、security.txt 揭露漏洞通報流程、incident response SLA 已生效。Vanta / Drata vendor 評估進行中，CPA 簽約與正式 attestation 目標 Q4 2026 / Q1 2027。"
+        "status": "規劃中",
+        "desc": "尚未開始。安全政策正在撰寫，核准後公開；本站的次處理者清單與 security.txt 漏洞通報方式為最新版本。目前尚未委任稽核機構，也沒有排定稽核日期。"
       },
       "iso27001": {
         "name": "ISO 27001",
         "status": "2027 規劃中",
-        "desc": "在 SOC 2 Type II 之後接續。ISMS 控制與 Type 1 準備同步設計，使認證成為形式化過程。"
+        "desc": "規劃在 SOC 2 之後進行，尚未開始。"
       },
       "gdpr": {
         "name": "GDPR / 台灣個資法",
@@ -3616,8 +3616,8 @@
         "title": "基礎設施層",
         "items": [
           "本地優先架構——所有資料留在你的機器上",
-          "Threat Cloud 部署在 SOC 2 Type II 認證的雲端供應商",
-          "管理操作不可變稽核日誌（保留 365 天）",
+          "Threat Cloud（目前暫停中）部署在 SOC 2 Type II 認證的雲端供應商",
+          "使用者無法修改的管理操作稽核日誌",
           "自動依賴弱點掃描",
           "供應商邊緣 DDoS 防護"
         ]
@@ -3626,7 +3626,7 @@
     "dataHandling": {
       "overline": "資料處理",
       "title": "我們如何對待你的資料。",
-      "subtitle": "每一項資料處理實踐都有文件記錄、透過政策強制執行，並透過自動化控制驗證。",
+      "subtitle": "產品目前如何處理資料。書面政策仍在撰寫中。",
       "item1": {
         "title": "資料加密",
         "desc": "AES-256 靜態加密，TLS 1.3 傳輸加密。本地組態和憑證儲存加密。"
@@ -3645,36 +3645,26 @@
       },
       "item5": {
         "title": "稽核日誌",
-        "desc": "所有管理操作的不可變稽核軌跡。日誌至少保留 12 個月。"
+        "desc": "管理操作會寫入使用者無法修改的稽核日誌。刪除 workspace 時，相關紀錄會一併刪除。"
       },
       "item6": {
         "title": "事件回應",
-        "desc": "72 小時資料外洩通知承諾。書面 IR runbook。外部桌上演練計劃在 Q3 2026 隨 SOC 2 Type 1 同步啟動。"
+        "desc": "72 小時資料外洩通知承諾。事件應變手冊撰寫中，尚未進行過桌上演練。"
       }
     },
     "subprocessors": {
       "overline": "次處理者",
       "title": "我們合作的第三方。",
-      "subtitle": "我們將次處理者的使用限制在必要服務。每個次處理者在加入前都經過安全審查，並每年重新評估。",
+      "subtitle": "以下是產品與公司實際使用的服務。",
       "headers": {
         "name": "次處理者",
         "purpose": "用途",
         "location": "位置"
       },
-      "updateNote": "最後更新：2026 年 5 月。我們在新增次處理者前至少 30 天通知客戶。透過我們的 GitHub 儲存庫訂閱更新。",
-      "aws": {
-        "name": "AWS",
-        "purpose": "基礎設施計算與儲存",
-        "location": "美國 / 全球"
-      },
+      "updateNote": "最後更新：2026 年 11 月。我們在新增次處理者前至少 30 天通知客戶。",
       "anthropic": {
         "name": "Anthropic",
         "purpose": "LLM 語意分析（Claude API）",
-        "location": "美國"
-      },
-      "openai": {
-        "name": "OpenAI",
-        "purpose": "LLM 語意分析（GPT API，opt-in）",
         "location": "美國"
       },
       "supabase": {
@@ -3694,8 +3684,8 @@
       },
       "railway": {
         "name": "Railway",
-        "purpose": "Threat Cloud 後端託管",
-        "location": "新加坡（亞太）"
+        "purpose": "Threat Cloud 後端託管（目前暫停中）",
+        "location": "暫停中，目前未使用"
       },
       "cloudflare": {
         "name": "Cloudflare",
@@ -3707,9 +3697,14 @@
         "purpose": "原始碼與安全政策託管",
         "location": "美國"
       },
-      "resend": {
-        "name": "Resend",
-        "purpose": "交易郵件（驗證、通知）",
+      "sentry": {
+        "name": "Sentry",
+        "purpose": "Panguard CLI 的錯誤回報（僅在啟用錯誤回報時）",
+        "location": "美國"
+      },
+      "google": {
+        "name": "Google Workspace",
+        "purpose": "公司 Email、行事曆與文件",
         "location": "美國"
       }
     },
@@ -3753,7 +3748,7 @@
         "0": {
           "phase": "偵測",
           "sla": "< 1 小時",
-          "desc": "自動監控偵測異常。值班工程師收到警報。"
+          "desc": "問題會透過 security@panguard.ai、GitHub 安全通報或錯誤回報送達我們。目前還沒有值班輪替，由創辦人負責分級處理。以下時間為目標，不是保證；資料外洩通知承諾為 72 小時。"
         },
         "1": {
           "phase": "評估",
@@ -3762,7 +3757,7 @@
         },
         "2": {
           "phase": "通知",
-          "sla": "< 24 小時",
+          "sla": "< 72 小時",
           "desc": "透過電子郵件通知受影響客戶。更新狀態頁面。如有需要通報監管機構。"
         },
         "3": {
@@ -3774,7 +3769,7 @@
     },
     "cta": {
       "title": "需要合規文件？",
-      "desc": "申請 SOC 2 報告、滲透測試摘要或資料處理協議。所有文件對社群開放。",
+      "desc": "可申請資料處理協議（DPA），或寄信到 security@panguard.ai 詢問安全問題。目前還沒有 SOC 2 報告，也還沒做過滲透測試。",
       "cta1": "申請文件",
       "cta2": "查看安全實踐",
       "cta3": "報告簽章金鑰"
@@ -3808,11 +3803,11 @@
       },
       "item5": {
         "title": "開源透明",
-        "desc": "Panguard 完全開源（MIT 授權）。每一行程式碼都可在 GitHub 上稽核。歡迎社群安全審查和貢獻。我們為外部研究員維護漏洞獎勵計畫。"
+        "desc": "Panguard 完全開源（MIT 授權）。每一行程式碼都可在 GitHub 上稽核。歡迎社群安全審查和貢獻。漏洞請寄到 security@panguard.ai。"
       },
       "item6": {
         "title": "安全開發生命週期",
-        "desc": "每次程式碼變更都經過自動 SAST/DAST 掃描、依賴項稽核和同儕審查。我們遵循 OWASP 最佳實踐，並為外部研究員維護漏洞獎勵計畫。"
+        "desc": "程式碼變更會經過自動依賴項稽核與 CI 測試。我們遵循 OWASP 最佳實踐。目前沒有付費漏洞獎勵計畫；漏洞請寄到 security@panguard.ai。"
       }
     },
     "compliance": {
@@ -3822,15 +3817,15 @@
       "frameworks": [
         {
           "badge": "SOC 2 Type II",
-          "status": "進行中",
+          "status": "規劃中",
           "statusColor": "text-[#f59e0b]",
-          "description": "Panguard 幫助生成符合 SOC 2 Type II 信任服務準則的合規報告，涵蓋安全性、可用性和機密性。使用這些報告加速你的稽核準備。"
+          "description": "我們自身的 SOC 2 稽核尚未開始。另外，Panguard 可產出對應 SOC 2 信任服務準則的報告，協助你自己的稽核準備。"
         },
         {
           "badge": "ISO 27001",
           "status": "規劃中",
           "statusColor": "text-[#60a5fa]",
-          "description": "ISO 27001 認證已列入 2026 年路線圖。我們的資訊安全管理系統（ISMS）從一開始就按照 ISO 27001 標準建構，使認證成為正式化而非轉型。"
+          "description": "規劃在 SOC 2 之後進行，尚未開始。"
         },
         {
           "badge": "GDPR",
@@ -3920,7 +3915,7 @@
         },
         "5": {
           "title": "資料落地與區域",
-          "desc": "行銷網站與客戶 dashboard 跑在 Vercel 全球邊緣（US/EU/APAC POP）。Threat Cloud 聚合器在 us-east。Enterprise 與 Sovereign tier 可選 EU 或 Taiwan in-region tenant（單一區域 Postgres + S3，無跨境資料流）。Sovereign 提供完全離網部署（airgap、零對外連線）。"
+          "desc": "行銷網站與客戶 dashboard 跑在 Vercel 全球邊緣（US/EU/APAC POP）。Threat Cloud 目前暫停中。Enterprise 與 Sovereign tier 可選 EU 或 Taiwan in-region tenant（單一區域 Postgres，無跨境資料流）。Sovereign 提供完全離網部署（airgap、零對外連線）。"
         }
       }
     },
@@ -3930,7 +3925,7 @@
       "subtitle": "我們對企業客戶的承諾。",
       "items": {
         "0": {
-          "metric": "威脅雲 API 可用性",
+          "metric": "威脅雲 API 可用性（服務目前暫停中）",
           "target": "99.9%",
           "scope": "所有使用者"
         },
@@ -3941,7 +3936,7 @@
         },
         "2": {
           "metric": "安全事件通知",
-          "target": "< 24 小時",
+          "target": "< 72 小時",
           "scope": "所有使用者"
         },
         "3": {
@@ -3960,14 +3955,14 @@
     "trustCenter": {
       "overline": "信任中心",
       "title": "可驗證的文件。",
-      "subtitle": "下載我們的安全文件、申請稽核報告，或查看我們的合規文件。",
+      "subtitle": "目前有哪些文件，哪些還在進行中。",
       "doc1": {
         "label": "SOC 2 Type II 報告",
-        "status": "2026 Q3 推出"
+        "status": "尚未開始"
       },
       "doc2": {
         "label": "滲透測試摘要",
-        "status": "可應要求提供"
+        "status": "尚未進行"
       },
       "doc3": {
         "label": "資料處理協議（DPA）",
@@ -3975,15 +3970,15 @@
       },
       "doc4": {
         "label": "安全白皮書",
-        "status": "可用"
+        "status": "撰寫中"
       },
       "doc5": {
         "label": "架構概覽",
-        "status": "可用"
+        "status": "撰寫中"
       },
       "doc6": {
         "label": "事件回應計畫",
-        "status": "可應要求提供"
+        "status": "撰寫中"
       }
     },
     "cta": {

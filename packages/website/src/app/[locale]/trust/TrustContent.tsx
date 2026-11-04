@@ -36,7 +36,7 @@ const statusStyles: Record<StatusVariant, string> = {
 
 /* ─── Compliance Card Config ─── */
 const complianceCardConfigs = [
-  { key: 'soc2' as const, variant: 'in-progress' as StatusVariant, badge: CertifiedSecureBadge },
+  { key: 'soc2' as const, variant: 'planned' as StatusVariant, badge: CertifiedSecureBadge },
   { key: 'iso27001' as const, variant: 'planned' as StatusVariant, badge: CertifiedSecureBadge },
   { key: 'gdpr' as const, variant: 'active' as StatusVariant, badge: ProtectedByBadge },
   { key: 'hipaa' as const, variant: 'in-progress' as StatusVariant, badge: EnterpriseGradeBadge },
@@ -61,7 +61,6 @@ const dataHandlingConfigs = [
 
 /* ─── Subprocessors Config ─── */
 const subprocessorKeys = [
-  'aws',
   'anthropic',
   'supabase',
   'stripe',
@@ -69,7 +68,8 @@ const subprocessorKeys = [
   'railway',
   'cloudflare',
   'github',
-  'resend',
+  'sentry',
+  'google',
 ] as const;
 
 /* ═══════════════════════════════════════════════════════════════════

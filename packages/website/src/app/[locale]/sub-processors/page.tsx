@@ -81,8 +81,8 @@ const SUB_PROCESSORS: ReadonlyArray<SubProcessor> = [
   {
     name: 'Functional Software, Inc. (Sentry)',
     purpose: {
-      en: 'Application error monitoring, performance tracing',
-      'zh-TW': '應用程式錯誤監控、效能追蹤',
+      en: 'Error reports and traces from the Panguard CLI, only when error reporting is enabled',
+      'zh-TW': 'Panguard CLI 的錯誤回報與效能追蹤（僅在啟用錯誤回報時）',
     },
     location: LOCATION_US,
     url: 'https://sentry.io',
@@ -102,15 +102,15 @@ const SUB_PROCESSORS: ReadonlyArray<SubProcessor> = [
     socUrl: 'https://trust.anthropic.com',
   },
   {
-    name: 'Fly.io, Inc.',
+    name: 'Railway Corporation',
     purpose: {
-      en: 'Threat Cloud hosting (tc.panguard.ai) where Enterprise customer elects hosted TC',
-      'zh-TW': 'Threat Cloud 託管（tc.panguard.ai），供企業客戶選擇使用託管版 TC 時使用',
+      en: 'Threat Cloud hosting (tc.panguard.ai). The service is currently offline.',
+      'zh-TW': 'Threat Cloud 託管（tc.panguard.ai）。此服務目前暫停中。',
     },
-    location: LOCATION_US,
-    url: 'https://fly.io',
-    dpaUrl: 'https://fly.io/legal/dpa',
-    socUrl: 'https://fly.io/docs/security/',
+    location: { en: 'Not in use while offline', 'zh-TW': '暫停中，目前未使用' },
+    url: 'https://railway.com',
+    dpaUrl: 'https://railway.com/legal/dpa',
+    socUrl: 'https://trust.railway.com',
   },
   {
     name: 'GitHub, Inc.',
