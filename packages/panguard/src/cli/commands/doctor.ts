@@ -612,6 +612,18 @@ function checkHookProtection(): CheckResult {
       detail: 'Installed; no degraded run recorded (verified on the next tool call)',
     };
   }
+  if (status.degraded && status.reason === 'evaluation-deadline') {
+    // Not a contract failure: the scan of one tool call ran past its time limit.
+    const allowed = status.disposition === 'allowed';
+    return {
+      status: 'warn',
+      label: 'Built-in-tool hook',
+      detail: `A tool call could not be scanned within the time limit and was ${
+        allowed ? 'ALLOWED (advisory posture)' : 'BLOCKED (fail-closed)'
+      } on host protocol "${status.platform || 'unknown'}"${status.at ? ` at ${status.at}` : ''}`,
+      fix: "If this blocks ordinary work, raise PANGUARD_HOOK_EVAL_DEADLINE_MS (milliseconds) in the host agent's environment. The marker clears on the next healthy run",
+    };
+  }
   if (status.degraded && status.reason) {
     // A contract/protocol failure. Word from the ACTUAL disposition: a
     // fail-closed marker blocked the call; under advisory posture the same
