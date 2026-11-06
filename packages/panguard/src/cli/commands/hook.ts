@@ -35,7 +35,11 @@ import { c } from '@panguard-ai/core';
 import {
   ProxyEvaluator,
   EVALUATION_ERROR_SENTINEL,
+  EvaluationDeadlineError,
+  EngineWorkerError,
+  loadRulesOrInline,
 } from '@panguard-ai/panguard-mcp-proxy/evaluator';
+import type { EvalResult, ProxyEvaluatorOptions } from '@panguard-ai/panguard-mcp-proxy/evaluator';
 import {
   readAutoUpdateSettings,
   resolveStagedAutoRules,
@@ -568,6 +572,84 @@ function resolvePosture(opts: { enforce?: boolean; advisory?: boolean }): HookPo
 }
 
 /**
+ * Tool-call content up to this many chars is scanned on the hook's own thread:
+ * at this size the slowest content we have measured still scans far inside the
+ * deadline, and most tool calls are this short, so they skip the cost of
+ * starting a worker. Longer content is scanned in a worker cut at the deadline.
+ */
+export const HOOK_INLINE_MAX_CHARS = 2_048;
+
+/**
+ * How long one scan of longer content may run (PANGUARD_HOOK_EVAL_DEADLINE_MS
+ * overrides it). The time the hook takes to start and load its rules comes on
+ * top; the limit leaves room for that under the shortest tool-hook timeout the
+ * installer writes (Gemini's 10 s), so on an ordinary machine the hook answers
+ * before the host stops waiting for it.
+ */
+export const HOOK_EVAL_DEADLINE_MS = 6_000;
+
+/** The longest delay a Node timer honors; a longer one fires at once. */
+const MAX_TIMER_DELAY_MS = 2_147_483_647;
+
+/** Inline for short content; a worker with a deadline for longer content. Pure + exported for testing. */
+export function hookEvaluatorOptions(
+  content: string,
+  env: NodeJS.ProcessEnv = process.env
+): ProxyEvaluatorOptions {
+  if (content.length <= HOOK_INLINE_MAX_CHARS) return { isolation: 'inline' };
+  const raw = env['PANGUARD_HOOK_EVAL_DEADLINE_MS'] ?? '';
+  const override = /^\d+$/.test(raw) ? Number(raw) : 0;
+  return {
+    isolation: 'worker',
+    deadlineMs: override > 0 && override <= MAX_TIMER_DELAY_MS ? override : HOOK_EVAL_DEADLINE_MS,
+  };
+}
+
+/**
+ * The engine could not evaluate this tool call: an operational error, so the
+ * hook fails OPEN (never brick the agent), loudly, and records it for doctor.
+ */
+function failOpenOnEngineError(platform: HookPlatform): never {
+  process.stderr.write(
+    '[panguard-hook] WARNING: the detection engine failed to evaluate this tool call ' +
+      '(operational error) — NOT blocking (fail-open). Protection is degraded; run "pga doctor".\n'
+  );
+  writeContractMarker(platform, 'evaluation-error-failopen', 'allowed');
+  process.exit(0);
+}
+
+/**
+ * The scan ran past its deadline and was cut. Under a blocking posture content
+ * that could not be scanned is not let through, the same as an oversized or
+ * unparseable payload: otherwise content that is slow to scan would be a way
+ * past the hook. Advisory blocks nothing, so it only warns. Either way the
+ * status file records it for `pga doctor`.
+ */
+function scanDeadlineEmission(platform: HookPlatform, posture: HookPosture): Emission {
+  if (posture === 'advisory') {
+    writeContractMarker(platform, 'evaluation-deadline', 'allowed');
+    return {
+      exit: 0,
+      stderr:
+        '[panguard] advisory (not blocked): tool-call content could not be scanned within the time limit ' +
+        '(PANGUARD_HOOK_EVAL_DEADLINE_MS raises it)',
+    };
+  }
+  writeContractMarker(platform, 'evaluation-deadline', 'blocked');
+  try {
+    return emitFor(
+      platform,
+      'deny',
+      'PanGuard: tool-call content could not be scanned within the time limit — blocked (fail-closed). ' +
+        'If this blocks ordinary work, raise PANGUARD_HOOK_EVAL_DEADLINE_MS (milliseconds).'
+    );
+  } catch (e) {
+    if (e instanceof HookContractError) failClosed(platform, e.message);
+    throw e;
+  }
+}
+
+/**
  * The hook. Reads the tool call, evaluates the COMMAND CONTENT, emits the host's
  * exact verdict. Failure handling is split by CAUSE:
  *   - OPERATIONAL error (stdin parse / evaluator load / 0 rules) on a recognized
@@ -625,8 +707,10 @@ export async function runHook(
     const norm = normalizeInput(platform, payload);
     if (!norm || !norm.content.trim()) process.exit(0);
 
-    const evaluator = new ProxyEvaluator();
-    const ruleCount = await evaluator.loadRules();
+    const { evaluator, ruleCount } = await loadRulesOrInline(
+      new ProxyEvaluator(hookEvaluatorOptions(norm.content)),
+      (message) => process.stderr.write(`[panguard-hook] WARNING: ${message}\n`)
+    );
     if (ruleCount <= 0) {
       // Fail-OPEN (correct: never brick the agent) but NOT silent — record the
       // degraded state + warn once on stderr so doctor/dashboard/user can see
@@ -664,12 +748,22 @@ export async function runHook(
     // host/code/any) still HARD-BLOCK, so credential exfil is caught regardless. The
     // posture surfaces the advisory (guarded warns; --enforce blocks it too, for
     // users who opt into the higher-FP posture).
-    const result = await evaluator.evaluateToolCall(
-      'command',
-      { input: norm.content },
-      'tool_call',
-      true
-    );
+    let result: EvalResult;
+    try {
+      result = await evaluator.evaluateToolCall(
+        'command',
+        { input: norm.content },
+        'tool_call',
+        true
+      );
+    } catch (err) {
+      if (err instanceof EvaluationDeadlineError)
+        return apply(scanDeadlineEmission(platform, posture));
+      // The worker died mid-scan: an operational failure, handled like an
+      // engine crash below.
+      if (err instanceof EngineWorkerError) failOpenOnEngineError(platform);
+      throw err;
+    }
 
     // Validate the evaluator outcome. An unexpected/unknown value must DENY
     // (fail closed), never fall through to allow.
@@ -687,14 +781,7 @@ export async function runHook(
     // and the advise-only cap. This is an OPERATIONAL error, not a flagged match,
     // so per this hook's invariant (operational errors never brick) we fail OPEN
     // — loudly, and record the degraded state so doctor/dashboard surface it.
-    if (isEvaluationErrorSentinel(result)) {
-      process.stderr.write(
-        '[panguard-hook] WARNING: the detection engine failed to evaluate this tool call ' +
-          '(operational error) — NOT blocking (fail-open). Protection is degraded; run "pga doctor".\n'
-      );
-      writeContractMarker(platform, 'evaluation-error-failopen', 'allowed');
-      process.exit(0);
-    }
+    if (isEvaluationErrorSentinel(result)) failOpenOnEngineError(platform);
     if (outcome !== rawOutcome) {
       // Record the marker with the disposition this posture will ACTUALLY apply:
       // advisory blocks nothing, so an unrecognized outcome is coerced to 'deny'
