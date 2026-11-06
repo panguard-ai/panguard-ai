@@ -7,7 +7,6 @@
   },
   "references": [
     { "path": "../scan-core" },
-    { "path": "../atr" },
     { "path": "../core" },
     { "path": "../panguard-scan" }
   ],

@@ -372,9 +372,6 @@ importers:
 
   packages/panguard-skill-auditor:
     dependencies:
-      '@panguard-ai/atr':
-        specifier: workspace:*
-        version: link:../atr
       '@panguard-ai/core':
         specifier: workspace:*
         version: link:../core
@@ -385,8 +382,8 @@ importers:
         specifier: workspace:*
         version: link:../scan-core
       agent-threat-rules:
-        specifier: ^3.5.8
-        version: 3.5.8(zod@3.25.76)
+        specifier: ^4.3.0
+        version: 4.3.0(zod@3.25.76)
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -1603,6 +1600,7 @@ packages:
 
   '@panguard-ai/threat-cloud@1.4.0':
     resolution: {integrity: sha512-hyJDRWNugnX3VI/vSIpLvQtolRvUi+l4s01BYDKhJJcb/xpgBkLHbsGH3wcOiOz0BWEcXe7QwYLvpV/LqSgkrQ==}
+    deprecated: Internal backend package, not for public use. The PanGuard CLI and Guard connect to the hosted Threat Cloud automatically.
     hasBin: true
 
   '@parcel/watcher-android-arm64@2.5.6':
@@ -2327,6 +2325,11 @@ packages:
 
   agent-threat-rules@4.2.1:
     resolution: {integrity: sha512-D3TccqAcJWiQu2SxN9Vb0Qwn0ZWFKP9ckieyttdCtaSOBUXX/ONZjytbGYHvJpqwLsF7igl23eFvvxqFzMtqDQ==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
+
+  agent-threat-rules@4.3.0:
+    resolution: {integrity: sha512-GQeZ5K94MVYBKqRsEkfsnAEh9XpMSNudcOO8t6osZHMhEPFKfrnn9LpL2beBauMj1dzzftco6huZaPkcwL7Xkw==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -6826,6 +6829,15 @@ snapshots:
       - zod
 
   agent-threat-rules@4.2.1(zod@3.25.76):
+    dependencies:
+      '@modelcontextprotocol/sdk': 1.29.0(zod@3.25.76)
+      js-yaml: 4.1.1
+    transitivePeerDependencies:
+      - '@cfworker/json-schema'
+      - supports-color
+      - zod
+
+  agent-threat-rules@4.3.0(zod@3.25.76):
     dependencies:
       '@modelcontextprotocol/sdk': 1.29.0(zod@3.25.76)
       js-yaml: 4.1.1

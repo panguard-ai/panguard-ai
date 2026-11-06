@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import type { AuditFinding, CheckResult, SkillManifest } from '../types.js';
-import type { ATREngine as ATREngineType, AgentEvent, ATRMatch } from '@panguard-ai/atr';
+import type { ATREngine as ATREngineType, AgentEvent, ATRMatch } from 'agent-threat-rules';
 import { filterInjectableCloudRules } from './cloud-rule-guard.js';
 
 const CHECK_LABEL = 'ATR Pattern Detection';
@@ -202,7 +202,7 @@ export async function checkWithATR(
   // Dynamic import — gracefully handle missing dependency
   let ATREngine: typeof ATREngineType;
   try {
-    const atr = await import('@panguard-ai/atr');
+    const atr = await import('agent-threat-rules');
     ATREngine = atr.ATREngine;
   } catch {
     return {
@@ -218,7 +218,7 @@ export async function checkWithATR(
     // Optional: behavioral fingerprinting for drift detection
     let fingerprintStore: unknown;
     try {
-      const { SkillFingerprintStore } = await import('@panguard-ai/atr');
+      const { SkillFingerprintStore } = await import('agent-threat-rules');
       fingerprintStore = new SkillFingerprintStore();
     } catch {
       // SkillFingerprintStore not available in this version
@@ -241,7 +241,7 @@ export async function checkWithATR(
       const safeCloudRules = filterInjectableCloudRules(cloudRules);
       for (const rule of safeCloudRules) {
         try {
-          engine.addRule(rule as unknown as import('@panguard-ai/atr').ATRRule);
+          engine.addRule(rule as unknown as import('agent-threat-rules').ATRRule);
           ruleCount++;
         } catch {
           // Skip invalid cloud rules silently

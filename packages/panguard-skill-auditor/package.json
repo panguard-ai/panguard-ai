@@ -37,11 +37,10 @@
     "dev": "tsc --build --watch"
   },
   "dependencies": {
-    "@panguard-ai/atr": "workspace:*",
     "@panguard-ai/core": "workspace:*",
     "@panguard-ai/panguard-scan": "workspace:*",
     "@panguard-ai/scan-core": "workspace:*",
-    "agent-threat-rules": "^3.5.8",
+    "agent-threat-rules": "^4.3.0",
     "js-yaml": "^4.1.0"
   },
   "devDependencies": {
