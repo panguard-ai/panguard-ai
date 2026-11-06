@@ -17,6 +17,7 @@ import { createRequire } from 'node:module';
 import type { AuditFinding, CheckResult, SkillManifest } from '../types.js';
 import type { ATREngine as ATREngineType, AgentEvent, ATRMatch } from 'agent-threat-rules';
 import { filterInjectableCloudRules } from './cloud-rule-guard.js';
+import { collectBundledScripts } from '../bundled-scripts.js';
 
 const CHECK_LABEL = 'ATR Pattern Detection';
 
@@ -147,6 +148,38 @@ function buildToolCallEvent(
 }
 
 /**
+ * Whether a rule may report on a bundled script: maturity stable or test, the
+ * rules the alert lane runs. Experimental and draft rules stay on SKILL.md text,
+ * where they were measured; on ordinary code they misfire more.
+ */
+function isScriptGradeRule(match: ATRMatch): boolean {
+  const maturity = String(match.rule.maturity ?? '').toLowerCase();
+  return maturity === 'stable' || maturity === 'test';
+}
+
+/**
+ * Scan each bundled script through the skill entry point and return one finding
+ * per rule per file, located at that file.
+ */
+async function scanBundledScripts(
+  engine: ATREngineType,
+  skillDir: string
+): Promise<AuditFinding[]> {
+  const findings: AuditFinding[] = [];
+  for (const script of await collectBundledScripts(skillDir)) {
+    const matches = engine.scanSkill(script.content).filter(isScriptGradeRule);
+    for (const f of matchesToFindings(matches)) {
+      findings.push({
+        ...f,
+        id: `${f.id}@${script.path}`,
+        location: f.location ? `${script.path}: ${f.location}` : script.path,
+      });
+    }
+  }
+  return findings;
+}
+
+/**
  * Convert ATR matches to AuditFinding[], deduplicating by rule ID.
  *
  * CALLER BEWARE: `ATRMatch.matchedPatterns` holds the RAW text that tripped the
@@ -192,12 +225,14 @@ function matchesToFindings(matches: readonly ATRMatch[]): AuditFinding[] {
  *    single-pattern prompt-injection rules scanSkill's FP gate suppresses)
  * 2. Skill description via the same dual path
  * 3. MCP tool descriptions (if present in metadata) as tool_call events
+ * 4. Script files bundled in the skill directory, when `skillDir` is given
  *
  * Returns a CheckResult compatible with the Skill Auditor pipeline.
  */
 export async function checkWithATR(
   manifest: SkillManifest,
-  cloudRules?: Array<{ id: string; title: string; detection: unknown; [key: string]: unknown }>
+  cloudRules?: Array<{ id: string; title: string; detection: unknown; [key: string]: unknown }>,
+  skillDir?: string
 ): Promise<CheckResult> {
   // Dynamic import — gracefully handle missing dependency
   let ATREngine: typeof ATREngineType;
@@ -321,6 +356,13 @@ export async function checkWithATR(
         }
         return severity !== f.severity ? { ...f, severity } : f;
       });
+    }
+
+    // 4. Bundled scripts. Added after the downgrade above: SKILL.md declaring a
+    //    capability or describing its safeguards says nothing about what a
+    //    script actually does.
+    if (skillDir) {
+      findings = [...findings, ...(await scanBundledScripts(engine, skillDir))];
     }
 
     const hasCritical = findings.some((f) => f.severity === 'critical');
