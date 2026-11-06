@@ -65,8 +65,11 @@ vi.mock('../src/cli/daemon-status.js', () => ({
   fetchDaemonStatus: async () => null,
 }));
 
+// What the hook's status file says; null = no marker. A test sets it and the
+// afterEach below resets it.
+const hookStatus = vi.hoisted(() => ({ value: null as unknown }));
 vi.mock('../src/cli/commands/hook.js', () => ({
-  readHookProtectionStatus: () => null,
+  readHookProtectionStatus: () => hookStatus.value,
   isBuiltinHookInstalled: () => false,
 }));
 
@@ -82,6 +85,7 @@ describe('doctorCommand — exit-code honesty regression', () => {
   });
 
   afterEach(() => {
+    hookStatus.value = null;
     consoleSpy.mockRestore();
     // Reset again so this file never leaks a non-zero exit code into the
     // rest of the test run (the whole point of the bug being pinned).
@@ -134,5 +138,30 @@ describe('doctorCommand — exit-code honesty regression', () => {
     const guardCheck = results.find((r) => r.label === 'Guard engine');
     expect(configCheck?.status).toBe('fail');
     expect(guardCheck?.status).toBe('fail');
+  });
+
+  it('--json explains a hook scan cut at its time limit and names the setting that raises it', async () => {
+    hookStatus.value = {
+      degraded: true,
+      ruleCount: 0,
+      at: '2026-10-27T00:00:00.000Z',
+      reason: 'evaluation-deadline',
+      platform: 'claude-code',
+      disposition: 'blocked',
+    };
+    const cmd = doctorCommand();
+    await cmd.parseAsync(['--json'], { from: 'user' });
+
+    const jsonOutput = consoleSpy.mock.calls[0]![0] as string;
+    const results = JSON.parse(jsonOutput) as Array<{
+      status: string;
+      label: string;
+      detail?: string;
+      fix?: string;
+    }>;
+    const hook = results.find((r) => r.label === 'Built-in-tool hook');
+    expect(hook?.status).toBe('warn');
+    expect(hook?.detail).toContain('could not be scanned within the time limit and was BLOCKED');
+    expect(hook?.fix).toContain('PANGUARD_HOOK_EVAL_DEADLINE_MS');
   });
 });

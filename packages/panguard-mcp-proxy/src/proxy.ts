@@ -28,8 +28,15 @@ import {
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
-import { ProxyEvaluator } from './evaluator.js';
-import type { EvalResult } from './evaluator.js';
+import {
+  ProxyEvaluator,
+  EngineWorkerError,
+  EvaluationDeadlineError,
+  EVALUATION_ERROR_SENTINEL,
+  DEFAULT_EVAL_DEADLINE_MS,
+  loadRulesOrInline,
+} from './evaluator.js';
+import type { EvalResult, EvaluationIsolation } from './evaluator.js';
 import {
   GuardGate,
   InlineGate,
@@ -54,7 +61,13 @@ export interface ProxyConfig {
   readonly upstreamCommand: string;
   /** Arguments for the upstream command */
   readonly upstreamArgs: readonly string[];
-  /** Evaluation timeout in ms (default: 5000) */
+  /**
+   * How long one scan may run, in ms (default: DEFAULT_EVAL_DEADLINE_MS; at most
+   * 2,147,483,647). The proxy's own evaluator cuts a scan still running at the
+   * limit; for an injected evaluator that does not cut its own scans, the proxy
+   * stops waiting at the limit instead. Either way the call is then decided by
+   * failMode.
+   */
   readonly evalTimeout?: number;
   /** Fail mode: 'closed' blocks on error (safer), 'open' allows on error (default for availability) */
   readonly failMode?: 'open' | 'closed';
@@ -66,6 +79,8 @@ export interface ProxyConfig {
 
 /** The subset of ProxyEvaluator the proxy uses — injectable for testing. */
 export interface ProxyEvaluatorLike {
+  /** 'worker' when the evaluator cuts each scan at its own deadline. */
+  readonly isolation?: EvaluationIsolation;
   loadRules(): Promise<number>;
   evaluateToolCall(
     toolName: string,
@@ -77,7 +92,7 @@ export interface ProxyEvaluatorLike {
 
 export class MCPProxy {
   private readonly config: ProxyConfig;
-  private readonly evaluator: ProxyEvaluatorLike;
+  private evaluator: ProxyEvaluatorLike;
   private client: Client | null = null;
   private server: Server | null = null;
   private readonly evalTimeout: number;
@@ -122,7 +137,11 @@ export class MCPProxy {
 
   constructor(config: ProxyConfig, deps: { evaluator?: ProxyEvaluatorLike } = {}) {
     this.config = config;
-    this.evaluator = deps.evaluator ?? new ProxyEvaluator();
+    this.evalTimeout = config.evalTimeout ?? DEFAULT_EVAL_DEADLINE_MS;
+    // The engine runs in a worker with evalTimeout as its deadline, so a scan
+    // still running at the limit is cut and the call is decided by failMode.
+    this.evaluator =
+      deps.evaluator ?? new ProxyEvaluator({ isolation: 'worker', deadlineMs: this.evalTimeout });
     // Fail-CLOSED by default (security-first): if the async evaluator errors or
     // times out, DENY the call rather than forward it unprotected. A security
     // tool whose default failure mode is "allow" can be defeated by simply making
@@ -135,7 +154,6 @@ export class MCPProxy {
     this.failMode =
       config.failMode ??
       (envFailMode === 'open' || envFailMode === 'closed' ? envFailMode : 'closed');
-    this.evalTimeout = config.evalTimeout ?? 5000;
     this.sessionId = config.sessionId ?? `mcp-proxy-${process.pid}-${Date.now().toString(36)}`;
     this.agentId = config.agentId ?? process.env['PANGUARD_AGENT_ID'] ?? 'mcp-agent';
     // Sync sub-ms pre-check (InlineGate.onAction) that reads riskStore: once a
@@ -177,7 +195,7 @@ export class MCPProxy {
    */
   async connect(upstreamTransport: Transport, agentTransport: Transport): Promise<void> {
     await this.ensureChain();
-    const ruleCount = await this.evaluator.loadRules();
+    const ruleCount = await this.loadEvaluatorRules();
     process.stderr.write(`[panguard-proxy] Loaded ${ruleCount} ATR rules\n`);
 
     this.client = new Client(
@@ -371,6 +389,9 @@ export class MCPProxy {
     // Normalize confidence to a 0-100 scale before the threshold check: the ATR
     // engine reports match confidence on a 0-1 scale, so comparing it raw to a
     // 0-100 threshold (95) made this escalation NEVER fire for a real deny.
+    // The evaluator's own crash verdict is a deny with confidence 100 but no
+    // detection behind it; escalating on it would lock the session for good.
+    if (verdict.matchedRules.includes(EVALUATION_ERROR_SENTINEL)) return;
     const conf = verdict.confidence <= 1 ? verdict.confidence * 100 : verdict.confidence;
     if (verdict.outcome === 'deny' && conf >= MCPProxy.ESCALATE_CONFIDENCE) {
       this.riskStore.set(this.sessionId, { level: 'high', reasons: [...verdict.matchedRules] });
@@ -440,6 +461,61 @@ export class MCPProxy {
     return this.chain ? this.chain.verify() : null;
   }
 
+  /**
+   * Load the evaluator's rules. If a ProxyEvaluator cannot start its worker
+   * here, carry on with an inline one rather than refuse to run: tool calls are
+   * still scanned, only without the time limit.
+   */
+  private async loadEvaluatorRules(): Promise<number> {
+    if (!(this.evaluator instanceof ProxyEvaluator)) return this.evaluator.loadRules();
+    const { evaluator, ruleCount } = await loadRulesOrInline(this.evaluator, (message) =>
+      process.stderr.write(`[panguard-proxy] WARNING: ${message}\n`)
+    );
+    this.evaluator = evaluator;
+    return ruleCount;
+  }
+
+  /**
+   * Settles as `scan` does, or rejects with EvaluationDeadlineError once
+   * evalTimeout has passed. A worker-mode evaluator cuts each scan at its own
+   * deadline, so its calls are not timed here: that would also count the time a
+   * call spends queued behind another scan, and fail it before its own scan
+   * had started.
+   */
+  private withinEvalTimeout<T>(scan: Promise<T>): Promise<T> {
+    if (this.evaluator.isolation === 'worker') return scan;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const limit = new Promise<never>((_, reject) => {
+      timer = setTimeout(
+        () => reject(new EvaluationDeadlineError(this.evalTimeout)),
+        this.evalTimeout
+      );
+    });
+    return Promise.race([scan, limit]).finally(() => clearTimeout(timer));
+  }
+
+  /** The verdict failMode gives a call whose scan failed or did not finish in time. */
+  private failModeResult(
+    err: unknown,
+    phase: 'Evaluation' | 'Post-eval',
+    start: number
+  ): EvalResult {
+    const cause =
+      err instanceof EvaluationDeadlineError
+        ? `Scan did not finish within the ${err.deadlineMs} ms time limit`
+        : err instanceof EngineWorkerError
+          ? 'Scan worker failed'
+          : `${phase} error`;
+    return {
+      outcome: this.failMode === 'closed' ? 'deny' : 'allow',
+      reason: `${cause} (fail-${this.failMode})`,
+      matchedRules: [],
+      confidence: 0,
+      durationMs: Date.now() - start,
+      adviseOnly: false,
+    };
+  }
+
   private registerHandlers(): void {
     const client = this.client!;
     const server = this.server!;
@@ -486,25 +562,15 @@ export class MCPProxy {
       // exception this is a superset of the mcp_exchange rules, so nothing that
       // 'mcp_exchange' caught is lost. (The old default silently skipped ~44
       // tool_call rules on every MCP call.)
-      let preResult;
+      let preResult: EvalResult;
+      const preStart = Date.now();
       try {
-        preResult = await Promise.race([
-          this.evaluator.evaluateToolCall(name, toolArgs, 'tool_call'),
-          new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error('timeout')), this.evalTimeout)
-          ),
-        ]);
-      } catch {
+        preResult = await this.withinEvalTimeout(
+          this.evaluator.evaluateToolCall(name, toolArgs, 'tool_call')
+        );
+      } catch (err) {
         // Timeout or error → respect failMode
-        const fallbackOutcome = this.failMode === 'closed' ? ('deny' as const) : ('allow' as const);
-        preResult = {
-          outcome: fallbackOutcome,
-          reason: `Evaluation error (fail-${this.failMode})`,
-          matchedRules: [] as string[],
-          confidence: 0,
-          durationMs: this.evalTimeout,
-          adviseOnly: false,
-        };
+        preResult = this.failModeResult(err, 'Evaluation', preStart);
       }
 
       this.logVerdict({
@@ -564,25 +630,16 @@ export class MCPProxy {
         .slice(0, 262144);
 
       if (responseText) {
-        let postResult;
+        let postResult: EvalResult;
+        let scanned = true;
+        const postStart = Date.now();
         try {
-          postResult = await Promise.race([
-            this.evaluator.evaluateToolResponse(name, responseText),
-            new Promise<never>((_, reject) =>
-              setTimeout(() => reject(new Error('timeout')), this.evalTimeout)
-            ),
-          ]);
-        } catch {
-          const fallbackOutcome =
-            this.failMode === 'closed' ? ('deny' as const) : ('allow' as const);
-          postResult = {
-            outcome: fallbackOutcome,
-            reason: `Post-eval error (fail-${this.failMode})`,
-            matchedRules: [] as string[],
-            confidence: 0,
-            durationMs: this.evalTimeout,
-            adviseOnly: false,
-          };
+          postResult = await this.withinEvalTimeout(
+            this.evaluator.evaluateToolResponse(name, responseText)
+          );
+        } catch (err) {
+          postResult = this.failModeResult(err, 'Post-eval', postStart);
+          scanned = false;
         }
 
         this.logVerdict({
@@ -604,7 +661,9 @@ export class MCPProxy {
             content: [
               {
                 type: 'text' as const,
-                text: `[BLOCKED by PanGuard] Response from "${name}" contained a security threat.\nReason: ${postResult.reason}`,
+                text: `[BLOCKED by PanGuard] Response from "${name}" ${
+                  scanned ? 'contained a security threat' : 'could not be scanned'
+                }.\nReason: ${postResult.reason}`,
               },
             ],
           };
