@@ -33,7 +33,7 @@ export const STATS = {
    * outward count. They describe the ATR standard. The panguard.ai web scanner
    * runs a separate, older bundle: see `scanner` below.
    */
-  atrVersion: '4.2.4',
+  atrVersion: '4.3.0',
   /**
    * Effective rules in the shipped npm package (v4.1.5: 829 rule files, of
    * which 5 draft and 2 deprecated are not loaded by the engine, so 822).
@@ -318,7 +318,7 @@ export const STATS = {
     upstreamMerged: ['Microsoft AGT', 'Cisco AI Defense'] as const,
   },
   /** Written by the ATR Stats Sync Bot. */
-  lastUpdated: '2026-11-02T23:20:25.318Z',
+  lastUpdated: '2026-11-06T21:22:49.291Z',
 } as const;
 
 export type Stats = typeof STATS;
