@@ -9,6 +9,7 @@ import type { SkillAnalysisLLM } from '../src/checks/ai-check.js';
 vi.mock('@panguard-ai/panguard-scan', () => ({
   checkSourceCode: vi.fn().mockResolvedValue([]),
   checkHardcodedSecrets: vi.fn().mockResolvedValue([]),
+  checkCompiledArtifacts: vi.fn().mockResolvedValue([]),
 }));
 
 async function makeTempDir(): Promise<string> {

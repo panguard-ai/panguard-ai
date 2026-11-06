@@ -5,6 +5,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('@panguard-ai/panguard-scan', () => ({
   checkSourceCode: vi.fn().mockResolvedValue([]),
   checkHardcodedSecrets: vi.fn().mockResolvedValue([]),
+  checkCompiledArtifacts: vi.fn().mockResolvedValue([]),
 }));
 
 import { checkCode } from '../src/checks/code-check.js';
@@ -53,6 +54,7 @@ describe('checkCode', () => {
     vi.clearAllMocks();
     vi.mocked(panguardScan.checkSourceCode).mockResolvedValue([]);
     vi.mocked(panguardScan.checkHardcodedSecrets).mockResolvedValue([]);
+    vi.mocked(panguardScan.checkCompiledArtifacts).mockResolvedValue([]);
   });
 
   describe('scanner not available', () => {
