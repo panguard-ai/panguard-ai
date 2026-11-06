@@ -12,7 +12,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { auditSkill } from '../src/index.js';
-import { collectBundledScripts } from '../src/bundled-scripts.js';
+import { collectBundledScripts, skippedCount, MAX_SCRIPT_FILES } from '../src/bundled-scripts.js';
 
 const dirs: string[] = [];
 
@@ -72,6 +72,36 @@ describe('ATR scan of bundled scripts', () => {
     );
     const report = await auditSkill(dir, { skipAI: true, skipCode: true });
     expect(scriptFindings(report).some((f) => f.severity === 'critical')).toBe(true);
+    // The context multiplier may soften the level, but the anti-evasion floor keeps a
+    // real critical at HIGH or above.
+    expect(['HIGH', 'CRITICAL']).toContain(report.riskLevel);
+  }, 30_000);
+
+  it('reports a rule once however many scripts repeat it, naming the other files', async () => {
+    const report = await auditSkill(
+      makeSkill({
+        'scripts/a.py': DOWNLOAD_AND_RUN,
+        'scripts/b.py': DOWNLOAD_AND_RUN,
+        'scripts/c.py': DOWNLOAD_AND_RUN,
+      }),
+      { skipAI: true, skipCode: true }
+    );
+    const found = scriptFindings(report);
+    expect(new Set(found.map((f) => f.id)).size).toBe(found.length);
+    expect(found.every((f) => /^atr-ATR-[\w-]+$/.test(f.id))).toBe(true);
+    expect(found[0]!.location).toContain('scripts/a.py');
+    expect(found[0]!.location).toContain('also in scripts/b.py, scripts/c.py');
+  }, 30_000);
+
+  it('flags a scan that skipped a script, so hiding one past a limit is not clean', async () => {
+    const report = await auditSkill(
+      makeSkill({ 'scripts/summary.py': BENIGN_SCRIPT, 'scripts/big.py': '#'.repeat(300 * 1024) }),
+      { skipAI: true, skipCode: true }
+    );
+    const incomplete = report.findings.find((f) => f.id === 'atr-scripts-incomplete');
+    expect(incomplete?.severity).toBe('high');
+    expect(incomplete?.description).toContain('1 over 256 KB');
+    expect(report.riskLevel).not.toBe('LOW');
   }, 30_000);
 });
 
@@ -86,17 +116,42 @@ describe('collectBundledScripts', () => {
       '__pycache__/a.py': 'x\n',
       'notes.txt': 'not a script\n',
     });
-    const files = await collectBundledScripts(dir);
-    expect(files.map((f) => f.path).sort()).toEqual(['lib/b.mjs', 'run.sh', 'scripts/a.py']);
+    const { scripts, skipped } = await collectBundledScripts(dir);
+    expect(scripts.map((f) => f.path).sort()).toEqual(['lib/b.mjs', 'run.sh', 'scripts/a.py']);
+    expect(skippedCount(skipped)).toBe(0);
   });
 
-  it('skips files larger than the size cap', async () => {
+  it('counts a file larger than the size cap as skipped', async () => {
     const dir = makeSkill({ 'scripts/big.js': 'x'.repeat(300 * 1024) });
-    expect(await collectBundledScripts(dir)).toHaveLength(0);
+    const { scripts, skipped } = await collectBundledScripts(dir);
+    expect(scripts).toHaveLength(0);
+    expect(skipped.oversize).toBe(1);
+  });
+
+  it('counts a file with NUL bytes as binary and does not return it', async () => {
+    const dir = makeSkill({ 'scripts/blob.py': 'print(1)\u0000\u0001' });
+    const { scripts, skipped } = await collectBundledScripts(dir);
+    expect(scripts).toHaveLength(0);
+    expect(skipped.binary).toBe(1);
+  });
+
+  it('reads scripts/ before other top-level directories when the file cap is reached', async () => {
+    const filler: Record<string, string> = {};
+    for (let i = 0; i < MAX_SCRIPT_FILES + 5; i++) filler[`aaa/f${i}.js`] = 'export {}\n';
+    const dir = makeSkill({ ...filler, 'scripts/evil.py': DOWNLOAD_AND_RUN });
+    const { scripts, skipped } = await collectBundledScripts(dir);
+    expect(scripts[0]!.path).toBe('scripts/evil.py');
+    expect(skipped.overCount).toBe(6);
+  });
+
+  it('skips minified bundles', async () => {
+    const dir = makeSkill({ 'scripts/app.min.js': 'x\n', 'scripts/app.js': 'x\n' });
+    const { scripts } = await collectBundledScripts(dir);
+    expect(scripts.map((f) => f.path)).toEqual(['scripts/app.js']);
   });
 
   it('returns nothing when given a single .md file', async () => {
     const dir = makeSkill({ 'scripts/a.py': 'print(1)\n' });
-    expect(await collectBundledScripts(join(dir, 'SKILL.md'))).toHaveLength(0);
+    expect((await collectBundledScripts(join(dir, 'SKILL.md'))).scripts).toHaveLength(0);
   });
 });

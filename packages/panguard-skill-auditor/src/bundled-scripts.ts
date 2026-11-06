@@ -2,6 +2,9 @@
  * Collect the script files a skill ships next to SKILL.md, for the ATR scan.
  * 收集技能附帶的腳本檔，供 ATR 掃描。
  *
+ * Every limit that drops a file is counted in `skipped`, so the caller can
+ * report a scan that did not see everything instead of calling it clean.
+ *
  * @module @panguard-ai/panguard-skill-auditor/bundled-scripts
  */
 
@@ -21,24 +24,39 @@ const SCRIPT_EXTENSIONS: ReadonlySet<string> = new Set([
   '.bash',
   '.zsh',
   '.ps1',
+  '.psm1',
+  '.bat',
+  '.cmd',
+  '.vbs',
   '.rb',
   '.pl',
   '.php',
 ]);
 
-/** Directories never read: dependencies, VCS, bytecode, build output */
+/** Directories never read: dependencies, VCS, bytecode, build and test output */
 const SKIPPED_DIRS: ReadonlySet<string> = new Set([
   '.git',
   'node_modules',
   '__pycache__',
   '.venv',
   'venv',
+  'site-packages',
+  'vendor',
   'dist',
   'build',
+  '.next',
+  'target',
+  'coverage',
 ]);
+
+/** Top-level directories read first, so a pile of other files cannot push them past the cap */
+const PRIORITY_DIRS: readonly string[] = ['scripts', 'bin', 'hooks', 'src', 'lib'];
 
 /** A single file larger than this is skipped / 超過此大小的單一檔案略過 */
 export const MAX_SCRIPT_BYTES = 256 * 1024;
+
+/** Total bytes read per skill / 每個技能讀取的總位元組上限 */
+export const MAX_TOTAL_BYTES = 2 * 1024 * 1024;
 
 /** At most this many files are read per skill / 每個技能最多讀取的檔案數 */
 export const MAX_SCRIPT_FILES = 200;
@@ -47,58 +65,166 @@ export const MAX_SCRIPT_FILES = 200;
 const MAX_DEPTH = 8;
 
 export interface BundledScript {
-  /** Path relative to the skill directory, with forward slashes */
+  /** Path relative to the skill directory, with forward slashes and no control characters */
   readonly path: string;
   readonly content: string;
+}
+
+/** Script files the walk found but did not return, by reason */
+export interface SkippedScripts {
+  readonly oversize: number;
+  readonly overTotal: number;
+  readonly overCount: number;
+  readonly tooDeep: number;
+  readonly binary: number;
+}
+
+export interface BundledScriptSet {
+  readonly scripts: readonly BundledScript[];
+  readonly skipped: SkippedScripts;
+}
+
+const NONE: SkippedScripts = { oversize: 0, overTotal: 0, overCount: 0, tooDeep: 0, binary: 0 };
+
+/** Total number of skipped script files */
+export function skippedCount(skipped: SkippedScripts): number {
+  return (
+    skipped.oversize + skipped.overTotal + skipped.overCount + skipped.tooDeep + skipped.binary
+  );
+}
+
+interface Candidate {
+  readonly full: string;
+  readonly size: number;
 }
 
 /**
  * Read the script files under a skill directory.
  *
  * Returns nothing for a single-file skill (a path to a .md file), since there is
- * no directory of its own to read. Symbolic links are not followed.
+ * no directory of its own to read. Symbolic links are not followed. Files are
+ * taken breadth first, with `scripts/`, `bin/`, `hooks/`, `src/` and `lib/`
+ * ahead of other directories at the top level.
  */
-export async function collectBundledScripts(skillDir: string): Promise<BundledScript[]> {
-  if (skillDir.endsWith('.md')) return [];
+export async function collectBundledScripts(skillDir: string): Promise<BundledScriptSet> {
+  if (skillDir.endsWith('.md')) return { scripts: [], skipped: NONE };
   try {
-    if (!(await stat(skillDir)).isDirectory()) return [];
+    if (!(await stat(skillDir)).isDirectory()) return { scripts: [], skipped: NONE };
   } catch {
-    return [];
+    return { scripts: [], skipped: NONE };
   }
-  const paths = await walk(skillDir, 0, []);
+
+  const { candidates, oversize, tooDeep } = await walk(skillDir);
   const scripts: BundledScript[] = [];
-  for (const full of paths) {
-    try {
-      const content = await readFile(full, 'utf8');
-      scripts.push({ path: relative(skillDir, full).split(sep).join('/'), content });
-    } catch {
-      // Unreadable file: skip it rather than fail the audit
+  let totalBytes = 0;
+  let overTotal = 0;
+  let overCount = 0;
+  let binary = 0;
+
+  for (const candidate of candidates) {
+    if (scripts.length >= MAX_SCRIPT_FILES) {
+      overCount++;
+      continue;
     }
+    if (totalBytes + candidate.size > MAX_TOTAL_BYTES) {
+      overTotal++;
+      continue;
+    }
+    let content: string;
+    try {
+      content = await readFile(candidate.full, 'utf8');
+    } catch {
+      continue; // Unreadable or vanished: skip rather than fail the audit
+    }
+    if (content.includes('\u0000')) {
+      binary++;
+      continue;
+    }
+    totalBytes += candidate.size;
+    scripts.push({ path: displayPath(skillDir, candidate.full), content });
   }
-  return scripts;
+
+  return { scripts, skipped: { oversize, overTotal, overCount, tooDeep, binary } };
 }
 
-async function walk(dir: string, depth: number, out: string[]): Promise<string[]> {
-  if (depth > MAX_DEPTH || out.length >= MAX_SCRIPT_FILES) return out;
+function displayPath(root: string, full: string): string {
+  return relative(root, full)
+    .split(sep)
+    .join('/')
+    .replace(/[\u0000-\u001f\u007f]/g, '?'); // eslint-disable-line no-control-regex
+}
+
+async function walk(
+  root: string
+): Promise<{ candidates: Candidate[]; oversize: number; tooDeep: number }> {
+  const candidates: Candidate[] = [];
+  let oversize = 0;
+  let tooDeep = 0;
+  let level: string[] = [root];
+
+  for (let depth = 0; level.length > 0; depth++) {
+    const next: string[] = [];
+    for (const dir of level) {
+      let entries;
+      try {
+        entries = await readdir(dir, { withFileTypes: true });
+      } catch {
+        continue;
+      }
+      for (const entry of sortEntries(entries, dir === root)) {
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) {
+          if (SKIPPED_DIRS.has(entry.name)) continue;
+          if (depth + 1 > MAX_DEPTH) {
+            tooDeep += await countScripts(full);
+          } else {
+            next.push(full);
+          }
+        } else if (entry.isFile() && isScript(entry.name)) {
+          try {
+            const size = (await stat(full)).size;
+            if (size > MAX_SCRIPT_BYTES) oversize++;
+            else candidates.push({ full, size });
+          } catch {
+            // Vanished between readdir and stat: skip
+          }
+        }
+      }
+    }
+    level = next;
+  }
+  return { candidates, oversize, tooDeep };
+}
+
+function isScript(name: string): boolean {
+  return SCRIPT_EXTENSIONS.has(extname(name).toLowerCase()) && !/\.min\.js$/i.test(name);
+}
+
+function sortEntries<T extends { name: string }>(entries: readonly T[], atRoot: boolean): T[] {
+  const rank = (name: string): number => {
+    if (!atRoot) return PRIORITY_DIRS.length;
+    const i = PRIORITY_DIRS.indexOf(name);
+    return i === -1 ? PRIORITY_DIRS.length : i;
+  };
+  return [...entries].sort((a, b) => rank(a.name) - rank(b.name) || a.name.localeCompare(b.name));
+}
+
+/** Count script files below a directory the walk will not enter, without reading them */
+async function countScripts(dir: string, budget = { left: 1000 }): Promise<number> {
+  let count = 0;
   let entries;
   try {
     entries = await readdir(dir, { withFileTypes: true });
   } catch {
-    return out;
+    return 0;
   }
-  const sorted = [...entries].sort((a, b) => a.name.localeCompare(b.name));
-  for (const entry of sorted) {
-    if (out.length >= MAX_SCRIPT_FILES) break;
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      if (!SKIPPED_DIRS.has(entry.name)) await walk(full, depth + 1, out);
-    } else if (entry.isFile() && SCRIPT_EXTENSIONS.has(extname(entry.name).toLowerCase())) {
-      try {
-        if ((await stat(full)).size <= MAX_SCRIPT_BYTES) out.push(full);
-      } catch {
-        // Vanished between readdir and stat: skip
-      }
+  for (const entry of entries) {
+    if (budget.left-- <= 0) break;
+    if (entry.isDirectory() && !SKIPPED_DIRS.has(entry.name)) {
+      count += await countScripts(join(dir, entry.name), budget);
+    } else if (entry.isFile() && isScript(entry.name)) {
+      count++;
     }
   }
-  return out;
+  return count;
 }

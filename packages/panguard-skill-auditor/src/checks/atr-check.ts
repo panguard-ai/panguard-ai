@@ -17,7 +17,13 @@ import { createRequire } from 'node:module';
 import type { AuditFinding, CheckResult, SkillManifest } from '../types.js';
 import type { ATREngine as ATREngineType, AgentEvent, ATRMatch } from 'agent-threat-rules';
 import { filterInjectableCloudRules } from './cloud-rule-guard.js';
-import { collectBundledScripts } from '../bundled-scripts.js';
+import {
+  collectBundledScripts,
+  skippedCount,
+  MAX_SCRIPT_BYTES,
+  MAX_SCRIPT_FILES,
+  MAX_TOTAL_BYTES,
+} from '../bundled-scripts.js';
 
 const CHECK_LABEL = 'ATR Pattern Detection';
 
@@ -157,24 +163,78 @@ function isScriptGradeRule(match: ATRMatch): boolean {
   return maturity === 'stable' || maturity === 'test';
 }
 
+/** Wall-clock budget for scanning one skill's scripts / 單一技能腳本掃描的時間上限 */
+const SCRIPT_SCAN_BUDGET_MS = 15_000;
+
+/** How many other files a script finding names before it says "and N more" */
+const LISTED_FILES = 3;
+
 /**
- * Scan each bundled script through the skill entry point and return one finding
- * per rule per file, located at that file.
+ * Scan each bundled script through the skill entry point.
+ *
+ * One finding per rule, located at the first file it matched, so the risk score
+ * counts a rule once however many files repeat it; the other files are named in
+ * `location`. When a limit dropped a file, or the time budget ran out, a high
+ * finding says the scan was incomplete, so a skill cannot score LOW by hiding a
+ * script past a limit.
  */
 async function scanBundledScripts(
   engine: ATREngineType,
   skillDir: string
 ): Promise<AuditFinding[]> {
-  const findings: AuditFinding[] = [];
-  for (const script of await collectBundledScripts(skillDir)) {
+  const { scripts, skipped } = await collectBundledScripts(skillDir);
+  const byRule = new Map<string, { finding: AuditFinding; files: string[] }>();
+  const deadline = Date.now() + SCRIPT_SCAN_BUDGET_MS;
+  let unscanned = 0;
+
+  for (const script of scripts) {
+    if (Date.now() > deadline) {
+      unscanned++;
+      continue;
+    }
     const matches = engine.scanSkill(script.content).filter(isScriptGradeRule);
     for (const f of matchesToFindings(matches)) {
-      findings.push({
-        ...f,
-        id: `${f.id}@${script.path}`,
-        location: f.location ? `${script.path}: ${f.location}` : script.path,
-      });
+      const seen = byRule.get(f.id);
+      if (seen) {
+        seen.files.push(script.path);
+      } else {
+        byRule.set(f.id, {
+          finding: { ...f, location: f.location ? `${script.path}: ${f.location}` : script.path },
+          files: [],
+        });
+      }
     }
+    // Yield between files so a bulk scan's other work is not starved
+    await new Promise<void>((done) => setImmediate(done));
+  }
+
+  const findings = [...byRule.values()].map(({ finding, files }) => {
+    if (files.length === 0) return finding;
+    const named = files.slice(0, LISTED_FILES).join(', ');
+    const more = files.length > LISTED_FILES ? ` and ${files.length - LISTED_FILES} more` : '';
+    return { ...finding, location: `${finding.location} (also in ${named}${more})` };
+  });
+
+  const notSeen = skippedCount(skipped) + unscanned;
+  if (notSeen > 0) {
+    const reasons = [
+      skipped.oversize && `${skipped.oversize} over ${MAX_SCRIPT_BYTES / 1024} KB`,
+      skipped.overTotal &&
+        `${skipped.overTotal} past the ${MAX_TOTAL_BYTES / 1024 / 1024} MB total`,
+      skipped.overCount && `${skipped.overCount} past the ${MAX_SCRIPT_FILES}-file cap`,
+      skipped.tooDeep && `${skipped.tooDeep} nested too deep`,
+      skipped.binary && `${skipped.binary} containing NUL bytes`,
+      unscanned && `${unscanned} after the ${SCRIPT_SCAN_BUDGET_MS / 1000} s time budget`,
+    ].filter(Boolean);
+    findings.push({
+      id: 'atr-scripts-incomplete',
+      title: 'Some bundled scripts were not scanned',
+      description:
+        `${notSeen} script file(s) in this skill were not checked against ATR rules: ` +
+        `${reasons.join('; ')}. Review them by hand before trusting this result.`,
+      severity: 'high',
+      category: 'atr',
+    });
   }
   return findings;
 }
