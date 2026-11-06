@@ -13,10 +13,11 @@ import { POST } from '../../src/app/api/demo/route';
 import { appendToSheet } from '@/lib/sheets';
 import { checkRateLimit } from '@/lib/rate-limit';
 
-function makeRequest(body: unknown) {
+// Real requests always carry Host; the route's CSRF check compares Origin/Referer against it.
+function makeRequest(body: unknown, headers: Record<string, string> = {}) {
   return new Request('https://example.com/api/demo', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Host: 'example.com', ...headers },
     body: JSON.stringify(body),
   });
 }
@@ -42,6 +43,34 @@ describe('POST /api/demo', () => {
     const json = await res.json();
     expect(json.ok).toBe(true);
     expect(appendToSheet).toHaveBeenCalledOnce();
+  });
+
+  it('returns 403 for a cross-site Origin', async () => {
+    const res = await POST(makeRequest(validBody, { Origin: 'https://evil.example' }));
+    expect(res.status).toBe(403);
+    expect(appendToSheet).not.toHaveBeenCalled();
+  });
+
+  it('accepts a same-origin Origin', async () => {
+    const res = await POST(makeRequest(validBody, { Origin: 'https://example.com' }));
+    expect(res.status).toBe(200);
+  });
+
+  it.each([
+    ['an unparsable Origin', { Origin: 'null' }],
+    ['a look-alike host that extends the real one', { Origin: 'https://example.com.evil.example' }],
+    ['the same hostname on another port', { Origin: 'https://example.com:8443' }],
+    ['a cross-site Referer without an Origin', { Referer: 'https://evil.example/form' }],
+    ['a missing Host header', { Host: '' }],
+  ])('returns 403 for %s', async (_label, headers) => {
+    const res = await POST(makeRequest(validBody, headers));
+    expect(res.status).toBe(403);
+    expect(appendToSheet).not.toHaveBeenCalled();
+  });
+
+  it('accepts a same-origin Referer without an Origin', async () => {
+    const res = await POST(makeRequest(validBody, { Referer: 'https://example.com/demo' }));
+    expect(res.status).toBe(200);
   });
 
   it('returns 400 for missing company', async () => {
