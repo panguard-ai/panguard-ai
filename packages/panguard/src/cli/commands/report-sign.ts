@@ -94,16 +94,17 @@ export async function runReportSignVerify(
 }
 
 function emitHuman(io: ReportSignIo, file: string, result: AuditReportVerifyResult): number {
+  const name = printable(file);
   if (!result.ok) {
-    io.err(`NOT VERIFIED (${result.reason ?? 'unknown'}): ${file}`);
-    if (result.detail !== undefined) io.err(`  ${result.detail}`);
+    io.err(`NOT VERIFIED (${printable(result.reason ?? 'unknown')}): ${name}`);
+    if (result.detail !== undefined) io.err(`  ${printable(result.detail)}`);
     return 1;
   }
   if (result.status === 'verified-issuer') {
-    io.out(`VERIFIED: ${file}`);
-    io.out(`  integrity   body matches SHA-256 ${result.sha256 ?? ''}`);
+    io.out(`VERIFIED: ${name}`);
+    io.out(`  integrity   body matches SHA-256 ${printable(result.sha256 ?? '')}`);
     io.out(
-      `  signature   Ed25519 valid (issuer=${result.issuer ?? ''}, key_id=${result.keyId ?? ''}, jurisdiction=${result.jurisdiction ?? ''})`
+      `  signature   Ed25519 valid (issuer=${printable(result.issuer ?? '')}, key_id=${printable(result.keyId ?? '')}, jurisdiction=${printable(result.jurisdiction ?? '')})`
     );
     io.out(
       result.trustedKey === true
@@ -114,14 +115,33 @@ function emitHuman(io: ReportSignIo, file: string, result: AuditReportVerifyResu
   }
   // Hash-only outcomes: the document matches its stated hash, but there is no
   // offline-verifiable issuer signature - say so plainly.
-  io.out(`HASH VERIFIED (no issuer signature): ${file}`);
-  io.out(`  integrity   body matches SHA-256 ${result.sha256 ?? ''}`);
+  io.out(`HASH VERIFIED (no issuer signature): ${name}`);
+  io.out(`  integrity   body matches SHA-256 ${printable(result.sha256 ?? '')}`);
   io.out(
     result.status === 'hash-only-server'
       ? '  signature   server-signed: offline verification of the server key is not yet available'
-      : `  signature   unsigned (${result.detail ?? 'unknown reason'})`
+      : `  signature   unsigned (${printable(result.detail ?? 'unknown reason')})`
   );
   return 0;
+}
+
+/**
+ * Characters that change how a terminal renders a line: C0 and C1 controls,
+ * DEL, and Unicode format characters (bidi overrides, zero-width marks, line
+ * and paragraph separators).
+ */
+const NON_PRINTABLE =
+  /[\u0000-\u001f\u007f-\u009f\u00ad\u061c\u180e\u200b-\u200f\u2028-\u202e\u2060-\u2069\ufeff]/gu;
+
+/**
+ * Render a string from the report or the command line for the human output,
+ * with every non-printable character shown as a visible escape.
+ */
+export function printable(value: unknown): string {
+  return String(value).replace(
+    NON_PRINTABLE,
+    (ch) => `\\u${(ch.codePointAt(0) ?? 0).toString(16).padStart(4, '0')}`
+  );
 }
 
 /** Commander tree: report > sign > verify (verification only - signing is enterprise-side). */

@@ -12,6 +12,14 @@ All notable changes to Panguard AI will be documented in this file.
   `.min.js` files are still not read but are now counted as skipped, which
   reports the scan as incomplete; `.pyw` files are read as Python.
 
+- **`pga report sign verify` output hardening.** Strings taken from the report
+  or the command line (file name, issuer, key_id, jurisdiction, hash, failure
+  detail) are printed with non-printable characters shown as `\uXXXX`
+  escapes. `--json` output and exit codes are unchanged.
+- **`verifyAuditReport` no longer throws on a malformed `issuer_signature`.**
+  A `null`, non-object or wrongly typed signature block now returns a failed
+  result (`missing-issuer-signature` or `bad-signature`).
+
 ## [1.10.0] - 2026-11-06
 
 Skill scans now read the code a skill ships, and rule proposals have a way out

@@ -190,6 +190,77 @@ describe('pga report sign verify (CLI)', () => {
     expect(await runReportSignVerify(file, {}, io)).toBe(2);
   });
 
+  describe('human output of document-supplied strings', () => {
+    const RAW_CONTROL = /[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028-\u202e\u2066-\u2069]/u;
+
+    function signatureBlock(doc: Record<string, unknown>): Record<string, unknown> {
+      const integrity = doc['integrity'] as Record<string, unknown>;
+      return integrity['issuer_signature'] as Record<string, unknown>;
+    }
+
+    it('escapes control characters in a key_id that reaches the failure detail', async () => {
+      const doc = fixtureDoc();
+      const sig = signatureBlock(doc);
+      sig['key_id'] = `${FIXTURE_KEY_ID}\u001b[0m\u202e`;
+      const file = writeDoc(doc);
+      const { out, err, io } = captureIo();
+      expect(await runReportSignVerify(file, {}, io)).toBe(1);
+      const lines = [...out, ...err];
+      expect(lines.length).toBeGreaterThan(0);
+      for (const line of lines) expect(line).not.toMatch(RAW_CONTROL);
+      expect(err.join('\n')).toContain('\\u001b');
+      expect(err.join('\n')).toContain('\\u202e');
+    });
+
+    it('escapes control characters in the file name', async () => {
+      const file = writeDoc(fixtureDoc(), 'report\rcopy.json');
+      const { out, err, io } = captureIo();
+      expect(await runReportSignVerify(file, { expectKey: FIXTURE_KEY_ID }, io)).toBe(0);
+      for (const line of [...out, ...err]) expect(line).not.toMatch(RAW_CONTROL);
+      expect(out[0]).toContain('report\\u000dcopy.json');
+    });
+
+    it('leaves --json output to the JSON encoder', async () => {
+      const doc = fixtureDoc();
+      signatureBlock(doc)['key_id'] = `x\u001b[2K`;
+      const file = writeDoc(doc);
+      const { out, io } = captureIo();
+      expect(await runReportSignVerify(file, { json: true }, io)).toBe(1);
+      const parsed = JSON.parse(out[0] ?? '{}') as { keyId?: string };
+      expect(parsed.keyId).toBe(`x\u001b[2K`);
+    });
+  });
+
+  describe('malformed issuer_signature blocks', () => {
+    for (const [label, value] of [
+      ['null', null],
+      ['a string', 'sig'],
+      ['an array', []],
+    ] as const) {
+      it(`fails (exit 1) instead of throwing when issuer_signature is ${label}`, async () => {
+        const doc = fixtureDoc();
+        (doc['integrity'] as Record<string, unknown>)['issuer_signature'] = value;
+        const file = writeDoc(doc);
+        const { err, io } = captureIo();
+        expect(await runReportSignVerify(file, {}, io)).toBe(1);
+        expect(err[0]).toContain('missing-issuer-signature');
+      });
+    }
+
+    it('fails (exit 1) instead of throwing when a signature field has the wrong type', async () => {
+      const doc = fixtureDoc();
+      const sig = (doc['integrity'] as Record<string, unknown>)['issuer_signature'] as Record<
+        string,
+        unknown
+      >;
+      sig['public_key_pem'] = 42;
+      sig['signature_b64'] = { not: 'a string' };
+      const file = writeDoc(doc);
+      const { io } = captureIo();
+      expect(await runReportSignVerify(file, { expectKey: FIXTURE_KEY_ID }, io)).toBe(1);
+    });
+  });
+
   describe('commander wiring', () => {
     it('registers report > sign > verify and NO public signing action', () => {
       const cmd = reportCommand();
