@@ -190,10 +190,13 @@ export interface VerifyAuditReportOptions {
   /** Require the report to be issuer-signed by exactly this key_id. */
   expectKeyId?: string;
   /**
-   * key_ids trusted without an explicit pin — normally the published list from
-   * /.well-known/panguard-signing-key.json. An issuer-signed report whose
-   * key_id is neither pinned nor in this list fails with 'untrusted-key-id'
-   * (the trust page policy: an unlisted key_id must not be trusted).
+   * key_ids trusted without an explicit pin — normally the published keys from
+   * /.well-known/panguard-signing-key.json whose usage is audit-report-signing.
+   * This function does not check key usage, so never list keys published for
+   * another usage (such as technical-receipt-signing). An issuer-signed report
+   * whose key_id is neither pinned nor in this list fails with
+   * 'untrusted-key-id' (the trust page policy: an unlisted key_id must not be
+   * trusted).
    */
   trustedKeyIds: readonly string[];
 }
@@ -269,7 +272,7 @@ export function verifyAuditReport(
         sha256: recomputed,
         keyId: sig.key_id,
         issuer: sig.issuer,
-        detail: `key_id ${sig.key_id} is not in the published trust list — pin it explicitly with --expect-key only if you verified it out of band`,
+        detail: `key_id ${sig.key_id} is not in the built-in audit-report trust list — pin it explicitly with --expect-key only after checking it against the published key list and its usage`,
       };
     }
     return {

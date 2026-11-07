@@ -61,6 +61,26 @@ describe('pga report sign verify (CLI)', () => {
     it('bundles the published issuer key_id', () => {
       expect(TRUSTED_ISSUER_KEY_IDS).toContain(PUBLISHED_KEY_ID);
     });
+
+    // verifyAuditReport does not check key usage, so a key published for another
+    // usage (technical receipts) must never become a default audit-report issuer.
+    it('bundles exactly the active audit-report-signing keys of the published well-known file', () => {
+      const wellKnown = new URL(
+        '../../website/public/.well-known/panguard-signing-key.json',
+        import.meta.url
+      );
+      const { keys } = JSON.parse(readFileSync(wellKnown, 'utf8')) as {
+        keys: ReadonlyArray<{ key_id: string; status: string; usage: string }>;
+      };
+      const auditKeyIds = keys
+        .filter((key) => key.status === 'active' && key.usage === 'audit-report-signing')
+        .map((key) => key.key_id);
+
+      expect([...TRUSTED_ISSUER_KEY_IDS].sort()).toEqual([...auditKeyIds].sort());
+      for (const key of keys.filter((candidate) => candidate.usage !== 'audit-report-signing')) {
+        expect(TRUSTED_ISSUER_KEY_IDS).not.toContain(key.key_id);
+      }
+    });
   });
 
   it('verifies the issuer-signed fixture with an explicit --expect-key pin (exit 0)', async () => {

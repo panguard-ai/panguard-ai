@@ -28,11 +28,16 @@ import { readFileSync } from 'node:fs';
 import { verifyAuditReport, type AuditReportVerifyResult } from '@panguard-ai/core';
 
 /**
- * Published issuer key_ids - the active keys listed at
- * website /.well-known/panguard-signing-key.json. Keep the two in sync: the
+ * Built-in audit-report trust list - the active keys whose usage is
+ * audit-report-signing at website /.well-known/panguard-signing-key.json. The
  * .well-known file is the authoritative publication, this copy makes offline
- * verification work out of the box. Per the published policy, a report signed
- * by a key_id not listed (and not explicitly pinned) must not be trusted.
+ * verification work out of the box. Keys published there for any other usage
+ * (technical-receipt-signing) are deliberately left out: verifyAuditReport does
+ * not check key usage, so listing them would let them verify audit reports.
+ * They verify only with an explicit --expect-key pin. A test keeps this list
+ * equal to the file's active audit-report-signing keys. Per the published
+ * policy, a report signed by a key_id not listed (and not explicitly pinned)
+ * must not be trusted.
  */
 export const TRUSTED_ISSUER_KEY_IDS: readonly string[] = ['pgk1-621b5f58dbfa5e2c'];
 
@@ -108,7 +113,7 @@ function emitHuman(io: ReportSignIo, file: string, result: AuditReportVerifyResu
     io.out(
       result.trustedKey === true
         ? '  trust       key_id is on the published trust list (/trust/signing-key)'
-        : '  trust       key_id pinned via --expect-key (not on the published list)'
+        : "  trust       key_id pinned via --expect-key (not in this CLI's built-in audit-report trust list)"
     );
     return 0;
   }
