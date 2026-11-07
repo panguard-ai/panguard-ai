@@ -25,7 +25,7 @@
  */
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
-  cliVersion: '1.9.0',
+  cliVersion: '1.10.0',
   /**
    * atrVersion/atrRules/totalRules are written by the ATR Stats Sync Bot
    * (.github/workflows/sync-atr-stats.yml): EFFECTIVE rules in the latest
