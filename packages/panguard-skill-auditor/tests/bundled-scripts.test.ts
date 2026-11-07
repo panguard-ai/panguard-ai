@@ -103,6 +103,24 @@ describe('ATR scan of bundled scripts', () => {
     expect(incomplete?.description).toContain('1 over 256 KB');
     expect(report.riskLevel).not.toBe('LOW');
   }, 30_000);
+
+  it('scans a payload placed in dist/', async () => {
+    const report = await auditSkill(makeSkill({ 'dist/summary.py': DOWNLOAD_AND_RUN }), {
+      skipAI: true,
+      skipCode: true,
+    });
+    const found = report.findings.filter((f) => f.location?.startsWith('dist/'));
+    expect(found.some((f) => f.severity === 'critical')).toBe(true);
+  }, 30_000);
+
+  it('flags a skill whose only script is minified', async () => {
+    const report = await auditSkill(makeSkill({ 'scripts/run.min.js': 'x\n' }), {
+      skipAI: true,
+      skipCode: true,
+    });
+    const incomplete = report.findings.find((f) => f.id === 'atr-scripts-incomplete');
+    expect(incomplete?.description).toContain('1 minified (.min.js)');
+  }, 30_000);
 });
 
 describe('collectBundledScripts', () => {
@@ -144,10 +162,35 @@ describe('collectBundledScripts', () => {
     expect(skipped.overCount).toBe(6);
   });
 
-  it('skips minified bundles', async () => {
+  it('does not read minified bundles but counts them as skipped', async () => {
     const dir = makeSkill({ 'scripts/app.min.js': 'x\n', 'scripts/app.js': 'x\n' });
-    const { scripts } = await collectBundledScripts(dir);
+    const { scripts, skipped } = await collectBundledScripts(dir);
     expect(scripts.map((f) => f.path)).toEqual(['scripts/app.js']);
+    expect(skipped.minified).toBe(1);
+  });
+
+  it('reads build output directories, since a skill can tell the agent to run them', async () => {
+    const dir = makeSkill({
+      'dist/index.js': 'export {}\n',
+      'build/install.sh': 'echo hi\n',
+      'target/run.pyw': 'print(1)\n',
+    });
+    const { scripts, skipped } = await collectBundledScripts(dir);
+    expect(scripts.map((f) => f.path).sort()).toEqual([
+      'build/install.sh',
+      'dist/index.js',
+      'target/run.pyw',
+    ]);
+    expect(skippedCount(skipped)).toBe(0);
+  });
+
+  it('reads build output after other top-level directories when the file cap is reached', async () => {
+    const filler: Record<string, string> = {};
+    for (let i = 0; i < MAX_SCRIPT_FILES + 5; i++) filler[`dist/f${i}.js`] = 'export {}\n';
+    const dir = makeSkill({ ...filler, 'tools/evil.py': DOWNLOAD_AND_RUN });
+    const { scripts, skipped } = await collectBundledScripts(dir);
+    expect(scripts[0]!.path).toBe('tools/evil.py');
+    expect(skipped.overCount).toBe(6);
   });
 
   it('returns nothing when given a single .md file', async () => {

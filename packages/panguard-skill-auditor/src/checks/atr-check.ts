@@ -224,6 +224,7 @@ async function scanBundledScripts(
       skipped.overCount && `${skipped.overCount} past the ${MAX_SCRIPT_FILES}-file cap`,
       skipped.tooDeep && `${skipped.tooDeep} nested too deep`,
       skipped.binary && `${skipped.binary} containing NUL bytes`,
+      skipped.minified && `${skipped.minified} minified (.min.js)`,
       unscanned && `${unscanned} after the ${SCRIPT_SCAN_BUDGET_MS / 1000} s time budget`,
     ].filter(Boolean);
     findings.push({
