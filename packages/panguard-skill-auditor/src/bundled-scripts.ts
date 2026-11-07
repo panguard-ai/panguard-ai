@@ -14,6 +14,7 @@ import { extname, join, relative, sep } from 'node:path';
 /** Extensions of files an agent can run or import / 代理可執行或匯入的檔案副檔名 */
 const SCRIPT_EXTENSIONS: ReadonlySet<string> = new Set([
   '.py',
+  '.pyw',
   '.js',
   '.mjs',
   '.cjs',
@@ -33,7 +34,10 @@ const SCRIPT_EXTENSIONS: ReadonlySet<string> = new Set([
   '.php',
 ]);
 
-/** Directories never read: dependencies, VCS, bytecode, build and test output */
+/**
+ * Directories never read: third-party dependencies, VCS data and bytecode
+ * (`.pyc` files are reported by the code check's compiled-artifact scan).
+ */
 const SKIPPED_DIRS: ReadonlySet<string> = new Set([
   '.git',
   'node_modules',
@@ -42,15 +46,17 @@ const SKIPPED_DIRS: ReadonlySet<string> = new Set([
   'venv',
   'site-packages',
   'vendor',
-  'dist',
-  'build',
-  '.next',
-  'target',
-  'coverage',
 ]);
 
 /** Top-level directories read first, so a pile of other files cannot push them past the cap */
 const PRIORITY_DIRS: readonly string[] = ['scripts', 'bin', 'hooks', 'src', 'lib'];
+
+/**
+ * Build and test output, read last at the top level. A skill can tell the agent
+ * to run what is in dist/ or build/, so these are read, but a large committed
+ * bundle should not push hand-written scripts past the file cap.
+ */
+const LAST_DIRS: ReadonlySet<string> = new Set(['dist', 'build', '.next', 'target', 'coverage']);
 
 /** A single file larger than this is skipped / 超過此大小的單一檔案略過 */
 export const MAX_SCRIPT_BYTES = 256 * 1024;
@@ -77,6 +83,7 @@ export interface SkippedScripts {
   readonly overCount: number;
   readonly tooDeep: number;
   readonly binary: number;
+  readonly minified: number;
 }
 
 export interface BundledScriptSet {
@@ -84,12 +91,24 @@ export interface BundledScriptSet {
   readonly skipped: SkippedScripts;
 }
 
-const NONE: SkippedScripts = { oversize: 0, overTotal: 0, overCount: 0, tooDeep: 0, binary: 0 };
+const NONE: SkippedScripts = {
+  oversize: 0,
+  overTotal: 0,
+  overCount: 0,
+  tooDeep: 0,
+  binary: 0,
+  minified: 0,
+};
 
 /** Total number of skipped script files */
 export function skippedCount(skipped: SkippedScripts): number {
   return (
-    skipped.oversize + skipped.overTotal + skipped.overCount + skipped.tooDeep + skipped.binary
+    skipped.oversize +
+    skipped.overTotal +
+    skipped.overCount +
+    skipped.tooDeep +
+    skipped.binary +
+    skipped.minified
   );
 }
 
@@ -114,7 +133,7 @@ export async function collectBundledScripts(skillDir: string): Promise<BundledSc
     return { scripts: [], skipped: NONE };
   }
 
-  const { candidates, oversize, tooDeep } = await walk(skillDir);
+  const { candidates, oversize, tooDeep, minified } = await walk(skillDir);
   const scripts: BundledScript[] = [];
   let totalBytes = 0;
   let overTotal = 0;
@@ -144,7 +163,10 @@ export async function collectBundledScripts(skillDir: string): Promise<BundledSc
     scripts.push({ path: displayPath(skillDir, candidate.full), content });
   }
 
-  return { scripts, skipped: { oversize, overTotal, overCount, tooDeep, binary } };
+  return {
+    scripts,
+    skipped: { oversize, overTotal, overCount, tooDeep, binary, minified },
+  };
 }
 
 function displayPath(root: string, full: string): string {
@@ -154,12 +176,18 @@ function displayPath(root: string, full: string): string {
     .replace(/[\u0000-\u001f\u007f]/g, '?'); // eslint-disable-line no-control-regex
 }
 
-async function walk(
-  root: string
-): Promise<{ candidates: Candidate[]; oversize: number; tooDeep: number }> {
+interface WalkResult {
+  readonly candidates: Candidate[];
+  readonly oversize: number;
+  readonly tooDeep: number;
+  readonly minified: number;
+}
+
+async function walk(root: string): Promise<WalkResult> {
   const candidates: Candidate[] = [];
   let oversize = 0;
   let tooDeep = 0;
+  let minified = 0;
   let level: string[] = [root];
 
   for (let depth = 0; level.length > 0; depth++) {
@@ -180,6 +208,8 @@ async function walk(
           } else {
             next.push(full);
           }
+        } else if (entry.isFile() && isMinified(entry.name)) {
+          minified++;
         } else if (entry.isFile() && isScript(entry.name)) {
           try {
             const size = (await stat(full)).size;
@@ -193,16 +223,21 @@ async function walk(
     }
     level = next;
   }
-  return { candidates, oversize, tooDeep };
+  return { candidates, oversize, tooDeep, minified };
 }
 
 function isScript(name: string): boolean {
-  return SCRIPT_EXTENSIONS.has(extname(name).toLowerCase()) && !/\.min\.js$/i.test(name);
+  return SCRIPT_EXTENSIONS.has(extname(name).toLowerCase()) && !isMinified(name);
+}
+
+function isMinified(name: string): boolean {
+  return /\.min\.js$/i.test(name);
 }
 
 function sortEntries<T extends { name: string }>(entries: readonly T[], atRoot: boolean): T[] {
   const rank = (name: string): number => {
     if (!atRoot) return PRIORITY_DIRS.length;
+    if (LAST_DIRS.has(name)) return PRIORITY_DIRS.length + 1;
     const i = PRIORITY_DIRS.indexOf(name);
     return i === -1 ? PRIORITY_DIRS.length : i;
   };
@@ -222,7 +257,7 @@ async function countScripts(dir: string, budget = { left: 1000 }): Promise<numbe
     if (budget.left-- <= 0) break;
     if (entry.isDirectory() && !SKIPPED_DIRS.has(entry.name)) {
       count += await countScripts(join(dir, entry.name), budget);
-    } else if (entry.isFile() && isScript(entry.name)) {
+    } else if (entry.isFile() && (isScript(entry.name) || isMinified(entry.name))) {
       count++;
     }
   }

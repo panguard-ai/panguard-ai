@@ -2,6 +2,16 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [Unreleased]
+
+- **`pga audit skill` reads scripts under `dist/`, `build/` and `target/`.**
+  The script scan skipped these directories without counting them, so a skill
+  whose SKILL.md runs `node dist/index.js` had its payload unread and could
+  still score LOW. They are now read, after every other top-level directory so
+  a committed bundle cannot push hand-written scripts past the file cap.
+  `.min.js` files are still not read but are now counted as skipped, which
+  reports the scan as incomplete; `.pyw` files are read as Python.
+
 ## [1.10.0] - 2026-11-06
 
 Skill scans now read the code a skill ships, and rule proposals have a way out
