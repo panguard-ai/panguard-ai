@@ -41,8 +41,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # The website is private and never published. Its build fetches Google
+      # Fonts at build time, and one failed fetch stopped the v1.10.0 publish
+      # before any package was released. Build only what gets published.
       - name: Build all packages
-        run: pnpm run build
+        run: pnpm -r --stream --filter '!@panguard-ai/website' build
 
       - name: Run type check
         run: pnpm run typecheck
