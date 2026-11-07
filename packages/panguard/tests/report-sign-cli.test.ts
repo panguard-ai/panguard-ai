@@ -191,6 +191,7 @@ describe('pga report sign verify (CLI)', () => {
   });
 
   describe('human output of document-supplied strings', () => {
+    // eslint-disable-next-line no-control-regex -- matching control chars is the intent
     const RAW_CONTROL = /[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028-\u202e\u2066-\u2069]/u;
 
     function signatureBlock(doc: Record<string, unknown>): Record<string, unknown> {

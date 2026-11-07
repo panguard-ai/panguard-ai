@@ -131,6 +131,7 @@ function emitHuman(io: ReportSignIo, file: string, result: AuditReportVerifyResu
  * and paragraph separators).
  */
 const NON_PRINTABLE =
+  // eslint-disable-next-line no-control-regex -- matching control chars is the intent
   /[\u0000-\u001f\u007f-\u009f\u00ad\u061c\u180e\u200b-\u200f\u2028-\u202e\u2060-\u2069\ufeff]/gu;
 
 /**
