@@ -65,7 +65,7 @@ Inc. (Delaware C-Corp) on 2026-05-12.
   only with that label. No confirmed-malicious count from this scan is supported,
   and the counts PanGuard published earlier are withdrawn.
 
-### Implementation (PanGuard 1.10.0)
+### Implementation (PanGuard 1.10.1)
 - CLI: 23 top-level commands
 - Skill Auditor: 8 pre-install checks
 - Detection layers: 3 (rules, content fingerprinting, LLM analysis)
