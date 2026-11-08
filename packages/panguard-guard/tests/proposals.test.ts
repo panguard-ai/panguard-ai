@@ -89,6 +89,26 @@ describe('deidentifyText', () => {
     expect(out).not.toContain('Zm9vYmFyYmF6');
   });
 
+  it('keeps file names: a long absolute path is not a token (1.10.0 showed "[token].py")', () => {
+    const out = deidentifyText(
+      '/private/tmp/claude-501/-Users-x---/7306b6cb-8480-46ec-8357-f3a4b2b6491b/scratchpad/demo-skill/scripts/run.py:3 and src/main.ts:10 and scripts/run.py',
+      CTX
+    );
+    expect(out).toContain('demo-skill/scripts/run.py:3');
+    expect(out).toContain('src/main.ts:10');
+    expect(out).toContain(' scripts/run.py');
+    expect(out).not.toContain('[token].py');
+  });
+
+  it('still masks a token inside a path and a slash-bearing key', () => {
+    const out = deidentifyText(
+      '/srv/app/AbCdEfGhIjKlMnOpQrStUv1234567890/config wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
+      CTX
+    );
+    expect(out).toContain('/srv/app/[token]/config');
+    expect(out).not.toContain('wJalrXUtnFEMI');
+  });
+
   it('keeps loopback addresses, clock times and plain attack text', () => {
     const out = deidentifyText('curl http://127.0.0.1:8080/x at 12:30:45 then rm -rf ./build', CTX);
     expect(out).toBe('curl http://127.0.0.1:8080/x at 12:30:45 then rm -rf ./build');

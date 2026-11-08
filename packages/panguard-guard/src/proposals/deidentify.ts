@@ -99,6 +99,29 @@ function looksLikeToken(run: string): boolean {
   return /\d/.test(run) && /[A-Za-z]/.test(run);
 }
 
+/** A path segment long and mixed enough to be a credential rather than a name. */
+function segmentLooksLikeToken(segment: string): boolean {
+  return (
+    segment.length >= 20 &&
+    looksLikeToken(segment) &&
+    /[a-z]/.test(segment) &&
+    /[A-Z]/.test(segment)
+  );
+}
+
+/**
+ * Mask a long opaque run. An absolute path ("/tmp/x/scripts/run") is a run of
+ * this alphabet too, and masking it whole turned "scripts/run.py" into
+ * "[token].py"; keep its segments and mask only segments that look like tokens.
+ */
+function maskOpaqueRun(run: string): string {
+  const segments = run.split('/');
+  if (run.startsWith('/') && segments.filter(Boolean).length >= 3) {
+    return segments.map((seg) => (segmentLooksLikeToken(seg) ? MASK.token : seg)).join('/');
+  }
+  return looksLikeToken(run) ? MASK.token : run;
+}
+
 /** Return `input` with every identifying or secret-looking substring masked. */
 export function deidentifyText(input: string, ctx: DeidentifyContext = localContext()): string {
   let out = scrubSecretValues(input);
@@ -116,6 +139,6 @@ export function deidentifyText(input: string, ctx: DeidentifyContext = localCont
     KEPT_IPS.has(ip) || !/[A-Fa-f]/.test(ip) ? ip : MASK.ip
   );
   out = out.replace(LONG_HEX_PATTERN, MASK.token);
-  out = out.replace(LONG_OPAQUE_PATTERN, (run) => (looksLikeToken(run) ? MASK.token : run));
+  out = out.replace(LONG_OPAQUE_PATTERN, maskOpaqueRun);
   return out;
 }

@@ -17,6 +17,7 @@ import { existsSync, readdirSync, watch, type FSWatcher } from 'node:fs';
 import { join, basename } from 'node:path';
 import { homedir } from 'node:os';
 import { createLogger, FileMonitor } from '@panguard-ai/core';
+import { buildSkillAuditProposal } from '../proposals/skill-evidence.js';
 
 const logger = createLogger('panguard-guard:skill-watcher');
 
@@ -112,7 +113,13 @@ interface AuditModule {
   ) => Promise<{
     riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
     riskScore: number;
-    findings?: Array<{ id: string; category: string; severity: string; title: string }>;
+    findings?: Array<{
+      id: string;
+      category: string;
+      severity: string;
+      title: string;
+      location?: string;
+    }>;
   }>;
 }
 
@@ -658,13 +665,16 @@ export class SkillWatcher extends EventEmitter {
         audit.findings &&
         audit.findings.length > 0
       ) {
-        void this.submitSkillATRProposal(change.name, audit.riskLevel, audit.findings).catch(
-          (err: unknown) => {
-            logger.warn(
-              `ATR proposal from skill audit failed for ${change.name}: ${err instanceof Error ? err.message : String(err)}`
-            );
-          }
-        );
+        void this.submitSkillATRProposal(
+          change.name,
+          skillDir,
+          audit.riskLevel,
+          audit.findings
+        ).catch((err: unknown) => {
+          logger.warn(
+            `ATR proposal from skill audit failed for ${change.name}: ${err instanceof Error ? err.message : String(err)}`
+          );
+        });
       }
     } catch (err) {
       logger.warn(
@@ -679,58 +689,34 @@ export class SkillWatcher extends EventEmitter {
    */
   private async submitSkillATRProposal(
     skillName: string,
+    skillDir: string,
     riskLevel: 'HIGH' | 'CRITICAL',
-    findings: Array<{ id: string; category: string; severity: string; title: string }>
+    findings: ReadonlyArray<{
+      id: string;
+      category: string;
+      severity: string;
+      title: string;
+      location?: string;
+    }>
   ): Promise<void> {
     if (!this.config.submitATRProposal) return;
 
-    const { patternHash: computePatternHash } = await import('@panguard-ai/scan-core');
-
-    // Build a concise description from findings for the ATR rule
-    const highFindings = findings
-      .filter((f) => f.severity === 'critical' || f.severity === 'high')
-      .slice(0, 5);
-
-    if (highFindings.length === 0) return;
-
-    const findingSummary = highFindings.map((f) => f.title).join('; ');
-    const patternHash = computePatternHash(skillName, findingSummary);
-
-    // Submit the actual findings as payload — TC or Guard's LLM Drafter
-    // will use the Rule Creation Standard to generate a proper behavioral rule
-    const payload = highFindings
-      .map((f) => `[${f.severity.toUpperCase()}] ${f.category}: ${f.title}`)
-      .join('\n');
-
-    const success = await this.config.submitATRProposal({
-      patternHash,
-      ruleContent: JSON.stringify({
-        type: 'skill-audit-finding',
-        skillName,
-        riskLevel,
-        payload,
-        findings: highFindings.map((f) => ({
-          id: f.id,
-          category: f.category,
-          severity: f.severity,
-          title: f.title,
-        })),
-        needsLLMDraft: true,
-      }),
-      llmProvider: 'skill-audit',
-      llmModel: 'needs-llm-drafting',
-      selfReviewVerdict: JSON.stringify({
-        approved: true,
-        source: 'skill-watcher',
-        skillName,
-        riskLevel,
-        findingCount: findings.length,
-      }),
+    // Same rules as `pga audit`: only threats no ATR rule caught, and only with
+    // the source lines they were found in. No usable evidence, no proposal.
+    const proposal = buildSkillAuditProposal({
+      skillName,
+      riskLevel,
+      source: 'skill-watcher',
+      skillDir,
+      findings,
     });
+    if (!proposal) return;
+
+    const success = await this.config.submitATRProposal(proposal);
 
     if (success) {
       logger.info(
-        `ATR proposal submitted from skill audit: ${skillName} (${patternHash}) / ` +
+        `ATR proposal submitted from skill audit: ${skillName} (${proposal.patternHash}) / ` +
           `技能審計 ATR 提案已提交: ${skillName}`
       );
     } else {

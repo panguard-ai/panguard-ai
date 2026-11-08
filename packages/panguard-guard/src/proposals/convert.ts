@@ -101,6 +101,8 @@ function fromDraftedRule(ruleYaml: string): AtrIssueFields | null {
   const tags = rec['tags'] as Record<string, unknown> | undefined;
   const category = typeof tags?.['category'] === 'string' ? tags['category'] : title;
   const examples = truePositiveInputs(rec);
+  // A drafted rule with no example input has no evidence to publish.
+  if (examples.length === 0) return null;
   const desc = typeof rec['description'] === 'string' ? rec['description'].trim() : '';
   return {
     title: `[Rule] ${title}`,
@@ -110,8 +112,7 @@ function fromDraftedRule(ruleYaml: string): AtrIssueFields | null {
       'Draft rule, unreviewed:\n\n```yaml\n' +
       ruleYaml.trim() +
       '\n```',
-    payload:
-      examples.length > 0 ? examples.join('\n---\n') : 'See the draft rule in the description.',
+    payload: examples.join('\n---\n'),
     references: cveRefs(ruleYaml),
     falsePositives: NOT_ASSESSED,
   };

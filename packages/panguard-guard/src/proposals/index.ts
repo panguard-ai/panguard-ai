@@ -16,6 +16,14 @@ export {
 } from './issue-url.js';
 export type { AtrIssueFields, AtrIssueLink } from './issue-url.js';
 export { proposalToIssueFields } from './convert.js';
+export {
+  buildSkillAuditProposal,
+  selectProposalEvidence,
+  isAtrFinding,
+  parseLocation,
+  MAX_SNIPPET_CHARS,
+} from './skill-evidence.js';
+export type { SkillFindingInput, SkillAuditProposalInput } from './skill-evidence.js';
 export type { AtrProposal } from './convert.js';
 export {
   saveProposalToOutbox,

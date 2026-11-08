@@ -610,6 +610,7 @@ export function auditCommand(): Command {
             skillName: safeSkillName(report.manifest?.name, resolvedPath),
             riskLevel: report.riskLevel === 'CRITICAL' ? 'CRITICAL' : 'HIGH',
             source: 'cli-auditor',
+            skillDir: resolvedPath,
             findings: report.findings.map((f) => ({
               id: f.id,
               title: f.title,
@@ -650,6 +651,7 @@ export function auditCommand(): Command {
               skillName,
               riskLevel: report.riskLevel === 'CRITICAL' ? 'CRITICAL' : 'HIGH',
               source: 'cli-auditor',
+              skillDir: resolvedPath,
               findings: report.findings.map((f) => ({
                 id: f.id,
                 title: f.title,

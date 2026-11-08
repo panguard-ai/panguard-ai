@@ -1,120 +1,38 @@
 /**
- * Build an ATR rule PROPOSAL from a local skill-audit result, for the Threat
- * Cloud flywheel (opt-in upload only).
+ * Build an ATR rule PROPOSAL from a local skill-audit result.
  *
  * WHY THIS EXISTS (learned the hard way — the scrapped ATR-PRED-* batch):
- * a proposal must carry the REAL attack evidence (the matched code), NOT a rule
- * fabricated from the finding TITLE's keywords. The old `pga up` / `pga audit`
- * path built `value: "(?i)<title keywords>"` regexes — those detect our own
- * REPORT TEXT, not the attack, and shipped with no precision test. That is
- * exactly the class of rule the project had to throw away. Uploading them is
- * worse than uploading nothing: it pollutes the community proposal queue with
- * rules that can never pass the flywheel safety gate (which requires
- * true-positive + true-negative test cases and 0 FP on the benign corpus).
- *
- * So instead of fabricating a rule, we emit a DRAFT REQUEST: `needsLLMDraft:
- * true` plus the actual evidence (the matched code snippet where available,
- * otherwise the labeled finding). The server-side / Guard LLM drafter turns it
- * into a real, test-backed rule via the Rule Creation Standard. This mirrors the
- * runtime skill-watcher producer (packages/panguard-guard/src/engines/
- * skill-watcher.ts) so ALL proposal paths emit ONE valid contract.
+ * a proposal must carry the REAL attack evidence, NOT a rule fabricated from a
+ * finding title or the regex of a rule that already fired. The rules live in
+ * the shared builder (@panguard-ai/panguard-guard proposals/skill-evidence) so
+ * `pga audit`, `pga up` and the Guard skill watcher all decide the same way:
+ * only threats ATR did not already catch, and only with the source lines the
+ * threat was found in. No usable evidence means no proposal.
  */
 
-import { patternHash } from '@panguard-ai/scan-core';
-import { scrubSecretValues, saveProposalToOutbox } from '@panguard-ai/panguard-guard';
-import type { OutboxRecord } from '@panguard-ai/panguard-guard';
+import {
+  buildSkillAuditProposal as buildShared,
+  saveProposalToOutbox,
+} from '@panguard-ai/panguard-guard';
+import type {
+  AtrProposal,
+  OutboxRecord,
+  SkillAuditProposalInput,
+  SkillFindingInput,
+} from '@panguard-ai/panguard-guard';
 
 /** A single finding, reduced to what a proposal needs. */
-export interface ProposalFinding {
-  readonly id?: string;
-  readonly title: string;
-  readonly severity: string;
-  readonly category: string;
-  /** file:line of the match, when the scanner reported it. */
-  readonly location?: string;
-  /** The actual matched source snippet — the REAL attack pattern (present when
-   *  the scan ran with source available / --explain). Preferred payload. */
-  readonly snippet?: string;
-}
+export type ProposalFinding = SkillFindingInput;
 
 /** The exact shape ThreatCloudClient.submitATRProposal expects. */
-export interface SkillAuditProposal {
-  patternHash: string;
-  ruleContent: string;
-  llmProvider: string;
-  llmModel: string;
-  selfReviewVerdict: string;
-}
+export type SkillAuditProposal = AtrProposal;
 
 /**
- * Turn a skill audit into a valid draft-request proposal, or null when there is
- * nothing high-confidence to propose (never emit an empty/garbage proposal).
+ * Turn a skill audit into a draft-request proposal, or null when ATR already
+ * covers every finding or no finding has readable evidence.
  */
-export function buildSkillAuditProposal(input: {
-  readonly skillName: string;
-  readonly riskLevel: 'HIGH' | 'CRITICAL';
-  readonly findings: readonly ProposalFinding[];
-  /** provenance tag for the self-review verdict, e.g. 'pga-up' | 'cli-auditor'. */
-  readonly source: string;
-}): SkillAuditProposal | null {
-  const highFindings = input.findings
-    .filter((f) => f.severity === 'critical' || f.severity === 'high')
-    .slice(0, 5);
-  if (highFindings.length === 0) return null;
-
-  const findingSummary = highFindings.map((f) => f.title).join('; ');
-  const pHash = patternHash(input.skillName, findingSummary);
-
-  // Payload = the real evidence the drafter reasons over. Prefer the actual
-  // matched code snippet (the genuine attack pattern); fall back to a labeled
-  // finding line only when no source snippet is available. Never the bare
-  // title-as-regex that made the old proposals detect their own report text.
-  const payload = highFindings
-    .map((f) => {
-      const head = `[${f.severity.toUpperCase()}] ${f.category}: ${f.title}`;
-      const loc = f.location ? ` (${f.location})` : '';
-      const code = f.snippet && f.snippet.trim() ? `\n${f.snippet.trim()}` : '';
-      return `${head}${loc}${code}`;
-    })
-    .join('\n---\n');
-
-  // A structured draft-request, NOT a finished rule. The server/Guard drafter
-  // builds the real detection + test cases from `payload`.
-  const draftRequest = {
-    type: 'skill-audit-finding',
-    skillName: input.skillName,
-    riskLevel: input.riskLevel,
-    payload,
-    findings: highFindings.map((f) => ({
-      id: f.id,
-      category: f.category,
-      severity: f.severity,
-      title: f.title,
-      location: f.location,
-      snippet: f.snippet,
-    })),
-    needsLLMDraft: true,
-  };
-  // SECRET DISCIPLINE: a matched code snippet (or even a finding title) can embed
-  // the very credential it flagged. This proposal is uploaded to Threat Cloud on
-  // opt-in, so mask any AWS/GitHub/Anthropic/OpenAI/Stripe key, private-key block,
-  // DB URL, or bearer token in every string VALUE before it can leave the machine.
-  // Value-level (not key-name) scrubbing — the secret lives inside free text.
-  const scrubbed = scrubSecretValues(draftRequest);
-
-  return {
-    patternHash: pHash,
-    ruleContent: JSON.stringify(scrubbed),
-    llmProvider: 'skill-audit',
-    llmModel: 'needs-llm-drafting',
-    selfReviewVerdict: JSON.stringify({
-      approved: true,
-      source: input.source,
-      skillName: input.skillName,
-      riskLevel: input.riskLevel,
-      findingCount: input.findings.length,
-    }),
-  };
+export function buildSkillAuditProposal(input: SkillAuditProposalInput): SkillAuditProposal | null {
+  return buildShared(input);
 }
 
 /**
@@ -124,10 +42,8 @@ export function buildSkillAuditProposal(input: {
  * Returns the stored record, or null when there is nothing to propose or the
  * outbox cannot be written (never throws: a full disk must not break a scan).
  */
-export function keepSkillAuditProposalLocally(
-  input: Parameters<typeof buildSkillAuditProposal>[0]
-): OutboxRecord | null {
-  const proposal = buildSkillAuditProposal(input);
+export function keepSkillAuditProposalLocally(input: SkillAuditProposalInput): OutboxRecord | null {
+  const proposal = buildShared(input);
   if (!proposal) return null;
   try {
     return saveProposalToOutbox(proposal);

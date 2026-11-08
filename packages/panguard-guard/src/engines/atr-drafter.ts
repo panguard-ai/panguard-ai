@@ -236,6 +236,9 @@ export class ATRDrafter {
 
     for (const [hash, pattern] of this.patterns) {
       if (this.submittedPatterns.has(hash)) continue;
+      // A pattern an ATR rule already matched is covered; drafting another rule
+      // for it would only duplicate one. Proposals are for what ATR missed.
+      if (pattern.atrRulesMatched.length > 0) continue;
 
       if (
         pattern.occurrences >= this.config.minEvents &&

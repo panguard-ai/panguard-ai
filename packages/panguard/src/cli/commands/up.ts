@@ -559,6 +559,7 @@ export function upCommand(): Command {
                             skillName: skill.name,
                             riskLevel: report.riskLevel,
                             source: 'pga-up',
+                            skillDir,
                             findings: report.findings.map((f) => ({
                               id: f.id,
                               title: f.title,
@@ -1214,6 +1215,7 @@ async function submitToTC(
       skillName,
       riskLevel: report.riskLevel === 'CRITICAL' ? 'CRITICAL' : 'HIGH',
       source: 'pga-up',
+      skillDir,
       findings: report.findings.map((f) => ({
         id: f.id,
         title: f.title,
