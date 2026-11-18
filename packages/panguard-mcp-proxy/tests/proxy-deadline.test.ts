@@ -2,12 +2,12 @@
  * Proxy + evaluation deadline — the proxy evaluates in worker mode with its
  * evalTimeout as the deadline, so a scan that runs too long is cut and handled
  * by the proxy's fail mode: fail-closed (the default) blocks the response,
- * fail-open forwards it. Driven over in-memory transports with a test-only rule
- * and upstream output chosen so that the response scan runs past the deadline,
+ * fail-open forwards it. Driven over in-memory transports with a stand-in engine
+ * (see fake-atr-package.ts) that does not finish scanning the upstream's output,
  * and with stub evaluators for the paths a real one cannot be made to take.
  */
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -18,49 +18,25 @@ import { MCPProxy } from '../src/proxy.js';
 import type { ProxyConfig, ProxyEvaluatorLike } from '../src/proxy.js';
 import { ProxyEvaluator, EngineWorkerError, EVALUATION_ERROR_SENTINEL } from '../src/evaluator.js';
 import type { EvalResult } from '../src/evaluator.js';
+import { BLOCKING_MARKER, writeFakeAtrPackage } from './fake-atr-package.js';
 
-const SLOW_OUTPUT = 'q'.repeat(400);
-/** Room for an ordinary scan on a fresh worker (regexes not yet compiled), on a slow CI runner too. */
-const DEADLINE_MS = 5_000;
+const SLOW_OUTPUT = BLOCKING_MARKER;
+/** Room for an ordinary scan on a fresh worker, on a slow CI runner too. */
+const DEADLINE_MS = 2_000;
 
-let slowDir: string;
+let root: string;
+let fakePackage: string;
 
 beforeAll(() => {
-  slowDir = mkdtempSync(join(tmpdir(), 'pg-proxy-deadline-'));
-  writeFileSync(
-    join(slowDir, 'ATR-TEST-SLOW.yaml'),
-    `title: "Proxy deadline test rule"
-id: ATR-TEST-SLOW
-rule_version: 1
-status: experimental
-description: "test-only rule that runs long enough to exceed the deadline"
-author: "test"
-date: "2026/10/27"
-schema_version: "1.0"
-maturity: stable
-severity: critical
-tags:
-  category: test
-  confidence: high
-agent_source:
-  type: mcp_exchange
-  provider:
-    - any
-detection:
-  condition: any
-  conditions:
-    - field: content
-      operator: regex
-      value: "q*q*q*q*q*q*q*!"
-`
-  );
+  root = mkdtempSync(join(tmpdir(), 'pg-proxy-deadline-'));
+  fakePackage = writeFakeAtrPackage(root, []);
 });
 
 afterAll(() => {
-  rmSync(slowDir, { recursive: true, force: true });
+  rmSync(root, { recursive: true, force: true });
 });
 
-/** Upstream whose `fetch` returns output the test rule cannot finish scanning, and `ok` returns "fine". */
+/** Upstream whose `fetch` returns output the stand-in engine does not finish scanning, and `ok` returns "fine". */
 function makeUpstream(): Server {
   const server = new Server(
     { name: 'slow-upstream', version: '0.0.1' },
@@ -102,9 +78,12 @@ async function throughProxy(config: Partial<ProxyConfig>, evaluator: ProxyEvalua
 }
 
 async function workerEvaluator(): Promise<ProxyEvaluator> {
-  const evaluator = new ProxyEvaluator({ isolation: 'worker', deadlineMs: DEADLINE_MS });
+  const evaluator = new ProxyEvaluator({
+    isolation: 'worker',
+    deadlineMs: DEADLINE_MS,
+    atrPackageDir: fakePackage,
+  });
   await evaluator.loadRules();
-  await evaluator.loadAutoRules(slowDir, { adviseOnly: false });
   return evaluator;
 }
 
@@ -136,8 +115,7 @@ describe('MCP proxy evaluation deadline', () => {
     );
     expect(tuned.isolation).toBe('worker');
     expect(tuned.deadlineMs).toBe(1_234);
-    // The default leaves room for large ordinary responses, which can take
-    // several seconds to scan.
+    // The default leaves room for large ordinary responses.
     expect(
       evaluatorOf(new MCPProxy({ upstreamCommand: 'noop', upstreamArgs: [] })).deadlineMs
     ).toBe(15_000);

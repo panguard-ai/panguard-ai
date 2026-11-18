@@ -69,7 +69,12 @@ export interface ProxyConfig {
    * failMode.
    */
   readonly evalTimeout?: number;
-  /** Fail mode: 'closed' blocks on error (safer), 'open' allows on error (default for availability) */
+  /**
+   * Fail mode. The default is 'closed': an error, or a scan that does not finish
+   * within the time limit (evalTimeout), blocks the call or response. 'open'
+   * allows it instead, so with 'open' content whose scan was cut at the limit
+   * is forwarded unscanned. Also set by PANGUARD_PROXY_FAIL_MODE.
+   */
   readonly failMode?: 'open' | 'closed';
   /** Stable session id for this proxy run (default: per-process unique). */
   readonly sessionId?: string;

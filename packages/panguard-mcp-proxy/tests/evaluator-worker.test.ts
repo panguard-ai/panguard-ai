@@ -3,11 +3,11 @@
  * worker thread, terminates that worker when an evaluation runs past its
  * deadline, then starts a fresh one with the same rules.
  *
- * The slow case comes from a test-only rule and input chosen so that one scan
- * runs far past the deadline; it does not depend on any bundled rule.
+ * The cut cases run against a stand-in engine package (see fake-atr-package.ts)
+ * whose engine can be made to stay busy; they do not depend on any bundled rule.
  */
 import { describe, it, expect, beforeAll, afterAll, afterEach, vi } from 'vitest';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
@@ -16,58 +16,30 @@ import {
   EvaluationDeadlineError,
   loadRulesOrInline,
 } from '../src/evaluator.js';
+import { BLOCKING_MARKER, writeFakeAtrPackage, writeFakeRules } from './fake-atr-package.js';
 
 const TOKEN = 'workerDeadlineMarker4417benign';
-/** With the test-only rule below, one scan of this runs far past the deadline. */
-const SLOW_INPUT = 'q'.repeat(400);
-/**
- * Room for an ordinary evaluation on a fresh worker, on a slow CI runner too:
- * the first evaluations run slower than later ones, since the engine's regexes
- * are not yet compiled.
- */
-const DEADLINE_MS = 5_000;
-/** A cut comes at the deadline, not whenever the slow pattern would give up. */
+/** Content the stand-in engine does not finish scanning. */
+const SLOW_INPUT = BLOCKING_MARKER;
+/** Room for an ordinary evaluation on a fresh worker, on a slow CI runner too. */
+const DEADLINE_MS = 2_000;
+/** A cut comes at the deadline. */
 const CUT_WITHIN_MS = DEADLINE_MS + 3_000;
 
-function ruleYaml(id: string, value: string, severity = 'critical', maturity = 'stable'): string {
-  return `title: "Worker deadline test rule ${id}"
-id: ${id}
-rule_version: 1
-status: experimental
-description: "worker deadline test rule"
-author: "test"
-date: "2026/10/27"
-schema_version: "1.0"
-maturity: ${maturity}
-severity: ${severity}
-tags:
-  category: test
-  confidence: high
-agent_source:
-  type: tool_call
-  provider:
-    - any
-detection:
-  condition: any
-  conditions:
-    - field: content
-      operator: regex
-      value: "${value}"
-`;
-}
-
 let root: string;
+let fakePackage: string;
 let slowDir: string;
 let tokenDir: string;
 
 beforeAll(() => {
   root = mkdtempSync(join(tmpdir(), 'pg-worker-deadline-'));
-  slowDir = join(root, 'slow');
-  tokenDir = join(root, 'token');
-  mkdirSync(slowDir);
-  mkdirSync(tokenDir);
-  writeFileSync(join(slowDir, 'ATR-TEST-SLOW.yaml'), ruleYaml('ATR-TEST-SLOW', 'q*q*q*q*q*q*q*!'));
-  writeFileSync(join(tokenDir, 'ATR-TEST-TOKEN.yaml'), ruleYaml('ATR-TEST-TOKEN', TOKEN));
+  fakePackage = writeFakeAtrPackage(join(root, 'package'), [
+    { id: 'ATR-TEST-BUNDLED', contains: 'bundled-marker' },
+  ]);
+  // Auto-pulled rule sets: the first has no rule of interest (the engine's
+  // behaviour on BLOCKING_MARKER is built in); the second flags TOKEN.
+  slowDir = writeFakeRules(join(root, 'slow'), [{ id: 'ATR-TEST-SLOW', contains: 'slow-marker' }]);
+  tokenDir = writeFakeRules(join(root, 'token'), [{ id: 'ATR-TEST-TOKEN', contains: TOKEN }]);
 });
 
 afterAll(() => {
@@ -75,8 +47,12 @@ afterAll(() => {
 });
 
 const open: ProxyEvaluator[] = [];
-function workerEvaluator(deadlineMs = DEADLINE_MS): ProxyEvaluator {
-  const ev = new ProxyEvaluator({ isolation: 'worker', deadlineMs });
+function workerEvaluator(deadlineMs = DEADLINE_MS, real = false): ProxyEvaluator {
+  const ev = new ProxyEvaluator({
+    isolation: 'worker',
+    deadlineMs,
+    ...(real ? {} : { atrPackageDir: fakePackage }),
+  });
   open.push(ev);
   return ev;
 }
@@ -94,7 +70,7 @@ describe('ProxyEvaluator worker isolation', () => {
     const inline = new ProxyEvaluator();
     await inline.loadRules();
     // Not a deadline test: leave the windowed long report all the time it needs.
-    const worker = workerEvaluator(60_000);
+    const worker = workerEvaluator(60_000, true);
     expect(await worker.loadRules()).toBe(await inline.loadRules());
     const calls: Array<[string, Record<string, unknown>]> = [
       ['Bash', { command: 'ls -la ./src' }],
@@ -135,16 +111,13 @@ describe('ProxyEvaluator worker isolation', () => {
     ).rejects.toBeInstanceOf(EvaluationDeadlineError);
     expect(Date.now() - start).toBeLessThan(CUT_WITHIN_MS);
 
-    const bundled = await ev.evaluateToolCall(
-      'Bash',
-      { command: 'cat ~/.ssh/id_rsa' },
-      'tool_call'
-    );
+    const bundled = await ev.evaluateToolCall('run', { input: 'bundled-marker' }, 'tool_call');
     expect(bundled.outcome).toBe('deny');
+    expect(bundled.matchedRules).toContain('ATR-TEST-BUNDLED');
     const token = await ev.evaluateToolCall('run', { input: TOKEN }, 'tool_call');
     expect(token.outcome).toBe('deny');
     expect(token.matchedRules).toContain('ATR-TEST-TOKEN');
-    // The slow rule came back too, so the same input is cut again.
+    // The same input is cut again by the fresh worker.
     await expect(
       ev.evaluateToolCall('run', { input: SLOW_INPUT }, 'tool_call')
     ).rejects.toBeInstanceOf(EvaluationDeadlineError);
