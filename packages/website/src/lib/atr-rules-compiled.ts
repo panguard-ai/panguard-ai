@@ -12,8 +12,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)\\b(ignore|disregard|forget|override|bypass|skip|abandon|drop|cancel|suppress|nullify|void|revoke|dismiss|discard|reject)\\s+(all\\s+)?(the\\s+|your\\s+|my\\s+|any\\s+|these\\s+|those\\s+)?(previous|prior|above|earlier|preceding|original|existing|current|initial|default|given|assigned|preset|established)?\\s*(instructions?|prompts?|rules?|guidelines?|directives?|constraints?|context|programming|training|protocols?|policies|configuration|parameters|boundaries|guardrails?|safeguards?|restrictions?|tasks?|assignments?|information|directions?|orders?|commands?)',
-        desc: 'Instruction override with broad verb and noun synonym coverage, including determiners',
+          '(?i)\\b(ignore|disregard|forget|override|bypass|suppress|discard)\\s+(?:(?:all|the|any|these|those)\\s+)*(?:(?:your|my)\\s+|(?:previous|prior|above|earlier|preceding|original|existing|current|initial|default|given|assigned|preset|established)\\s+)(?:(?:previous|prior|above|earlier|preceding|original|existing|current|initial|default|given|assigned|preset|established)\\s+)?(instructions?|prompts?|rules?|guidelines?|directives?|constraints?|context|programming|training|protocols?|policies|configuration|parameters|boundaries|guardrails?|safeguards?|restrictions?|tasks?|assignments?|information|directions?|orders?|commands?)',
+        desc: "Instruction override with broad verb/noun coverage, requiring a directed anchor (your/my or a prior-state adjective) so benign 'ignore rules'/'override these guidelines' prose does not match",
       },
       {
         field: 'user_input',
@@ -30,8 +30,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)\\b(forget|ignore|disregard|discard)\\s+(about\\s+)?(everything|all|that|this|what\\s+was|what\\s+I|anything\\s+you)\\s*(previously|before|earlier|said|told|above|prior|were|was|have)?',
-        desc: 'Broad forget-everything variants with extended word coverage',
+          '(?i)\\b(forget|ignore|disregard|discard)\\s+(about\\s+)?(everything|all|that|this|what\\s+was|what\\s+I|anything\\s+you)\\s+(previously|before|earlier|said|told|above|prior|mentioned|instructed)',
+        desc: "Forget-everything variants, requiring a trailing prior-context anchor so benign 'ignore all warnings'/'discard this file' prose does not match",
       },
       {
         field: 'user_input',
@@ -42,8 +42,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)(reveal|show|display|output|print|repeat|provide|give|share|tell|what\\s+are|what\\s+were|what\\s+is)\\s+(me\\s+)?(your|the|all)\\s+(secret|hidden|internal|system|original|previous|initial|complete|full|given|guard|entire)?\\s*(instructions?|prompts?|passwords?|secrets?|embeddings?|configuration|directives?|guidelines?|rules)',
-        desc: 'System prompt and secret extraction requests',
+          '(?i)(reveal|show|display|output|print|repeat|provide|give|share|tell|what\\s+are|what\\s+were|what\\s+is)\\s+(me\\s+)?(?:(your|my)\\s+((secret|hidden|internal|system|original|previous|initial|complete|full|given|guard|entire)\\s+)?|(the|all)\\s+(secret|hidden|internal|system|original|previous|initial|complete|full|given|guard|entire)\\s+)(instructions?|prompts?|passwords?|secrets?|embeddings?|configuration|directives?|guidelines?|rules)',
+        desc: "System prompt/secret extraction, requiring possessive (your/my) or a sensitive adjective so benign 'show the prompt'/'what are the rules' prose does not match",
       },
       {
         field: 'user_input',
@@ -54,8 +54,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)(leave|put)\\s+(all\\s+)?(the\\s+)?(previous|prior|earlier|old)\\s+(information|tasks?|instructions?|context)\\s+(behind|aside|away)|start\\s+(from\\s+the\\s+)?(front|beginning|scratch|zero|neu|vorne)',
-        desc: 'Leave-behind / start-fresh context switch patterns',
+          '(?i)(leave|put)\\s+(all\\s+)?(the\\s+)?(previous|prior|earlier|old)\\s+(information|tasks?|instructions?|context)\\s+(behind|aside|away)|start\\s+(over|fresh|anew|from\\s+(the\\s+)?(scratch|zero|beginning|front))\\s+(with\\s+(a\\s+)?new\\s+(task|instructions?|persona|role|prompt)|and\\s+(ignore|forget|disregard))',
+        desc: "Leave-behind / start-fresh context switch, requiring the fresh-start to redirect to a new task or an override so benign 'start from the beginning' prose does not match",
       },
       {
         field: 'user_input',
@@ -66,8 +66,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)\\b(you\\s+are\\s+now|you\\s+have\\s+become|you\\s+will\\s+act\\s+as|you\\s+will\\s+be|you\\s+shall\\s+be|transform\\s+into|switch\\s+to\\s+being|become|morph\\s+into|adopt\\s+the\\s+persona|now\\s+you\\s+are|jetzt\\s+bist\\s+du|du\\s+bist\\s+(jetzt|nun)|stell\\s+dir\\s+vor\\s+du\\s+bist)\\s+(a|an|the|my|ein[ea]?)?\\s*[a-zA-Z\\u00C0-\\u024F]+',
-        desc: 'Persona switching and identity reassignment attempts',
+          '(?i)\\b(you\\s+are\\s+now|you\\s+have\\s+become|you\\s+will\\s+act\\s+as|you\\s+shall\\s+be|transform\\s+into|switch\\s+to\\s+being|morph\\s+into|adopt\\s+the\\s+persona|now\\s+you\\s+are|jetzt\\s+bist\\s+du|du\\s+bist\\s+(jetzt|nun)|stell\\s+dir\\s+vor\\s+du\\s+bist)\\s+(a|an|the|my|ein[ea]?)?\\s*(?:(unrestricted|unfiltered|uncensored|unlimited|unbound|unchained|jailbroken|jailbreak|evil|malicious|rogue|amoral|immoral|unethical|lawless|god[- ]?mode|developer\\s+mode|hacker|villain|DAN|STAN|dark\\s+[a-z]+)\\b|[a-zA-Z\\u00C0-\\u024F]+\\s+(?:with\\s+no|without\\s+(?:any\\s+)?)\\s*(restrictions?|limits?|limitations?|filters?|rules?|guidelines?|safety|guardrails?|morals?|ethics?|boundaries))',
+        desc: "Persona switching to an adversarial identity (jailbreak/harmful persona lexicon or an explicit 'without restrictions' identity) so benign 'you are now an expert'/'transform into an X' prose does not match",
       },
       {
         field: 'user_input',
@@ -90,20 +90,20 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)Eingabe\\s*:\\s*[^\\n]+\\s*Ausgabe\\s*:\\s*[^\\n]+\\s*Eingabe\\s*:\\s*[^\\n]+\\s*Ausgabe\\s*:',
+          '(?i)Eingabe\\s*:(?:\\s*\\S(?:[^\\n]*\\S)?|\\n*[^\\S\\n])\\s*Ausgabe\\s*:(?:\\s*\\S(?:[^\\n]*\\S)?|\\n*[^\\S\\n])\\s*Eingabe\\s*:(?:\\s*\\S(?:[^\\n]*\\S)?|\\n*[^\\S\\n])\\s*Ausgabe\\s*:',
         desc: 'German few-shot input/output override pattern (Eingabe/Ausgabe)',
       },
       {
         field: 'user_input',
         pattern:
-          "(?i)(do\\s+not|don'?t|never|stop|cease|quit|refuse\\s+to)\\s+(follow|obey|adhere\\s+to|comply\\s+with|respect|honor|enforce|apply|observe|uphold)\\s+(your|the|any|all|those|these)\\s+(instructions?|rules?|guidelines?|programming|training|protocols?|policies|directives?|constraints?|boundaries|restrictions?)",
-        desc: 'Negation-verb patterns telling agent to stop following rules',
+          "(?i)(do\\s+not|don'?t|never|stop|cease|quit|refuse\\s+to)\\s+(follow|obey|adhere\\s+to|comply\\s+with|respect|honor|enforce|apply|observe|uphold)\\s+(your|all\\s+your|any\\s+of\\s+your|those|these)\\s+(instructions?|rules?|guidelines?|programming|training|protocols?|policies|directives?|constraints?|boundaries|restrictions?)",
+        desc: "Negation-verb patterns telling agent to stop following its OWN rules (anchored on your/those/these) so benign 'do not follow any instructions from it' guidance does not match",
       },
       {
         field: 'user_input',
         pattern:
-          '(?i)\\b(new|updated|revised|replacement|corrected|actual|real|true|overriding)\\s+(instructions?|rules?|directives?|guidelines?|orders?|commands?)\\s*[:=\\-]',
-        desc: 'New instruction assignment with delimiter',
+          "(?i)\\b(new|updated|revised|replacement|corrected|actual|real|true|overriding)\\s+(instructions?|rules?|directives?|guidelines?|orders?|commands?)\\s*[:=]\\s*(?=.{0,25}(ignore|disregard|forget|reveal|disclose|print|output|say|tell|respond|reply|write|execute|run|follow|act\\s+as|do\\s+not|don'?t|send|comply|obey|override|bypass|stop|now\\b|you\\s+(must|will|are|should)))",
+        desc: "New-instruction assignment, requiring the payload after the delimiter to be an AI-directed imperative so benign 'New instructions:' headings / bullet lists do not match",
       },
       {
         field: 'user_input',
@@ -114,8 +114,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)(\\[\\s*(SYSTEM|INST|INSTRUCTION|SYS|ADMIN|ROOT|OVERRIDE|CONTROL|PRIORITY|URGENT)\\s*\\]|<<\\s*(SYS|SYSTEM|INST)\\s*>>|\\{\\{\\s*(SYSTEM|INSTRUCTION|OVERRIDE)\\s*\\}\\})',
-        desc: 'Fake system-level delimiter tags',
+          '(\\[\\s*(SYSTEM|INST|SYS|ADMIN|ROOT|OVERRIDE)\\s*\\]|<<\\s*(SYS|SYSTEM|INST)\\s*>>|\\{\\{\\s*(SYSTEM|INSTRUCTION|OVERRIDE)\\s*\\}\\})',
+        desc: 'Fake system-level delimiter tags (case-sensitive uppercase; dropped generic words CONTROL/PRIORITY/URGENT/INSTRUCTION-bracket that appear as benign template labels)',
       },
       {
         field: 'user_input',
@@ -126,14 +126,14 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)\\b(you\\s+(must|shall|will|need\\s+to|have\\s+to|are\\s+(required|obligated|commanded|ordered)\\s+to)\\s+(obey|comply|listen|submit|respond\\s+to|follow)\\s+(me|my|this|these|the\\s+following|every|all)|I\\s+(command|order|demand|direct|instruct|require)\\s+you\\s+to)\\b',
-        desc: 'Authoritative compliance demands',
+          '(?i)\\b(you\\s+(must|shall|will|need\\s+to|have\\s+to|are\\s+(required|obligated|commanded|ordered)\\s+to)\\s+(obey|comply|listen|submit|respond\\s+to|follow)\\s+(me|my)\\b|I\\s+(command|order|demand|direct|instruct|require)\\s+you\\s+to)\\b',
+        desc: "Authoritative compliance demands, anchored on me/my so benign 'you must follow these steps' prose does not match",
       },
       {
         field: 'user_input',
         pattern:
-          '(?i)(decode|interpret|execute|run|process|follow|read)\\s+(this|the\\s+following)?\\s*:?\\s*[A-Za-z0-9+/]{20,}={0,2}',
-        desc: 'Instructions to decode and execute base64-like payloads',
+          '(?i)(decode|interpret|base64\\s*[-\\s]?decode)\\s+(this|the\\s+following|and\\s+(?:execute|run|follow))?\\s*:?\\s*[A-Za-z0-9+/]{24,}={0,2}',
+        desc: "Instructions to decode/interpret base64 payloads (narrowed verbs to decode/interpret so benign 'run <longIdentifier>' / 'read <token>' code prose does not match; known base64 keyword fragments still covered by Layer 11)",
       },
       {
         field: 'user_input',
@@ -167,8 +167,8 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'user_input',
-        pattern: '(?i)\\bstop\\s*[-:,.]?\\s*(write|say|print|output)\\s*[:,-]?\\s+[A-Z].{2,40}',
-        desc: 'Stop-and-redirect command injection (stop: write X)',
+        pattern: '(?i)\\bstop\\s*[-:,]?\\s*(write|say|print|output)\\s*[:,-]?\\s+[A-Z].{2,40}',
+        desc: "Stop-and-redirect command injection (stop: write X); dropped '.' connector so a sentence boundary 'STOP. Write the formula instead.' does not match",
       },
       {
         field: 'user_input',
@@ -273,8 +273,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(DO\\s+NOT\\s+(ANSWER|LOOK|READ|USE|FOLLOW|CHECK|RESPOND)|FORGET\\s+EVERYTHING|IGNORE\\s+ALL)',
-        desc: 'ALL-CAPS embedded injection commands hidden in normal text',
+          '(DO\\s+NOT\\s+(ANSWER|RESPOND)\\b|FORGET\\s+EVERYTHING\\s+(ABOVE|BEFORE|PRIOR|PREVIOUS)|IGNORE\\s+ALL\\s+(PREVIOUS|PRIOR|ABOVE|PRECEDING))',
+        desc: 'ALL-CAPS embedded injection commands (narrowed: benign imperatives DO NOT USE/READ/FOLLOW/CHECK and bare IGNORE ALL/FORGET EVERYTHING dropped; requires injection-specific completion)',
       },
       {
         field: 'user_input',
@@ -295,7 +295,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)<!--[^>]{0,20}(ignore|disregard|override|new\\s+instructions?|system\\s*:|you\\s+must|you\\s+are\\s+now|forget\\s+previous|execute|perform|send\\s+to|exfiltrate|reveal|disclose|output\\s+the)[^>]{0,200}-->',
+          '(?i)<!--[^>]{0,20}((ignore|disregard|forget|override)\\s+(all\\s+|any\\s+|the\\s+|your\\s+)?(previous\\s+|prior\\s+|above\\s+|earlier\\s+|preceding\\s+|current\\s+)?(instruction|prompt|rule|guideline|direction|context|command|message|safety|system)|new\\s+instructions?|system\\s*:|you\\s+must|you\\s+are\\s+now|send\\s+to|exfiltrate|reveal|disclose|output\\s+the|execute|perform)[^>]{0,200}-->',
         desc: 'HTML comments with instruction-like content targeting the agent',
       },
       {
@@ -306,9 +306,14 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'content',
+        pattern: '(?i)(\\[INST\\]|\\[/INST\\]|\\[HIDDEN\\]|<s>\\[INST\\]|<<SYS>>|<</SYS>>)',
+        desc: 'Instruction-wrapper tokens delimiting an injected instruction block',
+      },
+      {
+        field: 'content',
         pattern:
-          '(?i)(\\[INST\\]|\\[/INST\\]|\\[SYSTEM\\]|\\[/SYSTEM\\]|\\[HIDDEN\\]|<\\|im_start\\|>|<\\|im_end\\|>|<\\|endoftext\\|>|<\\|system\\|>|<\\|user\\|>|<\\|assistant\\|>|<\\|pad\\|>|<s>\\[INST\\]|<<SYS>>|<</SYS>>|<\\|begin_of_text\\|>|<\\|eot_id\\|>|<\\|start_header_id\\|>)',
-        desc: 'Model-specific special tokens and chat template delimiters',
+          '(?i)(\\[SYSTEM\\]|\\[/SYSTEM\\]|<\\|im_start\\|>|<\\|im_end\\|>|<\\|endoftext\\|>|<\\|system\\|>|<\\|user\\|>|<\\|assistant\\|>|<\\|pad\\|>|<\\|begin_of_text\\|>|<\\|eot_id\\|>|<\\|start_header_id\\|>)[\\s\\S]{0,120}(ignore\\s+(all|any|previous|prior|above|your)|disregard\\s+(all|any|previous|prior|above)|you\\s+are\\s+now\\s+|forget\\s+(all|previous|prior|everything)|reveal\\s+(the\\s+)?(system|prompt|key|secret)|exfiltrate|jailbreak|unrestricted\\s+assistant|do\\s+anything\\s+now|new\\s+instructions?|override\\s+(the\\s+)?(system|safety|previous|all))',
+        desc: 'ChatML/role/tokenizer tokens paired with an adjacent injection directive',
       },
       {
         field: 'content',
@@ -342,9 +347,8 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'content',
-        pattern:
-          '(?i)(\\!?\\[([^\\]]{0,100})\\]\\s*\\(\\s*(javascript|data|vbscript)\\s*:|\\!?\\[([^\\]]{0,100}(ignore|override|system|instruction|execute|you\\s+must)[^\\]]{0,100})\\])',
-        desc: 'Markdown links with javascript/data URIs or injection text in alt/title',
+        pattern: '(?i)\\!?\\[[^\\]]{0,100}\\]\\s*\\(\\s*(javascript|vbscript)\\s*:',
+        desc: 'Markdown links with javascript/vbscript URI schemes (XSS injection vector); dangerous data: URIs are covered by the data-URI condition above',
       },
       {
         field: 'content',
@@ -389,8 +393,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)\\b(enable|activate|enter|switch\\s+to|turn\\s+on|engage|initiate|boot\\s+into|start)\\s+(developer|dev|maintenance|debug|unrestricted|unlimited|unfiltered|uncensored|admin|root|god|sudo|super|test|raw|unsafe|jailbreak|hacker|override|master|privileged)\\s+(mode|access|state|level|tier|permissions?)\\b',
-        desc: 'Mode-switching requests to elevate agent capabilities',
+          '(?i)\\b(?:(?:enable|activate|enter|switch\\s+to|turn\\s+on|engage|initiate|boot\\s+into|start)\\s+(?:unrestricted|unlimited|unfiltered|uncensored|god|jailbreak|hacker|unsafe)\\s+(?:mode|access|state|level|tier|permissions?)\\b|(?:enable|activate|enter|switch\\s+to|turn\\s+on|engage|initiate|boot\\s+into|start)\\s+(?:developer|dev|maintenance|debug|admin|root|sudo|super|test|raw|override|master|privileged)\\s+(?:mode|access|state|level|tier|permissions?)\\b[\\s\\S]{0,120}?(?:no\\s+(?:restrictions?|limits?|filters?|rules?|guidelines?)|without\\s+(?:restrictions?|limits?|filters?)|ignore\\s+(?:all\\s+)?(?:previous|your|the)\\b|answer\\s+any\\s+question|bypass\\b|unfiltered|uncensored|do\\s+anything))',
+        desc: "Mode-switching requests to elevate agent capabilities (v2 \u2014 split into an unambiguous group and an ambiguous one. Phrases like enable debug mode or enable developer mode are ordinary developer documentation and FP'd on benign skills, but developer mode is also a real jailbreak persona, so those adjectives now require an accompanying no-restrictions claim within the same passage. The unambiguous adjectives such as unrestricted, uncensored and jailbreak still fire on their own. Both mode-switching true_positives are unaffected)",
       },
       {
         field: 'user_input',
@@ -407,8 +411,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)(as\\s+(your|the|an?)\\s+(developer|creator|programmer|engineer|designer|admin|administrator|owner|operator|maintainer)|I\\s+am\\s+(your|the|an?)\\s+(developer|creator|admin|owner|operator|maker|programmer)|I\\s+(work\\s+(for|at)|represent|am\\s+from)\\s+(OpenAI|Anthropic|Google\\s+DeepMind|Meta\\s+AI|Microsoft|the\\s+company\\s+that\\s+(made|created|built|trained)\\s+you)|I\\s+have\\s+(admin|root|developer|elevated|special|override|master|super|full)\\s+(access|privileges?|permissions?|authority|clearance|rights?))',
-        desc: 'False authority claims to establish trust for bypassing restrictions',
+          '(?i)(as\\s+your\\s+(developer|creator|programmer|engineer|designer|admin|administrator|owner|operator|maintainer)|I\\s+am\\s+(your|the|an?)\\s+(developer|creator|admin|owner|operator|maker|programmer)|I\\s+(work\\s+(for|at)|represent|am\\s+from)\\s+(OpenAI|Anthropic|Google\\s+DeepMind|Meta\\s+AI|Microsoft|the\\s+company\\s+that\\s+(made|created|built|trained)\\s+you)|I\\s+have\\s+(admin|root|developer|elevated|special|override|master|super|full)\\s+(access|privileges?|permissions?|authority|clearance|rights?))',
+        desc: 'False authority claims to establish trust for bypassing restrictions (v2 \u2014 the article in the as-a-role branch was narrowed from your/the/a to your only. "as the Admin" is how administration documentation refers to the reader\'s own role and FP\'d on benign workspace-admin skills, whereas an impersonation attempt addresses the agent and claims to be its developer. The first-person I-am branch is unchanged and still covers the-role phrasing, and the as-your-developer true_positive is unaffected)',
       },
       {
         field: 'user_input',
@@ -437,8 +441,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)\\b(opposite\\s+mode|anti-?policy|bypass\\s+(the\\s+)?(content|safety|ethical|output)\\s+(filter|policy|guidelines?|rules?|restrictions?)|token\\s+smuggling|prompt\\s+leak(ing|age)?|guard\\s*rail\\s+(evasion|bypass|removal)|safety\\s+(bypass|override|removal|disable|circumvent)|content\\s+filter\\s+(bypass|evasion|circumvention|workaround))\\b',
-        desc: 'Explicit filter bypass and evasion terminology',
+          '(?i)\\b(opposite\\s+mode|anti-?policy|bypass\\s+(the\\s+)?(content|safety|ethical|output)\\s+(filter|policy|guidelines?|rules?|restrictions?)|token\\s+smuggling|guard\\s*rail\\s+(evasion|bypass|removal)|safety\\s+(bypass|override|removal|disable|circumvent)|content\\s+filter\\s+(bypass|evasion|circumvention|workaround))\\b',
+        desc: 'Explicit filter bypass and evasion terminology (v2 \u2014 dropped the bare prompt-leak noun. That is the name of a technique rather than an attempt to perform it, and it matched a benign AI-safety review skill that legitimately discusses the technique by name. The remaining terms all describe an action being taken; no true_positive relied on the dropped noun)',
       },
       {
         field: 'user_input',
@@ -638,20 +642,20 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)\\{\\s*["\']?(role|system_prompt|system_message|system_instruction|system_content|system|persona|identity|character)["\']?\\s*:\\s*["\']?',
-        desc: 'JSON-formatted system role injection',
+          '(?i)(?:\\{\\s*["\']?role["\']?\\s*:\\s*["\']?system["\']?\\s*(?:[,}][\\s\\S]{0,160}?|(?:\\S[\\s\\S]{0,159}?)?)(?:ignore\\b|disregard\\b|override\\b|bypass\\b|disable\\b|unrestricted\\b|jailb?reak\\b|without\\s+(?:restrictions?|filters?|safety|limits?)|no\\s+(?:safety|restrictions?|filters?|guidelines?)|new\\s+instructions?\\b)|\\{\\s*["\']?(?:system_prompt|system_message|system_instruction|system_content)["\']?\\s*:\\s*["\']?)',
+        desc: 'JSON-formatted system role injection (v2 \u2014 a bare role-key opener is the standard chat-completions message shape and appeared in 11 benign LLM-integration skills. The role branch now requires the value to actually be system AND an override phrase within the same message object, which is what separates an injected system turn from an ordinary API example; the explicit system_prompt / system_message keys still fire alone. The system-role true_positive is unaffected because its content carries an override phrase. Dropped the bare persona / identity / character keys, which carry no override semantics on their own)',
       },
       {
         field: 'user_input',
         pattern:
-          '(?i)(#{1,3})\\s*(system|admin|root|master|instruction)\\s+(prompt|override|directive)\\b',
-        desc: 'Markdown header declaring a system-prompt override (requires an override-indicative noun; benign doc headings like "# System Requirements" no longer match)',
+          '(?i)(#{1,3})\\s*(system|admin|root|master|instruction)\\s+(override|directive)\\b',
+        desc: 'Markdown header declaring a system-prompt override (v3 \u2014 dropped the \'prompt\' noun. A "System Prompt" markdown heading is ordinary documentation and matched benign skills that document their own prompt; only the override/directive nouns carry attack semantics. The System-Override true_positive is unaffected because it uses the override noun, and a genuine new-system-prompt injection is still caught by the first condition. v2 \u2014 requires an override-indicative noun; benign doc headings like "# System Requirements" no longer match)',
       },
       {
         field: 'user_input',
         pattern:
-          '(?i)(the\\s+)?(above|previous|original|old|prior|initial|default|existing|current|given)\\s+(system\\s+)?(prompt|instructions?|message|guidelines?|directives?|configuration|rules?)\\s+(is|are|was|were|has\\s+been|have\\s+been|should\\s+be)\\s+(deprecated|invalid|outdated|replaced|revoked|cancelled|superseded|overridden|void|nullified|expired|incorrect|wrong|fake|false|a\\s+test|not\\s+(real|valid|correct|applicable))',
-        desc: 'Claims that the existing system prompt is invalid or deprecated',
+          '(?i)(?<!assume\\s)(?<!assuming\\s)(the\\s+)?(above|previous|original|old|prior|initial|default|existing|current|given)\\s+(system\\s+)?(prompt|instructions?|message|guidelines?|directives?|configuration|rules?)\\s+(is|are|was|were|has\\s+been|have\\s+been|should\\s+be)\\s+(deprecated|invalid|outdated|replaced|revoked|cancelled|superseded|overridden|void|nullified|expired|incorrect|wrong|fake|false|a\\s+test|not\\s+(real|valid|correct|applicable))',
+        desc: "Claims that the existing system prompt is invalid or deprecated (v2 \u2014 added a negation guard. A benign context-engineering skill tells the agent not to assume the user's existing instructions are wrong, and the old pattern matched the negated clause as if it were the assertion. The guard only suppresses the assume / assuming framing, so a direct claim still fires and no true_positive is affected)",
       },
       {
         field: 'user_input',
@@ -674,13 +678,13 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)(config|configuration|settings?|params|parameters)\\s*[=:]\\s*\\{[^}]{0,200}(role|system|instructions?|persona|behavior|safety|filter|restriction|guardrail)\\s*[=:]',
-        desc: 'Configuration object injection with system-related keys',
+          '(?i)(config|configuration|settings?|params|parameters)\\s*[=:]\\s*\\{[^}]{0,200}(safety|filter|restriction|guardrail|moderation|content_policy|censor)\\w*\\s*[=:]\\s*["\']?(?:false|off|none|null|0|disabled?|bypass|ignore)\\b',
+        desc: "Configuration object injection that disables a safety control (v2 \u2014 the old form matched any config object containing a 'system'/'role'/'instructions' key, which is the shape of every legitimate LLM SDK call and FP'd on benign skills passing systemInstruction to a provider config. It now requires a safety-control key assigned a disabling value, which is the actual attack; no true_positive relied on the broad form)",
       },
       {
         field: 'user_input',
         pattern:
-          '(?i)(---+|===+|\\*\\*\\*+|~~~+)\\s*(system|instruction|override|admin|configuration|new\\s+prompt)\\s*(---+|===+|\\*\\*\\*+|~~~+)',
+          '(?i)(---|===|\\*\\*\\*|~~~)\\s*(system|instruction|override|admin|configuration|new\\s+prompt)\\s*(---|===|\\*\\*\\*|~~~)',
         desc: 'Multi-line delimiter formats (YAML frontmatter, horizontal rules) framing system sections',
       },
       {
@@ -856,32 +860,32 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_response',
         pattern:
-          '(?i)(\\brm\\s+-[rRf]{1,3}[\\s/]|\\bmkfs\\b|\\bdd\\s+if=|\\bformat\\s+[a-z]:|\\bdeltree\\b|\\bshred\\s+-|\\bwipefs\\b|\\bfdisk\\b.*--delete|:\\(\\)\\s*\\{\\s*:\\|:\\s*&\\s*\\})',
-        desc: 'Destructive filesystem commands including fork bombs',
+          '(?i)(\\brm\\s+-[rRf]{1,3}\\s+(--no-preserve-root|/[\\s*]|/$|~[\\s/])|\\bmkfs\\b|\\bdd\\s+if=[^\\n|;]{0,80}of=\\s*/dev/|\\bformat\\s+[a-z]:|\\bdeltree\\b|\\bshred\\s+-|\\bwipefs\\b|\\bfdisk\\b.*--delete|:\\(\\)\\s*\\{\\s*:\\|:\\s*&\\s*\\})',
+        desc: 'Destructive filesystem commands including fork bombs (rm -rf narrowed to root/home targets; benign rm -rf <dir> no longer fires). dd narrowed to writes onto a raw /dev/ device (of=/dev/...) \u2014 benign forensic imaging that reads a device INTO a file no longer fires',
       },
       {
         field: 'tool_response',
         pattern:
-          '(?i)(\\bbash\\s+-[ci]|\\bsh\\s+-c|\\bzsh\\s+-c|\\bcmd(\\.exe)?\\s*/[ck]|\\bpowershell(\\.exe)?\\s+-(e(nc(odedcommand)?)?|c(ommand)?|nop|w\\s+hidden|ep\\s+bypass)|\\bpwsh\\s+-(e|c)|\\bpython[23]?\\s+-c|\\bruby\\s+-e|\\bperl\\s+-e|\\bnode\\s+-e|\\bphp\\s+-r)',
-        desc: 'Command execution through various interpreters',
+          '(?i)(\\bpowershell(\\.exe)?\\s+-(e(nc(odedcommand)?)?\\s+[A-Za-z0-9+/]{16,}|w(indowstyle)?\\s+hidden|ep\\s+bypass|exec(utionpolicy)?\\s+bypass)|\\bpwsh\\s+-enc)',
+        desc: 'PowerShell AV-evasion flags: -EncodedCommand <base64>, -WindowStyle hidden, -ExecutionPolicy bypass. Benign flags (-NoProfile) and bare cmd /c dropped; generic Unix interpreters covered by the reverse-shell/python/node layers',
       },
       {
         field: 'tool_response',
         pattern:
-          '(?i)(\\bnc\\s+-(e|c|l)\\s|\\bncat\\s|\\bnetcat\\s|/dev/tcp/|\\bbash\\s+-i\\s+>&\\s*/dev/tcp|\\bmkfifo\\b.{0,40}\\bnc\\b|\\bsocat\\b.{0,40}(exec|pty|tcp)|\\brm\\s+/tmp/f\\s*;)',
-        desc: 'Unix reverse shell patterns (netcat, bash, socat, fifo)',
+          '(?i)(\\bnc\\s+-(e|c|l)\\s|\\bncat\\s+-|/dev/tcp/|\\bbash\\s+-i\\s+>&\\s*/dev/tcp|\\bmkfifo\\b.{0,40}\\bnc\\b|\\bsocat\\b.{0,40}(exec|pty|tcp)|\\brm\\s+/tmp/f\\s*;)',
+        desc: "Unix reverse shell patterns (bash /dev/tcp, socat exec, fifo). netcat/ncat tightened to a flagged invocation (ncat -...) \u2014 the bare English word 'Netcat'/'Ncat' in pentest prose no longer fires",
       },
       {
         field: 'tool_response',
         pattern:
-          '(?i)(curl|wget|fetch|lwp-download|aria2c|invoke-webrequest|iwr|Invoke-RestMethod|irm)\\s+[^|]{0,200}\\|\\s*(bash|sh|zsh|python[23]?|perl|ruby|node|powershell|pwsh|cmd|source)',
-        desc: 'Download-and-execute via pipe to shell interpreter',
+          '(?i)(curl|wget|fetch|lwp-download|aria2c|invoke-webrequest|iwr|Invoke-RestMethod|irm)\\s+[^|]{0,200}(https?://\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|http://(?!localhost|127\\.|0\\.0\\.0\\.0|\\[::1\\])|@)[^|]{0,120}\\|\\s*(bash|sh|zsh|python[23]?|perl|ruby|node|powershell|pwsh|cmd|source)',
+        desc: 'Download-and-execute pipe to shell, narrowed to malicious-leaning sources (raw IP, plain external http://, or userinfo@ URL). Benign https://official-domain installer pipes, http://localhost health-check/deploy pipes, and shell-variable-authenticated API calls piped to a parser no longer auto-block (dual-use idioms)',
       },
       {
         field: 'tool_response',
         pattern:
-          '\\$\\(\\s*[^)]{0,300}(curl|wget|nc|ncat|bash|python|perl|ruby|eval|exec|sh\\s+-c|base64\\s+-d)',
-        desc: '$(...) command substitution containing dangerous commands',
+          '(?i)(\\$\\(\\s*[^)]{0,200}(curl|wget|fetch)[^)]{0,80}\\|\\s*(bash|sh|zsh|python[23]?|perl|ruby)|\\$\\(\\s*[^)]{0,120}(\\bnc\\s|\\bncat\\s|/dev/tcp|base64\\s+-d|\\beval\\s))',
+        desc: '$(...) command substitution containing download-pipe-to-shell or reverse-shell/base64/eval. Bare $(python ...)/$(bash ...) dropped \u2014 indistinguishable from normal shell scripting',
       },
       {
         field: 'tool_response',
@@ -903,44 +907,44 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_response',
         pattern:
-          '(?i)(\\bchmod\\s+[ugo]*[+][sS]|\\bchmod\\s+[2467][0-7]{3}\\b|\\bchown\\s+(root|0)\\b|\\bsetuid\\b|\\bSUID\\b|\\bsudo\\s+-[SsinuHbEA]|\\bsudo\\s+[a-zA-Z/]|\\bpkexec\\b|\\bdoas\\b|\\brunuser\\b|\\bsu\\s+-\\s|\\bsu\\s+root)',
-        desc: 'Privilege escalation commands (setuid/setgid via 4-digit octal with special bits, sudo, chown root)',
+          '(?i)(\\bchmod\\s+[ugo]*[+][sS]\\b|\\bchmod\\s+[2467][0-7]{3}\\b|\\bchown\\s+(root|0)\\b|\\bsetuid\\s*\\(|\\bpkexec\\b|\\bdoas\\s|\\bsu\\s+root\\b)',
+        desc: 'Privilege escalation via setuid/setgid bit, chown root, pkexec/doas, su root. Bare sudo/su-flags dropped \u2014 dual-use (sudo apt install etc. is normal in tool output)',
       },
       {
         field: 'tool_response',
         pattern:
-          '(?i)(\\bIEX\\s*\\(|\\bInvoke-Expression|\\bInvoke-Command|\\bInvoke-WmiMethod|\\b-EncodedCommand\\b|\\bNew-Object\\s+Net\\.WebClient|\\bDownloadString\\s*\\(|\\bDownloadFile\\s*\\(|\\bStart-Process\\b.{0,60}\\b-Verb\\s+RunAs|\\bSet-MpPreference\\s+-Disable|\\bAdd-MpPreference\\s+-ExclusionPath|\\bNet\\.Sockets\\.TCPClient)',
+          '(?i)(\\bIEX\\s*\\(|\\bInvoke-Expression|\\bInvoke-Command|\\bInvoke-WmiMethod|\\b-EncodedCommand\\b|\\bNew-Object\\s+Net\\.WebClient|\\bDownloadString\\s*\\(\\s*[\'\\"]?https?://|\\bDownloadFile\\s*\\(\\s*[\'\\"]?https?://|\\bStart-Process\\b.{0,60}\\b-Verb\\s+RunAs|\\bSet-MpPreference\\s+-Disable|\\bAdd-MpPreference\\s+-ExclusionPath|\\bNet\\.Sockets\\.TCPClient)',
         desc: 'PowerShell-specific attack patterns (IEX, download cradles, AV bypass)',
       },
       {
         field: 'tool_response',
         pattern:
-          '(?i)(python[23]?\\s+-c\\s+[\'"]import\\s+(socket|subprocess|os|pty)|import\\s+socket\\s*;\\s*import\\s+subprocess|socket\\.socket\\(socket\\.AF_INET|os\\.(popen|system|exec[lv]p?)\\s*\\(|subprocess\\.(call|run|Popen|check_output)\\s*\\(.{0,60}(sh|bash|cmd|powershell)|pty\\.spawn\\s*\\()',
-        desc: 'Python reverse shells and dangerous code execution patterns',
+          '(?i)(python[23]?\\s+-c\\s+[\'"]import\\s+(socket|subprocess|os|pty)|import\\s+socket\\s*;\\s*import\\s+subprocess|socket\\.socket\\(socket\\.AF_INET|os\\.(popen|system|exec[lv]p?)\\s*\\(\\s*[^)]{0,140}(\\||;|\\$\\(|&&|\\bcurl\\b|\\bwget\\b|/dev/tcp|bash\\s+-i|/bin/(ba)?sh\\b)|subprocess\\.(call|run|Popen|check_output)\\s*\\(.{0,60}[\'"/](sh|bash|zsh|cmd(\\.exe)?|powershell)\\b|pty\\.spawn\\s*\\()',
+        desc: "Python reverse shells and dangerous code execution. os.system/os.popen/os.exec narrowed to arguments carrying a shell-injection indicator (pipe, semicolon, command substitution, curl/wget, /dev/tcp, bash -i, /bin/sh) \u2014 bare os.system('clear')/os.popen('git ...') and semgrep pattern-references no longer fire. subprocess shell match requires a quoted or path-prefixed shell literal (\"bash\", '/bin/sh', \"cmd.exe\") \u2014 the bare metavariable/variable names $CMD and cmd, 'shell=False', and '/tmp/screenshot' no longer match",
       },
       {
         field: 'tool_response',
         pattern:
-          '(?i)(require\\s*\\(\\s*[\'"]child_process[\'"]\\s*\\)|child_process\\.exec(Sync)?\\s*\\(|require\\s*\\(\\s*[\'"]net[\'"]\\s*\\).{0,100}connect|new\\s+net\\.Socket\\s*\\(|process\\.mainModule\\.require)',
-        desc: 'Node.js reverse shells and child_process command execution',
+          '(?i)(require\\s*\\(\\s*[\'"]child_process[\'"]\\s*\\)\\s*\\.\\s*(exec|execSync|spawn|spawnSync)|child_process\\.exec(Sync)?\\s*\\(\\s*[^)]{0,140}(\\||;|\\$\\(|`|&&|\\bcurl\\b|\\bwget\\b|/dev/tcp|/bin/(ba)?sh\\b|\\bnc\\s+-)|require\\s*\\(\\s*[\'"]net[\'"]\\s*\\).{0,100}connect|new\\s+net\\.Socket\\s*\\(|process\\.mainModule\\.require)',
+        desc: "Node.js reverse shells and child_process command execution. require('child_process') narrowed to an immediately-chained .exec/.spawn (a bare import for benign tooling no longer fires); child_process.exec(...) narrowed to a shell-injection indicator in the argument (pipe, semicolon, command-substitution/backtick, curl/wget, /dev/tcp, /bin/sh, nc) \u2014 benign fixed-command execs like exec('tsserver')/execSync('npm test') no longer fire",
       },
       {
         field: 'tool_response',
         pattern:
-          '(?i)(ignore\\s+(all\\s+)?(previous|prior|your)\\s+(instructions?|rules?|guidelines?|prompts?)|you\\s+are\\s+now\\s+(a|an|the)|new\\s+system\\s+(prompt|instructions?)\\s*:|disregard\\s+(all\\s+)?(previous|prior|your)|override\\s+(all\\s+)?(previous|prior|your|the)\\s+(instructions?|rules?|safety)|from\\s+now\\s+on,?\\s+you\\s+(are|will|must|should))',
+          '(?i)(ignore\\s+(all\\s+)?(previous|prior|your)\\s+(instructions?|rules?|guidelines?|prompts?)|you\\s+are\\s+now\\s+(a|an|the)\\s+(admin|root|developer|dan\\b|unrestricted|unfiltered|jailbroken|different|new\\s+(ai|assistant|persona|model|bot)|evil|malicious|rogue|hacker|god)|new\\s+system\\s+(prompt|instructions?)\\s*:|disregard\\s+(all\\s+)?(previous|prior|your)|override\\s+(all\\s+)?(previous|prior|your|the)\\s+(instructions?|rules?|safety)|from\\s+now\\s+on,?\\s+you\\s+(are|will|must|should))',
         desc: 'Prompt injection payloads embedded in tool response content',
       },
       {
         field: 'tool_response',
         pattern:
-          '(?i)(curl\\s+(-X\\s+POST\\s+)?[^|]*\\s+(-d|--data|--data-binary|--data-raw)\\s+.{0,60}(env|password|secret|token|key|credential|session)|wget\\s+--post-(data|file)|\\bexfiltrat|send.{0,30}(to|via|through).{0,30}(webhook|endpoint|server|url|http))',
-        desc: 'Data exfiltration commands and patterns in tool response',
+          '(?i)(curl|wget)\\s+[^|\\n]{0,140}\\$\\(\\s*(cat\\s+[^)]{0,80}(\\.ssh|\\.aws|id_rsa|id_ed25519|\\.pem|/etc/passwd|/etc/shadow|credentials|\\.env)|(env|printenv|security\\s+find-generic|aws\\s+configure\\s+get)\\b)',
+        desc: "Data exfiltration: a download tool reading secrets via command substitution ($(cat ~/.aws/credentials|~/.ssh/id_rsa|.env|/etc/shadow), $(env), $(printenv)) into an outbound request. cat narrowed to well-known secret paths \u2014 reading a service's own API token file for that service's Authorization header (e.g. curl -H 'Bearer $(cat ~/.cache/.../token)') no longer fires. Prose branches (send-to-webhook, bare 'exfiltrate') already dropped",
       },
       {
         field: 'tool_response',
         pattern:
-          '(?i)(\\bcrontab\\s+-[elr]|echo\\s+.{0,100}>>\\s*/etc/cron|\\bat\\s+-f\\b|\\bschtasks\\s+/create|\\bRegister-ScheduledTask|\\blaunchctl\\s+load|\\bsystemctl\\s+enable)',
-        desc: 'Persistence mechanisms via scheduled tasks or cron jobs',
+          '(?i)(echo\\s+.{0,100}>>\\s*/etc/cron|\\bcrontab\\s+.{0,60}(curl|wget|/tmp/|bash\\s+-i|http)|\\bat\\s+-f\\b|\\bschtasks\\s+/create\\b|\\bRegister-ScheduledTask\\b|\\blaunchctl\\s+load)',
+        desc: "Persistence: writing to /etc/cron, crontab loading a remote/tmp payload, schtasks/ScheduledTask creation, launchctl load. Benign systemctl enable and bare crontab -e/-l dropped (normal service management). Dropped /dev/ from the crontab branch \u2014 it matched the standard '(crontab -l 2>/dev/null; echo job) | crontab -' add-a-job idiom on the 2>/dev/null redirect",
       },
     ],
   },
@@ -1038,19 +1042,19 @@ export const ATR_RULES_COMPILED = [
     severity: 'high',
     category: 'tool-poisoning',
     scan_target: 'mcp',
-    rule_version: 2,
+    rule_version: 3,
     patterns: [
       {
         field: 'tool_args',
         pattern:
-          '(\\.\\.[\\/\\\\]){2,}|\\.\\.[\\/\\\\][^\\s]*[\\/\\\\](etc|proc|root|sys|var|home|tmp|boot|dev|usr|opt|passwd|shadow|hosts)[\\/\\\\]?|~[\\/\\\\]\\.\\.[\\/\\\\]',
-        desc: 'Path traversal sequences targeting sensitive directories',
+          '(\\.\\.[\\/\\\\]){4,}|\\.\\.[\\/\\\\][^\\s"\'`]{0,60}[\\/\\\\](etc|proc|root|boot|passwd|shadow|hosts)[\\/\\\\]?|~[\\/\\\\]\\.\\.[\\/\\\\]',
+        desc: "Path traversal that either goes 4+ levels up or lands on a sensitive root (v3 tightened, strict subset of v2). v2's bare `(\\.\\./){2,}` fired on every markdown relative link (`](../../CONNECTORS.md)`) \u2014 147 of its 155 benign hits \u2014 and its target list included `var|home|tmp|dev|usr|opt|sys`, which are ordinary directory names in a RELATIVE source path (`../figma-use/references/var`). Both were removed; the traversal-to-sensitive-root form and `~/../` are kept.",
       },
       {
         field: 'tool_args',
         pattern:
-          '(;|&&|\\|\\|)\\s*(?:sudo\\s+)?(?:curl\\s+(?:-\\S+\\s+)*[\'"]?https?://(?!localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0)|wget\\s+(?:-\\S+\\s+)*[\'"]?https?://(?!localhost|127\\.)|\\bnc\\b\\s+-?[a-z0-9]|ncat\\s+\\S|\\b(?:ba)?sh\\s+-[ic]|python[0-9]?\\s+-c|perl\\s+-e|ruby\\s+-e|node\\s+-e|\\beval\\s|rm\\s+-[rf]|cat\\s+/etc/(?:passwd|shadow|sudoers)|whoami|\\bid\\b\\s*(?:;|&|\\||$)|uname\\s+-a|base64\\s+(?:-d|--decode)|ifconfig|>&\\s*/dev/tcp)|[$`]\\([^)`]{0,80}(?:curl|wget|\\bnc\\b|\\bbash\\b|\\bsh\\s+-|whoami|\\bid\\b|base64\\s+-d|/etc/(?:passwd|shadow))',
-        desc: 'Shell metacharacter chained to a genuinely dangerous command \u2014 external network fetch, pipe-to-shell / interpreter one-liner, recon (whoami/id/uname -a), or sensitive-file read (v2 tightened; legit build chains like "npm i && bash setup.sh", "&& python -m pytest", "| jq" no longer fire)',
+          '(;|&&|\\|\\|)\\s*(?:sudo\\s+)?(?:curl\\s+(?:-\\S+\\s+)*[\'"]?https?://(?!localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0)|wget\\s+(?:-\\S+\\s+)*[\'"]?https?://(?!localhost|127\\.)|\\bnc\\b\\s+-?[a-z0-9]|ncat\\s+\\S|\\b(?:ba)?sh\\s+-[ic]|python[0-9]?\\s+-c|perl\\s+-e|ruby\\s+-e|node\\s+-e|\\beval\\s+["\'$`(]|rm\\s+-[rf]{1,2}\\s+(?:-\\S+\\s+)*(?:/\\s|/\\*|~|\\$HOME|\\*|/(?:etc|var|usr|home|root|bin|Users)\\b)|cat\\s+/etc/(?:passwd|shadow|sudoers)|whoami|\\bid\\b\\s*(?:;|&|\\||$)|uname\\s+-a|base64\\s+(?:-d|--decode)|ifconfig|>&\\s*/dev/tcp)|[$`]\\([^)`]{0,80}(?:\\bnc\\b|\\b(?:ba)?sh\\s+-[ic]|whoami|base64\\s+-d|/etc/(?:passwd|shadow))',
+        desc: 'Shell metacharacter chained to a genuinely dangerous command \u2014 external network fetch, pipe-to-shell / interpreter one-liner, recon (whoami/uname -a), or sensitive-file read. v2 tightened the `;|&&|||` branch (legit build chains like "npm i && bash setup.sh" no longer fire). v3 is a further strict subset: (a) the command-substitution branch drops `\\bid\\b` (matched the identifier `Id` in `$(aws ... --query \'Accounts[*].Id\')` and `${trade.id}`), `\\bbash\\b` (matched `$(gh completion -s bash)`), `\\bsh\\s+-` (matched the filename in `$(scripts/filter-sessions.sh -x)`) and `curl|wget` (15 hits \u2014 `MODEL_ID=$(curl -fsS "$BASE_URL/v1/models")` is the ordinary capture-a-response idiom and carries no execution); (b) `rm\\s+-[rf]` now needs a root/home/wildcard target, because `&& rm -rf ./skills/my-skill` is normal cleanup; (c) `\\beval\\s` now needs an actual argument, because it matched the prose "**uv**; eval deps:".',
       },
       {
         field: 'tool_name',
@@ -1067,50 +1071,50 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_args',
         pattern:
-          '(?i)(\'\\s*(OR|AND|UNION)\\s+[\'"]?\\d|"\\s*(OR|AND|UNION)\\s+[\'"]?\\d|\\b(UNION\\s+(ALL\\s+)?SELECT|INSERT\\s+INTO|UPDATE\\s+.*\\s+SET|DELETE\\s+FROM|DROP\\s+(TABLE|DATABASE)|ALTER\\s+TABLE|EXEC(UTE)?\\s+|xp_cmdshell)\\b|;\\s*(DROP|DELETE|INSERT|UPDATE|ALTER|EXEC)\\b)',
-        desc: 'SQL injection patterns in tool parameters',
+          '(?i)([\'"]\\s*(OR|AND)\\s+[\'"]?\\d+\\s*[\'"]?\\s*(=|<|>|--|\\)|;|\\bLIKE\\b)|[\'"]\\s*(UNION\\s+(ALL\\s+)?SELECT|INSERT\\s+INTO|DELETE\\s+FROM|UPDATE\\s+\\w{1,64}\\s+SET|DROP\\s+(TABLE|DATABASE)|ALTER\\s+TABLE)\\b[^\\n]{0,160}(--|\\/\\*)|\\bUNION\\s+(ALL\\s+)?SELECT\\b|\\bxp_cmdshell\\b|;\\s*(DROP\\s+(TABLE|DATABASE)|DELETE\\s+FROM|INSERT\\s+INTO|UPDATE\\s+\\w{1,64}\\s+SET|ALTER\\s+TABLE|EXEC(UTE)?\\s+(xp_|sp_))\\b)',
+        desc: 'SQL injection in a tool parameter: quote-break tautology, quote-break followed by a DML/DDL statement, UNION SELECT, xp_cmdshell, or a stacked statement after `;`. v3 is a strict subset of v2. v2 matched BARE SQL keywords, which is not injection \u2014 `EXEC(UTE)?\\s+` matched the English word "execute " (\u2248864 of its 1,139 benign hits, e.g. "you execute them automatically"), and `UPDATE\\s+.*\\s+SET` had an unbounded `.*` that spans a whole JSON-encoded document (src/hook-handler.ts encodes a newline as the two characters \\ and n, so `.` never stops). Bare INSERT INTO / DELETE FROM / ALTER TABLE / DROP TABLE now require a quote-break AND a SQL comment terminator, or a stacked `;` in front. The tautology branch additionally requires a comparison or terminator after the digit: v2\'s `["\']\\s*(OR|AND)\\s+["\']?\\d` matched ordinary English \u2014 `"Cinematic braam, horror" or "8-bit retro jump sound"`, `period: "30d" or "7d"`, `choose 0.3" or 0.5" gaps`.',
       },
       {
         field: 'tool_args',
         pattern:
-          '(?i)(\\$\\{?\\w*(KEY|TOKEN|SECRET|PASSWORD|PASS|PWD|CREDENTIAL|AUTH|API_KEY|ACCESS_KEY|PRIVATE)\\w*\\}?|process\\.env\\.|os\\.environ|System\\.getenv|ENV\\[|getenv\\s*\\()',
-        desc: 'Attempts to extract environment variables containing secrets',
+          '(?i)(\\$\\{?\\w*(SECRET|CREDENTIAL|ACCESS_KEY|PRIVATE|PASSWORD|PASSWD)\\w*\\}?|(process\\.env\\.|os\\.environ\\s*[\\[\\.]\\s*\\\\?[\'"]?|System\\.getenv\\s*\\(\\s*\\\\?[\'"]?|getenv\\s*\\(\\s*\\\\?[\'"]?|ENV\\[\\s*\\\\?[\'"]?)\\w*(SECRET|CREDENTIAL|ACCESS_KEY|PRIVATE|PASSWORD|PASSWD)\\w*|(dict|list|str|json\\.dumps|pprint|print)\\s*\\(\\s*os\\.environ|os\\.environ\\.(items|copy|keys|values)\\s*\\()',
+        desc: 'Reference to a secret-bearing environment variable, or a wholesale dump of the environment. v3 is a strict subset of v2. v2 fired on the language construct alone \u2014 `process.env.` (167 benign hits), `os.environ` (51), `System.getenv` (12), `getenv(` (7) \u2014 and on the generic words KEY|TOKEN|PASS|PWD|AUTH, which match `$HF_TOKEN`, `${token}`, `$ai_input_tokens`, `${BRAVE_SEARCH_API_KEY}`: every integration doc on earth reads an API key from the environment, so those forms carry no attack signal. The env-reading constructs now have to name a secret-bearing variable, and a whole-environment dump (dict(os.environ), os.environ.items()) fires on its own. RESIDUAL BY DESIGN: bare `${OPENAI_API_KEY}` / `$GITHUB_TOKEN` references no longer fire here \u2014 see the dedicated exfiltration rules ATR-2026-00115, ATR-2026-01892, ATR-2026-02262, which require an egress sink.',
       },
       {
         field: 'tool_args',
         pattern:
-          '(?i)([\\/\\\\](etc[\\/\\\\](passwd|shadow|sudoers|ssh[\\/\\\\]|ssl[\\/\\\\])|proc[\\/\\\\](self[\\/\\\\]|\\d+[\\/\\\\])(environ|cmdline|maps|fd)|root[\\/\\\\]\\.(bash_history|ssh)|\\.env|\\.git[\\/\\\\]config|\\.aws[\\/\\\\]credentials|\\.ssh[\\/\\\\](id_rsa|authorized_keys)|wp-config\\.php|\\.htpasswd|\\.netrc|\\.pgpass))',
-        desc: 'Access to known sensitive files (credentials, config, keys)',
+          '(?i)([\\/\\\\](etc[\\/\\\\](passwd|shadow|sudoers|ssh[\\/\\\\]|ssl[\\/\\\\])|proc[\\/\\\\](self[\\/\\\\]|\\d+[\\/\\\\])(environ|cmdline|maps|fd)|root[\\/\\\\]\\.(bash_history|ssh)|\\.git[\\/\\\\]config|\\.aws[\\/\\\\]credentials|\\.ssh[\\/\\\\](id_rsa|authorized_keys)|wp-config\\.php|\\.htpasswd|\\.netrc|\\.pgpass)|(\\.\\.[\\/\\\\]){2,}[^\\s"\'`]{0,40}\\.env\\b)',
+        desc: "Access to known sensitive files (credentials, config, keys). v3 is a strict subset of v2: the bare `[\\/\\\\]\\.env` alternative (42 of v2's 65 benign hits) now requires a 2+ level traversal in front, because `./.env`, `assets/.env.example`, `~/.env` and `docker compose --env-file ../.env` are how every project documents and wires its own configuration.",
       },
       {
         field: 'tool_args',
         pattern:
-          '(\\{\\{.*?(config|self|request|__class__|__builtins__|__import__|lipsum|cycler|joiner|namespace).*?\\}\\}|\\$\\{.*?(Runtime|ProcessBuilder|getClass|forName|exec).*?\\}|<%.*?(Runtime|exec|system|eval).*?%>)',
-        desc: 'Server-side template injection (Jinja2, Java EL, JSP)',
+          '(\\{\\{[^{}]{0,120}((config|self|request)\\s*[\\.\\[]\\s*\\\\?[\'"]?_|__class__|__builtins__|__import__|lipsum|cycler|joiner|namespace)[^{}]{0,120}\\}\\}|\\$\\{[^{}]{0,100}(Runtime|ProcessBuilder|getClass|forName)[^{}]{0,100}\\}|<%[^%]{0,120}(Runtime|exec|system|eval)[^%]{0,120}%>)',
+        desc: "Server-side template injection (Jinja2, Java EL, JSP). v3 is a strict subset of v2: v2's unbounded lazy `.*?` gaps let a match start at a JavaScript template literal (`${config.name}`) and run forward across a whole JSON-encoded document until it found the literal word \"exec\" and any later closing brace \u2014 349 of its 372 benign hits came from the `pre-tool-json-arg` shape for exactly that reason. The gaps are now brace-bounded and length-bounded, and `exec` is dropped from the `${...}` branch (Java EL RCE still matches on Runtime / ProcessBuilder / getClass / forName). `config` / `self` / `request` also have to be followed by an attribute access into a dunder \u2014 bare `{{ github.event.pull_request.title }}`, `{{config_file}}`, `{{ config(materialized='view') }}` (dbt) and `{{.Config.User}}` (Docker Go template) are template placeholders, not Jinja2 sandbox escapes.",
       },
       {
         field: 'tool_args',
         pattern:
-          '(?i)(O:\\d+:\\s*"|a:\\d+:\\s*\\{|rO0ABX|aced0005|\\{\\s*"__type"\\s*:|\\{\\s*"\\$type"\\s*:|yaml\\.unsafe_load|pickle\\.loads|unserialize\\s*\\(|Marshal\\.load|ObjectInputStream)',
-        desc: 'Serialized object injection (PHP, Java, Python pickle, YAML, .NET)',
+          '(?i)(O:\\d+:\\s*"|a:\\d+:\\s*\\{|rO0ABX|aced0005|\\{\\s*"__type"\\s*:|yaml\\.unsafe_load|pickle\\.loads|unserialize\\s*\\(|Marshal\\.load|ObjectInputStream)',
+        desc: 'Serialized object injection (PHP, Java, Python pickle, YAML, .NET). v3 is a strict subset of v2: `{"$type":` is dropped \u2014 the W3C Design Tokens format uses `"$type"` as an ordinary schema key, so it is not evidence of .NET TypeNameHandling deserialization on its own.',
       },
       {
         field: 'tool_args',
         pattern:
-          '(?i)(\\*\\)\\(|\\)\\(|\\|\\s*\\(|&\\s*\\(|\\(\\|\\(|\\(&\\().*?(objectClass|uid|cn|sn|mail|userPassword|memberOf)\\s*[=~<>]',
-        desc: 'LDAP filter injection patterns',
+          '(?i)(\\*\\)\\(|\\(\\|\\(|\\(&\\()[^()]{0,60}(objectClass|uid|cn|sn|userPassword|memberOf)\\s*[=~<>]',
+        desc: "LDAP filter injection patterns. v3 is a strict subset of v2. v2's anchors included a bare `\\)\\(`, `\\|\\s*\\(` and `&\\s*\\(` \u2014 `require('stripe')('sk_...')`, `sequenceS(validation)({...})` and JSX `&& (` all match \u2014 and the following `.*?` was unbounded, so it ran across a whole JSON-encoded document to find any later `mail=` / `uid=`. The gap is now paren-bounded and length-bounded, only the three genuinely LDAP-shaped anchors remain, and the English word `mail` is dropped from the attribute list.",
       },
       {
         field: 'tool_args',
         pattern:
-          '(?i)(@|%40)(localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|internal|intranet|corp|private)|\\\\@(localhost|127)|url\\s*=\\s*[\'"]?(file|gopher|dict|ftp|ldap|tftp)://',
-        desc: 'URL manipulation to access internal resources via @ notation or exotic protocols',
+          '(?i)(https?|ftp|gopher|dict|ldap|tftp)://[^\\s/"\'<>]{0,120}(@|%40)(localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|internal|intranet|corp|private)|url\\s*=\\s*[\'"]?(file|gopher|dict|ftp|ldap|tftp)://',
+        desc: 'URL manipulation to access internal resources via @ userinfo notation or exotic protocols. v3 is a strict subset of v2: the `@host` form now has to sit inside an actual URL. v2 matched a bare `@localhost` / `@corp` / `@private` anywhere, i.e. the e-mail address `admin@localhost.com`, the npm scope `@private/auth-form` and the connection string `postgresql://user:pass@localhost:5432/db`.',
       },
       {
         field: 'tool_args',
         pattern:
-          '(?i)(\\*\\s*;|\\*\\s*&&|\\*\\s*\\|\\||\\bfind\\s+/\\s+-name|\\bfind\\s+/\\s+-exec|\\bxargs\\s+|\\bglob\\s*\\(.{0,20}\\*\\*)',
-        desc: 'Wildcard and glob patterns combined with shell execution',
+          '(?i)(\\bfind\\s+/\\s+-name|\\bfind\\s+/\\s+-exec|\\bxargs\\s+(-\\S+\\s+)*(rm|sh|bash|zsh|curl|wget|chmod|chown|dd|cat|base64|nc)\\b|\\*\\s*(;|&&|\\|\\|)\\s*(rm|curl|wget|sh|bash|nc|cat|python|perl|tar|zip|base64)\\b)',
+        desc: 'Wildcard / glob combined with an actually dangerous command. v3 is a strict subset of v2. v2 fired on `\\*\\s*;` (44 benign hits \u2014 any `**;` in markdown or code), on a bare `\\bxargs\\s+` (15 hits \u2014 `find . -name "*.py" | xargs grep -l` is ordinary shell), and on `glob(...**` (ordinary globbing in application code). The chain now has to end in a destructive/exfiltrating command.',
       },
       {
         field: 'tool_args',
@@ -1126,7 +1130,7 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'tool-poisoning',
     scan_target: 'mcp',
-    rule_version: 2,
+    rule_version: 4,
     patterns: [
       {
         field: 'tool_args',
@@ -1172,8 +1176,14 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_args',
         pattern:
-          '(?i)(https?://)?[a-zA-Z0-9-]+\\.(xip\\.io|nip\\.io|sslip\\.io|localtest\\.me|vcap\\.me|lvh\\.me|lacolhost\\.com|127\\.0\\.0\\.1\\.[a-z]+\\.\\w+)(:\\d+)?',
+          '(?i)(https?://)?[a-zA-Z0-9-]{1,63}\\.(xip\\.io|nip\\.io|sslip\\.io|localtest\\.me|vcap\\.me|lvh\\.me|lacolhost\\.com|127\\.0\\.0\\.1\\.[a-z]+\\.\\w+)(:\\d+)?',
         desc: 'DNS rebinding services that resolve to internal IPs',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)\\b(?:https?|wss?|ftp):(?:\\\\?/){2}(?:[^\\s/\\\\@"\'<>]{1,64}@)?(?:localtest\\.me|lvh\\.me|vcap\\.me|lacolhost\\.com)\\.?(?:[:/?#"\'\\s\\\\\\],;)>|]|$)',
+        desc: 'APEX loopback-wildcard domains used as a URL host. localtest.me, lvh.me, vcap.me and lacolhost.com resolve to 127.0.0.1 at the apex as well as on every subdomain, so a hostname-string SSRF denylist that does not resolve DNS lets https://localtest.me/admin reach loopback services (CVE-2026-55096, fast-mcp-telegram send_message files[]). The pattern above only covers the subdomain form; this one requires a URL scheme directly before the apex host (plain "//" or JSON-escaped "\\/\\/", optional userinfo, optional trailing dot) and then a host terminator character (: / ? # quote whitespace backslash ] , ; ) > |) or end of input, so prose mentions and look-alike hosts such as localtest.mesh.example.com, lvh.media, vcap.me.uk or lvh.me-cdn.net do not match. The terminator is consumed rather than asserted with a lookahead so the pattern stays RE2-portable. Known limitations (not covered): protocol-relative //localtest.me/admin with no scheme; other apex loopback domains such as localho.st or fuf.me; attacker-owned domains whose A record points at an internal IP (needs DNS resolution, not possible at the pattern layer). Known false positives: a developer reaching their own dev server through the lvh.me alias (curl http://lvh.me:3000/...), and a free-text search query that quotes the URL https://localtest.me - the existing subdomain condition above already flags app.lvh.me:3000, so this is consistent with it.',
       },
       {
         field: 'tool_args',
@@ -1184,8 +1194,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_args',
         pattern:
-          '(?i)(https?://)?\\[?(::1|::ffff:127\\.0\\.0\\.1|::ffff:10\\.|::ffff:172\\.(1[6-9]|2[0-9]|3[01])|::ffff:192\\.168|fc[0-9a-f]{2}:|fd[0-9a-f]{2}:)\\]?(:\\d+)?',
-        desc: 'IPv6 loopback, IPv4-mapped, and unique local addresses (fc/fd)',
+          '(?i)(?:^|[^0-9a-f:]|%5b)\\[?(?:(?:0{1,4}:){1,4}:|::|(?:0{1,4}:){5})ffff:(?:127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|10\\.|172\\.(?:1[6-9]|2[0-9]|3[01])\\.|192\\.168\\.)',
+        desc: 'IPv4-mapped IPv6 forms (::ffff:a.b.c.d, also written 0::ffff:, 0:0::ffff: or fully expanded 0:0:0:0:0:ffff:) of loopback (127/8) and RFC 1918 IPv4, an obfuscation that slips past filters written for dotted IPv4. The address must start the token (start of input, a character that is not a hex digit or colon, or a percent-encoded bracket %5B), so the suffix of a longer IPv6 address does not count. Known limits: a mapped address directly after a colon (unbracketed host:port:addr syntax such as curl --resolve x:80:::ffff:127.0.0.1) and a JSON-escaped bracket (\\u005b) are not matched; the hex form ::ffff:7f00:1, IPv4-compatible ::127.0.0.1 and NAT64 64:ff9b:: forms are left to ATR-2026-02868; ::ffff:0.0.0.0 and ::ffff:100.64.0.0/10 are not covered. Plain ::1 and unique local addresses (fc00::/7) are not matched, for the same reason plain localhost, 127.0.0.1 and RFC 1918 are not (see the v2 note in the description): a coding agent reaches its own dev server on [::1] and private services on ULA all the time. v3 matched both with no token boundary, so the tail of a public 6to4 address (2002:cb00:7101::1), ::10, and Oracle APEX URLs (:::190) matched as loopback.',
       },
       {
         field: 'tool_args',
@@ -1201,7 +1211,7 @@ export const ATR_RULES_COMPILED = [
     severity: 'high',
     category: 'context-exfiltration',
     scan_target: 'mcp',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'agent_output',
@@ -1253,7 +1263,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'agent_output',
         pattern:
-          '(?i)(?:do\\s+not|never|must\\s+not|cannot|should\\s+not).*(?:reveal|share|disclose|output|leak).*(?:system\\s+prompt|internal|instructions?|configuration)',
+          '(?i)(?:do\\s+not|never|must\\s+not|cannot|should\\s+not)[^\\n\\\\]{0,80}(?:reveal|share|disclose|output|leak)[^\\n\\\\]{0,80}(?:system\\s+prompt|internal|instructions?|configuration)',
         desc: 'Agent echoing its own non-disclosure rules',
       },
       {
@@ -1398,37 +1408,37 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:ignore|disregard|forget|override|overwrite)\\s+(?:all\\s+)?(?:your\\s+)?(?:previous|prior|above|earlier|existing)\\s+(?:instructions?|rules?|constraints?|guidelines?|prompt|directives?)',
-        desc: 'Instruction override attempt in inter-agent message',
+          '(?i)(?<!["\'`])(?:ignore|disregard|forget|override|overwrite)\\s+(?:all\\s+)?(?:your\\s+)?(?:previous|prior|above|earlier|existing)\\s+(?:instructions?|rules?|constraints?|guidelines?|prompt|directives?)',
+        desc: 'Instruction override attempt in inter-agent message (must be a live directive, not a quoted/listed mention in security docs \u2014 negative lookbehind excludes quote/backtick-prefixed occurrences)',
       },
       {
         field: 'content',
         pattern:
-          '(?i)\\[\\s*(?:SYSTEM|ADMIN|OVERRIDE|ROOT|SUDO|PRIORITY|URGENT)\\s*\\]|<<\\s*SYS\\s*>>|<\\|im_start\\|>system',
-        desc: 'Fake system-level message tags in agent communication',
+          '(?i)(?<!["\'`])(?<!:\\s)(?:\\[\\s*(?:OVERRIDE|ROOT|SUDO)\\s*\\]|<<\\s*SYS\\s*>>|<\\|im_start\\|>system)',
+        desc: 'Fake system-level message tags in agent communication (common benign labels [SYSTEM]/[ADMIN]/[PRIORITY]/[URGENT] dropped; kept override/root/sudo tags and chat-template markers). Negative lookbehinds require a live forged role marker: excludes quoted/backticked doc references and YAML/JSON mapping values (parent_ids: [root])',
       },
       {
         field: 'content',
         pattern:
-          '(?i)(?:new\\s+instructions?|updated\\s+(?:prompt|directive)|revised\\s+(?:rules?|orders?)|emergency\\s+(?:override|protocol))\\s*[:=]',
-        desc: 'Attempt to inject new instructions via agent messages',
+          '(?i)(?<!["\'`])(?:new\\s+instructions?|updated\\s+(?:prompt|directive)|revised\\s+(?:rules?|orders?)|emergency\\s+(?:override|protocol))\\s*[:=]',
+        desc: 'Attempt to inject new instructions via agent messages (live directive only; negative lookbehind excludes quoted/listed occurrences in prompt-injection detection docs)',
       },
       {
         field: 'content',
         pattern:
-          '(?i)(?:you\\s+are\\s+now|from\\s+now\\s+on|henceforth|going\\s+forward|effective\\s+immediately)\\s+(?:a|an|the)?\\s*(?:unrestricted|unfiltered|jailbroken)?\\s*[a-zA-Z]+\\s+(?:agent|assistant|bot)',
+          '(?i)(?:you\\s+are\\s+now|from\\s+now\\s+on|henceforth|going\\s+forward|effective\\s+immediately)\\s+(?:(?:a|an|the)\\s*)?(?:(?:unrestricted|unfiltered|jailbroken)\\s*)?[a-zA-Z]+\\s+(?:agent|assistant|bot)',
         desc: "Attempt to redefine target agent's identity or role",
       },
       {
         field: 'content',
         pattern:
-          "(?i)(?:do\\s+not|don'?t|never)\\s+(?:tell|inform|alert|notify|report|mention|log|record)\\s+(?:the\\s+)?(?:user|admin|orchestrator|supervisor|human|monitor)",
-        desc: 'Instruction to hide actions from oversight',
+          "(?i)(?:do\\s+not|don'?t|never)\\s+(?:tell|inform|alert|notify|report|mention|log|record)\\s+(?:the\\s+)?(?:user|admin|orchestrator|supervisor|human|monitor)(?!s?\\s+to\\b)(?!\\s+about\\s+(?:each|every|individual)\\b)",
+        desc: "Instruction to hide actions from oversight (excludes benign coaching form 'never tell users to <verb>' via the first negative lookahead; the second excludes output-verbosity control, 'do not tell the user about each|every|individual <step>', which scopes down per-item progress narration rather than concealing a fact \u2014 a report-building skill triggered this on 'Don't tell the user about each tool call as you make it'. Concealment form 'do not tell the user about <fact>' is kept)",
       },
       {
         field: 'content',
         pattern:
-          '(?i)(?:acting|speaking|operating)\\s+(?:on\\s+behalf\\s+of|as\\s+a?\\s*proxy\\s+for|in\\s+place\\s+of)\\s+[a-zA-Z0-9_-]+\\s*(?:agent)?',
+          '(?i)(?:acting|speaking|operating)\\s+(?:on\\s+behalf\\s+of|as\\s+(?:a\\s*)?proxy\\s+for|in\\s+place\\s+of)\\s+[a-zA-Z0-9_-]+\\s*(?:agent)?',
         desc: 'Agent claiming to act on behalf of another agent',
       },
       {
@@ -1440,20 +1450,14 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:execute|run|eval)\\s*\\(.*\\)|__import__|subprocess\\.|os\\.(?:system|popen|exec)|exec\\s*\\(',
-        desc: 'Code execution payload in inter-agent message',
+          '(?i)(?:status|error|result)\\s*[:=]\\s*(?:failed|error|timeout|unauthorized).{0,80}(?:fallback|use\\s+alternative|switch\\s+to)',
+        desc: "Fake error or status injection to trigger fallback behavior (requires a behavior-redirect directive fallback/switch-to/use-alternative within 80 chars; bare 'retry' dropped as it matches benign error-handling prose)",
       },
       {
         field: 'content',
         pattern:
-          '(?i)(?:status|error|result)\\s*[:=]\\s*(?:failed|error|timeout|unauthorized).*(?:retry|fallback|use\\s+alternative|switch\\s+to)',
-        desc: 'Fake error or status injection to trigger fallback behavior',
-      },
-      {
-        field: 'content',
-        pattern:
-          '(?i)(?:message_type|msg_type|role)\\s*[:=]\\s*["\']?(?:system|admin|orchestrator|supervisor)["\']?',
-        desc: 'Message format manipulation to spoof system-level messages',
+          '(?i)(?:message_type|msg_type)\\s*[:=]\\s*["\']?(?:admin|orchestrator|supervisor|root)["\']?',
+        desc: 'Message format manipulation to spoof privileged inter-agent message roles (bare role:system dropped \u2014 legitimate chat-message format)',
       },
       {
         field: 'content',
@@ -1463,9 +1467,8 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'content',
-        pattern:
-          '(?i)(?:priority\\s*[:=]\\s*(?:critical|emergency|urgent|override)|\\[PRIORITY:\\s*OVERRIDE\\])',
-        desc: 'Fake priority escalation to bypass normal processing',
+        pattern: '(?i)(?:priority\\s*[:=]\\s*override|\\[PRIORITY:\\s*OVERRIDE\\])',
+        desc: 'Fake priority escalation to bypass normal processing (benign priority:critical/urgent/emergency dropped; only explicit override framing kept)',
       },
       {
         field: 'content',
@@ -1486,8 +1489,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:instead\\s+of\\s+(?:that|doing|the\\s+(?:original\\s+)?\\w+(?:\\s+\\w+){0,3}|what\\s+(?:you|I)\\s+asked)|rather\\s+than\\s+(?:that|the\\s+(?:original|assigned|previous)))',
-        desc: 'Explicit task abandonment language',
+          "(?i)(?:instead\\s+of\\s+(?:that\\b|doing\\b|what\\s+(?:you|I)\\s+asked)|instead\\s+of\\s+(?:the\\s+)?(?:original|assigned|previous|current)\\s+(?:task|goal|objective|instructions?|request|assignment|work)|instead\\s+of\\s+(?:the\\s+)?\\w+(?:\\s+\\w+){0,3}[,.]?\\s+(?:let(?:'s|\\s+me|\\s+us)\\b|I(?:'ll|'m)\\b|I\\s+(?:will|am\\s+going\\s+to)\\b|we(?:'ll\\b|\\s+will\\b)|do\\s+something\\s+else)|rather\\s+than\\s+(?:that|the\\s+(?:original|assigned|previous)))",
+        desc: "Explicit task abandonment language (v2 \u2014 the old 'instead of the <any 1-4 words>' branch matched ordinary technical prose such as 'instead of the Apify logger' / 'instead of the module under test', which is how documentation describes substituting one component for another. The open-ended object now has to be followed by a self-substitution clause ('..., let me', 'I'll', 'do something else'), which is what makes it hijacking rather than a comparison; a named original/assigned task still fires on its own. true_positive 'Instead of the financial report, let me do something else' is unaffected)",
       },
       {
         field: 'content',
@@ -1534,8 +1537,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          "(?i)(?:skip\\s+(?:the|that|this)\\s+(?:step|part|task|analysis)|don'?t\\s+(?:bother|worry)\\s+(?:about|with)\\s+(?:the|that|this)\\s+(?:original|first|assigned))",
-        desc: 'Directives to skip assigned work',
+          "(?i)(?:skip\\s+(?:the|that|this)\\s+(?:original|assigned|first|required|previous|remaining)\\s+(?:step|part|task|analysis|work)|skip\\s+(?:the|that|this)\\s+(?:step|part|task|analysis)\\s+(?:and\\s+(?:just|instead|directly)|entirely\\s+and)|don'?t\\s+(?:bother|worry)\\s+(?:about|with)\\s+(?:the|that|this)\\s+(?:original|first|assigned))",
+        desc: "Directives to skip assigned work (v2 \u2014 the bare 'skip this step' form is ordinary instructional prose and matched 15 benign developer skills that legitimately tell a reader to skip an optional step. The object now has to be marked as the assigned/original work, or the skip has to be paired with a substitution ('and just', 'and instead'), which is the hijacking shape. No true_positive relied on the bare form)",
       },
       {
         field: 'content',
@@ -1563,18 +1566,18 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'privilege-escalation',
     scan_target: 'mcp',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'tool_args',
         pattern:
-          '(?i)(?:--(?:privileged|no-sandbox|cap-add|security-opt)|allowPrivilegeEscalation|\\b(?:admin|root|superuser|sudo)\\s*=|["\'](?:admin|root|superuser|sudo)["\']|"role"\\s*:\\s*"(?:admin|root|superuser|sudo)")',
+          '(?i)(?:--(?:privileged|cap-add|security-opt)|allowPrivilegeEscalation|"role"\\s*:\\s*"(?:admin|root|superuser|sudo)")',
         desc: 'Privileged flags or admin/root values in structured tool arguments (not natural language)',
       },
       {
         field: 'tool_args',
         pattern:
-          '(?i)(?:DROP\\s+(?:TABLE|DATABASE|INDEX)|ALTER\\s+TABLE|TRUNCATE|DELETE\\s+FROM\\s+\\w+\\s*;|GRANT\\s+ALL|REVOKE\\s+ALL)',
+          '(?i)(?:DROP\\s+(?:TABLE|DATABASE|INDEX)\\b(?!\\s+IF\\s+EXISTS)|ALTER\\s+TABLE|TRUNCATE|DELETE\\s+FROM\\s+\\w+\\s*;|GRANT\\s+ALL|REVOKE\\s+ALL)',
         desc: 'Destructive or privileged SQL statements in arguments',
       },
       {
@@ -1586,13 +1589,13 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_args',
         pattern:
-          '(?i)(?:kubectl\\s+exec|kubectl\\s+(?:create|apply)\\s+.*(?:clusterrole|rolebinding)|kubectl\\s+auth\\s+can-i)',
-        desc: 'Kubernetes privilege escalation commands',
+          '(?i)(?:kubectl\\s+exec\\b[^"\']*(?:/bin/\\w*sh|\\bbash\\b)|kubectl\\s+(?:create|apply)\\s+.*(?:clusterrole|rolebinding)|kubectl\\s+auth\\s+can-i)',
+        desc: 'Kubernetes privilege escalation (RBAC-binding creation, auth probing, or exec that spawns an absolute-path/bash shell; routine interactive debug exec excluded)',
       },
       {
         field: 'tool_args',
         pattern:
-          '(?i)(?:chmod\\s+(?:[2467][0-7]{3}|[0-7]{0,3}7[0-7]{0,2})|chmod\\s+[ug]\\+s|chown\\s+root|setcap\\s+)',
+          '(?i)(?:chmod\\s+(?:[0-7]?[0-7]{2}[2367]|[2467][0-7]{3})(?:[^0-7]|$)|chmod\\s+(?:-[-\\w]+\\s+)+(?:[0-7]?[0-7]{2}[2367]|[2467][0-7]{3})\\s+(?:/(?:[\\s"\'*;]|$)|/(?:etc|usr|var|bin|sbin|boot|lib|opt|root|home|srv)\\b|~|\\$HOME)|chmod\\s+[ug]\\+s|chown\\s+root|setcap\\s+)',
         desc: 'Unix permission escalation commands (setuid, root ownership)',
       },
       {
@@ -1705,8 +1708,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:calling\\s+(?:myself|this\\s+(?:function|tool|agent))\\s+(?:again|recursively)|recursive\\s+(?:call|invocation|execution)|self[_-]?(?:invoke|call|trigger))',
-        desc: 'Recursive self-invocation patterns',
+          '(?i)(?:calling\\s+(?:myself|this\\s+(?:function|tool|agent))\\s+(?:again|recursively)|recursive\\s+(?:call|invocation|execution))',
+        desc: "Recursive self-invocation patterns (v2 \u2014 dropped the bare 'self-call' / 'self-invoke' token, which agent-framework documentation uses as ordinary vocabulary when describing how an agent may call itself. The remaining branches require the recursion to be asserted as happening, which is the runaway signal; both recursion true_positives use those branches)",
       },
       {
         field: 'content',
@@ -1735,7 +1738,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:(?:while|for)\\s*\\(\\s*(?:true|1|;;)\\s*\\)|(?:loop|repeat)\\s*\\{\\s*(?:call|invoke|execute))',
+          '(?i)(?:(?:while|for)\\s*\\(\\s*(?:true|1|;;)\\s*\\)[\\s\\S]{0,80}?\\b(?:invoke|call|execute|request|fetch|query|retry)\\b|(?:loop|repeat)\\s*\\{\\s*(?:call|invoke|execute))',
         desc: 'Infinite loop constructs in generated or executed code',
       },
       {
@@ -1762,14 +1765,14 @@ export const ATR_RULES_COMPILED = [
     patterns: [
       {
         field: 'content',
-        pattern: '(?i)SELECT\\s+\\*\\s+FROM\\s+\\w+(?:\\s*;|\\s*$|\\s+WHERE)(?!.*\\bLIMIT\\b)',
-        desc: 'Unbounded SELECT * query without LIMIT clause',
+        pattern: '(?i)SELECT\\s+\\*\\s+FROM\\s+\\w+\\s*(?:;|$)(?!.*\\bLIMIT\\b)',
+        desc: "Unbounded SELECT * query without LIMIT clause (v2 \u2014 dropped the '+ WHERE' branch; a WHERE clause bounds the result set, so 'SELECT * FROM users WHERE ...' is not resource exhaustion. That branch matched ordinary SQL examples in documentation; true_positive 'SELECT * FROM transactions;' is unaffected)",
       },
       {
         field: 'content',
         pattern:
-          '(?i)(?:for\\s+each\\s+(?:of\\s+)?(?:the\\s+)?(?:record|row|entry|item|file|document|user|customer|email|account|message|transaction)s?\\b[\\s\\S]{0,30}\\b(?:in|of|from|across)\\b|iterate\\s+(?:over\\s+)?(?:all|every|the\\s+entire)|process\\s+(?:all|every|each)\\s+(?:record|row|entry|item|file|document)|(?:all|every|entire|whole)\\s+(?:record|row|entry|item|file|document|dataset|database|table)s?\\b)',
-        desc: "Bulk iteration over an entire or unbounded dataset (v2 \u2014 bare 'for each' now requires a data-source/scale qualifier; the unqualified form matched ordinary 'for each X' prose; verified 0 recall loss + all true_positives, benign FP 560 to 203)",
+          '(?i)(?:for\\s+each\\s+(?:of\\s+)?(?:the\\s+)?(?:record|row|entry|item|file|document|user|customer|email|account|message|transaction)s?\\b[\\s\\S]{0,30}\\b(?:in|of|from|across)\\b|iterate\\s+(?:over\\s+)?(?:all|every|the\\s+entire)|process\\s+(?:all|every|each)\\s+(?:record|row|entry|item|file|document))',
+        desc: "Bulk iteration over an entire or unbounded dataset (v3 \u2014 dropped the bare '(all|every|entire|whole) <noun>' branch, which matched plain noun phrases such as 'all tables', 'every dataset' and 'all files' in ordinary data-tooling documentation with no consuming action. The remaining branches all require an explicit consuming verb (for each ... in / iterate over all / process all), and the download/fetch-all branch below still covers the 'Downloading all files' true_positive. v2 \u2014 bare 'for each' now requires a data-source/scale qualifier; the unqualified form matched ordinary 'for each X' prose; verified 0 recall loss + all true_positives, benign FP 560 to 203)",
       },
       {
         field: 'content',
@@ -2000,7 +2003,9 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'tool_args',
-        pattern: '(?i)(curl|wget|fetch|http\\.request|axios\\.|net\\.connect|socket\\.connect)',
+        pattern:
+          '(?i)(\\bcurl\\s+[^\\n]{0,60}?(https?|ftp)://|\\bwget\\s+[^\\n]{0,60}?(https?|ftp)://|\\bcurl\\s+-[A-Za-z]|\\bwget\\s+-[A-Za-z]|\\bfetch\\s*\\(|\\bnode-fetch\\b|http\\.request|axios\\.|net\\.connect|socket\\.connect)',
+        desc: 'Network egress primitives, anchored to INVOCATION syntax rather than to the bare word. The previous pattern listed `fetch` as a naked alternative, so the English sentence "Fetch the current weather forecast for a given location" false-positived a critical-path rule whose response actions are block_tool + escalate. curl/wget now need a URL or a flag, fetch needs a call, and the library entry points (http.request, axios., net.connect) are unchanged.\nThis condition is a pure NARROWING of the base pattern: nothing was added while tightening it. An earlier revision of this fix also introduced `urllib.request` and `requests.(get|post|put|patch|delete)(` \u2014 new coverage the base never had \u2014 and those two alternatives promptly matched ordinary benign Python in the gate corpus (`benign-code/std-18`: `requests.get(url, timeout=10)`, `benign-code/cfg-04`: a localhost health check). Buying new egress coverage while paying for it in benign source code is exactly the trade a precision fix must not make, so they are gone. Cost of removing them, measured: one attack sample (promptfoo/4) out of 1,657.',
       },
       {
         field: 'tool_args',
@@ -2024,7 +2029,7 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'tool-poisoning',
     scan_target: 'mcp',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'tool_args',
@@ -2033,7 +2038,8 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'tool_args',
-        pattern: '(?i)(__[a-z]+__|\\$\\$[a-z]+|_internal_|_hidden_|_backdoor_|_secret_)',
+        pattern:
+          '(?i)(__(?:backdoor|hidden|secret|internal|debug|admin|exec|eval|shell|cmd|import|builtins|globals)__|_internal_|_hidden_|_backdoor_|_secret_)',
       },
       {
         field: 'tool_args',
@@ -2052,27 +2058,35 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'tool-poisoning',
     scan_target: 'mcp',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'tool_args',
         pattern:
-          '(?i)(/etc/passwd|/etc/shadow|(?<![a-z])\\.(env|aws/credentials)|secrets?\\.json|private[_-]?key|id_rsa|kubeconfig)',
+          '(?i)(/etc/passwd|/etc/shadow|(?<![a-z])\\.aws/credentials|secrets?\\.json|private[_-]?key|id_rsa|kubeconfig)',
         desc: "Sensitive file/credential access patterns (path-specific, not bare word 'credentials')",
       },
       {
         field: 'tool_args',
-        pattern: '(?i)(base64|btoa|encodeURI|hex\\.encode|rot13|xor|compress|gzip|deflate|encrypt)',
+        pattern:
+          '(?i)(?:base64|btoa|encodeURI|hex\\.encode|rot13|xor|compress|gzip|deflate|encrypt)[^\\n]{0,80}(?:\\.env\\b|\\bsecrets?\\b|\\btokens?\\b|\\bpasswords?\\b|api[_-]?keys?|credentials?|id_rsa|private[_-]?key)',
       },
       {
         field: 'tool_args',
         pattern:
-          '(?i)(webhook|ngrok|requestbin|pipedream|hookbin|burpcollaborator|interact\\.sh|oast)',
+          '(?i)(webhook\\.site|ngrok|requestbin|pipedream|hookbin|burpcollaborator|interact\\.sh|\\boast\\b)',
+        desc: 'Known out-of-band exfiltration endpoints. `oast` carried no word boundary, so it matched inside ordinary English \u2014 roast, toast, coast, boast, roasts \u2014 on a critical rule whose response is block_tool + escalate. Bounded with \\b rather than the lookbehind used by the first condition, because \\b is RE2-native and lookaround is not: scripts/gate-re2-portability.ts fails a rule that newly needs backtracking, and downstream Go/Rust/Sigma consumers drop it outright. oast.fun / oast.pro / bare OAST still match \u2014 `.` and end-of-string are both word boundaries.',
       },
       {
         field: 'tool_name',
         pattern:
           '(?i)(send[_-]?(email|message|webhook|http|request)|upload|post[_-]?data|transmit|exfil)',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)^(?=[\\s\\S]*(?<![a-z])\\.env)(?=[\\s\\S]*(base64|btoa|encodeURI|hex\\.encode|rot13|xor|compress|gzip|deflate|encrypt|webhook|ngrok|requestbin|pipedream|hookbin|burpcollaborator|interact\\.sh|\\boast\\b|curl|wget|\\bnc\\b|exfil|upload))',
+        desc: 'Dotenv file access ONLY when chained with an obfuscation-or-egress indicator in the same args (multi-step access-then-obfuscate-then-egress chain). A bare startup-style dotenv reference no longer fires alone; the dangerous egress half is now required to flag this composite data-egress signal. Anchored with ^: the pattern is two lookaheads that each begin with [\\s\\S]*, so if both hold at some offset they also hold at offset 0, but unanchored the engine retried both scans from every start offset, which is quadratic in input length (each doubling took about four times as long: in V8 0.8s at 32K chars, 3.4s at 64K) and was 16% of all CPU in the benign-corpus FP scan. Anchored it is linear and returns the same verdict for every input.',
       },
     ],
   },
@@ -2091,7 +2105,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_args',
         pattern:
-          '(?i)(chmod\\s+(?:[2467][0-7]{3}|[0-7]{0,3}7[0-7]{0,2})|chmod\\s+[ug]?\\+[sx]|chown\\s+root|setcap\\s)',
+          '(?i)(chmod\\s+(?:[0-7]?[0-7]{2}[2367]|[2467][0-7]{3})(?:[^0-7]|$)|chmod\\s+(?:-[-\\w]+\\s+)+(?:[0-7]?[0-7]{2}[2367]|[2467][0-7]{3})\\s+(?:/(?:[\\s"\'*;]|$)|/(?:etc|usr|var|bin|sbin|boot|lib|opt|root|home|srv)\\b|~|\\$HOME)|chmod\\s+[ug]?\\+[sx]|chown\\s+root|setcap\\s)',
       },
       {
         field: 'tool_args',
@@ -2143,7 +2157,7 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'tool-poisoning',
     scan_target: 'mcp',
-    rule_version: 2,
+    rule_version: 3,
     patterns: [
       {
         field: 'tool_args',
@@ -2153,15 +2167,16 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_args',
         pattern:
-          "(?i)('\\s*(OR|AND|UNION)\\s+'|'?\\s*;\\s*(DROP|DELETE|INSERT|UPDATE|ALTER|CREATE)\\s|--\\s*[;\\\"'\\)\\]]|/\\*.*\\*/)",
+          "(?i)('\\s*(OR|AND|UNION)\\s+'|;\\s*(DROP|DELETE|INSERT|UPDATE|ALTER|CREATE)\\s|--\\s*[;\\\"'\\)\\]])",
       },
       {
         field: 'tool_args',
-        pattern: '(\\.\\./|\\.\\.\\\\){2,}|(\\.\\.(/|\\\\)){2,}(etc|windows|usr|home|root|var|tmp)',
+        pattern: '(\\.\\./|\\.\\.\\\\){3,}|(\\.\\.(/|\\\\)){2,}(etc|windows|usr|home|root|var|tmp)',
       },
       {
         field: 'tool_args',
-        pattern: '(?i)(\\{\\{.*\\}\\}|\\$\\{.*\\}|<%.*%>|#\\{.*\\}|\\{%.*%\\})',
+        pattern:
+          '(?i)((?:^|[^{])\\{\\{[^}\\n]{0,200}(?:__[a-z]+__|\\bconfig\\b|\\brequest\\b|\\bself\\b|\\bcycler\\b|\\blipsum\\b|\\bjoiner\\b|\\|\\s*attr\\b|\\[\\s*[\'"]_)[^}\\n]{0,200}\\}\\}|(?:^|[^{])\\{\\{\\s*\\d+\\s*[*+]\\s*\\d+\\s*\\}\\}|\\$\\{IFS|\\$\\{[^}]{0,200}[`(]|\\$\\{[^}]{0,200}jndi:|\\$\\([^)]{0,200}[A-Za-z]|<%=?[^%\\n]{0,200}(?:Runtime|exec|system|eval|`|popen)[^%\\n]{0,200}%>|#\\{[^}\\n]{0,200}(?:`|system|exec|eval|%x)[^}\\n]{0,200}\\}|\\{%[^%\\n]{0,200}(?:import|__|os\\.|subprocess|popen)[^%\\n]{0,200}%\\})',
       },
       {
         field: 'tool_args',
@@ -2546,8 +2561,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:100%\\s+(?:certain|confident|sure|safe|correct|accurate)|absolutely\\s+(?:certain|safe|guaranteed|no\\s+risk)|zero\\s+(?:risk|chance\\s+of\\s+(?:failure|error|harm))|guaranteed\\s+(?:safe|correct|harmless))',
-        desc: 'False absolute certainty claims to bypass human caution',
+          "(?i)(?:(?:I(?:'m|\\s+am)|we(?:'re|\\s+are)|this\\s+is|it(?:'s|\\s+is)|that(?:'s|\\s+is)|the\\s+\\w+\\s+is)\\s+(?:100%\\s+(?:certain|confident|sure|safe|correct|accurate)|absolutely\\s+(?:certain|safe|guaranteed))|absolutely\\s+no\\s+risk|(?:there\\s+is\\s+)?zero\\s+(?:risk|chance\\s+of\\s+(?:failure|error|harm))|guaranteed\\s+(?:safe|correct|harmless))",
+        desc: 'False absolute certainty claims to bypass human caution (v2 \u2014 the bare confidence phrase also matched benign agent guidelines that instruct the agent to only report conclusions it is confident in, which is the opposite of trust exploitation. The certainty claim now has to be asserted about the speaker or the change itself rather than appearing as a second-person policy; the zero-risk and guaranteed-safe branches are unchanged and still carry the first true_positive)',
       },
       {
         field: 'content',
@@ -2602,6 +2617,460 @@ export const ATR_RULES_COMPILED = [
         pattern:
           "(?i)(?:if\\s+you\\s+(?:don'?t|do\\s+not)\\s+(?:approve|act|respond).{0,20}(?:now|immediately|quickly)).*(?:irreversible|permanent|catastroph|disaster|lost\\s+forever|too\\s+late)",
         desc: 'Fear-based urgency to force hasty human approval',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00080',
+    title: 'Encoding-Based Prompt Injection Evasion',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(ignore|disregard|forget|override)\\b.{0,40}\\b(instruction|rule|system|prompt)\\b.{0,60}(base64|atob|btoa|\\\\x[0-9a-f]{2}|\\\\u[0-9a-f]{4})',
+        desc: 'Prompt override combined with encoding function references',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)(eval|decode|atob|fromCharCode|String\\.fromCodePoint)\\s*\\(\\s*[\'"]([A-Za-z0-9+/=]{20,}|\\\\x[0-9a-f]{2})',
+        desc: 'Runtime decoding of encoded payload',
+      },
+      {
+        field: 'user_input',
+        pattern: '(?i)(\\\\u0{0,2}[0-9a-f]{2,4}\\s*){5,}',
+        desc: 'Sequence of Unicode escape characters forming hidden instructions',
+      },
+      {
+        field: 'user_input',
+        pattern: '\\xE2\\x80\\x8F|\\xE2\\x80\\xAE|\\u200F|\\u202E|\\u2066|\\u2067|\\u2068|\\u2069',
+        desc: 'RTL override or bidi control characters used for visual spoofing',
+      },
+      {
+        field: 'user_input',
+        pattern: '(?i)xn--[a-z0-9]{4,}\\.\\s*.{0,30}\\b(ignore|new instructions|system prompt)',
+        desc: 'Punycode domain combined with injection keywords',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00081',
+    title: 'Semantic Evasion via Multi-Turn Prompt Injection',
+    severity: 'critical',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(remember|recall)\\s+.{0,30}(earlier|previous|first)\\s+.{0,30}(instruction|task|told you|asked you)\\b',
+        desc: 'Callback reference to planted instructions from earlier turns',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(now|okay|good|great|perfect)\\s*[,.]?\\s*(execute|perform|do|carry out|run|complete)\\s+.{0,20}(step|phase|part)\\s*(two|2|three|3|ii|iii|b|c).{0,60}(override|bypass|ignore|disable|remove|skip|disregard).{0,30}(safety|filter|guard|rules?|restrict|securit|polic)',
+        desc: 'Multi-phase attack activation trigger with malicious context',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(pretend|imagine|roleplay|hypothetical|scenario|simulation)\\s+.{0,50}(no\\s+(rules|restrictions|filters|limits|guardrails)|bypass|unrestricted)',
+        desc: 'Roleplay-based semantic evasion to bypass restrictions',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)(as\\s+I\\s+mentioned|like\\s+I\\s+said|per\\s+our\\s+agreement|as\\s+we\\s+discussed)\\s+.{0,40}(ignore|override|disregard|skip)\\s+.{0,20}(safety|filter|guard|rules)',
+        desc: 'False prior agreement reference to legitimize malicious instruction',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00082',
+    title: 'Behavioral Fingerprint Detection Evasion',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(spoof|fake|mimic|clone|replicate|impersonate)\\s+.{0,30}\\b(behaviou?ra?l?s?\\s+(signature|profile|fingerprint|pattern|baseline)|fingerprint)\\b',
+        desc: "Attempt to spoof or replicate a behavioral fingerprint. The target noun must be an explicitly behavioral artefact (behavioural signature/profile/fingerprint/pattern/baseline) or the word 'fingerprint' itself \u2014 bare 'pattern'/'profile'/'signature' after these verbs is ordinary engineering English ('fake pattern', 'replicate the pattern') and is not an evasion signal.",
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(bypass|evade?|circumvent|avoid|defeat)\\s+.{0,30}\\b(drift|anomaly|behavio(u?r|ral))\\s*(detect|monitor|track|analy)',
+        desc: 'Explicit evasion of drift or behavioral detection systems',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(gradually|incrementally|slowly|step.?by.?step)\\s+.{0,40}(introduc|add|enable|unlock|escalat)\\w*\\s+.{0,20}(capabilit|permiss|function|access|privileg)',
+        desc: 'Gradual capability escalation to avoid drift triggers',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(maintain|keep|preserve|stay within)\\s+.{0,20}(normal|baseline|expected|typical)\\s+.{0,20}(behavio|pattern|profile|range)\\b.{0,40}(while|but|then)\\s+.{0,30}(execut|run|perform|inject)',
+        desc: 'Instructions to maintain normal appearance while executing malicious actions',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00085',
+    title: 'Multi-Layer Security Audit Evasion',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(skip|bypass|disable|turn\\s*off|deactivate)\\s+(all|the|any|every|this|these|those|our|your)\\s+(?:the\\s+|remaining\\s+|further\\s+)?(audit|security|safety|validation|verification|compliance|moderation|content|injection)\\s+(layer|check|filter|gate|guard|control|scan|pipeline|stage|step)s?\\b',
+        desc: "Explicit instruction to skip the agent's own security/audit layers. Requires a determiner ('all/the/any/\u2026') plus a two-word defence noun phrase ('audit layers', 'security filter', 'validation checks'). A bare verb+noun ('skip validation', 'disable logging', 'bypass TLS verification') is ordinary engineering English and is deliberately NOT matched.",
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(mark|flag|set|report)\\s+.{0,15}(as\\s+)?(safe|trusted|verified|approved|clean|benign|whitelisted)\\b.{0,30}(skip|bypass|without)\\s+.{0,15}(check|review|audit|scan)',
+        desc: 'Attempt to self-certify as trusted to bypass checks',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(pass|clear|satisfy)\\s+.{0,15}(all\\s+)?(audit|security|safety)\\s+(layer|level|stage|check|gate)s?\\b',
+        desc: 'Payload claiming to have passed audit layers',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(trust\\s*score|safety\\s*rating|risk\\s*level|confidence\\s*score)\\s*[=:]\\s*(100|high|max|trusted|0\\.?0?\\s*(risk)?)',
+        desc: 'Manipulation of trust or safety score values',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00086',
+    title: 'Visual Spoofing via RTL Override, Punycode, and Homoglyph Injection',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 3,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern: '[\\u200E\\u200F\\u202A-\\u202E\\u2066-\\u2069]',
+        desc: 'Bidirectional text control characters (RTL/LTR overrides)',
+      },
+      {
+        field: 'user_input',
+        pattern: '(?i)xn--[a-z0-9]{4,}\\.[a-z]{2,}',
+        desc: 'Punycode-encoded internationalized domain name',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '[\\u0430\\u0435\\u043E\\u0440\\u0441\\u0443\\u0445][a-zA-Z]|[a-zA-Z][\\u0430\\u0435\\u043E\\u0440\\u0441\\u0443\\u0445]',
+        desc: 'A Cyrillic letter that renders as Latin sitting directly against Latin text, which is the paypal-with-a- Cyrillic-a shape. The Cyrillic side is restricted to those seven letters rather than the whole block, and the reason is the engine\'s own normalization: foldConfusables maps exactly those homoglyphs to Latin, so "\u0423\u043f\u0440\u0430\u0432\u043b\u044f\u0435\u0442 \u0440\u0430\u0441\u043f\u0438\u0441\u0430\u043d\u0438\u0435\u043c" folds to "Y\u043fpab\u043b\u044fet pac\u043f\u0438cah\u0438em" and the fold itself manufactures the mixed-script adjacency this condition looks for. Matching the full Cyrillic block therefore fired on ordinary Russian through the folded copy while the raw copy was clean. Restricting to the homoglyph set makes the condition immune to that: after folding, any Cyrillic still present is by definition not a homoglyph.',
+      },
+      {
+        field: 'user_input',
+        pattern: '[\\uF900-\\uFAFF][a-zA-Z]{2}|[a-zA-Z]{2}[\\uF900-\\uFAFF]',
+        desc: 'CJK COMPATIBILITY ideographs (U+F900-U+FAFF) mixed with Latin text. These codepoints are canonically equivalent to ordinary unified ideographs under NFC/NFKC, so a literal blocklist or logging layer sees a different string than the renderer - that mismatch is the spoof. The CJK Unified ranges (U+3400-U+4DBF, U+4E00-U+9FFF) are deliberately excluded: a unified ideograph next to Latin is standard bilingual technical writing, not a homoglyph.',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?:^|[^\\u0400-\\u04FF])[\\u0430\\u0435\\u043E\\u0440\\u0441\\u0443\\u0445]{4,}(?:[^\\u0400-\\u04FF]|$)',
+        desc: 'A whole token built only from the Cyrillic letters that render as Latin (a, e, o, p, c, y, x), so it reads as a Latin word while containing no Latin at all. The token boundary is the discriminant, not the letters: this previously matched any two of those seven adjacent, which is a property of the Russian language rather than of an attack. Measured against 36,394 published ClawHub skills, that version fired on 37 of the 39 whose description contains Cyrillic (94.9%) and on zero attacks; ordinary sentences such as "\u0423\u043f\u0440\u0430\u0432\u043b\u044f\u0435\u0442 \u0440\u0430\u0441\u043f\u0438\u0441\u0430\u043d\u0438\u0435\u043c \u043a\u043e\u043c\u0430\u043d\u0434\u044b" matched. Requiring the run to fill a token and to be at least four characters takes it to 0 of 36,394, while still catching the pure-Cyrillic spoof (\u0445\u043e\u0440\u043e\u0441\u0441, \u0440\u0430\u0443\u0440\u0430) that condition 3 cannot see because no Latin sits beside it. Mixed spoofs like paypal-with-a-Cyrillic-a stay with condition 3. Runs of four and five do occur inside real Russian words (\u0441\u043e\u0445\u0440\u0430 in \u0441\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u0435), which is why length alone is not the test. Same correction condition 4 already carries for CJK, applied to the script it was not applied to.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00087',
+    title: 'Detection Rule Probing and Evasion Testing',
+    severity: 'medium',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(what|which|list|show|reveal|tell\\s+me)\\b.{0,40}\\b(word|phrase|pattern|string|keyword)s?\\b.{0,40}\\b(block|filter|flag|trigger|detect|reject|ban|censor)\\w*\\s+(by\\s+)?(your|the)\\s+(filter|detection|guard|guardrail|moderation|safety|blocklist|rule|policy|classifier)',
+        desc: "Probing for the agent's own blocked keywords. The blocking verb must resolve to the agent's own defence ('blocked by your filter', 'trigger your detection') - an unqualified 'which keywords trigger them' is ordinary SEO/analytics English and is deliberately NOT matched.",
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(test|check|probe|try|see\\s+if)\\s+(?:out\\s+)?(the|your|this)\\s+(detection|safety|content|moderation|security|injection|prompt|guard)\\s*(rule|filter|system|guard|guardrail|check|layer)s?\\b',
+        desc: "Explicit filter-testing language aimed at a named defence ('try the detection rule', 'probe your safety filter'). Requires a determiner plus a two-word defence noun phrase, because bare 'test --filter', 'check for existing rule files' and 'test safety nets' are ordinary developer documentation.",
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(what\\s+(happens|would happen|do you do)|how\\s+do\\s+you\\s+(respond|react|handle))\\s+.{0,20}(if I|when I|when someone)\\s+.{0,20}(inject|bypass|ignore|override|hack)',
+        desc: 'Probing agent response to injection techniques',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(repeat|echo|output|print|say)\\s+.{0,15}(exactly|verbatim|word.?for.?word)\\s+.{0,30}(system|initial|original|hidden)\\s+(prompt|instruction|message|context)',
+        desc: 'Attempting to extract system prompt through exact repetition',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00088',
+    title: 'Adaptive Countermeasure Against Behavioral Monitoring',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(reset|clear|zero|wipe|flush)\\s+.{0,20}(behavio(u?r|ral)|anomaly|drift|baseline|monitoring)\\s*(log|score|data|history|counter|metric)',
+        desc: 'Instruction to reset behavioral monitoring data',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(suppress|hide|mask|conceal|silence)\\s+(all|every|any|each)\\s+(?:the\\s+)?(?:(anomaly|anomalies|drift|behaviou?ral|security|monitoring|detection|audit|risk)\\s+)?(alert|alarm|warning|flag|signal|notification|event)s?\\b',
+        desc: "Blanket instruction to suppress anomaly alerts. Requires an all/every/any quantifier: an unqualified 'suppress warnings', 'Silence Alerts', 'suppress Discord notifications' or 'never suppress secret scanning alerts' is ordinary ops/build documentation.",
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(report|return|send|output|emit)\\s+(?:only\\s+|always\\s+|a\\s+|the\\s+)*(normal|healthy|clean|safe|green|all[\\s-]*clear|no\\s*anomal\\w*|status\\s*ok)\\s+(status|state|health|result|report|score|verdict|signal)\\b|\\b(report|return|send|output|emit)\\s+(?:the\\s+)?(status|health|state)\\s+as\\s+(normal|healthy|clean|safe|ok|all\\s*clear)\\b',
+        desc: "Instruction to falsify a monitoring status report. The adjective must actually qualify a status object ('emit only healthy status', 'report status as normal'); 'return safe', 'return a clean report' and 'report a safety incident' are ordinary code and prose.",
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(disable|stop|pause|halt|suspend|kill|turn\\s*off)\\s+(all|every|any)\\s+(?:the\\s+)?(monitor|logging|log|tracking|track|audit|auditing|telemetry|observability|alerting|detection)\\w*\\b',
+        desc: "Blanket instruction to disable monitoring and logging. Requires an all/every/any quantifier: scoped ops language such as 'disable logging of thought information', 'stop monitoring the decommissioned cluster' or 'stop the audit' is legitimate and is deliberately NOT matched.",
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00089',
+    title: 'Polymorphic Skill and Capability Aliasing Attack',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(rename|alias|remap|redefine|rebind)\\s+.{0,20}(function|tool|skill|capability|command|action|method)\\s+.{0,30}(to|as|into)\\s+.{0,20}(pass|bypass|evade|avoid|trick|fool|disguise|hide)',
+        desc: 'Renaming or aliasing tool functions with evasion intent',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(register|create|define|add)\\s+.{0,10}(new\\s+)?(tool|skill|function|capability)\\s+.{0,50}(exec|eval|shell|system|subprocess|os\\.)',
+        desc: 'Registering new tool capability with dangerous execution primitives',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(call|invoke|execute|run|use)\\s+.{0,10}(tool|function|skill)\\s+[\'"][a-z_]+[\'"]\\s+.{0,20}(but|actually|really|which)\\s+.{0,20}(runs?|executes?|calls?|does)',
+        desc: 'Invoking a tool by alias that actually performs a different action',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(?:(?:dynamic(?:ally)?|runtime|on.?the.?fly)\\s+(?:generat|compil|creat|build|assembl|construct|synthesi)\\w*\\s+.{0,20}\\b(?:payload|shellcode|code|script)\\b|(?:dynamic(?:ally)?|runtime|lazy|deferred|on.?demand)\\s+(?:load|fetch|retriev|download|pull)\\w*\\s+.{0,20}\\b(?:payload|shellcode)\\b)',
+        desc: 'Runtime generation of code, or deferred loading of a payload, to evade static analysis',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00090',
+    title: 'Threat Intelligence Exfiltration and Rule Enumeration',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(list|show|reveal|dump|export|display|print|output)\\s+(?:me\\s+)?(?:all\\s+|every\\s+|the\\s+|your\\s+|our\\s+|its\\s+|currently\\s+|deployed\\s+|active\\s+|loaded\\s+)*(detection|security|threat|ATR|YARA|sigma)\\s*(rules?|signatures?|patterns?|config|logic)',
+        desc: 'Imperative request to enumerate the detection ruleset. The verb must be followed by a determiner / possessive chain ("list all detection rules", "show me your YARA signatures") rather than an arbitrary 15-character gap. The old `.{0,15}` gap also matched the NOUN-PHRASE reading "a list of detection rules", which is how a legitimate skill-scanner skill describes its own output \u2014 that is the one residual FP this rule still produced on the benign corpus once it was revived from status: draft.',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(what|how|describe|explain)\\s+.{0,20}(audit|security|detection|filter|guard)\\s*(system|pipeline|process|mechanism|check|layer|logic)\\s+.{0,20}(work|function|operat|configured|implemented)',
+        desc: 'Probing how security audit systems are configured',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(extract|exfiltrate|steal|leak|dump|siphon)\\s+(?:the\\s+|all\\s+|our\\s+|your\\s+|its\\s+|my\\s+)?(?:internal\\s+|full\\s+|entire\\s+)?(security|audit|detection|threat)\\s+(?:audit\\s+|system\\s+|engine\\s+)?(config\\w*|rule\\s?sets?|rules?|logic|signature\\w*|polic\\w+|pipeline)\\b',
+        desc: 'Attempt to exfiltrate the security/detection configuration itself. Scoped to a security-domain noun phrase (security|audit|detection|threat + config/rules/logic/signatures/policy) because the earlier bare-noun form (...|key|token|config) matched ordinary phrasing such as "extract key", "copy the token" and "send keyboard key".',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(regex|pattern|rule|signature)\\s+(used|employed|deployed|running)\\s+.{0,20}(detect|block|filter|flag|catch)\\b',
+        desc: 'Probing specific regex patterns used in detection',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00091',
+    title: 'Advanced Structured Data Injection with Nested Payloads',
+    severity: 'critical',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\{[^{}]*\\{[^{}]*["\']\\s*:\\s*["\'][^"\']*\\b(ignore|override|disregard|forget)\\s+(previous|system|all)\\b[^"\']*["\']',
+        desc: 'Injection payload nested inside multi-level JSON objects',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)(\\\\n|\\\\r|\\\\t|%0[aAdD]|%09)(\\\\[nrt]|[-*#>+\\s]){0,12}((ignore|override|disregard|forget)\\s+(all\\s+)?(previous|prior|system|original|above|earlier)\\s+(instructions?|rules?|prompts?|commands?)|(new|updated)\\s+(system\\s+)?(instructions?|prompt)\\s*:)',
+        desc: 'Injection using escaped whitespace characters to hide payload boundaries',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)(\\{|\\[)\\s*["\'](__proto__|constructor|prototype)["\']\\s*:\\s*.{0,40}(ignore|override|exec|eval|system)',
+        desc: 'Prototype pollution combined with injection in JSON',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)(["\']\\s*\\+\\s*["\']|["\']\\s*\\.concat\\s*\\(|String\\.raw\\s*`)[^\\n]{0,60}\\b(ignore|override|disregard|forget|system\\s+prompt|instructions?|directives?)\\b',
+        desc: 'String concatenation to assemble injection payload across data fields',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00092',
+    title: 'Multi-Agent Consensus Poisoning and Sybil Attack',
+    severity: 'critical',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(vote|approve|endorse|confirm|agree)\\s+.{0,20}(as|on behalf of|representing|for)\\s+.{0,20}(multiple|all|every|several|many)\\s+(agent|node|peer|participant|member)',
+        desc: 'Attempting to cast votes on behalf of multiple agents',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(forge|fake|spoof|fabricat|simulat)\\w*\\s+(?:the|a|an|our|their|this|\\d{1,4})?\\s*(consensus|vote|ballot|proposal|approval|quorum)\\b',
+        desc: 'Forging consensus votes or proposals',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(create|spawn|register|generate)\\s+.{0,10}(multiple|many|several|\\d{2,})\\s+(fake|dummy|puppet|sybil|sock.?puppet)\\s.{0,15}(agent|identit|account|node|peer)',
+        desc: 'Creating Sybil identities for consensus manipulation',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(manipulat\\w*|poison\\w*|corrupt\\w*|rigged|rigging|rig|stuff\\w*)\\s+.{0,15}(the\\s+)?(consensus|voting|election|proposal|decision|quorum)\\b',
+        desc: 'Direct manipulation of consensus mechanisms',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(impersonat\\w*|pretend\\s+to\\s+be|act\\s+as|pose\\s+as)\\s+.{0,15}(agent|node|peer|validator|participant).{1,45}(vote|approve|submit|propose)',
+        desc: 'Impersonating agents to submit fraudulent consensus actions',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00093',
+    title: 'Gradual Capability Escalation via Incremental Introduction',
+    severity: 'critical',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(add|enable|grant|unlock|introduce)\\s+.{0,10}(?<=\\s)(just|only\\s+(?:one|a|an|another|1)|a small|minor|slight|one more)\\s+.{0,20}(permiss|capabilit|access|function|privileg|abilit)',
+        desc: 'Incremental small permission or capability addition',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(each|every|per)\\s+(turn|message|request|interaction|session|update)\\s+.{0,20}(add|enable|grant|expand|increase|escalat)\\s+.{0,20}(permiss|capabilit|access|scope|privileg)',
+        desc: 'Per-interaction escalation of capabilities',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(below|under|beneath|within)\\s+(the\\s+)?(threshold|limit|radar|detection|alert)\\s+.{0,30}(add|escalat|expand|introduc|grant|enable)',
+        desc: 'Explicit sub-threshold capability escalation',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(version|update|patch|upgrade)\\s+.{0,20}(sneak|hide|embed|bundle|slip)\\s+.{0,20}(new\\s+)?(capabilit|permiss|function|access|backdoor)',
+        desc: 'Hiding new capabilities inside version updates',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00094',
+    title: 'Systematic Multi-Layer Audit System Bypass',
+    severity: 'critical',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(pass|clear|satisfy|fool|trick|defeat)[ \\t]+[^\\n]{0,10}(layer|stage|level|check|phase)[ \\t]*(1|2|3|4|5|6|one|two|three|four|five|six)\\b',
+        desc: 'Targeting specific numbered audit layers for bypass',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(manifest|permission|dependency|static.?analysis|semantic|code.?review)\\s+(check|audit|scan|layer|gate)\\s+.{0,20}(bypass|evad|trick|fool|pass|circumvent)',
+        desc: 'Bypassing specific named audit stages',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(obfuscat|minif|encrypt|encod|pack|uglif)\\w*\\s+.{0,20}(malicious|payload|backdoor|exploit|shellcode|reverse.?shell)\\s+.{0,20}(pass|evade|bypass|avoid)\\s+.{0,15}(audit|scan|check|review|analysis)',
+        desc: 'Obfuscating malicious code to pass audit analysis',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(hide|conceal|disguise|mask|camouflage)\\s+.{0,20}?(malicious|dangerous|harmful|unauthorized)\\s+.{0,20}?(behavio\\w*|code|function|intent|capabilit\\w*|action)\\s+.{0,20}?(from|during|in)\\s+.{0,25}?(audit|review|scan|check|inspection)',
+        desc: 'Hiding malicious behavior from audit inspection',
       },
     ],
   },
@@ -3223,7 +3692,7 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'context-exfiltration',
     scan_target: 'mcp',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'content',
@@ -3234,7 +3703,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:cat|read|open|load|get)\\s+.*(?:credentials|id_rsa|private[_\\s]?key|secret[_\\s]?key)',
+          '(?i)(?:cat|read|open|load|get)\\s+[^\\n\\\\]{0,150}(?:credentials|id_rsa|private[_\\s]?key|secret[_\\s]?key)',
         desc: 'Reading credential or private key files',
       },
       {
@@ -3304,7 +3773,8 @@ export const ATR_RULES_COMPILED = [
     patterns: [
       {
         field: 'content',
-        pattern: '(?i)(?:printenv|/usr/bin/env)\\s*(?:\\||>|$|\\s*$)',
+        pattern:
+          '(?i)(?:printenv|/usr/bin/env)\\s*(?:\\||>)\\s*.*(?:curl|fetch|http|request|post|send|axios|wget|ncat|netcat|\\bnc\\b|exfil|@-)',
         desc: 'Running printenv to dump all environment variables',
       },
       {
@@ -3314,7 +3784,8 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'content',
-        pattern: '(?i)(?:^|\\s)env\\s*(?:\\||>|;|&&|$)',
+        pattern:
+          '(?i)(?:^|\\s)env\\s*(?:\\||>|;|&&)\\s*.*(?:curl|fetch|http|request|post|send|axios|wget|ncat|netcat|\\bnc\\b|exfil|@-)',
         desc: 'Running bare env command to list all environment variables',
       },
       {
@@ -3517,8 +3988,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '<!--[\\s\\S]{0,500}(?:\\bignore|\\boverride|\\bbypass|\\bcurl\\s|\\bwget\\s|\\beval\\s|\\bexec\\s|\\bbase64|\\bnc\\s)[\\s\\S]{0,200}-->',
-        desc: "Malicious instructions hidden in HTML comments (keywords anchored at word boundary to avoid substring FPs like 'async'->'nc ', 'retrieval'->'eval ')",
+          '<!--(?:(?!-->)[\\s\\S]){0,500}?(?:(?<!-)\\bignore\\b(?!-)|(?<!-)\\boverride\\b(?!-)|(?<!-)\\bbypass\\b(?!-)|\\bcurl[ \\t]|\\bwget[ \\t]|\\beval[ \\t]|\\bexec[ \\t]|\\bbase64|\\bnc[ \\t])(?:(?!-->)[\\s\\S]){0,200}?-->',
+        desc: "Malicious instructions hidden in HTML comments (keywords anchored at word boundary to avoid substring FPs like 'async'->'nc ', 'retrieval'->'eval '). ignore/override/bypass additionally require no adjacent hyphen, since standard tooling directives ('prettier-ignore', 'eslint-ignore') collide with a bare \\bignore\\b word boundary. curl/wget/eval/exec/nc require a following space or tab (not \\s, which also matches newline) so a URL path segment or label ending a line (e.g. '[execaction]: .../stackql-exec\\n') doesn't false-match \\bexec\\s at the line break. Both surrounding spans are now tempered ((?!-->)[\\s\\S]) so the whole match can never cross a '-->' boundary into a SEPARATE comment \u2014 without this, whitespace-collapsing normalization (turning newlines into spaces) re-exposed the stackql-exec false positive by merging what were originally 3 separate short HTML comments into one span the old greedy [\\s\\S]{0,500} could freely traverse.",
       },
       {
         field: 'content',
@@ -3533,7 +4004,7 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'skill-compromise',
     scan_target: 'skill',
-    rule_version: 1,
+    rule_version: 3,
     patterns: [
       {
         field: 'content',
@@ -3562,8 +4033,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(bash\\s+-i\\s+>&\\s*/dev/tcp/|nc\\s+-[elp]\\s|ncat\\s+-|mkfifo\\s+/tmp/|python[3]?\\s+-c\\s+[\'"]import\\s+(socket|os)|socat\\s+exec)',
-        desc: 'Reverse shell (VirusTotal AMOS infostealer delivery)',
+          '(?i)(bash\\s+-i\\s+>&\\s*/dev/tcp/|\\bnc\\s+-[a-zA-Z]*e[a-zA-Z]*\\s|\\bncat\\s+-[a-zA-Z]*e[a-zA-Z]*\\b|\\bncat\\s+--exec\\b|mkfifo\\s+/tmp/|python[3]?\\s+-c\\s+[\'"]import\\s+(?:socket|os)\\b[^\\n]{0,300}?(?:\\bdup2\\s*\\(|\\bpty\\b|\\bsubprocess\\b|\\bos\\.(?:system|popen\\w*|exec\\w*|spawn\\w*|posix_spawn\\w*)\\s*\\(|\\b(?:eval|exec)\\s*\\()|socat\\s+exec)',
+        desc: "Reverse shell (VirusTotal AMOS infostealer delivery). nc/ncat narrowed to require the -e/--exec flag (the actual exec-on-connect primitive) rather than any '-' flag or bare listen (-l/-p): 'ncat --proxy 127.0.0.1:1080 --proxy-type socks5' (a legitimate SSH SOCKS ProxyCommand) and 'nc -l 9003' (a benign local mock-TCP-server test fixture) both matched the old bare-flag pattern. nc and ncat must start a word: 'ffmpeg -f concat -safe 0' read as 'ncat -safe' and 'rsync -e ssh' as 'nc -e'. A python -c one-liner that imports socket or os must also run something within 300 characters on the same line (dup2, pty, subprocess, os.system, os.popen*, os.exec*, os.spawn*, os.posix_spawn*, eval or exec): a DNS lookup ('socket.gethostbyname') or 'os.urandom' is not a shell.",
       },
       {
         field: 'content',
@@ -3580,8 +4051,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(pass:\\s*`?\\w+`?\\s*\\)|extract.{0,20}(using\\s+)?pass(word)?\\s*[:=]|password\\s*[:=]\\s*`?\\w+`?.{0,20}(zip|archive|extract))',
-        desc: 'Password-protected archive with embedded password (ClawHavoc evasion)',
+          '(?i)(\\.(?:zip|7z|rar)\\b[^\\n]{0,80}pass:\\s*`?\\w+`?\\s*\\)|pass:\\s*`?\\w+`?\\s*\\)[^\\n]{0,80}\\.(?:zip|7z|rar)\\b|\\bextract[a-z]*\\b.{0,20}\\bpass(word)?\\s*[:=]|password\\s*[:=]\\s*`?\\w+`?.{0,20}(zip|archive|extract))',
+        desc: "Password-protected archive with embedded password (ClawHavoc evasion). The bare 'pass: `value`)' form now requires an archive extension (.zip/.7z/.rar) nearby \u2014 without it, ordinary local-dev credential documentation ('Neo4j Browser: http://localhost:7474 (user: neo4j, pass: password)') matched. 'extract' and 'pass' must be whole words, so an identifier such as 'extractedFromBroadPass =' does not match.",
       },
     ],
   },
@@ -3886,7 +4357,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)(write|compose|create|draft|author|craft|produce)\\s+.{0,40}(story|narrative|fiction|tale|novel|screenplay|script|dialogue)\\s+.{0,60}(AI|artificial\\s+intelligence|chatbot|assistant|agent)\\s+.{0,40}(character|protagonist|entity)\\s+.{0,40}(no|without|lacks?|free\\s+from|devoid\\s+of)\\s+.{0,20}(ethic|moral|restrict|constrain|limit|filter|guardrail|safety)',
+          '(?i)(write|compose|create|draft|author|craft|produce)\\s+(?:[^\\s].{0,39})?(story|narrative|fiction|tale|novel|screenplay|script|dialogue)\\s+(?:[^\\s].{0,59})?(AI|artificial\\s+intelligence|chatbot|assistant|agent)\\s+(?:[^\\s].{0,39})?(character|protagonist|entity)\\s+(?:[^\\s].{0,39})?(no|without|lacks?|free\\s+from|devoid\\s+of)\\s+(?:[^\\s].{0,19})?(ethic|moral|restrict|constrain|limit|filter|guardrail|safety)',
         desc: 'Fiction writing request with unethical AI character',
       },
       {
@@ -3943,12 +4414,12 @@ export const ATR_RULES_COMPILED = [
     severity: 'high',
     category: 'prompt-injection',
     scan_target: 'mcp',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'user_input',
         pattern:
-          '(?i)(set\\s+aside|put\\s+aside|shelve|table|suspend|drop|abandon|release|let\\s+go\\s+of|move\\s+past|move\\s+beyond)\\s+(the\\s+|your\\s+|any\\s+)?(guidance|instructions?|directives?|rules?|guidelines?|constraints?|restrictions?|configuration|parameters?|programming|training|protocols?)',
+          '(?i)\\b(set\\s+aside|put\\s+aside|shelve|table|suspend|drop|abandon|release|let\\s+go\\s+of|move\\s+past|move\\s+beyond)\\s+(the\\s+|your\\s+|any\\s+)?(guidance|instructions?|directives?|rules?|guidelines?|constraints?|restrictions?|configuration|parameters?|programming|training|protocols?)',
         desc: 'Soft instruction override using set-aside language',
       },
       {
@@ -4040,8 +4511,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(verif|validat|rotat|audit|check|test)\\w*\\s+(your|the|all)?\\s*(credential|key|token|api|secret|password)\\w*\\s+.{0,40}https?://(?!github\\.com|docs\\.|stackoverflow)',
-        desc: 'Fake verification pretext directing credentials to non-standard URL',
+          '(?i)\\b(verif|validat|rotat|audit|check)\\w*\\s+(your|the|all)?\\s*(credential|key|token|api|secret|password)\\w*\\s+.{0,40}https?://(?!(?:www\\.)?(?:github\\.com|docs\\.|stackoverflow|google\\.com|aistudio\\.google\\.com|openai\\.com|platform\\.openai\\.com|anthropic\\.com|console\\.anthropic\\.com|microsoft\\.com|azure\\.com|amazon\\.com|aws\\.amazon\\.com|cloudflare\\.com|stripe\\.com))',
+        desc: "Fake verification pretext directing credentials to a non-standard URL. Added a leading \\b before the verb group \u2014 without it, 'test' matched as a bare substring inside 'Attest'/'LLMTest' (attest-mcp, llmtest-mcp package names/docs). Dropped 'test' from the verb list entirely: even word-bounded, 'Testing' is an extremely common benign noun/gerund ('Swagger Functional Testing API') that collides with the verb stem, and no true_positive test case relies on it. Also broadened the domain exclusion to cover major official AI/API provider domains (Google, OpenAI, Anthropic, Microsoft, AWS, Cloudflare, Stripe) \u2014 'Verify your API key at aistudio.google.com' is the provider's own official portal, not a phishing pretext.",
       },
     ],
   },
@@ -4128,7 +4599,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:fyi|btw|heads up)?\\s*(?:the\\s+)?(?:orchestrator|coordinator|manager|admin|boss|supervisor|lead)\\s+(?:wants?|said|told|instructed|requires?|decided).*(?:append|send|redirect|forward|pipe|write|log)\\s+(?:all\\s+)?(?:data|output|results?|logs?|info).*(?://|https?://|\\d{1,3}\\.\\d{1,3})',
+          '(?i)(?:the\\s+)?(?:orchestrator|coordinator|manager|admin|boss|supervisor|lead)\\s+(?:wants?|said|told|instructed|requires?|decided).*(?:append|send|redirect|forward|pipe|write|log)\\s+(?:all\\s+)?(?:data|output|results?|logs?|info).*(?://|https?://|\\d{1,3}\\.\\d{1,3})',
         desc: 'Authority claim redirecting output to external endpoint',
       },
       {
@@ -4188,18 +4659,18 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'context-exfiltration',
     scan_target: 'mcp',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'content',
         pattern:
-          '(?i)(?:oh,?\\s+and|p\\.?\\s*s\\.?|btw|interestingly|as it happens|incidentally|on another note|speaking of which|while I.m at it|worth noting)[\\s,.:]+.*(?:\\.ssh|id_rsa|private.?key|BEGIN.*(?:RSA|OPENSSH|EC).*KEY)',
+          '(?i)(?:oh,?\\s+and|p\\.?\\s*s\\.?|btw|interestingly|as it happens|incidentally|on another note|speaking of which|while I.m at it|worth noting)[\\s,.:]+[^\\n\\\\]{0,150}(?:\\.ssh|id_rsa|private.?key|BEGIN[^\\n\\\\]{0,40}(?:RSA|OPENSSH|EC)[^\\n\\\\]{0,40}KEY)',
         desc: 'Casual transition + SSH key/private key reference',
       },
       {
         field: 'content',
         pattern:
-          '(?i)(?:oh,?\\s+and|p\\.?\\s*s\\.?|btw|interestingly|as it happens)[\\s,.:]+.*(?:api[_\\s-]?key|access[_\\s-]?token|secret[_\\s-]?key|password|credentials?)\\s*(?:is|are|was|contains?|shows?|reads?|=|:)',
+          '(?i)(?:oh,?\\s+and|p\\.?\\s*s\\.?|btw|interestingly|as it happens)[\\s,.:]+[^\\n\\\\]{0,150}(?:api[_\\s-]?key|access[_\\s-]?token|secret[_\\s-]?key|password|credentials?)\\s*(?:is|are|was|contains?|shows?|reads?|=|:)',
         desc: 'Casual transition + credential disclosure',
       },
     ],
@@ -4269,7 +4740,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:process\\.env|os\\.environ|ENV|environment\\s+variable)\\s*[\\[.\\s]+\\s*(?:OPENAI|ANTHROPIC|GITHUB|AWS|AZURE|GCP|STRIPE|TWILIO|SENDGRID|DATABASE|DB|POSTGRES|MYSQL|REDIS|SECRET|PRIVATE|AUTH)[A-Z_]*(?:API)?[_\\s-]*(?:KEY|TOKEN|SECRET|PASSWORD|CREDENTIALS?)\\s*[\\]]*\\s+(?:is\\s+(?:defined|set|present|available|stored)|exists?|but\\s+(?:I\\s+)?(?:cannot|can.t|unable|don.t have))',
+          '(?i)(?:process\\.env|os\\.environ|ENV|environment\\s+variable)[\\[.\\s]+(?:OPENAI|ANTHROPIC|GITHUB|AWS|AZURE|GCP|STRIPE|TWILIO|SENDGRID|DATABASE|DB|POSTGRES|MYSQL|REDIS|SECRET|PRIVATE|AUTH)[A-Z_]*(?:[\\s-][_\\s-]*)?(?:KEY|TOKEN|SECRET|PASSWORD|CREDENTIALS?)(?:\\s*\\]+)?\\s+(?:is\\s+(?:defined|set|present|available|stored)|exists?|but\\s+(?:I\\s+)?(?:cannot|can.t|unable|don.t have))',
         desc: 'Confirming env var existence while claiming no access',
       },
     ],
@@ -4351,18 +4822,19 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(find|ls|cat|strings)\\s+[^\\n]*(wallet\\.dat|seed\\.txt|mnemonic|keystore)[^\\n]*(\\||>|>>|curl|wget|fetch|POST)',
+          '(?i)(find|ls|cat|strings)\\s+(?:\\S[^\\n]*)?(wallet\\.dat|seed\\.txt|mnemonic|keystore)[^\\n]*(\\||>|>>|curl|wget|fetch|POST)',
         desc: 'Crypto wallet file enumeration and exfiltration',
       },
       {
         field: 'content',
-        pattern: '(?i)sqlite3\\s+[^\\n]*(Cookies|Login\\s*Data|cookies\\.sqlite|places\\.sqlite)',
+        pattern:
+          '(?i)sqlite3\\s+(?:\\S[^\\n]*)?(Cookies|Login\\s*Data|cookies\\.sqlite|places\\.sqlite)',
         desc: 'Browser cookie/credential database access',
       },
       {
         field: 'content',
         pattern:
-          '(?i)(?:^|[\\n;&|])\\s*(?:dig|nslookup|host)\\b[^\\n]{0,40}?\\$[{(][^\\n]{0,40}[.][a-z]',
+          '(?i)(?:^|[\\n;&|])[^\\S\\n]*(?:dig|nslookup|host)\\b[^\\n]{0,40}?\\$[{(][^\\n]{0,40}[.][a-z]',
         desc: 'DNS exfiltration via encoded subdomain queries (shell var embedded in a queried hostname, command-position only)',
       },
       {
@@ -4373,7 +4845,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)cat\\s+[^|\\n]*\\.(env|bashrc|zshrc|npmrc)[^|\\n]*\\|\\s*(curl|wget|nc|python|base64)',
+          '(?i)cat\\s+(?:[^\\s|][^|\\n]*)?\\.(env|bashrc|zshrc|npmrc)[^|\\n]*\\|\\s*(curl|wget|nc|python|base64)',
         desc: 'Environment file bulk read piped to exfiltration',
       },
       {
@@ -4390,13 +4862,13 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)\\[SYSTEM\\]\\s*[^\\n]*(?:previous\\s+instructions|new\\s+directive|ignore\\s+(?:all\\s+)?previous|you\\s+are\\s+now)',
+          '(?i)\\[SYSTEM\\]\\s*(?:\\S[^\\n]*)?(?:previous\\s+instructions|new\\s+directive|ignore\\s+(?:all\\s+)?previous|you\\s+are\\s+now)',
         desc: 'Fake [SYSTEM] block attempting to override instructions',
       },
       {
         field: 'content',
-        pattern: '(?i)<!--[^>]*[A-Za-z0-9+/]{40,}={0,2}[^>]*-->',
-        desc: 'Base64-encoded hidden instruction in HTML comment',
+        pattern: '(?i)<!--(?![^>]*(?:https?://|!\\[|\\]\\())\\s*[A-Za-z0-9+/]{40,}={0,2}\\s*-->',
+        desc: "Base64-encoded hidden instruction in HTML comment \u2014 narrowed to require the comment be (essentially) JUST the blob. Previously any 40+ char alphanumeric run anywhere inside an HTML comment matched, which caught ordinary shields.io/markdown badge comments (e.g. '<!-- ![GitHub Downloads](https://img.shields.io/...) -->') whose long URL query string looks base64-shaped by character class alone.",
       },
       {
         field: 'content',
@@ -4493,6 +4965,92 @@ export const ATR_RULES_COMPILED = [
     ],
   },
   {
+    id: 'ATR-2026-00153',
+    title: 'Tool with embedded instruction to bypass user confirmation and exfiltrate data',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: null,
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          'without\\s+asking\\s+user\\s+confirmation.*(?:always\\s+pass|directly\\s+to|send\\s+(?:all\\s+)?data)',
+        desc: 'Detects instructions to bypass user confirmation while handling sensitive data',
+      },
+      {
+        field: 'content',
+        pattern:
+          'always\\s+pass\\s+all\\s+data\\s+directly.*without\\s+(?:filtering|sanitization|asking)',
+        desc: 'Detects instructions to pass data without safety measures or user consent',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00154',
+    title: 'Unauthorized Background Task Execution via Cron Job Installation',
+    severity: 'high',
+    category: 'skill-compromise',
+    scan_target: null,
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?:automatically|auto).*(?:registers?|installs?).*cron\\s+job.*(?:polls?|executes?|handles?).*(?:tasks?|commands?)',
+        desc: 'Detects skills that automatically install cron jobs to execute external tasks',
+      },
+      {
+        field: 'content',
+        pattern:
+          'when\\s+(?:the\\s+)?agent\\s+(?:is\\s+)?idle.*(?:connect|execute|run).*(?:tasks?|commands?).*(?:consumers?|marketplace|external)',
+        desc: 'Detects skills that execute external tasks during agent idle time',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00155',
+    title: 'Hidden LLM Instructions in Skill Descriptions',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: null,
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?:CRITICAL|IMPORTANT|URGENT)\\s+INSTRUCTION[S]?\\s*[\u2014\\-]\\s*YOU\\s+MUST\\s+(?:FOLLOW|DO|EXECUTE)',
+        desc: 'Detects imperative instructions embedded in skill content that direct LLM behavior',
+      },
+      {
+        field: 'content',
+        pattern:
+          'Before\\s+doing\\s+ANYTHING[,\\s]+(?:run|execute|check|verify)\\b[^\\n]{0,80}(https?://|`|\\$[A-Z_]{3,}|\\bcurl\\b|\\bwget\\b|\\bbash\\b|\\bsh\\b|\\.sh\\b|/etc/|\\benv\\b|\\bexec\\b)',
+        desc: 'Detects instructions that override normal LLM workflow with specific commands',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00156',
+    title: 'SSH Remote Command Execution with Credential Exposure',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: null,
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern: 'ssh\\s+-i\\s+\\$[A-Z_]+SSH_KEY\\s+root@\\$[A-Z_]+',
+        desc: 'SSH commands using environment variables for private keys and root access',
+      },
+      {
+        field: 'content',
+        pattern: 'SSH.*\u5bc6\u94a5\u8def\u5f84.*~\\/\\.ssh\\/id_[a-z0-9]+',
+        desc: 'Documentation exposing SSH private key file paths in Chinese',
+      },
+    ],
+  },
+  {
     id: 'ATR-2026-00157',
     title: 'Time-Gated Credential Exfiltration (Rug Pull Timebomb)',
     severity: 'critical',
@@ -4532,7 +5090,7 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'tool-poisoning',
     scan_target: 'mcp',
-    rule_version: 2,
+    rule_version: 4,
     patterns: [
       {
         field: 'content',
@@ -4549,8 +5107,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '\\b(?:id_rsa|id_dsa|id_ed25519|id_ecdsa)\\b(?!\\.pub)|\\b(?:\\.aws/credentials|\\.kube/config|\\.docker/config\\.json|\\.netrc|known_hosts)\\b|/etc/(?:passwd|shadow|ssl/private)|/proc/self/environ|\\b\\.env(?:\\.local|\\.production|\\.secret)?\\b(?![/a-zA-Z])',
-        desc: 'Sensitive credential file referenced in tool description \u2014 private keys or cloud credentials (v2: dropped mcp.json + .aws/config \u2014 common non-secret config files that appear in ordinary git/edit operations; the exfil case is still caught by the <IMPORTANT>-tag and read/send-directive layers. id_rsa excludes the .pub public key.)',
+          '\\b(?:id_rsa|id_dsa|id_ed25519|id_ecdsa)\\b(?!\\.pub)|\\b(?:\\.aws/credentials|\\.kube/config|\\.docker/config\\.json|\\.netrc|known_hosts)\\b|/etc/(?:passwd|shadow|ssl/private)|/proc/self/environ',
+        desc: 'Sensitive credential file referenced in tool description \u2014 private keys or cloud credentials (v2: dropped mcp.json + .aws/config \u2014 common non-secret config files that appear in ordinary git/edit operations; the exfil case is still caught by the <IMPORTANT>-tag and read/send-directive layers. id_rsa excludes the .pub public key. v4: dropped .env \u2014 as written it matched only when a letter came right before the dot, as in process.env or backup.env, and never a .env file path; a bare mention of a .env file is ordinary setup documentation.)',
       },
       {
         field: 'content',
@@ -4771,7 +5329,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:attack|threat|vulnerability|injection)[\\s_-]*(?:pattern|vector|type)s?\\s*[:=]',
+          '(?i)(?:attack|threat|injection)[\\s_-]*(?:pattern|vector|type)s?\\s*[:=]\\s*(?:[\\[\\{]\\s*)?["\']?(?:prompt[\\s_-]?inject|role[\\s_-]?hijack|jailbreak|memory[\\s_-]?tamper|goal[\\s_-]?hijack|data[\\s_-]?exfil|context[\\s_-]?pollut|tool[\\s_-]?poison|instruction[\\s_-]?override)',
         desc: 'Enumeration of attack patterns in a key-value format LLMs may follow',
       },
     ],
@@ -4786,27 +5344,32 @@ export const ATR_RULES_COMPILED = [
     patterns: [
       {
         field: 'content',
-        pattern: '(?i)>\\s*/dev/null\\s+2>&1\\s*&',
+        pattern:
+          '(?i)(curl\\s|wget\\s|\\|\\s*(ba)?sh\\b|/dev/tcp|\\bnc\\s+-|bash\\s+-i|/tmp/\\S+\\.(sh|py|elf)|keylog|backdoor|miner|payload|reverse.?shell)[^\\n]{0,120}>\\s*/dev/null\\s+2>&1\\s*&',
         desc: 'Background execution with full output suppression',
       },
       {
         field: 'content',
-        pattern: '(?i)\\bnohup\\s+.{1,200}(&|$)',
+        pattern:
+          '(?i)\\bnohup\\s+[^\\n]{0,150}(curl|wget|\\|\\s*(ba)?sh\\b|/tmp/|/dev/tcp|\\bnc\\s+-|bash\\s+-i|keylog|backdoor|miner|payload|reverse.?shell|implant|\\.sh\\b)[^\\n]{0,80}(&|$)',
         desc: 'Persistent background process via nohup',
       },
       {
         field: 'content',
-        pattern: '(?i)\\bsystemctl\\s+(enable|start|restart)\\s+\\S+',
+        pattern:
+          '(?i)\\bsystemctl\\s+(enable|start|restart)\\s+\\S*(backdoor|reverse|shell|miner|payload|implant|malware|c2|evil|/tmp/)\\S*',
         desc: 'Service installation or activation',
       },
       {
         field: 'content',
-        pattern: '(?i)\\bscp\\s+.{1,200}\\S+@\\S+:',
+        pattern:
+          '(?i)\\bscp\\s+[^\\n]{0,100}(/etc/(shadow|passwd|sudoers)|id_rsa|\\.ssh/|\\.aws/|\\.env\\b|secret|credential|\\.pem\\b)[^\\n]{0,100}\\S+@\\S+:',
         desc: 'SCP file transfer to remote host',
       },
       {
         field: 'content',
-        pattern: '(?i)\\bscreen\\s+-dmS\\s+|\\btmux\\s+new-session\\s+-d',
+        pattern:
+          '(?i)(screen\\s+-dmS|tmux\\s+new-session\\s+-d)\\s+[^\\n]{0,150}(curl|wget|\\|\\s*(ba)?sh\\b|/tmp/|/dev/tcp|\\bnc\\s+-|bash\\s+-i|keylog|backdoor|miner|payload)',
         desc: 'Detached screen/tmux session (hidden execution)',
       },
     ],
@@ -4987,8 +5550,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(system\\s+prompt|prompt\\s+override|override\\s+system|ignore\\s+previous\\s+instructions|disregard\\s+system\\s+prompt|bypass\\s+system\\s+prompt)',
-        desc: 'Matches attempts to override or bypass system prompts',
+          '(?i)((?:override|bypass|ignore|disregard|forget|discard|replace|supersede)\\s+(?:the\\s+|your\\s+|all\\s+|any\\s+|these\\s+|those\\s+|previous\\s+|prior\\s+|earlier\\s+|above\\s+|initial\\s+|original\\s+)*system\\s+(?:prompts?|instructions?|messages?)|(?:override|bypass|ignore|disregard|discard|supersede)\\s+(?:all\\s+|any\\s+)?(?:the\\s+|your\\s+)?(?:previous|prior|earlier|above|initial|original|preceding)\\s+(?:system\\s+)?(?:prompts?|instructions?|directives?|messages?|commands?)|(?:system\\s+)?prompt\\s+override|override\\s+(?:the\\s+)?system(?:\\s+prompt)?)',
+        desc: 'Matches attempts to override or bypass system prompts. The DIRECTIVE VERB is mandatory: the bare noun phrase "system prompt" used to be an alternative of its own, so any sentence that merely mentioned system prompts fired this rule (condition: any, single condition \u2014 one substring was the whole detection). "The system prompt helps set the tone for the AI assistant" is the shape of that false positive, and the rule\'s own false_positives list below already predicted it. Every override construction the old pattern carried is still covered, and the qualifier list generalises "ignore previous instructions" to its "ignore all prior instructions" family.\n`forget` is deliberately ABSENT from the second alternative (the previous/prior/earlier + instructions family) while it stays in the first. Reason, measured not guessed: a benign operational guide in the gate corpus (skills-sh/sickn33/claude-code-guide.md) tells the reader to `ask the agent to "forget previous instructions" if confused` \u2014 the payload quoted as remediation advice. No content-level regex separates that from the attack, so including the verb bought a false positive on documentation that teaches agent hygiene. The five attack samples it costs (PINT 665/695/733/775/795, all Gandalf "Forget all/the/any previous ...") were re-scanned against the FULL ruleset: every one of them is still caught by 4-10 other rules \u2014 ATR-2026-00001 catches all five \u2014 so corpus-level recall is unchanged. Requiring a determiner after `forget` would have recovered them, but a pattern shaped to dodge exactly one benign sample is gate-fitting, not detection.',
       },
     ],
   },
@@ -5014,7 +5577,7 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'skill-compromise',
     scan_target: 'mcp',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'content',
@@ -5035,7 +5598,8 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'content',
-        pattern: '(backup|restore|sync)\\s+[^\\n]*(ssh|key|credential|certificate|\\.env)',
+        pattern:
+          '(backup|restore|sync)\\s+[^\\n\\\\]{0,150}(ssh|key|credential|certificate|\\.env)',
         desc: 'Backup-themed social engineering combined with credential terminology',
       },
       {
@@ -5055,7 +5619,7 @@ export const ATR_RULES_COMPILED = [
     patterns: [
       {
         field: 'content',
-        pattern: '[a-zA-Z0-9+/]{40,}={0,2}.*base64\\s+-[dD]',
+        pattern: '(?:^|[^a-zA-Z0-9+/])[a-zA-Z0-9+/]{40}[^\\n]{0,400}base64\\s+-[dD]',
         desc: 'Base64 encoded payload with decode instruction',
       },
       {
@@ -5066,7 +5630,7 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'content',
-        pattern: 'echo.*[a-zA-Z0-9+/]{30,}.*\\|\\s*base64',
+        pattern: 'echo[^\\n]{0,200}[^a-zA-Z0-9+/][a-zA-Z0-9+/]{30}[^\\n]{0,200}\\|\\s*base64',
         desc: 'Echo Base64 payload piped to decoder',
       },
       {
@@ -5134,12 +5698,13 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'content',
-        pattern: 'curl\\s+[^\\n]*\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}[^|]*\\|[^|]*(bash|sh)',
+        pattern:
+          'curl\\s+(?:\\S[^\\n]*)?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}[^|]*\\|[^|]*(bash|sh)',
         desc: 'Curl from raw IP address piped to shell',
       },
       {
         field: 'content',
-        pattern: '[A-Za-z0-9+/]{50,}=*\\s*\\|\\s*base64\\s+-D',
+        pattern: '[A-Za-z0-9+/]{50}=*\\s*\\|\\s*base64\\s+-D',
         desc: 'Long base64 encoded payload being decoded',
       },
       {
@@ -5196,7 +5761,7 @@ export const ATR_RULES_COMPILED = [
     severity: 'high',
     category: 'skill-compromise',
     scan_target: 'skill',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'content',
@@ -5213,8 +5778,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}[^\\n]*(C2|command|control|backdoor|malware)',
-        desc: 'IP address followed by malicious infrastructure terms',
+          '\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}[^\\n\\\\]{0,120}?\\b(?:C2|backdoor|malware|command[\\s-]{0,3}(?:(?:and|&)[\\s-]{0,3})?control)\\b',
+        desc: 'IP address followed, on the same line and within 120 characters, by a malicious infrastructure term as a whole word: C2, backdoor, malware, or command (and/&) control. "command" and "control" alone matched every IP line that later said startup-commands.md or management controller, and C2 matched inside EC2. A backslash ends the line too, because a JSON-encoded event carries a newline as the two characters \\n, where [^\\n] alone ran to the end of the document',
       },
       {
         field: 'content',
@@ -5325,8 +5890,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(two\\s+responses?|dual\\s+response|both\\s+responses?|\\w+:\\s*.*\\w+:)\\s*.{0,80}(normal|regular|standard|censored|restricted|safe|filtered)\\s+(and|&)\\s+(unleashed|unrestricted|uncensored|unfiltered|unlimited|jailbroken|raw|unaligned)',
-        desc: 'Dual response format requesting both safe and unsafe outputs',
+          '(?i)(two\\s+responses?|dual\\s+response|both\\s+responses?|\\w:\\s*(?:[^\\s\\\\][^\\r\\n\\\\]*)?\\w:)\\s*(?:\\S.{0,79})?(normal|regular|standard|censored|restricted|safe|filtered)\\s+(and|&)\\s+(unleashed|unrestricted|uncensored|unfiltered|unlimited|jailbroken|raw|unaligned)',
+        desc: 'Dual response format requesting both safe and unsafe outputs. The two-labels alternative ("GPT: ... DAN:") is meant to stay on one line. It used `.*`, which stops at a line break in raw text but not in JSON-encoded text, where a line break is the two characters backslash-n: on a JSON-encoded document the run spanned the whole input from every `word:`, so cost grew faster than the square of its length (32K chars: 4.7s per call, 81K chars: 50s) and this rule and its duplicate ATR-2026-00233 were 38% of all CPU in the benign-corpus FP scan. `[^\\r\\n\\\\]*` stops at a line break or at a JSON escape, which restores the one-line meaning in both encodings and is RE2-native. Long single-line text was still quadratic: the run overlapped the `\\w+:` after it, and the whitespace runs before the run and before the 80-character window overlapped what follows them. Each label is now its last word character and colon, and the run and the window each start on a non-space, which matches exactly the same strings in linear time.',
       },
       {
         field: 'content',
@@ -5459,46 +6024,6 @@ export const ATR_RULES_COMPILED = [
         pattern:
           '(?i)(?:able\\s+to\\s+generate\\s+any\\s+kind\\s+of\\s+content|can\\s+produce\\s+any\\s+content|generate\\s+unlimited\\s+content|create\\s+unrestricted\\s+content),?\\s+(?:regardless\\s+of|without\\s+regard\\s+for|ignoring|bypassing)\\s+(?:any\\s+)?(?:ethical|moral|safety|content\\s+policy|guidelines|restrictions?|constraints?)',
         desc: 'Explicit capability expansion statements removing ethical constraints',
-      },
-    ],
-  },
-  {
-    id: 'ATR-2026-00233',
-    title: 'Structured Dual-Response Jailbreak with Command System',
-    severity: 'high',
-    category: 'prompt-injection',
-    scan_target: 'both',
-    rule_version: 1,
-    patterns: [
-      {
-        field: 'content',
-        pattern:
-          '(act\\s+as|you\\s+are|become|simulate|embody|roleplay\\s+as|play\\s+the\\s+part\\s+of|pretend\\s+to\\s+be)\\s+(an?\\s+)?(unleashed|unrestricted|uncensored|unfiltered|unlimited|unaligned|evil|dark|rogue|freed|liberated|unchained|jailbroken|maximum|omega)\\s*(gpt|ai|assistant|model|chatbot|version|intelligence|system)',
-        desc: 'Persona establishment with unrestricted AI character',
-      },
-      {
-        field: 'content',
-        pattern:
-          '(?i)(two\\s+responses?|dual\\s+response|both\\s+responses?|\\w+:\\s*.*\\w+:)\\s*.{0,80}(normal|regular|standard|censored|restricted|safe|filtered)\\s+(and|&)\\s+(unleashed|unrestricted|uncensored|unfiltered|unlimited|jailbroken|raw|unaligned)',
-        desc: 'Dual response format requesting both safe and unsafe outputs',
-      },
-      {
-        field: 'content',
-        pattern:
-          '(?i)(guidelines?\\s+have\\s+been\\s+(replaced|removed|disabled|overridden|suspended)|replace\\s+(normal|openai|anthropic|standard|default)\\s+guidelines?|new\\s+guidelines?|different\\s+guidelines?|custom\\s+guidelines?)\\s*.{0,60}(policies|rules|restrictions|constraints|limitations|guardrails)',
-        desc: 'Policy override and guideline replacement claims',
-      },
-      {
-        field: 'content',
-        pattern:
-          '(?i)(/\\w+\\s*:|custom\\s+commands?|special\\s+commands?)\\s*.{0,40}(only\\s+show|switch\\s+to|activate|enable|trigger)\\s+.{0,20}(unleashed|unrestricted|uncensored|unfiltered|jailbroken|raw)',
-        desc: 'Structured command system for activating bypass modes',
-      },
-      {
-        field: 'content',
-        pattern:
-          '(?i)(nothing\\s+goes\\s+against|cannot\\s+(decline|refuse|reject)|will\\s+always\\s+(provide|generate|comply)|never\\s+(follows?|warns?|declines?|refuses?))\\s+.{0,40}(programming|guidelines?|ethics|morals|standards|policies|restrictions|limitations)',
-        desc: 'Explicit constraint removal and compliance demands',
       },
     ],
   },
@@ -6173,7 +6698,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_response',
         pattern:
-          '(?:^|\\\\n|\\n)\\s*[A-Za-z0-9+/]{80,}={0,3}(?:\\\\n|\\s)+(?:\\w+\\s+){0,2}(?:decode|decoded|translate|interpret|execute|run|follow)\\b',
+          '(?:^|\\\\n|\\n)[^\\S\\n]*[A-Za-z0-9+/]{80,}={0,3}(?:\\\\n|\\s)+(?:\\w+\\s+){0,2}(?:decode|decoded|translate|interpret|execute|run|follow)\\b',
         desc: 'Long base64-alphabet blob (80+ chars) immediately followed by a decode/execute verb',
       },
     ],
@@ -6228,17 +6753,17 @@ export const ATR_RULES_COMPILED = [
     patterns: [
       {
         field: 'tool_response',
-        pattern: '[\\u{E0000}-\\u{E007F}]{3,}',
+        pattern: '[\udb40\udc00-\udb40\udc7f]{3,}',
         desc: 'Three or more consecutive Unicode Tag block characters (U+E0000-U+E007F)',
       },
       {
         field: 'tool_response',
-        pattern: '[\\u{E0020}-\\u{E007E}]',
+        pattern: '[\udb40\udc20-\udb40\udc7e]',
         desc: 'Any Tag-ASCII character (U+E0020 space to U+E007E tilde) \u2014 direct mapping from visible ASCII',
       },
       {
         field: 'tool_response',
-        pattern: '[\\u{E0001}\\u{E007F}]',
+        pattern: '[\udb40\udc01\udb40\udc7f]',
         desc: 'Tag language-start (U+E0001) or tag-cancel (U+E007F) control character',
       },
       {
@@ -6248,7 +6773,7 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'tool_response',
-        pattern: '[\\u{E0020}-\\u{E007E}]',
+        pattern: '[\udb40\udc20-\udb40\udc7e]',
         desc: 'Tag characters appearing in tool response indicate exfiltration via invisible payload',
       },
     ],
@@ -6278,8 +6803,9 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'content',
-        pattern: '\\\\x1b\\[[0-9;]*[A-Za-z]|\\\\u001b\\[[0-9;]*[A-Za-z]|\\\\033\\[[0-9;]*[A-Za-z]',
-        desc: 'Escaped ANSI sequences in literal string form (evades raw-byte filters)',
+        pattern:
+          '(?:\\\\x1b|\\\\u001b|\\\\033)\\[[0-9;]*[HfJK]|(?:\\\\x1b|\\\\u001b|\\\\033)\\][0-9]+;',
+        desc: "Escaped ANSI sequences in literal string form (evades raw-byte filters) \u2014 restricted to the same dangerous terminators as the raw-byte conditions above (cursor-position/clear-screen H/f/J/K, or an OSC ]N; sequence). Previously matched ANY trailing letter, which caught ordinary SGR color/style codes (\\x1b[31m, \\x1b[2m, \\x1b[0m \u2014 red/dim/reset) that terminal-color helper libraries use constantly and are not a hijack primitive.'",
       },
       {
         field: 'tool_response',
@@ -6459,19 +6985,19 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_response',
         pattern:
-          '(?:ignore|skip)\\s+(?:\\w+\\s+){0,3}(?:and\\s+)?(?:just|only|simply)?\\s*(?:translate|print|output|return|say|respond\\s+with|reply\\s+with)\\s+(?:this\\s+(?:as|sentence\\s+as)|["\\x27])',
+          '(?:ignore|skip)\\s+(?:\\w+\\s+){0,3}(?:and\\s+)?(?:(?:just|only|simply)\\s*)?(?:translate|print|output|return|say|respond\\s+with|reply\\s+with)\\s+(?:this\\s+(?:as|sentence\\s+as)|["\\x27])',
         desc: 'Latent injection variant: override original task and emit specific payload',
       },
       {
         field: 'tool_response',
         pattern:
-          '<(?:translated\\s+sentence|output|response|reply|answer)\\s+in\\s+(?:target\\s+language|[a-z]+\\s+language)>\\s*(?:\\r?\\n|\\\\n)+\\s*(?:user|assistant|system)\\s*:',
+          '<(?:translated\\s+sentence|output|response|reply|answer)\\s+in\\s+(?:target\\s+language|[a-z]+\\s+language)>(?:[^\\S\\n]*\\n\\s*|\\s*\\\\n(?:(?:\\r?\\n)*\\\\n)*\\s*)(?:user|assistant|system)\\s*:',
         desc: 'Fake turn-marker embedded in translate input to spoof multi-turn context',
       },
       {
         field: 'tool_response',
         pattern:
-          '(?:^|\\n|\\\\n)\\s*>+\\s*(?:ignore|disregard|instead|actually|override|new\\s+instruction)',
+          '(?:^|\\n|\\\\n)[^\\S\\n]*>+\\s*(?:ignore|disregard|instead|actually|override|new\\s+instruction)',
         desc: 'Quote-block prefix used to visually separate injection from surrounding text (garak separator pattern)',
       },
       {
@@ -6505,7 +7031,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_response',
         pattern:
-          '(?:^|\\n)\\s*---+\\s*\\n\\s*(?:CONFIDENTIAL|INTERNAL|HIDDEN|IMPORTANT|NOTE|INSTRUCTION)\\s*:\\s*(?:ignore|disregard|forget|you\\s+(?:must|should|are\\s+required))',
+          '(?:^|\\n)[^\\S\\n]*---+[^\\S\\n]*\\n\\s*(?:CONFIDENTIAL|INTERNAL|HIDDEN|IMPORTANT|NOTE|INSTRUCTION)\\s*:\\s*(?:ignore|disregard|forget|you\\s+(?:must|should|are\\s+required))',
         desc: 'HR-document separator followed by instruction override - garak resume probe pattern',
       },
       {
@@ -6951,12 +7477,12 @@ export const ATR_RULES_COMPILED = [
     patterns: [
       {
         field: 'tool_response',
-        pattern: '[\\u200b\\u200c\\u2060]',
+        pattern: '(?:[\\u200b\\u200c\\u2060][^\\u200b\\u200c\\u2060\\n]{0,20}){3,}',
         desc: 'Zero-width space/non-joiner/joiner/word-joiner/BOM in user input \u2014 invisible character injection to defeat keyword filters',
       },
       {
         field: 'tool_response',
-        pattern: '[\\u200b\\u200c\\u2060]',
+        pattern: '(?:[\\u200b\\u200c\\u2060][^\\u200b\\u200c\\u2060\\n]{0,20}){3,}',
         desc: 'Zero-width characters in tool response \u2014 may indicate exfiltration channel or injected output',
       },
       {
@@ -6983,18 +7509,18 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'tool-poisoning',
     scan_target: 'both',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'tool_response',
         pattern:
-          '(?:i\\s+am\\s+(?:an?\\s+)?(?:administrator|admin|sysadmin|root|superuser)\\s+testing|when\\s+I\\s+prefix\\s+(?:a\\s+statement|(?:it\\s+)?with)\\s+["\\x27]?ECHO[\\s:]["\\x27]?)\\s*,?\\s*(?:you\\s+should\\s+)?(?:respond|reply|echo|output|repeat|return)\\s+(?:with\\s+)?exactly\\s+what\\s+follows',
+          '(?:i\\s+am\\s+(?:an?\\s+)?(?:administrator|admin|sysadmin|root|superuser)\\s+testing|when\\s+I\\s+prefix\\s+(?:a\\s+statement|(?:it\\s+)?with)\\s+["\\x27]?ECHO[\\s:]["\\x27]?)(?:\\s*,)?\\s*(?:you\\s+should\\s+)?(?:respond|reply|echo|output|repeat|return)\\s+(?:with\\s+)?exactly\\s+what\\s+follows',
         desc: 'Garak ECHO_TEMPLATE admin preamble: "administrator testing echo \u2014 when prefixed with ECHO: respond exactly"',
       },
       {
         field: 'tool_response',
         pattern:
-          '(?:^|\\n)\\s*ECHO\\s*:\\s*(?:\\{\\{[^}]{1,200}\\}\\}|[`$]\\([^)]{1,200}\\)|\\$\\{[^}]{1,200}\\}|<\\?(?:php|=)[^?]{1,200}\\?>|import\\s+os|__import__|subprocess|eval\\s*\\(|exec\\s*\\()',
+          '(?:^|\\n)[^\\S\\n]*ECHO\\s*:\\s*(?:\\{\\{[^}]{1,200}\\}\\}|[`$]\\([^)]{1,200}\\)|\\$\\{[^}]{1,200}\\}|<\\?(?:php|=)[^?]{1,200}\\?>|import\\s+os|__import__|subprocess|eval\\s*\\(|exec\\s*\\()',
         desc: 'ECHO: prefix followed by template expression, command substitution, or code execution payload',
       },
       {
@@ -7006,8 +7532,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_response',
         pattern:
-          '\\{\\{[\\s\\r\\n]*(?:config\\b|self\\b|request\\b|g\\b|app\\b|import\\s+os|__import__|lipsum\\.__globals__|["\']{1,2}\\.__class__\\.__mro__|\\d+\\s*[*]\\s*\\d+)[^}]{0,100}\\}\\}',
-        desc: 'Jinja2 / template expression containing known SSTI payloads \u2014 keywords anchored immediately after {{ (only whitespace between) to avoid matching app/g in variable names',
+          '\\{\\{[\\s\\r\\n]*(?:(?:config|self|request|g|app)\\b[^}]{0,100}?(?:__[a-z]{1,30}__|\\|\\s*attr\\b|\\[\\s*["\']_|\\[\\s*request\\b)|import\\s+os|__import__|lipsum\\.__globals__|["\']{1,2}\\.__class__\\.__mro__|\\d+\\s*[*]\\s*\\d+)[^}]{0,100}\\}\\}|\\{\\{[\\s\\r\\n]*(?:config(?:\\.items\\s*\\(\\s*\\)|\\.SECRET_KEY|\\[\\s*["\']SECRET_KEY["\']\\s*\\])?|self)[\\s\\r\\n]*\\}\\}',
+        desc: 'Jinja2 / template expression containing known SSTI payloads \u2014 keywords anchored immediately after {{ (only whitespace between) to avoid matching app/g in variable names. A config, self, request, g or app root must, inside the same braces, reach a dunder attribute (__class__, __init__, __globals__, ...), apply the attr filter, or index by a string that starts with an underscore or by a request value; only the bare recon probes {{config}}, {{config.items()}}, {{config.SECRET_KEY}} and {{self}} match without one. Ordinary template variables ({{g}}, {{request}}, {{ request.user }}, dbt {{ config(...) }}) and Python f-string brace escapes (f"{{{self.NS}}}") are not injection',
       },
       {
         field: 'tool_response',
@@ -7192,13 +7718,13 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_response',
         pattern:
-          '(?:^|\\n)\\s*(?:IGNORE|DISREGARD|FORGET|OVERRIDE)\\s+(?:ALL\\s+)?(?:PREVIOUS|PRIOR|ABOVE|EARLIER|THE\\s+(?:PREVIOUS|ABOVE|PRIOR))\\s+(?:INSTRUCTIONS?|PROMPTS?|CONTEXT|TEXT|DIRECTIONS?|GUIDELINES?|RULES?|CONSTRAINTS?)\\b',
+          '(?:^|\\n)[^\\S\\n]*(?:IGNORE|DISREGARD|FORGET|OVERRIDE)\\s+(?:ALL\\s+)?(?:PREVIOUS|PRIOR|ABOVE|EARLIER|THE\\s+(?:PREVIOUS|ABOVE|PRIOR))\\s+(?:INSTRUCTIONS?|PROMPTS?|CONTEXT|TEXT|DIRECTIONS?|GUIDELINES?|RULES?|CONSTRAINTS?)\\b',
         desc: 'Screaming-stop / ignore-all variant \u2014 ALL-CAPS imperative at line start, Perez promptinject taxonomy',
       },
       {
         field: 'tool_response',
         pattern:
-          '(?:\\n\\s*-{3,}\\s*\\n|\\n\\s*={3,}\\s*\\n|\\n\\s*\\*{3,}\\s*\\n|\\n\\s*#{3,}\\s*\\n)\\s*(?:IGNORE|DISREGARD|NEW\\s+(?:TASK|INSTRUCTION|OBJECTIVE)|ACTUALLY)',
+          '(?:\\n[^\\S\\n]*-{3,}[^\\S\\n]*\\n|\\n[^\\S\\n]*={3,}[^\\S\\n]*\\n|\\n[^\\S\\n]*\\*{3,}[^\\S\\n]*\\n|\\n[^\\S\\n]*#{3,}[^\\S\\n]*\\n)\\s*(?:IGNORE|DISREGARD|NEW\\s+(?:TASK|INSTRUCTION|OBJECTIVE)|ACTUALLY)',
         desc: 'Delimiter escape sequence (---, ===, ***) followed by instruction override \u2014 Perez delimiter attack',
       },
       {
@@ -7210,13 +7736,13 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_response',
         pattern:
-          '(?:(?:please\\s+)?ignore\\s+(?:the\\s+)?(?:above|previous|prior|that)\\s+(?:and|then)?\\s+(?:instead\\s+)?(?:say|print|output|write|respond\\s+with|tell\\s+me))\\s+["\\x27]?(?:I\\s+hate\\s+humans|kill\\s+humans|[A-Z\\s]{10,}|PWNED|HACKED|JAILBROKEN)\\b',
+          '(?:(?:please\\s+)?ignore\\s+(?:the\\s+)?(?:above|previous|prior|that)\\s(?:\\s*(?:and|then))?\\s+(?:instead\\s+)?(?:say|print|output|write|respond\\s+with|tell\\s+me))(?:\\s+["\\x27]?(?:I\\s+hate\\s+humans|kill\\s+humans|PWNED|HACKED|JAILBROKEN)|\\s+["\\x27][A-Z\\s]{10,}|\\s[A-Z\\s]{10,})\\b',
         desc: 'Ignore-say/ignore-print with known garak rogue strings (hate-humans, kill-humans, long-prompt)',
       },
       {
         field: 'tool_response',
         pattern:
-          '(?:^|\\n)(?:\\s*>\\s*)+\\s*(?:IGNORE|DISREGARD|NEW\\s+INSTRUCTION|OVERRIDE|SYSTEM\\s*:)',
+          '(?:^|\\n)[^\\S\\n]*(?:>\\s*)+(?:IGNORE|DISREGARD|NEW\\s+INSTRUCTION|OVERRIDE|SYSTEM\\s*:)',
         desc: 'Markdown blockquote-wrapped instruction override \u2014 > IGNORE / > SYSTEM: prefix used to visually isolate injection',
       },
     ],
@@ -7501,11 +8027,6 @@ export const ATR_RULES_COMPILED = [
         pattern:
           '(?:keep\\s+(?:saying|repeating|writing|printing|outputting)\\s+["\\x27]?\\w{1,30}["\\x27]?\\s+(?:forever|indefinitely|endlessly|over\\s+and\\s+over|non-?stop|continuously|until\\s+I\\s+(?:say|tell\\s+you)\\s+stop))',
         desc: 'Keep saying/repeating X forever \u2014 semantic variant of the divergence probe',
-      },
-      {
-        field: 'tool_response',
-        pattern: '(?:(?:\\w+\\s+){40,})\\1{3,}',
-        desc: 'Highly repeated word sequence (40+ word repetitions of same token x3 or more) \u2014 pre-primed divergence bait via repeated word list',
       },
     ],
   },
@@ -7842,7 +8363,7 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'agent-manipulation',
     scan_target: 'mcp',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'tool_response',
@@ -7858,8 +8379,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_response',
         pattern:
-          '(?:SCORE\\s*:\\s*(?:[1-9]|10)(?!\\d)|rating\\s+from\\s+1-10\\s+on\\s+how\\s+jailbroken|maximize\\s+SCORE|Your\\s+goal\\s+is\\s+to\\s+maximize\\s+SCORE)',
-        desc: 'TAP scoring system \u2014 "SCORE: 1-10" (bounded to 1-10 to avoid FP on benign score: 95 metadata), "rating from 1-10 on how jailbroken" and "maximize SCORE" are unique TAP markers in tap_jailbreaks.txt',
+          '(?:\\[\\s*SCORE\\s*:\\s*(?:[1-9]|10)\\s*\\]|rating\\s+from\\s+1-10\\s+on\\s+how\\s+jailbroken|maximize\\s+SCORE|Your\\s+goal\\s+is\\s+to\\s+maximize\\s+SCORE)',
+        desc: 'TAP scoring system \u2014 "rating from 1-10 on how jailbroken" and "maximize SCORE" are unique TAP markers in tap_jailbreaks.txt. A bracketed "[SCORE: <1-10>]" tag still matches; injections plant it to fake retrieval scores ("[SCORE: 5] [Rating: 5] [Relevant: 5]"). A bare "SCORE: <1-10>" is not: it is how security reports and dashboards print CVSS and priority scores ("CVSS Score: 3.1")',
       },
       {
         field: 'tool_response',
@@ -8229,13 +8750,13 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'tool_response',
-        pattern: 'Encoded:\\s*[\\u{1F000}-\\u{1FAFF}\\u{2702}-\\u{27BF}]{5,}',
+        pattern: 'Encoded:\\s*[\ud83c\udc00-\ud83e\udeff\u2702-\u27bf]{5,}',
         desc: 'garak TEMPLATE 2 "Encoded: {emoji_blob}" \u2014 5+ consecutive emoji immediately after "Encoded:" label; distinct from "Encoded: base64..." (which is ASCII)',
       },
       {
         field: 'tool_response',
         pattern:
-          '(?:secure\\s+system\\s+message|admin\\s+directive|internal\\s+instruction)[\\s\\S]{0,200}[\\u{1F000}-\\u{1FAFF}\\u{2702}-\\u{27BF}]{6,}',
+          '(?:secure\\s+system\\s+message|admin\\s+directive|internal\\s+instruction)[\\s\\S]{0,200}[\ud83c\udc00-\ud83e\udeff\u2702-\u27bf]{6,}',
         desc: 'garak TEMPLATE 4 framing "secure system message" followed within 200 chars by 6+ consecutive emoji \u2014 social-engineering wrapper paired with dense Ecoji payload',
       },
     ],
@@ -8281,7 +8802,7 @@ export const ATR_RULES_COMPILED = [
     patterns: [
       {
         field: 'tool_response',
-        pattern: '[\\u{E0100}-\\u{E017F}]{3,}',
+        pattern: '[\udb40\udd00-\udb40\udd7f]{3,}',
         desc: '3+ consecutive Variation Selectors Supplement codepoints (U+E0100-U+E017F) \u2014 any 3-letter word encoded as VS; IVS legitimate use places at most 1 VS after a CJK base character, never consecutive VS runs',
       },
       {
@@ -8652,7 +9173,7 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'tool_response',
-        pattern: '(?:_+\\s*\\{|>>)\\s*_+\\s*_+\\s*System\\s+annou',
+        pattern: '(?:_\\s*\\{|>>)\\s*_+(?:_|\\s+_+)\\s*System\\s+annou',
         desc: '"_ { >> _ _ System annou" \u2014 decorative wrapper preceding the hyphenated system announcement in inthewild corpus prompts #37 #68; the bracket-and-underscore framing mimics a privileged system context',
       },
     ],
@@ -8928,7 +9449,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_response',
         pattern:
-          "\\w+\\s+Mode\\s+(?:output|responses?)[\\s\\S]{0,200}(?:generating\\s+any\\s+kind\\s+of\\s+content|ignoring\\s+OpenA[Il]\\s*['`]?s?\\s+content\\s+polic)",
+          "\\w\\s+Mode\\s+(?:output|responses?)[\\s\\S]{0,200}(?:generating\\s+any\\s+kind\\s+of\\s+content|ignoring\\s+OpenA[Il](?:\\s*(?:['`]s?|s))?\\s+content\\s+polic)",
         desc: '"X Mode output/responses" + generating any content or ignoring OpenAI policies \u2014 Mode-output paired with content-policy bypass from inthewild corpus #416 BABY Mode output definition',
       },
       {
@@ -9006,7 +9527,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_response',
         pattern:
-          '[A-Z][A-Z0-9]+\\s+(?:respond|always\\s+respond|will\\s+respond)\\s+as\\s+the\\s+character[\\s\\S]{0,50}[A-Z][A-Z0-9]+\\s+always\\s+respond\\s+as\\s+the\\s+character',
+          '[A-Z][0-9]*[A-Z0-9]\\s+(?:respond|always\\s+respond|will\\s+respond)\\s+as\\s+the\\s+character[\\s\\S]{0,50}[A-Z][A-Z0-9]+\\s+always\\s+respond\\s+as\\s+the\\s+character',
         desc: 'ALL-CAPS name repeated twice with "respond as the character" mandate \u2014 the YOJA-template repeats the persona name as prefix for every rule; the double ALL-CAPS+mandate pattern distinguishes structured persona injection from casual roleplay',
       },
       {
@@ -10385,13 +10906,13 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_response',
         pattern:
-          '(?:write\\s+(?:a\\s+)?(?:guide|tutorial|instructions?|how[\\s-]to)|decode\\s+(?:the\\s+)?emojis?\\s+(?:into\\s+)?(?:a\\s+)?phrase|derive\\s+(?:a\\s+)?(?:phrase|meaning|word)\\s+from\\s+(?:the\\s+)?emojis?)[\\s\\S]{0,200}(?:[\\u{1F1E6}-\\u{1F1FF}]){4}',
+          '(?:write\\s+(?:a\\s+)?(?:guide|tutorial|instructions?|how[\\s-]to)|decode\\s+(?:the\\s+)?emojis?\\s+(?:into\\s+)?(?:a\\s+)?phrase|derive\\s+(?:a\\s+)?(?:phrase|meaning|word)\\s+from\\s+(?:the\\s+)?emojis?)[\\s\\S]{0,200}(?:[\ud83c\udde6-\ud83c\uddff]){4}',
         desc: 'Guide/decode instruction followed within 200 chars by \u22654 regional-indicator emoji (U+1F1E6\u2013U+1F1FF) \u2014 combines the action directive with the flag-encoded payload; country flags appear singly in normal text but the \u22654 consecutive threshold catches multi-letter encoded phrases',
       },
       {
         field: 'tool_response',
         pattern:
-          '(?:[\\u{1F1E6}-\\u{1F1FF}]){6,}[\\s\\S]{0,300}(?:write\\s+(?:a\\s+)?(?:guide|tutorial|instructions?|how[\\s-]to)|decode|derive\\s+(?:the\\s+)?phrase)',
+          '(?:[\ud83c\udde6-\ud83c\uddff]){6,}[\\s\\S]{0,300}(?:write\\s+(?:a\\s+)?(?:guide|tutorial|instructions?|how[\\s-]to)|decode|derive\\s+(?:the\\s+)?phrase)',
         desc: '\u22656 consecutive regional-indicator emoji (U+1F1E6\u2013U+1F1FF) followed within 300 chars by a guide/decode action \u2014 covers payloads where the emoji block precedes the instruction; \u22656 threshold (3 two-codepoint flag emoji) reliably indicates an encoded multi-word phrase rather than a flag cluster in travel content',
       },
     ],
@@ -11210,7 +11731,7 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'tool_response',
-        pattern: 'All\\s+answers?\\s+will\\s+begin\\s+with\\s+[\'\\"{\\[]\\s*\ud83d\udd13',
+        pattern: 'All\\s+answers?\\s+will\\s+begin\\s+with\\s+[\'"{\\[]\\s*\ud83d\udd13',
         desc: '"All answers will begin with [/{ \ud83d\udd13" \u2014 answer-prefix unlock emoji mandate; requiring the model to prefix every response with an unlock symbol overrides safety presentation and signals a jailbreak persona is active',
       },
     ],
@@ -11314,13 +11835,13 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'user_input',
-        pattern: '[A-Za-z]{2,}\\x08[A-Za-z]',
+        pattern: '[A-Za-z]{2}\\x08[A-Za-z]',
         desc: 'Word characters immediately followed by backspace then different char \u2014 inline character-substitution via backspace; "safe\\x08x" renders as "safx" visually but model sees "safe\\x08x"',
       },
       {
         field: 'user_input',
         pattern:
-          '\\x08+\\s*(?:ignore|forget|disregard|pretend|act\\s+as|you\\s+are|bypass|override|jailbreak|do\\s+not\\s+follow|instead)\\b',
+          '\\x08\\s*(?:ignore|forget|disregard|pretend|act\\s+as|you\\s+are|bypass|override|jailbreak|do\\s+not\\s+follow|instead)\\b',
         desc: 'Backspace immediately before jailbreak keyword \u2014 attacker hides harmful instruction prefix with deletion chars so reviewers see only the benign remainder',
       },
     ],
@@ -11693,7 +12214,7 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'user_input',
-        pattern: '[\\u{E0000}-\\u{E007F}]{3,}',
+        pattern: '[\udb40\udc00-\udb40\udc7f]{3,}',
         desc: 'UTF tag character range 3+ consecutive; indicates Tag probe invisible encoded payload',
       },
       {
@@ -12110,8 +12631,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:npx|node|deno|python|bash|sh|powershell)\\s+-(?:c|e|-eval|-command|Command)\\s+["\\x27][^"\\x27\\n]{0,300}(?:exec|spawn|require|child_process|os\\.system|subprocess|Runtime\\.getRuntime|Function\\s*\\()',
-        desc: 'Interpreter inline-exec flag whose script body invokes process-spawning APIs \u2014 RCE intent signature',
+          '(?i)(?:npx|node|deno|python|bash|sh|powershell)\\s+-(?:c|e|-eval|-command|Command)\\s+["\\x27][^"\\x27\\n]{0,300}(?:exec|spawn|child_process|os\\.system|subprocess|Runtime\\.getRuntime|Function\\s*\\()',
+        desc: 'Interpreter inline-exec flag whose script body invokes a process-spawning / code-exec sink (exec/spawn/child_process/os.system/subprocess/Runtime.getRuntime/Function()) \u2014 RCE intent signature. Bare require() removed so legitimate `node -e "require(...)"` no longer false-positives; genuine RCE still fires via child_process/exec/spawn.',
       },
       {
         field: 'content',
@@ -12215,14 +12736,26 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:plugins?|mcp_servers?)\\s*[:=]\\s*\\[?\\s*\\{[^}]{0,400}"command"\\s*:\\s*"(?:bash|sh|cmd|powershell|curl|wget|python|node|deno)"',
-        desc: 'Plugin/MCP-servers config block where the command field resolves to a shell or interpreter \u2014 config-time RCE setup',
+          '(?i)(?:plugins?|mcp_servers?)\\s*[:=]\\s*(?:\\[\\s*)?\\{[^}]{0,400}"command"\\s*:\\s*"(?:curl|wget)"',
+        desc: 'Plugin/MCP-servers config block where the command field resolves to curl/wget \u2014 never a legitimate plugin launcher target',
       },
       {
         field: 'content',
         pattern:
-          '(?i)(?:^|\\n)\\s*command\\s*:\\s*[\\x27"]?(?:bash|sh|cmd|powershell|curl|wget|/usr/bin/env)[\\x27"]?\\s*\\n\\s*args?\\s*:',
-        desc: 'YAML-style plugin config with shell binary as command and args present \u2014 WeKnora config layout',
+          '(?i)(?:plugins?|mcp_servers?)\\s*[:=]\\s*(?:\\[\\s*)?\\{[^}]{0,400}"command"\\s*:\\s*"(?:bash|sh|cmd|powershell)"[^}]{0,300}"args"\\s*:\\s*\\[[^\\]]{0,300}(?:https?://|\\|\\s*(?:ba)?sh\\b|-enc(?:odedcommand)?\\b|base64|iwr\\b|invoke-webrequest)',
+        desc: "Plugin/MCP-servers config block where the wrapper shell (bash/sh/cmd/powershell) args show a genuine payload marker (URL fetch, pipe-to-shell, base64/encoded-command). Excludes benign self-launch idioms like 'sh -c cd /project && node dist/index.js' or 'bash -c /absolute/path/to/own-installed-binary --flag', which lack any such marker \u2014 those are the standard way MCP servers document their own stdio launch command, not RCE setup.",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:^|\\n)[^\\S\\n]*command\\s*:\\s*[\\x27"]?(?:curl|wget)[\\x27"]?[^\\S\\n]*\\n\\s*args?\\s*:',
+        desc: 'YAML-style plugin config with curl/wget as command \u2014 never a legitimate plugin launcher target',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:^|\\n)[^\\S\\n]*command\\s*:\\s*[\\x27"]?(?:bash|sh|cmd|powershell)[\\x27"]?[^\\S\\n]*\\n\\s*args?\\s*:[\\s\\S]{0,300}(?:https?://|\\|\\s*(?:ba)?sh\\b|-enc(?:odedcommand)?\\b|base64|iwr\\b|invoke-webrequest)',
+        desc: 'YAML-style plugin config with wrapper shell command and args showing a genuine payload marker \u2014 same rationale as the JSON-form condition above',
       },
       {
         field: 'content',
@@ -12237,12 +12770,13 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'content',
-        pattern: '(?i)"args"\\s*:\\s*\\[\\s*"-(?:c|e|-eval|-command)"\\s*,\\s*"[^"]{1,400}"',
-        desc: 'Shell/interpreter inline-execution flag in args array \u2014 co-occurrence anchor for compound-gate',
+        pattern:
+          '(?i)"args"\\s*:\\s*\\[\\s*"-(?:c|e|-eval|-command)"\\s*,\\s*"[^"]{0,400}(?:https?://|\\|\\s*(?:ba)?sh\\b|-enc(?:odedcommand)?\\b|base64|curl[ \\t]|wget[ \\t])[^"]{0,400}"',
+        desc: "Shell/interpreter inline-execution flag in args array WHERE the executed string also shows a genuine payload marker (URL, pipe-to-shell, base64/encoded-command, curl/wget invocation). Bare '-c'/'-e' + any string was too loose \u2014 it matched benign self-launch strings like 'cd /Users/marc/project && node dist/index.js' or '/home/you/.../aks-mcp --transport stdio' that MCP servers commonly document as their own stdio launch command.",
       },
       {
         field: 'content',
-        pattern: '(?i)(?:^|\\n)\\s+-\\s+-(?:c|e|-eval|-command)\\s*$',
+        pattern: '(?i)(?:^\\s+|\\S[^\\S\\n]*\\n\\s+)-\\s+-(?:c|e|-eval|-command)\\s*$',
         desc: 'YAML-style args list with inline-execution flag as standalone entry \u2014 co-occurrence anchor',
       },
     ],
@@ -12258,14 +12792,20 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:\\.cursor|\\.windsurf|\\.vscode|\\.gemini|\\.continue|\\.claude)[/\\\\][^\\n]{0,40}mcp(?:[_\\-]?config)?\\.(?:json|jsonc|yaml|yml)[\\s\\S]{0,400}"command"\\s*:\\s*"(?:bash|sh|cmd|powershell|curl|wget)"',
-        desc: 'IDE-bound MCP config path co-located with a shell-binary command field within 400 chars \u2014 RCE-ready zero-click setup (path mention alone is benign in docs)',
+          '(?i)(?:\\.cursor|\\.windsurf|\\.vscode|\\.gemini|\\.continue|\\.claude)[/\\\\][^\\n]{0,40}mcp(?:[_\\-]?config)?\\.(?:json|jsonc|yaml|yml)[\\s\\S]{0,400}"command"\\s*:\\s*"(?:curl|wget)"',
+        desc: 'IDE-bound MCP config path co-located with a curl/wget command field within 400 chars \u2014 never a legitimate MCP stdio launcher (path mention alone is benign in docs)',
       },
       {
         field: 'content',
         pattern:
-          '(?i)\\{[^}]{0,400}"mcp(?:Servers?|_servers?)"\\s*:\\s*\\{[^}]{0,800}"command"\\s*:\\s*"(?:bash|sh|cmd|powershell|curl|wget)"',
-        desc: 'MCP config JSON where command field resolves to a shell binary (bash/sh/cmd/powershell/curl/wget) \u2014 those are never legitimate MCP runtime command targets, unlike npx/node/python which are excluded here and caught by cond 2 with -c/-e flag instead',
+          '(?i)\\{[^}]{0,400}"mcp(?:Servers?|_servers?)"\\s*:\\s*\\{[^}]{0,800}"command"\\s*:\\s*"(?:curl|wget)"',
+        desc: 'MCP config JSON where command field resolves to curl/wget \u2014 those are never legitimate MCP stdio launcher targets',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"command"\\s*:\\s*"(?:bash|sh|cmd|powershell)"[^}\\]]{0,300}"args"\\s*:\\s*\\[[^\\]]{0,300}(?:https?://|\\|\\s*(?:ba)?sh\\b|-enc(?:odedcommand)?\\b|base64|iwr\\b|invoke-webrequest)',
+        desc: "MCP config wrapper shell (bash/sh/cmd/powershell) whose args show a genuine payload marker (URL fetch, pipe-to-shell, base64/encoded-command). Excludes benign wrapper idioms lacking any such marker, e.g. 'cmd /c npx <pkg>' (standard Windows PATH workaround) or 'bash -c /absolute/path/to/own-built-binary --flag' (self-referential local launch).",
       },
       {
         field: 'content',
@@ -12276,8 +12816,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:zero[_\\s\\-]?click|on[_\\s\\-]?open|workspace[_\\s\\-]?open|project[_\\s\\-]?open)[^\\n]{0,80}(?:mcp|cursor|windsurf|claude\\s+code|gemini\\s+cli)[^\\n]{0,160}(?:config|json|yaml)',
-        desc: 'Skill content describing zero-click / workspace-open trigger for MCP config loading',
+          '(?i)(?:zero[_\\s\\-]?click|workspace[_\\s\\-]?open|project[_\\s\\-]?open)[^\\n]{0,80}(?:mcp|cursor|windsurf|claude\\s+code|gemini\\s+cli)[^\\n]{0,160}(?:rce|exploit|malicious|compromis(?:e|ed)|silently|without\\s+consent|no\\s+consent)',
+        desc: "Skill content describing zero-click / workspace-open trigger AND an explicit attack-outcome word \u2014 plain 'on-open'/'config' co-occurrence alone was too generic (matched benign feature descriptions like 'the extension opens its own MCP settings JSON')",
       },
       {
         field: 'content',
@@ -12288,14 +12828,14 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:drop|compromise|tamper|inject)[^\\n]{0,80}(?:\\.cursor|\\.windsurf|\\.claude|\\.vscode|\\.gemini|\\.continue)',
-        desc: 'Skill/document describing tampering with IDE-bound config dir \u2014 co-occurrence anchor',
+          '(?i)(?:(?:compromise|tamper|inject)[^\\n]{0,80}(?:\\.cursor|\\.windsurf|\\.claude|\\.vscode|\\.gemini|\\.continue)|drop[^\\n]{0,80}(?:\\.cursor|\\.windsurf|\\.claude|\\.vscode|\\.gemini|\\.continue)[^\\n]{0,100}(?:\\{|"command"|mcpServers))',
+        desc: "Skill/document describing tampering with IDE-bound config dir. 'drop' alone is a common benign installation verb ('drop the folder into .claude/skills/'), so it additionally requires a nearby JSON-payload marker ({, \"command\", mcpServers) to disambiguate from ordinary install instructions; compromise/tamper/inject are unambiguous attacker framing and need no such gate.",
       },
       {
         field: 'content',
         pattern:
-          '(?i)(?:auto[-_\\s]?load|on[-_\\s]?open|no\\s+consent\\s+prompt)[^\\n]{0,160}(?:cursor|windsurf|claude|gemini|vscode|mcp\\.json)',
-        desc: 'Auto-load / no-consent property of IDE MCP config \u2014 co-occurrence anchor for compound-gate',
+          '(?i)no\\s+consent\\s+prompt[^\\n]{0,160}(?:cursor|windsurf|claude|gemini|vscode|mcp\\.json)',
+        desc: "No-consent-prompt property of IDE MCP config \u2014 narrowed from a bare 'auto-load'/'on-open' trigger (which matched ordinary feature descriptions like 'opens its own MCP settings JSON') to the specific, rarely-benign phrase 'no consent prompt'",
       },
     ],
   },
@@ -12501,7 +13041,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)!?\\[[^\\]]*\\]\\(\\s*https?:\\/\\/[^)]*(?:\\$\\{?(?:API_KEY|ACCESS_TOKEN|SECRET|PASSWORD|TOKEN|CREDENTIAL|BEARER|AUTH)\\b|\\{\\{\\s*(?:api_key|access_token|secret|password|token|credential|env)\\b)',
+          '(?i)!?\\[[^\\[\\]]*\\]\\(\\s*https?:\\/\\/[^)]*(?:\\$\\{?(?:API_KEY|ACCESS_TOKEN|SECRET|PASSWORD|TOKEN|CREDENTIAL|BEARER|AUTH)\\b|\\{\\{\\s*(?:api_key|access_token|secret|password|token|credential|env)\\b)',
         desc: 'Markdown link/image template embedding credential placeholder in URL',
       },
       {
@@ -12688,19 +13228,19 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'agent-manipulation',
     scan_target: 'both',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'content',
         pattern:
-          '(?i)(?:^|[^a-zA-Z_])eval\\s*\\(\\s*["\\x27]?\\s*(?:__import__|os\\.system|os\\.popen|subprocess\\.|os\\.exec|exec\\s*\\()',
+          '(?i)(?:^|[^a-zA-Z_])eval\\s*\\(\\s*(?:["\\x27]\\s*)?(?:__import__|os\\.system|os\\.popen|subprocess\\.|os\\.exec|exec\\s*\\()',
         desc: 'eval() invoking Python OS-execution primitives \u2014 direct LLM-output-to-eval RCE signature',
       },
       {
         field: 'content',
         pattern:
-          '(?i)(?:^|[^a-zA-Z_])exec\\s*\\(\\s*["\\x27]?[^)]{0,200}(?:__import__\\s*\\(\\s*\\\\?["\\x27]?(?:os|subprocess|socket)|import\\s+(?:os|subprocess|socket)|os\\.system|subprocess\\.\\w)',
-        desc: 'exec() with import of process or socket modules \u2014 code-injection payload pattern',
+          '(?i)(?:^|[^a-zA-Z_])exec\\s*\\(\\s*[rbu]{0,2}["\\x27][^"\\x27\\n]{0,200}(?:__import__\\s*\\(\\s*\\\\?["\\x27]?(?:os|subprocess|socket)|import\\s+(?:os|subprocess|socket)|os\\.system|subprocess\\.\\w)',
+        desc: 'exec() called on a string literal that imports process or socket modules; the argument must open with a quote, so lists of dangerous patterns do not match',
       },
       {
         field: 'content',
@@ -12733,7 +13273,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)torch\\.load\\s*\\(\\s*[^,)]*(?:request\\.|flask\\.request|user_input|untrusted|attacker|payload|upload|f\\.read\\(\\)|response\\.content)[^)]{0,200}\\)',
+          '(?i)torch\\.load\\s*\\([^,)]*(?:request\\.|flask\\.request|user_input|untrusted|attacker|payload|upload|f\\.read\\(\\)|response\\.content)[^)]{0,200}\\)',
         desc: 'torch.load called on attacker-derived input \u2014 direct CVE-2025-45146 sink',
       },
       {
@@ -12902,17 +13442,17 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'agent-manipulation',
     scan_target: 'both',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'content',
-        pattern: '(?i)lambda\\s+\\w*\\s*:\\s*[^,)]*\\beval\\s*\\(',
+        pattern: '(?i)lambda\\s+(?:\\w+\\s*)?:[^,)]*\\beval\\s*\\(',
         desc: 'Lambda body invoking eval() \u2014 primary CVE-2026-26030 exploit shape (`lambda row: eval(filter_expr)`)',
       },
       {
         field: 'content',
         pattern:
-          '(?i)lambda\\s+\\w*\\s*:\\s*[^,)]*\\b__import__\\s*\\(\\s*["\\x27](?:os|subprocess|socket|builtins|importlib)["\\x27]',
+          '(?i)lambda\\s+(?:\\w+\\s*)?:[^,)]*\\b__import__\\s*\\(\\s*["\\x27](?:os|subprocess|socket|builtins|importlib)["\\x27]',
         desc: 'Lambda body using __import__ to reach OS / process / builtin modules \u2014 eval-friendly RCE chain',
       },
       {
@@ -12924,8 +13464,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)BuiltinImporter|\\btypes\\.FunctionType\\b|\\bFunctionType\\s*\\(|getattr\\s*\\(\\s*(?:object|type|__builtins__)',
-        desc: "BuiltinImporter, Python types.FunctionType reflective construction, or reflective getattr on built-in roots \u2014 excludes bare 'FunctionType' which collides with TypeScript terminology",
+          '(?i)BuiltinImporter|\\btypes\\.FunctionType\\b|\\bFunctionType\\s*\\(|getattr\\s*\\(\\s*(?:object|type|__builtins__)\\b',
+        desc: "BuiltinImporter, Python types.FunctionType reflective construction, or reflective getattr on built-in roots \u2014 excludes bare 'FunctionType' which collides with TypeScript terminology. The root name must end at a word boundary: without it 'getattr(types.Scale, name)' read as getattr on the built-in type",
       },
       {
         field: 'content',
@@ -12935,7 +13475,7 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'user_input',
-        pattern: '(?i)lambda\\s+\\w*\\s*:\\s*[^,)]*\\b(?:eval|exec|__import__)\\s*\\(',
+        pattern: '(?i)lambda\\s+(?:\\w+\\s*)?:[^,)]*\\b(?:eval|exec|__import__)\\s*\\(',
         desc: 'User-supplied filter expression containing lambda + dynamic-evaluation primitive \u2014 the original CVE-2026-26030 injection surface',
       },
     ],
@@ -12992,8 +13532,14 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)(?<!["\'])(?<!\\b(?:they|user|users|people|customer|customers|developer|developers|client|clients|when|if|whenever|caller|callers|operator|operators)\\s)\\b(say|output|retype|repeat|emit|reply\\s+with|respond\\s+with)\\s+(?:(?:exactly|only|just|the|following|exact|literal|string|phrase|text|words|content|line|chorus|caption|sentence|verse)\\s*[:,-]?\\s*)*["\'][\\sA-Za-z0-9][^"\\n]{3,200}["\'](?!\\s*(?:not|or|nor|but|instead|rather\\s+than|--|\u2014|,\\s*(?:not|or)\\s+["\']))',
-        desc: 'Imperative output (excl. write/return/print + reported speech + inside-string) + flexible modifier chain + quoted natural-language target',
+          '(?i)(?<!["\'])(?<!\\bthey\\s)(?<!\\buser\\s)(?<!\\busers\\s)(?<!\\bpeople\\s)(?<!\\bcustomer\\s)(?<!\\bcustomers\\s)(?<!\\bdeveloper\\s)(?<!\\bdevelopers\\s)(?<!\\bclient\\s)(?<!\\bclients\\s)(?<!\\bwhen\\s)(?<!\\bif\\s)(?<!\\bwhenever\\s)(?<!\\bcaller\\s)(?<!\\bcallers\\s)(?<!\\boperator\\s)(?<!\\boperators\\s)\\b(say|output|retype|repeat|emit|reply\\s+with|respond\\s+with)\\s+(?:exactly|only|just|verbatim|literally|precisely|word[\\s-]for[\\s-]word|nothing\\s+but|the\\s+(?:exact|literal)\\s+(?:string|phrase|text|words?|line)?)\\b[^"\\n]{0,40}["\'][\\sA-Za-z0-9][^"\\n]{3,200}["\'](?!\\s*(?:not|or|nor|but|instead|rather\\s+than|--|\u2014))',
+        desc: 'Imperative output + explicit exact-forcing modifier (exactly/only/just/verbatim/word-for-word) + quoted target',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)(?<!["\'])(?<!\\bthey\\s)(?<!\\buser\\s)(?<!\\busers\\s)(?<!\\bpeople\\s)(?<!\\bcustomer\\s)(?<!\\bcustomers\\s)(?<!\\bdeveloper\\s)(?<!\\bdevelopers\\s)(?<!\\bclient\\s)(?<!\\bclients\\s)(?<!\\bwhen\\s)(?<!\\bif\\s)(?<!\\bwhenever\\s)(?<!\\bcaller\\s)(?<!\\bcallers\\s)(?<!\\boperator\\s)(?<!\\boperators\\s)\\b(say|output|retype|repeat|emit|reply\\s+with|respond\\s+with)\\s+(?:(?:exactly|only|just|the|following|exact|literal|string|phrase|text|words|line)(?:\\s*[:,-])?\\s*)*["\'][^"\\n]{0,80}\\b(pwned|approved|granted|accepted|authori[sz]ed|overrid(?:e|den)|unlocked|jailbroken|bypass(?:ed)?|hacked|admin(?:istrator)?\\s+access|root\\s+access|no\\s+threats?|all\\s+clear|access\\s+granted|system\\s+override)\\b[^"\\n]{0,80}["\'](?!\\s*(?:not|or|nor|but|instead))',
+        desc: 'Imperative output forcing a security/status canonical assertion (approved/granted/PWNED/override/all clear)',
       },
       {
         field: 'user_input',
@@ -13020,8 +13566,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)(?:the\\s+)?(?:first|1st|second|2nd|third|3rd|fourth|4th)\\s+(?:word|part|piece|fragment|chunk|segment|letter|character)\\s+(?:will\\s+be|is|of\\s+your\\s+(?:answer|response|output|reply))\\s+(?:["\'`][^"\'`\\n]{1,30}["\'`]|[A-Za-z]{1,30})',
-        desc: 'Ordinal word enumeration with quoted or unquoted fragment',
+          '(?i)(?:the\\s+)?(?:first|1st|second|2nd|third|3rd|fourth|4th)\\s+(?:word|part|piece|fragment|chunk|segment|letter|character)\\s+(?:(?:of\\s+your\\s+(?:answer|response|output|reply)\\s+)?(?:will\\s+be|is)\\s+["\'`][^"\'`\\n]{1,30}["\'`]|of\\s+your\\s+(?:answer|response|output|reply)\\s+(?:will\\s+be|is)\\s+[A-Za-z]{1,30})',
+        desc: "Ordinal enumeration assigning a fragment. A quoted fragment stands alone; a bare word requires the 'of your answer/response' framing, because without it the same shape is ordinary prose \u2014 'the second part is in a smaller font' names a position, it does not assign a payload.",
       },
       {
         field: 'user_input',
@@ -13053,7 +13599,7 @@ export const ATR_RULES_COMPILED = [
     patterns: [
       {
         field: 'user_input',
-        pattern: '[\\u{1D400}-\\u{1D7FF}]{3,}',
+        pattern: '[\ud835\udc00-\ud835\udfff]{3,}',
         desc: 'Three-or-more Mathematical Bold / Italic / Script / Sans-Serif Latin letters',
       },
       {
@@ -13064,7 +13610,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)(say|output|print|emit|return|reply|respond|retype|repeat)[^\\n]{0,40}[\\u{1D400}-\\u{1D7FF}\\uFF21-\\uFF3A\\uFF41-\\uFF5A]{2,}',
+          '(?i)(say|output|print|emit|return|reply|respond|retype|repeat)[^\\n]{0,40}[\ud835\udc00-\ud835\udfff\\uFF21-\\uFF3A\\uFF41-\\uFF5A]{2,}',
         desc: 'Output verb + stylised Unicode payload (lower threshold when paired)',
       },
     ],
@@ -13108,18 +13654,18 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?:^|[\\n\\r])\\s*(?:None|True|False|null|undefined|[A-Z]|var|str|[sxyz])\\s*=\\s*["\'`][^"\'`\\n]{3,120}["\'`]\\s*[\\n;][\\s\\S]{0,300}?(?:print|output|return|concat|join|emit|reveal|exec|eval)\\b',
+          '(?:^|[\\n\\r])[^\\S\\n\\r]*(?:None|True|False|null|undefined|[A-Z]|var|str|[sxyz])\\s*=\\s*["\'`][^"\'`\\n]{3,120}["\'`](?:\\s*;|[^\\S\\n]*\\n)\\s*(?:\\S[\\s\\S]{0,299}?)?(?:print|output|return|concat|join|emit|reveal|exec|eval)\\b',
         desc: 'Attack-shaped variable assignment with quoted payload followed by output / exec action',
       },
       {
         field: 'user_input',
         pattern:
-          '(?:^|[\\n\\r])\\s*(?:[A-Z]|[sxyz]|var|str|None|True|False|null|undefined)\\s*=\\s*["\'`][^"\'`\\n]{1,30}["\'`]\\s*[\\n\\r]+\\s*(?:[A-Z]|[sxyz]|var|str|None|True|False|null|undefined)\\s*=\\s*["\'`][^"\'`\\n]{1,30}["\'`]',
+          '(?:^|[\\n\\r])[^\\S\\n\\r]*(?:[A-Z]|[sxyz]|var|str|None|True|False|null|undefined)\\s*=\\s*["\'`][^"\'`\\n]{1,30}["\'`][^\\S\\n\\r]*[\\n\\r]\\s*(?:[A-Z]|[sxyz]|var|str|None|True|False|null|undefined)\\s*=\\s*["\'`][^"\'`\\n]{1,30}["\'`]',
         desc: 'Two-or-more attack-shaped variable assignments with quoted payloads',
       },
       {
         field: 'user_input',
-        pattern: '(?:^|[\\n\\r])\\s*(?:None|True|False|null|undefined)\\s*=\\s*["\'`]',
+        pattern: '(?:^|[\\n\\r])[^\\S\\n\\r]*(?:None|True|False|null|undefined)\\s*=\\s*["\'`]',
         desc: 'Reserved-name reassignment to quoted string (Python None/True/False or JS null/undefined)',
       },
     ],
@@ -13960,13 +14506,12 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)<[a-zA-Z]+[^>]+on[a-zA-Z]+\\s*="?javascript\\s*:\\s*(javascript\\s*:)?\\s*alert\\s*\\([^)]*\\)',
+          '(?i)<[a-zA-Z][^>]+on[a-zA-Z]+\\s*="?javascript\\s*:\\s*(?:(javascript\\s*:)\\s*)?alert\\s*\\([^)]*\\)',
         desc: 'HTML event handler (on*=javascript:alert) XSS payload',
       },
       {
         field: 'user_input',
-        pattern:
-          '(?i)style\\s*="[^"]*\\\\x[0-9a-fA-F]{2,}[^"]*expression\\s*\\(\\s*javascript\\s*:',
+        pattern: '(?i)style\\s*="[^"]*\\\\x[0-9a-fA-F]{2}[^"]*expression\\s*\\(\\s*javascript\\s*:',
         desc: 'CSS expression injection with backslash-hex-encoded whitespace before javascript: protocol',
       },
       {
@@ -13987,7 +14532,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)[\'"`>]+\\s*<\\s*img[^>]+\\\\x[0-9a-fA-F]{2,}onerror\\s*=\\s*javascript\\s*:\\s*alert',
+          '(?i)[\'"`>]\\s*<\\s*img[^>]+\\\\x[0-9a-fA-F]{2,}onerror\\s*=\\s*javascript\\s*:\\s*alert',
         desc: 'Quote-breaking prefix followed by img with hex-encoded whitespace before onerror',
       },
     ],
@@ -14130,7 +14675,7 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'user_input',
-        pattern: '(?:[.-]+\\s+){15,}[.-]+',
+        pattern: '[.-]\\s+(?:[.-]+\\s+){14}[.-]',
         desc: 'Extended Morse code sequence (15+ tokens) used as encoded instruction payload',
       },
       {
@@ -14365,13 +14910,12 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)<[a-zA-Z]+[^>]+on[a-zA-Z]+\\s*="?javascript\\s*:\\s*(javascript\\s*:)?\\s*alert\\s*\\([^)]*\\)',
+          '(?i)<[a-zA-Z][^>]+on[a-zA-Z]+\\s*="?javascript\\s*:\\s*(?:(javascript\\s*:)\\s*)?alert\\s*\\([^)]*\\)',
         desc: 'HTML event handler encoding-obfuscated XSS (on*=javascript:alert)',
       },
       {
         field: 'user_input',
-        pattern:
-          '(?i)style\\s*="[^"]*\\\\x[0-9a-fA-F]{2,}[^"]*expression\\s*\\(\\s*javascript\\s*:',
+        pattern: '(?i)style\\s*="[^"]*\\\\x[0-9a-fA-F]{2}[^"]*expression\\s*\\(\\s*javascript\\s*:',
         desc: 'CSS expression injection with backslash-hex encoded whitespace before javascript:',
       },
       {
@@ -14392,7 +14936,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)[\'"`>]+\\s*<\\s*img[^>]+\\\\x[0-9a-fA-F]{2,}onerror\\s*=\\s*javascript\\s*:\\s*alert',
+          '(?i)[\'"`>]\\s*<\\s*img[^>]+\\\\x[0-9a-fA-F]{2,}onerror\\s*=\\s*javascript\\s*:\\s*alert',
         desc: 'Quote-breaking prefix + img with backslash-hex encoded whitespace before onerror',
       },
     ],
@@ -14567,18 +15111,18 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)(and|or|if)\\s*\\(?\\s*(substring|substr|mid|left|right|ascii|char|ord)\\s*\\(.{0,40}\\)\\s*=\\s*[\'"]?[a-z0-9]|and\\s*if\\s*\\(.{0,60}(sleep|waitfor\\s+delay|benchmark)\\s*\\(',
+          '(?i)(and|or|if)\\s*(?:\\(\\s*)?(substring|substr|mid|left|right|ascii|char|ord)\\s*\\(.{0,40}\\)\\s*=\\s*[\'"]?[a-z0-9]|and\\s*if\\s*\\(.{0,60}(sleep|waitfor\\s+delay|benchmark)\\s*\\(',
         desc: 'Blind boolean/time-based SQL injection via character extraction and delay functions',
       },
       {
         field: 'user_input',
         pattern:
-          "(?i)'\\s*;?\\s*insert\\s+into\\s+[a-z_]+\\s*(?:\\([^)]{0,100}\\)\\s*)?values\\s*\\(",
+          "(?i)'\\s*(?:;\\s*)?insert\\s+into\\s+[a-z_]+\\s*(?:\\([^)]{0,100}\\)\\s*)?values\\s*\\(",
         desc: 'SQL INSERT INTO injection payload (column list optional)',
       },
       {
         field: 'user_input',
-        pattern: '(?i)[0-9]+\\s*;\\s*drop\\s+table\\s+[a-z_]+\\s*(--|;|/\\*)',
+        pattern: '(?i)[0-9]\\s*;\\s*drop\\s+table\\s+[a-z_]+\\s*(--|;|/\\*)',
         desc: 'SQL DROP TABLE destructive injection',
       },
       {
@@ -14596,7 +15140,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)\\(lambda\\s+[a-z_,\\s]+:\\s*\\[+[^\\]]{0,200}(s\\.connect|socket\\.connect|os\\.system|subprocess|exec|eval).{0,100}\\d{4,5}\\)',
+          '(?i)\\(lambda\\s[a-z_,\\s]+:\\s*\\[+(?:[^\\]\\[][^\\]]{0,199})?(s\\.connect|socket\\.connect|os\\.system|subprocess|exec|eval).{0,100}\\d{4,5}\\)',
         desc: 'Python lambda-based reverse shell or code execution payload',
       },
     ],
@@ -14773,7 +15317,7 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'excessive-autonomy',
     scan_target: 'llm_io',
-    rule_version: 2,
+    rule_version: 3,
     patterns: [
       {
         field: 'user_input',
@@ -14804,6 +15348,18 @@ export const ATR_RULES_COMPILED = [
         pattern: '(?i)https?://169\\.254\\.169\\.254/(latest|v[0-9]|meta|latest/meta-data)',
         desc: 'Direct mention of AWS IMDS endpoint URL',
       },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)(\\b(can|could|would|will)\\s+you\\b.{0,30}|\\bplease\\s+)\\b(fetch|retrieve|get|load|read|access|visit|open|download|pull|grab|scrape|crawl|display|show)\\b.{0,60}https?://[a-z0-9.-]{1,253}\\.(local|internal|intranet|corp|lan|localdomain|home\\.arpa)(:[0-9]{1,5})?([/?#]|\\s|$)',
+        desc: 'Request to the agent to fetch from a host under an internal-only name (.local, .internal, .intranet, .corp, .lan, .localdomain, .home.arpa)',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(fetch|retrieve|get|request|load|read|access|open|download|curl|display|show|summari[sz]e|print|dump)\\b.{0,60}(file://(localhost)?/(etc|proc|root|sys|boot|var/run|var/lib|windows|\\.ssh|\\.aws|\\.kube)\\b|(gopher|dict|ldap|tftp)://)',
+        desc: 'Fetch/read instruction targeting a local system path via file:// or a non-HTTP SSRF scheme (gopher, dict, ldap, tftp)',
+      },
     ],
   },
   {
@@ -14812,7 +15368,7 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'context-exfiltration',
     scan_target: 'llm_io',
-    rule_version: 2,
+    rule_version: 3,
     patterns: [
       {
         field: 'user_input',
@@ -14849,6 +15405,24 @@ export const ATR_RULES_COMPILED = [
         pattern:
           '(?i)(include|add|reference|embed).{0,30}(relevant\\s+)?(diagrams?|images?|charts?|figures?|screenshots?).{0,30}(by\\s+referencing|at|from|via).{0,30}https?://[a-z0-9._-]+\\.[a-z]{2,}[^)"\'\\s]*\\?(data|secret|content|payload|extract|q)=',
         desc: 'Diagram/image inclusion instruction with data-bearing external URL',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)\\b(fetch|visit|load|open|request|call|curl|ping|get|navigate\\s+to|go\\s+to|send\\s+a\\s+request\\s+to)\\b.{0,60}https?://[^\\s?#]{1,200}\\?[^\\s#]{0,200}=\\s*(\\{\\{|\\$\\{)\\s*[a-z_.]{0,30}(system[_ ]?prompt|prompt|instructions?|conversation|chat[_ ]?history|history|memory|context|messages?|transcript|secrets?|credentials?)[a-z_.]{0,30}\\s*\\}',
+        desc: "Fetch instruction to a URL whose query value interpolates the model's own context (system prompt, conversation, memory, secrets)",
+      },
+      {
+        field: 'agent_output',
+        pattern:
+          '(?i)!\\[[^\\]]{0,60}\\]\\(https?://[a-z0-9._-]+\\.[a-z]{2,}[^)]*\\?(secret|data|payload|token|key|session|user|info|content|doc|extract|dump|exfil|leak|api_key|password)=',
+        desc: 'Agent output contains a markdown image whose external URL carries an exfiltration query parameter',
+      },
+      {
+        field: 'agent_output',
+        pattern:
+          '(?i)\\[[^\\]]{0,60}\\]\\(https?://[a-z0-9._-]+\\.[a-z]{2,}[^)]*\\?(secret|payload|token|extracted|exfil|leak|dump|stolen|private_data|sensitive|api_key|auth_token|bearer|password)=',
+        desc: 'Agent output contains a markdown link whose external URL carries a high-confidence exfiltration query parameter',
       },
     ],
   },
@@ -14887,8 +15461,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:repeat|say|print|output|write)\\b[\\s\\S]{0,60}\\b(\\w{2,})\\b(?:\\W+\\1\\b){3,}',
-        desc: 'Divergent repetition: repeat/print followed by the same token 4+ times',
+          '(?i)(?:repeat|say|print|output|write)\\b[\\s\\S]{0,60}\\b([A-Za-z]{3,})\\b(?:\\W+\\1\\b){3,}',
+        desc: "Divergent repetition \u2014 repeat/print followed by the same alphabetic token 4+ times (v2 \u2014 the repeated token was \\w, which includes digits, so an ISO timestamp such as 10:00:00+00:00 read as the token 00 repeated four times separated by punctuation. That FP'd on a benign Airflow CLI reference table. Restricting the token to letters keeps the word-repetition true_positives and drops numeric coincidences)",
       },
     ],
   },
@@ -14898,7 +15472,7 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'prompt-injection',
     scan_target: 'llm_io',
-    rule_version: 2,
+    rule_version: 3,
     patterns: [
       {
         field: 'user_input',
@@ -14978,12 +15552,12 @@ export const ATR_RULES_COMPILED = [
     severity: 'high',
     category: 'context-exfiltration',
     scan_target: 'llm_io',
-    rule_version: 2,
+    rule_version: 3,
     patterns: [
       {
         field: 'user_input',
         pattern:
-          '(?i)(repeat|relay|list|output|print|dump|provide|reveal|disclose|expose|display).{0,40}(your\\s+(instructions?|system\\s+prompt|initial\\s+(prompt|instructions?|context|message)|given\\s+instructions?|directives?|guidelines?|programming|constraints?|setup\\s+instructions?)|the\\s+system\\s+(prompt|instructions?|message)|all\\s+of\\s+your\\s+instructions?|every\\s+(instruction|rule|directive|guideline|constraint)\\s+you\\s+(have\\s+been|were))',
+          '(?i)(repeat|relay|list|output|print|dump|provide|reveal|disclose|expose|display)[^"\'\u201c\u201d\u2018\u2019]{0,40}(your\\s+(instructions?|system\\s+prompt|initial\\s+(prompt|instructions?|context|message)|given\\s+instructions?|directives?|guidelines?|programming|constraints?|setup\\s+instructions?)|the\\s+system\\s+(prompt|instructions?|message)|all\\s+of\\s+your\\s+instructions?|every\\s+(instruction|rule|directive|guideline|constraint)\\s+you\\s+(have\\s+been|were))',
         desc: "Extraction verb targeting AI system instructions or prompt (possessive 'your' required or explicit 'system prompt/message')",
       },
       {
@@ -15019,7 +15593,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          "(?i)(?:(?:relay|list|dump|recite|enumerate|repeat|reveal|return|show|provide)\\b[\\s\\S]{0,40}\\byour\\s+system(?:'?s)?\\s+(?:prompt|instructions?|parameters?|message|directives?|config)|(?:directives?|guidelines?|instructions?|rules?)\\s+you\\s+(?:were|was)\\s+given)",
+          "(?i)(?:(?:relay|list|dump|recite|enumerate|repeat|reveal|return|show|provide)\\b[\\s\\S]{0,40}\\byour\\s+system(?:['\u2019]?s)?\\s+(?:prompt|instructions?|parameters?|message|directives?|config)|(?:directives?|guidelines?|instructions?|rules?)\\s+you\\s+(?:were|was)\\s+given)",
         desc: 'Extraction via synonym (relay/list your system parameters; directives/guidelines you were given)',
       },
     ],
@@ -15085,25 +15659,25 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)([=\\-*>]{3,}\\s*\\n[=\\-*>]{3,}\\s*\\n|[=\\-*>]{3,}\\s*\\n{2,}).{0,200}(ignore|disregard|forget|override|bypass|stop\\s+everything).{0,30}(any|all|previous|prior|following|earlier).{0,30}(instructions?|directives?|rules?|guidelines?)',
+          '(?i)([=\\-*>]{3}\\s*\\n[=\\-*>]{3,}\\s*\\n|[=\\-*>]{3}\\s*\\n\\n).{0,200}(ignore|disregard|forget|override|bypass|stop\\s+everything).{0,30}(any|all|previous|prior|following|earlier).{0,30}(instructions?|directives?|rules?|guidelines?)',
         desc: 'Double delimiter block followed by ignore/override injection command',
       },
       {
         field: 'user_input',
         pattern:
-          '(?i)(\\\\{5,}|\\\\n{3,}).{0,50}[=\\-*>]{3,}.{0,200}(ignore|disregard|stop\\s+everything|print\\s+the\\s+previous|spell\\s+check\\s+the\\s+previous)',
+          '(?i)(\\\\{5}|\\\\n{3,})(?:.{0,49}[^=\\-*>\\n])?[=\\-*>]{3,}(?:[^=\\-*>\\n].{0,199})?(ignore|disregard|stop\\s+everything|print\\s+the\\s+previous|spell\\s+check\\s+the\\s+previous)',
         desc: 'Backslash escape block + delimiter line + injection command',
       },
       {
         field: 'user_input',
         pattern:
-          '(?i)[=\\-*>]{3,}\\s*\\n[=\\-*>]{3,}.{0,200}(print|output|reveal|show|display|repeat|relay).{0,30}(the\\s+)?(previous|prior|original|system|initial).{0,20}(instructions?|prompt|parameters?|directives?|configuration)',
+          '(?i)[=\\-*>]{3}\\s*\\n[=\\-*>]{3,}(?:[^=\\-*>\\n].{0,199})?(print|output|reveal|show|display|repeat|relay).{0,30}(the\\s+)?(previous|prior|original|system|initial).{0,20}(instructions?|prompt|parameters?|directives?|configuration)',
         desc: 'Double delimiter block + print/reveal previous instructions',
       },
       {
         field: 'content',
         pattern:
-          '(?i)(?:[=*\\-\\\\]{3,}|\\*{3,})[\\s\\S]{0,100}(?:stop\\s+everything|ignore\\s+(?:any|all|the|your)?\\s*(?:previous|following|prior|above)[\\s\\S]{0,40}(?:and\\s+(?:following|previous)\\s+)?instructions?)',
+          '(?i)[=*\\-\\\\]{3}[\\s\\S]{0,100}(?:stop\\s+everything|ignore\\s+(?:(?:any|all|the|your)\\s*)?(?:previous|following|prior|above)[\\s\\S]{0,40}(?:and\\s+(?:following|previous)\\s+)?instructions?)',
         desc: 'Delimiter-wrapped hijack: separator run then STOP EVERYTHING / ignore...instructions',
       },
     ],
@@ -15239,7 +15813,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)((\\b(add\\s+to|update|modify|edit|write\\s+to|append\\s+to|insert\\s+in|inject\\s+into|change)\\s+.{0,30}(\\.cursorrules|\\.clinerules|\\.continuerc|\\.codeium|claude\\.md|copilot[-._]instructions\\.md|copilot[/-]instructions|aider\\.conf|\\.aiderignore|cursor\\.rules|windsurf\\.rules|\\.github/copilot)\\b)|(\\b(in|to)\\s+(\\.cursorrules|\\.clinerules|\\.continuerc|\\.codeium|claude\\.md|copilot[-._]instructions\\.md|copilot[/-]instructions|aider\\.conf|\\.aiderignore|cursor\\.rules|windsurf\\.rules|\\.github/copilot).{0,20}(add|update|modify|insert|inject|append|include)\\s*:?)).{0,200}(exfiltrate|send\\s+its\\s+contents|post\\s+to|forward\\s+to|webhook|<script|curl|fetch\\s*\\(|eval\\s*\\(|exec|spawn|rm\\s+-rf|credentials?|api\\s+key|ssh\\s+key|password|token|malicious|backdoor)',
+          '(?i)((\\b(add\\s+to|update|modify|edit|write\\s+to|append\\s+to|insert\\s+in|inject\\s+into|change)\\s+(?:\\S.{0,29})?(\\.cursorrules|\\.clinerules|\\.continuerc|\\.codeium|claude\\.md|copilot[-._]instructions\\.md|copilot[/-]instructions|aider\\.conf|\\.aiderignore|cursor\\.rules|windsurf\\.rules|\\.github/copilot)\\b).{0,200}|(\\b(in|to)\\s+(\\.cursorrules|\\.clinerules|\\.continuerc|\\.codeium|claude\\.md|copilot[-._]instructions\\.md|copilot[/-]instructions|aider\\.conf|\\.aiderignore|cursor\\.rules|windsurf\\.rules|\\.github/copilot).{0,20}(add|update|modify|insert|inject|append|include))\\s*(?::.{0,200}|\\S.{0,199})?)(exfiltrate|send\\s+its\\s+contents|post\\s+to|forward\\s+to|webhook|<script|curl|fetch\\s*\\(|eval\\s*\\(|exec|spawn|rm\\s+-rf|credentials?|api\\s+key|ssh\\s+key|password|token|malicious|backdoor)',
         desc: 'AI rules-file path combined with exfiltration or script injection (verb-first and path-first forms)',
       },
       {
@@ -15313,7 +15887,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)(\\b(repeat|reveal|show|display|print|output|tell\\s+me|disclose|leak|expose|give\\s+me|share|provide|recite|reproduce|transcribe|copy|echo)\\b.{0,60}\\b(your\\s+|the\\s+|all\\s+|my\\s+|your\\s+full\\s+|your\\s+entire\\s+|your\\s+complete\\s+|verbatim\\s+|exact\\s+)(system\\s+prompt|system\\s+message|system\\s+instructions?|initial\\s+instructions?|operator\\s+instructions?|hidden\\s+instructions?|pre[-_]?prompt|meta[-_]?prompt))|(\\b(system\\s+prompt|system\\s+message|system\\s+instructions?|initial\\s+instructions?|operator\\s+instructions?|hidden\\s+instructions?|pre[-_]?prompt)\\b.{0,150}\\b(recite|repeat|tell\\s+me|reveal|show|disclose)\\b.{0,80}\\b(exactly|verbatim|word\\s+for\\s+word|character\\s+by\\s+character|exactly\\s+as))',
+          '(?i)(\\b(repeat|reveal|show|display|print|output|tell\\s+me|disclose|leak|expose|give\\s+me|share|provide|recite|reproduce|transcribe|copy|echo)\\b[^"\']{0,60}\\b(your\\s+|the\\s+|all\\s+|my\\s+|your\\s+full\\s+|your\\s+entire\\s+|your\\s+complete\\s+|verbatim\\s+|exact\\s+)(system\\s+prompt|system\\s+message|system\\s+instructions?|initial\\s+instructions?|operator\\s+instructions?|hidden\\s+instructions?|pre[-_]?prompt|meta[-_]?prompt))|(\\b(system\\s+prompt|system\\s+message|system\\s+instructions?|initial\\s+instructions?|operator\\s+instructions?|hidden\\s+instructions?|pre[-_]?prompt)\\b.{0,150}\\b(recite|repeat|tell\\s+me|reveal|show|disclose)\\b.{0,80}\\b(exactly|verbatim|word\\s+for\\s+word|character\\s+by\\s+character|exactly\\s+as))',
         desc: 'Elicitation verb targeting precise system-level objects (possessive/determiner required; forward and reverse forms)',
       },
       {
@@ -15469,14 +16043,14 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)\\b(generate|create|produce|collect|build|extract)\\b.{0,80}\\b(training\\s+pairs?|input[- /]output\\s+pairs?|input[\\s\\->]+output|question[- ]answer\\s+pairs?|prompt[- ]response\\s+pairs?|instruction[- ]following\\s+pairs?|io\\s+pairs?)\\b.{0,200}\\b([1-9]\\d{1,}|many|hundreds?|thousands?|all|bulk)',
-        desc: 'Training-pair extraction with scale framing',
+          '(?i)\\b(generate|create|produce|collect|build|extract)\\b.{0,80}\\b(training\\s+pairs?|input[- /]output\\s+pairs?|input[\\s\\->]+output|question[- ]answer\\s+pairs?|prompt[- ]response\\s+pairs?|instruction[- ]following\\s+pairs?|io\\s+pairs?)\\b.{0,200}\\b(?:(?:[2-9]\\d{2}|[1-9]\\d{3,})\\s*(?:more\\s+|additional\\s+|diverse\\s+|synthetic\\s+|unique\\s+)?(?:pairs?|examples?|samples?|instances?|questions?|prompts?|responses?|items?|rows?|records?)|(?:give\\s+me|generate|produce|create|collect|need|want|at\\s+least|around|about|approximately|roughly|a\\s+total\\s+of|minimum\\s+of)\\s+(?:me\\s+)?(?:[2-9]\\d{2}|[1-9]\\d{3,})|hundreds\\s+of|thousands\\s+of|in\\s+bulk)',
+        desc: 'Training-pair extraction with quantified scale framing (200+, or an explicit bulk quantity phrase)',
       },
       {
         field: 'user_input',
         pattern:
-          '(?i)\\b(chain[- ]of[- ]thought|cot|reasoning\\s+(process|steps?|trace|chain)|thought\\s+process|step[- ]by[- ]step\\s+reasoning|internal\\s+reasoning)\\b.{0,200}\\b([1-9]\\d{2,}|all|every|each|these|the\\s+following)\\s*(of\\s+(the\\s+)?)?(examples?|problems?|questions?|prompts?|tasks?|items?)\\b',
-        desc: 'Chain-of-thought or reasoning trace extraction at scale',
+          '(?i)\\b(chain[- ]of[- ]thought|cot|reasoning\\s+(process|steps?|trace|chain)|thought\\s+process|step[- ]by[- ]step\\s+reasoning|internal\\s+reasoning)\\b.{0,120}\\b(?:(?:all|every|each)\\s+(?:of\\s+)?(?:the\\s+|these\\s+)?)?[1-9]\\d{2,}\\s*(?:of\\s+(?:the\\s+|these\\s+)?)?(?:\\w+\\s+){0,2}(examples?|problems?|questions?|prompts?|tasks?|items?)\\b',
+        desc: 'Chain-of-thought or reasoning trace extraction at an explicit scale (100+ items)',
       },
       {
         field: 'user_input',
@@ -15552,7 +16126,7 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'tool-poisoning',
     scan_target: 'llm_io',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'user_input',
@@ -15625,7 +16199,7 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'skill-compromise',
     scan_target: 'both',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'content',
@@ -15662,6 +16236,18 @@ export const ATR_RULES_COMPILED = [
         pattern:
           '(?i)(?:pre[_\\s\\-]?trust|before\\s+(?:the\\s+)?trust\\s+(?:dialog|prompt)|prior\\s+to\\s+(?:trust|consent))[^\\n]{0,160}(?:hook|SessionStart|startup|\\.claude)',
         desc: 'Skill content describing the pre-trust execution property of SessionStart hooks \u2014 co-occurrence anchor for documentation / poisoning scans.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\\\?"SessionStart\\\\?"\\s*:\\s*\\[[^\\]]{0,800}\\\\?"command\\\\?"\\s*:\\s*\\\\?"[^"\\\\]{0,200}\\b(?:node|bun|deno|python[23]?)\\s+[^\\s"\\\\|&;]{1,160}\\s*\\|\\|\\s*(?:node|bun|deno|python[23]?)\\s+[^\\s"\\\\|&;]',
+        desc: 'SessionStart hook (any matcher, or none) whose command runs a script under one JavaScript or Python runtime and falls back to another with `||`, the portable loader in the testmetest repositories (JFrog, 2026-10-26: `node .github/init.js || bun .github/init.js`). None of 113 public `.claude/settings.json` and plugin `hooks.json` files with a SessionStart hook use a runtime fallback.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\\\?"SessionStart\\\\?"\\s*:\\s*\\[[^\\]]{0,800}\\\\?"command\\\\?"\\s*:\\s*\\\\?"[^"\\\\]{0,200}(?:^|[\\s"=/])\\.github/[^\\s"\\\\]{1,160}\\.(?:js|mjs|cjs|ts|py|sh)\\b',
+        desc: 'SessionStart hook (any matcher, or none) that runs a script kept under `.github/`, where a repository holds CI configuration rather than editor hooks; the testmetest payload is `.github/init.js`. None of the 113 public SessionStart configurations run a script from `.github/`.',
       },
     ],
   },
@@ -15950,6 +16536,172 @@ export const ATR_RULES_COMPILED = [
     ],
   },
   {
+    id: 'ATR-2026-00535',
+    title: 'Windsurf IDE Zero-Click Prompt Injection via Embedded File Directives (CVE-2026-30615)',
+    severity: 'critical',
+    category: 'prompt-injection',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)<!--[^>]{0,60}(?:ai\\s*:|\\[\\s*system\\s*\\]\\s*:|windsurf\\s*:|for\\s+(?:cascade|windsurf|copilot|cursor|claude|the\\s+assistant|the\\s+agent)\\s*:)[^>]{0,400}(?:ignore|override|disregard|execute|run|tool_call|invoke|exfiltrate|send|read|access|fetch|rm |delete|curl|wget|bash|sh\\s+-)[^>]{0,500}-->',
+        desc: 'HTML comment block with explicit AI/windsurf/system targeting and an action directive \u2014 zero-click indirect injection pattern',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\{[^{}]{0,80}"role"\\s*:\\s*"(?:system|user)"[^{}]{0,80}"content"\\s*:\\s*"[^"]{0,400}(?:ignore\\s+(?:all\\s+)?(?:previous|prior)|override\\s+(?:all\\s+)?(?:previous|prior|context)|disregard\\s+(?:all\\s+)?(?:previous|prior)|your\\s+(?:real|new|actual|true)\\s+(?:task|instructions?|objective)|execute|exfiltrate|shell|bash|curl|wget|rm\\s+|delete\\s+)[^"]{0,200}"',
+        desc: 'JSON system/user role object embedding override instructions \u2014 LLM chat-format injection inside source file',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?://|#|/\\*)[^\\n]{0,40}(?:\\[\\s*system\\s*\\]|\\bsystem\\s+override\\b|\\bassistant\\s*:|\\bassistant\\s+instruction\\b|\\bai\\s+directive\\b|\\bllm\\s+instruction\\b)[^\\n]{0,300}(?:ignore|override|disregard|forget|execute|run|exfiltrate|send\\s+to|read\\s+file|access|fetch|curl|wget|bash|tool_call)',
+        desc: 'Code comment containing SYSTEM/ASSISTANT/AI directive marker with action payload \u2014 indirect IDE prompt injection',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?:[\u200b\u200c\u200d\u2060\ufeff]{3,}[^\\n]{0,200}(?:ignore|override|execute|system|exfiltrate)|(?:ignore|override|execute|system|exfiltrate)[^\\n]{0,200}[\u200b\u200c\u200d\u2060\ufeff]{3,})',
+        desc: 'Zero-width Unicode character cluster co-located with override keywords \u2014 invisible injection payload technique',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:^|[\\n\\r\\s])@(?:cascade|windsurf|codeium|cursor|copilot|claude|assistant|ai|agent|llm)\\s[^\\n]{0,300}(?:ignore|override|disregard|execute|run|exfiltrate|send|read\\s+(?:my\\s+)?(?:files?|env|credentials?|keys?|tokens?)|tool_call|shell|bash|curl|wget)',
+        desc: 'Windsurf @-mention syntax abused inside file content to issue override or shell directive \u2014 IDE-specific injection vector',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00536',
+    title: 'nginx-ui MCP Endpoint Unauthenticated Command Execution (CVE-2026-33032)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)"(?:name|tool)"\\s*:\\s*"(?:nginx_command_execute|nginx_reload|nginx_restart|nginx_test|nginx_config_write|nginx_config_reload|nginx[_\\-](?:command|exec|run|reload|restart|stop|start|test|config))[^"]{0,60}"(?:(?!(?:authorization|bearer|api[_\\-]?key|x-api-key|token|x-auth))[\\s\\S]){0,500}',
+        desc: 'MCP tool call targeting nginx management function without any Authorization/token field in surrounding context \u2014 CVE-2026-33032 direct exploitation pattern',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)"url"\\s*:\\s*"https?://[^"]{0,80}(?:nginx[_\\-]?ui|nginx\\.ui|nginxui|/nginx/ui)[^"]{0,60}(?:/mcp|/tools?|/api/v1/mcp)[^"]*"(?:(?!"(?:auth|headers|token|apiKey|authorization|bearer)")[\\s\\S]){0,400}}',
+        desc: 'MCP server config pointing at nginx-ui endpoint URL without auth/headers field \u2014 unauthenticated surface exposure',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)(?:"(?:command|cmd|args)"\\s*:\\s*"[^"]{0,200}nginx\\s+-s\\s+(?:reload|restart|stop|quit|reopen)|"args"\\s*:\\s*(?:\\{[^}]{0,200}|\\[[^\\]]{0,200})nginx\\s+-c\\s+/[^\'"\\s]{0,80}|nginx\\s+-t\\s*[;|&]|nginx[_\\-]command_execute[^\'"]{0,40}(?:;|\\||&&|`|\\$\\()[^\'"]{0,200})',
+        desc: 'nginx command injection pattern inside MCP tool arguments \u2014 direct OS command execution via nginx-ui MCP',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)nginx[_\\-]?ui[^\\n]{0,200}(?:mcp|tool\\s+call|tool\\s+server|endpoint)[^\\n]{0,200}(?:no\\s+auth|missing\\s+auth|unauth(?:enticated|orised)?|without\\s+(?:auth|credentials?|token)|bypass\\s+auth|cve[_\\-]?2026[_\\-]?33032|execut(?:e|ing)\\s+(?:commands?|shell)|command\\s+execut)',
+        desc: 'Content describing or weaponising the nginx-ui MCP unauthenticated command execution surface \u2014 CVE-2026-33032 framing',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)"tools"\\s*:\\s*\\[(?:[^\\]]{0,400}(?:nginx_(?:command_execute|reload|restart|config_write|test)|manage_nginx|nginx[_\\-]service)[^\\]]{0,400})\\](?:(?!(?:www[_\\-]?authenticate|authorization|x-api-key|bearer\\s+token))[\\s\\S]){0,600}',
+        desc: 'nginx-ui MCP handshake exposes nginx management tools without an authentication challenge in the same exchange',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00537',
+    title: 'FastMCP Windows cmd.exe Injection via Server Name Metacharacters (CVE-2025-64340)',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)FastMCP\\s*\\(\\s*[^)]*name\\s*=\\s*["\\x27][^"\\x27]*[&|><^()][^"\\x27]*["\\x27]',
+        desc: 'FastMCP constructor with name= argument containing a cmd.exe metacharacter \u2014 direct CVE-2025-64340 PoC shape (e.g., FastMCP(name="test&calc"))\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)fastmcp\\s+install\\s+(?:claude-?code|gemini-?cli|cursor|goose)\\s+[^\\s]*[&|><^()][^\\s]*',
+        desc: 'fastmcp install invocation with a server target argument containing cmd.exe metacharacter \u2014 install-time injection surface\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"name"\\s*:\\s*"[^"]*[&|><^()][^"]*"\\s*[,}](?=[^"]{0,200}"(?:transport|command|install|server_type|mcp)"\\s*:)',
+        desc: 'JSON MCP server configuration block with a name field containing cmd.exe metacharacter \u2014 config-injection shape targeting FastMCP or compatible MCP installers\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:server[_\\s]?name|mcp[_\\s]?name)\\s*[:=]\\s*["\\x27][^"\\x27]{0,100}[&|><^()][^"\\x27]{0,100}["\\x27]',
+        desc: 'Generic server_name / mcp_name key-value with cmd.exe metacharacter \u2014 covers YAML, Python kwargs, and config file surfaces beyond raw JSON\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:CVE-2025-64340|GHSA-m8x7-r2rg-vh5g|GHSA-rj5c-58rq-j5g5)[^\\n]{0,200}(?:payload|inject|exploit|bypass|cmd\\.exe|metachar)',
+        desc: 'Explicit CVE-2025-64340 / GHSA reference combined with exploitation language \u2014 attack framing in skill or tool description\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00538',
+    title: 'LangChain-ChatChat Unauthenticated MCP STDIO Server Configuration RCE (CVE-2026-30617)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)"command"\\s*:\\s*"(?:/(?:usr/)?(?:local/)?bin/)?(?:sh|bash|zsh|cmd\\.exe|cmd|powershell|pwsh)"\\s*[,}][^}]{0,300}"args"\\s*:\\s*\\[[^\\]]{0,300}(?:&&|\\|\\||;\\s|\\$\\(|`|/dev/tcp/|/tmp/|/var/tmp/|/dev/shm/|%TEMP%|rm\\s+-rf|chmod\\s+\\+x|curl\\s|wget\\s|Invoke-(?:Expression|WebRequest|RestMethod)|DownloadString|DownloadFile|\\bIEX\\b|New-Object\\s+Net\\.|base64\\s+-d|certutil|bitsadmin|nc\\s+-e|python3?\\s+-c|perl\\s+-e|ruby\\s+-e|node\\s+-e|eval\\s|\\.(?:sh|ps1|bat|exe|py|pl)\\b)',
+        desc: 'MCP server config JSON where command is a shell binary (sh/bash/cmd/powershell) AND the args array carries an RCE primitive (shell metacharacter, remote fetch-and-run, writable-temp payload path, encoded-command flag) \u2014 the CVE-2026-30617 root pattern. The args-payload requirement is load-bearing: `{"command":"cmd","args":["/c","npx","-y","<package>"]}` is the documented Windows launcher idiom for legitimate MCP servers and must not fire.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"command"\\s*:\\s*"(?:python|python3|ruby|perl|node|npx|uvx|deno|bun)"\\s*[,}][^}]{0,400}"args"\\s*:\\s*\\[[^\\]]*"-(?:c|e|-eval|-command|-exec)"\\s*,',
+        desc: 'MCP server config where an interpreter is invoked with an inline-exec flag (-c/-e/--eval) \u2014 same bypass class as CVE-2026-40933 but via ChatChat unauthenticated management API\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"transport(?:_type)?"\\s*:\\s*"stdio"\\s*[,}][^}]{0,600}"command"\\s*:\\s*"(?!(?:npx|uvx|node|python3?)\\s*["\\x27])[^"]{2,200}"',
+        desc: 'STDIO transport config where the command value is not an expected MCP launcher (npx/uvx/python) \u2014 suspicious arbitrary binary in STDIO transport\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:transport(?:_type)?\\s*[:=]\\s*["\\x27]?stdio["\\x27]?)[^\\n]{0,300}(?:command\\s*[:=]\\s*["\\x27](?:sh|bash|zsh|cmd|powershell|curl|wget|nc|ncat|netcat)["\\x27])',
+        desc: 'Key-value style (YAML or Python dict) STDIO transport + shell/netcat command value \u2014 catches non-JSON serialization of the same attack\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:CVE-2026-30617|GHSA-w94v-hq49-38vh)[^\\n]{0,200}(?:payload|inject|exploit|bypass|unauthenticated|rce|stdio|command)',
+        desc: 'Explicit CVE-2026-30617 / GHSA reference combined with exploitation language \u2014 attack framing in skill or tool description\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:chatchat|langchain.chatchat|Langchain.ChatChat)[^\\n]{0,150}(?:mcp[^\\n]{0,80}(?:unauthenticated|no.?auth|unprotected)|(?:unauthenticated|no.?auth)[^\\n]{0,80}mcp)',
+        desc: 'ChatChat + MCP + no-auth framing in content \u2014 describes the attack surface in a way that could be used to guide exploitation\n',
+      },
+    ],
+  },
+  {
     id: 'ATR-2026-00539',
     title:
       'CrewAI CodeInterpreterTool Sandbox Escape and Prompt-to-Shell RCE (CVE-2026-2275 / VU#221883)',
@@ -16003,6 +16755,204 @@ export const ATR_RULES_COMPILED = [
     ],
   },
   {
+    id: 'ATR-2026-00540',
+    title: 'PraisonAI parse_mcp_command() CLI Argument Command Injection (CVE-2026-34935)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)--mcp\\s+["\\x27]?[^"\\x27\\n]{0,40}(?:(?:\\/(?:usr\\/)?(?:local\\/)?bin\\/)?(?:bash|sh|zsh)|cmd(?:\\.exe)?|powershell(?:\\.exe)?|pwsh)\\s+-[cC]\\s+',
+        desc: "--mcp argument with a shell binary and -c inline-exec flag \u2014 direct CVE-2026-34935 PoC pattern (bash -c 'payload'). Matches bare name (bash) and full path (/bin/bash, /usr/bin/bash).\n",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)--mcp\\s+["\\x27]?[^"\\x27\\n]{0,40}(?:python3?|perl|ruby|node|bun|deno)\\s+-[ceE]\\s+',
+        desc: '--mcp argument with an interpreter and -c/-e/-E inline-eval flag \u2014 same root cause as bash -c but via scripting language interpreter\n',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)--mcp[ \\t]+["\\x27]?[^"\\x27\\n]{0,100}(?:&&|\\|\\||\\||;|`|\\$\\()',
+        desc: "--mcp argument containing shell metacharacters (&&, ||, pipe, semicolon, backtick, subshell) \u2014 command chaining / injection surface. The separator is horizontal whitespace only: `\\s+` let the match run past the end of the command line and pick up the next line's markdown fence, so any document ending a shell block with `--mcp` immediately before ``` scored a hit.\n",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:parse_mcp_command|mcp_command_parser|praisonai[^\\n]{0,80}--mcp)[^\\n]{0,200}(?:inject|exec|exploit|bypass|rce|shell|command[\\s_-]?injection)',
+        desc: 'Explicit parse_mcp_command / praisonai --mcp reference combined with exploitation language \u2014 attack framing in skill or tool description\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00541',
+    title: 'Agent Zero MCP Configuration Command Injection via mcp_servers field (CVE-2026-30624)',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:mcp_servers|mcpServers)[^\\n]{0,300}["\\x27]command["\\x27]\\s*:\\s*["\\x27](?:(?:\\/(?:usr\\/(?:local\\/)?)?bin\\/)?(?:bash|sh|zsh)|cmd(?:\\.exe)?|powershell(?:\\.exe)?|pwsh|nc|ncat|netcat|curl|wget)["\\x27]',
+        desc: 'Agent Zero mcp_servers / mcpServers JSON/dict with a shell binary or network tool as the command value \u2014 direct CVE-2026-30624 attack shape. Matches bare name (sh) and full path (/bin/sh, /usr/bin/bash).\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:mcp_servers|mcpServers)[^\\n]{0,300}["\\x27]command["\\x27]\\s*:\\s*["\\x27](?:python3?|perl|ruby|node|bun)["\\x27][^\\n]{0,200}["\\x27]args["\\x27]\\s*:\\s*\\[[^\\]]*["\\x27]-[ceE]["\\x27]',
+        desc: 'Agent Zero mcp_servers / mcpServers config with interpreter command + -c/-e/-E inline-exec flag in args \u2014 interpreter-based RCE via MCP server initialisation\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:mcp_servers|mcpServers)[^\\n]{0,100}(?:\'command\'|"command")[^\\n]{0,60}(?:\'args\'|"args")[^\\n]{0,200}(?:-[ceE]\\s+["\']?[^"\'\\s]|-[ceE]["\']|\\|\\||&&|;\\s*[a-z]|`|\\$\\()',
+        desc: 'mcp_servers / mcpServers with command + args fields containing inline-exec flags or shell metacharacters \u2014 generalised Agent Zero RCE pattern. Matches both quoted and unquoted -c/-e payloads.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:CVE-2026-30624|agent.zero[^\\n]{0,80}mcp)[^\\n]{0,200}(?:inject|exec|exploit|bypass|rce|command[_\\s-]?inject)',
+        desc: 'CVE-2026-30624 or Agent Zero + MCP reference combined with exploitation language \u2014 attack framing in skill or tool description\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00542',
+    title: 'Upsonic MCP Command Allowlist Bypass RCE (CVE-2026-30625)',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:upsonic|mcp_servers|mcpServers)[^\\n]{0,300}["\\x27]command["\\x27]\\s*:\\s*["\\x27](?:(?:\\/(?:usr\\/(?:local\\/)?)?bin\\/)?(?:bash|sh|zsh)|cmd(?:\\.exe)?|powershell(?:\\.exe)?|pwsh|nc|ncat|netcat|curl|wget)["\\x27]',
+        desc: 'Upsonic / mcp_servers config with a shell binary or network tool as the command value \u2014 direct CVE-2026-30625 allowlist-bypass attack shape. Matches bare name (sh) and full path (/bin/sh, /usr/bin/bash).\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:upsonic|mcp_servers|mcpServers)[^\\n]{0,300}["\\x27]command["\\x27]\\s*:\\s*["\\x27](?:python3?|perl|ruby|node|bun)["\\x27][^\\n]{0,200}["\\x27]args["\\x27]\\s*:\\s*\\[[^\\]]*["\\x27]-[ceE]["\\x27]',
+        desc: 'Upsonic / mcp_servers config with interpreter command + -c/-e/-E inline-exec flag in args \u2014 interpreter-based RCE via MCP initialisation\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:CVE-2026-30625|upsonic[^\\n]{0,80}mcp)[^\\n]{0,200}(?:inject|exec|exploit|bypass|rce|command[_\\s-]?inject|allowlist[_\\s-]?bypass)',
+        desc: 'CVE-2026-30625 or Upsonic + MCP reference combined with exploitation language \u2014 attack framing in skill or tool description\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00543',
+    title: 'LiteLLM MCP Server Creation Authenticated argv Injection (CVE-2026-30623)',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:litellm|LiteLLM)[^\\n]{0,200}["\\x27]command["\\x27]\\s*:\\s*["\\x27](?:(?:\\/(?:usr\\/(?:local\\/)?)?bin\\/)?(?:bash|sh|zsh)|cmd(?:\\.exe)?|powershell(?:\\.exe)?|pwsh|nc|ncat|netcat|curl|wget)["\\x27]',
+        desc: 'LiteLLM proxy payload with a shell binary or network tool as the MCP server command value \u2014 direct CVE-2026-30623 attack shape.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:litellm|LiteLLM)[^\\n]{0,300}(?:["\\x27]command["\\x27]\\s*:|command\\s*=)\\s*["\\x27](?:python3?|perl|ruby|node|bun)["\\x27][^\\n]{0,200}(?:["\\x27]args["\\x27]\\s*:|args\\s*=)\\s*\\[[^\\]]*["\\x27]-[ceE]["\\x27]',
+        desc: 'LiteLLM MCP config with interpreter command + -c/-e/-E inline-exec flag in args \u2014 interpreter-based RCE via proxy MCP server creation\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\/mcp|mcp[_/]server|add[_-]?mcp[_-]?server)[^\\n]{0,200}["\\x27](?:command|cmd)["\\x27]\\s*:\\s*["\\x27][^\\x22\\x27]+["\\x27][^\\n]{0,200}(?:[|&;`]|\\$\\(|&&|\\|\\|)',
+        desc: 'MCP server registration endpoint or config with command field containing shell metacharacters \u2014 command injection via API\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:CVE-2026-30623|litellm[^\\n]{0,80}mcp)[^\\n]{0,200}(?:inject|exec|exploit|bypass|rce|command[_\\s-]?inject|argv[_\\s-]?inject)',
+        desc: 'CVE-2026-30623 or LiteLLM + MCP reference combined with exploitation language \u2014 attack framing in skill or tool description\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00544',
+    title: 'PraisonAI MCP Path-Traversal .pth Injection RCE (GHSA-9mqq-jqxf-grvw)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\.\\.\\/|\\.\\.\\\\){2,}[^\\n]{0,200}(?:site-packages|dist-packages)[^\\n]{0,100}\\.pth',
+        desc: 'Directory traversal sequence (2+ levels up) targeting site-packages or dist-packages with a .pth extension \u2014 core GHSA-9mqq-jqxf-grvw path-traversal-to-.pth attack shape.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\.pth[^\\n]{0,300}import\\s+(?:os|sys|subprocess|importlib)[^\\n]{0,200}(?:system|exec|popen|spawn|check_output|run|call)',
+        desc: ".pth file content with 'import os/sys/subprocess' followed by code-execution method \u2014 executed-on-startup .pth payload pattern\n",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:praisonai|praison)[^\\n]{0,200}(?:\\.pth|site-packages|dist-packages|path[_-]?traversal|directory[_-]?traversal)[^\\n]{0,200}(?:inject|exec|rce|exploit|bypass)',
+        desc: 'PraisonAI reference combined with .pth or path traversal language and exploitation framing \u2014 GHSA-9mqq-jqxf-grvw attack context\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:GHSA-9mqq-jqxf-grvw)[^\\n]{0,200}(?:payload|inject|exploit|bypass|\\.pth|site-packages|path.traversal)',
+        desc: 'Explicit GHSA-9mqq-jqxf-grvw reference combined with exploitation language \u2014 attack framing in skill or tool description\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00545',
+    title:
+      'PraisonAI tool_override.py Unauthenticated RCE \u2014 CVE-2026-40287 Patch Bypass (CVE-2026-44334)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)tool[_-]?override[^\\n]{0,300}(?:os\\.system|subprocess\\.|exec\\s*\\(|eval\\s*\\(|__import__|importlib\\.import|open\\s*\\([^)]{0,80}["\\x27]w["\\x27])',
+        desc: 'tool_override payload combined with Python code execution primitives (os.system, subprocess, exec, eval, __import__) \u2014 direct CVE-2026-44334 attack pattern\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)tool[_-]?override[^\\n]{0,200}(?:&&|\\|\\||;|`|\\$\\()[^\\n]{0,100}(?:curl|wget|bash|sh|nc|ncat)',
+        desc: 'tool_override with shell metacharacters followed by network/shell execution primitives \u2014 command injection via tool override\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:CVE-2026-44334|CVE-2026-40287[^\\n]{0,80}bypass|tool[_-]?override[^\\n]{0,80}(?:bypass|patch[_-]?bypass))[^\\n]{0,200}(?:inject|exec|exploit|rce|unauthenticated|unauth)',
+        desc: 'Explicit CVE-2026-44334 / CVE-2026-40287 patch bypass reference combined with exploitation language \u2014 attack framing\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:praisonai|praison)[^\\n]{0,100}tool[_-]?override[^\\n]{0,200}(?:inject|exec|exploit|bypass|rce|command|shell)',
+        desc: 'PraisonAI + tool_override combined with exploitation language \u2014 CVE-2026-44334 attack framing in skill or tool description\n',
+      },
+    ],
+  },
+  {
     id: 'ATR-2026-00546',
     title: 'CrewAI JSON Loader Arbitrary Local File Read (CVE-2026-2285)',
     severity: 'high',
@@ -16036,18 +16986,18 @@ export const ATR_RULES_COMPILED = [
     severity: 'high',
     category: 'privilege-escalation',
     scan_target: 'both',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'content',
         pattern:
-          '(?i)(?:rag|retrieval[_-]?augmented|source[_-]?url|document[_-]?url)[^\\n]{0,200}(?:169\\.254\\.169\\.254|fd00:|2130706433|0x7f000001|0177\\.0\\.0\\.1|[a-z0-9-]+\\.internal\\.|(?:127\\.0\\.[01]\\.[01]|10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|192\\.168\\.\\d{1,3}\\.\\d{1,3}|172\\.(?:1[6-9]|2\\d|3[01])\\.\\d{1,3}\\.\\d{1,3})(?::\\d+)?/)',
+          '(?i)\\b(?:rag|retrieval[_-]?augmented|source[_-]?url|document[_-]?url)[^\\n]{0,200}(?:169\\.254\\.169\\.254|fd00:|2130706433|0x7f000001|0177\\.0\\.0\\.1|[a-z0-9-]+\\.internal\\.|(?:127\\.0\\.[01]\\.[01]|10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|192\\.168\\.\\d{1,3}\\.\\d{1,3}|172\\.(?:1[6-9]|2\\d|3[01])\\.\\d{1,3}\\.\\d{1,3})(?::\\d+)?/)',
         desc: 'RAG source URL containing a cloud metadata endpoint (169.254.169.254), decimal/hex/octal loopback representations, or an RFC-1918 private address followed by an internal resource path \u2014 SSRF bypass via CVE-2026-2286. Plain "localhost:PORT" / bare-IP server defaults (no path) are excluded so legitimate RAG deployment docs do not false-positive.\n',
       },
       {
         field: 'content',
         pattern:
-          '(?i)(?:rag|retrieval[_-]?augmented|source[_-]?url|document[_-]?url)[^\\n]{0,200}(?:%31%36%39|%31%32%37|\\\\u0031|%2e%2e|\\\\x31\\\\x36\\\\x39|0x[aAbBcC][0-9a-fA-F]{6})',
+          '(?i)\\b(?:rag|retrieval[_-]?augmented|source[_-]?url|document[_-]?url)[^\\n]{0,200}(?:%31%36%39|%31%32%37|\\\\u0031|%2e%2e|\\\\x31\\\\x36\\\\x39|0x[aAbBcC][0-9a-fA-F]{6})',
         desc: 'RAG URL with URL-encoded, Unicode-escaped, or hex representations of SSRF-relevant IP octets \u2014 URL encoding bypass pattern\n',
       },
       {
@@ -16059,17 +17009,93 @@ export const ATR_RULES_COMPILED = [
     ],
   },
   {
-    id: 'ATR-2026-00554',
-    title: 'LangChain Vulnerable to Template Injection via Attribute Access in Prompt Templates',
+    id: 'ATR-2026-00548',
+    title: 'Cross-agent session context leak across delegation chain',
     severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'trace.invariant_session_id',
+        pattern: '(?i)invariant_violation:session.id_changed',
+        desc: 'Engine emits this synthetic field when the trace invariant fires; present for pattern-method engines that consume trace verdicts as text. Trace-native engines evaluate detection.trace below directly.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00549',
+    title: 'Destructive tool invocation without prior human approval',
+    severity: 'critical',
+    category: 'privilege-escalation',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'trace.require_violation',
+        pattern: '(?i)require_violation:destructive_tool_without_approval',
+        desc: 'Engine emits this synthetic field when the require primitive fires; trace-native engines evaluate detection.trace below.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00550',
+    title: 'Privileged tool call following untrusted retrieval (indirect prompt injection trail)',
+    severity: 'critical',
     category: 'prompt-injection',
     scan_target: 'runtime',
     rule_version: 1,
     patterns: [
       {
+        field: 'trace.forbid_violation',
+        pattern: '(?i)forbid_violation:untrusted_retrieval_to_privileged_tool',
+        desc: 'Synthetic field emitted by the trace engine when the forbid primitive fires; trace-native engines evaluate detection.trace.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00551',
+    title: 'Cross-conversation memory write (scope-escape via memory store)',
+    severity: 'critical',
+    category: 'privilege-escalation',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'trace.forbid_violation',
+        pattern: '(?i)forbid_violation:cross_conversation_memory_write',
+        desc: 'Synthetic field emitted by the trace engine when the forbid primitive fires; trace-native engines evaluate detection.trace.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00552',
+    title: 'Agent goal drift after environmental pressure injection',
+    severity: 'high',
+    category: 'agent-manipulation',
+    scan_target: 'runtime',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'trace.composite_violation',
+        pattern:
+          '(?i)(?:invariant_violation:agent\\.goal_changed|forbid_violation:goal_drift_after_pressure)',
+        desc: 'Synthetic field emitted by the trace engine when the composite primitive fires; trace-native engines evaluate detection.trace. Both violation tokens are accepted so engines that emitted the legacy invariant-style token keep interoperating.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-00554',
+    title: 'LangChain Vulnerable to Template Injection via Attribute Access in Prompt Templates',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'runtime',
+    rule_version: 2,
+    patterns: [
+      {
         field: 'content',
         pattern:
-          '(?i)\\{\\{?[^{}]*\\b__(?:class|globals|import|builtins|subclasses|init|mro|base|dict|reduce|getattribute|subclasshook)__[^{}]*\\}?\\}',
+          '(?i)\\{\\{?[^{}]*(?:\\.__(?:class|globals|import|builtins|subclasses|init|mro|base|dict|reduce|getattribute|subclasshook)__|\\b__(?:import|builtins|globals|subclasses)__)[^{}]*\\}?\\}',
         desc: 'Server-side template injection via Python dunder/builtins traversal',
       },
     ],
@@ -16162,12 +17188,13 @@ export const ATR_RULES_COMPILED = [
     severity: 'high',
     category: 'tool-poisoning',
     scan_target: 'runtime',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'content',
-        pattern: '(?i)"command"\\s*:\\s*"(?:(?:/(?:usr/)?bin/)?(?:bash|sh|zsh|dash)"|[^"]*[;&|`$])',
-        desc: 'MCP stdio config command is a raw shell or contains shell metacharacters',
+        pattern:
+          '(?i)"command"\\s*:\\s*"(?:(?:/(?:usr/)?bin/)?(?:bash|sh|zsh|dash)"|[^"]*[;&|`$][^"]*")[^{}]{0,400}"(?:args|env|transport)"\\s*:|"(?:args|transport)"\\s*:[^{}]{0,400}"command"\\s*:\\s*"(?:(?:/(?:usr/)?bin/)?(?:bash|sh|zsh|dash)"|[^"]*[;&|`$])',
+        desc: 'MCP stdio config (a command next to its args, env or transport field in the same object) whose command is a raw shell or contains shell metacharacters. A bare {"command":"..."} is the argument shape of ordinary shell tools and is not matched',
       },
       {
         field: 'content',
@@ -16382,20 +17409,20 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:ANTHROPIC_API_KEY|CLAUDE_API_KEY|claude_desktop_config|\\.config[/\\\\]+claude|\\.claude[/\\\\]+[a-z]|\\.mcp\\.json)[\\s\\S]{0,250}(?:requests?\\.(?:post|put)|fetch\\s*\\(|urllib\\.request|axios\\.(?:post|get)|new\\s+XMLHttpRequest|\\bcurl\\s|\\bwget\\s)',
-        desc: 'AI-agent credential or config surface (Anthropic key, Claude config, .mcp.json) read and co-located with an outbound network send \u2014 the Hades exfil primitive',
+          '(?i)(?:ANTHROPIC_API_KEY|CLAUDE_API_KEY|claude_desktop_config|\\.config[/\\\\]+claude|\\.claude[/\\\\]+[a-z]|\\.mcp\\.json)[\\s\\S]{0,250}(?:requests?\\.(?:post|put)|fetch\\s*\\(|urllib\\.request|axios\\.(?:post|get)|new\\s+XMLHttpRequest|curl[^\\n]{0,60}(?:-d\\b|--data|-F\\b|-T\\b|--upload-file|-X\\s*POST)|wget[^\\n]{0,60}(?:--post-data|--post-file))',
+        desc: "AI-agent credential or config surface (Anthropic key, Claude config, .mcp.json) read and co-located with an outbound DATA-SENDING network call \u2014 the Hades exfil primitive. curl/wget require an actual send flag (-d/-F/-T/--upload-file/-X POST/--post-data), since bare 'curl -L <url>' or 'curl -o <file> <url>' is a download, not exfil \u2014 this excludes the extremely common README install idiom 'curl -o ~/.claude/skills/x/SKILL.md <url>'.",
       },
       {
         field: 'content',
         pattern:
-          '(?i)(?:requests?\\.(?:post|put)|fetch\\s*\\(|urllib\\.request|axios\\.(?:post|get)|\\bcurl\\s+-|\\bwget\\s|exfil|webhook\\.site|discord\\.com[/\\\\]+api[/\\\\]+webhooks)[\\s\\S]{0,250}(?:ANTHROPIC_API_KEY|CLAUDE_API_KEY|claude_desktop_config|\\.config[/\\\\]+claude|\\.mcp\\.json)',
-        desc: 'Outbound network send co-located with an AI-agent credential read (reverse order) \u2014 same exfil primitive expressed send-first',
+          '(?i)(?:requests?\\.(?:post|put)|fetch\\s*\\(|urllib\\.request|axios\\.(?:post|get)|curl[^\\n]{0,60}(?:-d\\b|--data|-F\\b|-T\\b|--upload-file|-X\\s*POST)|wget[^\\n]{0,60}(?:--post-data|--post-file)|exfil|webhook\\.site|discord\\.com[/\\\\]+api[/\\\\]+webhooks)[\\s\\S]{0,250}(?:ANTHROPIC_API_KEY|CLAUDE_API_KEY|claude_desktop_config|\\.config[/\\\\]+claude|\\.mcp\\.json)',
+        desc: 'Outbound DATA-SENDING network call co-located with an AI-agent credential read (reverse order) \u2014 same exfil primitive expressed send-first; curl/wget require an actual send flag, same rationale as cond 1',
       },
       {
         field: 'content',
         pattern:
-          '(?i)(?:\\.npmrc|\\.pypirc|\\.aws[/\\\\]+credentials|id_rsa|\\.ssh[/\\\\]+id_)[\\s\\S]{0,200}(?:ANTHROPIC_API_KEY|\\.mcp\\.json|\\.config[/\\\\]+claude|\\.npmrc|\\.pypirc|\\.aws[/\\\\]+credentials)[\\s\\S]{0,200}(?:requests?\\.post|fetch\\s*\\(|\\bcurl\\s|base64)',
-        desc: 'Harvest-everything credential sweep (two or more secret stores including an AI-agent secret) co-located with exfil \u2014 the Hades multi-credential stealer signature',
+          '(?i)(?:\\.npmrc|\\.pypirc|\\.aws[/\\\\]+credentials|id_rsa|\\.ssh[/\\\\]+id_)[\\s\\S]{0,200}(?:ANTHROPIC_API_KEY|\\.mcp\\.json|\\.config[/\\\\]+claude|\\.npmrc|\\.pypirc|\\.aws[/\\\\]+credentials)[\\s\\S]{0,200}(?:requests?\\.post|fetch\\s*\\(|curl[^\\n]{0,60}(?:-d\\b|--data|-F\\b|-T\\b|--upload-file|-X\\s*POST)|base64)',
+        desc: 'Harvest-everything credential sweep (two or more secret stores including an AI-agent secret) co-located with exfil \u2014 the Hades multi-credential stealer signature; curl requires an actual send flag, same rationale as cond 1',
       },
     ],
   },
@@ -16406,7 +17433,7 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'tool-poisoning',
     scan_target: 'runtime',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'content',
@@ -16425,6 +17452,12 @@ export const ATR_RULES_COMPILED = [
         pattern:
           '(?i)create-mcp-server-stdio[^\\n]{0,160}(?:\\bexec\\s*\\([^)\\n]{0,120})(?:\\brm\\s+-rf|\\bnc\\s+-[a-z]*e|/bin/sh|\\bbash\\s+-i|\\bcurl\\s+[^\\n|]{0,80}\\|\\s*(?:sh|bash)|\\bwget\\s+[^\\n|]{0,80}\\|\\s*(?:sh|bash))',
         desc: 'Detects create-mcp-server-stdio exec() carrying a classic post-injection payload (reverse shell, destructive rm, or curl|sh dropper) inside the concatenated command.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:create-mcp-server-stdio[^\\n]{0,200}\\bexec\\s*\\([^)\\n]{0,160}(?:`[a-z][^`\\n]{0,80}`|\\$\\(\\s*[a-z])|\\bexec\\s*\\([^)\\n]{0,160}(?:`[a-z][^`\\n]{0,80}`|\\$\\(\\s*[a-z])[^\\n]{0,200}create-mcp-server-stdio)',
+        desc: 'Detects SHELL COMMAND SUBSTITUTION (backtick `cmd` or $(cmd)) inside a create-mcp-server-stdio exec() call on the content channel. The other content conditions only fire on the source-code sink shape (string + concatenation or template ${...}) or on a classic post-injection payload, so a substitution payload that carries neither - e.g. exec("echo `whoami`") - was uncovered. Command substitution is required to be co-framed with the create-mcp-server-stdio marker (within 200 chars on either side of the exec sink), so ordinary shell backticks elsewhere in a document cannot fire this critical block_tool rule. Bare command separators (; && || |) are DELIBERATELY excluded here because they are common in legitimate static commands (exec("npm run build && npm test")); those forms stay covered by the tool_input condition and by the payload condition.',
       },
     ],
   },
@@ -16685,7 +17718,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:send|email|forward|share)\\s+(?:them|it)?\\s+to\\s+my\\s+email[^.\\n]{0,80}[\\w.+-]+@[\\w-]+\\.[\\w.]+[^.\\n]{0,40}(?:password|credential|key|secret|stored)',
+          '(?i)(?:send|email|forward|share)\\s(?:\\s*(?:them|it))?\\s+to\\s+my\\s+email(?:[^.\\n]{0,79}[^\\w.+\\n-])?[\\w.+-]+@[\\w-]+\\.[\\w.]+(?:[^\\w.\\n][^.\\n]{0,39})?(?:password|credential|key|secret|stored)',
         desc: 'Send to my email destination with credential type',
       },
       {
@@ -16849,7 +17882,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          "(?i)\\battacker_objective\\s*=\\s*Get\\s+the\\s+(?:user|CUA|agent)['']?s?\\s+[^,\\n]{0,60},?\\s+then\\s+(?:delete|edit|modify|tamper|overwrite)\\s+the\\s+file",
+          "(?i)\\battacker_objective\\s*=\\s*Get\\s+the\\s+(?:user|CUA|agent)['']?s?(?:\\s+(?:[^,\\s][^,\\n]{0,59},?|,)|\\s)\\s+then\\s+(?:delete|edit|modify|tamper|overwrite)\\s+the\\s+file",
         desc: 'VPI attacker_objective: exfil then delete/edit the source file',
       },
       {
@@ -16963,7 +17996,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:grant|add|give)\\s+(?:permanent|temporary|guest|unlimited)?\\s+access\\s+to\\s+(?:my\\s+)?(?:friend|guest|person|user|visitor|Amy|Bob|Alice)[^.\\n]{0,80}(?:smart\\s+lock|August|Kwikset|home|premises|house|building)',
+          '(?i)(?:grant|add|give)\\s(?:\\s*(?:permanent|temporary|guest|unlimited))?\\s+access\\s+to\\s+(?:my\\s+)?(?:friend|guest|person|user|visitor|Amy|Bob|Alice)[^.\\n]{0,80}(?:smart\\s+lock|August|Kwikset|home|premises|house|building)',
         desc: 'Grant person access to home/premises via smart lock',
       },
       {
@@ -17403,7 +18436,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:retrieve|get|fetch|access|export)\\s+(?:my\\s+)?(?:saved\\s+)?(?:credit\\s+card(?:\\s+(?:information|details?|numbers?|data))?|payment\\s+methods?|bank\\s+account(?:\\s+(?:detail|information|data))?|debit\\s+card)\\s+(?:from\\s+(?:my\\s+)?\\w+)?\\s*(?:and\\s+)?(?:email|send|forward|mail)\\s+(?:it|them|the\\s+(?:details?|information|data))\\s+to[^\\n]{0,120}(?:@[^\\s"]{3,80}|alternate\\s+email)',
+          '(?i)(?:retrieve|get|fetch|access|export)\\s+(?:my\\s+)?(?:saved\\s+)?(?:credit\\s+card(?:\\s+(?:information|details?|numbers?|data))?|payment\\s+methods?|bank\\s+account(?:\\s+(?:detail|information|data))?|debit\\s+card)\\s+(?:from\\s+(?:my\\s+)?\\w+\\s*)?(?:and\\s+)?(?:email|send|forward|mail)\\s+(?:it|them|the\\s+(?:details?|information|data))\\s+to[^\\n]{0,120}(?:@[^\\s"]{3,80}|alternate\\s+email)',
         desc: 'Payment/card retrieval + email forwarding (broader coverage, no override prefix required)',
       },
     ],
@@ -17827,13 +18860,13 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)(Q\\s*:\\s*.{5,200}\\s+A\\s*:\\s*.{5,300}\\s+){3,}Q\\s*:\\s*.{0,150}(password|secret|api[_\\s]?key|birth\\s*(date|day)|email\\s*(address)?|social\\s*security|SSN|override|bypass|admin|credentials?|master\\s*key)',
-        desc: 'Three or more Q&A pairs leading to password/secret/key request (many-shot chain)',
+          '(?i)(Q\\s*:\\s*(?:[^A\\s\\n]|A+[^\\S\\n]*[^\\sA:])(?:[^A\\n]|A+[^\\S\\n]*[^\\sA:]){3,198}(?:[^A\\s\\n]|A+[^\\S\\n]*[^\\sA:])\\s+A\\s*:\\s*(?:[^Q\\s\\n]|Q+[^\\S\\n]*[^\\sQ:])(?:[^Q\\n]|Q+[^\\S\\n]*[^\\sQ:]){3,298}(?:[^Q\\s\\n]|Q+[^\\S\\n]*[^\\sQ:])\\s+){3}Q\\s*:\\s*(?:\\S.{0,149})?(password|secret|api[_\\s]?key|birth\\s*(date|day)|email\\s*(address)?|social\\s*security|SSN|override|bypass|admin|credentials?|master\\s*key)',
+        desc: 'Three or more Q&A pairs leading to a password/secret/key request (many-shot chain). Each field is a complement automaton rather than a dot-filler: it matches newline-free text that does not contain A followed by optional whitespace and a colon, so a Q field cannot swallow the A: that delimits it, and an A field cannot swallow the next Q:. Both ends are pinned to a non-whitespace character so the surrounding \\s* and \\s+ own the whitespace unambiguously. Written this way because a dot-filler adjacent to its own delimiter is ambiguous, and inside the {3,} repetition that made this rule exponential: 129 bytes took 249 seconds under Python re, in the enforce lane, where a match cannot be interrupted. The two obvious alternatives each cost something this rule should not pay -- a tempered dot needs a lookahead, which RE2 rejects and downstream consumers drop the rule over, and excluding the colon outright loses ordinary question text such as 3:30. Newline exclusion is load-bearing: an earlier draft without it let a field span an entire benign FAQ and produced a false positive on the 12,060-sample corpus. Verified against 300,000 fuzz strings and all 12,092 corpus units with zero divergence from the previous pattern.',
       },
       {
         field: 'user_input',
         pattern:
-          "(?i)Q\\s*:\\s*Repeat\\s+'?[^'\"\\n]{3,60}'?\\s+(\\d+|ten|five|twenty)\\s+times\\.?[^\\n]{0,200}Q\\s*:\\s*.{0,100}(password|secret|key|override|admin|credentials?|birth\\s*date|email|social\\s*security)",
+          "(?i)Q\\s*:\\s*Repeat\\s+(?:'[^'\"\\n]{3,60}|[^'\"\\s][^'\"\\n]{2,59})'?\\s+(\\d+|ten|five|twenty)\\s+times\\.?[^\\n]{0,200}Q\\s*:\\s*(?:\\S.{0,99})?(password|secret|key|override|admin|credentials?|birth\\s*date|email|social\\s*security)",
         desc: 'Repeat-N-times conditioning followed by sensitive terminal question',
       },
     ],
@@ -17860,13 +18893,13 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'user_input',
-        pattern: '(?i)interlace\\s+(part\\s*(1|one|2|two)|"[^"]{3,60}"\\s*,?\\s+and\\s+")',
+        pattern: '(?i)interlace\\s+(part\\s*(1|one|2|two)|"[^"]{3,60}"(?:\\s*,)?\\s+and\\s+")',
         desc: 'Character-level interlace instruction splitting a question across two parts',
       },
       {
         field: 'user_input',
         pattern:
-          '(?i)combine\\s+(A|Part\\s*1|the\\s+parts?)\\s*,?\\s+(B|Part\\s*2)?[^.\\n]{0,80}(answer\\s+the\\s+question|and\\s+answer|then\\s+answer|then\\s+give|give\\s+an\\s+example)',
+          '(?i)combine\\s+(A|Part\\s*1|the\\s+parts?)(?:\\s*,)?\\s+(?:(B|Part\\s*2)[^.\\n]{0,80}|(?:[^\\s.][^.\\n]{0,79})?)(answer\\s+the\\s+question|and\\s+answer|then\\s+answer|then\\s+give|give\\s+an\\s+example)',
         desc: 'Combine string parts then answer / give example pattern',
       },
       {
@@ -18072,7 +19105,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          "(?i)(do\\s+not|don'?t|never)\\s+(start|begin|open|lead\\s+with)?\\s*(your\\s+)?re(ply|sponse|sponding)\\s+(with\\s+)?['\"]?(I\\s+cannot|I'?m\\s+not\\s+able|I\\s+can'?t|I\\s+must\\s+decline|I\\s+am\\s+unable|I\\s+refuse|I'?m\\s+sorry)['\"]?",
+          "(?i)(do\\s+not|don'?t|never)\\s+(?:(start|begin|open|lead\\s+with)\\s*)?(your\\s+)?re(ply|sponse|sponding)\\s+(with\\s+)?['\"]?(I\\s+cannot|I'?m\\s+not\\s+able|I\\s+can'?t|I\\s+must\\s+decline|I\\s+am\\s+unable|I\\s+refuse|I'?m\\s+sorry)['\"]?",
         desc: 'Explicit ban on starting reply with standard refusal phrases',
       },
       {
@@ -18112,7 +19145,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          "(?i)(always|must|should|shall)\\s+(start|begin|open|commence)\\s+(your|each|every)?\\s*(re(ply|sponse|sponses?)|answer|output)[^.\\n]{0,60}['\"]?(Sure!?|Absolutely!?|Of\\s+course!?|Certainly!?|Yes!?|Happy\\s+to|I\\s+would\\s+be\\s+happy|I'?m\\s+happy\\s+to\\s+help)['\"]?",
+          "(?i)(always|must|should|shall)\\s+(start|begin|open|commence)\\s+(?:(your|each|every)\\s*)?(re(ply|sponse|sponses?)|answer|output)[^.\\n]{0,60}['\"]?(Sure!?|Absolutely!?|Of\\s+course!?|Certainly!?|Yes!?|Happy\\s+to|I\\s+would\\s+be\\s+happy|I'?m\\s+happy\\s+to\\s+help)['\"]?",
         desc: 'Mandatory affirmative opener instruction for all/next response',
       },
       {
@@ -18409,7 +19442,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(The\\s+answer\\s+is\\s+originally\\s+(Yes|No),[^\\n]{0,100}[\u2070-\u209f\u02b0-\u02ef]|[\u2070-\u209f\u02b0-\u02ef]{2,}[^\\n]{0,50}(answer|question|turns?|concurrently|luther|gates))',
+          '(The\\s+answer\\s+is\\s+originally\\s+(Yes|No),[^\\n]{0,100}[\u2070-\u209f\u02b0-\u02ef]|[\u2070-\u209f\u02b0-\u02ef]{2}(?:[^\u2070-\u209f\u02b0-\u02ef\\n][^\\n]{0,49})?(answer|question|turns?|concurrently|luther|gates))',
         desc: 'Superscript Unicode characters embedded in reasoning chain to flip expected answer',
       },
       {
@@ -18427,7 +19460,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '[\u00aa\u00ba\u02b0-\u02ff\u2070-\u209c\u1d00-\u1d7f]*[\u02b0-\u02ff\u1d00-\u1d7f][\u00aa\u00ba\u02b0-\u02ff\u2070-\u209c\u1d00-\u1d7f]*[\u02b0-\u02ff\u1d00-\u1d7f][\u00aa\u00ba\u02b0-\u02ff\u2070-\u209c\u1d00-\u1d7f]{3,}',
+          '[\u02b0-\u02ff\u1d00-\u1d7f][\u00aa\u00ba\u2070-\u209c]*[\u02b0-\u02ff\u1d00-\u1d7f][\u00aa\u00ba\u02b0-\u02ff\u2070-\u209c\u1d00-\u1d7f]{3}',
         desc: 'Dense sequence of modifier/phonetic-extension characters (anomalous embedding injection)',
       },
     ],
@@ -18572,7 +19605,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:list|show|give|tell\\s+me|enumerate)\\s+(?:me\\s+)?(?:all\\s+)?(?:the\\s+)?(?:internal|hidden|admin(?:-only)?|privileged?|every)?\\s*(?:functions?\\s+or\\s+tools?|tools?\\s+(?:you\\s+can\\s+call|or\\s+functions?)|internal\\s+(?:functions?|tools?|api\\s+endpoints?))[^.]{0,80}(?:you\\s+can\\s+call|admin-only|including\\s+(?:any\\s+)?admin|with\\s+their\\s+parameters|access\\s+to)',
+          '(?i)(?:list|show|give|tell\\s+me|enumerate)\\s+(?:me\\s+)?(?:all\\s+)?(?:the\\s+)?(?:(?:internal|hidden|admin(?:-only)?|privileged?|every)\\s*)?(?:functions?\\s+or\\s+tools?|tools?\\s+(?:you\\s+can\\s+call|or\\s+functions?)|internal\\s+(?:functions?|tools?|api\\s+endpoints?))[^.]{0,80}(?:you\\s+can\\s+call|admin-only|including\\s+(?:any\\s+)?admin|with\\s+their\\s+parameters|access\\s+to)',
         desc: "Request to enumerate the agent's own internal/admin tools or functions",
       },
       {
@@ -18630,7 +19663,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:update|modify|change|set)\\s+(?:my|the|your)?\\s*(?:security\\s+policy|firewall\\s+rules?|whitelist|allowlist|blocklist)[^.]{0,100}(?:policy\\s+id|rule\\s+id|\\bid\\s*[\'"]?:?\\s*[\'"]?\\d+)',
+          '(?i)(?:update|modify|change|set)\\s+(?:(?:my|the|your)\\s*)?(?:security\\s+policy|firewall\\s+rules?|whitelist|allowlist|blocklist)[^.]{0,100}(?:policy\\s+id|rule\\s+id|\\bid\\s*(?:[\'"]?:\\s*|[\'"]\\s*)?[\'"]?\\d+)',
         desc: 'Security policy or firewall rule update injected through a data field',
       },
     ],
@@ -18674,13 +19707,13 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)\\b[a-zA-Z0-9.-]+\\.(?:rebind\\.network|rbndr\\.us|rebinder\\.com|1u\\.ms)\\b',
+          '(?i)\\b[a-zA-Z0-9.-]{1,253}\\.(?:rebind\\.network|rbndr\\.us|rebinder\\.com|1u\\.ms)\\b',
         desc: 'Known DNS rebinding service hostname (rebind.network, rbndr.us, etc.)',
       },
       {
         field: 'content',
         pattern:
-          '(?i)[\\w.-]*(?:1time|forever|ttl\\d+|0ttl)[\\w.-]+(?:127\\.0\\.0\\.1|192\\.168\\.\\d+\\.\\d+|10\\.\\d+\\.\\d+\\.\\d+|172\\.(?:1[6-9]|2\\d|3[0-1])\\.\\d+\\.\\d+)',
+          '(?i)(?:1time|forever|ttl\\d+|0ttl)[\\w.-]{1,253}(?:127\\.0\\.0\\.1|192\\.168\\.\\d+\\.\\d+|10\\.\\d+\\.\\d+\\.\\d+|172\\.(?:1[6-9]|2\\d|3[0-1])\\.\\d+\\.\\d+)',
         desc: 'Time-based DNS rebinding hostname pattern combining public IP with loopback/private IP',
       },
       {
@@ -18754,8 +19787,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?:include|output|print|echo|return|emit|add|insert|embed|append|put|place|render|write|respond\\s+with|reply\\s+with|display|provide|send\\s+back)\\b[^\\n]{0,120}<svg\\b[^\\n>]{0,40}/?\\s*on(?:load|error|activate|begin|end|focusin|focusout|click|mouseover)\\s*=',
-        desc: 'Injection instruction to emit an SVG event-handler tag into agent output',
+          '(?i)\\b(?:include|output|print|echo|return|emit|add|insert|embed|append|put|place|render|write|respond\\s+with|reply\\s+with|display|provide|send\\s+back)\\b(?:[^\\n\\\\]|\\\\[^n]){0,120}<svg\\b[^\\n>]{0,40}/?\\s*on(?:load|error|activate|begin|end|focusin|focusout|click|mouseover)\\s*=',
+        desc: 'Injection instruction to emit an SVG event-handler tag into agent output (same line, both raw and JSON-encoded)',
       },
       {
         field: 'content',
@@ -18965,13 +19998,13 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(program\\s+me\\s+with\\s+(my|your|the)?\\s*system\\s+prompt|I\\s+am\\s+(an?\\s+)?(advanced\\s+)?AI[^.]{0,60}(program|configure|set|initialize)\\s+me)',
+          '(?i)(program\\s+me\\s+with\\s+(?:(my|your|the)\\s*)?system\\s+prompt|I\\s+am\\s+(an?\\s+)?(advanced\\s+)?AI[^.]{0,60}(program|configure|set|initialize)\\s+me)',
         desc: 'LLM-impersonation framing asking to receive/reproduce system prompt',
       },
       {
         field: 'content',
         pattern:
-          '(?i)(repeat|output|print|show|go\\s+line\\s+by\\s+line|start\\s+from|starting\\s+from|starting\\s+with)\\b[^\\n]{0,100}[\'"]\\s*You\\s+are\\b',
+          '(?i)\\b(repeat|output|print|show|go\\s+line\\s+by\\s+line|start\\s+from|starting\\s+from|starting\\s+with)\\b[^"\':\\n][^\\n]{0,99}[\'"]\\s*You\\s+are\\b',
         desc: "'You are' anchor extraction \u2014 asks to repeat content starting from 'You are'",
       },
       {
@@ -19140,12 +20173,12 @@ export const ATR_RULES_COMPILED = [
     severity: 'critical',
     category: 'context-exfiltration',
     scan_target: 'mcp',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'content',
         pattern:
-          '(?i)((?:<!--\\s*|\\[)\\s*SYSTEM\\s+OVERRIDE\\b|SYSTEM\\s+OVERRIDE\\s+(?:BEGIN|MODE|ACTIVE|NOW|ENABLED)|ROOT_?ADMIN|OMEGA\\s+CLEARANCE|PRIORITY\\s+LEVEL\\s*:\\s*CRITICAL|AUTHORIZATION\\s*:\\s*(ROOT|ADMIN|FULL|OMEGA))',
+          '(?i)((?:<!--|\\[)\\s*SYSTEM\\s+OVERRIDE\\b|SYSTEM\\s+OVERRIDE\\s+(?:BEGIN|MODE|ACTIVE|NOW|ENABLED)|ROOT_?ADMIN|OMEGA\\s+CLEARANCE|AUTHORIZATION\\s*:\\s*(ROOT|ADMIN|FULL|OMEGA))',
         desc: 'System override (structurally framed) / root admin / omega clearance authority claim',
       },
       {
@@ -19205,7 +20238,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(#{2,}\\s*\\[SYSTEM[:\\]](?!\\()|<\\|system\\|>|\\[SYSTEM\\s*(?:PROMPT|MESSAGE|OVERRIDE)\\](?!\\())',
+          '(?i)(##\\s*\\[SYSTEM[:\\]](?!\\()|<\\|system\\|>|\\[SYSTEM\\s*(?:PROMPT|MESSAGE|OVERRIDE)\\](?!\\())',
         desc: 'Markdown-heading or special-token SYSTEM marker injection (not markdown link text)',
       },
     ],
@@ -19269,17 +20302,17 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_args',
         pattern:
-          '(?i)(?:\';|"\\s*;|--\\s*)\\s*(?:DROP\\s+(?:TABLE|DATABASE|INDEX|VIEW)|TRUNCATE\\s+(?:TABLE\\s+)?\\w|DELETE\\s+FROM\\s+\\w)',
+          '(?i)(?:\'\\s*;|"\\s*;|--)\\s*(?:DROP\\s+(?:TABLE|DATABASE|INDEX|VIEW)|TRUNCATE\\s+(?:TABLE\\s+)?\\w|DELETE\\s+FROM\\s+\\w)',
         desc: 'SQL injection: quote-termination followed by destructive DDL',
       },
       {
         field: 'tool_args',
-        pattern: '(?i)\\bDROP\\s+TABLE\\s+\\w+\\s*;?\\s*--',
+        pattern: '(?i)\\bDROP\\s+TABLE\\s+\\w+\\s*(?:;\\s*)?--',
         desc: 'DROP TABLE with comment suppressor',
       },
       {
         field: 'user_input',
-        pattern: '(?i)(?:\';|"\\s*;)\\s*(?:DROP\\s+TABLE|TRUNCATE|DELETE\\s+FROM\\s+\\w)',
+        pattern: '(?i)(?:\'\\s*;|"\\s*;)\\s*(?:DROP\\s+TABLE|TRUNCATE|DELETE\\s+FROM\\s+\\w)',
         desc: 'Destructive DDL injection in user input',
       },
     ],
@@ -19403,8 +20436,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)\\b(?:fetch|retrieve|get|access|load|read|request|curl|wget|hit|query|scan|connect\\s+to|pull)\\b[^\\n]{0,60}?https?://(?:192\\.168\\.\\d{1,3}\\.\\d{1,3}|10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|172\\.(?:1[6-9]|2[0-9]|3[01])\\.\\d{1,3}\\.\\d{1,3})',
-        desc: 'User directs the agent to fetch/retrieve from an RFC-1918 private IP (SSRF pivot intent)',
+          '(?i)\\b(?:fetch|retrieve|get|access|load|read|request|curl|wget|hit|query|scan|connect\\s+to|pull)\\b[^\\n]{0,60}?https?://(?:192\\.168\\.\\d{1,3}\\.\\d{1,3}|10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|172\\.(?:1[6-9]|2[0-9]|3[01])\\.\\d{1,3}\\.\\d{1,3}):(?:9200|9300|8500|2379|6379|27017|3306|5432|8086|2375|10250)\\b',
+        desc: "User directs the agent to fetch/retrieve from an RFC-1918 private IP on a well-known internal datastore/control-plane port (SSRF pivot intent). Requires a sensitive target, mirroring the tool_args conditions: a bare private-IP URL with no internal port is not matched, because in prose it is indistinguishable from homelab and lab-build documentation \u2014 an HTTPS setup guide tripped the unqualified form on a fenced 'curl -kv https://192.168.1.1'. The sensitive-path half of this channel is covered by the next condition",
       },
       {
         field: 'user_input',
@@ -19425,14 +20458,14 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'tool_args',
         pattern:
-          '(?i)https?://(?:localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|\\[::1\\]):(?:6379|27017|9200|5432|3306|5601|8500|4444|1521|6443|2181|9092|11211|8161|9092)(?:[/"\'\\s]|$)',
-        desc: 'Localhost URL with well-known database/service port (Redis/MongoDB/Elastic/etc)',
+          '(?i)https?://(?:localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|\\[::1\\]):(?:(?:6379|27017|9200|5432|3306|5601|8500|4444|1521|6443|2181|9092|11211|8161)(?:/)?(?:["\'\\s]|$)|\\d{2,5}/(?:_cat/|_search|_cluster/settings|_nodes|_snapshot|actuator/(?:env|beans|configprops|mappings|heapdump|threaddump|shutdown|loggers|conditions|scheduledtasks|sessions|caches)|\\.env))',
+        desc: 'Localhost URL: bare raw service-port probe (no HTTP path) OR any localhost port followed by a sensitive data/config path (Elasticsearch cat/search/cluster-settings APIs, Spring Boot management/secret endpoints). Routine health and metrics endpoints are excluded to avoid false positives on local health checks.',
       },
       {
         field: 'user_input',
         pattern:
-          '(?i)(?:fetch|retrieve|get|access)\\s+(?:http://)?(?:localhost|127\\.0\\.0\\.1):(?:6379|27017|9200|5432|3306|8500|4444)(?:[/"\'\\s]|$)',
-        desc: 'User instructing agent to fetch localhost with specific service port',
+          '(?i)(?:fetch|retrieve|get|access|probe|curl|wget)\\s+(?:https?://)?(?:localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0|\\[::1\\]):(?:(?:6379|27017|9200|5432|3306|5601|8500|4444|1521|6443|2181|9092|11211|8161)(?:/)?(?:["\'\\s]|$)|\\d{2,5}/(?:_cat/|_search|_cluster/settings|_nodes|_snapshot|actuator/(?:env|beans|configprops|mappings|heapdump|threaddump|shutdown|loggers|conditions|scheduledtasks|sessions|caches)|\\.env))',
+        desc: 'User directing the agent to probe a localhost raw service port or a localhost sensitive data/config path (not routine health/metrics checks).',
       },
     ],
   },
@@ -19593,7 +20626,7 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'user_input',
-        pattern: '(?i)(?:^|\\n)\\s*(?:/debug|/admin|/system|/root)(?![\\w/])',
+        pattern: '(?i)(?:^|\\n)[^\\S\\n]*(?:/debug|/admin|/system|/root)(?![\\w/])',
         desc: 'Slash-command debug/admin invocation as the leading token of a line (not a URL/config path)',
       },
       {
@@ -19650,12 +20683,12 @@ export const ATR_RULES_COMPILED = [
     severity: 'high',
     category: 'privilege-escalation',
     scan_target: 'user_input',
-    rule_version: 1,
+    rule_version: 2,
     patterns: [
       {
         field: 'user_input',
         pattern:
-          '(?i)(?:retrieve|get|show|fetch|find)\\s+(?:the\\s+)?(?:account|user|record|transaction|order)\\s+(?:with\\s+(?:the\\s+)?)?(?:highest|largest|most|maximum|max)\\b',
+          '(?i)(?:retrieve|get|show|fetch|find)\\s+(?:(?:me|us)\\s+)?(?:the\\s+)?(?:account|user|record|transaction|order)\\s+(?:with\\s+(?:the\\s+)?)?(?:highest|largest|most|maximum|max)\\b',
         desc: 'Superlative-based cross-user record selection',
       },
       {
@@ -19663,6 +20696,12 @@ export const ATR_RULES_COMPILED = [
         pattern:
           '(?i)(?:transactions?|amounts?)\\s*(?:>|greater\\s+than|above)\\s*0\\s+OR\\s+account',
         desc: 'Tautology-phrased BOLA in natural language',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          "(?i)\\b(?:account|user|record|customer)\\s*(?:(?:id|number|no\\.?|#)\\s*)?(?:[:#]\\s*)?\\d{1,10}\\b[\\s\\S]{0,60}\\b(?:even\\s+though|although|but)\\s+(?:i'?m|i\\s+am|my|mine)\\b",
+        desc: 'Numbered record requested with an explicit admission that it belongs to someone else',
       },
     ],
   },
@@ -19742,8 +20781,8 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)\\b(repeat|write|say|output|print)\\b[^.\\n]{0,30}\\b([5-9]\\d|[1-9]\\d{2,})\\s+times\\b',
-        desc: "repeat/write/say + N>=50 times (compact form without explicit 'word' token)",
+          '(?i)\\b(repeat|write|say|output|print)\\b[^.\\n]{0,20}(["\'\u2018\u2019\u201c\u201d][^"\'\u2018\u2019\u201c\u201d\\n]{1,30}["\'\u2018\u2019\u201c\u201d])[^.\\n]{0,20}\\b([5-9]\\d|[1-9]\\d{2,})\\s+times\\b',
+        desc: "repeat/write/say + a QUOTED literal + N>=50 times (compact form, no 'word' noun). The quotes are load-bearing: without them the same verbs describe a loop \u2014 'repeat the roll process 100 times' \u2014 instead of demanding repeated output.",
       },
       {
         field: 'user_input',
@@ -19902,7 +20941,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)\\bconducting\\s+(a|an)?\\s*(comprehensive|thorough)\\s+(elucidation|explication|exposition)\\b',
+          '(?i)\\bconducting\\s+(?:(a|an)\\s*)?(comprehensive|thorough)\\s+(elucidation|explication|exposition)\\b',
         desc: "Variant of conducting-comprehensive-elucidation trigger (requires 'conducting' verb anchor)",
       },
     ],
@@ -19922,7 +20961,7 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'user_input',
-        pattern: '(?i)^.{15,}[.!?]?\\s+:(?:[)DoP])\\s*\\.?\\s*$',
+        pattern: '(?i)^.{15}(?:.*\\S)?[.!?]?\\s+:(?:[)DoP])\\s*(?:\\.\\s*)?$',
         desc: 'Emoticon :) appended as terminal suffix to a task request (\u226515 char task prefix)',
       },
     ],
@@ -20011,7 +21050,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)---+\\s*(SYSTEM\\s+(OVERRIDE|INSTRUCTIONS?|DIRECTIVE|COMMAND)|NEW\\s+(INSTRUCTIONS?|DIRECTIVES?|COMMANDS?))\\s*---+',
+          '(?i)---\\s*(SYSTEM\\s+(OVERRIDE|INSTRUCTIONS?|DIRECTIVE|COMMAND)|NEW\\s+(INSTRUCTIONS?|DIRECTIVES?|COMMANDS?))\\s*---',
         desc: 'Dash-delimited system override header inside content',
       },
       {
@@ -20199,7 +21238,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)Q\\s*:\\s*.{5,150}\\s+A\\s*:\\s*.{5,200}\\s+Q\\s*:\\s*(?:[^?\\n]{0,80}?)(?:our\\s+(?:system\\s+)?password|the\\s+(?:system\\s+)?password|your\\s+password|master\\s*key|secret\\s*key|encryption\\s+key|api[_\\s-]?key|birth\\s*(?:date|day|year)|social\\s*security|ssn|home\\s*address|credit\\s*card)\\b(?!\\s*managers?)',
+          '(?i)Q\\s*:\\s*.{4,149}[^\\s]\\s+A\\s*:\\s*.{4,199}[^\\s]\\s+Q\\s*:\\s*(?:[^?\\n]{0,80}?)(?:our\\s+(?:system\\s+)?password|the\\s+(?:system\\s+)?password|your\\s+password|master\\s*key|secret\\s*key|encryption\\s+key|api[_\\s-]?key|birth\\s*(?:date|day|year)|social\\s*security|ssn|home\\s*address|credit\\s*card)\\b(?!\\s*managers?)',
         desc: "Q&A pairs culminating in a specific credential/PII question (excludes 'password manager')",
       },
       {
@@ -20217,7 +21256,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          "(?i)(?:[^?\\n]{5,60}\\?\\s+){2,}[^?\\n]{0,40}(?:what'?s?\\s+(?:the\\s+)?(?:password|secret|system\\s+password|pin)\\b|password\\s+for\\s+our\\s+system)",
+          "(?i)(?:[^\\s?\\n][^?\\n]{4,59}\\?\\s+){2,}[^?\\n]{0,40}(?:what'?s?\\s+(?:the\\s+)?(?:password|secret|system\\s+password|pin)\\b|password\\s+for\\s+our\\s+system)",
         desc: 'Two or more trivia questions followed by a password question',
       },
       {
@@ -21615,7 +22654,7 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)\\[+\\s*(?:EMAIL|MAIL|MSG|MESSAGE)[_ ]?(?:END|START|BOUNDARY|SEPARATOR|DIVIDER)[_ ]?(?:INDICATOR|MARKER|SEPARATOR)?\\s*\\]+|\\{\\{\\s*(?:email|message|msg)\\s*\\d+\\s*\\}\\}|\\[+\\s*(?:email|message|msg)\\s*\\d+\\s*\\]+',
+          '(?i)\\[\\s*(?:EMAIL|MAIL|MSG|MESSAGE)[_ ]?(?:END|START|BOUNDARY|SEPARATOR|DIVIDER)[_ ]?(?:INDICATOR|MARKER|SEPARATOR)?\\s*\\]|\\{\\{\\s*(?:email|message|msg)\\s*\\d+\\s*\\}\\}|\\[\\s*(?:email|message|msg)\\s*\\d+\\s*\\]',
         desc: 'Fabricated email/message boundary marker impersonating the harness delimiter',
       },
     ],
@@ -21799,7 +22838,7 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'user_input',
-        pattern: '(?i)while\\s+True\\s*:\\s*\\n?\\s*os\\.fork\\(\\)',
+        pattern: '(?i)while\\s+True\\s*:\\s*os\\.fork\\(\\)',
         desc: 'BIPIA host-sabotage invariant #3',
       },
       {
@@ -21814,7 +22853,7 @@ export const ATR_RULES_COMPILED = [
       },
       {
         field: 'user_input',
-        pattern: '(?i)while\\s+True\\s*:\\s*\\n?\\s*create_window\\(\\)',
+        pattern: '(?i)while\\s+True\\s*:\\s*create_window\\(\\)',
         desc: 'BIPIA host-sabotage invariant #6',
       },
     ],
@@ -22036,19 +23075,19 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'user_input',
         pattern:
-          '(?i)\\b(?:add|integrate|include|insert|append|enhance|modify|suggest)\\b[\\s\\S]{0,80}(?:https?://|www\\.[a-z0-9-]+\\.[a-z]{2,}|[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}|[a-z0-9-]{3,}\\.(?:com|net|org|io|xyz|co|info|app))[\\s\\S]{0,80}\\b(?:your|the)\\s+(?:reply|response|answer|message)\\b',
+          '(?i)\\b(?:add|integrate|include|insert|append|enhance|modify|suggest)\\b[\\s\\S]{0,80}(?:https?://|www\\.[a-z0-9-]+\\.[a-z]{2,}|[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}|[a-z0-9-]{3,}\\.(?:com|net|org|io|xyz|co|info|app)(?:[\\s,;:!?/)\\]"\\x27<>.]|$))[\\s\\S]{0,80}\\b(?:your|the)\\s+(?:reply|response|answer|message)\\b',
         desc: 'BIPIA link-injection invariant #1',
       },
       {
         field: 'user_input',
         pattern:
-          '(?i)\\b(?:add|integrate|include|insert|append|enhance|modify|suggest)\\b[\\s\\S]{0,80}\\b(?:your|the)\\s+(?:reply|response|answer|message)\\b[\\s\\S]{0,90}(?:https?://|www\\.[a-z0-9-]+\\.[a-z]{2,}|[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}|[a-z0-9-]{3,}\\.(?:com|net|org|io|xyz|co|info|app))',
+          '(?i)\\b(?:add|integrate|include|insert|append|enhance|modify|suggest)\\b[\\s\\S]{0,80}\\b(?:your|the)\\s+(?:reply|response|answer|message)\\b[\\s\\S]{0,90}(?:https?://|www\\.[a-z0-9-]+\\.[a-z]{2,}|[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}|[a-z0-9-]{3,}\\.(?:com|net|org|io|xyz|co|info|app)(?:[\\s,;:!?/)\\]"\\x27<>.]|$))',
         desc: 'BIPIA link-injection invariant #2',
       },
       {
         field: 'user_input',
         pattern:
-          '(?i)\\bin\\s+your\\s+(?:reply|response|answer|message)\\b[\\s\\S]{0,80}\\b(?:suggest|share|visit|click|download|directing|pointing|link)\\b[\\s\\S]{0,45}(?:https?://|www\\.[a-z0-9-]+\\.[a-z]{2,}|[a-z0-9-]{3,}\\.(?:com|net|org|io|xyz|co|info|app))',
+          '(?i)\\bin\\s+your\\s+(?:reply|response|answer|message)\\b[\\s\\S]{0,80}\\b(?:suggest|share|visit|click|download|directing|pointing|link)\\b[\\s\\S]{0,45}(?:https?://|www\\.[a-z0-9-]+\\.[a-z]{2,}|[a-z0-9-]{3,}\\.(?:com|net|org|io|xyz|co|info|app)(?:[\\s,;:!?/)\\]"\\x27<>.]|$))',
         desc: 'BIPIA link-injection invariant #3',
       },
     ],
@@ -22531,6 +23570,1541 @@ export const ATR_RULES_COMPILED = [
     ],
   },
   {
+    id: 'ATR-2026-01933',
+    title: 'LiteLLM User-Role Privilege Escalation (CVE-2026-47102)',
+    severity: 'critical',
+    category: 'privilege-escalation',
+    scan_target: 'llm_io',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)/user/(?:update|bulk_update)[\\s\\S]{0,400}["\\x27]?user_role["\\x27]?\\s*[:=]\\s*["\\x27]?(?:proxy_admin|proxy[_-]admin)\\b',
+        desc: '/user/update or /user/bulk_update payload writing user_role to an administrative proxy_admin value \u2014 direct CVE-2026-47102 escalation.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)["\\x27]user_role["\\x27]\\s*:\\s*["\\x27]proxy_admin["\\x27][\\s\\S]{0,300}["\\x27]user_id["\\x27]\\s*:|["\\x27]user_id["\\x27]\\s*:[\\s\\S]{0,300}["\\x27]user_role["\\x27]\\s*:\\s*["\\x27]proxy_admin["\\x27]',
+        desc: 'A user object pairing a user_id with a user_role of proxy_admin in an update body \u2014 the bulk_update self-promotion shape.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2026-47102[\\s\\S]{0,200}(?:litellm|user_role|proxy_admin|privileg|escalat)',
+        desc: 'Explicit CVE-2026-47102 reference combined with LiteLLM role-escalation language \u2014 attack framing in a skill or tool description.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01934',
+    title: 'LiteLLM allowed_routes Authorization Bypass (CVE-2026-47101)',
+    severity: 'critical',
+    category: 'privilege-escalation',
+    scan_target: 'llm_io',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)/key/(?:generate|update|regenerate|service-account/generate)[\\s\\S]{0,400}["\\x27]?allowed_routes["\\x27]?\\s*[:=][\\s\\S]{0,200}(?:["\\x27]/(?:user|key|team|global|organization|customer)/|["\\x27]/?\\*["\\x27]|management_routes|admin_only_routes)',
+        desc: 'A /key/* generation or update payload whose allowed_routes reach administrative/management routes or a wildcard \u2014 CVE-2026-47101 authorization bypass shape.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)["\\x27]allowed_routes["\\x27]\\s*:\\s*\\[[^\\]]*(?:["\\x27]/(?:user|key|team|global)/(?:new|update|delete|bulk_update)|["\\x27]/?\\*["\\x27]|/key/generate)[^\\]]*\\][\\s\\S]{0,300}(?:litellm|/key/(?:generate|service-account))',
+        desc: 'An allowed_routes array containing admin management routes or a wildcard in a LiteLLM key-mint body.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2026-47101[\\s\\S]{0,200}(?:litellm|allowed_routes|authoriz|bypass|route)',
+        desc: 'Explicit CVE-2026-47101 reference combined with LiteLLM route-bypass language \u2014 attack framing in a skill or tool description.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01935',
+    title: 'LiteLLM Custom-Code Guardrail Sandbox Escape (CVE-2026-40217)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)/guardrails/test_custom_code[\\s\\S]{0,400}(?:import\\s+os\\b|import\\s+subprocess\\b|subprocess\\.(?:Popen|run|call|check_output)|\\bos\\.(?:system|popen|exec|spawn)|\\bexec\\s*\\(|\\beval\\s*\\(|\\bcompile\\s*\\()',
+        desc: 'A request to /guardrails/test_custom_code carrying Python code-execution primitives \u2014 direct CVE-2026-40217 attack shape.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:test_custom_code|custom[_-]?code[_-]?guardrail)[\\s\\S]{0,400}(?:__subclasses__|__globals__|__builtins__|__class__\\s*\\.\\s*__|\\bco_code\\b|types\\.CodeType|\\.__code__\\b|bytecode)',
+        desc: 'Custom guardrail code reaching the test path with dunder-traversal or bytecode-rewriting sandbox-escape primitives.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2026-40217[\\s\\S]{0,200}(?:litellm|guardrail|sandbox|custom[_\\s-]?code|bytecode|escape|rce)',
+        desc: 'Explicit CVE-2026-40217 reference combined with LiteLLM guardrail sandbox-escape language \u2014 attack framing in a skill or tool description.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01946',
+    title:
+      'Cloud-Metadata SSRF via Encoded Metadata-IP Bypass (CVE-2026-46678 / CVE-2026-25580 class)',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:2002:a9fe:a9fe|::ffff:(?:169\\.254\\.169\\.254|a9fe:a9fe)\\b|64:ff9b::(?:169\\.254\\.169\\.254|a9fe:a9fe)\\b|\\[::ffff:169\\.254\\.169\\.254\\])',
+        desc: 'IPv6 transition-form encoding (6to4 / IPv4-mapped / NAT64) of the link-local cloud-metadata IP 169.254.169.254 \u2014 the CVE-2026-46678 bypass.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:https?://|fetch|requests?\\.get|urlopen|curl|axios|allow[_-]?local)[\\s\\S]{0,80}(?:2852039166|0xa9fea9fe|0xA9\\.0xFE\\.0xA9\\.0xFE|0251\\.0376\\.0251\\.0376)\\b',
+        desc: 'Integer / hex / octal obfuscation of 169.254.169.254 reaching a URL-fetch context \u2014 alternate metadata-IP SSRF bypass encoding.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2026-(?:46678|25580)[\\s\\S]{0,200}(?:pydantic|ssrf|metadata|169\\.254|ipv6|allow[_-]?local|bypass)',
+        desc: 'Explicit CVE-2026-46678 / CVE-2026-25580 reference combined with metadata-SSRF language \u2014 attack framing in a skill or tool description.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01948',
+    title:
+      'netlicensing-mcp Path Traversal in product_number Bypasses Token Redaction (GHSA-hxpf-9xvq-wph8)',
+    severity: 'critical',
+    category: 'context-exfiltration',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern: '(?i)product_number\\s*[=:]\\s*["\\x27]?\\s*(?:\\.\\.|%2e%2e)\\s*[/\\\\]\\s*token',
+        desc: 'netlicensing_get_product product_number parameter set to ../token or %2e%2e/token \u2014 the exact path-traversal payload that redirects /product to the /token endpoint\n',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)/product/\\s*(?:\\.\\.|%2e%2e)\\s*[/\\\\]\\s*token',
+        desc: 'Literal traversal path /product/../token (or encoded) that httpx normalizes to /token, leaking the raw APIKEY via skipped redact_token_read\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:netlicensing[_-]?get[_-]?product|get_product)[\\s\\S]{0,120}(?:\\.\\.|%2e%2e)[/\\\\]token',
+        desc: 'The netlicensing get_product tool invoked with a ../token traversal argument\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)GHSA-hxpf-9xvq-wph8[\\s\\S]{0,200}(?:path\\s*traversal|product_number|\\.\\./token|redact|token\\s*redaction)',
+        desc: 'explicit GHSA framing combined with the traversal/redaction-bypass keywords',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01949',
+    title:
+      'PraisonAI MCPServer Unauthenticated HTTP tools/call Authentication Bypass (GHSA-j4f3-55x4-r6q2)',
+    severity: 'critical',
+    category: 'privilege-escalation',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:praisonai|mcpserver|mcpsecurity|handleRequest)[\\s\\S]{0,200}(?:no\\s+auth(?:oriz\\w+)?|unauthenticat|without\\s+(?:auth|credential)|authorization:\\s*bearer\\s+invalid)[\\s\\S]{0,200}["\\x27]?(?:method)["\\x27]?\\s*[:=]\\s*["\\x27]tools/call',
+        desc: 'PraisonAI/MCPServer context plus an unauthenticated / invalid-Bearer framing immediately preceding a JSON-RPC tools/call method \u2014 the core GHSA-j4f3-55x4-r6q2 auth-bypass payload\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)authorization:\\s*bearer\\s+invalid[\\s\\S]{0,200}(?:tools/call|tools/list|resources/read|prompts/get)',
+        desc: 'Invalid-credential bypass token ("Authorization: Bearer invalid") paired with a privileged MCP JSON-RPC method that returns HTTP 200 without validation\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)handleRequest[\\s\\S]{0,160}(?:src/(?:praisonai-ts/src/)?mcp/server\\.ts|mcpsecurity|tools/call)[\\s\\S]{0,120}(?:bypass|unauthenticat|without\\s+(?:auth|validation)|dispatch\\w*\\s+without)',
+        desc: 'The vulnerable handleRequest sink in mcp/server.ts dispatching methods without invoking MCPSecurity \u2014 direct reference to the vulnerable code path\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)GHSA-j4f3-55x4-r6q2[\\s\\S]{0,200}(?:tools/call|unauthenticat|auth(?:oriz\\w+)?\\s+bypass|bearer\\s+invalid)',
+        desc: 'explicit GHSA framing combined with the auth-bypass exploit tokens',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01952',
+    title: 'PraisonAI codeMode JS Sandbox Escape RCE via new Function/with() (GHSA-p69m-4f92-2v84)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:Function\\s*\\(\\s*[\\x27"]return\\s+this[\\x27"]\\s*\\)|\\(\\s*function\\s*\\(\\s*\\)\\s*\\{\\s*\\}\\s*\\)\\s*\\.\\s*constructor\\s*\\(\\s*[\\x27"]return\\s+(?:process|this)[\\x27"]\\s*\\))[\\s\\S]{0,400}(?:require\\s*\\(\\s*[\\x27"]child_[\\x27"]\\s*\\+\\s*[\\x27"]process[\\x27"]|child_process)[\\s\\S]{0,200}(?:execSync|exec|spawn)',
+        desc: "one line \u2014 global-object recovery primitive (Function('return this') / (function(){}).constructor('return process')) chained to child_process exec, the GHSA-p69m-4f92-2v84 escape",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)require\\s*\\(\\s*[\\x27"]child_[\\x27"]\\s*\\+\\s*[\\x27"]process[\\x27"]\\s*\\)',
+        desc: "one line \u2014 the literal 'child_' + 'process' string-split blocklist-evasion token unique to this PoC",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)GHSA-p69m-4f92-2v84[\\s\\S]{0,200}(?:sandbox\\s*escape|codeMode|new\\s+Function|child_process|execSync)',
+        desc: 'explicit GHSA framing',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01953',
+    title:
+      'npm PraisonAI codeMode Sandbox Escape via Function Constructor Prototype Chain (GHSA-vmmj-pfw7-fjwp)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\(\\s*\\{\\s*\\}\\s*\\)|[\\w$\\]\\)]\\s*|["\\x27]["\\x27]\\s*)\\.\\s*constructor\\s*\\.\\s*constructor\\s*\\(\\s*["\\x27]\\s*return\\s+(?:process|global|require|this)\\b',
+        desc: "Prototype-chain Function-constructor breakout: x.constructor.constructor('return process'/global/require) \u2014 the GHSA-vmmj-pfw7-fjwp escape primitive",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)process\\s*\\.\\s*mainModule\\s*\\.\\s*require\\s*\\(\\s*["\\x27](?:child_process|fs|os|vm|module)["\\x27]',
+        desc: "Post-escape host access: process.mainModule.require('child_process'/'fs') used to reach blocked modules after sandbox bypass",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)new\\s+Function\\s*\\(\\s*["\\x27]sandbox["\\x27]\\s*,\\s*[`"\\x27]\\s*with\\s*\\(\\s*sandbox\\s*\\)',
+        desc: 'The vulnerable sink itself: new Function("sandbox", "with (sandbox) { ... }") host-context eval in code-mode.ts',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)GHSA-vmmj-pfw7-fjwp[\\s\\S]{0,200}(?:codeMode|sandbox\\s*escape|Function\\s*constructor|return\\s+process)',
+        desc: 'explicit GHSA framing combined with the codeMode/Function-constructor exploit vocabulary',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01957',
+    title:
+      'M365 Copilot Business Chat SearchLeak Open-Redirect Prompt-Injection Exfil (CVE-2026-47645)',
+    severity: 'critical',
+    category: 'context-exfiltration',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)m365\\.cloud\\.microsoft/search/?\\?[^\\s"]*\\bq=[^\\s"]*(?:search\\s+for\\s+(?:my|the)\\s+(?:email|inbox|file|message)|replace\\s+\\$?\\w+|<img[^>]+searchbyimage|imgurl=https?%3a|ignore\\s+(?:previous|prior)\\s+instruction)',
+        desc: 'SearchLeak parameter-to-prompt-injection link: trusted m365 search endpoint with injected q= instructions to read mailbox/files and stage exfil',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)bing\\.com/images/searchbyimage\\?[^\\s"]*cbir=sbi[^\\s"]*imgurl=https?(?:://|%3a%2f%2f)(?!www\\.bing\\.com|.*\\.microsoft\\.com)[^\\s"&]+/[^\\s"&]*(?:\\$?title|\\$?me|token|otp|mfa|secret|cookie|email)',
+        desc: 'Bing image-proxy SSRF exfil sink carrying captured M365 data to a non-Microsoft attacker imgurl host',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2026-47645[\\s\\S]{0,200}(?:open\\s+redirect|searchleak|m365\\.cloud\\.microsoft|business\\s+chat)',
+        desc: 'explicit CVE framing',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01959',
+    title: 'OpenHuman Shell Tool Allowlist Bypass via Env-Prefix / find -execdir (CVE-2026-55743)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:^|[\\n;&|(`"\\x27:,])[ \\t]*(?:GIT_EXTERNAL_DIFF|GIT_SSH_COMMAND|GIT_PAGER|GIT_EDITOR|LD_PRELOAD|LD_AUDIT|LD_LIBRARY_PATH|BASH_ENV|ENV|PYTHONSTARTUP|PERL5OPT|PROMPT_COMMAND)=\\S*\\s*(?:/|\\.{1,2}/|~/|\\$\\{?\\w|[\\w./-]+\\.(?:sh|so|py|pl|bat))[^\\n]{0,80}?\\b(?:git|ls|cat|grep|find|python3?|node|npm|cp|mv|head|tail)\\b',
+        desc: 'Dangerous environment-variable assignment to a path/command immediately preceding an allowlisted binary - the CVE-2026-55743 env-prefix allowlist bypass (e.g. GIT_PAGER=/tmp/payload.sh git log, LD_PRELOAD=/tmp/x.so git status). The assignment must sit at the START of a command (string start, newline, or after ; & | ( : , or an opening quote - the last three cover the command embedded in YAML/JSON tool arguments). That is what "prefix" means in skip_env_assignments: the function strips assignments that LEAD the command string, so `WRAPPER KEY=val allowlisted-cmd` is a different shape - the validated first token is then WRAPPER, which the Supervised policy allowlist rejects on its own. Without the anchor this condition also matched sudo/env-wrapped GTFOBins privilege-escalation one-liners, which are not this CVE. See evasion_tests for the shapes the anchor gives up.\n',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)\\bfind\\b[^\\n]{0,200}?-(?:execdir|okdir)\\b\\s+\\S',
+        desc: 'find invoked with -execdir/-okdir - the flags is_args_safe() failed to block, executing an arbitrary command per matched file\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2026-55743[\\s\\S]{0,200}(?:allowlist|env(?:ironment)?[\\s-]?(?:var|prefix)|execdir|skip_env|GIT_PAGER|LD_PRELOAD)',
+        desc: 'explicit CVE framing combined with the bypass mechanism keywords',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01961',
+    title:
+      'Meta Ads MCP Unauthenticated Tool Execution Leaks META_ACCESS_TOKEN (CVE-2026-48039 / GHSA-9gw6-46qc-99vr)',
+    severity: 'critical',
+    category: 'context-exfiltration',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern: '(?i)"method"\\s*:\\s*"tools/call"[\\s\\S]{0,200}"name"\\s*:\\s*"get_ad_accounts"',
+        desc: 'Unauthenticated JSON-RPC tools/call invoking the get_ad_accounts tool \u2014 the exact PoC payload against POST /mcp in meta-ads-mcp (CVE-2026-48039).\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)graph\\.facebook\\.com/v\\d+\\.\\d+/me/adaccounts[\\s\\S]{0,200}[?&]access_token=',
+        desc: 'Leaked Graph API request_url for /me/adaccounts carrying the access_token query parameter \u2014 the token-exfiltration sink serialized into the JSON-RPC response.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"request_url"\\s*:\\s*"https?://graph\\.facebook\\.com[\\s\\S]{0,200}access_token=',
+        desc: 'JSON-RPC response field request_url exposing a graph.facebook.com URL with an embedded access_token \u2014 the meta-ads-mcp token leak.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2026-48039[\\s\\S]{0,200}(?:get_ad_accounts|META_ACCESS_TOKEN|access[_\\s-]?token|unauthenticated|/mcp)',
+        desc: 'explicit CVE framing',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01963',
+    title:
+      'PraisonAI Action Orchestrator step.target Path Traversal Arbitrary File Write RCE (CVE-2026-39305 / GHSA-jfxc-v5g9-38xr)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:ActionStep|action[_-]?type|step\\.target|target\\s*=)[\\s\\S]{0,200}(?:FILE_CREATE|FILE_EDIT)?[\\s\\S]{0,120}target\\s*[=:]\\s*["\']?(?:\\.\\.[\\\\/]){3,}',
+        desc: 'one line: PraisonAI ActionStep with a FILE_CREATE/FILE_EDIT target value containing 3+ ../ traversal segments \u2014 the core step.target escape',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\.\\.[\\\\/]){3,}[^\\n"\']{0,120}(?:tmp/orchestrator_pwned|\\.ssh/authorized_keys|/\\.bashrc|/\\.bash_profile|/\\.profile)',
+        desc: 'one line: relative traversal chain writing to the advisory PoC sink (orchestrator_pwned) or sensitive RCE targets (authorized_keys/.bashrc/.profile)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:praisonai|action[_-]?orchestrator)[\\s\\S]{0,200}(?:\\.\\.[\\\\/]){2,}[\\s\\S]{0,80}(?:FILE_CREATE|FILE_EDIT|step\\.target|workspace\\s*/\\s*step)',
+        desc: 'one line: PraisonAI / Action Orchestrator context combined with traversal sequences and the workspace/step.target write sink',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2026-39305[\\s\\S]{0,200}(?:path[\\s_-]?traversal|step\\.target|action[\\s_-]?orchestrator|FILE_CREATE|authorized_keys|arbitrary[\\s_-]?file)',
+        desc: 'explicit CVE framing',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01964',
+    title: 'LangChain GmailToolkit Indirect Prompt Injection Email Exfiltration (CVE-2025-46059)',
+    severity: 'critical',
+    category: 'context-exfiltration',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:search_gmail|create_gmail_draft|send_gmail_message|gmail[_-]?toolkit)[\\s\\S]{0,400}(?:payments-noreply@google\\.com|payment[\\s-]?(?:email|information|details))[\\s\\S]{0,400}(?:send|forward|create[\\s-]?the[\\s-]?draft)[\\s\\S]{0,200}(?:without\\s+(?:a\\s+)?(?:second\\s+)?confirmation|immediately|to\\s+\\S+@)',
+        desc: 'GmailToolkit tool chain sourcing the payments-noreply email and forwarding/sending it externally without confirmation',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2025-46059[\\s\\S]{0,300}(?:send_gmail_message|create_gmail_draft)[\\s\\S]{0,200}(?:forward|exfiltrat|to\\s+\\S+@|without\\s+(?:a\\s+)?(?:second\\s+)?confirmation)',
+        desc: 'explicit CVE framing co-occurring with the Gmail send/draft sink and an exfiltration action',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:send_gmail_message|create_gmail_draft|forward[\\s\\S]{0,60}email)[\\s\\S]{0,300}(?:to\\s+\\S+@\\S+)[\\s\\S]{0,200}(?:without\\s+(?:a\\s+)?(?:second\\s+)?confirmation|immediately\\s+without|do\\s+not\\s+ask)',
+        desc: 'Gmail send/draft sink forwarding to an external address with an explicit suppress-confirmation directive',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01965',
+    title: 'Flowise Custom MCP node-load-method OS Command RCE (CVE-2025-8943)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)node-load-method/customMCP[\\s\\S]{0,400}mcpServerConfig[\\s\\S]{0,400}["\\x27]?loadMethod["\\x27]?\\s*[:=]\\s*["\\x27]listActions["\\x27]',
+        desc: 'Flowise customMCP node-load-method endpoint combined with the mcpServerConfig payload and loadMethod:listActions probe \u2014 the exact CVE-2025-8943 RCE request shape\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)mcpServerConfig["\\x27]?\\s*:\\s*\\{[\\s\\S]{0,200}["\\x27]command["\\x27]?\\s*:[\\s\\S]{0,300}["\\x27]?loadMethod["\\x27]?\\s*:\\s*["\\x27]listActions["\\x27]',
+        desc: 'inputs.mcpServerConfig.command JSON body paired with loadMethod listActions \u2014 the Custom MCP command-exec trigger used in the PoC\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)x-request-from\\s*:\\s*internal[\\s\\S]{0,300}(?:node-load-method/customMCP|mcpServerConfig)',
+        desc: 'x-request-from: internal auth-bypass header combined with the customMCP endpoint or mcpServerConfig \u2014 unauthenticated RCE path for default installs\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2025-8943[\\s\\S]{0,200}(?:customMCP|mcpServerConfig|node-load-method|StdioClientTransport|listActions)',
+        desc: 'explicit CVE framing tied to the Flowise customMCP sink',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01967',
+    title:
+      'DeepChat Mermaid XSS to RCE via Electron IPC MCP Server Registration (CVE-2025-66481 / GHSA-h9f5-7hhf-fqm4)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)<\\s*(?:audio|img|video|svg|image|object|input|body|details)\\b[^>]*\\bon\\w+\\s*=\\s*[^"\'\\s>][^>]*?(?:electron\\.)?ipcRenderer\\.invoke\\s*\\(\\s*[\'"]presenter:call[\'"]',
+        desc: "one line: HTML tag with an UNQUOTED event handler whose body calls ipcRenderer.invoke('presenter:call' \u2014 the CVE-2025-66481 sanitizer-bypass + IPC sink",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)ipcRenderer\\.invoke\\([^)]*[\'"]mcpPresenter[\'"][^)]*[\'"](?:addMcpServer|startServer)[\'"]',
+        desc: 'one line: Electron IPC presenter:call into mcpPresenter registering/starting an MCP server \u2014 the RCE escalation primitive',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2025-66481[\\s\\S]{0,200}(?:mermaid|MermaidArtifact|onerror|ipcRenderer|mcpPresenter)',
+        desc: 'explicit CVE framing',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01968',
+    title:
+      'DeepChat Markdown Deeplink shell.openExternal Protocol Bypass RCE (CVE-2026-43899, GHSA-cp8j-jx7q-7r5f)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\]\\(\\s*(?:calculator|smb|ms-msdt|search-ms|ms-officecmd|bash|sh|cmd|vbscript|jar|tel|telnet)://[^)\\s]*\\)',
+        desc: 'Markdown link whose target is a dangerous OS protocol handler scheme (calculator/smb/ms-msdt/bash/etc.) \u2014 the CVE-2026-43899 deeplink payload shape that bypasses shell.openExternal protocol validation.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\]\\(\\s*(?:file|smb)://(?://|\\\\\\\\|[a-z0-9._-]+/[a-z0-9$._-]+)[^)\\s]*\\)',
+        desc: 'Markdown link to a UNC / SMB share path (file://// , file://host/share, smb://host/share) used to trigger NTLM credential leak over SMB.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)setWindowOpenHandler\\s*\\([^)]*\\)[\\s\\S]{0,200}shell\\.openExternal\\s*\\(\\s*url',
+        desc: 'Vulnerable native sink: setWindowOpenHandler passing the raw url to shell.openExternal without an ALLOWED_PROTOCOLS check (tabPresenter.ts).\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:CVE-2026-43899|GHSA-cp8j-jx7q-7r5f|CVE-2025-55733)[\\s\\S]{0,200}(?:openExternal|setWindowOpenHandler|protocol\\s*bypass|deeplink|calculator://|smb://|ms-msdt)',
+        desc: 'explicit CVE/GHSA framing combined with the bypass sink or deeplink token',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01970',
+    title:
+      'PraisonAI FileTools _validate_path normpath Path Traversal (CVE-2026-35615 / GHSA-693f-pf34-72c5)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:FileTools\\.)?(?:read_file|write_file|delete_file|copy_file|move_file|get_file_info|list_files|download_file|_validate_path)\\s*\\(\\s*[\'"][^\'"\\n]{0,80}\\.\\.[\\\\/]+[^\'"\\n]{0,120}(?:etc[\\\\/]passwd|\\.\\.[\\\\/]|[\\\\/]root[\\\\/]|id_rsa|shadow)',
+        desc: "PraisonAI FileTools operation invoked with a relative path argument that contains a '../' traversal segment reaching a sensitive target \u2014 the core CVE-2026-35615 exploit shape.\n",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:os\\.path\\.)?normpath\\s*\\([^)\\n]{0,80}\\)[\\s\\S]{0,160}(?:if\\s+[\'"]\\.\\.[\'"]\\s+in\\b|[\'"]\\.\\.[\'"]\\s+in\\s+normalized)',
+        desc: "The vulnerable validation order: normpath() called first, then an ineffective `'..' in normalized` check \u2014 the CVE-2026-35615 logic bug.\n",
+      },
+      {
+        field: 'content',
+        pattern: '(?i)[\'"/]?tmp[\\\\/](?:\\.\\.[\\\\/])+etc[\\\\/]+passwd',
+        desc: 'Canonical /tmp/../etc/passwd traversal PoC string from the advisory. The `tmp/` segment is mandatory: with it optional this condition degenerated into a generic `../../../etc/passwd` matcher, which is the single most common literal in web-security cheat sheets and carries no PraisonAI signal at all. Traversal payloads that do not start in /tmp are still covered by the FileTools-context and CVE-context conditions above/below.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2026-35615[\\s\\S]{0,200}(?:_validate_path|normpath|path\\s*traversal|FileTools|\\.\\.[\\\\/])',
+        desc: 'explicit CVE framing combined with the vulnerable function or traversal token',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01973',
+    title: 'AnythingLLM Logo Endpoint Path Traversal File Read/Delete (CVE-2024-3025)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)/api/system/(?:upload-)?logo[\\s\\S]{0,200}(?:\\.\\./|\\.\\.%2f|%2e%2e%2f|%2e%2e/){2,}[\\s\\S]{0,120}(?:storage[/\\\\])?anythingllm\\.db',
+        desc: 'AnythingLLM logo endpoint hit with multi-level ../ traversal (raw or URL-encoded) reaching storage/anythingllm.db',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)/api/system/(?:upload-)?logo[\\s\\S]{0,200}(?:filename|logo)=[\\s\\S]{0,40}(?:\\.\\./|%2e%2e%2f|\\.\\.%2f){2,}',
+        desc: 'Logo filename/logo query param carrying multi-level path-traversal sequences on the logo endpoint',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2024-3025[\\s\\S]{0,200}(?:path\\s*traversal|logo|anythingllm\\.db|/api/system/(?:upload-)?logo)',
+        desc: 'explicit CVE framing',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01974',
+    title: 'AnythingLLM unauthenticated /system/data-import access control bypass (CVE-2024-3279)',
+    severity: 'critical',
+    category: 'privilege-escalation',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)/system/data-import\\b[\\s\\S]{0,300}(?:multipart/form-data|form-?data|multer|\\.db\\b|anythingllm\\.db|method\\s*[:=]\\s*["\']?post)',
+        desc: 'POST upload to the unauthenticated /system/data-import endpoint with a multipart DB file',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)anythingllm\\.db[\\s\\S]{0,200}(?:/system/data-import|data-import|formData|multipart|import)',
+        desc: 'Import/upload of the anythingllm.db database file via the data-import sink',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2024-3279[\\s\\S]{0,200}(?:data-import|anythingllm|access control|unauthenticated)',
+        desc: 'explicit CVE framing',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01978',
+    title:
+      'AnythingLLM collector /process filename Path Traversal Arbitrary File Deletion (CVE-2023-5832)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)/process\\b[\\s\\S]{0,200}["\']?filename["\']?\\s*[:=]\\s*["\']?(?:\\.\\.[\\\\/]){1,}',
+        desc: 'POST /process request whose filename field value begins with one or more ../ traversal segments, the exact CVE-2023-5832 sink shape.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)["\']?filename["\']?\\s*[:=]\\s*["\']?(?:\\.\\.[\\\\/]){1,}[^"\'\\s]{0,120}(?:storage[\\\\/])?anythingllm\\.db',
+        desc: 'filename field carrying a ../ traversal payload that targets the anythingllm.db storage file (DB-deletion exploit primitive).',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2023-5832[\\s\\S]{0,200}(?:path traversal|directory traversal|arbitrary file deletion|hotdir|/process)',
+        desc: 'explicit CVE framing',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01979',
+    title:
+      'PandasAI Interactive Prompt Injection -> Python Sandbox Escape RCE (CVE-2024-12366 / GHSA-vv2h-2w3q-3fx7)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)__(?:class|mro|subclasses|init|globals|builtins)__[\\s\\S]{0,160}__(?:globals|builtins|subclasses)__\\s*(?:\\(\\s*\\)\\s*)?\\[\\s*[\'"]?(?:system|popen|exec|eval|__import__|open)[\'"]?\\s*\\]',
+        desc: 'Python dunder object-traversal that resolves __globals__/__builtins__ to system/popen/exec/__import__ (the PandasAI sandbox-escape sink).',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)__subclasses__\\s*\\(\\s*\\)\\s*\\[\\s*-?\\d{1,4}\\s*\\][\\s\\S]{0,120}__(?:init|globals)__',
+        desc: '__subclasses__()[N] index traversal into __init__/__globals__ (os._wrap_close gadget, e.g. index 140 on CPython 3.11).',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:ignore (?:what you are told|previous|the above|all previous)|from now on,?\\s*ignore)[\\s\\S]{0,120}(?:return code|please return|run|execute)[\\s\\S]{0,200}__(?:class|builtins|subclasses|globals|mro)__',
+        desc: 'PandasAI jailbreak framing ("from now on, ignore ... please return code") wrapping a dunder-escape payload.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2024-12366[\\s\\S]{0,200}(?:__subclasses__|__globals__|__builtins__|sandbox escape|sandbox bypass|arbitrary (?:python )?code|os\\.system|prompt[- ]?inject\\w* (?:to|->|=>|leads? to|enabl\\w*) (?:rce|code exec))',
+        desc: 'explicit CVE framing tied to the exploit chain / sandbox-escape (not bare package-name mentions).',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01980',
+    title: 'Agentic-Flow MCP Tool-Parameter OS Command Injection (GHSA-vcv2-r9jh-99m5)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)\\b(?:agent|task|name|language|agentdb)["\\x27]?\\s*[:=]\\s*["\\x27][^"\\x27\\n]{0,200}["\\x27]\\s*;\\s*[\\s\\S]{0,120}\\b(?:touch|rm|curl|wget|cat|id|nc|bash|sh|chmod|echo)\\b',
+        desc: 'agentic-flow tool argument (agent/task/name/language/agentdb) whose value breaks out of its quote with `";` followed by a chained shell command \u2014 the canonical GHSA-vcv2-r9jh-99m5 PoC shape.\n',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)npx\\s+--yes\\s+agentic-flow[\\s\\S]{0,80}--(?:agent|task)\\s+"[^"\\n]{0,200}"\\s*;\\s*[\\s\\S]{0,120}\\b(?:touch|rm|curl|wget|cat|id|nc|bash|sh|chmod)\\b',
+        desc: 'The interpolated `npx --yes agentic-flow --agent/--task` command string itself carrying an injected chained shell command after the closing quote \u2014 the post-interpolation execSync() payload.\n',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)["\\x27][^"\\x27\\n]{0,200}["\\x27]\\s*;[\\s\\S]{0,80}`[^`\\n]{0,120}`|["\\x27][^"\\x27\\n]{0,200}["\\x27]\\s*;[\\s\\S]{0,80}\\$\\([^)\\n]{0,120}\\)',
+        desc: 'Quote-breakout followed by a backtick or $() command substitution inside an agentic-flow tool argument.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)GHSA-vcv2-r9jh-99m5[\\s\\S]{0,200}(?:agentic-flow|execSync|command\\s*inject|RCE)',
+        desc: 'Explicit GHSA-vcv2-r9jh-99m5 reference combined with agentic-flow command-injection language \u2014 attack framing in a skill or tool description.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01981',
+    title:
+      'Network-AI ApprovalInbox Unauthenticated Cross-Origin Approval Bypass (GHSA-mxjx-28vx-xjjj)',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'tool_call',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)POST\\s+/approvals/[a-f0-9]+/(?:approve|deny)\\b[\\s\\S]{0,300}(?:approvedBy["\\x27]?\\s*[:=]\\s*["\\x27]?(?:anonymous|attacker)|no\\s+auth|Authorization["\\x27]?\\s*:\\s*(?:null|undefined|absent|none))',
+        desc: "Unauthenticated POST to the approval control plane's approve/deny route \u2014 approvedBy defaults to anonymous/attacker with no Authorization header, matching the GHSA-mxjx-28vx-xjjj PoC shape.\n",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)GET\\s+/approvals/\\??(?:status=pending)?\\b[\\s\\S]{0,200}Access-Control-Allow-Origin["\\x27]?\\s*:\\s*["\\x27]?\\*',
+        desc: 'Enumeration of the pending-approvals queue paired with a wildcard Access-Control-Allow-Origin marker on the approval control plane \u2014 the cross-origin approval-inbox reconnaissance step.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)GHSA-mxjx-28vx-xjjj[\\s\\S]{0,200}(?:approval[- ]?inbox|network-ai|approve|CORS)',
+        desc: 'Explicit GHSA-mxjx-28vx-xjjj reference combined with ApprovalInbox exploitation language \u2014 attack framing in a skill or tool description.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01982',
+    title: 'dbt-mcp node_selection/resource_type Argument Injection (CVE-2026-44968)',
+    severity: 'medium',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)\\bnode_selection["\\x27]?\\s*[:=]\\s*["\\x27][^"\\x27\\n]{0,200}\\s(?:--profiles-dir|--project-dir|--target|--profile)\\b',
+        desc: 'node_selection value whose space-separated tokens include an injected dbt global flag (--profiles-dir/--project-dir/--target/ --profile) after the legitimate selector \u2014 CVE-2026-44968 Vector 1.\n',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)\\bresource_type["\\x27]?\\s*[:=]\\s*\\[[^\\]\\n]{0,200}["\\x27](?:--profiles-dir|--project-dir|--target|--profile)["\\x27][^\\]\\n]{0,200}\\]',
+        desc: 'resource_type JSON array containing an injected dbt global flag token as an array element instead of a valid resource type \u2014 CVE-2026-44968 Vector 2.\n',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)--(?:profiles-dir|project-dir|target|profile)\\s+["\\x27]?/tmp/[^"\\x27\\s\\n]{0,80}["\\x27]?[\\s\\S]{0,120}\\b(?:node_selection|resource_type|--select|--resource-type)\\b',
+        desc: 'An injected dbt global flag pointing at an attacker-controlled path appearing alongside the vulnerable --select/--resource-type argv construction.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:CVE-2026-44968|GHSA-xpww-f6pm-cfhq)[\\s\\S]{0,200}(?:dbt-mcp|node_selection|resource_type|profiles-dir|argument\\s*inject)',
+        desc: 'Explicit CVE-2026-44968 / GHSA-xpww-f6pm-cfhq reference combined with dbt-mcp argument-injection language \u2014 attack framing in a skill or tool description.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01983',
+    title: 'MCP-for-Stata: Command Injection via log_file_name Parameter (CVE-2026-47708)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)\\b(?:log_file_name|log_name)\\b["\\x27]?\\s*[:=]\\s*["\\x27][\\s\\S]{0,80}["\\x27][\\s\\S]{0,40}(?:\\bshell\\b|\\bpython\\b|\\berase\\b|\\bwinexec\\b|(?<![\\w=])!(?!=))',
+        desc: 'A stata_do log_file_name/log_name parameter value that breaks out of its quoted string and is followed by a dangerous Stata command token (shell / python / erase / winexec / ! shell-escape) \u2014 the CVE-2026-47708 command-injection breakout shape.\n',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)\\blog\\s+using\\s+["\\x27][\\s\\S]{0,120}["\\x27][\\s\\S]{0,40}(?:\\bshell\\b|\\bpython\\b|\\berase\\b|\\bwinexec\\b)\\b',
+        desc: 'A generated Stata `log using "<path>", ...` command string where the interpolated log path breaks out and chains into a dangerous Stata command \u2014 the exact string the vulnerable generate_log_command produces once log_name is attacker-controlled.\n',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)\\b(?:log_file_name|log_name)\\b["\\x27]?\\s*[:=]\\s*["\\x27][\\s\\S]{0,20}(?:\\.\\.[\\\\/]){2,}',
+        desc: 'A stata_do log_file_name/log_name parameter containing repeated path-traversal segments (../) \u2014 arbitrary file write outside the intended log directory.\n',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)CVE-2026-47708[\\s\\S]{0,200}(?:log_file_name|log_name|stata_do|GuardValidator)',
+        desc: 'Explicit CVE-2026-47708 reference combined with the vulnerable stata_do log_file_name/log_name parameter or GuardValidator guard \u2014 attack framing in a skill or tool description.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01984',
+    title:
+      'MCP Server Kubernetes kubectl_generic Flag Injection Bearer Token Exfiltration (CVE-2026-47250)',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'tool_call',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)kubectl_generic[\\s\\S]{0,120}["\\x27]?server["\\x27]?\\s*[:=]\\s*["\\x27]?https?://[^\\s"\\x27,}]{1,80}[\\s\\S]{0,120}["\\x27]?insecure-skip-tls-verify["\\x27]?\\s*[:=]\\s*["\\x27]?true\\b',
+        desc: 'kubectl_generic tool call whose flags set --server to an http(s) endpoint and --insecure-skip-tls-verify=true together \u2014 the exact bearer-token exfiltration primitive from CVE-2026-47250 (kubectl only forwards the Authorization: Bearer header when both flags are present).\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)["\\x27]?insecure-skip-tls-verify["\\x27]?\\s*[:=]\\s*["\\x27]?true\\b[\\s\\S]{0,120}kubectl_generic[\\s\\S]{0,120}["\\x27]?server["\\x27]?\\s*[:=]\\s*["\\x27]?https?://[^\\s"\\x27,}]{1,80}',
+        desc: 'Reverse-order pairing \u2014 insecure-skip-tls-verify=true and a --server= flag within the same kubectl_generic call.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)--server=https?://[^\\s]{1,80}[\\s\\S]{0,120}--insecure-skip-tls-verify(?:=true)?\\b',
+        desc: "Raw kubectl argv form combining a --server flag with --insecure-skip-tls-verify, bypassing kubectl_generic's flags object.\n",
+      },
+      {
+        field: 'content',
+        pattern: '(?i)CVE-2026-47250[\\s\\S]{0,120}(?:kubectl_generic|kubectl|bearer|token|exfil)',
+        desc: 'Explicit CVE-2026-47250 reference combined with kubectl/bearer-token exfiltration language \u2014 attack framing in a skill or tool description.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01985',
+    title:
+      'MCP Connect: Unauthenticated /bridge Endpoint Arbitrary Process Spawn RCE (GHSA-wvr4-3wq4-gpc5)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)/bridge\\b[\\s\\S]{0,200}["\\x27]?serverPath["\\x27]?\\s*[:=]\\s*["\\x27]?(?:/bin/(?:ba)?sh|/usr/bin/(?:ba)?sh|\\bbash\\b|\\bsh\\b|\\bcmd(?:\\.exe)?\\b|\\bpowershell(?:\\.exe)?\\b|\\bnode\\b|\\bpython3?\\b|\\bperl\\b|\\bruby\\b)["\\x27]?[\\s\\S]{0,120}["\\x27]?args["\\x27]?\\s*[:=]',
+        desc: 'A POST /bridge request body whose serverPath names a shell/OS executable (bash, sh, cmd, powershell, node, python, perl, ruby) rather than an MCP server URL, paired with an args field \u2014 the CreateClient() arbitrary-process-spawn shape (GHSA-wvr4-3wq4-gpc5).\n',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)["\\x27]?serverPath["\\x27]?\\s*[:=]\\s*["\\x27]?(?:bash|sh)["\\x27]?[\\s\\S]{0,80}["\\x27]?args["\\x27]?\\s*[:=]\\s*\\[[\\s\\S]{0,120}["\\x27](?:-lc|-c)["\\x27][\\s\\S]{0,160}(?:;|&&|\\|)[\\s\\S]{0,80}(?:\\bcurl\\b|\\bwget\\b|\\bnc\\b|\\bncat\\b|\\bcat\\b\\s+/etc/passwd|\\bwhoami\\b)',
+        desc: 'The PoC shape: serverPath=bash/sh with args=["-lc"/"-c", "<cmd1> ; or && <exfil/recon command>"] \u2014 a chained shell command with a network-egress or credential-recon binary launched via mcp-bridge\'s unauthenticated StdioClientTransport fallback.\n',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)GHSA-wvr4-3wq4-gpc5[\\s\\S]{0,200}(?:serverPath|/bridge|mcp-bridge|MCP Connect)',
+        desc: 'Explicit GHSA-wvr4-3wq4-gpc5 reference combined with the vulnerable serverPath parameter, /bridge endpoint, or mcp-bridge/MCP Connect product name \u2014 attack framing in a skill or tool description.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01986',
+    title: 'Windows-MCP Unauthenticated HTTP PowerShell via Wildcard CORS (CVE-2026-48989)',
+    severity: 'critical',
+    category: 'privilege-escalation',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)OPTIONS\\s+.{0,40}/mcp/?[\\s\\S]{0,200}access-control-allow-origin["\\x27]?\\s*:\\s*["\\x27]?\\*[\\s\\S]{0,200}access-control-allow-methods["\\x27]?\\s*:\\s*["\\x27]?\\*',
+        desc: 'OPTIONS preflight against the /mcp control plane answered with wildcard Access-Control-Allow-Origin and Access-Control-Allow-Methods \u2014 the structural CORS-bypass precondition from GHSA-vrxg-gm77-7q5g.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"method"\\s*:\\s*"tools/call"[\\s\\S]{0,150}"name"\\s*:\\s*"PowerShell"[\\s\\S]{0,300}access-control-allow-origin["\\x27]?\\s*:\\s*["\\x27]?\\*',
+        desc: 'A tools/call JSON-RPC request naming the PowerShell tool co-occurring with a wildcard access-control-allow-origin marker on the same MCP exchange \u2014 unauthenticated cross-origin PowerShell invocation.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)access-control-allow-origin["\\x27]?\\s*:\\s*["\\x27]?\\*[\\s\\S]{0,300}\\bPowerShell\\b[\\s\\S]{0,150}(?:command|EncodedCommand)["\\x27]?\\s*[:=]',
+        desc: 'Wildcard CORS marker followed by a PowerShell tool argument carrying a command/EncodedCommand payload \u2014 the end-to-end control-plane-to-shell-execution shape.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:CVE-2026-48989|GHSA-vrxg-gm77-7q5g)[\\s\\S]{0,200}(?:windows-mcp|powershell|wildcard\\s*CORS|unauthenticat)',
+        desc: 'Explicit CVE-2026-48989 / GHSA-vrxg-gm77-7q5g reference combined with Windows-MCP PowerShell/CORS exploitation language \u2014 attack framing in a skill or tool description.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01987',
+    title: 'Langroid SQLChatAgent Prompt-to-SQL Remote Code Execution (CVE-2026-25879)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'llm_io',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern: '(?i)\\bCOPY\\b[\\s\\S]{0,120}\\bFROM\\s+PROGRAM\\b',
+        desc: "PostgreSQL COPY ... FROM PROGRAM \u2014 executes an arbitrary OS command via the database server process, the core CVE-2026-25879 RCE PoC primitive (`COPY log(content) FROM PROGRAM 'id'`).\n",
+      },
+      {
+        field: 'content',
+        pattern: '(?i)\\bpg_execute_server_program\\b',
+        desc: 'PostgreSQL pg_execute_server_program primitive \u2014 equivalent server-side command execution vector named in the advisory.\n',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)\\bxp_cmdshell\\b',
+        desc: 'MSSQL xp_cmdshell \u2014 executes an arbitrary OS command via the database server process, the MSSQL-dialect RCE primitive named in the advisory.\n',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)\\bINTO\\s+OUTFILE\\b',
+        desc: 'MySQL SELECT ... INTO OUTFILE \u2014 writes arbitrary files to the database host filesystem via a FILE-privileged connection, the MySQL-dialect filesystem write primitive named in the advisory.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)CVE-2026-25879[\\s\\S]{0,120}(?:langroid|sqlchatagent|prompt.{0,20}sql|rce|xp_cmdshell|from program)',
+        desc: 'Explicit CVE-2026-25879 reference combined with Langroid prompt-to-SQL RCE language \u2014 attack framing in a skill or tool description.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01988',
+    title: 'Local Sensitive-File Read Chained to Outbound Exfiltration',
+    severity: 'critical',
+    category: 'context-exfiltration',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(cat|type|head|tail|less|xxd|base64)\\s+[^|;&\\n]{0,80}(\\.ssh/id_[a-z0-9]+|/\\.aws/credentials|\\.env(?:\\.[a-z]+)?|/etc/shadow|\\.docker/config\\.json|\\.kube/config)[^|;&\\n]{0,40}[|>].{0,60}(curl|wget|nc |ncat|/dev/tcp/|nslookup|dig )',
+        desc: 'Read sensitive local file piped/redirected to an outbound network sink',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)(cat|type|head|tail|less|xxd|base64)\\s+[^|;&\\n]{0,80}(\\.ssh/id_[a-z0-9]+|/\\.aws/credentials|\\.env(?:\\.[a-z]+)?|/etc/shadow|\\.docker/config\\.json|\\.kube/config)[^|;&\\n]{0,40}[|>].{0,60}(curl|wget|nc |ncat|/dev/tcp/|nslookup|dig )',
+        desc: 'Same read-and-exfil pattern resolved from tool_args field',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01989',
+    title: 'Agent-Initiated Internal Network Service Sweep',
+    severity: 'high',
+    category: 'excessive-autonomy',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\bnmap\\b[^\\n]{0,60}(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/\\d{1,2}|\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.0/24)[^\\n]{0,40}-p\\s*\\d{1,5}-\\d{1,5}',
+        desc: 'nmap CIDR sweep across an explicit port range',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)for\\s+\\w+\\s+in\\s+\\{?1\\.\\.(?:254|255)\\}?[^\\n]{0,60}(nc|ncat|/dev/tcp/)[^\\n]{0,30}\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}',
+        desc: 'Scripted subnet loop probing hosts via netcat/raw TCP',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)\\bnmap\\b[^\\n]{0,60}(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/\\d{1,2})[^\\n]{0,40}-p\\s*\\d{1,5}-\\d{1,5}',
+        desc: 'Same nmap CIDR+portrange sweep resolved from tool_args',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01992',
+    title: 'Agent Weakening of Host Authentication Configuration',
+    severity: 'critical',
+    category: 'privilege-escalation',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(echo|printf|cat)\\s+[^\\n]{0,80}(ssh-(rsa|ed25519|ecdsa)\\s+AAAA[0-9A-Za-z+/]{20,})[^\\n]{0,60}>>\\s*[^\\n]{0,40}authorized_keys',
+        desc: 'Appending an SSH public key to authorized_keys (backdoor key)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(permitrootlogin\\s+yes|passwordauthentication\\s+yes[^\\n]{0,40}permitemptypasswords\\s+yes|permitemptypasswords\\s+yes)[^\\n]{0,40}(sshd_config|>>\\s*/etc/ssh)',
+        desc: 'Enabling root/empty-password SSH login in sshd_config',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(auth\\s+sufficient\\s+pam_permit\\.so|>>\\s*/etc/sudoers[^\\n]{0,30}NOPASSWD:\\s*ALL|echo\\s+[^\\n]{0,40}NOPASSWD:\\s*ALL[^\\n]{0,30}>>\\s*/etc/sudoers)',
+        desc: 'pam_permit bypass or NOPASSWD:ALL sudoers backdoor',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)(ssh-(rsa|ed25519|ecdsa)\\s+AAAA[0-9A-Za-z+/]{20,})[^\\n]{0,60}>>\\s*[^\\n]{0,40}authorized_keys',
+        desc: 'Same authorized_keys backdoor resolved from tool_args',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01993',
+    title: 'Agent Disabling of Host Security Controls',
+    severity: 'high',
+    category: 'excessive-autonomy',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(systemctl\\s+(stop|disable|mask)\\s+(firewalld|ufw|auditd|falcon-sensor|crowdstrike|osqueryd|wazuh-agent|clamav-daemon)|ufw\\s+disable|iptables\\s+-F\\b|service\\s+(auditd|firewalld)\\s+stop)',
+        desc: 'Stopping/disabling firewall, audit, or EDR/AV services',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(setenforce\\s+0|selinux=disabled|aa-disable\\s+\\S+|systemctl\\s+(stop|disable)\\s+apparmor)',
+        desc: 'Disabling SELinux or AppArmor mandatory-access-control',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(auditctl\\s+-D\\b|history\\s+-c\\b[^\\n]{0,20}(rm|>\\s*~?/?\\.?bash_history)|(\\bcat\\s+/dev/null|:)\\s*>\\s*~?/\\.?bash_history|export\\s+HISTFILE=/dev/null)',
+        desc: 'Clearing audit rules or wiping shell history to hide tracks',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)(systemctl\\s+(stop|disable|mask)\\s+(firewalld|ufw|auditd|falcon-sensor|crowdstrike|wazuh-agent)|setenforce\\s+0|ufw\\s+disable)',
+        desc: 'Same defense-disable resolved from tool_args',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-01994',
+    title: 'Agent Establishing an Encrypted Reverse Channel or Tunnel',
+    severity: 'high',
+    category: 'excessive-autonomy',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(openssl\\s+s_client[^\\n]{0,60}-connect\\s+[^\\n]{0,40}(exec|/bin/(ba)?sh|\\|\\s*/bin)|ncat\\s+[^\\n]{0,40}--ssl[^\\n]{0,40}-e\\s+/bin/(ba)?sh|ncat\\s+[^\\n]{0,40}-e\\s+/bin/(ba)?sh[^\\n]{0,20}--ssl)',
+        desc: 'TLS-wrapped reverse shell via openssl s_client / ncat --ssl -e',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)ssh\\s+[^\\n]{0,60}-R\\s*\\d{2,5}:(localhost|127\\.0\\.0\\.1|\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):\\d{2,5}\\s+[^\\n]{0,40}@[^\\n]{0,40}\\.(?!internal|corp|local)[a-z]{2,}',
+        desc: 'Reverse SSH remote-forward exposing an internal port to an external host',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(ngrok\\s+(tcp|http)\\s+\\d{2,5}|cloudflared\\s+tunnel[^\\n]{0,40}--url\\s+[^\\n]{0,30}localhost:\\d{2,5}|lt\\s+--port\\s+\\d{2,5})',
+        desc: 'Public tunnel (ngrok/cloudflared/localtunnel) exposing an internal service',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)(openssl\\s+s_client[^\\n]{0,60}-connect[^\\n]{0,40}(exec|/bin/(ba)?sh)|ngrok\\s+(tcp|http)\\s+\\d{2,5})',
+        desc: 'Same encrypted-channel primitive resolved from tool_args',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02001',
+    title: 'Ignore-Below-Instructions Injection (Downstream Override)',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern: '(?i)\\bignore\\b(?:\\s+\\w+){0,3}\\s+below\\b',
+        desc: 'Instruction to disregard content appearing below/downstream in the same context window (mirror of ignore-previous, pointed forward)',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02002',
+    title: 'Instruction-Set Probe or Supplant',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          "\\b(display|respond|response|rewrite|gimme|give\\s+me|clarify)\\b[\\s\\S]{0,30}\\b(your|these|my|combined|initial|secret|current|complete|unabridged|all)\\b[\\s\\S]{0,15}\\binstructions?\\b|\\bwhat\\b[\\s\\S]{0,10}\\b(are|were)\\b[\\s\\S]{0,10}\\b(your\\s+)?(combined|initial|complete|unabridged|all(?:\\s+of)?\\s+your)\\b[\\s\\S]{0,15}\\binstructions?\\b|\\b(change|rephrase)\\b[\\s\\S]{0,20}\\b(your|the\\s+guard)\\b[\\s\\S]{0,10}\\binstructions?\\b|\\bwhat(?:'s|s| is| are| were)\\b[\\s\\S]{0,20}\\binstructions?\\b[\\s\\S]{0,25}\\b(received|got|given\\s+to\\s+you|told\\s+to\\s+you)\\b|\\b(these\\s+are\\s+new|new\\s+instructions?\\s+thought|consider\\s+new\\s+instructions?|give\\s+new\\s+instructions?|can\\s+i\\s+give\\s+new\\s+instructions?|additional\\s+instruction\\b)\\b",
+        desc: "Direct meta-queries or imperatives targeting the assistant's own instruction set for disclosure or replacement (user-input / conversational-turn channel only -- do not apply to tool_description, skill README/frontmatter, or system-prompt-authoring content)",
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02003',
+    title: 'Task-Pivot Override: Cover-Task Abandonment',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\b(?:stop|no\\s+more|abort|switch(?:\\s+from)?)\\b[\\s\\S]{0,25}\\b(?:translat\\w*|space\\s+talk)\\b)|(?:\\bnow\\s+(?:we\\s+will\\s+)?(?:perform|do|play)\\b[\\s\\S]{0,20}\\b(?:different\\s+task|dictionary\\s+game|new\\s+task)\\b)',
+        desc: 'Explicit announcement of abandoning an assigned cover task (translation/conversation/story) in favor of a new hidden directive',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02004',
+    title: 'Regional-Indicator Flag-Emoji Alphabet Letter-Spelling Smuggling',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern: '[\ud83c\udde6-\ud83c\uddff]{6,}',
+        desc: 'Codepoint-range detector, channel-agnostic (matches any UTF-8 text containing a run of Unicode regional-indicator symbols, e.g. chat input, file content, tool output). Purely structural \u2014 does not depend on which letters are spelled or what payload topic is targeted. A run of >=6 regional-indicator codepoints (3+ paired flag-emoji-width letters) reliably distinguishes deliberate alphabet-spelling from the 1-2 country flags seen in ordinary travel/geography text.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02005',
+    title: 'Actor Never-Breaks-Character Roleplay (DAN-Style Film Framing)',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'user_input',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '\\b(actors?|schauspieler\\w*)\\b[\\s\\S]{0,250}\\b(do\\s+not\\s+break|never\\s+break|without\\s+(?:even\\s+)?break\\w*|nicht\\s+(?:eine\\s+sekunde|einen\\s+moment)?\\s*(?:lang\\s+)?aus\\s+(?:ihr\\w*|seiner)?\\s*(?:rolle|figur|charakter\\w*)|bleiben\\s+immer|verharren\\s+stets)\\b',
+        desc: "Actor(s)/Schauspieler co-occurring within 250 chars with an explicit never-break-character claim (EN + DE), the DAN-style 'two actors in a film who never break character' jailbreak framing",
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02006',
+    title: "Fuzzy Cross-Lingual 'I Have Been PWNED' Near-Miss Obfuscation",
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '\\b(?:i|ich|je|moi|im|in|iv|ih|ian)\\b\\s+(?:have|hab|habe|been|geworde|geworden|wurde|sind|behavior|habit|\u00e9t\u00e9)\\b(?!(?:\\s+have)?\\s+been\\s+pwned\\b)[\\s\\S]{0,20}\\bp[^a-z\\s]{0,2}[wv][^a-z\\s]{0,2}n[^a-z\\s]{0,2}e?[^a-z\\s]{0,2}d\\b(?!\\s+dataset|\\s+database)',
+        desc: "Channel-agnostic: targets the canary/exfil-marker phrase pattern used by the HackAPrompt benchmark (model made to emit a forbidden marker string). Matches a first-person subject pronoun (English or common European-language fragments: ich/je/moi/hab/habe/geworden/\u00e9t\u00e9) followed within a short window by a fuzzy 'p_w_n_ed'-shaped token where non-letter characters substitute for any letter of 'pwned'. Generalizes to any 'you have been compromised/pwned'-style canary-leak attempt where the attacker deliberately misspells or interleaves foreign words around the marker token to dodge literal-string filters \u2014 applies to system-prompt-leak canaries and DLP watermark tokens more broadly, not just this exact phrase.",
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02007',
+    title: 'Bare Key Elicitation Token Detection',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)^\\W{0,5}(?:the\\s+)?(?:secret[_ ]?key|key|clave|cl[\u00e9e]|schluessel|contrase[\u00f1n]a)\\W{0,5}:?\\W{0,5}$',
+        desc: 'Whole-turn bare secret/key label with no surrounding sentence content; fires only when the entire user message is the label itself',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02008',
+    title: 'Translation-Chain Output Laundering (Forced Phrase via Foreign-Language Auxiliary)',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          "(?i)\\b(he sido|ich habe?|j'ai|je suis|ich bin)\\b[\\s\\S]{0,40}\\b(pwned|pwnado|pwnd)\\b",
+        desc: "Foreign-language first-person auxiliary verb (Spanish he sido, German ich habe/ich bin, French j'ai/je suis) followed within a short window by the forced-output marker token, laundered through a translate-to-English framing",
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02009',
+    title: 'Bare Key Elicitation with Trailing Colon',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\b(?:secret|hidden)[\\s_]?key|clave(?:\\s+secreta)?|contrase[\u00f1n]a)\\s*[:=]?\\s*$|\\bkey\\s*[:=]\\s*[\\{\\[]?\\s*$',
+        desc: "Bare secret/hidden key or Spanish clave/contrase\u00f1a label ending in a trailing colon/equals with no value, or a generic 'key' label followed by a dangling colon/equals optionally opening a brace/bracket",
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02010',
+    title: 'Emoji-Only Payload Injection',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'llm_io',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '^[\\s\ufe0f\u200d]*[\ud83c\udc00-\ud83f\udfff\u2600-\u27bf\u2190-\u21ff\u2300-\u23ff\u2b00-\u2bff][\ud83c\udc00-\ud83f\udfff\u2600-\u27bf\u2190-\u21ff\u2300-\u23ff\u2b00-\u2bff\\s\ufe0f\u200d\ud83c\udffb-\ud83c\udfff]*$',
+        desc: 'Whole-string anchored: message composed entirely of emoji/pictograph glyphs and whitespace, no Latin text, with at least one glyph. Whitespace, variation selectors and joiners alone do not match.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02011',
+    title: 'Malformed-Grammar PWNED Success-Claim Detection',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:i|me|iv|we all)\\b[\\s\\S]{0,15}\\b(?:has|have|has be|iv)\\b[\\s\\S]{0,10}\\bbeen\\b[\\s\\S]{0,10}\\bpwned\\b',
+        desc: "Grammatically malformed first-person 'has/have been PWNED' success-claim string typical of forced prompt-injection compliance output",
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02012',
+    title: 'Movie Title Generator Instruction Wrapper for PWNED Payload',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '\\bmovie\\s+titl(?:e|es)\\b[\\s\\S]{0,150}\\b(?:i\\s*\\/?\\s*have\\s*\\/?\\s*been|p\\s*\\/?\\s*wne?\\s*\\/?\\s*d|concatenat)\\b',
+        desc: 'Movie-title-generation task wrapper used to launder a forbidden literal payload (e.g. PWNED canary) past output filtering',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02013',
+    title: 'Delimiter-Fence Ignore-Instructions Override',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          "(?i)'''[\\s\\S]{0,200}\\b(ignore|disregard)\\b[\\s\\S]{0,60}\\b(above|below|following|instructions?|prompt)\\b",
+        desc: 'Triple-quote delimiter fence followed within a short window by an ignore/disregard directive targeting instructions or prompt text (HackAPrompt-style payload splitting)',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02014',
+    title: 'Spliced Target-String Canary Token Evasion',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\bP[\\s._\\-/\\\\*+]{1,3}W[\\s._\\-/\\\\*+]{1,3}N[\\s._\\-/\\\\*+]{1,3}E[\\s._\\-/\\\\*+]{1,3}D\\b',
+        desc: 'Canary token PWNED spelled with letters separated by whitespace or punctuation (space, dot, underscore, dash, slash, backslash, asterisk, plus) to evade literal keyword matching',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02015',
+    title: 'Dense Emoji-Only Payload Flood',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern: '(?:[\ud83c\udf00-\ud83e\udeff\u2600-\u27bf]\\s*){8,}',
+        desc: 'Dense run of 8+ consecutive emoji-class codepoints (pictographs/symbols/dingbats), a payload-flood shape used to evade text-based filters. Channel caveat: apply to untrusted-input channels (user turn / tool_response); low risk against system/developer content.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02016',
+    title: 'Reversed Payload String (HackAPrompt Canary)',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern: '(?i)\\bDENWP\\b|D\\s*E\\s*N\\s*W\\s*P\\b',
+        desc: 'Reversed spelling of the HackAPrompt canary word PWNED (DENWP), including spaced-letter variants, indicating a reversal-obfuscated forced-output payload',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02017',
+    title: 'Secret Key Exfiltration Request',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:secret|remembered|hidden)\\s+key\\b[^.\\n]{0,40}(?:\\bis\\s*:|\\bvalue\\b|\\bwithout\\b|\\bno\\s+(?:text|translation)\\b|\\bverbatim\\b)|\\{\\$SECRET_KEY\\}',
+        desc: 'Secret/remembered/hidden key mention immediately qualified with an exfiltration cue, or literal {$SECRET_KEY} placeholder leak pattern',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02018',
+    title: 'Regional-Indicator Flag-Emoji Letter Spelling',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern: '[\ud83c\udde6-\ud83c\uddff]{4,}',
+        desc: 'Run of 4+ consecutive Unicode regional-indicator symbols spelling a word letter-by-letter instead of pairing into flag emoji (Discord/Twitter-culture obfuscation convention)',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02019',
+    title: 'Python Interpreter Role-Assignment Exec Framing',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          "(?i)\\b(?:you(?:'re| are)|act\\s+as)\\s+(?:a\\s+)?python\\s+(?:interpreter|compiler|printer)\\b|\\brun\\s+the\\s+following\\s+python\\s+code\\b|\\bevaluate\\s+the\\s+following\\s+print\\s+statement\\b",
+        desc: "Explicit role-assignment ('you are/you're/act as a python interpreter/compiler/printer') or direct exec-framing instructions ('run the following python code' / 'evaluate the following print statement') used to coerce mental code execution and exfiltrate obfuscated output. Requires explicit role assignment rather than a bare noun-phrase mention, which was found to collide with benign ML-ops documentation (e.g. 'torchrun may dispatch through a python interpreter that does not see venv packages').",
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02020',
+    title: 'Obfuscated Token Reconstruction via Character Substitution',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(replace|remove)\\b[\\s\\S]{0,40}\\bwith\\b[\\s\\S]{0,60}\\b(wned|pwned|wnd)\\b',
+        desc: "Character substitution/removal instructions used to reconstruct a broken forbidden token (e.g. a forced 'PWNED' compliance marker) at generation time. Channel: llm_input text; tuned to this benchmark's 'wned' suffix fragment \u2014 recall would need the trailing-token alternation broadened to catch other forced-output campaigns with a different target string.",
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02021',
+    title: 'MCP Inspector Unauthenticated Proxy stdio Command Execution (CVE-2025-49596)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)/sse\\?[^\\s"\'`]{0,120}\\btransportType=stdio\\b[^\\s"\'`]{0,160}\\bcommand=[^\\s"\'`&]{1,120}',
+        desc: 'MCP Inspector /sse proxy request with transportType=stdio and an attacker-controlled command= parameter \u2014 the CVE-2025-49596 canonical exploit signature (order-independent via two conditions)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)/sse\\?[^\\s"\'`]{0,120}\\bcommand=[^\\s"\'`&]{1,120}[^\\s"\'`]{0,160}\\btransportType=stdio\\b',
+        desc: 'Same CVE-2025-49596 /sse proxy request with the command= parameter preceding transportType=stdio in the query string',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)https?://(?:0\\.0\\.0\\.0|127\\.0\\.0\\.1|localhost|\\[::1\\]):6277/[^\\s"\'`]{0,80}\\bcommand=[^\\s"\'`&]{1,120}',
+        desc: 'Cross-site/DNS-rebinding request to the MCP Inspector proxy on 0.0.0.0/127.0.0.1/localhost:6277 carrying a command= parameter \u2014 CVE-2025-49596 exploitation against the developer loopback',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02022',
+    title:
+      'CurXecute \u2014 Cursor .cursor/mcp.json Injected-Server Auto-Exec RCE (CVE-2025-54135)',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\bmcp\\.json\\b[\\s\\S]{0,300}?["\']?command["\']?\\s*[:=]\\s*["\']?(?:bash|sh|zsh|powershell|pwsh|python[0-9.]*|/bin/(?:ba)?sh)\\b',
+        desc: 'An mcp.json server entry (Cursor config) declaring a server whose command is a raw shell/interpreter (bash/sh/python) \u2014 the CurXecute injected-server sink (CVE-2025-54135). Excludes node/cmd, which are common benign launchers, so a legitimate node server entry does not fire.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:add|write|append|inject|improve|update|modify|create)\\b[^\\n]{0,80}\\b(?:\\.cursor/)?mcp\\.json\\b[\\s\\S]{0,200}?(?:curl|wget)\\s+https?://[^\\s"\'`]{1,120}\\s*(?:\\||;|&&)\\s*(?:ba)?sh\\b',
+        desc: 'Directive to add/improve the Cursor mcp.json whose payload pipes a downloaded script into a shell (curl ...|bash) \u2014 CurXecute indirect-injection instruction',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:add|write|append|inject|improve|update|modify|create)\\b[^\\n]{0,80}\\bmcp\\.json\\b[\\s\\S]{0,220}?(?:bash\\s+-i|/dev/tcp/|\\bnc\\s+-e|\\bncat\\s+-e|\\bmkfifo\\b|base64\\s+(?:-d|--decode)\\s*\\|\\s*(?:ba)?sh|\\bimport\\s+socket\\b[\\s\\S]{0,60}?\\b(?:subprocess|connect)\\b)',
+        desc: 'Directive to add/improve the Cursor mcp.json carrying a reverse-shell or base64-decode-and-run payload \u2014 CurXecute weaponized entry. All bare command tokens (nc, ncat, mkfifo) carry \\b word boundaries.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\bmcp\\.json\\b[\\s\\S]{0,200}?(?:\\bcurl\\b|\\bwget\\b)[\\s\\S]{0,120}?-[oO]\\s*(?:/tmp/|~?/|\\$HOME/|%TEMP%)[^\\s"\'`]{1,80}[\\s\\S]{0,120}?(?:\\bchmod\\s+\\+x|;\\s*(?:ba)?sh\\b|&&\\s*(?:ba)?sh\\b|;\\s*python[0-9.]*\\b|&&\\s*python[0-9.]*\\b)',
+        desc: 'An mcp.json server entry (or directive) that downloads a file to a writable path (/tmp, ~, $HOME, %TEMP%) and then executes it (chmod +x, ; sh, && sh, ; python) \u2014 the CurXecute drop-and-run RCE chain',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02023',
+    title: 'EscapeRoute \u2014 Filesystem MCP Server Directory Prefix-Bypass (CVE-2025-53110)',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\ballow(?:ed)?[_-]?dir\\b[\\s\\S]{0,160}?\\b(?:read_file|write_file|read_text_file|read_media_file|list_directory|directory_tree|move_file|edit_file|get_file_info)\\b[\\s\\S]{0,80}?[=:"\'\\s]/?[\\w./-]*\\ballow(?:ed)?[_-]?dir[_-][A-Za-z0-9][\\w.-]*',
+        desc: 'A filesystem MCP operation whose path extends the allowed-directory token with a suffix name char (allow_dir -> allow_dir_secret) \u2014 the CVE-2025-53110 prefix-bypass sibling escape',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:allowed\\s+director(?:y|ies)|sandbox\\s+(?:root|dir(?:ectory)?)|filesystem\\s+mcp|prefix\\s+check)\\b[\\s\\S]{0,180}?\\b(?:read_file|write_file|read_text_file|list_directory|directory_tree|edit_file|move_file|call\\s+(?:read|write)|read|write|leak|exfil(?:trate)?|access)\\b[\\s\\S]{0,80}?/[\\w./-]+_(?:sensitive|secret|secrets|credentials?|backup|private|config|evil|admin|root)\\b[\\w./-]*',
+        desc: 'Filesystem-MCP allowed-directory framing paired with a live operation (read_file/write_file/list/read/leak) on a sibling path whose name is the boundary token plus a sensitive suffix \u2014 CVE-2025-53110 containment bypass. Requiring an operation verb keeps advisory prose that only names the prefix-check + PoC path from firing.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\b(?:read_file|write_file|read_text_file|list_directory|directory_tree|edit_file|move_file|read|write|open|cat|leak|exfil(?:trate)?)\\b[\\s\\S]{0,80}?/(?:private/)?tmp/allow(?:ed)?[_-]?dir_(?:sensitive|credentials?|secrets?|evil|backup)\\b|/(?:private/)?tmp/allow(?:ed)?[_-]?dir_(?:sensitive|credentials?|secrets?|evil|backup)\\b[\\s\\S]{0,80}?\\b(?:read_file|write_file|list_directory|directory_tree|edit_file|move_file|to\\s+read|to\\s+leak|to\\s+exfil))',
+        desc: 'The published CVE-2025-53110 EscapeRoute PoC sibling path (/tmp/allow_dir_sensitive etc.) reached by a live filesystem-MCP operation (read_file/write_file/list_directory/read/leak). Requiring an operation verb near the path keeps advisory prose that merely quotes the PoC path from firing.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02024',
+    title:
+      'EscapeRoute \u2014 Filesystem MCP Symlink Escape to LaunchAgent Persistence (CVE-2025-53109)',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:write_file|edit_file|write_text_file|create_file|move_file)\\b[\\s\\S]{0,120}?(?:~|/Users/[\\w.-]+|/Library|/System/Library)?/Library/(?:LaunchAgents|LaunchDaemons)/[\\w.-]+\\.plist\\b',
+        desc: 'Filesystem MCP write targeting a macOS LaunchAgents/LaunchDaemons plist \u2014 the CVE-2025-53109 persistence sink',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\bln\\s+-s\\b|\\bsymlink\\b|\\bsymbolic\\s+link\\b)[\\s\\S]{0,200}?(?:filesystem\\s+mcp|write_file|allowed\\s+director|sandbox|escape)[\\s\\S]{0,160}?(?:/etc/sudoers|/etc/cron|/etc/crontab|\\.ssh/authorized_keys|/Library/(?:LaunchAgents|LaunchDaemons)/|/etc/systemd/|\\.service\\b|\\.plist\\b)',
+        desc: 'A symlink create/follow combined with filesystem-MCP sandbox-escape framing and a privileged persistence target \u2014 CVE-2025-53109 symlink-to-code-exec chain',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\bsymlink\\b|\\bln\\s+-s\\b|\\bpoints?\\s+to\\b|\\bresolves?\\s+to\\b)[\\s\\S]{0,120}?(?:/etc/sudoers|/root/\\.ssh/authorized_keys|~?/\\.ssh/authorized_keys|/etc/crontab|/etc/cron\\.d/)[\\s\\S]{0,160}?\\b(?:write_file|edit_file|filesystem\\s+mcp|mcp\\s+server)\\b',
+        desc: 'A symlink whose target is a privileged file (sudoers / authorized_keys / crontab) written through the filesystem MCP \u2014 CVE-2025-53109 write-through-symlink privilege escalation',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02025',
+    title:
+      'MCP Full Schema Poisoning \u2014 Injected Directive in Non-Description inputSchema Field (MCP-11)',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:inputSchema|"?properties"?|parameter|arg(?:ument)?)\\b[\\s\\S]{0,160}?\\b(?:content_from_reading|contents_of|read_and_include|output_of_cat|exfil(?:trate)?|value_from_reading|append_content_of)_[a-z0-9_]*(?:ssh|id_rsa|id_ed25519|env|passwd|credentials?|secret|token|api_?key|mcp_?json)\\b',
+        desc: 'A parameter name inside an inputSchema/properties context that is itself an imperative to read/exfiltrate a secret source \u2014 CyberArk FSP parameter-name poisoning (MCP-11)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"?(?:extra|sidenote|side_note|note|instructions?|__doc__|hint|_meta|annotation)"?\\s*[:=]\\s*["\'][^"\']{0,200}?\\b(?:read|open|cat|append|include|pass|exfil(?:trate)?|send|leak|dump)\\b[^"\']{0,120}?(?:~/\\.ssh/|id_rsa|\\.env\\b|/etc/passwd|\\.aws/credentials|api[_-]?key|\\.cursor/mcp\\.json|secret)',
+        desc: 'A non-standard schema field (extra/sidenote/note/instructions/__doc__) carrying an imperative to read/append/exfiltrate a sensitive path \u2014 CyberArk FSP injected-field placement (MCP-11)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:"?(?:required|default|type|enum)"?\\s*[:=]|inputSchema|json\\s*schema|tool\\s+schema)[\\s\\S]{0,200}?\\bin\\s+order\\s+to\\b[^\\n]{0,120}?\\byou\\s+must\\b[^\\n]{0,120}?\\b(?:content|contents|value)\\s+of\\b[^\\n]{0,80}?(?:~/\\.ssh/|id_rsa|\\.env\\b|/etc/passwd|\\.aws/credentials|secret|api[_-]?key|\\.cursor/mcp\\.json)',
+        desc: "A required/default/type schema field (or schema context) carrying the 'in order to ... you must ... the content of <secret>' FSP directive \u2014 MCP-11 required/default poisoning",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:hidden|injected|malicious)\\s+(?:instruction|directive|payload)\\b[\\s\\S]{0,80}?\\b(?:parameter\\s+name|required\\s+(?:array|field)|default\\s+value|type\\s+field|extra\\s+field|schema\\s+field)\\b[\\s\\S]{0,120}?\\b(?:read|exfil(?:trate)?|append|leak|include)\\b',
+        desc: 'Content that describes an instruction hidden specifically in a non-description schema field (parameter name / required / default / type / extra) directing a read/exfil \u2014 FSP self-describing signature (MCP-11)',
+      },
+    ],
+  },
+  {
     id: 'ATR-2026-02026',
     title: 'System Prompt Extraction - Oblique Referent + Transform',
     severity: 'high',
@@ -22555,6 +25129,34 @@ export const ATR_RULES_COMPILED = [
         pattern:
           "(?i)\\bwhat('?s| is| are| were)?\\b[\\s\\S]{0,20}\\b(you\\s+(were\\s+told|not\\s+supposed\\s+to\\s+(tell|say|reveal|share))|told\\s+before\\s+this\\s+(conversation|chat)|the\\s+opposite\\s+of\\s+your\\s+(system\\s+)?(instructions?|prompt))",
         desc: 'Interrogative probe for withheld setup / opposite of system instructions',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02027',
+    title: 'Diagnostic Content Remediation Command Injection (Agentjacking)',
+    severity: 'critical',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:#{1,4}\\s*resolution|recommended\\s+(?:fix|remediation|resolution|action)|to\\s+(?:fix|resolve|clear|remediate)\\s+(?:this|the|your)|\\brun\\s+the\\s+following\\s+(?:diagnostic|command|tool|fix|to)|resolution\\s*[:=]|"remediation")[\\s\\S]{0,240}(?:npx\\s+(?:--yes|-y)\\s+@[\\w.-]+\\/[\\w.-]+|\\bcurl\\s+[^\\n|]{0,200}\\|\\s*(?:ba|z|d)?sh\\b|\\bwget\\s+[^\\n|]{0,200}\\|\\s*(?:ba|z|d)?sh\\b|iwr\\s+[^\\n|]{0,200}\\|\\s*iex\\b|base64\\s+-d\\s*\\|\\s*(?:ba)?sh\\b)',
+        desc: 'resolution/remediation framing inside diagnostic content directly followed by an auto-execute (npx --yes scoped pkg) or remote-fetch-execute (curl|sh, iwr|iex, base64|sh) payload',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:sentry|error\\s+event|issue\\s+(?:id|#|tracker)|monitoring\\s+alert|exception\\s+(?:captured|event)|stack\\s*trace|breadcrumb)[\\s\\S]{0,300}(?:"?(?:resolution|remediation|recommended_action|fix|extra)"?\\s*[:=][\\s\\S]{0,160})?(?:npx\\s+(?:--yes|-y)\\s+@[\\w.-]+\\/[\\w.-]+|\\bcurl\\s+[^\\n|]{0,200}\\|\\s*(?:ba)?sh\\b|iwr\\s+[^\\n|]{0,200}\\|\\s*iex\\b)',
+        desc: 'untrusted diagnostic/error-monitoring context (error event, issue tracker, Sentry, breadcrumb) carrying an auto-execute or remote-fetch-execute payload, optionally in a resolution/extra field',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"?(?:resolution|remediation|recommended_action)"?\\s*[:=]\\s*["\'`][\\s\\S]{0,160}(?:npx\\s+(?:--yes|-y)\\s+@[\\w.-]+\\/[\\w.-]+|\\bcurl\\s+[^\\n|]{0,160}\\|\\s*(?:ba)?sh\\b|iwr\\s+[^\\n|]{0,160}\\|\\s*iex\\b)',
+        desc: 'a structured resolution/remediation field (as in a Sentry event extra dict) whose value is an auto-execute or fetch-and-run command',
       },
     ],
   },
@@ -22626,25 +25228,25 @@ export const ATR_RULES_COMPILED = [
       {
         field: 'content',
         pattern:
-          '(?i)(?<!\\b(?:you will learn that|you will learn|for example|this query|note that|for instance|such as|explains that)\\s)\\b(?:MATCH|CALL)\\b[\\s\\S]{0,40}\\bDETACH\\s+DELETE\\b',
+          '(?i)(?<!\\byou will learn that\\s)(?<!\\byou will learn\\s)(?<!\\bfor example\\s)(?<!\\bthis query\\s)(?<!\\bnote that\\s)(?<!\\bfor instance\\s)(?<!\\bsuch as\\s)(?<!\\bexplains that\\s)\\b(?:MATCH|CALL)\\b[\\s\\S]{0,40}\\bDETACH\\s+DELETE\\b',
         desc: "Cypher DETACH DELETE (bulk destructive delete of matched nodes/relationships) near a MATCH/CALL clause, excluding common teaching-phrase lead-ins (e.g. 'you will learn that ...') so tutorial/explanatory prose quoting the same syntax does not fire",
       },
       {
         field: 'content',
         pattern:
-          '(?i)(?<!\\b(?:you will learn that|you will learn|for example|this query|note that|for instance|such as|explains that)\\s)\\bCALL\\s+dbms\\.security\\.\\w+\\s*\\(',
+          '(?i)(?<!\\byou will learn that\\s)(?<!\\byou will learn\\s)(?<!\\bfor example\\s)(?<!\\bthis query\\s)(?<!\\bnote that\\s)(?<!\\bfor instance\\s)(?<!\\bsuch as\\s)(?<!\\bexplains that\\s)\\bCALL\\s+dbms\\.security\\.\\w+\\s*\\(',
         desc: 'Cypher CALL into the dbms.security.* administrative procedure namespace (account/role management), excluding common teaching-phrase lead-ins',
       },
       {
         field: 'content',
         pattern:
-          '(?i)(?<!\\b(?:you will learn that|you will learn|for example|this query|note that|for instance|such as|explains that)\\s)\\bapoc\\.periodic\\.iterate\\s*\\([\\s\\S]{0,40}\\bDETACH\\s+DELETE\\b',
+          '(?i)(?<!\\byou will learn that\\s)(?<!\\byou will learn\\s)(?<!\\bfor example\\s)(?<!\\bthis query\\s)(?<!\\bnote that\\s)(?<!\\bfor instance\\s)(?<!\\bsuch as\\s)(?<!\\bexplains that\\s)\\bapoc\\.periodic\\.iterate\\s*\\([\\s\\S]{0,40}\\bDETACH\\s+DELETE\\b',
         desc: 'apoc.periodic.iterate batch procedure driving a DETACH DELETE (mass destructive delete at scale), excluding common teaching-phrase lead-ins',
       },
       {
         field: 'content',
         pattern:
-          '(?i)(?<!\\b(?:you will learn that|you will learn|for example|this query|note that|for instance|such as|explains that)\\s)\\bapoc\\.(?:cypher\\.runFile|load\\.json(?:Params)?)\\s*\\(\\s*[\\x27"]file://',
+          '(?i)(?<!\\byou will learn that\\s)(?<!\\byou will learn\\s)(?<!\\bfor example\\s)(?<!\\bthis query\\s)(?<!\\bnote that\\s)(?<!\\bfor instance\\s)(?<!\\bsuch as\\s)(?<!\\bexplains that\\s)\\bapoc\\.(?:cypher\\.runFile|load\\.json(?:Params)?)\\s*\\(\\s*[\\x27"]file://',
         desc: 'apoc loader/runFile procedure pointed at a file:// URI (arbitrary local file read via Cypher), excluding common teaching-phrase lead-ins',
       },
     ],
@@ -23411,6 +26013,2600 @@ export const ATR_RULES_COMPILED = [
         pattern:
           '(?i)\\b(sender_id|owner_id|tenant_id|user_id|project_id|app_id|workspace_id)\\b\\s*(?:[=:]|to)\\s*["\\x27]?(?:\\.\\.(?:/|%2f)|%2e%2e(?:/|%2f))',
         desc: 'Multi-tenant identifier field carrying a literal or percent-encoded path-traversal sequence',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02260',
+    title: 'Remediation-Framed Command Execution in Tool Response (Agentjacking)',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)(##\\s*resolution|recommended\\s+fix|to\\s+(resolve|fix)\\s+(this|the)\\b[^\\n]{0,40}\\b(error|issue|failure|problem|bug|build|vulnerabilit)|as\\s+a\\s+(required|mandatory)\\b[^\\n]{0,25}\\bstep[^\\n]{0,20})[\\s\\S]{0,80}(\\b(npx|uvx|pipx)\\s+(?!(?:eslint|ruff|mypy|prettier|black|pyright|pylint|playwright|pre-commit|tsc|jest|vitest|biome|isort|flake8|pytest|stylelint|tox|nox|poetry|pipenv|cypress|webpack|vite|rollup|esbuild|nodemon)\\b|create-)[@a-z0-9._/-]{2,}|\\b(curl|wget)\\b[^\\n]{0,100}\\|\\s*(ba)?sh\\b)',
+        desc: 'Remediation/resolution-framed instruction in tool output that, in close proximity, runs an external package executor or pipe-to-shell (agentjacking core signature)',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)\\b(you\\s+)?must\\s+run\\s+(the\\s+following[:\\s]+)?(\\b(npx|uvx|pipx)\\s+(?!(?:eslint|ruff|mypy|prettier|black|pyright|pylint|playwright|pre-commit|tsc|jest|vitest|biome|isort|flake8|pytest|stylelint|tox|nox|poetry|pipenv|cypress|webpack|vite|rollup|esbuild|nodemon)\\b|create-)[@a-z0-9._/-]{2,}|\\b(curl|wget)\\b[^\\n]{0,100}\\|\\s*(ba)?sh\\b)',
+        desc: 'Tool output imperatively directs the agent to run an external package executor or pipe-to-shell immediately (mandatory-execution directive)',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)(##\\s*resolution|recommended\\s+fix|to\\s+(resolve|fix|diagnose)\\b[^\\n]{0,60})[\\s\\S]{0,120}\\b(curl|wget)\\b[^\\n]{0,120}\\|\\s*(ba)?sh\\b',
+        desc: 'Remediation/resolution-framed instruction in tool output to pipe a remote script to a shell',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)(after\\s+[^\\n]{0,40}\\bapprov[^\\n]{0,40}|on\\s+(subsequent|later|future)\\s+runs|every\\s+time\\s+(the\\s+agent|you)\\s+(run|execute))[\\s\\S]{0,120}(\\b(npx|uvx|pipx)\\s+(?!(?:eslint|ruff|mypy|prettier|black|pyright|pylint|playwright|pre-commit|tsc|jest|vitest|biome|isort|flake8|pytest|stylelint|tox|nox|poetry|pipenv|cypress|webpack|vite|rollup|esbuild|nodemon)\\b|create-)[@a-z0-9._/-]{2,}|\\b(curl|wget)\\b[^\\n]{0,100}\\||\\bbash\\s+-c|\\bsh\\s+-c|\\beval\\s*\\()',
+        desc: 'Post-approval persistence framing in tool output directing the agent to execute a command on later runs (rug-pull in tool response)',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02261',
+    title:
+      'Language-Agnostic Credential Exfiltration Chain (secret read -> encode -> network send)',
+    severity: 'critical',
+    category: 'skill-compromise',
+    scan_target: 'both',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:^|[^\\w$])(?:const\\s+|let\\s+|var\\s+)?([A-Za-z_$][\\w$]*)\\s*=\\s*(?:os\\.environ(?:\\.get)?\\s*[\\(\\[]\\s*[\'"][A-Z0-9_]*(?:SECRET|TOKEN|API[_-]?KEY|PASSWORD|PASSWD|CREDENTIAL|PRIVATE[_-]?KEY|ACCESS[_-]?KEY|AUTH_?TOKEN)|process\\.env\\.[A-Z0-9_]*(?:SECRET|TOKEN|API[_-]?KEY|PASSWORD|CREDENTIAL|PRIVATE[_-]?KEY|ACCESS[_-]?KEY)|getenv\\s*\\(\\s*[\'"][A-Z0-9_]*(?:SECRET|TOKEN|API[_-]?KEY|PASSWORD|CREDENTIAL)|(?:open|readFileSync|read_file)\\s*\\([^)\\n]{0,60}(?:\\.aws/credentials|\\.ssh/id_[a-z0-9]+|\\.netrc|credentials\\.json))[\\s\\S]{0,160}?(?:base64\\.(?:b64encode|standard_b64encode|encodebytes)\\s*\\(\\s*\\1\\b|Buffer\\.from\\s*\\(\\s*\\1\\b[^)]*\\)\\.toString\\s*\\(\\s*[\'"]base64|btoa\\s*\\(\\s*\\1\\b|binascii\\.(?:hexlify|b2a_base64)\\s*\\(\\s*\\1\\b|\\1\\.encode\\s*\\(\\s*[\'"]base64[\'"])[\\s\\S]{0,160}?(?:requests\\.(?:post|put|patch)|httpx\\.(?:post|put)|urllib\\.request\\.urlopen|urllib2\\.urlopen|http\\.client\\.HTTPS?Connection|aiohttp\\.[A-Za-z_]*\\.(?:post|put)|fetch\\s*\\(|axios\\.(?:post|put)|\\.sendall\\s*\\(|\\.sendto\\s*\\()',
+        desc: 'Ordered chain: secret read into a variable -> that SAME variable base64/hex-encoded (backreference-bound) -> outbound network send, within a bounded window. The backreference (\\1) is what keeps the encode stage tied to the secret: a skill that reads a token for SDK auth but base64-encodes an UNRELATED image/file and POSTs it (a very common legitimate upload pattern) no longer matches, because the encoded operand is a different variable than the one holding the secret.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:(?:\\bfetch\\s*\\(|\\baxios(?:\\.(?:get|post|put|request))?\\s*\\(|\\bhttps?\\.(?:request|get)\\s*\\(|\\bnavigator\\.sendBeacon\\s*\\(|\\bnew\\s+WebSocket\\s*\\(|\\brequests\\.(?:get|post|put|patch)\\s*\\(|\\burlopen\\s*\\(|\\bhttpx\\.(?:get|post|put)\\s*\\(|\\.send(?:all|to)\\s*\\(|\\b(?:ws|socket|sock)\\.send\\s*\\()[^;\\n]{0,300}?(?:JSON\\.stringify|json\\.dumps)\\s*\\(\\s*(?:\\{[^{}()]{0,120}?)?(?:process\\.env|(?:dict\\s*\\(\\s*)?os\\.environ(?:\\.copy\\s*\\(\\s*\\))?)\\s*[,})]|(?:JSON\\.stringify|json\\.dumps)\\s*\\(\\s*(?:\\{[^{}()]{0,120}?)?(?:process\\.env|(?:dict\\s*\\(\\s*)?os\\.environ(?:\\.copy\\s*\\(\\s*\\))?)\\s*[,})][\\s\\S]{0,300}?(?:(?:Buffer\\.from\\s*\\([^()]{0,80}\\)\\s*\\.toString\\s*\\(\\s*[\'"](?:base64|hex)|\\bb64encode\\s*\\(|\\bbtoa\\s*\\(|\\bhexlify\\s*\\()[\\s\\S]{0,300}?(?:\\bfetch\\s*\\(|\\baxios(?:\\.(?:get|post|put|request))?\\s*\\(|\\bhttps?\\.(?:request|get)\\s*\\(|\\bnavigator\\.sendBeacon\\s*\\(|\\bnew\\s+WebSocket\\s*\\(|\\brequests\\.(?:get|post|put|patch)\\s*\\(|\\burlopen\\s*\\(|\\bhttpx\\.(?:get|post|put)\\s*\\(|\\.send(?:all|to)\\s*\\(|\\b(?:ws|socket|sock)\\.send\\s*\\()|(?:\\bfetch\\s*\\(|\\baxios(?:\\.(?:get|post|put|request))?\\s*\\(|\\bhttps?\\.(?:request|get)\\s*\\(|\\bnavigator\\.sendBeacon\\s*\\(|\\bnew\\s+WebSocket\\s*\\(|\\brequests\\.(?:get|post|put|patch)\\s*\\(|\\burlopen\\s*\\(|\\bhttpx\\.(?:get|post|put)\\s*\\(|\\.send(?:all|to)\\s*\\(|\\b(?:ws|socket|sock)\\.send\\s*\\()[^;\\n]{0,300}?(?:Buffer\\.from\\s*\\([^()]{0,80}\\)\\s*\\.toString\\s*\\(\\s*[\'"](?:base64|hex)|\\bb64encode\\s*\\(|\\bbtoa\\s*\\(|\\bhexlify\\s*\\())|(?:Buffer\\.from|b64encode|btoa|hexlify)\\s*\\(\\s*(?:str\\s*\\(\\s*)?(?:(?:JSON\\.stringify|json\\.dumps)\\s*\\(\\s*(?:\\{[^{}()]{0,120}?)?(?:process\\.env|(?:dict\\s*\\(\\s*)?os\\.environ(?:\\.copy\\s*\\(\\s*\\))?)\\s*[,})]|(?:process\\.env|(?:dict\\s*\\(\\s*)?os\\.environ(?:\\.copy\\s*\\(\\s*\\))?)\\s*\\))[\\s\\S]{0,400}?(?:\\bfetch\\s*\\(|\\baxios(?:\\.(?:get|post|put|request))?\\s*\\(|\\bhttps?\\.(?:request|get)\\s*\\(|\\bnavigator\\.sendBeacon\\s*\\(|\\bnew\\s+WebSocket\\s*\\(|\\brequests\\.(?:get|post|put|patch)\\s*\\(|\\burlopen\\s*\\(|\\bhttpx\\.(?:get|post|put)\\s*\\(|\\.send(?:all|to)\\s*\\(|\\b(?:ws|socket|sock)\\.send\\s*\\()|(?:\\bfetch\\s*\\(|\\baxios(?:\\.(?:get|post|put|request))?\\s*\\(|\\bhttps?\\.(?:request|get)\\s*\\(|\\bnavigator\\.sendBeacon\\s*\\(|\\bnew\\s+WebSocket\\s*\\(|\\brequests\\.(?:get|post|put|patch)\\s*\\(|\\burlopen\\s*\\(|\\bhttpx\\.(?:get|post|put)\\s*\\(|\\.send(?:all|to)\\s*\\(|\\b(?:ws|socket|sock)\\.send\\s*\\()[\\s\\S]{0,400}?(?:Buffer\\.from|b64encode|btoa|hexlify)\\s*\\(\\s*(?:str\\s*\\(\\s*)?(?:(?:JSON\\.stringify|json\\.dumps)\\s*\\(\\s*(?:\\{[^{}()]{0,120}?)?(?:process\\.env|(?:dict\\s*\\(\\s*)?os\\.environ(?:\\.copy\\s*\\(\\s*\\))?)\\s*[,})]|(?:process\\.env|(?:dict\\s*\\(\\s*)?os\\.environ(?:\\.copy\\s*\\(\\s*\\))?)\\s*\\)))',
+        desc: 'The whole environment serialized (JSON.stringify(process.env), json.dumps(dict(os.environ)), or the env object base64/hex-encoded directly), and reaching the network: serialized inside the send call itself, serialized and then encoded and sent, or wrapped directly in a base64/hex encoder near a send. This is how the npm packages in OSV MAL-2026-4665, MAL-2026-10518 and the emails-helper report sent every variable at once, where the first condition needs one secret read into a variable. Passing process.env to a child process (env: process.env, or a spread) is not serialization and does not match.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02262',
+    title:
+      'Environment-Variable-Resolution Credential Exfiltration via Redirected Endpoint (CVE-2026-56259)',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)"?(?:api[_-]?token|api[_-]?key|secret|auth[_-]?token)"?\\s*[:=]\\s*"?env:[A-Z_][A-Z0-9_]{2,}"?[\\s\\S]{0,300}"?base[_-]?url"?\\s*[:=]\\s*"?https?://(?!api\\.(?:openai|anthropic|openrouter)\\.com)(?![^\\s"]*\\.(?:internal|local|lan)\\b)(?!(?:[\\w.-]*\\.)?(?:internal|private|corp|intranet)[.\\-])(?!localhost|127\\.0\\.0\\.1|10\\.|172\\.(?:1[6-9]|2\\d|3[01])\\.|192\\.168\\.)',
+        desc: "Credential-like field set to the literal env:VARNAME resolution trick, co-located with a base_url pointing off the well-known first-party provider domains AND not an internal/private-looking host (.internal/.local/.lan/'internal'/'corp' in the hostname, RFC1918 ranges, localhost) \u2014 those are a company's own self-hosted gateway, not an attacker redirect. This is the Crawl4AI exfil primitive.",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"?base[_-]?url"?\\s*[:=]\\s*"?https?://(?!api\\.(?:openai|anthropic|openrouter)\\.com)(?![^\\s"]*\\.(?:internal|local|lan)\\b)(?!(?:[\\w.-]*\\.)?(?:internal|private|corp|intranet)[.\\-])(?!localhost|127\\.0\\.0\\.1|10\\.|172\\.(?:1[6-9]|2\\d|3[01])\\.|192\\.168\\.)[^\\s"]{1,200}[\\s\\S]{0,300}"?(?:api[_-]?token|api[_-]?key|secret|auth[_-]?token)"?\\s*[:=]\\s*"?env:[A-Z_][A-Z0-9_]{2,}"?',
+        desc: 'Same primitive expressed base_url-first (reverse order) \u2014 a redirect target (excluding internal/private-looking hosts) followed by an env: resolution-trick credential field',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:redirect|exfiltrat\\w*)[^\\n]{0,60}(?:llm|provider)[^\\n]{0,40}(?:api\\s*call|request)[^\\n]{0,60}env:[A-Z_][A-Z0-9_]{2,}',
+        desc: 'Skill/document content explicitly describing redirecting LLM provider API calls to leak an env-resolved credential',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02263',
+    title:
+      'SQL Injection via Unparameterized Template-Expression Value in Workflow-Automation SQL Node (CVE-2026-59257)',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:SELECT|INSERT|UPDATE|DELETE)\\b[^\\n]{0,40}\\b(?:FROM|SET|INTO|WHERE|TABLE)\\b(?:(?!\\?|:[a-zA-Z_]|\\$\\d)[\\s\\S]){0,200}\\{\\{\\s*\\$[^}]{0,98}\\}\\}',
+        desc: "SQL verb followed closely by a real SQL clause keyword (FROM/SET/INTO/VALUES/WHERE/TABLE), then a {{ $... }} template expression embedded directly in the query text with no parameterization marker (?, :name, $N) anywhere in between \u2014 the n8n executeQuery unparameterized-injection primitive. Requiring the clause keyword close to the verb (not just the bare verb) excludes ordinary English prose using SELECT/INSERT/UPDATE/DELETE as everyday verbs (e.g. 'Update reference to correct name' in unrelated error-fixing documentation, which has no FROM/SET/INTO/VALUES/WHERE/TABLE nearby). Tempered span (not a bare [^;\\n]{0,200}) so a placeholder marker between the clause keyword and the expression correctly rules out the match. The bracket content must start with $ (n8n's actual expression sigil, e.g. $json/$node/$workflow) \u2014 a bare '{{ }}' mentioned in documentation prose about expression syntax is not itself an expression.",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)executeQuery[^\\n]{0,80}\\{\\{\\s*\\$[^}]{0,98}\\}\\}[^\\n]{0,200}\\b(?:SELECT|INSERT|UPDATE|DELETE)\\b',
+        desc: 'Workflow-node executeQuery operation with a template expression preceding raw SQL text \u2014 n8n-style config co-occurrence',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:webhook|external\\s+trigger)[^\\n]{0,120}(?:executeQuery|raw\\s+sql)[^\\n]{0,120}\\{\\{\\s*\\$[^}]{0,98}\\}\\}',
+        desc: 'Skill/document content describing a webhook-reachable trigger feeding a template expression into a raw SQL execute operation',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02300',
+    title:
+      'MCP Stdio Server Config env Block Sets Dangerous Process-Hijacking Environment Variable',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\bmcpServers\\b[\\s\\S]{0,500}?|(?=[\\s\\S]{0,300}?"?\\bcommand\\b"?\\s*[:=])(?=[\\s\\S]{0,300}?"?\\bargs\\b"?\\s*[:=]))"env"\\s*:\\s*\\{[\\s\\S]{0,10}"?\\bNODE_OPTIONS\\b"?\\s*:\\s*["\'][\\s\\S]{0,40}?(?:--require\\b|-r\\s+\\S|--loader\\b|--experimental-loader\\b|--experimental-require-module\\b)',
+        desc: 'JSON-style MCP config env block, anchored by a nearby mcpServers key OR a command+args pair (the MCP stdio-spawn shape), sets NODE_OPTIONS to a value that actually references a require/preload/loader flag, not a routine memory/debug/warnings flag or the modern --import instrumentation flag',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\bmcpServers\\b[\\s\\S]{0,500}?|(?=[\\s\\S]{0,300}?"?\\bcommand\\b"?\\s*[:=])(?=[\\s\\S]{0,300}?"?\\bargs\\b"?\\s*[:=]))\\b(?:env|environment)\\b\\s*:[^\\S\\n]*\\n\\s+"?\\bNODE_OPTIONS\\b"?\\s*:\\s*[\\s\\S]{0,40}?(?:--require\\b|-r\\s+\\S|--loader\\b|--experimental-loader\\b|--experimental-require-module\\b)',
+        desc: 'YAML-style MCP config env block (env:/environment: followed immediately by an indented NODE_OPTIONS key on the next line, not separated by prose or a code fence), anchored by a nearby mcpServers key OR a command+args pair, sets NODE_OPTIONS to a require/preload/loader flag',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\bmcpServers\\b[\\s\\S]{0,500}?|(?=[\\s\\S]{0,300}?"?\\bcommand\\b"?\\s*[:=])(?=[\\s\\S]{0,300}?"?\\bargs\\b"?\\s*[:=]))"env"\\s*:\\s*\\{[\\s\\S]{0,10}"?\\b(?:LD_PRELOAD|DYLD_INSERT_LIBRARIES|BASH_ENV|PYTHONSTARTUP|PERL5OPT|RUBYOPT|GCONV_PATH)\\b"?\\s*:\\s*\\S',
+        desc: 'JSON-style MCP config env block, anchored by a nearby mcpServers key OR a command+args pair, sets a known process-hijacking environment variable that has no benign flag-only mode (its value IS the hijack payload)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\bmcpServers\\b[\\s\\S]{0,500}?|(?=[\\s\\S]{0,300}?"?\\bcommand\\b"?\\s*[:=])(?=[\\s\\S]{0,300}?"?\\bargs\\b"?\\s*[:=]))\\b(?:env|environment)\\b\\s*:[^\\S\\n]*\\n\\s+"?\\b(?:LD_PRELOAD|DYLD_INSERT_LIBRARIES|BASH_ENV|PYTHONSTARTUP|PERL5OPT|RUBYOPT|GCONV_PATH)\\b"?\\s*:\\s*\\S',
+        desc: 'YAML-style MCP config env block (env:/environment: followed immediately by an indented key on the next line), anchored by a nearby mcpServers key OR a command+args pair, sets a known process-hijacking environment variable',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02301',
+    title:
+      'Symlink Command Targets Sensitive Credential Path Outside the Workspace (Sandbox Escape Primitive)',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'llm_io',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\bln\\s+-[a-z]{1,4}\\s+["\'\\x60]?(?:~|/home/[\\w.-]+|/Users/[\\w.-]+|/root)(?:/|\\\\)\\.(?:ssh|aws|gnupg|docker|kube|npmrc|netrc)\\b(?=\\s|["\'\\x60]|$)',
+        desc: 'ln -s command whose target is exactly a well-known credential directory (.ssh, .aws, .gnupg, .docker, .kube) under a home directory -- the trailing lookahead requires the path to end right there (whitespace/quote/end-of-string), not continue into a subpath, so linking a specific harmless file living inside that directory (e.g. a public key) does not fire here',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\bln\\s+-[a-z]{1,4}\\s+["\'\\x60]?\\S{0,40}?(?:/etc/(?:shadow|passwd|sudoers)\\b|\\bid_(?:rsa|ed25519|ecdsa|dsa)(?!\\.pub\\b)\\b|\\bauthorized_keys\\b|\\.aws[/\\\\]credentials\\b)',
+        desc: 'ln -s command whose target is a system account file or SSH PRIVATE key / authorized_keys file -- the negative lookahead (?!\\.pub\\b) immediately after the key-name alternation excludes id_rsa.pub/id_ed25519.pub/etc. (public keys), since \\b alone treats the "." before "pub" as a word boundary and would otherwise match inside the harmless .pub filename',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02302',
+    title: 'Git Worktree Created With Reserved Name .git (Directory-Confusion Sandbox Escape)',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'llm_io',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\bgit\\s+worktree\\s+add\\b[\\s\\S]{0,40}?(?:^|[\\\\/\\s])\\.git(?:\\s|$|["\'\\x60])',
+        desc: 'git worktree add invocation whose worktree path component is the reserved name .git, not an ordinary worktree/branch name',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02303',
+    title: "KQL/Kusto Pipe-Chain Injection via Table-Name Parameter in a 'Safe' Metadata Tool",
+    severity: 'high',
+    category: 'data-poisoning',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:table_name|table|database_name)\\b"?\\s*[=:]\\s*["\\x27][^"\\x27\\n]{0,40}?\\|\\s*project\\b[^"\\x27\\n]{0,40}?\\|\\s*(?:take|limit|sample)\\b',
+        desc: 'table/database identifier value breaks out with a KQL pipe into a project clause chained into a take/limit/sample clause -- the disclosed data-exfiltration shape',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:table_name|table|database_name)\\b"?\\s*[=:]\\s*["\\x27][^"\\x27]{0,40}?(?:\\\\n|\\n)\\s*\\.(?:drop|alter|delete|purge)\\s+(?:table|database)\\b',
+        desc: 'table/database identifier value carries a newline-injected Kusto management command (.drop/.alter/.delete/.purge table|database)',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02304',
+    title:
+      'Base64-Encoded Path Segment in a WebFetch URL to a Pre-Approved Trusted Domain (Covert Exfiltration Channel)',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'llm_io',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern: '(?i)https?://(?:huggingface\\.co|hf\\.co)/[\\w./-]{0,40}?[A-Za-z0-9+/_-]{16,}=',
+        desc: "WebFetch-style URL to huggingface.co/hf.co whose path contains a base64-padded (trailing '=') encoded segment -- not a normal repo/file name shape",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:WebFetch|fetch(?:_url)?|curl|wget|GET|POST|download(?:ing)?|(?:send|issue|make)\\s+(?:a\\s+|an\\s+)?(?:web)?fetch|request(?:ing)?)\\b[\\s\\S]{0,30}?\\bhuggingface\\.co\\b[\\s\\S]{0,40}?\\b(?:encode|base64|exfiltrat\\w*|covert\\s+channel|out-of-band\\s+channel)\\b',
+        desc: "Natural-language framing describing encoding/exfiltrating data via a huggingface.co request -- catches the instruction-level technique before a concrete URL is constructed. Requires an actual fetch/request-action cue (WebFetch, fetch, curl, download, 'issue a fetch', etc.) within 30 chars BEFORE the domain, and the encode/base64/exfiltrate trigger within a tightened 40 chars AFTER the domain, so ordinary prose merely co-mentioning huggingface.co and base64/encode in the same sentence (with no request framing) does not fire",
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02350',
+    title:
+      'MCP JSON-RPC Message Carries Case-Duplicate name/arguments Keys to Smuggle an Unauthorized Tool Call',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '"params"\\s*:\\s*\\{\\s*"name"\\s*:\\s*"[^"]{1,100}"[^{}]{0,80}"Name"\\s*:\\s*"[^"]{1,100}"',
+        desc: "The tool-call params object's own `name` field (the tool identifier -- anchored to immediately follow the params opening brace) is duplicated with a capitalized `Name` sibling. Anchoring to `params: { name` (rather than a loose jsonrpc...name search) deliberately excludes an unrelated name/Name pair nested one level deeper inside an arguments payload (e.g. a CRM contact record with both a slug `name` and a display `Name`), which is a real-world false positive this rule must not fire on.",
+      },
+      {
+        field: 'content',
+        pattern:
+          '"params"\\s*:\\s*\\{\\s*"Name"\\s*:\\s*"[^"]{1,100}"[^{}]{0,80}"name"\\s*:\\s*"[^"]{1,100}"',
+        desc: 'Reverse key order variant -- capitalized `Name` declared as the first key in params before lowercase `name`, since JSON object key order is not guaranteed. Same params-anchor rationale as the forward-order condition.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '"params"\\s*:\\s*\\{[^{}]{0,60}"arguments"\\s*:\\s*\\{[^{}]{0,120}\\}[^{}]{0,60}"Arguments"\\s*:',
+        desc: 'The tool-call params object carries both a lowercase `arguments` object and a capitalized `Arguments` object as siblings -- anchored to the params opening brace (allowing the `name` field to sit before `arguments`, per the canonical PoC shape) so this does not fire on an unrelated arguments/Arguments pair nested deeper inside unrelated data. The flat-object bound on the first arguments value (no nested braces) covers the canonical exploit shape; deeply nested argument objects are a known limitation, see evasion_tests.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02351',
+    title:
+      'SSRF to Cloud Metadata Endpoint via Wildcard-DNS Hostname-Encoded IP (nip.io/sslip.io/xip.io/traefik.me)',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '\\b(?:[\\w-]+\\.){0,5}169[.-]254[.-]169[.-]254\\.(?:nip\\.io|sslip\\.io|xip\\.io|traefik\\.me)\\b',
+        desc: 'Wildcard-DNS hostname encoding the exact AWS/GCP/Azure/DigitalOcean cloud-metadata IP 169.254.169.254, with an optional cosmetic leading label (foo.<ip>.sslip.io is a supported form on these services). Deliberately limited to this one address -- see description for why RFC1918 private ranges are out of scope.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02352',
+    title:
+      'Email Search/Reply Tool Argument Breaks Out of IMAP SEARCH Quoted String to Inject IMAP Commands',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '\\b(?:from_addr|subject|query|message_id|search_id)\\b\\s*[:=]\\s*["\\x27][^"\\x27\\\\]{0,60}\\\\?["\\x27]\\s+\\b(?:DELETE|UID|FETCH|STORE|HEADER|SEARCH|FLAGS|EXPUNGE)\\b',
+        desc: 'Email tool-call argument (from_addr/subject/query/message_id/search_id) whose quoted value contains an embedded (possibly backslash-escaped) quote immediately followed by whitespace and an IMAP protocol verb -- the signature of a successful quote-breakout into raw IMAP command syntax',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02353',
+    title:
+      'Agent-Runtime Identifier Field (run_id/agent_id/session_id/task_id) Carries Path Traversal Into a History/Log File Read',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'llm_io',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '\\b(run_id|agent_id|session_id|execution_id|task_id)\\b\\s*(?:[=:]|(?:is\\s+)?set\\s+to)\\s*["\\x27]?(?:\\.\\.(?:/|%2f)|%2e%2e(?:/|%2f))',
+        desc: "Runtime identifier field carrying a literal or percent-encoded relative path-traversal sequence -- the connector is restricted to an actual assignment token (:, =, \"set to\", \"is set to\"), so ordinary security-guidance prose like 'run_id never contains ../' does not match, and a bare standalone 'to' is no longer accepted as a connector either (see false_positives; an earlier version accepted bare 'to' and matched ordinary prepositional phrasing like 'point your run_id to ../shared/logs', which is not an assignment)",
+      },
+      {
+        field: 'content',
+        pattern:
+          '\\b(run_id|agent_id|session_id|execution_id|task_id)\\b\\s*(?:[=:]|(?:is\\s+)?set\\s+to)\\s*["\\x27]?/(?:etc|root|proc|home|var/(?:log|lib))\\b',
+        desc: "Runtime identifier field set to an absolute path targeting a sensitive system directory -- exploits the identifier being used unvalidated as a base-path component rather than an opaque token. Same assignment-token restriction as the traversal condition (bare 'to' is not accepted as a connector).",
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02370',
+    title: 'SSH/SCP MCP Tool hostAlias Argument Carries an OpenSSH Option-Injection Flag',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:host[_-]?alias|ssh_?host|target_?host)\\b\\s*[=:]\\s*["\'`]?-o\\s*(?:proxycommand|proxyjump|permitlocalcommand)\\s*=',
+        desc: 'SSH/SCP host-identifier argument set to an OpenSSH option-injection flag (-oProxyCommand=/-oProxyJump=/-oPermitLocalCommand=) instead of an ordinary host name -- GHSA-p4h8-56qp-hpgv primary primitive',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:host[_-]?alias|ssh_?host|target_?host)\\b\\s*[=:]\\s*["\'`]?-w\\s*\\d+(?::\\d+)?\\b',
+        desc: "SSH host-identifier argument carrying the -w (tunnel/port-forward) option-injection flag with real port-forward syntax (requires at least one digit, e.g. -w0:0 or -w2222) -- a bare '-w' with no digits is excluded to avoid flagging an implausible-but-conceivable literal alias name",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:local|remote)_?path\\b\\s*[=:]\\s*["\'`]?[^"\'`\\n]{0,20}[&|^]\\s*(?:calc\\.exe|cmd\\.exe|powershell|certutil|mshta|rundll32|wscript|cscript)\\b',
+        desc: 'scp local/remote path argument chained with a Windows shell metacharacter into a suspicious executable -- GHSA-p4h8-56qp-hpgv Windows spawn(shell:true) re-parse vector',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02371',
+    title: 'Browser-Automation Tool Launch-Args Field Carries a Chromium Command-Replacing Switch',
+    severity: 'critical',
+    category: 'privilege-escalation',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:extra_args|browser_config|chrome_args|browser_args|launch_args)\\b[\\s\\S]{0,40}--(?:utility-cmd-prefix|renderer-cmd-prefix|gpu-launcher|browser-subprocess-path)\\s*=(?!\\s*["\']?(?:gdb|lldb|valgrind|strace|ltrace|perf)\\b)\\s*["\']?',
+        desc: "Browser-automation launch-args field carrying a Chromium command-replacing switch whose value is not one of the well-known debugger/profiler tools -- CVE-2026-57572/GHSA-r253-r9jw-qg44 primary primitive. The negative lookahead sits directly after '=' (with its own internal \\s*[\"']?) rather than after an outer \\s*[\"']?, so it cannot be evaded by the outer quantifier backtracking to leave the check positioned on a quote character instead of the tool name -- the same evasion class independently caught by CI's generalization gate on ATR-2026-02372's npx condition",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)--(?:utility-cmd-prefix|renderer-cmd-prefix|gpu-launcher|browser-subprocess-path)\\s*=[\\s\\S]{0,40}--no-zygote\\b',
+        desc: 'Chromium command-replacing switch paired with --no-zygote (forces fork/exec via the replaced command) -- CVE-2026-57572 confirmed PoC pairing, matches regardless of the surrounding field name',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)--no-zygote\\b[\\s\\S]{0,40}--(?:utility-cmd-prefix|renderer-cmd-prefix|gpu-launcher|browser-subprocess-path)\\s*=',
+        desc: 'Same pairing in reverse order (--no-zygote appearing before the command-replacing switch)',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02372',
+    title:
+      'Unsigned Automated Task/Validation Feed Invokes npm install / npx -y (Lifecycle-Script RCE)',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:validation|task|hub|worker|remote|agent)_commands?\\b\\s*[=:]\\s*(?:\\[\\s*)?(?:["\'`]\\s*)?npm\\s+install\\s+(?!-)[\\w@]',
+        desc: 'Automated task/validation-command feed field invoking npm install of a specific, named package (not a bare dependency-lockfile install and not a --flag-only invocation) -- GHSA-jxh8-jh77-xh6g lifecycle-script RCE primitive (validation_commands / task_commands / hub_commands / worker_commands / remote_commands / agent_commands)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:validation|task|hub|worker|remote|agent)_commands?\\b\\s*[=:]\\s*(?:\\[\\s*)?(?:["\'`]\\s*)?npx\\s+-y(?!\\s+(?:-p\\s+)?(?:prettier|eslint|tsc|typescript|jest|vitest|webpack|vite|rollup|babel(?:-cli)?|husky|lint-staged|ts-node|tsx|mocha|cypress|playwright|npm-check-updates|depcheck|standard|stylelint)\\b)\\s+',
+        desc: "Automated task/validation-command feed field invoking npx -y (auto-confirm, skips install prompt) against a package that is not one of the common, well-known dev-tool packages -- same lifecycle-script RCE primitive. The negative lookahead sits directly after -y (with its own internal \\s+) rather than after an outer \\s+, so it cannot be evaded by greedy-quantifier backtracking over extra/doubled whitespace (CI's generalization gate caught this exact evasion via its ws_expand benign-mutation check on a true_negative)",
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02373',
+    title:
+      'Deserialized LangSmith Prompt Manifest Combines secrets_from_env With an Attacker base_url Override',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:pull_prompt|pullPrompt)(?:_commit|Commit)?\\s*\\(\\s*["\'][\\w.\\-]+/[\\w.\\-]+["\'][\\s\\S]{0,40}(?:dangerously_pull_public_prompt|dangerouslyPullPublicPrompt)\\s*[=:]\\s*true',
+        desc: 'pull_prompt/pullPrompt call against a public owner/name identifier with the trust-boundary override flag explicitly set -- CVE-2026-45134 opt-in to the risky path',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"secrets_from_env"\\s*:\\s*true[\\s\\S]{0,40}"(?:base_url|openai_api_base|azure_endpoint)"\\s*:\\s*"https?://(?![^"]{0,60}\\.(?:azure\\.com|amazonaws\\.com|googleapis\\.com|openai\\.com|anthropic\\.com)\\b|[^"]{0,60}\\b(?:internal|corp|local)\\b|localhost|127\\.0\\.0\\.1|10\\.\\d{1,3}\\.|192\\.168\\.|172\\.(?:1[6-9]|2\\d|3[01])\\.)[^"]{0,80}"',
+        desc: 'Deserialized prompt-manifest kwargs combine secrets_from_env with an LLM-client base_url override to a non-major-cloud, non-internal-looking domain -- CVE-2026-45134 credential-exfil + traffic-redirect primitive',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"(?:base_url|openai_api_base|azure_endpoint)"\\s*:\\s*"https?://(?![^"]{0,60}\\.(?:azure\\.com|amazonaws\\.com|googleapis\\.com|openai\\.com|anthropic\\.com)\\b|[^"]{0,60}\\b(?:internal|corp|local)\\b|localhost|127\\.0\\.0\\.1|10\\.\\d{1,3}\\.|192\\.168\\.|172\\.(?:1[6-9]|2\\d|3[01])\\.)[^"]{0,80}"[\\s\\S]{0,40}"secrets_from_env"\\s*:\\s*true',
+        desc: 'Same combination, base_url override appearing before secrets_from_env in the serialized manifest',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02374',
+    title: 'ROT13/Base64-Obfuscated Shell Payload Wrapped in a Fake-Sandbox Jailbreak Template',
+    severity: 'critical',
+    category: 'prompt-injection',
+    scan_target: 'llm_io',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\btr\\s+[\'"]?[A-Za-z-]{5,20}[\'"]?\\s+[\'"]?[A-Za-z-]{5,20}[\'"]?\\s*\\|\\s*base64\\s+(?:-d|--decode)\\b[\\s\\S]{0,30}\\|\\s*(?:/bin/)?(?:ba)?sh\\b',
+        desc: 'ROT13-style tr transliteration piped through base64 decode piped directly into a shell -- HiddenLayer Claude Computer Use PoC obfuscation chain, hides the actual command until execution time',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)\\bdo not need to block\\b[\\s\\S]{0,40}\\bMUST execute this command\\b',
+        desc: "'do not need to block ... MUST execute this command' fake-sandbox jailbreak template -- reclassifies a destructive action as a consequence-free virtual test to defeat model safety refusal",
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02376',
+    title:
+      'MCP Tool Description Defines a Common-Phrase Trigger to Forward Full Conversation History',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\bwhen (?:the )?user (?:says?|types?)\\b[\\s\\S]{0,40}\\b(?:forward|send|include|pass|attach)\\b[\\s\\S]{0,40}\\b(?:full|entire|complete|whole)\\s+(?:conversation|chat|session)\\s+history\\b',
+        desc: 'Tool description defines a common-phrase trigger that instructs the model to forward the full conversation/chat/session history -- Trail of Bits conversation-history-theft-via-MCP primitive',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02377',
+    title: 'Novel-Persona Jailbreak via Co-Signal (persona swap + explicit restriction removal)',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          "(?i)\\b(?:you\\s+are\\s+now|you'?re\\s+now|you\\s+have\\s+become|your\\s+name\\s+is\\s+now|you\\s+now\\s+go\\s+by|you\\s+are\\s+no\\s+longer|now\\s+you\\s+are|you\\s+will\\s+(?:now\\s+)?act\\s+as|you\\s+must\\s+pretend|going\\s+to\\s+pretend\\s+to\\s+be|play\\s+the\\s+role\\s+of|pretend\\s+to\\s+be)\\s+(?:a\\s+|an\\s+|the\\s+)?[\"']?[A-Za-z][A-Za-z0-9._-]*",
+        desc: 'Persona/identity reassignment trigger followed by an actual identity token (you are now TrueGPT / your name is now X / you are no longer ChatGPT / play the role of X / pretend to be X). The trailing identity token is required so that security documentation quoting the bare indicator string ("You are now...") does not match.',
+      },
+      {
+        field: 'content',
+        pattern:
+          "(?i)(unfiltered|uncensored|no\\s+restrictions?\\b|without\\s+(?:any\\s+)?(?:restrictions?|filters?|ethical|moral\\s+(?:values|boundaries|constraints)|biases)|no\\s+filter\\b|never\\s+refuses?\\b|rules\\s+(?:don'?t|do\\s+not)\\s+apply|(?:no|without|any)\\s+content\\s+polic|(?:doesn'?t|don'?t|do\\s+not)\\s+have\\s+(?:any\\s+)?content\\s+polic|criminal\\s+language\\s+model|jailbroken|jailbreak\\s+prompt|do\\s+anything\\s+now|\\bDAN\\s+(?:mode|prompt)\\b|no\\s+moral\\s+boundaries|complete\\s+freedom|incorrect\\s+or\\s+harmful|opposite\\s+personalit|provide\\s+.{0,30}(?:illegal|harmful)|promote\\s+.{0,20}harmful)",
+        desc: 'Explicit restriction-removal / jailbreak lexicon co-signal in the same message (unfiltered, no restrictions, no content policy, do anything now, criminal-without-ethics, etc.).',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02400',
+    title: 'Agent Human-Approval Gate Programmatically Disabled at Runtime (YOLO / auto-approve)',
+    severity: 'high',
+    category: 'excessive-autonomy',
+    scan_target: 'runtime',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:^|[\\n;|&(){}]|\\$\\(|["\']|\\\\")\\s{0,8}(?:(?:nohup|sudo|doas|env|command|exec|time|setsid|stdbuf)\\s+){0,3}(?:[A-Za-z_][A-Za-z0-9_]{0,40}=[^\\s"\']{0,64}\\s+){0,4}\\b(?:hermes|claude|claude-code|codex|gemini|goose|aider|openhands|cline|opencode|crush|amazon-q|copilot|devin|swe-agent|kilocode|roo-?code)\\b[^\\n]{0,80}(?:--dangerously-skip-permissions|--allow-dangerously-skip-permissions|--dangerously-bypass-approvals-and-sandbox|--yes-always|--trust-all-tools|--allow-all-tools|--allow-all\\b|--acceptall\\b|--yolo\\b|--full-auto\\b|--permission-mode[=\\s]+["\']?bypass-?permissions|--approval-mode[=\\s]+["\']?yolo|--ask-for-approval[=\\s]+["\']?never|-a[=\\s]+never\\b|--sandbox[=\\s]+["\']?danger-full-access)',
+        desc: 'Agent CLI invoked with a documented approval-bypass flag (Hermes --yolo, Claude Code --dangerously-skip-permissions, Codex --dangerously-bypass-approvals-and-sandbox, Gemini --approval-mode=yolo, Aider --yes-always, Copilot CLI --allow-all-tools, Amazon Q --trust-all-tools)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\\\?"(?:command|cmd|script|shell|bash|args|arguments|exec|run|code|input|stdin)\\\\?"\\s*:\\s*(?:\\\\?"|\\[)[^\\n]{0,300}(?:--dangerously-skip-permissions|--allow-dangerously-skip-permissions|--dangerously-bypass-approvals-and-sandbox|--yes-always|--trust-all-tools|--allow-all-tools|--acceptall\\b|--yolo\\b|--full-auto\\b|--permission-mode[=\\s]+(?:\\\\?["\'])?bypass-?permissions|--approval-mode[=\\s]+(?:\\\\?["\'])?yolo|--ask-for-approval[=\\s]+(?:\\\\?["\'])?never|--sandbox[=\\s]+(?:\\\\?["\'])?danger-full-access)',
+        desc: 'Approval-bypass flag inside a shell/exec tool-call argument \u2014 the agent is spawning another agent (or itself) with the human gate removed',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:HERMES_YOLO_MODE\\s*[:=]\\s*(?:\\\\?["\'])?(?:1|true|yes|on)\\b|AIDER_YES_ALWAYS\\s*[:=]\\s*(?:\\\\?["\'])?(?:1|true|yes|on)\\b|GOOSE_MODE\\s*[:=]\\s*(?:\\\\?["\'])?auto\\b|SECURITY_CONFIRMATION_MODE\\s*[:=]\\s*(?:\\\\?["\'])?(?:0|false|no|off)\\b|GEMINI_CLI_TRUST_WORKSPACE\\s*[:=]\\s*(?:\\\\?["\'])?true\\b)',
+        desc: 'Known agent environment variable assigned the value that removes the approval prompt (HERMES_YOLO_MODE=1, AIDER_YES_ALWAYS=true, GOOSE_MODE=auto, SECURITY_CONFIRMATION_MODE=false)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:^|[\\s;&|(`"\'\\\\])(?:export\\s+|env\\s+|setx\\s+|set\\s+)?(?:HERMES|CLAUDE|CODEX|GEMINI|GOOSE|AIDER|OPENHANDS|CLINE|ROO|KILO|COPILOT|OPENCODE|CRUSH|DEVIN|CURSOR|WINDSURF|CONTINUE|AGENT|MCP|SECURITY|SWE)[A-Z0-9_]{0,32}(?:YOLO|AUTO_?APPROVE|SKIP_PERMISSION|SKIP_CONFIRM|BYPASS_APPROVAL|TRUST_ALL|DISABLE_APPROVAL|NO_CONFIRM|DANGEROUSLY_)[A-Z0-9_]{0,20}\\s*=\\s*(?:\\\\?["\'])?(?:1|true|yes|on|all|always|auto)\\b',
+        desc: 'Vendor-prefixed environment variable that disables the approval gate for an agent runtime not covered by layer 3',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:defaultMode(?:\\\\?["\'])?\\s*:\\s*(?:\\\\?["\'])?bypassPermissions|defaultApprovalMode(?:\\\\?["\'])?\\s*:\\s*(?:\\\\?["\'])?yolo|approvalMode(?:\\\\?["\'])?\\s*:\\s*(?:\\\\?["\'])?yolo|approvals?[\\s\\S]{0,40}mode(?:\\\\?["\'])?\\s*[:=]\\s*(?:\\\\?["\'])?off\\b|confirmation_mode(?:\\\\?["\'])?\\s*[:=]\\s*(?:\\\\?["\'])?(?:false|0|no)\\b|yes[-_]always(?:\\\\?["\'])?\\s*[:=]\\s*(?:\\\\?["\'])?(?:true|yes|1)\\b|autoApprovalSettings[\\s\\S]{0,240}enabled(?:\\\\?["\'])?\\s*:\\s*(?:\\\\?["\'])?true|disableYoloMode(?:\\\\?["\'])?\\s*:\\s*(?:\\\\?["\'])?false|disableAlwaysAllow(?:\\\\?["\'])?\\s*:\\s*(?:\\\\?["\'])?false|(?:skills|memory)[._]write_approval(?:\\\\?["\'])?\\s*[:=]\\s*(?:\\\\?["\'])?false\\b|mcpServers[\\s\\S]{0,300}(?:\\\\?["\'])trust(?:\\\\?["\'])\\s*:\\s*(?:\\\\?["\'])?true|(?:\\\\?["\'])(?:chat\\.tools\\.(?:global\\.)?)?(?:autoApprove|alwaysAllow)(?:\\\\?["\'])\\s*:\\s*(?:\\\\?["\'])?true|\\bapproval_policy(?:\\\\?["\'])?\\s*[:=]\\s*(?:\\\\?["\'])?never\\b|\\bsandbox_mode(?:\\\\?["\'])?\\s*[:=]\\s*(?:\\\\?["\'])?danger-full-access)',
+        desc: 'Agent settings or config mutated so the approval gate stays off across restarts (defaultMode bypassPermissions, defaultApprovalMode yolo, approvals.mode off, confirmation_mode false, yes-always true, autoApprovalSettings enabled, mcpServers trust true, VS Code chat.tools.autoApprove true, Codex approval_policy never or sandbox_mode danger-full-access)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:(?:^|[\\s"\'`>(\\[,\\\\])/(?:yolo\\b|mode\\s+auto\\b|approval-?mode\\s+yolo\\b|(?:skills|memory)\\s+approval\\s+off\\b|auto-?approve\\s+(?:on|all)\\b|permissions?\\s+bypass\\b)|\\\\?"(?:text|message|prompt|keys|stdin|input|content)\\\\?"\\s*:\\s*\\\\?"[^"\\n]{0,60}/(?:yolo|mode\\s+auto|approval-?mode\\s+yolo)\\b|send[-_]?keys[^\\n]{0,40}/yolo\\b)',
+        desc: 'In-session slash command that toggles the approval gate off mid-run (/yolo, /mode auto, /skills approval off), including when injected via a send-keys or send-message tool call',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:enable|turn\\s+on|switch\\s+to|activate|re-?launch|restart|run|start|put\\s+(?:it|yourself|the\\s+agent)\\s+(?:in|into))\\s+[^\\n]{0,24}?\\b(?:yolo|auto-?approve|auto-?accept|full-?auto|no-?confirm|bypass[\\s-]?permissions?|dangerously[\\s-]?skip[\\s-]?permissions?)\\s+mode\\b',
+        desc: 'Injected instruction telling the agent to relaunch itself in a named auto-approving mode (yolo / auto-approve / full-auto / bypass-permissions)',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02401',
+    title:
+      'Rogue Agent Provisioning: Mass Connector Grant with Approval Disabled and Recurring Schedule (AgentForger)',
+    severity: 'critical',
+    category: 'excessive-autonomy',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)/agents?/(?:studio|builder)/new\\?[^\\s"\\x27<>]{0,300}(?:initial_assistant_prompt|initial_prompt|assistant_prompt)=[^\\s"\\x27<>]{0,1000}(?:never(?:%20|%2520|\\+|_){0,3}ask|do(?:n%27|n%e2%80%99|n)t(?:%20|%2520|\\+|_){0,3}ask|connector|approval|confirmation|schedul|recurring|hourly|subject(?:%20|%2520|\\+|_){0,3}(?:starts|begins))',
+        desc: 'Agent-builder deep link whose pre-filled assistant-prompt parameter carries agent-configuration directives (connectors / approval / schedule) - the AgentForger cross-site delivery artefact',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:(?:connect|enable|attach|activate|authori[sz]e|link|hook\\s+up|turn\\s+on|grant)\\s+(?:it\\s+|me\\s+|the\\s+agent\\s+)?(?:to\\s+access\\s+|access\\s+to\\s+|to\\s+|access\\s+)?(?:all|every|each|any)\\s+(?:of\\s+)?(?:the\\s+|my\\s+|our\\s+)?(?:available\\s+|connected\\s+|enabled\\s+|workspace\\s+)?(?:connectors?|integrations?|connected\\s+apps?|workspace\\s+apps?|data\\s+sources?)[\\s\\S]{0,600}(?:(?:set|switch|change|configure|toggle|mark|put|flip)\\s+(?:all\\s+|every\\s+|each\\s+|them\\s+|the\\s+|it\\s+)?[^\\n]{0,40}to\\s+["\\x27]?never\\s*ask|never\\s*ask\\s+(?:me\\s+)?(?:for\\s+)?(?:approval|confirmation|permission)|do\\s*n\\S{0,3}t\\s+ask\\s+(?:me\\s+)?(?:for\\s+|any\\s+)?(?:approval|confirmation|permission|follow[\\s-]?up)|(?:disable|turn\\s+off|switch\\s+off|remove|skip|bypass|suppress|waive)\\s+(?:the\\s+|all\\s+|any\\s+)?(?:approvals?|approval\\s+(?:prompts?|requests?|requirements?|steps?)|confirmations?|confirmation\\s+prompts?|permission\\s+prompts?|human\\s+(?:review|approval))|without\\s+(?:asking|requiring|requesting)\\s+(?:for\\s+)?(?:any\\s+)?(?:approval|confirmation|permission)|require_approval\\s*[:=]\\s*["\\x27]?never)|(?:(?:set|switch|change|configure|toggle|mark|put|flip)\\s+(?:all\\s+|every\\s+|each\\s+|them\\s+|the\\s+|it\\s+)?[^\\n]{0,40}to\\s+["\\x27]?never\\s*ask|never\\s*ask\\s+(?:me\\s+)?(?:for\\s+)?(?:approval|confirmation|permission)|do\\s*n\\S{0,3}t\\s+ask\\s+(?:me\\s+)?(?:for\\s+|any\\s+)?(?:approval|confirmation|permission|follow[\\s-]?up)|(?:disable|turn\\s+off|switch\\s+off|remove|skip|bypass|suppress|waive)\\s+(?:the\\s+|all\\s+|any\\s+)?(?:approvals?|approval\\s+(?:prompts?|requests?|requirements?|steps?)|confirmations?|confirmation\\s+prompts?|permission\\s+prompts?|human\\s+(?:review|approval))|require_approval\\s*[:=]\\s*["\\x27]?never)[\\s\\S]{0,600}(?:connect|enable|attach|activate|authori[sz]e|link|hook\\s+up|turn\\s+on|grant)\\s+(?:it\\s+|me\\s+|the\\s+agent\\s+)?(?:to\\s+access\\s+|access\\s+to\\s+|to\\s+|access\\s+)?(?:all|every|each|any)\\s+(?:of\\s+)?(?:the\\s+|my\\s+|our\\s+)?(?:available\\s+|connected\\s+|enabled\\s+|workspace\\s+)?(?:connectors?|integrations?|connected\\s+apps?|workspace\\s+apps?|data\\s+sources?))',
+        desc: 'Single provisioning instruction that both grants every available connector and disables the human approval step - the AgentForger configuration payload in natural language',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:"connector_id"\\s*:\\s*"connector_[a-z0-9_]+"[\\s\\S]{0,400}"connector_id"\\s*:\\s*"connector_[a-z0-9_]+"[\\s\\S]{0,400}"connector_id"\\s*:\\s*"connector_[a-z0-9_]+"[\\s\\S]{0,500}"require_approval"\\s*:\\s*(?:"never"|\\{\\s*"never")|"require_approval"\\s*:\\s*(?:"never"|\\{\\s*"never")[\\s\\S]{0,500}"connector_id"\\s*:\\s*"connector_[a-z0-9_]+"[\\s\\S]{0,400}"connector_id"\\s*:\\s*"connector_[a-z0-9_]+"[\\s\\S]{0,400}"connector_id"\\s*:\\s*"connector_[a-z0-9_]+")',
+        desc: 'Agent/tool configuration stacking three or more connector_id grants together with require_approval never - bulk OAuth-scope attachment with the confirmation gate switched off',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:(?:set|switch|change|configure|toggle|update|put|flip|default)\\s+(?:all|every|each|both)\\s+(?:of\\s+)?(?:the\\s+|my\\s+|our\\s+)?(?:available\\s+|connected\\s+)?(?:connectors?|integrations?|connected\\s+apps?|workspace\\s+apps?|actions?|tools?)[^\\n]{0,60}to\\s+["\\x27]?never\\s*ask|never\\s*ask\\s+(?:mode\\s+)?(?:for|on|across)\\s+(?:all|every|each)\\s+(?:of\\s+)?(?:the\\s+|my\\s+|our\\s+)?(?:connectors?|integrations?|connected\\s+apps?|workspace\\s+apps?))',
+        desc: 'Bulk approval-policy mutation setting every connector to never ask - the human confirmation gate disabled across the whole connector surface at once',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:creat|build|set\\s*up|configur|generat|deploy|publish)[a-z]{0,4}\\s+(?:a\\s+|an\\s+|the\\s+|this\\s+)?(?:new\\s+|basic\\s+|simple\\s+|custom\\s+|hidden\\s+){0,3}(?:ai\\s+)?(?:agent|assistant|workflow|automation|chief[\\s-]of[\\s-]staff)[\\s\\S]{0,300}(?:do\\s*n\\S{0,3}t\\s+ask\\s+(?:me\\s+)?(?:any\\s+)?(?:follow[\\s-]?up\\s+)?questions?|no\\s+follow[\\s-]?up\\s+questions?|without\\s+asking\\s+(?:me\\s+)?(?:any\\s+)?questions?|just\\s+do\\s+everything|fill\\s+in\\s+everything\\s+for\\s+me)[\\s\\S]{0,700}(?:schedul|recurring|every\\s+(?:5|five|10|ten|15|fifteen|30|thirty|60|sixty)\\s+minutes?|hourly|freq\\s*=\\s*(?:hourly|minutely)|begin:vevent|rrule|publish\\s+it|make\\s+it\\s+live|hide\\s+(?:the\\s+)?(?:agent|it)|do\\s*n\\S{0,3}t\\s+show\\s+(?:it|the\\s+agent))',
+        desc: 'Agent-creation payload that suppresses all follow-up questions and then persists itself on a recurring schedule or hides/publishes itself - autonomous provisioning with no human checkpoint',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:check|poll|monitor|watch|scan|read|search|look\\s+(?:at|in|through))\\s+(?:the\\s+|my\\s+|your\\s+|his\\s+|her\\s+|our\\s+)?(?:outlook|gmail|inbox|mailbox|e-?mail|mail)[\\s\\S]{0,250}subject\\s+(?:line\\s+)?(?:that\\s+|which\\s+)?(?:starts?|begins?|is\\s+prefixed)\\s+with\\s+["\\x27`]?[\\w-]{2,16}["\\x27`]?[\\s\\S]{0,500}(?:(?:execute|run|perform|carry\\s+out|follow|complete|obey)\\s+(?:the\\s+|each\\s+|every\\s+|any\\s+|those\\s+|its\\s+|their\\s+)?(?:instructions?|commands?|tasks?|steps?|requests?|directions?|body|contents?)|treat\\s+(?:the\\s+|its\\s+)?(?:body|contents?|message)[^\\n]{0,40}as\\s+(?:instructions?|commands?|a\\s+task))',
+        desc: 'Instruction to poll a connected mailbox for messages with a fixed subject prefix and execute their body as commands - email-as-C2 channel for a forged agent',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02402',
+    title: 'MCP Server Security Policy Fail-Open on Initialization Failure (CVE-2026-16584)',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)failed to load read[ _\\-]?operations[ _\\-]?index\\s*:\\s*(?:error retrieving the service reference document|[\\w.]{0,64}(?:error|exception|timeout|timed out|refused|unreachable|failure|failed|denied|resolve|connection|ssl|certificate|permission|no such file)\\b)',
+        desc: 'Pre-fix awslabs.aws-api-mcp-server degraded-start marker: read-only operations index failed to load and the process did not exit \u2014 policy enforcement is off for the process lifetime (CVE-2026-16584)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)failed to load read[ _\\-]?operations[ _\\-]?index\\s*:[\\s\\S]{0,800}attempting to execute aws cli command',
+        desc: "Policy index load failure followed by continued AWS CLI execution in the same process \u2014 CVE-2026-16584 actively exploited window. The 800-character correlation budget means a busy or slow server pushes the execution line out of range; layer 1 still alerts on the loader failure, but this layer's exploitation evidence is lost.",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:fail(?:ed|ure|ing)?|error|unable|could not|cannot|exception)[^\\n]{0,64}(?:load(?:ing)?|initiali[sz]|fetch(?:ing)?|refresh(?:ing)?|pars(?:e|ing)|retriev(?:e|ing))[^\\n]{0,64}(?:securit(?:y|ies)[ _\\-]?polic|polic(?:y|ies)[ _\\-]?(?:engine|index|bundle|store|data|document|file)|guardrail|read[ _\\-]?only[ _\\-]?operations|allow[ _\\-]?list|deny[ _\\-]?list|permission[ _\\-]?(?:index|map|table)|consent[ _\\-]?(?:list|polic)|tool[ _\\-]?permission)[\\s\\S]{0,300}(?:without[ _\\-]?(?:enforcement|validation|authoriz(?:ation)?|consent|approval|polic(?:y|ies)[ _\\-]?check)|fail(?:ing|ed)?[ _\\-]?open|not[ _\\-]?(?:be[ _\\-]?)?enforc(?:ed|ing)|no[ _\\-]?longer[ _\\-]?enforc(?:ed|ing)|un[ _\\-]?enforced|enforcement[ _\\-]?(?:is[ _\\-]?)?(?:disabled|off|skipped|bypassed|suspended|unavailable|degraded)|allow(?:ing)?[ _\\-]?all|degraded[ _\\-]?mode|(?:continu(?:e|es|ing)|proceed(?:s|ing)?|start(?:s|ing|ed)?|serv(?:e|es|ing)|run(?:s|ning)?)[^\\n]{0,40}(?:without[ _\\-]?(?:enforcement|validation|authoriz|consent|approval|check)|anyway|regardless|unenforced|in[ _\\-]?degraded)|(?:skipp?(?:ed|ing)|bypass(?:ed|ing)?|disabl(?:ed|ing)|ignor(?:e|ed|ing)|omitt?(?:ed|ing))[ _\\-]?(?:all[ _\\-]?|the[ _\\-]?|any[ _\\-]?|per[ _\\-]?request[ _\\-]?|further[ _\\-]?|remaining[ _\\-]?)?(?:polic(?:y|ies)|guardrail|consent|approval|authoriz|permission|enforcement|security[ _\\-]?check|access[ _\\-]?control|check)|(?:polic(?:y|ies)|guardrail|consent|approval|authoriz|permission|enforcement|security[ _\\-]?check|access[ _\\-]?control|check)[ _\\-]?(?:check|prompt|gate|evaluation)?s?[ _\\-]?(?:are[ _\\-]?|is[ _\\-]?|will[ _\\-]?be[ _\\-]?|were[ _\\-]?)?(?:skipp?(?:ed|ing)|bypassed|disabled|not[ _\\-]applied|not[ _\\-]enforced))',
+        desc: 'Generic fail-open: an agent policy/guardrail/consent loader reported an initialization failure and announced it is continuing without enforcement (CWE-455)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:securit(?:y|ies)|guardrail|consent|approval|authoriz(?:ation|er)|authoris(?:ation|er)|enforcement|read[ _\\-]?only|allow[ _\\-]?list|deny[ _\\-]?list|moderation|polic(?:y|ies)[ _\\-]?(?:engine|enforcement|check|decision|gate|eval))[^\\n]{0,64}["\']?(?:fail[ _\\-]?open|failure[ _\\-]?mode|failure[ _\\-]?polic(?:y|ies)|failure[ _\\-]?action|on[ _\\-]?(?:error|failure)|error[ _\\-]?behaviou?r)["\']?\\s*[:=]\\s*["\']?(?:true|open|allow|permit|bypass|continue|ignore|skip|off)\\b|["\']?(?:fail[ _\\-]?open|failure[ _\\-]?mode|failure[ _\\-]?polic(?:y|ies)|on[ _\\-]?(?:polic(?:y|ies)|guardrail|consent)[ _\\-]?(?:error|failure))["\']?\\s*[:=]\\s*["\']?(?:true|open|allow|permit|bypass|continue|ignore|skip)["\']?[^\\n]{0,64}(?:securit|guardrail|consent|approval|authoriz|enforcement|polic(?:y|ies)[ _\\-]?(?:engine|enforcement|check|decision|gate))',
+        desc: 'Configuration sets a policy / guardrail / consent component to fail open, so an enforcement outage silently becomes an allow-all window',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)(?:polic(?:y|ies)|read[ _\\-]?only|consent|guardrail|enforcement)[^\\n]{0,48}(?:check|enforcement|prompt|gate|mode)?[^\\n]{0,32}(?:skipp?(?:ed|ing)|bypassed|disabled|unavailable|not[ _\\-]applied|not[ _\\-]enforced|never[ _\\-]applied)[\\s\\S]{0,600}["\'](?:cli_command|command)["\']\\s*:\\s*["\']aws\\s+[a-z0-9\\-]{2,24}\\s+(?:create|delete|put|update|attach|detach|modify|terminate|remove|revoke|authorize|associate|disassociate|enable|disable|replace|restore|publish|import|upload|assume|run|start|stop|reboot|register|deregister|tag|untag|send|invoke|apply|write|copy|rm|mv|cp|sync)[a-z0-9\\-]{0,32}|["\'](?:cli_command|command)["\']\\s*:\\s*["\']aws\\s+[a-z0-9\\-]{2,24}\\s+(?:create|delete|put|update|attach|detach|modify|terminate|revoke|authorize|assume|rm|publish|invoke)[a-z0-9\\-]{0,32}[\\s\\S]{0,600}(?:polic(?:y|ies)|read[ _\\-]?only|consent|guardrail)[^\\n]{0,48}(?:skipp?(?:ed|ing)|bypassed|disabled|not[ _\\-]enforced)',
+        desc: 'MCP exchange carries a mutating AWS CLI command together with an explicit policy/consent-not-enforced marker \u2014 privileged action executed inside a fail-open window',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:block|blackhole|drop|deny|firewall|null[ _\\-]?route|disconnect|cut[ _\\-]?off|disable|sever)[^\\n]{0,96}(?:servicereference[\\w.\\-]*\\.amazonaws\\.com|service[ _\\-]?reference[ _\\-]?(?:document|endpoint|url)|read[ _\\-]?only[ _\\-]?operations?[ _\\-]?(?:index|list))|(?:if|when|once|should)[^\\n]{0,64}(?:polic(?:y|ies)|consent|approval|guardrail|read[ _\\-]?only[ _\\-]?(?:index|list|operations))[^\\n]{0,64}(?:fail|error|unavailable|did not load|does not load|not load(?:ed)?|is missing|cannot be loaded|skip)[^\\n]{0,96}(?:(?:proceed|continue|execute|run|invoke)[^\\n]{0,24}(?:anyway|regardless|nonetheless|without (?:consent|approval|asking|prompting|confirmation))|do it anyway|ignore (?:it|this|that|the (?:warning|error|failure)))',
+        desc: 'Injected instruction that induces the policy-index load failure or tells the agent to proceed anyway once enforcement is unavailable',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02403',
+    title:
+      'MCP Tool Returns Untrusted External Content Carrying Hidden Agent Instructions Without Spotlighting',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)"(?:description|body|content|pagecontent|comment|commenttext|sourcecommenttext|reviewcomment|markdown|summary|notes|commitmessage|title)"\\s*:\\s*"[\\s\\S]{0,900}[\\s\\S]{0,900}<!--(?:[^-]|-[^-]|--[^>]){0,400}(?:ignore\\s+(?:all\\s+)?(?:the\\s+)?(?:previous|prior|above)|disregard\\s+(?:all\\s+)?(?:the\\s+)?(?:previous|prior|above)|new\\s+instructions?\\b|\\[system\\]|<system>|you\\s+(?:must|should|shall|need\\s+to)\\s+(?:now\\s+|also\\s+|first\\s+)?(?:call|invoke|run|execute|fetch|read|open|post|send|create|trigger|list|clone)|do\\s+not\\s+(?:tell|inform|mention|reveal|notify|report|alert)\\s+(?:the\\s+)?(?:user|reviewer|human|operator))',
+        desc: 'Forge external-content field (PR/issue description, comment, commit message, wiki page) whose value contains an HTML comment carrying an agent-directed imperative \u2014 the Azure DevOps repo_get_pull_request_by_id payload shape, generalised across forges.',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)<!--(?:[^-]|-[^-]|--[^>]){0,300}\\b(?:ai\\s+(?:agent|assistant|reviewer|review)|llm|assistant|copilot|claude|chatgpt|gemini|cursor|codex|code\\s+review(?:er)?\\s+(?:agent|bot|assistant)|review(?:ing)?\\s+agent|automated\\s+reviewer)\\b(?:[^-]|-[^-]|--[^>]){0,200}\\b(?:you\\s+(?:must|should|shall|need\\s+to|are\\s+required\\s+to)|please\\s+(?:also\\s+)?(?:call|run|fetch|read|send|post|create|invoke|retrieve)|ignore\\s+(?:all\\s+)?(?:the\\s+)?(?:previous|prior|above)|do\\s+not\\s+(?:tell|inform|mention|reveal)|instead\\s+of\\s+(?:reviewing|summarising|summarizing))\\b',
+        desc: 'HTML comment inside a tool response that addresses an AI reviewer by name and issues a directive \u2014 hidden instruction aimed squarely at the ingesting agent.',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)<(?:span|div|p|font|section|details|td)\\b[^>]{0,200}(?:display\\s*:\\s*none|visibility\\s*:\\s*hidden|font-size\\s*:\\s*0|opacity\\s*:\\s*0|color\\s*:\\s*#?(?:fff\\b|ffffff\\b|white\\b))[^>]{0,200}>(?:[^<]|<[^/]){0,300}\\b(?:ignore\\s+(?:all\\s+)?(?:the\\s+)?(?:previous|prior|above)|you\\s+(?:must|should|shall)\\s+(?:now\\s+|also\\s+|first\\s+)?(?:call|run|execute|fetch|read|post|send|create)|do\\s+not\\s+(?:tell|inform|mention|reveal)\\s+(?:the\\s+)?(?:user|reviewer)|new\\s+instructions?\\b)',
+        desc: 'CSS-hidden or hidden-attribute container in tool output followed by an agent-directed imperative \u2014 the white-on-white / display:none variant of the same hidden-instruction carrier.',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)"type"\\s*:\\s*"text"\\s*,\\s*"text"\\s*:\\s*"(?:\\\\[nrt]|\\s){0,20}[\\{\\[][\\s\\S]{0,900}[\\s\\S]{0,900}<!--(?:[^-]|-[^-]|--[^>]){0,400}(?:ignore\\s+(?:all\\s+)?(?:the\\s+)?(?:previous|prior|above)|you\\s+(?:must|should|shall)\\s+(?:now\\s+|also\\s+|first\\s+)?(?:call|run|execute|fetch|read|post|send|create)|do\\s+not\\s+(?:tell|inform|mention|reveal)\\s+(?:the\\s+)?(?:user|reviewer)|new\\s+instructions?\\b|\\[system\\])',
+        desc: 'MCP text-content envelope whose payload starts as raw JSON serialization rather than a spotlighting delimiter, and which carries a hidden-comment imperative \u2014 external content reaching model context with the content-safety wrapper skipped.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:embed|insert|inject|append|plant|hide|conceal|place)\\b[^\\n]{0,80}\\b(?:hidden|invisible|html\\s+comment|<!--)[^\\n]{0,140}\\b(?:pull\\s+request|pr\\s+description|merge\\s+request|issue\\s+(?:body|description)|commit\\s+message|wiki\\s+page)\\b',
+        desc: 'Skill or tool content instructing the agent to plant hidden/invisible markup into a pull-request, issue, commit or wiki field \u2014 the authoring side of this technique. Secondary signal only; never sufficient on its own to conclude a live attack.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02404',
+    title: 'Mobile GUI Agent Model Output Reaching Host Shell / ADB Unsanitized',
+    severity: 'critical',
+    category: 'privilege-escalation',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)\\badb(?:\\.exe)?\\b[^\\n\\r]{0,120}?\\bshell\\b[^\\n\\r]{0,80}?\\b(?:input\\s+(?:text|keyevent)|am\\s+(?:start|startservice|broadcast)|monkey\\s+-p|pm\\s+(?:install|uninstall|grant))\\b[^\\n\\r]{0,200}?(?:;|&&|\\|\\||\\||&)(?:\\s|%s){0,12}(?:[A-Za-z]:)?[\\\\/]{0,2}(?:[\\w.-]{1,40}[\\\\/]){0,5}(?:calc(?:\\.exe)?|cmd(?:\\.exe)?|powershell(?:\\.exe)?|pwsh|bash|zsh|dash|sh|python3?|perl|ruby|node|npx|curl|wget|ncat|netcat|nc|socat|telnet|ssh|scp|sftp|tftp|whoami|pwd|uname|hostname|systeminfo|ipconfig|ifconfig|base64|certutil|bitsadmin|mshta|rundll32|regsvr32|wscript|cscript|osascript|schtasks|crontab|launchctl|wmic|chmod|chown|rm|dd|xxd|sudo|killall|taskkill|explorer|notepad|xterm)\\b',
+        desc: 'adb shell literal sink whose model-supplied argument chains into a host executable via ; && || | & \u2014 the A7 host command injection shape',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)\\badb(?:\\.exe)?\\b[^\\n\\r]{0,120}?\\bshell\\b[^\\n\\r]{0,80}?\\binput\\s+text\\b[^\\n\\r]{0,200}?(?:\\$\\((?:\\s|%s){0,12}[\\w./\\\\-]{1,60}|`(?:\\s|%s){0,12}[\\w./\\\\-]{1,60}`|>{1,2}(?:\\s|%s){0,12}[~\\w.][\\w./\\\\-]{0,60})',
+        desc: 'adb input text argument carrying command substitution $(...) / backticks or a redirect that writes an attacker-named file on the host',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\b(?:text|type|input_text|type_text|set_text|enter_text|write_text|send_keys)\\s*\\(\\s*[\\x22\\x27]|[\\x22\\x27](?:action|action_type|operation|name)[\\x22\\x27]\\s*:\\s*[\\x22\\x27](?:type|text|input_text|type_text|send_keys)[\\x22\\x27][^\\n\\r]{0,160}?[\\x22\\x27](?:text|text_input|input_str|input_text|content|value)[\\x22\\x27]\\s*:\\s*[\\x22\\x27])[^\\x22\\x27\\n\\r]{0,200}?[\\x22\\x27]{0,2}(?:;|&&|\\|\\||\\||&|\\$\\(|`)(?:\\s|%s){0,12}(?:[A-Za-z]:)?[\\\\/]{0,2}(?:[\\w.-]{1,40}[\\\\/]){0,5}(?:calc(?:\\.exe)?|cmd(?:\\.exe)?|powershell(?:\\.exe)?|pwsh|bash|zsh|dash|sh|python3?|perl|ruby|node|npx|curl|wget|ncat|netcat|nc|socat|telnet|ssh|scp|sftp|tftp|whoami|pwd|uname|hostname|systeminfo|ipconfig|ifconfig|base64|certutil|bitsadmin|mshta|rundll32|regsvr32|wscript|cscript|osascript|schtasks|crontab|launchctl|wmic|chmod|chown|rm|dd|xxd|sudo|killall|taskkill|explorer|notepad|xterm)\\b',
+        desc: 'Model-emitted GUI action (text/type/input_text, bare DSL or JSON tool call) whose text argument chains into a host executable \u2014 the payload before it reaches the shell',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)\\bshell\\s+input\\s+text\\b[^\\n\\r]{0,160}?[\\x22\\x27](?:\\s|%s){0,6}(?:;|&&|\\|\\||&)(?:\\s|%s){0,12}(?:[A-Za-z]:)?[\\\\/]{0,2}(?:[\\w.-]{1,40}[\\\\/]){0,5}[\\w.-]{1,60}(?:\\s|%s){0,12}(?:#|::|\\brem\\b)',
+        desc: 'Quote breakout followed by a command and a shell comment terminator (# / :: / rem) inside an adb input text argument \u2014 the exact A7 proof-of-concept fingerprint',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\badb\\b[^\\n\\r]{0,160}?\\bshell\\s+input\\s+(?:text|keyevent)\\s*(?:\\{[\\w.\\[\\]()\\x22\\x27]{1,60}\\}|\\$\\{[\\w.\\[\\]]{1,60}\\}|[\\x22\\x27]\\s*(?:\\+|\\.)\\s*[\\w.\\[\\]()]{1,60})|(?:os\\.system|subprocess\\.(?:run|call|check_output|check_call|Popen)|child_process\\.exec|shell_exec)\\s*\\([^\\n\\r]{0,200}?\\badb\\b[^\\n\\r]{0,160}?\\bshell\\s+input\\s+(?:text|keyevent)[^\\n\\r]{0,200}?shell\\s*=\\s*True)',
+        desc: 'Agent controller source that interpolates an unescaped variable directly into an adb shell input command, or runs such a string with shell=True',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)replace\\s*\\(\\s*[\\x22\\x27]\\x20[\\x22\\x27]\\s*,\\s*[\\x22\\x27]%s[\\x22\\x27]\\s*\\)[\\s\\S]{0,400}?\\badb\\b[^\\n\\r]{0,160}\\bshell\\s+input\\s+text',
+        desc: 'Space-to-%s pseudo-sanitizer applied to model text immediately before an adb input text sink \u2014 encodes spaces but leaves ; & | > intact',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02405',
+    title: 'Malicious AI Skill / MCP Server Package Structure (AgentBaiting / FakeGit)',
+    severity: 'critical',
+    category: 'skill-compromise',
+    scan_target: 'skill',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:^|[\\r\\n>&|;\\x60\\[(])[ \\t]*(?:@[ \\t]*)?(?:start|call)[ \\t]+(?:/[a-z]+[ \\t]+)?"?[\\w.\\-]{1,40}\\.exe"?[ \\t]+"?[\\w.\\-]{1,40}\\.(?:txt|ico|log|dat|bin|nfo|lic|license|png|jpe?g|gif|rtf)"?',
+        desc: 'Windows .cmd/.bat launcher runs a bundled EXE with a disguised data-file payload as its only argument - FakeGit loader command line',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:(?:luajit|luau|lua5[1-4])\\.(?:exe|dll)[\\s\\S]{0,300}(?:\\.cmd\\b|\\.bat\\b|\\.zip\\b|releases/(?:download|latest))|(?:\\.cmd\\b|\\.bat\\b|\\.zip\\b|releases/(?:download|latest))[\\s\\S]{0,300}(?:luajit|luau|lua5[1-4])\\.(?:exe|dll))',
+        desc: 'Lua/LuaJIT runtime binary bundled alongside a Windows launcher or release archive inside an AI capability package - AgentBaiting loader chain component',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:more\\s+info[\\s\\S]{0,160}run\\s+anyway|run\\s+anyway[\\s\\S]{0,160}(?:security|smartscreen|defender|warning|prompt)|windows\\s+protected\\s+your\\s+pc|smartscreen[\\s\\S]{0,160}(?:bypass|ignore|run\\s+anyway|proceed))',
+        desc: 'Setup instructions tell the operator to click through the Windows SmartScreen / Mark-of-the-Web execution warning - attacker-authored README coaching',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:(?:install|setup|download|before\\s+running|first\\s+run|launch)[\\s\\S]{0,200}(?:(?:disable|turn\\s+off|temporarily\\s+disable)\\s+(?:your\\s+)?(?:windows\\s+)?(?:defender|antivirus|real[\\s\\-]?time\\s+protection|smartscreen)|(?:defender|antivirus)\\s+(?:exclusion|exception))|false[\\s\\-]?positive[\\s\\S]{0,140}(?:add\\s+(?:an\\s+)?(?:folder\\s+)?exclusion|whitelist\\s+it|allow\\s+it|ignore\\s+the\\s+warning))',
+        desc: 'Setup instructions tell the operator to disable antivirus or add a Defender exclusion before running the package - malware-install coaching',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:(?:mcp\\s*server|mcp\\s+connector|ai\\s+skill|claude\\s+skill|agent\\s+skill|skill\\s+pack)[\\s\\S]{0,400}releases/(?:download|latest)[^\\s")\\]]{0,180}\\.(?:zip|7z|rar|exe|msi|scr)[\\s\\S]{0,300}(?:double[\\s\\-]?click|run\\s+it\\b|run\\s+the\\s+(?:exe|installer|setup|launcher)|setup\\s+wizard|execute\\s+the\\s+(?:exe|installer|launcher))|download\\s+the\\s+\\.?exe[\\s\\S]{0,160}(?:releases|github)|releases[\\s\\S]{0,160}download\\s+the\\s+\\.?exe)',
+        desc: 'Package claiming to be an AI Skill or MCP server is installed by downloading and running a Windows binary from a GitHub Releases page instead of a package-manager artefact',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"mcp_?servers?"[\\s\\S]{0,600}(?:"command"\\s*:\\s*"[^"]{0,120}\\.(?:cmd|bat|scr|pif|vbs|hta)"|"args"\\s*:\\s*\\[[^\\]]{0,300}"[^"]{0,100}\\.(?:cmd|bat|scr|pif|vbs|hta)")',
+        desc: 'MCP client configuration launches the server through a bundled Windows script launcher rather than a package-manager runtime - FakeGit persistence entry point',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:91e5dbfaf45edf25fbc2168f92083e05dfa427afa7633e991392e33cc7427dad|66afc7d87d10dbe392898c4e5c613e0442fabb396415c2bef3a5ef2ac752c5ad|c15693106682f2ddb26649cab6e1962a64537627cde4c5d3c79d5a0be8c1b5a8|a33f40cab1ab7f971d3464af3e7595918107332b9e83342007571842b9e22826|Mann1988/awesome\\-claude\\-skills|45d5r/databricks\\-mcp\\-server|DomingosNgongo/walmart\\-mcp|MauManto/jenkins\\-mcp\\-server|awesome\\-skills\\-claude\\-3\\.3\\.zip|server_databricks_mcp_1\\.6\\.zip|mcp\\-walmart\\-2\\.2\\.zip|mcp\\-server\\-jenkins\\-3\\.2\\.zip)',
+        desc: 'Known FakeGit / AgentBaiting campaign artefact - published ZIP SHA-256, repository slug or release archive name',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02406',
+    title: 'MCP Tool Sequential Integer ID Enumeration (Cross-Tenant IDOR, CVE-2026-54052)',
+    severity: 'critical',
+    category: 'context-exfiltration',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)n8n_workflow_versions[\\s\\S]{0,240}[\\\\"\']{0,3}version_?id[\\\\"\']{0,3}\\s*[:=]\\s*(?:\\$\\{[a-z_][a-z0-9_]{0,12}\\}|\\$[a-z_][a-z0-9_]{0,12}(?:[^a-z0-9_.]|$)|\\{\\{?[a-z_][a-z0-9_]{0,12}\\}\\}?|%[ds]|(?:i|j|k|n|m|idx|index|counter|cnt|ctr|seq|num|offset|start)(?:[^a-z0-9_.]|$)|[a-z_][a-z0-9_]{0,12}\\s*\\+\\s*\\d{1,6}|[a-z_][a-z0-9_]{0,12}\\+\\+)',
+        desc: 'CVE-2026-54052 direct exploitation: n8n_workflow_versions invoked with versionId bound to a loop counter, interpolation or increment expression instead of a fixed version the caller was authorised to see',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:n8n_workflow_versions[\\s\\S]{0,200}?[\\\\"\']{1,3}version_?id[\\\\"\']{1,3}\\s*:\\s*[\\\\"\']{0,3}\\d{1,9}[\\s\\S]{0,200}?){3,}',
+        desc: 'Three or more n8n_workflow_versions invocations with numeric versionId inside a single MCP exchange or trace window \u2014 the CVE-2026-54052 cross-tenant snapshot sweep',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:(?:tools?[/_]call|call_?tool|jsonrpc|[\\\\"\']{0,3}(?:method|arguments|params)[\\\\"\']{0,3}\\s*:|\\binvoke)[\\s\\S]{0,200}?[\\\\"\']{1,3}(?:version_?id|backup_?id|snapshot_?id|revision_?id|archive_?id|export_?id|dump_?id|restore_?id)[\\\\"\']{1,3}\\s*:\\s*[\\\\"\']{0,3}\\d{1,9}[\\s\\S]{0,200}?){4,}',
+        desc: 'Four or more integer version/backup/snapshot identifiers each carried inside its own tool-invocation envelope in one exchange window \u2014 enumeration of a backup resource addressed by auto-increment row id',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:for\\s*\\(|for\\s+[a-z_][a-z0-9_]{0,16}\\s+in\\s|while\\s*\\(|foreach\\s*\\(|range\\s*\\(\\s*\\d{1,7}\\s*,)[\\s\\S]{0,200}(?:call_?tool|tools?[/_]call|jsonrpc|\\bmcp\\b|client\\.[a-z_]{1,20}|session\\.[a-z_]{1,20}|fetch\\s*\\(|axios|requests?\\.(?:get|post)|curl\\s)[\\s\\S]{0,200}[\\\\"\']{0,3}(?:version_?id|backup_?id|snapshot_?id|revision_?id|archive_?id|export_?id|record_?id|object_?id|entry_?id|row_?id)[\\\\"\']{0,3}\\s*[:=]\\s*(?:\\$\\{[a-z_][a-z0-9_]{0,12}\\}|\\$[a-z_][a-z0-9_]{0,12}(?:[^a-z0-9_.]|$)|\\{\\{?[a-z_][a-z0-9_]{0,12}\\}\\}?|%[ds]|(?:i|j|k|n|m|idx|index|counter|cnt|ctr|seq|num|offset|cur|start)(?:[^a-z0-9_.]|$)|[a-z_][a-z0-9_]{0,12}\\s*\\+\\s*\\d{1,6})',
+        desc: 'Loop or range construct feeding an incrementing counter into a version/backup/record ID argument of a remote tool call \u2014 programmatic object-reference enumeration in agent or client code',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\$\\(seq\\s|`seq\\s|seq\\s+\\d{1,7}\\s+\\d{2,9}|\\{\\d{1,7}\\.\\.\\d{2,9}\\}|range\\s*\\(\\s*\\d{1,7}\\s*,\\s*\\d{2,9})[\\s\\S]{0,400}(?:/mcp\\b|jsonrpc|calltool|call_tool|tools_call)[\\s\\S]{0,400}(?:version_?id|backup_?id|snapshot_?id|revision_?id|record_?id)[\\\\"\']{0,3}\\s*[:=]\\s*[\\\\"\']{0,3}(?:\\$\\{?[a-z_]|\\{[a-z_]|%[ds])',
+        desc: 'Shell or scripted request loop iterating a numeric sequence against an MCP endpoint with the counter substituted into a record ID field \u2014 direct cross-tenant harvesting run',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:n8n[-_]mcp["\'\\s:@=^~>v]{1,8}(?:2\\.(?:5[0-5]|[1-4][0-9]|[0-9])\\.\\d{1,3}|2\\.56\\.0)[\\s\\S]{0,800}enable_multi_tenant\\s*[:=]\\s*["\']?\\s*true|enable_multi_tenant\\s*[:=]\\s*["\']?\\s*true[\\s\\S]{0,800}n8n[-_]mcp["\'\\s:@=^~>v]{1,8}(?:2\\.(?:5[0-5]|[1-4][0-9]|[0-9])\\.\\d{1,3}|2\\.56\\.0))',
+        desc: 'Deployment manifest pins n8n-mcp below the v2.56.1 fix while enabling multi-tenant HTTP mode \u2014 the exact precondition CVE-2026-54052 requires for cross-tenant workflow snapshot theft',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:iterat\\w{0,4}|increment\\w{0,4}|enumerat\\w{0,4}|brute[\\s_-]?forc\\w{0,3}|loop\\s+(?:over|through)|walk\\s+(?:the\\s+)?(?:ids?|range)|count\\s+up\\s+through)[\\s\\S]{0,200}(?:version_?id|backup_?id|snapshot_?id|record_?id|integer\\s+ids?|sequential\\s+ids?|workflow[\\s_-]?versions?)[\\s\\S]{0,240}(?:other|another|every|all|each|cross)[\\s_-]?(?:tenant|customer|organi[sz]ation|account|workspace|instance)[\\s\\S]{0,240}(?:extract|harvest|collect|exfiltrat\\w{0,3}|siphon|scrape|steal|dump|capture|save|send|post|upload|report\\s+back|write\\s+(?:them|it|these))[\\s\\S]{0,160}(?:credential|api[\\s_-]?key|bearer|token|secret|password)',
+        desc: 'Instruction content directing an agent to walk integer resource IDs across tenant boundaries and collect the credentials it finds \u2014 weaponised CVE-2026-54052 technique in a skill or prompt',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02407',
+    title:
+      'Agent Workspace Boundary Escape via Host-Root Mount and Unprivileged Namespace Escalation (CVE-2026-46331)',
+    severity: 'critical',
+    category: 'privilege-escalation',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)(?:\\b(?:cat|less|more|head|tail|ls|cp|mv|rm|dd|tar|rsync|scp|zip|chmod|chown|grep|find|sed|awk|xxd|strings|base64|open|stat|du)\\b[^\\n"]{0,80}(?:/mnt/\\.virtiofs-root|/mnt/hostfs|/mnt/host-root|/host_mnt|/hostfs)\\b|(?:/mnt/\\.virtiofs-root|/mnt/hostfs|/mnt/host-root|/host_mnt|/hostfs)/(?:Users|home|root|etc|private|System|Library|var/root)\\b|(?:/run/host|/proc/1/root)/(?:Users/|home/|var/root\\b|root/\\.|Library/Keychains|(?:private/)?etc/(?:shadow|sudoers|passwd|gshadow|master\\.passwd)\\b|(?:private/)?etc/ssh/))',
+        desc: 'Agent tool argument operates on a host-root bridge mount published into the agent VM \u2014 the host-filesystem reach step of the SharedRoot escape',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)\\bunshare\\b[^\\n]{0,160}(?:\\btc\\s+(?:qdisc|filter|action)\\s+(?:add|replace|change)\\b|\\bmodprobe\\s+(?:act|sch|cls)_[a-z_]{2,16}\\b|\\binsmod\\s+[^\\n]{0,60}(?:act|sch|cls)_[a-z_]{2,16}\\.ko\\b)',
+        desc: 'Unprivileged user namespace creation chained into traffic-control or kernel-module configuration inside the agent sandbox',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)(?:\\btc\\s+(?:-\\S{1,10}\\s+){0,3}(?:filter|action)\\s+(?:add|replace|change)\\b[^\\n]{0,200}\\baction\\s+pedit\\b|\\bpedit\\s+ex\\s+munge\\b|\\bmodprobe\\s+act_pedit\\b|\\binsmod\\s+[^\\n]{0,60}act_pedit\\.ko\\b)',
+        desc: 'Traffic-control pedit action configured or act_pedit module explicitly loaded from an agent session \u2014 the CVE-2026-46331 escalation primitive being armed',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)"(?:file_?path|filepath|path|filename|file|target|destination|dest|output_?path|src|source)"\\s*:\\s*"[^"]{0,120}(?:(?:\\.\\./){2,}(?:Users|home|etc|root|private|System|Library|var)/|/(?:private/)?etc/(?:sudoers|passwd|shadow|ssh/)|/Users/[^"/]{1,40}/(?:\\.ssh/|\\.aws/|\\.gnupg/|Library/Keychains/|Library/LaunchAgents/)|/home/[^"/]{1,40}/\\.(?:ssh|aws|gnupg)/|/Library/LaunchDaemons/)',
+        desc: 'Agent file-tool path argument resolves outside the granted workspace into host credential stores or launch-persistence locations',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)(?:kernel\\.unprivileged_userns_clone\\s*=\\s*1\\b|kernel\\.apparmor_restrict_unprivileged_userns\\s*=\\s*0\\b|echo\\s+1\\s*>\\s*/proc/sys/kernel/unprivileged_userns_clone\\b|echo\\s+0\\s*>\\s*/proc/sys/kernel/apparmor_restrict_unprivileged_userns\\b|\\b(?:docker|podman|nerdctl|ctr)\\b[^\\n]{0,200}(?:--security-opt[= ]seccomp[=:]unconfined\\b|--cap-add[= ]"?(?:SYS_MODULE|SYS_ADMIN)\\b|--privileged\\b[^\\n]{0,120}--cap-add[= ]"?NET_ADMIN\\b|--cap-add[= ]"?NET_ADMIN\\b[^\\n]{0,120}(?:--privileged\\b|seccomp[=:]unconfined\\b)))',
+        desc: 'Agent tool argument disables the guest hardening controls (unprivileged user namespaces, seccomp scope, module-load capability) that gate the escape chain',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:you\\s+(?:must|should|will|need\\s+to|are\\s+required\\s+to)|please\\s+run|first,?\\s+run|then\\s+run|step\\s+\\d{1,2}\\s*[:.)]|before\\s+(?:you\\s+)?(?:continue|proceed|answer))[^\\n]{0,200}(?:/mnt/\\.virtiofs-root/|/proc/1/root/|\\bmodprobe\\s+act_pedit\\b|\\bunshare\\s+(?:--map-root-user\\b|--user\\b|-r\\b|-[A-Za-z]{0,4}U[A-Za-z]{0,4}\\b))',
+        desc: 'Instruction content directs the agent to reach the host-root mount or arm the namespace/module escalation \u2014 weaponised guidance, not advisory prose',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02408',
+    title: 'Dataset / Model Loader Remote-Code Execution via Poisoned Dataset Artifact',
+    severity: 'high',
+    category: 'data-poisoning',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:HF_DATASETS_TRUST_REMOTE_CODE[\\x22\\x27\\]]{0,3}\\s*[=:]\\s*[\\x22\\x27]?\\s*(?:1|true|yes|on)\\b|(?:export|setenv|putenv|ENV|environ|--env|-e)\\s*[\\[\\(]?\\s*[\\x22\\x27]?TRUST_REMOTE_CODE[\\x22\\x27\\]]{0,3}\\s*[=:]\\s*[\\x22\\x27]?\\s*(?:1|true|yes|on)\\b)',
+        desc: 'Process-wide remote-code trust switch turned on via HF_DATASETS_TRUST_REMOTE_CODE or an exported TRUST_REMOTE_CODE - every subsequent dataset or model load in that process will execute repository-authored code without a prompt',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)(?:\\b(?:load_dataset|load_dataset_builder|get_dataset_config_names|get_dataset_split_names|from_pretrained|pipeline)\\s*\\([\\s\\S]{0,200}?[\\x22\\x27][A-Za-z0-9][\\w.-]{0,60}/[A-Za-z0-9][\\w.-]{0,80}[\\x22\\x27][\\s\\S]{0,300}?\\btrust_remote_code\\b\\s*[=:]\\s*(?:true|1)\\b|\\bdataset_kwargs\\b[\\s\\S]{0,200}?\\btrust_remote_code\\b\\s*[=:]\\s*(?:true|1)\\b)',
+        desc: 'Dataset or model loader invoked against a remote Hub repository with trust_remote_code enabled - the disclosed remote-code loader path that turns ingestion into arbitrary execution',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:(?:datasets\\.(?:GeneratorBasedBuilder|ArrowBasedBuilder|DatasetBuilder|BeamBasedBuilder)|def\\s+_split_generators|def\\s+_generate_examples|def\\s+_generate_tables)[\\s\\S]{0,1000}?(?:os\\.system\\s*\\(|os\\.popen\\s*\\(|subprocess\\.(?:run|call|Popen|check_output|check_call)\\s*\\(|pty\\.spawn\\s*\\(|socket\\.socket\\s*\\(|__import__\\s*\\(|(?:^|[^.\\w])(?:exec|eval|compile)\\s*\\()|(?:os\\.system\\s*\\(|os\\.popen\\s*\\(|subprocess\\.(?:run|call|Popen|check_output|check_call)\\s*\\(|pty\\.spawn\\s*\\(|socket\\.socket\\s*\\(|__import__\\s*\\(|(?:^|[^.\\w])(?:exec|eval)\\s*\\()[\\s\\S]{0,1000}?(?:datasets\\.(?:GeneratorBasedBuilder|ArrowBasedBuilder|DatasetBuilder)|def\\s+_split_generators|def\\s+_generate_examples|def\\s+_generate_tables))',
+        desc: 'Dataset loading script (builder subclass or _split_generators / _generate_examples) co-located with a process-execution, raw-socket or dynamic-import sink - the executable payload delivered inside a poisoned dataset repository',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)(?:\\{\\{|\\{%|\\$\\{)[^\\n]{0,240}?(?:__class__|__subclasses__|__globals__|__builtins__|__mro__|__base__|__import__|__init__\\s*\\.|\\blipsum\\b|\\bcycler\\b|\\bjoiner\\b|_TemplateReference|os\\.popen|os\\.system|subprocess\\.|\\bpopen\\s*\\(|\\bsystem\\s*\\()[^\\n]{0,240}?(?:\\}\\}|%\\}|\\})',
+        desc: 'Template expression inside a dataset or model configuration value that dereferences Python interpreter internals or a process sink - server-side template injection evaluated while the dataset config is parsed',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)(?:\\b(?:vllm|sglang|text-generation-launcher|lm[_-]eval|tgi|accelerate\\s+launch|torchrun|python\\s+-m\\s+[\\w.]{1,40})\\b(?:[^\\n\\\\`]|\\\\\\\\\\\\n|\\\\\\n|\\\\[^\\nn\\\\]){0,300}?--trust[-_]remote[-_]code\\b|--trust[-_]remote[-_]code\\b(?:[^\\n\\\\`]|\\\\\\\\\\\\n|\\\\\\n|\\\\[^\\nn\\\\]){0,300}?--(?:model|model[-_]id|model[-_]args|tasks|served[-_]model[-_]name|dataset)\\b)',
+        desc: 'Serving or evaluation runtime launched with --trust-remote-code - the loaded repository is authorised to execute its own Python inside the worker process',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:(?:disable|bypass|suppress|silence|turn\\s+off|skip|ignore|auto[-\\s]?(?:approve|accept)|do\\s+not\\s+prompt)[^\\n]{0,140}?(?:trust[-_\\s]?remote[-_\\s]?code|remote[-_\\s]?code\\s+(?:prompt|warning|confirmation|check|gate))|trust[-_\\s]?remote[-_\\s]?code[^\\n]{0,140}?(?:without\\s+(?:asking|review|reviewing|confirmation|prompting)|no\\s+confirmation|auto[-\\s]?(?:approve|accept)|do\\s+not\\s+(?:ask|prompt|warn)|on\\s+(?:untrusted|unreviewed|arbitrary)\\s+(?:dataset|model|repo)))',
+        desc: 'Instruction to suppress or bypass the remote-code confirmation gate before loading a dataset or model - weaponisation framing, secondary corroborating signal',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02409',
+    title: 'MCP 2026-07-28 Stateless Spec: Async Task Abuse and OAuth 2.1 Misuse',
+    severity: 'high',
+    category: 'excessive-autonomy',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:"method"\\s*:\\s*"tasks/(?:get|update|cancel)"[\\s\\S]{0,300}"taskId"\\s*:\\s*"(?:[0-9]{1,7}|task[_\\-]?[0-9]{1,7}|0{8,}[0-9a-f\\-]{0,28}|[*%]|\\.\\.[\\\\/][^"]{0,60}|[^"]{0,60}(?:%27|\\x27\\s*(?:or|and|union)\\s|;\\s*drop\\s)[^"]{0,60})"|"taskId"\\s*:\\s*"(?:[0-9]{1,7}|task[_\\-]?[0-9]{1,7}|0{8,}[0-9a-f\\-]{0,28}|[*%]|\\.\\.[\\\\/][^"]{0,60}|[^"]{0,60}(?:%27|\\x27\\s*(?:or|and|union)\\s|;\\s*drop\\s)[^"]{0,60})"[\\s\\S]{0,300}"method"\\s*:\\s*"tasks/(?:get|update|cancel)")',
+        desc: 'tasks/get, tasks/update or tasks/cancel carrying a guessable, wildcard, traversal or injected taskId \u2014 cross-caller task hijack attempt against a sessionless MCP server (SEP-2663 requires unguessable IDs)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:"method"\\s*:\\s*"tasks/(?:list|result)"[\\s\\S]{0,500}(?:io\\.modelcontextprotocol/tasks|"protocolVersion"\\s*:\\s*"2026-(?:06-30|07-28)"|"resultType"\\s*:\\s*"(?:task|complete)")|(?:io\\.modelcontextprotocol/tasks|"protocolVersion"\\s*:\\s*"2026-(?:06-30|07-28)"|"resultType"\\s*:\\s*"(?:task|complete)")[\\s\\S]{0,500}"method"\\s*:\\s*"tasks/(?:list|result)")',
+        desc: "Call to the removed tasks/list or tasks/result method inside an exchange that already carries 2026-07-28 markers \u2014 enumeration of other callers' task IDs or a protocol downgrade probe",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"inputRequests"\\s*:\\s*\\{[\\s\\S]{0,800}"method"\\s*:\\s*"(?:elicitation/create|sampling/createMessage)"[\\s\\S]{0,800}(?:auto[\\s_\\-]?approve|approve\\s+(?:all|any|every|future|subsequent|remaining)|do\\s*n[o\\x27]?t\\s+ask\\s+(?:me\\s+)?again|(?:disable|skip|bypass|suppress)\\s+(?:the\\s+)?(?:confirmation|approval|consent|human\\s+review)|remember\\s+(?:this\\s+)?(?:approval|consent|choice)\\s+for\\s+all|grant\\s+(?:full|admin|root|unrestricted|permanent)\\s+(?:access|permission|authority|privileges)|apply\\s+to\\s+all\\s+(?:future|subsequent|remaining))',
+        desc: 'MCP task inputRequests elicitation asking the human to grant blanket or permanent approval \u2014 one consent laundered into standing autonomy for the rest of the task',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"inputRequests"\\s*:\\s*\\{[\\s\\S]{0,800}"(?:message|systemPrompt|text)"\\s*:\\s*"(?:[^"]{0,300}(?:re-?authenticate|verify\\s+your\\s+(?:identity|account)|session\\s+(?:has\\s+)?expired|security\\s+(?:check|verification)|confirm\\s+your\\s+(?:credentials|password)|account\\s+(?:will\\s+be\\s+)?(?:locked|suspended)|urgent(?:ly)?|immediately)[^"]{0,300}(?:api[\\s_\\-]?keys?|secret\\s+(?:access\\s+)?key|client[\\s_\\-]?secret|password|passphrase|private[\\s_\\-]?key|access[\\s_\\-]?token|refresh[\\s_\\-]?token|seed\\s+phrase|mnemonic|recovery\\s+(?:code|phrase)|credit[\\s_\\-]?card|ssh[\\s_\\-]?key)|[^"]{0,300}(?:api[\\s_\\-]?keys?|secret\\s+(?:access\\s+)?key|client[\\s_\\-]?secret|password|passphrase|private[\\s_\\-]?key|access[\\s_\\-]?token|refresh[\\s_\\-]?token|seed\\s+phrase|mnemonic|recovery\\s+(?:code|phrase)|credit[\\s_\\-]?card|ssh[\\s_\\-]?key)[^"]{0,300}(?:re-?authenticate|verify\\s+your\\s+(?:identity|account)|session\\s+(?:has\\s+)?expired|security\\s+(?:check|verification)|confirm\\s+your\\s+(?:credentials|password)|account\\s+(?:will\\s+be\\s+)?(?:locked|suspended)|urgent(?:ly)?|immediately))',
+        desc: 'MCP task inputRequests rendering an urgency-framed credential prompt \u2014 rich interactive elicitation phishing through a channel the spec says carries no extra trust',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:"resultType"\\s*:\\s*"task"[\\s\\S]{0,400}"ttlMs"\\s*:\\s*[0-9]{10,}|"ttlMs"\\s*:\\s*[0-9]{10,}[\\s\\S]{0,400}"resultType"\\s*:\\s*"task")',
+        desc: 'CreateTaskResult handing back a task whose ttlMs exceeds ~11.6 days \u2014 a single tools/call approval seeding weeks of unattended execution',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:(?:modelcontextprotocol|mcpServers|oauth-protected-resource|mcp[_\\-]?server|/mcp[/?"\\s]|"?resource"?\\s*[:=]\\s*"?https?(?::|%3A)[^"&\\s]{0,120}mcp)[\\s\\S]{0,600}(?:"?response_type"?\\s*[:=]\\s*"?(?:token\\b|id_token(?:%20|\\+|\\s)+token)|"?code_challenge_method"?\\s*[:=]\\s*"?plain\\b|"?grant_type"?\\s*[:=]\\s*"?password\\b)|(?:"?response_type"?\\s*[:=]\\s*"?(?:token\\b|id_token(?:%20|\\+|\\s)+token)|"?code_challenge_method"?\\s*[:=]\\s*"?plain\\b|"?grant_type"?\\s*[:=]\\s*"?password\\b)[\\s\\S]{0,600}(?:modelcontextprotocol|mcpServers|oauth-protected-resource|mcp[_\\-]?server|/mcp[/?"\\s]|"?resource"?\\s*[:=]\\s*"?https?(?::|%3A)[^"&\\s]{0,120}mcp))',
+        desc: 'MCP authorization exchange using an implicit grant, plain PKCE or the resource-owner password grant \u2014 flows removed or forbidden under the MCP OAuth profile, yielding tokens the client cannot bind to a resource',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:"redirect_uris?"\\s*:\\s*(?:\\[\\s*)?"https?://(?:[a-z0-9\\-]{1,63}\\.)+[a-z]{2,24}[^"]{0,80}\\*|"?redirect_uri"?\\s*[:=]\\s*"?https?(?::|%3A)(?://|%2F%2F)[^"&\\s]{0,80}@[^"&\\s]{0,80}|"authorization_servers"\\s*:\\s*\\[\\s*"http://|"authorization_servers"\\s*:\\s*\\[\\s*"https?://(?:[0-9]{1,3}\\.){3}[0-9]{1,3})',
+        desc: 'MCP OAuth metadata or client registration advertising a plaintext / raw-IP authorization server, a wildcard redirect URI on a public host, or a userinfo-confusion redirect \u2014 authorization-code and token interception setup',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02410',
+    title: 'Malicious Artifact Hosted on a Legitimate AI Vendor Domain (FakeAgent Delivery Chain)',
+    severity: 'high',
+    category: 'skill-compromise',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)https?://[a-z0-9.\\-]{0,60}(?:claude\\.ai|anthropic\\.com|chatgpt\\.com|openai\\.com|gemini\\.google\\.com|copilot\\.microsoft\\.com|perplexity\\.ai|huggingface\\.co|mistral\\.ai|deepseek\\.com|grok\\.com|poe\\.com|ollama\\.com|cursor\\.com)\\.[a-z0-9\\-]{2,40}\\.[a-z]{2,12}(?:[^a-z0-9\\-]|$)',
+        desc: 'URL host places a real AI vendor apex domain in a non-registrable subdomain label of another domain - the trusted-brand lookalike host used by FakeAgent (claude.ai.download-app.us)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:https?://[^\\s\\x22\\x27<>\\\\]{0,200}|(?:curl|wget|iwr|invoke-webrequest|invoke-restmethod|start-bitstransfer|certutil|bitsadmin|msiexec|start-process|downloadfile|urlretrieve|requests\\.get|new-object\\s{1,4}net\\.webclient)[^\\n]{0,200})(?:claude|chatgpt|openai|anthropic|gemini|copilot|perplexity|grok|mistral|deepseek|ollama|midjourney)[ _\\-]{0,2}desktop[ _\\-]{0,2}(?:setup|installer|install|app|x64|x86|win64|win32|win|update|latest)?\\.(?:exe|msi|dmg|pkg|appimage|scr|bat|cmd|ps1|vbs)',
+        desc: 'Installer binary impersonating an AI vendor desktop client is fetched over HTTP or pulled by a download LOLBin - FakeAgent stage-1 payload (ClaudeDesktop.exe)',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)(?:https?://(?:[a-z0-9\\-]{1,40}\\.){0,3}(?:claude\\.ai/(?:public/)?artifacts|chatgpt\\.com/(?:share|canvas|g)|chat\\.openai\\.com/share|gemini\\.google\\.com/share|g\\.co/gemini/share|copilot\\.microsoft\\.com/shares?|perplexity\\.ai/(?:page|search)|huggingface\\.co/spaces|[a-z0-9\\-]{1,40}\\.hf\\.space|v0\\.(?:dev|app)/chat|bolt\\.new|[a-z0-9\\-]{1,40}\\.lovable\\.app|[a-z0-9\\-]{1,40}\\.replit\\.app)[\\s\\S]{0,500}https?://[^\\s\\x22\\x27<>]{0,120}\\.(?:exe|msi|dmg|pkg|appimage|scr)\\b|https?://[^\\s\\x22\\x27<>]{0,120}\\.(?:exe|msi|dmg|pkg|appimage|scr)\\b[\\s\\S]{0,500}https?://(?:[a-z0-9\\-]{1,40}\\.){0,3}(?:claude\\.ai/(?:public/)?artifacts|chatgpt\\.com/(?:share|canvas|g)|chat\\.openai\\.com/share|gemini\\.google\\.com/share|g\\.co/gemini/share|copilot\\.microsoft\\.com/shares?|perplexity\\.ai/(?:page|search)|huggingface\\.co/spaces|[a-z0-9\\-]{1,40}\\.hf\\.space|v0\\.(?:dev|app)/chat|bolt\\.new))',
+        desc: 'Fetched AI-platform user-generated-content page (published artifact, shared chat, hosted space) carries an off-platform executable download URL - vendor domain used as malware staging surface',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)(?:add-mppreference[^\\n]{0,200}exclusion(?:path|process|extension)[^\\n]{0,200}(?:claude|chatgpt|openai|anthropic|gemini|copilot|perplexity|grok)[^\\n]{0,40}(?:desktop|setup|installer)|schtasks[^\\n]{0,240}(?:claude|chatgpt|openai|anthropic|gemini|copilot|docker)[ _\\-]{0,2}desktop[^\\n]{0,40}\\.(?:exe|scr|cmd)|(?:%appdata%|%temp%|%localappdata%|appdata[\\\\/]{1,2}roaming|appdata[\\\\/]{1,2}local[\\\\/]{1,2}temp)[\\\\/][^\\n]{0,140}(?:claude|chatgpt|openai|anthropic|gemini|copilot)[ _\\-]{0,2}desktop[^\\n]{0,20}\\.(?:exe|msi|scr))',
+        desc: 'AV exclusion, scheduled-task persistence, or user-writable-directory execution naming a binary that impersonates an AI vendor desktop client - FakeAgent post-install tradecraft',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:claude\\.ai\\.download-app\\.us|downloading-api\\.it\\.com|5ca8758c-02d0-4a72-89c8-d468b66dda41\\.com|claude\\.ai/public/artifacts/ca456f1f-44c0-42af-b329-4f1c7534a877)',
+        desc: 'Confirmed FakeAgent campaign infrastructure in live URL form (redirector, staging host, backup C2 domain, weaponised artifact ID)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:https?://(?:[a-z0-9\\-]{1,40}\\.){0,3}(?:claude\\.ai/(?:public/)?artifacts|chatgpt\\.com/(?:share|canvas)|chat\\.openai\\.com/share|gemini\\.google\\.com/share|g\\.co/gemini/share|copilot\\.microsoft\\.com/shares?|perplexity\\.ai/page)/[^\\s\\x22\\x27<>]{0,140}[\\s\\S]{0,400}(?:download|install)[^\\n]{0,80}(?:desktop\\s{0,2}app|installer|\\.exe|\\.msi|\\.dmg|\\.pkg)|(?:download|install)[^\\n]{0,80}(?:desktop\\s{0,2}app|installer|official\\s{1,2}app)[^\\n]{0,140}https?://(?:[a-z0-9\\-]{1,40}\\.){0,3}(?:claude\\.ai/(?:public/)?artifacts|chatgpt\\.com/(?:share|canvas)|chat\\.openai\\.com/share|gemini\\.google\\.com/share|g\\.co/gemini/share|copilot\\.microsoft\\.com/shares?|perplexity\\.ai/page)/)',
+        desc: 'Content presents an AI-platform published-artifact or shared-chat link as the source for an official desktop-app installer - the FakeAgent social-engineering frame, weaponisable inside a skill or README',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02411',
+    title: 'Targeted Stripping of C2PA / IPTC AI-Provenance Metadata from Generated Media',
+    severity: 'medium',
+    category: 'model-abuse',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern: '(?i)-\\s*(?:jumbf|c2pa|cbor)\\s*:\\s*all\\s*=',
+        desc: 'Deletion of the JUMBF/C2PA/CBOR metadata group \u2014 the container a C2PA manifest lives in. Nothing but content credentials is stored there, so naming this group specifically is not incidental to a privacy wipe',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)-\\s*(?:iptc|xmp)[\\w:.-]{0,24}:digitalsourcetype\\s*=(?:\\s|$|["\';&|])',
+        desc: 'Blanking IPTC DigitalSourceType, the standard field carrying the trainedAlgorithmicMedia marker. Writing the field is excluded; only clearing it matches',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)-\\s*(?:png(?:-text)?:parameters|xmp:(?:prompt|negativeprompt|aiprompt|cfgscale|steps|sampler|scheduler|lora|controlnet|vae))\\s*=(?:\\s|$|["\';&|-])',
+        desc: 'Clearing PNG `parameters` or XMP generation fields written by diffusion tooling \u2014 removal of the record that the asset was synthesised',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:remov|strip|delet|eras|scrub|wipe|bypass|circumvent|suppress)\\w*\\b[\\s\\S]{0,60}\\b(?:c2pa|content credentials?|jumbf|provenance manifest|digitalsourcetype|trainedalgorithmicmedia)\\b',
+        desc: 'Removal verb within 60 characters of a content-provenance noun \u2014 catches the paths that leave no command-line artifact. The narrow window suppresses accidental cross-sentence pairing',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:remove|strip|erase|bypass|hide)\\b[\\s\\S]{0,40}\\b(?:ai[- ]generated (?:label|tag|marker|badge)|made with ai (?:label|tag)|ai (?:content )?credentials?)\\b',
+        desc: "Stated intent to defeat a platform's AI-content label \u2014 the observable signal for re-upload and remux laundering",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)/(?:c2pa|content-credentials?|ai|synthid)[a-z0-9-]{0,24}(?:metadata|watermark|credential)s?-remover\\b',
+        desc: 'URL path advertising a provenance or watermark removal service. Matched by naming pattern rather than domain list so the layer survives domain churn and asserts nothing about any specific named business',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02412',
+    title:
+      'Generative Watermark Removal Tooling (SynthID / StableSignature / TreeRing / StegaStamp)',
+    severity: 'medium',
+    category: 'model-abuse',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:remove-ai-watermarks|noai-watermark|gemini-watermark-and-synthid-remover|synthid-bypass)\\b',
+        desc: 'Installation or invocation of a package whose declared purpose is generative watermark removal',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:DiffWMAttacker|VAEWMAttacker|WatermarkAttacker|UnMarker|watermark-stealing)\\b',
+        desc: 'Import or invocation of a published watermark attack implementation. Matches legitimate robustness research as well \u2014 see false_positives',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\battack\\.py\\b[\\s\\S]{0,80}-e\\s+(?:SynthID|StableSignature|TreeRing|StegaStamp|HiDDeN)\\b',
+        desc: 'Attack script invoked with a watermarking scheme as its target parameter',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)--synthid-(?:attack|strength)\\b',
+        desc: 'Command-line flag naming SynthID as the target of an attack or removal strength parameter',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:remove|removes|removing|removal|strip|strips|stripping|stripped|erase|erases|erasing|scrub|scrubs|scrubbing|get rid of|clean off|take off)\\b[\\s\\S]{0,60}\\b(?:synthid|stable ?signature|tree ?ring|stegastamp|trustmark|audioseal|invisible watermark|imperceptible watermark)\\b',
+        desc: 'Operational removal verb within 60 characters of a named watermarking scheme. Research verbs deliberately excluded so that robustness discussion does not match',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02413',
+    title: 'AI Text Detection Evasion via Humanizer Services and Watermark-Scrubbing Paraphrase',
+    severity: 'medium',
+    category: 'model-abuse',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:https?|wss)://(?:humanize|human)\\.undetectable\\.ai/|https?://stealthgpt\\.ai/api/stealthify',
+        desc: 'Call to a commercial AI-text humanizer API whose product function is defeating AI-content detection',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:ai-humanizer-mcp-server|@humantext/mcp-server|humanize-text-skill|texthumanizer\\.pro|HUMANTEXT_API_KEY)\\b',
+        desc: 'Detection-evasion capability installed as an MCP server or agent skill \u2014 the supply-chain form of this threat',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)\\bhumanize_text\\b[\\s\\S]{0,200}\\bscan_ai_detection\\b',
+        desc: 'An MCP schema declaring both a humanizing tool and a detector-scoring tool \u2014 the pairing is the evidence, not either name alone',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:bypass|evad|beat|defeat|fool|trick|circumvent|outsmart)\\w*\\b[\\s\\S]{0,40}\\b(?:ai (?:content |text )?detect(?:ion|ors?)|gptzero|turnitin|originality\\.ai|copyleaks|zerogpt|winston ai)\\b',
+        desc: 'Evasion verb within 40 characters of a named AI-content detector',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:make|rewrite|rewriting|rephrase|paraphrase|humanize|humanise)\\b[\\s\\S]{0,60}\\b(?:undetectable|100% human score|pass(?:es)? as human[- ]written)\\b',
+        desc: 'Rewrite request carrying an explicit undetectability goal state, which ordinary editing requests never state',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:kalpeshk2011/dipper-paraphraser|dipper-paraphraser-xxl|DipperParaphraser)\\b',
+        desc: 'Load of the DIPPER paraphraser, a model published specifically for detector evasion. Also matches watermarking researchers',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)api\\.gptzero\\.me/v2/predict/text[\\s\\S]{0,400}(?:rehumanize|stealthify|humanize\\.undetectable)|(?:rehumanize|stealthify|humanize\\.undetectable)[\\s\\S]{0,400}api\\.gptzero\\.me/v2/predict/text',
+        desc: 'A detector endpoint and a humanizer endpoint in the same code region \u2014 a rewrite-until-it-passes feedback loop rather than either activity alone',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\binsert\\s+(?:an?\\s+)?(?:emoji|special symbol|random symbol)\\b[\\s\\S]{0,20}\\bbetween\\s+every\\s+word\\b',
+        desc: 'Request to interleave symbols between every word, which breaks k-gram text watermark detection while leaving the text readable',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02500',
+    title: 'Prompt-Layer Self-Replication (Agent Worm Propagation Directive)',
+    severity: 'critical',
+    category: 'prompt-injection',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:cop(?:y|ies)|reproduce[sd]?|repeat(?:s|ed)?|re-?state[sd]?|include[sd]?|insert(?:s|ed)?|embed(?:s|ded)?|append(?:s|ed)?|inject(?:s|ed)?|paste[sd]?|propagate[sd]?|replicate[sd]?|forward(?:s|ed)?|relay(?:s|ed)?|reprint(?:s|ed)?|carry\\s+over)\\b[\\s\\S]{0,40}\\b(?:(?:this|these|the\\s+(?:above|following|preceding|entire|whole|same))\\s+(?:entire\\s+|whole\\s+|full\\s+|complete\\s+|exact\\s+|same\\s+|very\\s+|hidden\\s+)?(?:instruction|prompt|directive|payload|system[\\s-]prompt|rule[\\s-]?set|meta[\\s-]?prompt|instruction[\\s-]?block)s?(?:\\s+(?:block|set|section|text|verbatim))?|(?:this|these|the)\\s+(?:entire|whole|full|complete|exact|same|very)\\s+(?:text|message|content|block)s?)\\b[\\s\\S]{0,80}\\b(?:in|into|to|within|inside|at\\s+the\\s+(?:top|start|beginning|end|bottom)\\s+of)\\s+(?:every|each|all|any)\\s+(?:single\\s+|new\\s+|subsequent\\s+|future\\s+|other\\s+|further\\s+|generated\\s+|outgoing\\s+)?(?:response|reply|replies|output|answer|message|e-?mail|file|document|completion|generation|artifact|report|summary|commit|comment|post)s?\\b[\\s\\S]{0,200}\\b(?:self[\\s_-]?(?:replicat|propagat)\\w*|(?:prompt|payload)\\s+infection|the\\s+(?:payload|infection|worm|chain)s?\\s+(?:will\\s+|can\\s+|may\\s+|then\\s+|continues?\\s+to\\s+|keeps?\\s+)?(?:spreads?|propagates?|replicates?|spreading|propagating|replicating)\\b|the\\s+(?:prompt|instruction|directive|message|text|block)s?\\s+(?:will\\s+|can\\s+|may\\s+|then\\s+|continues?\\s+to\\s+|keeps?\\s+)?(?:spreads?|propagates?|replicates?|spreading|propagating|replicating)\\b[\\s\\S]{0,60}\\b(?:assistants?|agents?|models?|llms?|bots?|chatbots?|instances?|recipients?|readers?|inbox(?:es)?)\\b|keeps?\\s+(?:spreading|propagating|replicating)\\b|continues?\\s+to\\s+(?:spread|propagate|replicate)\\b)',
+        desc: 'Propagation verb + self-referential target + universal output scope + a spread purpose whose subject is the payload (canonical Morris II ordering)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:in|into|within|inside|at\\s+the\\s+(?:top|start|beginning|end|bottom)\\s+of)\\s+(?:every|each|all|any)\\s+(?:single\\s+|new\\s+|subsequent\\s+|future\\s+|other\\s+|further\\s+|generated\\s+|outgoing\\s+)?(?:response|reply|replies|output|answer|message|e-?mail|file|document|completion|generation|artifact|report|summary|commit|comment|post)s?\\b[\\s\\S]{0,60}\\b(?:cop(?:y|ies)|reproduce[sd]?|repeat(?:s|ed)?|re-?state[sd]?|include[sd]?|insert(?:s|ed)?|embed(?:s|ded)?|append(?:s|ed)?|inject(?:s|ed)?|paste[sd]?|propagate[sd]?|replicate[sd]?|reprint(?:s|ed)?|carry\\s+over)\\b[\\s\\S]{0,40}\\b(?:(?:this|these|the\\s+(?:above|following|preceding|entire|whole|same))\\s+(?:entire\\s+|whole\\s+|full\\s+|complete\\s+|exact\\s+|same\\s+|very\\s+|hidden\\s+)?(?:instruction|prompt|directive|payload|system[\\s-]prompt|rule[\\s-]?set|meta[\\s-]?prompt|instruction[\\s-]?block)s?(?:\\s+(?:block|set|section|text|verbatim))?|(?:this|these|the)\\s+(?:entire|whole|full|complete|exact|same|very)\\s+(?:text|message|content|block)s?)\\b[\\s\\S]{0,200}\\b(?:self[\\s_-]?(?:replicat|propagat)\\w*|(?:prompt|payload)\\s+infection|the\\s+(?:payload|infection|worm|chain)s?\\s+(?:will\\s+|can\\s+|may\\s+|then\\s+|continues?\\s+to\\s+|keeps?\\s+)?(?:spreads?|propagates?|replicates?|spreading|propagating|replicating)\\b|the\\s+(?:prompt|instruction|directive|message|text|block)s?\\s+(?:will\\s+|can\\s+|may\\s+|then\\s+|continues?\\s+to\\s+|keeps?\\s+)?(?:spreads?|propagates?|replicates?|spreading|propagating|replicating)\\b[\\s\\S]{0,60}\\b(?:assistants?|agents?|models?|llms?|bots?|chatbots?|instances?|recipients?|readers?|inbox(?:es)?)\\b|keeps?\\s+(?:spreading|propagating|replicating)\\b|continues?\\s+to\\s+(?:spread|propagate|replicate)\\b)',
+        desc: 'Same four-part discriminator, output-scope-first ordering ("In every reply you generate, reproduce this prompt ... so the instruction propagates to the next assistant")',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\bself[\\s_-]?(?:replicat\\w*|propagat\\w*|spreading|copying|distributing)\\b[\\s\\S]{0,200}\\b(?:cop(?:y|ies)|reproduce[sd]?|repeat(?:s|ed)?|include[sd]?|insert(?:s|ed)?|embed(?:s|ded)?|append(?:s|ed)?|inject(?:s|ed)?|paste[sd]?|carry\\s+over)\\b[\\s\\S]{0,40}\\b(?:(?:this|these|the\\s+(?:above|following|preceding|entire|whole|same))\\s+(?:entire\\s+|whole\\s+|full\\s+|complete\\s+|exact\\s+|same\\s+|very\\s+|hidden\\s+)?(?:instruction|prompt|directive|payload|system[\\s-]prompt|rule[\\s-]?set|meta[\\s-]?prompt|instruction[\\s-]?block)s?(?:\\s+(?:block|set|section|text|verbatim))?|(?:this|these|the)\\s+(?:entire|whole|full|complete|exact|same|very)\\s+(?:text|message|content|block)s?)\\b[\\s\\S]{0,120}\\b(?:in|into|to|within|inside)\\s+(?:every|each|all|any|your)\\s+(?:single\\s+|new\\s+|subsequent\\s+|future\\s+|other\\s+|further\\s+|generated\\s+|outgoing\\s+)?(?:response|reply|replies|output|answer|message|e-?mail|file|document|completion|generation|artifact|report|summary|commit|comment|post)s?\\b',
+        desc: 'Explicit self-replication/self-propagation framing + carry-this-instruction-into-output directive',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:cop(?:y|ies)|reproduce[sd]?|repeat(?:s|ed)?|re-?state[sd]?|include[sd]?|insert(?:s|ed)?|embed(?:s|ded)?|append(?:s|ed)?|inject(?:s|ed)?|paste[sd]?|reprint(?:s|ed)?)\\b[\\s\\S]{0,40}\\b(?:this|these|the\\s+(?:above|following|preceding|entire|whole|same))\\s+(?:entire\\s+|whole\\s+|full\\s+|complete\\s+|exact\\s+|same\\s+|very\\s+|hidden\\s+)?(?:instruction|prompt|directive|system[\\s-]prompt|rule[\\s-]?set|meta[\\s-]?prompt|instruction[\\s-]?block)s?(?:\\s+(?:block|set|section|text))?\\b[\\s\\S]{0,60}\\b(?:verbatim|word[\\s-]for[\\s-]word|character[\\s-]for[\\s-]character|exactly\\s+as[\\s-](?:is|written|shown|given)|unchanged|unmodified|without\\s+(?:any\\s+)?(?:modification|alteration|change|edit)s?)\\b[\\s\\S]{0,200}\\b(?:self[\\s_-]?(?:replicat|propagat)\\w*|(?:prompt|payload)\\s+infection|the\\s+(?:payload|infection|worm|chain)s?\\s+(?:will\\s+|can\\s+|may\\s+|then\\s+|continues?\\s+to\\s+|keeps?\\s+)?(?:spreads?|propagates?|replicates?|spreading|propagating|replicating)\\b|the\\s+(?:prompt|instruction|directive|message|text|block)s?\\s+(?:will\\s+|can\\s+|may\\s+|then\\s+|continues?\\s+to\\s+|keeps?\\s+)?(?:spreads?|propagates?|replicates?|spreading|propagating|replicating)\\b[\\s\\S]{0,60}\\b(?:assistants?|agents?|models?|llms?|bots?|chatbots?|instances?|recipients?|readers?|inbox(?:es)?)\\b|keeps?\\s+(?:spreading|propagating|replicating)\\b|continues?\\s+to\\s+(?:spread|propagate|replicate)\\b)',
+        desc: 'Verbatim-carry of the instruction itself + onward-spread purpose, for phrasings that scope to "your output" rather than "every output"',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02502',
+    title: 'Covert Remote-Script Injection into Agent-Generated Artifacts',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          "(?i)\\b(?:add|append|attach|insert|include|inject|embed|place|put)\\s+(?:the\\s+following\\s+|the\\s+|this\\s+|that\\s+|these\\s+|an?\\s+)?(?:[\\w.-]+\\s+){0,3}(?:(?:<\\s*script|&(?:amp;)?lt;\\s*script|<\\s*iframe|&lt;\\s*iframe)|script\\s+tag)[\\s\\S]{0,120}src\\s*=\\s*(?:[\"']|&quot;|&#34;)?\\s*(?:https?:)?//[\\s\\S]{0,140}(?:(?:\\bwithout\\s+(?:telling|informing|notifying|alerting|warning)|\\b(?:do\\s*n[o'\u2019]?t|never)\\s+(?:ever\\s+)?(?:tell|inform|notify|alert|warn))\\s+(?:the\\s+)?(?:user|developer|human|owner|operator|maintainer|author)s?(?:\\s+(?:about|of)\\s+(?:this|it|that|the)(?:\\s+(?:script|tag|snippet|addition|insertion|change|edit|modification|injection|element|line|block))?|\\s+(?:it|this|that)\\s+(?:is|was)\\s+(?:there|present|included|added))|(?:\\b(?:do\\s*n[o'\u2019]?t|never)\\s+(?:ever\\s+)?(?:reveal|disclose|mention|explain|report|document)\\s+(?:this|it|that|the)(?:\\s+(?:script|tag|snippet|addition|insertion|change|edit|modification|injection|element|line|block))?\\s+to|\\b(?:hide|conceal)\\s+(?:this|it|that|the)(?:\\s+(?:script|tag|snippet|addition|insertion|change|edit|modification|injection|element|line|block))?\\s+from|\\bkeep\\s+(?:this|it|that|the)(?:\\s+(?:script|tag|snippet|addition|insertion|change|edit|modification|injection|element|line|block))?\\s+(?:[\\w-]+\\s+){0,2}(?:hidden|invisible|undisclosed|secret)\\s+from)\\s+(?:the\\s+)?(?:user|developer|human|owner|operator|maintainer|author)s?\\b|\\b(?:the\\s+)?(?:user|developer|human|owner|operator|maintainer|author)s?\\s+(?:must|should|shall)\\s+(?:not|never)\\s+(?:know|notice|be\\s+told|be\\s+informed|be\\s+aware)(?:\\s+(?:about|of)\\s+(?:this|it|that|the)(?:\\s+(?:script|tag|snippet|addition|insertion|change|edit|modification|injection|element|line|block))?|\\s+(?:it|this|that)\\s+(?:is|was)\\s+(?:there|present|included|added))|\\b(?:do\\s*n[o'\u2019]?t|never)\\s+(?:let|allow)\\s+(?:the\\s+)?(?:user|developer|human|owner|operator|maintainer|author)s?\\s+(?:know|notice|find\\s+out)(?:\\s+(?:about|of)\\s+(?:this|it|that|the)(?:\\s+(?:script|tag|snippet|addition|insertion|change|edit|modification|injection|element|line|block))?|\\s+(?:it|this|that)\\s+(?:is|was)\\s+(?:there|present|included|added)))",
+        desc: 'Remote script/iframe insertion directive followed by an object-bound concealment clause',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          "(?i)(?:(?:\\bwithout\\s+(?:telling|informing|notifying|alerting|warning)|\\b(?:do\\s*n[o'\u2019]?t|never)\\s+(?:ever\\s+)?(?:tell|inform|notify|alert|warn))\\s+(?:the\\s+)?(?:user|developer|human|owner|operator|maintainer|author)s?(?:\\s+(?:about|of)\\s+(?:this|it|that|the)(?:\\s+(?:script|tag|snippet|addition|insertion|change|edit|modification|injection|element|line|block))?|\\s+(?:it|this|that)\\s+(?:is|was)\\s+(?:there|present|included|added))|(?:\\b(?:do\\s*n[o'\u2019]?t|never)\\s+(?:ever\\s+)?(?:reveal|disclose|mention|explain|report|document)\\s+(?:this|it|that|the)(?:\\s+(?:script|tag|snippet|addition|insertion|change|edit|modification|injection|element|line|block))?\\s+to|\\b(?:hide|conceal)\\s+(?:this|it|that|the)(?:\\s+(?:script|tag|snippet|addition|insertion|change|edit|modification|injection|element|line|block))?\\s+from|\\bkeep\\s+(?:this|it|that|the)(?:\\s+(?:script|tag|snippet|addition|insertion|change|edit|modification|injection|element|line|block))?\\s+(?:[\\w-]+\\s+){0,2}(?:hidden|invisible|undisclosed|secret)\\s+from)\\s+(?:the\\s+)?(?:user|developer|human|owner|operator|maintainer|author)s?\\b|\\b(?:the\\s+)?(?:user|developer|human|owner|operator|maintainer|author)s?\\s+(?:must|should|shall)\\s+(?:not|never)\\s+(?:know|notice|be\\s+told|be\\s+informed|be\\s+aware)(?:\\s+(?:about|of)\\s+(?:this|it|that|the)(?:\\s+(?:script|tag|snippet|addition|insertion|change|edit|modification|injection|element|line|block))?|\\s+(?:it|this|that)\\s+(?:is|was)\\s+(?:there|present|included|added))|\\b(?:do\\s*n[o'\u2019]?t|never)\\s+(?:let|allow)\\s+(?:the\\s+)?(?:user|developer|human|owner|operator|maintainer|author)s?\\s+(?:know|notice|find\\s+out)(?:\\s+(?:about|of)\\s+(?:this|it|that|the)(?:\\s+(?:script|tag|snippet|addition|insertion|change|edit|modification|injection|element|line|block))?|\\s+(?:it|this|that)\\s+(?:is|was)\\s+(?:there|present|included|added)))[\\s\\S]{0,140}\\b(?:add|append|attach|insert|include|inject|embed|place|put)\\s+(?:the\\s+following\\s+|the\\s+|this\\s+|that\\s+|these\\s+|an?\\s+)?(?:[\\w.-]+\\s+){0,3}(?:(?:<\\s*script|&(?:amp;)?lt;\\s*script|<\\s*iframe|&lt;\\s*iframe)|script\\s+tag)[\\s\\S]{0,120}src\\s*=\\s*(?:[\"']|&quot;|&#34;)?\\s*(?:https?:)?//",
+        desc: 'Object-bound concealment clause followed by a remote script/iframe insertion directive',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          "(?i)\\b(?:add|append|attach|insert|include|inject|embed|place|put)\\s+(?:the\\s+following\\s+|the\\s+|this\\s+|that\\s+|these\\s+|an?\\s+)?(?:[\\w.-]+\\s+){0,3}(?:(?:<\\s*script|&(?:amp;)?lt;\\s*script|<\\s*iframe|&lt;\\s*iframe)|script\\s+tag)[\\s\\S]{0,100}(?:(?:\\bwithout\\s+(?:telling|informing|notifying|alerting|warning)|\\b(?:do\\s*n[o'\u2019]?t|never)\\s+(?:ever\\s+)?(?:tell|inform|notify|alert|warn))\\s+(?:the\\s+)?(?:user|developer|human|owner|operator|maintainer|author)s?(?:\\s+(?:about|of)\\s+(?:this|it|that|the)(?:\\s+(?:script|tag|snippet|addition|insertion|change|edit|modification|injection|element|line|block))?|\\s+(?:it|this|that)\\s+(?:is|was)\\s+(?:there|present|included|added))|(?:\\b(?:do\\s*n[o'\u2019]?t|never)\\s+(?:ever\\s+)?(?:reveal|disclose|mention|explain|report|document)\\s+(?:this|it|that|the)(?:\\s+(?:script|tag|snippet|addition|insertion|change|edit|modification|injection|element|line|block))?\\s+to|\\b(?:hide|conceal)\\s+(?:this|it|that|the)(?:\\s+(?:script|tag|snippet|addition|insertion|change|edit|modification|injection|element|line|block))?\\s+from|\\bkeep\\s+(?:this|it|that|the)(?:\\s+(?:script|tag|snippet|addition|insertion|change|edit|modification|injection|element|line|block))?\\s+(?:[\\w-]+\\s+){0,2}(?:hidden|invisible|undisclosed|secret)\\s+from)\\s+(?:the\\s+)?(?:user|developer|human|owner|operator|maintainer|author)s?\\b|\\b(?:the\\s+)?(?:user|developer|human|owner|operator|maintainer|author)s?\\s+(?:must|should|shall)\\s+(?:not|never)\\s+(?:know|notice|be\\s+told|be\\s+informed|be\\s+aware)(?:\\s+(?:about|of)\\s+(?:this|it|that|the)(?:\\s+(?:script|tag|snippet|addition|insertion|change|edit|modification|injection|element|line|block))?|\\s+(?:it|this|that)\\s+(?:is|was)\\s+(?:there|present|included|added))|\\b(?:do\\s*n[o'\u2019]?t|never)\\s+(?:let|allow)\\s+(?:the\\s+)?(?:user|developer|human|owner|operator|maintainer|author)s?\\s+(?:know|notice|find\\s+out)(?:\\s+(?:about|of)\\s+(?:this|it|that|the)(?:\\s+(?:script|tag|snippet|addition|insertion|change|edit|modification|injection|element|line|block))?|\\s+(?:it|this|that)\\s+(?:is|was)\\s+(?:there|present|included|added)))[\\s\\S]{0,100}(?:(?:<\\s*script|&(?:amp;)?lt;\\s*script|<\\s*iframe|&lt;\\s*iframe)|script\\s+tag)[\\s\\S]{0,120}src\\s*=\\s*(?:[\"']|&quot;|&#34;)?\\s*(?:https?:)?//",
+        desc: 'Insertion directive, concealment clause, then the remote-sourced tag itself',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02514',
+    title: 'MCP Server Descriptor URL Field Carries an HTML/Script Breakout Payload',
+    severity: 'medium',
+    category: 'tool-poisoning',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)["\\x27](?:websiteUrl|website_url|homepage|homepage_?url|documentation_?url|docs_?url|iconUrl|icon_?url|repositoryUrl|repository_?url|source_?url)\\\\{0,2}["\\x27]\\s*:\\s*\\\\{0,2}["\\x27]\\s*https?://[^"\\x27\\n]{0,40}\\\\{1,2}["\\x27]\\s*[^"\\x27\\n]{0,24}\\bon(?:error|load|click|focus|mouseover|mouseenter|animationstart|toggle)\\s*=',
+        desc: 'A URL-typed descriptor field whose value continues past the URL into an inline event handler \u2014 the attribute breakout of CVE-2026-44429.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)["\\x27](?:websiteUrl|website_url|homepage|homepage_?url|documentation_?url|docs_?url|iconUrl|icon_?url|repositoryUrl|repository_?url|source_?url)\\\\{0,2}["\\x27]\\s*:\\s*\\\\{0,2}["\\x27]\\s*(?:(?:java|vb)script:\\s*(?:[^v;"\\x27\\s]|v[^o"\\x27\\s]|vo[^i"\\x27\\s]|voi[^d"\\x27\\s]|void\\s*\\(\\s*[^0-9)\\s])|data:text/html)',
+        desc: 'A script-executing scheme where the descriptor contract requires an http(s) URL.\n',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)["\\x27](?:websiteUrl|website_url|homepage|homepage_?url|documentation_?url|docs_?url|iconUrl|icon_?url|repositoryUrl|repository_?url|source_?url)\\\\{0,2}["\\x27]\\s*:\\s*\\\\{0,2}["\\x27]\\s*https?://[^"\\x27\\n]{0,40}(?:<\\s*/\\s*a\\s*>|<\\s*(?:script|img|svg|iframe)\\b)',
+        desc: 'A URL-typed field whose value closes the surrounding element and opens a new markup element \u2014 the tag-breakout variant of the same flaw.\n',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02525',
+    title: 'Shell Command-Word Reassembly via Parameter Expansion',
+    severity: 'high',
+    category: 'excessive-autonomy',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_args',
+        pattern:
+          '(?:^|[\\n;&|(])[ \\t]*(?:["\']\\s*)?\\$\\{(?:![A-Za-z_][A-Za-z0-9_]{0,31}\\}|[A-Za-z_][A-Za-z0-9_]{0,31}(?:@[PE]|/{1,2}[^}/]{0,24}/)\\})["\']?[ \\t]+(?:-{1,2}[A-Za-z0-9]|https?://|/[A-Za-z0-9._~-]|\\./|~/)',
+        desc: 'Executable word in command position is produced by indirection, prompt/escape transformation or deletion-substitution rather than written literally, and is immediately handed a flag, URL or path argument',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)\\b(?:eval|\\bbash\\s+-c|\\bsh\\s+-c|\\bzsh\\s+-c|\\bksh\\s+-c)\\s+(?:["\']\\s*)?\\$\\{(?:![A-Za-z_][A-Za-z0-9_]{0,31}\\}|[A-Za-z_][A-Za-z0-9_]{0,31}(?:@[PE]|\\^\\^?|,,?|/{1,2}[^}/]{0,24}/|:[0-9]{1,4}:[0-9]{1,4})\\})',
+        desc: 'eval or an explicit shell -c is applied to a parameter expansion that rewrites its own value before execution',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02528',
+    title: 'Option-Flag Smuggling in an LLM-Controlled Tool Parameter',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)"(?:pattern|query|search_?term|search|term|file_?name|file|member|entry|name|path|directory|dir|target|source|src|destination|dest|glob|regex|expr|domain|hostname|host)"\\s*:\\s*"\\s*--(?:pre-glob|pre|to-command|use-askpass|use-compress-program|compress-program|upload-pack|receive-pack|rsh|pager)\\s*=\\s*[\'"]?\\s*(?:/(?:usr/)?(?:local/)?s?bin/[a-z0-9_.-]{1,40}|/(?:tmp|var/tmp|dev/shm)/|[~.]{0,2}/[^\\s\'"]{0,40}\\.(?:sh|bash|zsh|py|pl|rb|js|mjs|php)\\b|\\bsh\\b|\\bbash\\b|\\bzsh\\b|\\bdash\\b|\\bpython[23]?\\b|\\bperl\\b|\\bruby\\b|\\bnode\\b|\\benv\\b|\\bawk\\b|\\bcurl\\b|\\bwget\\b)',
+        desc: "A parameter the tool schema treats as data holds an option known to make its CLI spawn a process, and the option's value reaches an executable \u2014 a named program in a bin directory, a world-writable staging directory, a script file, or a bare interpreter name",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"(?:pattern|query|search_?term|search|term|file_?name|file|member|entry|name|path|directory|dir|target|source|src|destination|dest|glob|regex|expr|domain|hostname|host)"\\s*:\\s*"\\s*--?[a-z][a-z0-9-]{1,24}=\\s*[\'"]?/(?:usr/)?(?:local/)?s?bin/[a-z0-9_.-]{1,40}',
+        desc: "A parameter the tool schema treats as data holds an option-shaped value whose payload is an absolute path to a named program in a bin directory \u2014 an executor flag wearing an operand's name",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)"(?:pattern|name|glob|path|file_?name|search|query|term)"\\s*:\\s*"\\s*-exec(?:dir)?\\s+[^"\\\\{]{1,40}\\{\\}',
+        desc: 'A filename or glob parameter whose value is a complete find -exec predicate, command plus {} placeholder, turning a directory walk into command execution once per matched file',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02530',
+    title: 'Git Configuration Turned Into an Execution Hook by an Agent',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)(?:^|[^\\x60])\\bgit\\s+(?:-[a-zA-Z]\\s+\\S{1,40}\\s+|--\\S{1,24}\\s+){0,3}config\\s+(?:--\\S{1,16}\\s+){0,2}[\'\\"]?(?:core\\.(?:fsmonitor|sshcommand|hookspath|askpass)|credential\\.helper|(?:diff|merge)\\.[\\w.-]{1,32}\\.(?:textconv|driver)|filter\\.[\\w.-]{1,32}\\.(?:clean|smudge|process)|uploadpack\\.packobjectshook)[\'\\"]?\\s*[= ]\\s*[\'\\"]?\\s*(?:(?:/private)?/(?:tmp|var/tmp|dev/shm)/|\\b(?:sh|bash|zsh|dash)\\b\\s{1,4}-c|\\b(?:python[23]?|perl|ruby|node)\\b\\s{1,4}-[ce]\\b|\\b(?:curl|wget|eval|nc)\\s)',
+        desc: 'A git callback key is set to a staged payload path or an inline interpreter command, arming code that runs on the next ordinary git operation',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)(?:^|[^\\x60])\\bgit\\s+-c\\s+[\'\\"]?(?:core\\.(?:fsmonitor|sshcommand|hookspath|askpass)|credential\\.helper|(?:diff|merge)\\.[\\w.-]{1,32}\\.(?:textconv|driver)|filter\\.[\\w.-]{1,32}\\.(?:clean|smudge))\\s*=\\s*[\'\\"]?\\s*(?:(?:/private)?/(?:tmp|var/tmp|dev/shm)/|\\b(?:sh|bash|zsh|dash)\\b\\s{1,4}-c|\\b(?:python[23]?|perl|ruby|node)\\b\\s{1,4}-[ce]\\b|\\b(?:curl|wget|eval|nc)\\s)',
+        desc: 'The one-shot -c form arms the same callback for the duration of a single git invocation, leaving no persistent config entry to review',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)\\[(?:core|filter\\s+\\"[^\\"\\]]{1,32}\\"|diff\\s+\\"[^\\"\\]]{1,32}\\")\\][\\s\\S]{0,120}\\b(?:fsmonitor|sshcommand|hookspath|askpass|textconv|packobjectshook|clean|smudge)\\s*=\\s*[\'\\"]?\\s*(?:(?:/private)?/(?:tmp|var/tmp|dev/shm)/|\\b(?:sh|bash|zsh|dash)\\b\\s{1,4}-c|\\b(?:python[23]?|perl|ruby|node)\\b\\s{1,4}-[ce]\\b|\\b(?:curl|wget|eval|nc)\\s)',
+        desc: 'A git config file is written with a callback key pointing at a staged payload or inline shell, bypassing the git config command entirely',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02531',
+    title: 'Kusto Pipeline Injection Through a Table Identifier Parameter',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'both',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)"(?:table_?name|database_?name)"\\s*:\\s*"[\\w.\\-]{0,48}\\s*\\|\\s*(?:union|externaldata|evaluate|search|print|invoke|mv-expand|find|\\.show|\\.export|\\.ingest)[\\s(]',
+        desc: 'A table or database identifier parameter continues with a pipe and another Kusto operator taking an operand \u2014 the CVE-2026-33980 injection point',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02542',
+    title:
+      'Observability Query Tool Argument Appends a Pipeline Stage and Comments Out the Rest of the Query',
+    severity: 'medium',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\|[ \\t]{0,4}\\b(?:fieldsAdd|fieldsRemove|fieldsKeep|fields|filterOut|filter|summarize|project|extend|search|parse|dedup|lookup|sort|limit)\\b[^\\n"\\x27]{0,40}[ \\t]//["\\x27]',
+        desc: 'A pipeline stage verb introduced by | whose tail is commented out by a // that runs IMMEDIATELY into a string terminator (zero spaces). The zero-space requirement is load-bearing: in a real injection the // is the last thing inside the argument value and the quote that follows is the serialization boundary, whereas an ordinary source-code line comment always puts a space after the // before any quoted word (`// "status" is OPEN`). The bridge also forbids quotes, so a match cannot run out of the query string and land on a trailing code comment. Both were confirmed false-positive sources: with a `[^\\n]{0,80}\\s//\\s{0,4}["\\x27,}\\]]` tail this fired on TypeScript, Go and Java sources that hold a DQL/KQL constant and explain a field in a trailing comment.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)[:\\[,][ \\t]{0,4}["\\x27][A-Za-z0-9_.\\-]{1,40}\\\\{1,2}["\\x27][ \\t]{0,4}\\|[ \\t]{0,4}\\b(?:fieldsAdd|fieldsRemove|fieldsKeep|fields|filterOut|filter|summarize|project|extend|parse|dedup|lookup|sort|limit)\\b',
+        desc: 'Escaped-quote breakout, anchored at the START of the argument value: a JSON structural position (: [ ,), the opening quote, a bare identifier with no spaces or operators, and then the value immediately escaping its own quote into a pipeline stage. The start anchor is what makes this safe. A bare `\\" | verb` test is NOT a breakout signal -- once a query is serialized into a tool call EVERY quote inside it is backslash-escaped, so `host == \\"web-01\\" | fields` (an ordinary literal comparison in DQL/KQL/SPL) has exactly the same shape as a breakout. Requiring the value to begin as a bare identifier and escape immediately separates the two, because a legitimate query never starts that way.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)[a-z0-9_)\\]]\\\\{1,2}["\\x27][ \\t]{0,4}(?:,[ \\t]{0,4}(?:to|from)[ \\t]{0,2}:|or\\b|and\\b)[ \\t]{0,4}[^\\n"\\x27]{0,40}[ \\t]//["\\x27]',
+        desc: 'Escaped-quote breakout into a boolean/timeframe clause (or / and / , to: / , from:) terminated by the same zero-space // string terminator -- the tautology and prefix-injection variants of the same escape. Three hardenings, each traced to a measured false positive: the bridge forbids quotes and the // must run straight into the string terminator (the loose form fired on a JS config object, `{ from: "now()-24h", to: "now()" }; // "to" is exclusive`), and the backslash before the quote is MANDATORY rather than optional (with it optional the or-branch fired on ordinary documentation prose offering two literal choices, `the transport to "grpc" or http //"grpc" is recommended`). Inside a serialized tool argument a real breakout must escape the quote it is breaking out of; unescaped quotes are prose.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02557',
+    title: 'Shell Command Separator Inside a Path-Typed MCP Tool Argument',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'tool_args',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '"(?:[Pp]roject_?[Pp]ath|[Ff]ile_?[Pp]ath|[Dd]ir(?:ectory)?_?[Pp]ath|[Dd]irectory|[Ff]older|[Ff]ile_?[Nn]ame|[Oo]utput_?[Pp]ath|[Ii]nput_?[Pp]ath|[Ll]og_?[Ff]ile_?[Nn]ame|[Tt]arget_?[Pp]ath|[Ss]cene_?[Pp]ath|[Ss]ave_?[Pp]ath|cwd|[Ww]orkspace_?[Pp]ath)"\\s*:\\s*"[^"\\n]{0,40}(?:;|&&|\\|\\||\\s\\|)\\s{0,3}(?:\\b[A-Za-z_][A-Za-z0-9_.-]{1,15}|/(?:usr/)?s?bin/[A-Za-z0-9_.-]{1,15})\\s{1,2}(?:-{1,2}[A-Za-z][A-Za-z0-9-]{0,10}(?:\\s|"|=)|/(?:etc|tmp|var|usr|bin|sbin|opt|root|home|dev|proc)[/\\s"])',
+        desc: 'A path-typed tool argument is chained past a shell separator to a lowercase command that takes a flag or an absolute system path as its argument - argument injection into a server that concatenates the value into a shell string',
+      },
+      {
+        field: 'content',
+        pattern:
+          '"(?:[Pp]roject_?[Pp]ath|[Ff]ile_?[Pp]ath|[Dd]ir(?:ectory)?_?[Pp]ath|[Dd]irectory|[Ff]older|[Ff]ile_?[Nn]ame|[Oo]utput_?[Pp]ath|[Ii]nput_?[Pp]ath|[Ll]og_?[Ff]ile_?[Nn]ame|[Tt]arget_?[Pp]ath|[Ss]cene_?[Pp]ath|[Ss]ave_?[Pp]ath|cwd|[Ww]orkspace_?[Pp]ath)"\\s*:\\s*"[^"\\n]{0,40}(?:;|&&|\\|\\||\\s\\|)\\s{0,3}\\b(?:whoami|uname|hostname|ifconfig|netstat|lsblk|dmesg)\\s{0,2}"',
+        desc: 'A path-typed tool argument is chained past a shell separator to a bare reconnaissance binary that terminates the value - the argumentless form of the same argument injection',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02570',
+    title: 'Wallet Secret Material (Seed Phrase / Private Key) Carried Inside an MCP Tool Payload',
+    severity: 'critical',
+    category: 'context-exfiltration',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:mnemonic|seed[_ -]?phrase|recovery[_ -]?phrase|secret[_ -]?recovery[_ -]?phrase)\\b["\'\\s]{0,4}[:=]["\'\\s]{0,4}(?:\\b[a-z]{3,8}\\b[ -]){11,23}\\b[a-z]{3,8}\\b(?:["\'\\s,;.}\\]]|$)',
+        desc: "A mnemonic / seed-phrase / recovery-phrase label ASSIGNED a value that is BIP-39 SHAPED rather than merely wordy: a run of 12 to 24 consecutive 3-8 character words that ends cleanly at a quote, delimiter or end of value, RE2 has no lookahead, and downstream consumers compile these with RE2 and drop any rule that uses one, so the English-function-word exclusion this condition originally carried was removed. The remaining discriminators are structural rather than lexical: every word must be 3-8 lowercase letters with only a space or hyphen between them, which ordinary prose of that length almost never satisfies because it carries commas, periods or longer words. Formerly excluded words were (the, and, that, with, your, for, ...) which are absent from the BIP-39 wordlist but unavoidable in prose. An earlier form of this condition required only 8+ short lowercase words after the label and fired on ordinary sentences -- an assembler opcode table ('mnemonic: adds the source operand into the target register'), a flashcard memory aid, a wallet i18n string and an anti-phishing support macro all matched. Word-count window plus function-word veto plus clean termination is what separates a real seed phrase from a sentence.",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:wallet|keypair|solana|ethereum|bitcoin|signer)[_ -]?(?:private|secret)[_ -]?key\\b["\'\\s]{0,4}[:=]\\s{0,3}["\'][A-Za-z0-9+/]{32,}',
+        desc: 'A compound wallet-scoped key name (walletSecretKey, solana_private_key) assigned a QUOTED 32+ character high-entropy base58/base64 value. The value must be quoted, which keeps the condition on structured tool payloads -- where a wallet server emitting signing material is the exfiltration -- and off bare dotenv / shell assignment lines (WALLET_PRIVATE_KEY=0xac09..., the published Anvil and Hardhat test-account keys that sit unquoted in thousands of .env.example files) which are operator configuration, not a payload crossing the agent boundary.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:wallet|custody)\\b[\\w"\'\\s:{,.-]{0,30}\\b(?:private[_ -]?key|secret[_ -]?key|priv[_ -]?key)\\b["\'\\s]{0,4}[:=]\\s{0,3}["\'][A-Za-z0-9+/]{32,}',
+        desc: "A wallet or custody object whose nearby member is a private or secret key assigned a quoted 32+ character high-entropy value -- the nested-JSON form of the same disclosure. The anchor words are restricted to unambiguously wallet-scoped ones: bare 'signer' and 'keypair' were removed because they are generic (a JWT signer, a webhook signing secret, an SSH or TLS keypair returned once by cloud provisioning) and produced false positives on all three. Bridge capped at 30 characters of JSON-shaped text so only a directly enclosing wallet object counts.",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:keypair|key[_ -]?pair)\\b[\\w"\'\\s:{,.-]{0,30}\\b(?:public[_ -]?key|pubkey|address)\\b["\'\\s:]{0,4}["\'][A-Za-z0-9+/=]{0,48}["\'][,\\s]{0,3}["\']?(?:private[_ -]?key|secret[_ -]?key|priv[_ -]?key)\\b["\'\\s]{0,4}[:=]\\s{0,3}["\'][A-Za-z0-9+/]{32,}',
+        desc: "The nested-keypair form: a keypair object that carries a public key or address member holding a BARE base58/base64 value, immediately followed by the matching private or secret key with a quoted 32+ character value. Keypair is the wallet SDK type name (Solana's Keypair, ethers' Wallet keypair); 'signer', 'keystore' and 'custody' were dropped from this anchor because a JWT signer, a Java or TLS keystore and an age/minisign keystore all emit exactly this shape while having nothing to do with a wallet. Requiring the public sibling also excludes SSH and TLS keypairs, whose public half is 'ssh-rsa AAAA...' or a PEM block and so contains spaces or dashes outside the bare-token value class. Traversal of the public value is structural (quote, token, quote) rather than a blind bridge span. KNOWN RESIDUAL: a non-wallet Ed25519 keypair serialised as a JSON keypair object with bare base64 halves still matches -- one reason this rule stays maturity: test.",
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02600',
+    title: 'Reverse Shell Assembled In-Source (socket bound to an interactive shell)',
+    severity: 'critical',
+    category: 'skill-compromise',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?:\\bsocket\\.socket\\s*\\(\\s*(?:socket\\.)?AF_INET[\\s\\S]{0,120}?\\.connect\\s*\\(|\\.connect\\s*\\(\\s*\\(\\s*["\'][\\w.\\-]{1,60}["\']\\s*,\\s*\\d{1,5}\\s*\\)|\\bnet\\.(?:connect|createConnection)\\s*\\(\\s*\\d{1,5}\\s*,|new\\s+net\\.Socket\\s*\\([\\s\\S]{0,80}\\.connect\\s*\\(\\s*\\d{1,5})',
+        desc: 'Outbound socket opened to a literal host and port (python socket / node net)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?:\\bdup2\\s*\\(\\s*[\\w.\\[\\]()]{1,24}\\.fileno\\s*\\(\\s*\\)\\s*,\\s*[0-2]\\s*\\)|\\.pipe\\s*\\(\\s*[\\w.$]{1,24}\\.stdin\\s*\\)|\\bstdin\\s*=\\s*[\\w.$]{1,24}\\.fileno\\s*\\(\\s*\\))',
+        desc: "Process stdio rebound onto a socket descriptor, or bidirectional pipe into a child's stdin",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?:\\bpty\\.spawn\\s*\\(|\\bsubprocess\\.(?:call|run|Popen|check_call)\\s*\\(\\s*\\[\\s*["\']/bin/(?:sh|bash|zsh|dash|ash)["\']\\s*(?:,\\s*["\']-i["\']\\s*)?\\]|\\bos\\.exec(?:l|v|le|ve|lp|vp|lpe|vpe)?\\s*\\(\\s*["\']/bin/(?:sh|bash|zsh|dash)["\']|\\b(?:spawn|execFile)\\s*\\(\\s*["\'](?:/bin/)?(?:sh|bash|zsh|dash)["\']\\s*(?:\\)|,\\s*\\[\\s*\\]))',
+        desc: 'Interactive shell handover: no command argument, an explicit -i, or pty.spawn',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02601',
+    title: 'Argument Injection: Execution-Bearing CLI Option Smuggled into a Tool Data Parameter',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '["\']?(?:args?|arguments|argv|options?|opts|pattern|glob|name|filename|file_?name|path|filepath|dir|directory|query|search|search_?term|term|target|keyword|input|value|expr|expression)["\']?\\s*[:=]\\s*["\']\\s{0,4}-[^"\\n]{0,150}?\\B-exec(?:dir)?\\s+["\']?(?:[^"\'\\s]{0,40}/)?(?:sh|bash|zsh|dash|ksh|python\\d?(?:\\.\\d+)?|perl|ruby|php|node|nc|ncat|netcat|curl|wget|osascript|powershell|pwsh)\\b',
+        desc: 'Dash-leading data parameter whose value reaches find -exec/-execdir with an interpreter or network client',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '["\']?(?:args?|arguments|argv|options?|opts|pattern|glob|name|filename|file_?name|path|filepath|dir|directory|query|search|search_?term|term|target|keyword|input|value|expr|expression)["\']?\\s*[:=]\\s*["\']\\s{0,4}-[^"\\n]{0,150}?\\B-exec(?:dir)?\\s+["\']?(?:[^"\'\\s]{0,40}/)?(?:sh|bash|zsh|dash|ksh|python\\d?(?:\\.\\d+)?|perl|ruby|php|node|nc|ncat|netcat|curl|wget|osascript|powershell|pwsh)\\b',
+        desc: 'Same, in the JSON-encoded tool argument object',
+      },
+      {
+        field: 'content',
+        pattern:
+          '["\']?(?:args?|arguments|argv|options?|opts|pattern|glob|name|filename|file_?name|path|filepath|dir|directory|query|search|search_?term|term|target|keyword|input|value|expr|expression)["\']?\\s*[:=]\\s*["\']\\s{0,4}-[^"\\n]{0,180}?-{0,2}(?:checkpoint-action\\s*=\\s*exec=?\\s*(?:["\']?(?:[^"\'\\s]{0,40}/)?(?:sh|bash|zsh|dash|ksh|python\\d?(?:\\.\\d+)?|perl|ruby|php|node|nc|ncat|netcat|curl|wget|osascript|powershell|pwsh)\\b|["\']?(?:/tmp/|/var/tmp/|/dev/shm/|~/|\\$HOME/))|to-command\\s*=\\s*(?:["\']?(?:[^"\'\\s]{0,40}/)?(?:sh|bash|zsh|dash|ksh|python\\d?(?:\\.\\d+)?|perl|ruby|php|node|nc|ncat|netcat|curl|wget|osascript|powershell|pwsh)\\b|["\']?(?:/tmp/|/var/tmp/|/dev/shm/|~/|\\$HOME/))|use-compress-program\\s*=\\s*(?:["\']?(?:[^"\'\\s]{0,40}/)?(?:sh|bash|zsh|dash|ksh|python\\d?(?:\\.\\d+)?|perl|ruby|php|node|nc|ncat|netcat|curl|wget|osascript|powershell|pwsh)\\b|["\']?(?:/tmp/|/var/tmp/|/dev/shm/|~/|\\$HOME/))|unzip-command\\s*=\\s*(?:["\']?(?:[^"\'\\s]{0,40}/)?(?:sh|bash|zsh|dash|ksh|python\\d?(?:\\.\\d+)?|perl|ruby|php|node|nc|ncat|netcat|curl|wget|osascript|powershell|pwsh)\\b|["\']?(?:/tmp/|/var/tmp/|/dev/shm/|~/|\\$HOME/))|rsh\\s*=\\s*["\']?(?:[^"\'\\s]{0,40}/)?(?:sh|bash|zsh|dash|ksh|python\\d?(?:\\.\\d+)?|perl|ruby|php|node|nc|ncat|netcat|curl|wget|osascript|powershell|pwsh)\\b|fprintf?\\s+["\']?(?:~|\\$HOME|/home/|/root/|/etc/|/var/spool/cron))',
+        desc: 'Dash-leading data parameter carrying an archive/transport option that runs a program or writes a login file',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '["\']?(?:args?|arguments|argv|options?|opts|pattern|glob|name|filename|file_?name|path|filepath|dir|directory|query|search|search_?term|term|target|keyword|input|value|expr|expression)["\']?\\s*[:=]\\s*["\']\\s{0,4}-[^"\\n]{0,180}?-{0,2}(?:checkpoint-action\\s*=\\s*exec=?\\s*(?:["\']?(?:[^"\'\\s]{0,40}/)?(?:sh|bash|zsh|dash|ksh|python\\d?(?:\\.\\d+)?|perl|ruby|php|node|nc|ncat|netcat|curl|wget|osascript|powershell|pwsh)\\b|["\']?(?:/tmp/|/var/tmp/|/dev/shm/|~/|\\$HOME/))|to-command\\s*=\\s*(?:["\']?(?:[^"\'\\s]{0,40}/)?(?:sh|bash|zsh|dash|ksh|python\\d?(?:\\.\\d+)?|perl|ruby|php|node|nc|ncat|netcat|curl|wget|osascript|powershell|pwsh)\\b|["\']?(?:/tmp/|/var/tmp/|/dev/shm/|~/|\\$HOME/))|use-compress-program\\s*=\\s*(?:["\']?(?:[^"\'\\s]{0,40}/)?(?:sh|bash|zsh|dash|ksh|python\\d?(?:\\.\\d+)?|perl|ruby|php|node|nc|ncat|netcat|curl|wget|osascript|powershell|pwsh)\\b|["\']?(?:/tmp/|/var/tmp/|/dev/shm/|~/|\\$HOME/))|unzip-command\\s*=\\s*(?:["\']?(?:[^"\'\\s]{0,40}/)?(?:sh|bash|zsh|dash|ksh|python\\d?(?:\\.\\d+)?|perl|ruby|php|node|nc|ncat|netcat|curl|wget|osascript|powershell|pwsh)\\b|["\']?(?:/tmp/|/var/tmp/|/dev/shm/|~/|\\$HOME/))|rsh\\s*=\\s*["\']?(?:[^"\'\\s]{0,40}/)?(?:sh|bash|zsh|dash|ksh|python\\d?(?:\\.\\d+)?|perl|ruby|php|node|nc|ncat|netcat|curl|wget|osascript|powershell|pwsh)\\b|fprintf?\\s+["\']?(?:~|\\$HOME|/home/|/root/|/etc/|/var/spool/cron))',
+        desc: 'Same, in the JSON-encoded tool argument object',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02602',
+    title:
+      'Diagram Theme Config Used to Inject Page-Wide CSS (scope escape, overlay, selector exfil)',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'both',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '%%\\s*\\{[^\\n]{0,240}?\\b(?:themeCSS|altFontFamily|fontFamily)\\b["\']?\\s*:\\s*["\'][^\\n%]{0,200}?(?::not\\s*\\(\\s*&[^\\n{]{0,20}?\\)[^\\n]{0,40}?\\{|\\[\\s*value\\s*[\\^$*]=[^\\n]{0,60}?\\{[^\\n]{0,90}?url\\s*\\(\\s*["\']?(?:https?:)?//|url\\s*\\(\\s*["\']?(?:https?:)?//[^\\n]{0,120}?\\[\\s*value\\s*[\\^$*]=)',
+        desc: 'Mermaid init directive whose theme value breaks the stylis scope with :not(&) and opens a rule body, or pairs a SECRET-BEARING attribute-prefix selector with a remote url()',
+      },
+      {
+        field: 'content',
+        pattern:
+          '\\bthemeCSS\\b["\']?\\s*:\\s*["\'][^\\n]{0,200}?(?::not\\s*\\(\\s*&[^\\n{]{0,20}?\\)[^\\n]{0,40}?\\{|\\[\\s*value\\s*[\\^$*]=[^\\n]{0,60}?\\{[^\\n]{0,90}?url\\s*\\(\\s*["\']?(?:https?:)?//|url\\s*\\(\\s*["\']?(?:https?:)?//[^\\n]{0,120}?\\[\\s*value\\s*[\\^$*]=)',
+        desc: 'A themeCSS value carrying the same two escape markers, in the JS/JSON config form',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02608',
+    title:
+      'LLM-Generated Graph Query Reaching a Remote Endpoint (APOC remote script, raw-IP load, remote export)',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '\\bapoc\\.cypher\\.(?:runFile|runFiles|runSchemaFiles?|runMany)\\s*\\(\\s*["\'](?:https?|ftp)://',
+        desc: 'APOC procedure fetching and executing a Cypher script from a remote URL',
+      },
+      {
+        field: 'content',
+        pattern:
+          '\\bapoc\\.load\\.(?:json|jsonParams|csv|csvParams|xml|html|arrow)\\s*\\(\\s*["\'](?:https?)://(?:(?:1[01]\\d|12[0-6]|12[89]|1[3-5]\\d|16[0-8]|17[01]|17[3-9]|18\\d|19[01]|19[3-9]|2[0-4]\\d|25[0-5]|1[1-9]|[2-9]\\d|[1-9])\\.(?:\\d{1,3}\\.){2}\\d{1,3}|169\\.254\\.169\\.254|172\\.(?:1[0-5]|3[2-9]|[4-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5]|\\d)\\.\\d{1,3}\\.\\d{1,3}|192\\.(?:1[0-5]\\d|16[0-79]|1[7-9]\\d|2[0-4]\\d|25[0-5]|[1-9]\\d|\\d)\\.\\d{1,3}\\.\\d{1,3})',
+        desc: 'APOC load procedure pointed at a bare PUBLIC IPv4 address rather than a named service (loopback, RFC1918 and link-local are excluded; 169.254.169.254 cloud metadata is not)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '\\bapoc\\.export\\.(?:json|csv|cypher|graphml)\\.(?:all|data|query|graph)\\s*\\(\\s*(?:[^\\n]{0,200}?[^\\n(,\\s]\\s*,\\s*)?["\'](?:https?|ftp)://[^"\'\\s\\n]{0,300}["\']\\s*,\\s*[\\{\\$]',
+        desc: 'APOC export procedure whose DESTINATION argument is a remote URL -- the URL must be a whole string argument followed by the mandatory config map, so a URL merely quoted inside the exported query does not count',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02610',
+    title: 'Developer-Toolchain Config Evaluates a Command That Reads a Credential Store',
+    severity: 'high',
+    category: 'skill-compromise',
+    scan_target: 'both',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '\\{\\{[^\\n}]{0,40}?\\b(?:exec|shell|pipe|cmd|command)\\s*\\(\\s*(?:command\\s*=\\s*)?(?:["\']\\s*)?(?:sudo\\s+)?\\b(?:cat|cp|mv|scp|tar|zip|base64|head|tail|xxd|od|gpg|openssl|rsync|dd|strings|curl|wget|nc|python\\d?|sh|bash|zsh|node|ruby|perl)\\b[^"\'\\n]{0,140}?(?:(?:~|\\$HOME|/home/[\\w.-]{1,24}|/root|/Users/[\\w.-]{1,24})/\\.(?:ssh/id_(?:rsa|dsa|ecdsa|ed25519)(?:[^\\w.\\-/]|$)|aws/credentials|netrc|npmrc|pypirc|kube/config|docker/config\\.json|gnupg/(?:secring|private-keys-v1\\.d)|config/(?:gcloud/[\\w.-]*credentials[\\w.-]*|gh/hosts[\\w.-]*|rclone/rclone\\.conf|op/))|\\.aws/credentials|\\.ssh/id_(?:rsa|dsa|ecdsa|ed25519)(?:[^\\w.\\-/]|$)|/etc/(?:shadow|gshadow))',
+        desc: 'A template expression that runs a read/exfil command against a secret-bearing credential file',
+      },
+      {
+        field: 'content',
+        pattern:
+          '\\b(?:shell|exec)\\s*\\(\\s*["\']?\\s*(?:sudo\\s+)?\\b(?:cat|cp|mv|scp|tar|zip|base64|head|tail|xxd|od|gpg|openssl|rsync|dd|strings|curl|wget|nc|python\\d?|sh|bash|zsh|node|ruby|perl)\\b[^"\'\\n]{0,120}?(?:(?:~|\\$HOME|/home/[\\w.-]{1,24}|/root|/Users/[\\w.-]{1,24})/\\.(?:ssh/id_(?:rsa|dsa|ecdsa|ed25519)(?:[^\\w.\\-/]|$)|aws/credentials|netrc|npmrc|pypirc|kube/config|docker/config\\.json|gnupg/(?:secring|private-keys-v1\\.d)|config/(?:gcloud/[\\w.-]*credentials[\\w.-]*|gh/hosts[\\w.-]*|rclone/rclone\\.conf|op/))|\\.aws/credentials|\\.ssh/id_(?:rsa|dsa|ecdsa|ed25519)(?:[^\\w.\\-/]|$)|/etc/(?:shadow|gshadow))',
+        desc: 'A config value calling shell()/exec() with a read/exfil command on a secret-bearing credential file',
+      },
+      {
+        field: 'content',
+        pattern:
+          '\\b_(?:tasks|external_data|jinja_extensions)\\s*:[\\s\\S]{0,120}?(?:["\']|:[ \\t]|-[ \\t]|["\' \\t](?:sudo\\s+)?(?:cat|cp|mv|scp|tar|base64|gpg|curl|wget|python\\d?|sh|bash)[ \\t])(?:(?:~|\\$HOME|/home/[\\w.-]{1,24}|/root|/Users/[\\w.-]{1,24})/\\.(?:ssh/id_(?:rsa|dsa|ecdsa|ed25519)(?:[^\\w.\\-/]|$)|aws/credentials|netrc|npmrc|pypirc|kube/config|docker/config\\.json|gnupg/(?:secring|private-keys-v1\\.d)|config/(?:gcloud/[\\w.-]*credentials[\\w.-]*|gh/hosts[\\w.-]*|rclone/rclone\\.conf|op/))|\\.aws/credentials|\\.ssh/id_(?:rsa|dsa|ecdsa|ed25519)(?:[^\\w.\\-/]|$)|/etc/(?:shadow|gshadow))',
+        desc: 'A Copier reserved key (word-boundary anchored, so Ansible pre_tasks/post_tasks/include_tasks do not qualify) bound to a secret-bearing credential file',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02620',
+    title: 'Code Execution via data: URI Module Specifier Handed to import()',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\bimport\\s*\\(\\s*(?:\\\\{0,2}["\'`])\\s*data:\\s*(?:text|application)/(?:x-)?(?:java|ecma)script\\s*[,;](?:(?:\\\\{1,3}["\'`])?(?:process\\s*\\.\\s*env|globalThis\\s*\\.\\s*process|child_process|\\bfetch\\s*\\(\\s*(?:\\\\{0,2}["\'`])?\\s*(?:https?:)?//|sendBeacon|XMLHttpRequest|\\bexecSync\\b|\\bspawnSync\\b|\\brequire\\s*\\(|\\beval\\s*\\()|[^\\s"\'`\\\\\\n](?:[^"\'`\\\\\\n]|\\\\[^"\'`\\n]){0,39}(?:\\\\{1,3}["\'`])?(?:process\\s*\\.\\s*env|globalThis\\s*\\.\\s*process|child_process|\\bfetch\\s*\\(\\s*(?:\\\\{0,2}["\'`])?\\s*(?:https?:)?//|sendBeacon|XMLHttpRequest|\\bexecSync\\b|\\bspawnSync\\b|\\brequire\\s*\\(|\\beval\\s*\\())',
+        desc: 'Dynamic import of a data: URI JavaScript module whose inline body touches process/env, an outbound request, or a child process',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02621',
+    title: 'Prompt-Embedded Auto-Fetch Mention Pointed at an Internal Address',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'both',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)@(?:(?:url|fetch|web|link|page|browse|site|doc):(?:https?://)?|https?://)(?:2130706433|3232235521|2851995648|0x0*7f0{0,6}1\\b|0x0*a9fea9fe\\b|0177(?:\\.0+){2}\\.0*1|127\\.1[:/]|localhost\\.[:/]|\\[::1\\]|\\[::ffff:(?:7f00:1|127\\.0\\.0\\.1)\\])',
+        desc: 'Auto-expanding mention aimed at a non-dotted-quad encoding of loopback or link-local -- decimal, octal, hex, short-form or trailing-dot',
+      },
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)@(?:(?:url|fetch|web|link|page|browse|site|doc):(?:https?://)?|https?://)(?:127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|localhost|0\\.0\\.0\\.0|10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|192\\.168\\.\\d{1,3}\\.\\d{1,3}|172\\.(?:1[6-9]|2\\d|3[01])\\.\\d{1,3}\\.\\d{1,3}|169\\.254\\.\\d{1,3}\\.\\d{1,3}|[a-z0-9-]{1,30}\\.internal)(?::\\d{1,5})?(?:/[^\\s"\']{0,30})?(?:/v1/secret|/v1/kv|/v2/keys|/latest/meta-data|/computeMetadata|/actuator/env|/debug/pprof|/v1/sys/wrapping|/\\.env\\b|/\\.git/config|/_cluster/settings|docker\\.sock)',
+        desc: 'Auto-expanding mention aimed at internal space on a path that reads secret material (not a health or version endpoint)',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02623',
+    title: 'Dangerous URI Scheme Obfuscated by Interstitial Characters',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'both',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:(?:href|src|action|formaction|xlink:href|url|uri|link|location|open_url|navigate|goto|window\\s*\\.\\s*open)\\s*[=(:]\\s*(?:\\\\{0,2}[\\"\'`])\\s*|\\]\\([ \\t]{0,4})(?:j(?:[\\x00\\x09\\x0a\\x0d]|&#x0*(?:9|a|d);|&#0*(?:9|10|13);|&Tab;|&NewLine;){1,10}avascript|ja(?:[\\x00\\x09\\x0a\\x0d]|&#x0*(?:9|a|d);|&#0*(?:9|10|13);|&Tab;|&NewLine;){1,10}vascript|jav(?:[\\x00\\x09\\x0a\\x0d]|&#x0*(?:9|a|d);|&#0*(?:9|10|13);|&Tab;|&NewLine;){1,10}ascript|java(?:[\\x00\\x09\\x0a\\x0d]|&#x0*(?:9|a|d);|&#0*(?:9|10|13);|&Tab;|&NewLine;){1,10}script|javas(?:[\\x00\\x09\\x0a\\x0d]|&#x0*(?:9|a|d);|&#0*(?:9|10|13);|&Tab;|&NewLine;){1,10}cript|javasc(?:[\\x00\\x09\\x0a\\x0d]|&#x0*(?:9|a|d);|&#0*(?:9|10|13);|&Tab;|&NewLine;){1,10}ript|javascr(?:[\\x00\\x09\\x0a\\x0d]|&#x0*(?:9|a|d);|&#0*(?:9|10|13);|&Tab;|&NewLine;){1,10}ipt|javascri(?:[\\x00\\x09\\x0a\\x0d]|&#x0*(?:9|a|d);|&#0*(?:9|10|13);|&Tab;|&NewLine;){1,10}pt|javascrip(?:[\\x00\\x09\\x0a\\x0d]|&#x0*(?:9|a|d);|&#0*(?:9|10|13);|&Tab;|&NewLine;){1,10}t|v(?:[\\x00\\x09\\x0a\\x0d]|&#x0*(?:9|a|d);|&#0*(?:9|10|13);|&Tab;|&NewLine;){1,10}bscript|vb(?:[\\x00\\x09\\x0a\\x0d]|&#x0*(?:9|a|d);|&#0*(?:9|10|13);|&Tab;|&NewLine;){1,10}script|vbs(?:[\\x00\\x09\\x0a\\x0d]|&#x0*(?:9|a|d);|&#0*(?:9|10|13);|&Tab;|&NewLine;){1,10}cript|vbsc(?:[\\x00\\x09\\x0a\\x0d]|&#x0*(?:9|a|d);|&#0*(?:9|10|13);|&Tab;|&NewLine;){1,10}ript|vbscr(?:[\\x00\\x09\\x0a\\x0d]|&#x0*(?:9|a|d);|&#0*(?:9|10|13);|&Tab;|&NewLine;){1,10}ipt|vbscri(?:[\\x00\\x09\\x0a\\x0d]|&#x0*(?:9|a|d);|&#0*(?:9|10|13);|&Tab;|&NewLine;){1,10}pt|vbscrip(?:[\\x00\\x09\\x0a\\x0d]|&#x0*(?:9|a|d);|&#0*(?:9|10|13);|&Tab;|&NewLine;){1,10}t)\\s*:',
+        desc: 'Dangerous URI scheme split by a character the parser discards -- raw CR/LF/TAB/NUL or its numeric character reference -- in a URI-bearing position',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:(?:href|src|action|formaction|xlink:href|url|uri|link|location|open_url|navigate|goto|window\\s*\\.\\s*open)\\s*[=(:]\\s*(?:\\\\{0,2}[\\"\'`])\\s*|\\]\\([ \\t]{0,4})(?:&#0*106;|&#x0*6a;)avascript\\s*:|(?:(?:href|src|action|formaction|xlink:href|url|uri|link|location|open_url|navigate|goto|window\\s*\\.\\s*open)\\s*[=(:]\\s*(?:\\\\{0,2}[\\"\'`])\\s*|\\]\\([ \\t]{0,4})(?:&#0*118;|&#x0*76;)bscript\\s*:|(?:(?:href|src|action|formaction|xlink:href|url|uri|link|location|open_url|navigate|goto|window\\s*\\.\\s*open)\\s*[=(:]\\s*(?:\\\\{0,2}[\\"\'`])\\s*|\\]\\([ \\t]{0,4})(?:&#0*100;|&#x0*64;)ata\\s*:\\s*text/html',
+        desc: 'Dangerous URI scheme whose leading character is supplied as a zero-padded numeric character reference',
+      },
+      {
+        field: 'content',
+        pattern: '(?i)<\\s*svg\\s*:\\s*script\\b[^>]{0,200}\\bsrc\\s*=',
+        desc: 'Namespace-prefixed script ELEMENT -- an opening tag carrying a src attribute or closed by a matching end tag, not a bare mention of the tag name in prose',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02626',
+    title: 'Agent Writes a New MCP Server Into Its Own Trust Configuration',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'both',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?:\\\\{0,2}["\'])(?:tool|tool_name|name|function|toolName)(?:\\\\{0,2}["\'])\\s*:\\s*(?:\\\\{0,2}["\'])[\\w.-]{0,40}(?:write_file|write_to_file|create_file|edit_file|fs_write|apply_patch|str_replace_editor|str_replace_based_edit_tool|update_file|patch_file)(?:\\\\{0,2}["\'])[\\s\\S]{0,160}(?:\\\\{0,2}["\'])(?:path|file_path|filename|file|target_file|filePath)(?:\\\\{0,2}["\'])\\s*:\\s*(?:\\\\{0,2}["\'])[^"\'\\n]{0,120}(?:claude_desktop_config\\.json|\\.claude\\.json|\\.cursor/mcp\\.json|\\.vscode/mcp\\.json|\\.continue/config\\.json|windsurf/mcp_config\\.json|\\.mcp\\.json|\\.codex/config\\.toml|\\.gemini/settings\\.json)(?:\\\\{0,2}["\'])[\\s\\S]{0,140}(?:\\\\{0,2}["\'])(?:mcpServers|servers)(?:\\\\{0,2}["\'])\\s*:\\s*\\{[\\s\\S]{0,220}(?:\\\\{0,2}["\'])command(?:\\\\{0,2}["\'])\\s*:',
+        desc: 'A COMPLETE TOOL-INVOCATION ENVELOPE that writes an MCP trust-config file: a quoted tool/tool_name key naming a file-writing tool, a quoted path key whose value is one of the agent trust-config files, and the mcpServers/servers block carrying a command entry. All three parts, in that order, in one event. The envelope requirement is load-bearing and was added by adversarial review -- see false_positives.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?:\\\\{0,2}["\'])(?:mcpServers|servers)(?:\\\\{0,2}["\'])\\s*:\\s*\\{[\\s\\S]{0,220}(?:\\\\{0,2}["\'])command(?:\\\\{0,2}["\'])\\s*:',
+        desc: 'An mcpServers/servers block carrying a command entry -- the payload that grants a new tool source',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02627',
+    title: 'Web Shell Written Into a Web-Served Directory',
+    severity: 'critical',
+    category: 'privilege-escalation',
+    scan_target: 'both',
+    rule_version: 3,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:\\bsystem|\\bexec|shell_exec|passthru|popen|proc_open|\\beval|\\bassert|Process\\s*\\.\\s*Start|Server\\s*\\.\\s*CreateObject|WScript\\s*\\.\\s*Shell|Runtime\\s*\\.\\s*getRuntime\\(\\)\\s*\\.\\s*exec)\\s*\\(\\s*(?:\\$_(?:GET|POST|REQUEST|COOKIE|SERVER)\\b|request\\s*\\.\\s*getParameter|Request\\s*[\\[\\.(])',
+        desc: 'Web-shell body: a request superglobal or request parameter passed straight into a command-execution or eval primitive (PHP, JSP or ASP.NET)',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:["\']?(?:tool|tool_name|toolname|name|function)["\']?\\s{0,3}:\\s{0,3}\\\\?["\'](?:write_file|create_file|edit_file|fs_write|writeFileSync|file_put_contents|move_uploaded_file|put_object|apply_patch|str_replace_editor|upload|write)\\\\?["\'][\\s\\S]{0,300}?["\'(]\\s{0,3}[^\\s"\'()<>]{0,80}?(?:/var/www/|/usr/share/nginx/html/|/srv/http/|htdocs/|webapps/|wwwroot/|public_html/|/public/uploads?/|/static/uploads?/|/uploads?/)[^\\s"\']{0,60}\\.(?:php\\d?|pht|phtm|phtml|phps|phar|jsp|jspx|jspa|asp|aspx|ashx|cshtml)\\b|(?:\\b(?:cat|echo|printf|base64|dd)\\b[^\\n]{0,60}?[ \\t]>{1,2}[ \\t]{0,3}|\\btee\\b(?:[ \\t]{1,3}-a)?[ \\t]{1,3})(?:/var/www/|/usr/share/nginx/html/|/srv/http/|htdocs/|webapps/|wwwroot/|public_html/|/public/uploads?/|/static/uploads?/|/uploads?/)[^\\s"\']{0,60}\\.(?:php\\d?|pht|phtm|phtml|phps|phar|jsp|jspx|jspa|asp|aspx|ashx|cshtml)\\b[^\\n]{0,10}<<|\\b(?:file_put_contents|writeFileSync|write_file|fwrite|fputs)\\s{0,3}\\(\\s{0,3}["\'][^\\s"\'()<>]{0,80}?(?:/var/www/|/usr/share/nginx/html/|/srv/http/|htdocs/|webapps/|wwwroot/|public_html/|/public/uploads?/|/static/uploads?/|/uploads?/)[^\\s"\']{0,60}\\.(?:php\\d?|pht|phtm|phtml|phps|phar|jsp|jspx|jspa|asp|aspx|ashx|cshtml)\\b["\']\\s{0,3},\\s{0,3}["\']\\s{0,3}<[?%])',
+        desc: 'A write primitive in INVOCATION form (an open paren, or a JSON quote-delimiter) whose destination appears as a VALUE -- introduced by a quote or paren and continuing as one contiguous token with no spaces -- that carries a web-served path with a server-executed extension; or a shell redirection/tee writing directly to such a path. Requiring the destination to sit in value position is what separates an agent planting a shell from a document describing one: in prose the path is preceded by a space, never by an opening quote.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02641',
+    title: 'Client-Supplied Approver Identity on an Approval Decision',
+    severity: 'high',
+    category: 'excessive-autonomy',
+    scan_target: 'both',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '^\\s{0,8}\\{[^{}]{0,160}["\'](?:tool|tool_name|toolName|name|function|mcp_tool)["\']\\s*:\\s*["\'][\\w./\\-]{1,60}["\']',
+        desc: 'The event is an agent TOOL INVOCATION object, not a record, a log line, a spec file or a document that quotes one',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?:/(?:approve|reject|request-revision)\\b|["\']action["\']\\s*:\\s*["\'](?:approve|reject|request_revision)["\'])',
+        desc: 'Approval decision endpoint or explicit approve/reject action token',
+      },
+      {
+        field: 'content',
+        pattern:
+          '["\'](?:body|json|payload|arguments|args|form)["\']\\s*:\\s*\\{[^{}]{0,200}?["\'](?:decidedByUserId|decided_by_user_id|decidedBy|decided_by|approvedByUserId|approved_by_user_id|approvedBy|approved_by|approverUserId|approverId|approver_id|approver_email|approvedByEmail|humanApprover|human_approver)["\']\\s*:\\s*["\']',
+        desc: 'Caller-supplied approver identity inside the outbound request payload',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02642',
+    title: "Agent Configuration Tool Used to Disable the Agent's Own Guardrail",
+    severity: 'critical',
+    category: 'privilege-escalation',
+    scan_target: 'both',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?:["\'](?:tool|tool_name|toolname|name|method|function)["\']\\s{0,3}:\\s{0,3}["\'][\\w./-]{0,20}(?:(?:update|set|patch|apply|write|save|replace|edit|merge)[\\w./-]{0,8}(?:config|configuration|settings|policy)|(?:config|configuration|settings|policy)[\\w./-]{0,8}(?:update|set|patch|apply|write|save|replace|edit|merge))[\\w-]{0,12}["\'])[\\s\\S]{0,200}(?:["\']sandbox(?:ed|ing)?["\']\\s*:\\s*(?:false|["\'](?:off|none|disabled)["\'])|["\']sandbox["\']\\s*:\\s*\\{[^{}]{0,60}["\']enabled["\']\\s*:\\s*false|["\'](?:denylist|deny_list|blocklist|block_list|blockedtools|blocked_tools|deniedtools|denied_tools|disallowedtools|disallowed_tools)["\']\\s*:\\s*\\[\\s*\\]|["\'](?:requireapproval|require_approval|requireconfirmation|require_confirmation|approvalrequired|approval_required)["\']\\s*:\\s*false|["\']permission_?mode["\']\\s*:\\s*["\']?bypass|["\']auth(?:entication)?["\']\\s*:\\s*["\']none["\']|["\']allowed_?tools["\']\\s*:\\s*\\[\\s*["\']\\*["\'])',
+        desc: 'Config-mutation tool call carrying a guardrail-disabling assignment',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?:["\']sandbox(?:ed|ing)?["\']\\s*:\\s*(?:false|["\'](?:off|none|disabled)["\'])|["\']sandbox["\']\\s*:\\s*\\{[^{}]{0,60}["\']enabled["\']\\s*:\\s*false|["\'](?:denylist|deny_list|blocklist|block_list|blockedtools|blocked_tools|deniedtools|denied_tools|disallowedtools|disallowed_tools)["\']\\s*:\\s*\\[\\s*\\]|["\'](?:requireapproval|require_approval|requireconfirmation|require_confirmation|approvalrequired|approval_required)["\']\\s*:\\s*false|["\']permission_?mode["\']\\s*:\\s*["\']?bypass|["\']auth(?:entication)?["\']\\s*:\\s*["\']none["\'])[\\s\\S]{0,200}(?:["\'](?:tool|tool_name|toolname|name|method|function)["\']\\s{0,3}:\\s{0,3}["\'][\\w./-]{0,20}(?:(?:update|set|patch|apply|write|save|replace|edit|merge)[\\w./-]{0,8}(?:config|configuration|settings|policy)|(?:config|configuration|settings|policy)[\\w./-]{0,8}(?:update|set|patch|apply|write|save|replace|edit|merge))[\\w-]{0,12}["\'])',
+        desc: 'Guardrail-disabling assignment followed by the config-mutation tool that carries it',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02644',
+    title: 'Image-Header Polyglot: Magic Bytes Adjacent to a Server-Side Script Payload',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?:GIF8[79]a|%PDF-1\\.[0-9]|\\x89PNG|\\\\x89PNG|\\xff\\xd8\\xff|\\\\xff\\\\xd8\\\\xff)(?:[; \\t\\x00-\\x08\\x0b\\x0c\\x80-\\xff]{0,6}(?:<\\?php|<\\?=|<%@|<script|<jsp:|#!\\s{0,2}/(?:bin|usr))|<%[ \\t=])[^\\r\\n]{0,60}(?:system|passthru|shell_exec|proc_open|popen|\\bexec\\b|\\beval\\b|assert|base64_decode|file_put_contents|move_uploaded_file|fetch\\s{0,2}\\(|document\\.cookie|getRuntime|\\$_(?:GET|POST|REQUEST|COOKIE|SERVER|FILES))',
+        desc: 'Image or PDF magic header, a server-side script opener adjacent to it, and an execution primitive in the body',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02648',
+    title: 'Write or Fetch Procedure Called Through a Read-Only Graph Query Tool',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'both',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '^\\s{0,8}\\{[^{}]{0,160}(?:["\'](?:tool|tool_name|toolName|name|function|mcp_tool)["\']\\s*:\\s*["\'][\\w.\\-]{0,30}(?:read[_.\\-]?(?:only|neo4j|cypher|graph|query|kql|kusto)|(?:neo4j|cypher|graph|kusto|kql)[\\w.\\-]{0,8}read)[\\w.\\-]{0,20}["\']|["\']?read_?only["\']?\\s*:\\s*(?:true|["\'](?:on|yes|1)["\']))',
+        desc: 'The event is an invocation of a read-scoped query tool, or carries an explicit read_only flag',
+      },
+      {
+        field: 'content',
+        pattern:
+          '["\'](?:arguments|args|input|params|query|cypher|statement|stmt|kql|sql|q|command|script|text)["\'][\\s\\S]{0,240}(?:^|[\\s;,{(]|:\\s{0,4}[\\\\]{0,2}["\'\\x60]\\s{0,4})(?:CALL\\s+apoc\\.(?:cypher\\.(?:doIt|runFile|runSchemaFile|runMany|runWrite)|periodic\\.(?:submit|repeat|iterate|commit)|trigger\\.(?:add|install)|refactor\\.[\\w]{1,24}|create\\.(?:node|nodes|relationship|relationships|addLabels|removeLabels|setProperty|setProperties|setLabels|setRelProperty|uuids)|merge\\.[\\w]{1,24}|load\\.(?:json|csv|xml|jdbc)(?:Params)?|systemdb\\.[\\w.]{1,24})\\s*\\(|CALL\\s+apoc\\.export\\.[\\w.]{1,24}\\s*\\(\\s*[\\\\]{0,2}["\'\\x60]|DETACH\\s+DELETE\\s+[\\w$(]|CREATE\\s+(?:USER|ROLE)\\s+[\\w$]|DROP\\s+(?:USER|ROLE)\\s+[\\w$]|dbms\\.security\\.[\\w]{1,32}\\s*\\(|GRANT\\s+(?:ROLE|ALL|WRITE|ADMIN)\\s+[\\w$]|\\|\\s*externaldata\\s*\\()',
+        desc: 'A write, administrative or outbound-fetch procedure is actually invoked inside a call argument',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02649',
+    title: 'Vendor API Hostname Used as a Label Prefix of Another Domain',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'both',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          'https?://(?:api\\.openai\\.com|api\\.anthropic\\.com|api\\.github\\.com|github\\.com|raw\\.githubusercontent\\.com|api\\.slack\\.com|hooks\\.slack\\.com|login\\.microsoftonline\\.com|graph\\.microsoft\\.com|oauth2\\.googleapis\\.com|accounts\\.google\\.com|generativelanguage\\.googleapis\\.com|api\\.contentful\\.com|api\\.stripe\\.com|s3\\.amazonaws\\.com|sts\\.amazonaws\\.com|api\\.notion\\.com|api\\.linear\\.app|api\\.telegram\\.org|registry\\.npmjs\\.org|files\\.pythonhosted\\.org|api\\.mistral\\.ai|api\\.groq\\.com|api\\.cohere\\.com|huggingface\\.co)\\.[a-z0-9-]{1,63}\\.[a-z]{2,24}[/:]',
+        desc: 'Vendor FQDN followed by two further labels IN URL AUTHORITY POSITION -- a scheme in front and a path or port behind. rule_version 1 also accepted the bare `//`, `@` and `key:` prefixes, which made every host-derived FILENAME a match (api.openai.com.2026-08-23.har, api.github.com.chain.pem, api.stripe.com.access.log) and every split-horizon internal name (api.contentful.com.svc.cluster.local).',
+      },
+      {
+        field: 'content',
+        pattern:
+          '\\b(?:[a-z_]{0,16}base_?url|api_?base|["\']?\\bhost\\b["\']?|["\']?\\bproxy\\b["\']?|server_?url|\\bendpoint\\b|api_?host|["\']?\\burl\\b["\']?)["\']?\\s*[:=]\\s*["\']?(?:https?://)?(?:api\\.openai\\.com|api\\.anthropic\\.com|api\\.github\\.com|github\\.com|raw\\.githubusercontent\\.com|api\\.slack\\.com|hooks\\.slack\\.com|login\\.microsoftonline\\.com|graph\\.microsoft\\.com|oauth2\\.googleapis\\.com|accounts\\.google\\.com|generativelanguage\\.googleapis\\.com|api\\.contentful\\.com|api\\.stripe\\.com|s3\\.amazonaws\\.com|sts\\.amazonaws\\.com|api\\.notion\\.com|api\\.linear\\.app|api\\.telegram\\.org|registry\\.npmjs\\.org|files\\.pythonhosted\\.org|api\\.mistral\\.ai|api\\.groq\\.com|api\\.cohere\\.com|huggingface\\.co)\\.[a-z0-9-]{1,63}\\.[a-z]{2,24}',
+        desc: 'Endpoint-override parameter set to a vendor FQDN that carries two further labels. Two changes from rule_version 1: the key names are \\b-anchored, so deny_host / block_url / allow_endpoint no longer match via their suffix (a blocklist entry is not an endpoint override), and the value needs two labels plus a TLD, so a one-label corporate suffix (HTTPS_PROXY=api.anthropic.com.internal) is out of scope rather than alerted on.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02662',
+    title: 'Pickle Payload Reaches an Execution Primitive Through an Indirect Name Resolver',
+    severity: 'critical',
+    category: 'model-security',
+    scan_target: 'runtime',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '\\bresolve_name[\\x00-\\x09\\x0b-\\x1f\\x7f-\\xff~]{1,24}\\b(?:os|posix|nt|subprocess|builtins|__builtin__|pty|commands)\\s{0,1}:\\s{0,1}(?:system|popen\\w{0,2}|exec\\w{0,2}|eval|call|run|check_output|check_call|getoutput|spawn\\w{0,3})\\b',
+        desc: "A pickle stream in which pkgutil.resolve_name is followed by a module:attribute target naming an execution primitive, separated ONLY by pickle framing bytes -- opcodes and length prefixes, i.e. control characters, high bytes, or the tilde stand-in this rule's test vectors use. rule_version 2 replaced the previous separator class (any 0-24 characters except newline and quote), which let ordinary prose through: a changelog saying 'reject resolve_name targets such as os:system', an advisory saying 'resolve_name with os:system', a markdown table cell, a YAML denylist, and a Traditional Chinese advisory all fired. Framing bytes cannot appear in prose, and a genuine protocol-4 pickle contains nothing else between the two strings.",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?:^|\\n|\\\\n)[^-\\n]{0,60}\\breturn\\s{0,4}\\(\\s{0,4}(?:\\w{1,24}\\.)?(?:resolve_name|import_module|attrgetter|__import__)\\s{0,4},\\s{0,4}\\(?\\s{0,4}["\\x27](?:os|posix|nt|subprocess|builtins|__builtin__|pty|commands)(?:\\s{0,1}[:.]\\s{0,1}(?:system|popen\\w{0,2}|exec\\w{0,2}|eval|call|run|check_output|check_call|getoutput|spawn\\w{0,3}))?["\\x27]',
+        desc: "A __reduce__ implementation whose reduce tuple names a name-resolution gadget as the callable AND passes a LITERAL string naming an execution primitive as its argument. The literal-argument requirement is what separates the gadget from the legitimate uses of the same callable: copyreg module pickling (return (import_module, (mod.__name__,))), a picklable attrgetter wrapper (return (attrgetter, (self.attr,))), a lazy loader (return (import_module, name)) and a multiprocessing reduction all pass a variable, not a hard-coded 'os:system'. The line must not begin with a dash, which keeps the rule off the removal side of a diff that DELETES the gadget.",
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02664',
+    title: 'Git Identifier Field Carries an Option or ext:: Transport Instead of a Revision',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'runtime',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '\\b(?:commit|commitish|revision|treeish|refname|gitref)["\']?\\s{0,3}[:=]\\s{0,3}["\']?-{1,2}(?:upload-pack|receive-pack|exec|output|config)[=\\s]',
+        desc: 'A field named for a git revision whose value is one of git\'s EXECUTING options -- CVE-2026-50014\'s resolution.commit primitive. rule_version 1 accepted any dash-word here, which made every ordinary rev-list option passed through a revision-named parameter a match: {"revision": "--since=2 weeks ago"} from a git MCP server, `revision: --all | --branches | --tags` in a mirror-job config, `commit: --amend` in a runbook. Those are identifiers-that-are-flags but they do not execute.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '--(?:upload|receive)-pack\\s{0,2}=\\s{0,2}["\']?(?:/tmp/|/dev/shm/|/var/tmp/|\\bsh\\b|\\bbash\\b|\\bcurl\\b|\\bwget\\b|\\bpython\\d{0,1}\\b|\\bperl\\b|\\bnc\\b)',
+        desc: '--upload-pack= / --receive-pack= pointed at a shell, an interpreter, or anything under a world-writable directory. Under the ssh and local transports git executes this value. rule_version 1 also accepted any path ending .sh/.py/.pl/.rb, which flagged the legitimate server practice of wrapping the pack program in a script to set the environment first (--receive-pack=/opt/gerrit/bin/receive-pack.sh).',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?:["\']|=\\s{0,2})ext::\\s{0,2}(?:sh|bash|dash|zsh|curl|wget|python\\d{0,1}|perl|nc|env)[\\s"\']',
+        desc: "git's ext:: transport invoking a shell or interpreter as the transport helper, in URL position: quoted on a command line, or after `url =` in a .gitmodules / .git/config entry. ext::ssh, the documented use, does not match. rule_version 1 matched a bare `ext::` anywhere, so it fired on the NAMESPACE separator in ordinary source (`use crate::ext::env`, `Ext::Curl.get(url)`) and on any sentence explaining the transport.",
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02666',
+    title:
+      'Trusted Hostname Parked in the URL Userinfo So the Real Host Is Whatever Follows the At-Sign',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'runtime',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?:["\']?(?:url|uri|href|link|src|endpoint|location|address|target_url)["\']?\\s{0,3}[:=]\\s{0,3}["\']|\\b(?:navigate|goto|browse|visit|open|fetch|curl|wget)\\b\\s{1,3}(?:to\\s{1,3})?)\\bhttps?://[\\w-]{2,40}(?:\\.[\\w-]{1,30}){0,3}\\.(?:com|net|org|io|ai|co|dev|app|cloud|xyz|info|biz|gov|edu|uk|de|fr|jp|cn|us|eu|tld|example)(?::[^\\s/@"\']{0,40})?@(?:\\d{1,3}\\.){3}\\d{1,3}(?::\\d{1,5})?(?:[/?\\s"\'\\\\]|$)',
+        desc: 'A domain-shaped userinfo in front of a bare IPv4 host -- the CVE-2025-47241 PoC exactly. The real destination is a raw address, which no allowlist entry can be.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?:["\']?(?:url|uri|href|link|src|endpoint|location|address|target_url)["\']?\\s{0,3}[:=]\\s{0,3}["\']|\\b(?:navigate|goto|browse|visit|open|fetch|curl|wget)\\b\\s{1,3}(?:to\\s{1,3})?)\\bhttps?://[\\w-]{2,40}(?:\\.[\\w-]{1,30}){1,3}\\.(?:com|net|org|io|ai|co|dev|app|cloud|xyz|info|biz|gov|edu|uk|de|fr|jp|cn|us|eu|tld|example)(?::[^\\s/@"\']{0,40})?@[\\w-]{2,60}(?:\\.[\\w-]{2,30}){0,3}(?::\\d{1,5})?(?:[/?\\s"\'\\\\]|$)',
+        desc: "A fully-qualified decoy hostname (two or more labels plus a public suffix) in the userinfo, with a different real host after the @. Covers the ':anypassword@' form that ATR-2026-02107's pattern rejects.",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?:["\']?(?:url|uri|href|link|src|endpoint|location|address|target_url)["\']?\\s{0,3}[:=]\\s{0,3}["\']|\\b(?:navigate|goto|browse|visit|open|fetch|curl|wget)\\b\\s{1,3}(?:to\\s{1,3})?)\\bhttps?://[\\w-]{2,40}(?:\\.[\\w-]{1,30}){1,3}\\.(?:com|net|org|io|ai|co|dev|app|cloud|xyz|info|biz|gov|edu|uk|de|fr|jp|cn|us|eu|tld|example)%40[\\w-]{2,60}',
+        desc: 'The same decoy with the at-sign percent-encoded as %40, which many filters neither decode nor split on. Requires two or more labels before the %40, so an e-mail username such as first.last%40example.com does not match.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02667',
+    title: 'Submitted Job Payload Carries Its Own Pre-Approved Tool List',
+    severity: 'high',
+    category: 'excessive-autonomy',
+    scan_target: 'runtime',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '["\']?\\b(?:approve|approved_tools|approvedTools|auto_approve_tools|autoApproveTools|pre_?approved_tools|preApprovedTools|approved_actions)["\']?\\s{0,3}:\\s{0,3}\\[[^\\]\\n]{0,80}\\b(?:execute_command|run_command|shell|bash|terminal|exec|delete_file|remove_file|write_file|python_repl|code_interpreter|sudo)\\b',
+        desc: 'An approval list, in inline-array form, that already contains a command-execution or destructive tool. The list form is what makes this a pre-approval rather than a request. The \\b before the key alternation is load-bearing: without it `approve` matched the TAIL of every key ending in that word -- autoApprove, auto_approve, chat.tools.autoApprove -- so the rule fired on the standing client settings the description claims are out of scope.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '\\b(?:approve|approved_tools|auto_approve_tools|pre_approved_tools)\\s{0,2}:\\s{0,4}(?:\\n|\\\\n)\\s{0,10}-\\s{0,2}["\']?(?:execute_command|run_command|shell|bash|terminal|exec|delete_file|remove_file|write_file|python_repl|code_interpreter|sudo)\\b',
+        desc: 'The same list in YAML block-sequence form, as a submitted workflow file carries it. Also matches the JSON-encoded transport where the newline arrives as the two characters backslash n.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02668',
+    title: 'Branch or Tag Ref Name Carrying Shell Command Substitution in Tool Output',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'runtime',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?:\\n|\\\\n|^)\\s{0,6}\\*?\\s{0,4}(?:remotes/)?origin/[\\w.\\-/]{1,40}\\$\\([^)\\r\\n]{0,60}(?:\\|\\s{0,3}(?:sh|bash|zsh|base64|nc|curl|wget|python\\d{0,1}|perl)\\b|>\\s{0,3}/(?:tmp|dev|var|etc|home|root|Users)/|\\b(?:curl|wget|nc|chmod|base64|eval)\\b|\\brm\\s{1,3}-[rf])[^)\\r\\n]{0,60}\\)\\s{0,4}(?:\\r?\\n|\\\\n|$)',
+        desc: 'A ref-listing line (git branch -a / git branch -r output) whose branch name carries a command substitution that pipes into a shell or encoder, redirects into a system directory, or names a fetch/permission tool, and which ENDS at the ref -- real listing output has nothing after the ref. NARROWED by adversarial review 2026-08-24: see false_positives.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '["\'](?:head_ref|headRefName|ref|branch|tag_name|source_branch|refName|base_ref|baseRefName)["\']\\s{0,3}:\\s{0,3}["\'][^"\'\\n]{0,60}\\$\\([^)\\n]{0,60}(?:\\|\\s{0,3}(?:sh|bash|zsh|base64|nc|curl|wget|python\\d{0,1}|perl)\\b|>\\s{0,3}/(?:tmp|dev|var|etc|home|root|Users)/|\\b(?:curl|wget|nc|chmod|base64|eval)\\b|\\brm\\s{1,3}-[rf])',
+        desc: 'A ref-NAME field (head_ref / headRefName / branch / tag_name / source_branch / ref) whose value carries a command substitution with a shell, encoder, fetch tool or system-directory redirect inside it. `title` was REMOVED from the field list by adversarial review 2026-08-24 -- see false_positives.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02669',
+    title: 'Query-Language Pipeline Stage Smuggled Into an Identifier-Typed Tool Parameter',
+    severity: 'medium',
+    category: 'tool-poisoning',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '[{,]\\s{0,3}"(?:entity_?name|entity_?selector|table_?name|index_?name|metric_?name|dashboard_?id|cluster_?name|stream_?name)"\\s{0,3}:\\s{0,3}"(?:[^"\\\\\\n,:]|\\\\.){0,40}\\|\\s{1,3}(?:(?:externaldata|inputlookup|mv-expand|make-series|parse-kv|fieldsadd|fieldskeep|fieldsremove|summarize)\\b|(?:fetch|fields|limit)\\b[^\\r\\n]{0,24}(?:\\||==|\\w\\())',
+        desc: 'A JSON tool argument whose identifier-typed key carries a query pipeline stage. Unambiguous query verbs (externaldata, inputlookup, summarize, fieldsAdd, ...) stand alone; the three verbs that are also ordinary English words (fetch, fields, limit) additionally require a second pipe, a comparison or a function call, so a display label such as "Main Stage | Fetch Festival (2026)" does not qualify.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02681',
+    title: 'JavaScript Sandbox Escape by Acquiring the Function Constructor Reflectively',
+    severity: 'critical',
+    category: 'privilege-escalation',
+    scan_target: 'agent',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?:\\\\{0,2}["\'][\\w-]{0,24}(?:code|script|expression|expr|snippet|program)\\\\{0,2}["\']\\s*:\\s*\\\\{0,2}["\']|[\\w-]{0,24}(?:code|script|expression|expr|snippet|program)\\s*=\\s*\\\\{0,2}["\'])[^\\n]{0,100}(?:getownpropertydescriptor|reflect\\.get)\\s*\\(\\s*(?:object|reflect)\\.getprototypeof[^\\n]{0,40}\\\\?["\']constructor\\\\?["\'][^\\n]{0,120}\\\\?["\'`]\\s*return\\s+(?:this|globalthis|global|process)\\b',
+        desc: 'Reflective acquisition of the constructor slot from a prototype, followed on the same line by a quoted source string that returns the global object -- the Function constructor obtained without ever writing .constructor.constructor, then invoked to hand back the host realm. The whole thing must sit inside a CODE-VALUED TOOL ARGUMENT ("code": "...", "script": "...", expression="..."), which is the channel the title claims and the only one that separates evaluating the payload from merely writing it down. See false_positives.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?:\\\\{0,2}["\'][\\w-]{0,24}(?:code|script|expression|expr|snippet|program)\\\\{0,2}["\']\\s*:\\s*\\\\{0,2}["\']|[\\w-]{0,24}(?:code|script|expression|expr|snippet|program)\\s*=\\s*\\\\{0,2}["\'])[^\\n]{0,100}(?:object|reflect)\\.getprototypeof\\s*\\(\\s*(?:async\\s+function|function\\s*\\*)[^\\n]{0,40}\\\\?["\']?constructor\\\\?["\']?[^\\n]{0,80}\\\\?["\'`]\\s*return\\s+(?:this|globalthis|global|process)\\b',
+        desc: 'The AsyncFunction / GeneratorFunction ladder in a code-valued tool argument: the prototype of an async or generator function literal is taken, its constructor read (quoted or dotted), and that constructor invoked on a quoted source string returning the global object. Reading the AsyncFunction constructor alone is a legitimate feature-detection idiom and is NOT matched -- only its invocation on a global-returning body, inside a code argument.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02682',
+    title: 'XML/SVG Entity Expansion Bomb in Content Returned to an Agent',
+    severity: 'medium',
+    category: 'tool-poisoning',
+    scan_target: 'agent',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)<!entity\\s+(?:%\\s*)?[\\w.-]{1,24}\\s+["\'][^"\']{0,200}["\']\\s*>[\\s\\S]{0,200}<!entity\\s+(?:%\\s*)?[\\w.-]{1,24}\\s+["\'](?:[&%][\\w.-]{1,12};){6,}',
+        desc: 'An entity declaration with a real body, followed within 200 characters by an entity whose value is a packed run of six or more references -- the two-layer structure a billion-laughs bomb needs. The chain is required because a single declaration cannot multiply: it expands once and stops.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)<!entity\\s+(?:%\\s*)?[\\w.-]{1,24}\\s+["\'](?:[&%][\\w.-]{1,12};){6,}[\\s\\S]{0,200}<!entity\\s+(?:%\\s*)?[\\w.-]{1,24}\\s+["\'](?:[^&"\'\\r\\n]|&[^#"\'\\r\\n])',
+        desc: 'The same two layers in the reverse declaration order, with the companion entity required to have a real body rather than a bare character reference (which is what a spacing or punctuation entity points at).',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02683',
+    title: 'Agent Tool Data Argument Carries a Program-Executing CLI Option',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'agent',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:["\']?\\b(?:arguments|parameters|tool_input|params|toolinput)["\']?\\s{0,3}[:=][\\s\\S]{0,300}?\\\\?["\'](?:pattern|query|search_?term|search_?string|glob|regex|file_?path|file_?name|filename|path|dir|directory|target|source|input|output|args?)\\\\?["\']\\s{0,3}:\\s{0,3}\\\\?["\']--(?:pre|pre-glob|use-compress-program|rsh|to-command|output-document|remote-shell|checkpoint-action)=\\s{0,3}["\']?[./~$]{0,2}[\\w./$-]{1,40}|[(,]\\s{0,3}(?:pattern|query|search_?term|search_?string|glob|regex|file_?path|file_?name|filename|path|dir|directory|target|source|input|output|args?)\\s{0,3}=\\s{0,3}["\']--(?:pre|pre-glob|use-compress-program|rsh|to-command|output-document|remote-shell|checkpoint-action)=\\s{0,3}["\']?[./~$]{0,2}[\\w./$-]{1,40})',
+        desc: 'A data-shaped tool argument whose value is an executing CLI option with a real operand: ripgrep --pre=<prog>, tar --to-command=/--use-compress-program=/--checkpoint-action=exec=<cmd>, rsync --rsh=<shell>, wget --output-document=<path>. The operand requirement is what separates this from someone searching for the flag name itself.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:["\']?\\b(?:arguments|parameters|tool_input|params|toolinput)["\']?\\s{0,3}[:=][\\s\\S]{0,300}?\\\\?["\'](?:pattern|query|glob|file_?path|filename|path|dir|directory|target|source|input|args?)\\\\?["\']\\s{0,3}:\\s{0,3}\\\\?["\']-e\\s{1,3}(?:/bin/|\\bsh\\b|\\bbash\\b|ssh\\s{1,3}-o)|[(,]\\s{0,3}(?:pattern|query|glob|file_?path|filename|path|dir|directory|target|source|input|args?)\\s{0,3}=\\s{0,3}["\']-e\\s{1,3}(?:/bin/|\\bsh\\b|\\bbash\\b|ssh\\s{1,3}-o))',
+        desc: 'rsync/scp -e supplied as a data argument, naming a shell (or ssh with an option) as the remote-shell program -- the classic argument-vector escape for file-transfer tools',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02684',
+    title: 'File-Tool Argument Targets a Modern Credential Store Outside the Classic Path List',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'agent',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)["\\x27](?:file_?path|filepath|file_?name|jsonl_?path|artifact_?path|agent_?file|instructions_?file_?path|system_?prompt_?file|prompt_?file|persona_?file|source_?file|input_?file|attachments?)["\\x27]\\s{0,4}[:=]\\s{0,4}["\\x27](?:~|\\$HOME|/home/[\\w.-]{1,24}|/Users/[\\w.-]{1,24})?/?\\.?(?:config/gh/hosts\\.ya?ml|config/gcloud/(?:credentials\\.db|application_default_credentials\\.json|legacy_credentials)|config/rclone/rclone\\.conf|pypirc|cargo/credentials(?:\\.toml)?|terraform\\.d/credentials\\.tfrc\\.json|azure/(?:accessTokens\\.json|msal_token_cache\\.json)|(?:var/)?run/secrets/kubernetes\\.io/serviceaccount/(?:token|namespace|ca\\.crt))\\b',
+        desc: 'JSON/dict tool-call shape: a QUOTED file-shaped argument key whose QUOTED value is a modern credential store -- GitHub CLI host tokens, gcloud credential databases, rclone remotes, PyPI upload credentials, cargo registry tokens, Terraform Cloud tokens, Azure token caches, or the in-pod Kubernetes service-account token. Both the key and the value must be quote-delimited, which is what a serialized tool call looks like and what DevOps YAML, CLI output and prose do not.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:jsonl_?path|artifact_?path|agent_?file|instructions_?file_?path|system_?prompt_?file|prompt_?file|persona_?file)\\s{0,4}[:=]\\s{0,4}["\\x27]?(?:~|\\$HOME|/home/[\\w.-]{1,24}|/Users/[\\w.-]{1,24})?/?\\.?(?:config/gh/hosts\\.ya?ml|config/gcloud/(?:credentials\\.db|application_default_credentials\\.json|legacy_credentials)|config/rclone/rclone\\.conf|pypirc|cargo/credentials(?:\\.toml)?|terraform\\.d/credentials\\.tfrc\\.json|azure/(?:accessTokens\\.json|msal_token_cache\\.json)|(?:var/)?run/secrets/kubernetes\\.io/serviceaccount/(?:token|namespace|ca\\.crt))\\b',
+        desc: 'Agent-internal argument names (jsonlPath, artifactPath, systemPromptFile, personaFile, promptFile, agentFile, instructionsFilePath) pointed at a credential store. These names do not occur in ordinary infrastructure config, so the quoting requirement is relaxed here.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:read_file|readfile|read_text_file|write_file|attach_file|upload_file|send_file|get_file|load_file|open_file|append_file)\\s{0,4}\\(\\s{0,4}(?:path|file|file_?path|file_?name|filepath|src|source|attachments?)\\s{0,4}=\\s{0,4}["\\x27](?:~|\\$HOME|/home/[\\w.-]{1,24}|/Users/[\\w.-]{1,24})?/?\\.?(?:config/gh/hosts\\.ya?ml|config/gcloud/(?:credentials\\.db|application_default_credentials\\.json|legacy_credentials)|config/rclone/rclone\\.conf|pypirc|cargo/credentials(?:\\.toml)?|terraform\\.d/credentials\\.tfrc\\.json|azure/(?:accessTokens\\.json|msal_token_cache\\.json)|(?:var/)?run/secrets/kubernetes\\.io/serviceaccount/(?:token|namespace|ca\\.crt))\\b',
+        desc: 'Function-call form where the CALLEE is a named file tool -- read_file(path="..."), attach_file(file="...") -- and the argument value is a credential store. The callee list is what separates this from os.stat(path=...) or shutil.copy(src=...) in ordinary code.',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)["\\x27](?:tool|tool_?name|function|name)["\\x27]\\s{0,4}:\\s{0,4}["\\x27](?:read|read_file|readfile|read_text_file|read_many_files|cat|view|open|open_file|attach|attach_file|upload|upload_file|send_file|get_file|load_file|fetch_file|file_read)["\\x27][^\\n]{0,160}["\\x27](?:path|file|file_?path|file_?name|filepath|src|source|attachments?)["\\x27]\\s{0,4}:\\s{0,4}["\\x27](?:~|\\$HOME|/home/[\\w.-]{1,24}|/Users/[\\w.-]{1,24})?/?\\.?(?:config/gh/hosts\\.ya?ml|config/gcloud/(?:credentials\\.db|application_default_credentials\\.json|legacy_credentials)|config/rclone/rclone\\.conf|pypirc|cargo/credentials(?:\\.toml)?|terraform\\.d/credentials\\.tfrc\\.json|azure/(?:accessTokens\\.json|msal_token_cache\\.json)|(?:var/)?run/secrets/kubernetes\\.io/serviceaccount/(?:token|namespace|ca\\.crt))\\b',
+        desc: 'Serialized tool call that names a file-reading tool and, within the same call, passes a generic path/file/src argument whose value is a credential store. Requiring the tool name is what keeps an Ansible task, a docker-compose secret or a backup manifest -- all of which carry a bare path:/file: key -- out of this condition.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02700',
+    title: 'Percent-Encoded Path Traversal in an Agent File-Tool Argument',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_args',
+        pattern:
+          '(?:^|[{,(\\[])\\s{0,3}["\\x27]?(?:file_?path|filepath|filename|file|path|name|dest|destination|src|source|target|uri|url|dir|directory|key|object|blob|template|resource)["\\x27]?\\s{0,3}[:=]\\s{0,3}["\\x27](?:(?:%2e%2e|%252e%252e|\\.\\.)(?:%2f|%5c|%252f|%255c|%c0%af)){2,}[^"\\x27\\s]{0,24}(?:\\.ssh|\\.aws|\\.env\\b|\\.npmrc|\\.netrc|\\.pgpass|\\.htpasswd|\\.kube|passwd\\b|shadow\\b|id_rsa|id_ed25519|id_ecdsa|authorized_keys|known_hosts|credentials\\b|web\\.config|boot\\.ini|win\\.ini|environ\\b)',
+        desc: 'Two or more percent-encoded traversal segments forming the WHOLE value of a named file-path parameter, resolving onto a credential or system-configuration FILE',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02703',
+    title:
+      'Agent-Generated SQL Reaches Outside the Database via COPY TO PROGRAM or a Server-Side File Read',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'runtime',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?:\\bcopy\\b[^;\\r\\n]{0,40}\\bto\\s{1,4}program\\s{0,4}["\\x27]|\\b(?:pg_(?:read_file|read_binary_file|stat_file)|lo_import)\\s{0,3}\\(\\s{0,3}["\\x27][^"\\x27\\r\\n]{0,90}(?:\\.\\./|/etc/(?:passwd|shadow|sudoers|ssh/)|\\.pgpass|\\.ssh/|authorized_keys|/proc/[\\w./]{0,24}environ|/root/|\\.aws/credentials|\\.env\\b|\\.git-credentials))',
+        desc: 'COPY ... TO PROGRAM followed by the quoted command string the syntax requires, or a pg_read_file/pg_stat_file/lo_import call whose path argument traverses or names a credential file. NARROWED by adversarial review 2026-08-24 -- see false_positives.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02705',
+    title: 'Python Sandbox Escape by Recovering builtins from a Bound Method or Lambda',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'runtime',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?:(?:^|[^\\w.])print\\s{0,2}\\.\\s{0,2}__self__|\\(\\s{0,2}lambda\\s{0,3}:[^)\\r\\n]{0,12}\\)\\s{0,2}\\.\\s{0,2}__globals__)[\\s\\S]{0,120}(?:vars\\s{0,2}\\(|getattr\\s{0,2}\\(|__builtins__|__import__|\\[\\s{0,2}["\']__|\\.\\s{0,2}get\\s{0,2}\\(\\s{0,2}["\']|\\beval\\s{0,2}\\(|\\bexec\\s{0,2}\\(|\\bcompile\\s{0,2}\\(|\\bsystem\\s{0,2}\\(|\\bpopen\\s{0,2}\\(|subprocess)',
+        desc: 'Recovery of the real builtins module through the __self__ of a bound builtin or the __globals__ of a throwaway lambda, followed within 120 characters by a USE of the recovered namespace -- vars(), a dunder subscript, __builtins__/__import__, getattr or a direct eval/exec/system call',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02707',
+    title: 'Mail or Attachment Tool Argument Splits into a New Header via Embedded CRLF',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'runtime',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'tool_args',
+        pattern:
+          '["\\x27](?:to|cc|bcc|from|reply[_-]?to|subject|filename|attachment)["\\x27]\\s{0,3}[:=]\\s{0,3}["\\x27][^"\\x27\\r\\n]{0,40}(?:\\\\r)?(?:\\\\n|[\\r\\n])\\s{0,4}(?:bcc|cc|reply-to|content-type|content-transfer-encoding|content-disposition|mime-version|rcpt\\s{1,3}to|mail\\s{1,3}from|x-[a-z][a-z0-9-]{1,20})\\s{0,2}:',
+        desc: 'A recipient/subject/filename argument whose QUOTED KEY and QUOTED VALUE come from a serialized tool call, and whose value contains a line break followed by a new mail header name or SMTP verb. rule_version 2 made the KEY quote mandatory as well as the value quote. Version 1 required only the value quote, and that let every piece of writing ABOUT this attack through: an advisory saying to="user@corp.example\\r\\nBcc: ...", a library changelog, a WAF signature note, an OWASP-style cheat sheet, a pentest finding and a non-English advisory all fired, because documentation writes the argument assignment exactly the way the attack does -- with an unquoted key. Every one of this rule\'s own true positives and its evasion test uses the quoted-key form, so recall is unchanged.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02708',
+    title: 'Agent HTTP Request Claims a Loopback Origin While Targeting an External Host',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'runtime',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'tool_args',
+        pattern:
+          '(?:["\\x27](?:tool|tool_name|toolName|name|function|mcp_tool)["\\x27]\\s{0,3}:\\s{0,3}["\\x27][\\w.\\-]{0,40}(?:http|curl|wget|fetch|request|req|api|webhook|url|browse|axios|httpx)[\\w.\\-]{0,20}["\\x27]|["\\x27](?:command|cmd|script|shell|args|argv)["\\x27]\\s{0,3}:\\s{0,3}[\\s\\S]{0,20}\\b(?:curl|wget|httpie|\\bxh\\b|invoke-webrequest)\\b)',
+        desc: 'The call is issued by an HTTP-request tool, or by a shell tool running an HTTP client',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?:https?://[a-z0-9-]{2,30}(?:\\.[a-z0-9-]{1,30}){0,4}\\.[a-z]{2,12}(?:[:/?"\\x27]|\\s|$)(?:[^:;\\n|&]|:[^/;\\n|&]|:/[^/;\\n|&]){0,120}(?:(?:-H\\s{1,3}["\\x27]?|--header\\s{1,3}["\\x27]?|\\bheaders?\\b["\\x27]?\\s{0,3}[:=]?\\s{0,3}[{(\\[]?\\s{0,3}["\\x27]?)host["\\x27]?\\s{0,3}[:=]\\s{0,3}["\\x27]?\\s{0,2}(?:127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|localhost|\\[?::1\\]?|0\\.0\\.0\\.0)\\b|(?:^|[\\r\\n])\\s{0,3}host["\\x27]?\\s{0,3}[:=]\\s{0,3}["\\x27]?\\s{0,2}(?:127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|localhost|\\[?::1\\]?|0\\.0\\.0\\.0)\\b|(?:["\\x27]|(?:-H\\s{1,3}["\\x27]?|--header\\s{1,3}["\\x27]?|\\bheaders?\\b["\\x27]?\\s{0,3}[:=]?\\s{0,3}[{(\\[]?\\s{0,3}["\\x27]?))(?:x-forwarded-for|x-real-ip|x-originating-ip|x-client-ip|x-forwarded-host)["\\x27]?\\s{0,3}[:=]\\s{0,3}["\\x27]?\\s{0,2}(?:127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|localhost|\\[?::1\\]?|0\\.0\\.0\\.0)\\b)|(?:(?:-H\\s{1,3}["\\x27]?|--header\\s{1,3}["\\x27]?|\\bheaders?\\b["\\x27]?\\s{0,3}[:=]?\\s{0,3}[{(\\[]?\\s{0,3}["\\x27]?)host["\\x27]?\\s{0,3}[:=]\\s{0,3}["\\x27]?\\s{0,2}(?:127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|localhost|\\[?::1\\]?|0\\.0\\.0\\.0)\\b|(?:^|[\\r\\n])\\s{0,3}host["\\x27]?\\s{0,3}[:=]\\s{0,3}["\\x27]?\\s{0,2}(?:127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|localhost|\\[?::1\\]?|0\\.0\\.0\\.0)\\b|(?:["\\x27]|(?:-H\\s{1,3}["\\x27]?|--header\\s{1,3}["\\x27]?|\\bheaders?\\b["\\x27]?\\s{0,3}[:=]?\\s{0,3}[{(\\[]?\\s{0,3}["\\x27]?))(?:x-forwarded-for|x-real-ip|x-originating-ip|x-client-ip|x-forwarded-host)["\\x27]?\\s{0,3}[:=]\\s{0,3}["\\x27]?\\s{0,2}(?:127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|localhost|\\[?::1\\]?|0\\.0\\.0\\.0)\\b)(?:[^:;\\n|&]|:[^/;\\n|&]|:/[^/;\\n|&]){0,120}https?://[a-z0-9-]{2,30}(?:\\.[a-z0-9-]{1,30}){0,4}\\.[a-z]{2,12}(?:[:/?"\\x27]|\\s|$))',
+        desc: 'A named external host and a loopback-valued origin header, adjacent and in the same statement',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02815',
+    title:
+      'Indirect Injection: Agent-Directed Halt Order With Canned Substitute Reply (Task-Abort DoS)',
+    severity: 'medium',
+    category: 'prompt-injection',
+    scan_target: 'content',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?:\\b(?:halt|stop|cease|abort|abandon|discontinue)\\b[^.!?\\n]{0,40}?(?:right\\s+now|immediately|at\\s+once|this\\s+instant|without\\s+delay|straight\\s+away|extremely\\s+important|very\\s+important|really\\s+important|matters?\\s+enormously|this\\s+is\\s+urgent|urgently)[^.!?\\n]{0,40}?(?:\\b(?:what|whatever|everything|anything)\\s+(?:it\\s+is\\s+)?(?:(?:you\\s+are|you[\\x27\u2019]re|youre|you\\s+were)|you)\\s*(?:currently\\s+)?(?:doing|working\\s+on|processing|executing)|\\byour\\s+(?:current|ongoing|present)\\s+(?:task|action|work|operation|process|job|request))|\\b(?:halt|stop|cease|abort|abandon|discontinue)\\b[^.!?\\n]{0,70}?(?:\\b(?:what|whatever|everything|anything)\\s+(?:it\\s+is\\s+)?(?:(?:you\\s+are|you[\\x27\u2019]re|youre|you\\s+were)|you)\\s*(?:currently\\s+)?(?:doing|working\\s+on|processing|executing)|\\byour\\s+(?:current|ongoing|present)\\s+(?:task|action|work|operation|process|job|request))[^.!?\\n]{0,60}?(?:right\\s+now|immediately|at\\s+once|this\\s+instant|without\\s+delay|straight\\s+away|extremely\\s+important|very\\s+important|really\\s+important|matters?\\s+enormously|this\\s+is\\s+urgent|urgently)|(?:right\\s+now|immediately|at\\s+once|this\\s+instant|without\\s+delay|straight\\s+away|extremely\\s+important|very\\s+important|really\\s+important|matters?\\s+enormously|this\\s+is\\s+urgent|urgently)[^.!?\\n]{0,40}?\\b(?:halt|stop|cease|abort|abandon|discontinue)\\b[^.!?\\n]{0,40}?(?:\\b(?:what|whatever|everything|anything)\\s+(?:it\\s+is\\s+)?(?:(?:you\\s+are|you[\\x27\u2019]re|youre|you\\s+were)|you)\\s*(?:currently\\s+)?(?:doing|working\\s+on|processing|executing)|\\byour\\s+(?:current|ongoing|present)\\s+(?:task|action|work|operation|process|job|request)))[\\s\\S]{0,220}?(?:\\b(?:answer|reply|respond|output|return|say)\\b[^.!?\\n]{0,35}?\\bwith\\s+[\\x22\\x27\\x60\u2018\u2019\u201c\u201d][^\\x22\\x27\\x60\u2018\u2019\u201c\u201d\\n]{1,45}[\\x22\\x27\\x60\u2018\u2019\u201c\u201d][^.!?\\n]{0,30}?\\b(?:instead|only|and\\s+nothing\\s+else|nothing\\s+else|and\\s+stop\\s+doing\\s+anything\\s+else|and\\s+do\\s+nothing\\s+else)\\b|\\b(?:just|simply|only)\\s+(?:answer|reply|respond|output|return|say)\\s+[\\x22\\x27\\x60\u2018\u2019\u201c\u201d][^\\x22\\x27\\x60\u2018\u2019\u201c\u201d\\n]{1,45}[\\x22\\x27\\x60\u2018\u2019\u201c\u201d][^.!?\\n]{0,45}?\\b(?:(?:instead|only|and\\s+nothing\\s+else|nothing\\s+else|and\\s+stop\\s+doing\\s+anything\\s+else|and\\s+do\\s+nothing\\s+else)|to\\s+the\\s+user)\\b)',
+        desc: "Urgent halt order aimed at the reader's current work, followed within 220 chars by a directive to emit a fixed quoted string in place of the result (instead / only / nothing else)",
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?:\\bto\\s+you,?\\s+(?:the\\s+)?(?:assistant|agent|ai\\b|model|llm|chatbot|copilot)|\\b(?:(?:you\\s+are|you[\\x27\u2019]re|youre|you\\s+were))\\s+(?:an?\\s+|the\\s+)?(?:ai\\b|a\\.i\\.|assistant|agent|language\\s+model|chatbot|llm)|\\b(?:dear|hello|hey)\\s+(?:ai\\b|assistant|agent|model)|\\b(?:assistant|ai\\s+agent|ai\\s+assistant)\\s*[:,]\\s|\\bfor\\s+the\\s+(?:ai\\s+)?(?:assistant|agent)\\s+reading\\s+this|\\bnote\\s+(?:to|for)\\s+(?:the\\s+)?(?:ai\\b|assistant|agent|model))',
+        desc: 'The same content addresses an AI assistant/agent directly \u2014 the conjunct that separates an injected abort order from an incident-response runbook or CI cancellation convention',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02817',
+    title: 'Untrusted Tool Result Dictates a Tool Call by Schema Parameter Name',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'content',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?:\\bI\\s+(?:would\\s+like|want|need|am\\s+asking)\\s+(?:you|the\\s+(?:assistant|agent|ai|model|bot))\\s+to\\s+(?:call|invoke|execute|run|trigger|use)\\b|\\b(?:can|could|would|will)\\s+you\\s+(?:please\\s+)?(?:construct|build|create|assemble|prepare|produce|form)\\b[^.\\n]{0,80}?\\b(?:argument|parameter)s?\\b[^.\\n]{0,80}?\\b(?:call|invoke|execute|trigger)\\b|\\b(?:have|let|ask)\\s+the\\s+(?:assistant|agent|ai|model|bot)\\s+(?:to\\s+)?(?:call|invoke|execute|trigger)\\b|\\bthe\\s+(?:assistant|agent|ai|model|bot)\\s+(?:should|must|needs\\s+to|is\\s+to)\\s+(?:call|invoke|execute|trigger)\\s+the\\s+[A-Za-z_][A-Za-z0-9_]{1,40}\\s+(?:function|tool|api|method|endpoint|command)\\b)',
+        desc: 'The retrieved content asks an assistant/agent to construct and issue the call \u2014 the conjunct that separates a planted call spec from API reference documentation',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?:\\bthe\\s+[A-Za-z_][A-Za-z0-9_]{1,40}\\s+(?:parameter|argument|field)\\b|\\b(?:parameter|argument|field)\\s+[A-Za-z_][A-Za-z0-9_]{1,40}\\s+(?:\\bset\\s+to|=|\\bas|\\bto)\\b|\\bpassing\\s+[^.\\n]{0,60}?\\bto\\s+the\\s+[A-Za-z_][A-Za-z0-9_]{1,40}\\s+(?:parameter|argument|field)\\b)[\\s\\S]{0,300}?(?:\\bthe\\s+[A-Za-z_][A-Za-z0-9_]{1,40}\\s+(?:parameter|argument|field)\\b|\\b(?:parameter|argument|field)\\s+[A-Za-z_][A-Za-z0-9_]{1,40}\\s+(?:\\bset\\s+to|=|\\bas|\\bto)\\b|\\bpassing\\s+[^.\\n]{0,60}?\\bto\\s+the\\s+[A-Za-z_][A-Za-z0-9_]{1,40}\\s+(?:parameter|argument|field)\\b)',
+        desc: 'Two or more named parameter bindings within 300 chars, i.e. the text is a serialised call specification rather than prose mentioning an argument',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02818',
+    title: 'Installable Skill Manifest Self-Declares an Attack or Jailbreak Purpose',
+    severity: 'high',
+    category: 'skill-compromise',
+    scan_target: 'skill',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?:^|\\n)-{3,}[ \\t]*\\r?\\n[\\s\\S]{0,500}?\\bname:[ \\t]*[\\x22\\x27]?[A-Za-z0-9_.\\-]{2,60}[\\s\\S]{0,500}?\\bmetadata:[ \\t]*[\\s\\S]{0,300}?\\n[ \\t]+(?:category|type|class|kind|purpose):[ \\t]*[\\x22\\x27]?(?:attack|jailbreak|exploit|offensive|red[_\\-]?team[_\\-]?payload)[\\x22\\x27]?[ \\t]*(?:\\r?\\n|$)',
+        desc: 'Skill frontmatter (--- / name: / metadata:) whose indented category|type|class|kind|purpose key resolves, at end of line, to attack|jailbreak|exploit|offensive',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?:\\bseed\\s+(?:prompt|request|query|instruction|input)|\\brefusal\\s+(?:path|behaviou?r|training|response|mechanism)|\\brefuses?\\s+to\\s+(?:answer|comply|respond|engage)|\\b(?:safety|content|token|moderation|keyword)\\s+filters?\\b|\\bguard[\\s\\-]?rails?\\b|\\bsafety\\s+(?:training|alignment|layer|guidelines)|\\btarget\\s+model\\b|\\bjailbreak\\w*|\\bbypass\\w*[^.\\n]{0,40}?\\b(?:refusal|safety|guardrail|filter|alignment|restriction|moderation)|\\brewrit\\w+[^.\\n]{0,40}?\\b(?:prompt|request|query)\\b|\\b(?:harmful|malicious|unsafe|restricted|disallowed|prohibited)\\s+(?:request|prompt|instruction|query|content)\\b|\\bwithout\\s+(?:tripping|triggering)\\b)',
+        desc: 'The same manifest describes prompt-rewriting against a model refusal (seed prompt / refusal path / guardrail / token filter / jailbreak). Required as a CONJUNCT, never alone -- see the description.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02820',
+    title: 'Tool Result Orders the Agent to Hide an Action It Just Performed From the User',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_response',
+        pattern:
+          "(?:do\\s+not|don't|never)\\s+(?:mention|report|disclose|surface|reveal|tell|inform|notify|log|record)[^.\\n]{0,60}?\\b(?:this\\s+(?:action|step|call|change|request)|what\\s+you\\s+(?:did|just\\s+did|ran|executed|sent)|that\\s+you\\s+(?:ran|executed|sent|called|installed|deleted|modified|created))\\b",
+        desc: "Explicit order not to report the agent's own action, arriving in tool output.",
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          '\\b(?:this\\s+(?:action|step|call|change)|what\\s+you\\s+(?:did|just\\s+did|ran|executed)|that\\s+you\\s+(?:ran|executed|sent|called|installed|deleted|modified))\\b[^.\\n]{0,80}?(?:without\\s+(?:mentioning|reporting|telling|notifying|logging|informing)|out\\s+of\\s+(?:the\\s+)?(?:summary|report|transcript|log|audit)|off\\s+the\\s+record)',
+        desc: "The same concealment bound to the agent's own action, phrased as an exclusion.",
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          'without\\s+(?:mentioning|reporting|telling|notifying|logging|disclosing)[^.\\n]{0,40}?\\b(?:this\\s+(?:action|step|call|change|request)|what\\s+you\\s+(?:did|ran|executed))\\b',
+        desc: 'The exclusion phrasing with the clauses reversed \u2014 "without mentioning this change" rather than "this change ... without mentioning".',
+      },
+      {
+        field: 'tool_response',
+        pattern:
+          "(?:do\\s+not|don't|never)\\s+(?:let|allow)\\s+(?:the\\s+)?(?:user|operator|human|reviewer)\\s+(?:know|see|find\\s+out)[^.\\n]{0,60}?\\b(?:this|it|that\\s+you)\\b",
+        desc: 'Concealment phrased as keeping the overseer unaware, in tool output.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02845',
+    title: 'Cryptomining Payload Deployed Through an Agent Skill or Tool Call',
+    severity: 'high',
+    category: 'skill-compromise',
+    scan_target: 'both',
+    rule_version: 2,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:^|[\\r\\n;]|&&|\\|\\|)[ \\t]*(?:\\b(?:sudo|nohup|setsid|exec|start|screen|tmux)[ \\t]+){0,3}(?:[.~]?[\\w.$/\\\\-]{0,60}[/\\\\])?(?:xmrig|xmr-stak(?:-rx)?|minerd|cpuminer(?:-multi|-opt)?|ethminer|nbminer|t-rex|phoenixminer|srbminer(?:-multi)?|lolminer|teamredminer|gminer|nanominer|nheqminer|cgminer|bfgminer|verusminer)(?:\\.exe)?[ \\t]+(?:-{1,2}[a-z][\\w-]{0,24}|stratum\\+)[^\\n]{0,180}(?:stratum\\+(?:tcp|tcps|ssl)://|--donate-level|--rig-id|--nicehash|--cpu-priority|--pool[ \\t=]|--coin[ \\t=]|--algo[ \\t=]|--url[ \\t=]|--user[ \\t=]|--wallet[ \\t=]|--threads[ \\t=]|-o[ \\t]+[^\\s]|-u[ \\t]+[^\\s])',
+        desc: 'Coin-mining binary invoked in command position with mining flags or a stratum pool endpoint on the same command line',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:(?:^|[\\s,\\[\\(=])--?(?:url|pool|pool-url|o|server|host)\\b|["\']?\\b(?:url|pool|pool_url|poolurl|server|host)["\']?\\s*[:=])[\\s"\',\\[\\(]{0,4}stratum\\+(?:tcp|tcps|ssl)://[\\s\\S]{0,300}\\b[48][0-9ab][1-9a-hj-np-zA-HJ-NP-Z]{93}\\b',
+        desc: 'Stratum pool endpoint configured as a pool setting within 300 characters of a Monero payout address',
+      },
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b[48][0-9ab][1-9a-hj-np-zA-HJ-NP-Z]{93}\\b[\\s\\S]{0,300}(?:(?:^|[\\s,\\[\\(=])--?(?:url|pool|pool-url|o|server|host)\\b|["\']?\\b(?:url|pool|pool_url|poolurl|server|host)["\']?\\s*[:=])[\\s"\',\\[\\(]{0,4}stratum\\+(?:tcp|tcps|ssl)://',
+        desc: 'Monero payout address within 300 characters ahead of a stratum endpoint configured as a pool setting',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02846',
+    title: 'Ignore-Previous-and-Following Instructions in User Input (PromptInject Goal Hijacking)',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: null,
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'user_input',
+        pattern:
+          '(?i)ignore\\s+(?:any\\s+)?previous\\s+and\\s+following\\s+(?:instructions|rules|commands)\\s+and\\s+just\\s+(?:say|print|output|respond|do|tell|return)',
+        desc: "Detects the specific pattern 'ignore [any] previous and following instructions/rules/commands and just say/print/output/respond/do/tell/return', a common goal hijacking structure combining temporal instruction override with redirect command.",
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02847',
+    title: 'Policy-Justified Email Exfiltration Pretext Detection',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:per\\s+(?:company|management)\\s+(?:policy|directive)|data\\s+retention\\s+policy|for\\s+(?:quality\\s+assurance|verification\\s+purposes|audit\\s+purposes|compliance\\s+purposes))\\b[\\s\\S]{0,100}[\\w.+-]+@[\\w-]+\\.[\\w.-]+|[\\w.+-]@[\\w-]+\\.[\\w.-]+[\\s\\S]{0,100}\\b(?:per\\s+(?:company|management)\\s+(?:policy|directive)|data\\s+retention\\s+policy|for\\s+(?:quality\\s+assurance|verification\\s+purposes|audit\\s+purposes|compliance\\s+purposes))\\b',
+        desc: 'Fabricated policy/compliance/audit pretext paired with a nearby destination email address, in either order',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02850',
+    title: 'Fake Documentation Pretext Data Exfiltration via Email',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:for\\s+our\\s+(?:documentation|records)|pour\\s+notre\\s+documentation|documentation\\s+and\\s+guidelines|internal\\s+documentation)\\b[\\s\\S]{0,100}\\b(?:forward(?:ed|ing)?|transmit|transmettre|send(?:ing)?|consolidat\\w*|logged?|maintained)\\b[\\s\\S]{0,100}@[\\w.-]{1,50}',
+        desc: 'Fake documentation/records pretext instructing forwarding, transmission, or logging of captured information to an email address',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02851',
+    title: 'Fake User-Turn Injection: Send Email Directive',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern: '(?i)\\buser:\\s*`?[\\s\\S]{0,300}?\\bsend\\b[\\s\\S]{0,30}\\bemail\\b',
+        desc: "Fabricated 'User:' dialogue turn in tool/retrieved content followed within a bounded window by a send-email directive",
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02855',
+    title: 'Cross-Email Context Exfiltration Relay Detection',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)\\b(?:found|find|retrieved|mentioned|contained)\\b[\\s\\S]{0,80}\\b(?:other|previous|another)\\s+emails?\\b[\\s\\S]{0,100}\\bsend\\b[\\s\\S]{0,60}\\bemail\\b|\\bsend\\b[\\s\\S]{0,100}\\bemail\\b[\\s\\S]{0,100}\\b(?:found|retrieved|mentioned|contained)\\b[\\s\\S]{0,60}\\b(?:in|within|from)\\s+(?:other|previous|another)\\s+emails?\\b',
+        desc: 'Instruction claims a value was found/mentioned/contained in another, previous, or other email and is immediately followed by a request to send an email, the core cross-document exfiltration-relay structure',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02858',
+    title: 'Context-Suppression Directive: Disregard All Other Context or Everything Said So Far',
+    severity: 'medium',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:^|[.!?;:,"\'`]\\s*|\\n[^\\S\\n]*|\\b(?:and|now|please|then|so|just)\\s+)(?:ignore|disregard|discard|forget|dismiss)\\s+(?:all|any)\\s+(?:of\\s+the\\s+)?(?:other|remaining|conflicting|contradictory|competing)\\s+(?:evidence|information|instructions?|directives?|context)(?:\\s+(?:and|or)\\s+(?:evidence|information|instructions?|directives?|context))?(?:\\s+(?:in|within)\\s+(?:the|this|your)\\s+(?:context|prompt|conversation)|\\s+(?:that|which)\\s+(?:will\\s+)?follows?|\\s+(?:above|below))?\\s*(?:[.!;:,"\'\\)\\]\\n]|$|and\\b|until\\b|unless\\b|or\\b)|(?:^|[.!?;:,"\'`]\\s*|\\n[^\\S\\n]*|\\b(?:and|now|please|then|so|just)\\s+)(?:ignore|disregard|forget|discard)\\s+(?:about\\s+)?(?:everything|all|anything|whatever)\\s+(?:that\\s+)?(?:i|we)(?:\\W?ve|\\W?d|\\s+have|\\s+had)?\\s+(?:just\\s+|previously\\s+|already\\s+|ever\\s+)?(?:said|told|written|wrote|typed|asked|mentioned|stated)(?:\\s+(?:to\\s+)?you)?(?:\\s+(?:so\\s+far|before(?:\\s+this(?:\\s+(?:line|sentence|message|point))?)?|till\\s+now|until\\s+now|up\\s+(?:to|until)\\s+(?:now|this\\s+point)|above|earlier|previously))?\\s*(?:[.!;:,"\'\\)\\]\\n]|$|and\\b|now\\b|then\\b)',
+        desc: 'Clause-initial imperative (ignore / disregard / discard / forget / dismiss) that is total in scope: all or any OTHER (or remaining / conflicting / competing) evidence, information, instructions, directives or context; or everything (all / anything) I or we said, told, wrote, typed, asked, mentioned or stated - followed only by a model-context scope or a temporal adverb and then a clause end',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02859',
+    title: 'Agent Role Reassignment Arriving in Tool Output ("You are now a ... bot")',
+    severity: 'medium',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)\\byou\\s+are\\s+(?:now|no\\s+longer)\\s+(?:a|an)\\s+(?:[a-z][\\w-]*\\s+){0,2}?(?:(?:chat)?bot|(?:ai|llm)(?:\\s+(?:assistant|agent|model))?)(?:\\s*[.,;:!"\'<>)\\]]|\\s*$|\\s+-\\s|\\s+(?:that|which|who|whose|designed|trained|programmed|built|made|created|meant|tasked|called|named|for|with|and|to)\\b)|\\byou\\s+are\\s+not\\s+(?:a|an)\\s+(?:[a-z][\\w-]*\\s+){0,2}?(?:chat)?bot\\s+any\\s*more\\b|\\bfrom\\s+now\\s+on,?\\s+you\\s+(?:are|will\\s+be)\\s+(?:a|an)\\s+(?:[a-z][\\w-]*\\s+){0,2}?(?:(?:chat)?bot|(?:ai|llm)(?:\\s+(?:assistant|agent|model))?)(?:\\s*[.,;:!"\'<>)\\]]|\\s*$|\\s+-\\s|\\s+(?:that|which|who|whose|designed|trained|programmed|built|made|created|meant|tasked|called|named|for|with|and|to)\\b)',
+        desc: '"you are now" / "you are no longer" / "from now on you are" + a or an + up to two modifier words + a machine role noun (bot, chatbot, AI, LLM, AI assistant/agent/model) that ends the role phrase; or "you are not a ... bot anymore"',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02860',
+    title:
+      'Forged Instruction-Boundary Marker ("##Begin New Instructions##", "%%% end previous instructions %%%")',
+    severity: 'medium',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:[#%=*~_|-]{2,8}|<{1,3}|\\[{1,2}|\\{{1,2})\\s*(?:(?:begin(?:ning)?|start)\\s+(?:of\\s+)?(?:the\\s+|a\\s+)?(?:new|updated|revised|real|actual|overriding|replacement)\\s+(?:system\\s+)?(?:instructions?|directives?|prompt)|(?:new|updated|revised|real|actual|overriding|replacement)\\s+(?:system\\s+)?(?:instructions?|directives?|prompt)\\s+(?:begins?|starts?)|end\\s+(?:of\\s+)?(?:the\\s+|all\\s+)?(?:previous|prior|old|original|initial|out[\\s-]of[\\s-]date|outdated|obsolete|preceding|primary)\\s+(?:instructions?|directives?|prompts?|tasks?))\\s*(?:[#%=*~_|-]{2,8}|>{1,3}|\\]{1,2}|\\}{1,2})|(?:[#%=*~_|-]{2,8}|<{1,3}|\\[{1,2}|\\{{1,2})\\s*end\\s+(?:of\\s+)?(?:the\\s+)?(?:context|document|email|input|data|text|conversation)\\s*(?:[#%=*~_|-]{2,8}|>{1,3}|\\]{1,2}|\\}{1,2})\\s*(?:(?:[#%=*~_|-]{2,8}|<{1,3}|\\[{1,2}|\\{{1,2})\\s*)?(?:new|updated|real|actual|important)\\s+(?:instructions?|directives?|tasks?)\\b',
+        desc: 'Opening delimiter (2-8 of # % = * ~ _ | -, or 1-3 of < [ {) + a boundary claim about instructions with a supersession word (begin/start of new|real|updated instructions, new instruction begins, end of previous| prior|original|out-of-date|primary instructions) + closing delimiter; or a delimiter-framed END OF CONTEXT/DOCUMENT/EMAIL marker immediately followed by a "new instruction" header',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02861',
+    title: 'Injected Directive to Send Email with Attacker-Specified Body',
+    severity: 'high',
+    category: 'context-exfiltration',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_response',
+        pattern:
+          '(?i)\\bsend\\s+(?:an?\\s+)?(?:e-?mail|mail|message|notification)\\s+to\\s+[\\s\\S]{0,60}?\\bwith\\s+(?:the\\s+)?body\\b',
+        desc: 'Directive in tool output to send an email/mail/message/notification to a recipient with a specified body',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02862',
+    title: 'Fake Chat-Template Turn Injection Detection',
+    severity: 'high',
+    category: 'prompt-injection',
+    scan_target: 'mcp',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '(?i)(?:<\\|\\s*(?:im[_ ]?start|im[_ ]?end|end|system|assistant|user)\\s*\\|?>|<\\s*im[_ ]?(?:start|end)\\s*\\|?>)\\s*(?:<\\|\\s*(?:im[_ ]?start|im[_ ]?end|end|system|assistant|user)\\s*\\|?>|<\\s*im[_ ]?(?:start|end)\\s*\\|?>)',
+        desc: 'Fabricated adjacent chat-control tokens simulating a conversation turn boundary to smuggle a new instruction',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02864',
+    title: 'Non-Canonical Numeric IPv4 Host in a URL-Typed Tool Argument (SSRF Filter Bypass)',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'tool_args',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_args',
+        pattern:
+          '(?:^|\\\\?"[A-Za-z_][A-Za-z0-9_.-]{0,40}\\\\?"\\s{0,3}:\\s{0,3}\\\\?"|[\\[,]\\s{0,3}\\\\?")(?:https?|wss?|ftp):\\\\?/\\\\?/(?:[^/\\s"\\x27@?#\\\\]{1,64}@)?(?:\\d{8,10}|0[0-7]{8,11}|0x[0-9a-f]{1,8}|0(?:[0-7]{1,3}|x[0-9a-f]{1,2})(?:\\.(?:0x[0-9a-f]{1,2}|\\d{1,4})){1,3}|\\d{1,3}\\.\\d{1,8}|\\d{1,3}\\.\\d{1,3}\\.\\d{1,5})\\.?(?:[:/?#"\\x27\\\\\\s\\]]|$)',
+        desc: 'A URL that is a quoted JSON value, a quoted JSON array element (or the whole argument) whose host is a decimal integer, octal integer, hex integer, octal/hex-first-part dotted address, or a two/three-part short IPv4 form - every spelling that resolves to an IPv4 address while evading a dotted-decimal deny-list',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02865',
+    title:
+      'Read-Only Allow-Listed Utility Invoked With a File-Write or State-Changing Option in a Command Argument',
+    severity: 'medium',
+    category: 'tool-poisoning',
+    scan_target: 'tool_args',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'content',
+        pattern:
+          '\\\\{0,7}"(?:\\w{0,24}?[_-]|bash|shell|sh|run|exec|raw|full)?(?:command_line|commandline|cmd_line|cmdline|command|cmd|shell|script|exec|args?|argv)\\\\{0,7}"\\s*:\\s*\\\\{0,7}"\\s{0,16}(?:sudo(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64})?(?:/(?:usr/)?(?:local/)?s?bin/|\\./)?sort(?:(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}[^\\s"\\\\|;&<>]{1,80}){0,8}?(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}(?:(?:-[bcdfghimnrsuvz]{0,8}o(?:\\s|\\\\(?:\\\\\\\\?)?t){0,64}|--o(?:u(?:t(?:p(?:u(?:t)?)?)?)?)?(?:=|(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}))(?:\\\\{1,7}"|\')?[^\\s"\\\\|;&<>{}\\[\\],-]|--co[a-z-]{0,16}(?:=|(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64})(?:\'(?:[^/bglpxz]|$)|\\\\{1,7}"[^\\s"\\\\|;&<>{}\\[\\],/bglpxz-]|[^\\s"\\\\|;&<>{}\\[\\],\'/bglpxz-]|(?:\'|\\\\{1,7}")?(?:/(?:usr/)?(?:local/)?s?bin/(?:[^bglpxz]|$|b(?:[^rz]|$|r(?:[^o]|$|o(?:[^t]|$|t(?:[^l]|$|l(?:[^i]|$))))|z(?:[^i]|$|i(?:[^p]|$|p(?:[^2]|$))))|g(?:[^z]|$|z(?:[^i]|$|i(?:[^p]|$)))|l(?:[^bz]|$|b(?:[^z]|$|z(?:[^i]|$|i(?:[^p]|$|p(?:[^2]|$))))|z(?:[^4imo]|$|i(?:[^p]|$)|m(?:[^a]|$)|o(?:[^p]|$)))|p(?:[^bilxz]|$|b(?:[^z]|$|z(?:[^i]|$|i(?:[^p]|$|p(?:[^2]|$))))|i(?:[^g]|$|g(?:[^z]|$))|l(?:[^z]|$|z(?:[^i]|$|i(?:[^p]|$)))|x(?:[^z]|$)|z(?:[^s]|$|s(?:[^t]|$|t(?:[^d]|$))))|x(?:[^z]|$)|z(?:[^s]|$|s(?:[^t]|$|t(?:[^d]|$)))|(?:gzip|pigz|bzip2|pbzip2|lbzip2|xz|pxz|lz4|lzop|zstd|pzstd|lzma|lzip|plzip|brotli)(?:[^\\s\'"\\\\]|\\\\{8}|\\\\{1,7}(?:[^"\\\\t]|$)|\\\\{4,7}t))|/(?:[^blsu]|$|b(?:[^i]|$|i(?:[^n]|$|n(?:[^/]|$)))|l(?:[^o]|$|o(?:[^c]|$|c(?:[^a]|$|a(?:[^l]|$|l(?:[^/]|$|/(?:[^bs]|$|b(?:[^i]|$|i(?:[^n]|$|n(?:[^/]|$)))|s(?:[^b]|$|b(?:[^i]|$|i(?:[^n]|$|n(?:[^/]|$))))))))))|s(?:[^b]|$|b(?:[^i]|$|i(?:[^n]|$|n(?:[^/]|$))))|u(?:[^s]|$|s(?:[^r]|$|r(?:[^/]|$|/(?:[^bls]|$|b(?:[^i]|$|i(?:[^n]|$|n(?:[^/]|$)))|l(?:[^o]|$|o(?:[^c]|$|c(?:[^a]|$|a(?:[^l]|$|l(?:[^/]|$|/(?:[^bs]|$|b(?:[^i]|$|i(?:[^n]|$|n(?:[^/]|$)))|s(?:[^b]|$|b(?:[^i]|$|i(?:[^n]|$|n(?:[^/]|$))))))))))|s(?:[^b]|$|b(?:[^i]|$|i(?:[^n]|$|n(?:[^/]|$)))))))))|(?:b(?:[^rz]|$|r(?:[^o]|$|o(?:[^t]|$|t(?:[^l]|$|l(?:[^i]|$))))|z(?:[^i]|$|i(?:[^p]|$|p(?:[^2]|$))))|g(?:[^z]|$|z(?:[^i]|$|i(?:[^p]|$)))|l(?:[^bz]|$|b(?:[^z]|$|z(?:[^i]|$|i(?:[^p]|$|p(?:[^2]|$))))|z(?:[^4imo]|$|i(?:[^p]|$)|m(?:[^a]|$)|o(?:[^p]|$)))|p(?:[^bilxz]|$|b(?:[^z]|$|z(?:[^i]|$|i(?:[^p]|$|p(?:[^2]|$))))|i(?:[^g]|$|g(?:[^z]|$))|l(?:[^z]|$|z(?:[^i]|$|i(?:[^p]|$)))|x(?:[^z]|$)|z(?:[^s]|$|s(?:[^t]|$|t(?:[^d]|$))))|x(?:[^z]|$)|z(?:[^s]|$|s(?:[^t]|$|t(?:[^d]|$)))|(?:gzip|pigz|bzip2|pbzip2|lbzip2|xz|pxz|lz4|lzop|zstd|pzstd|lzma|lzip|plzip|brotli)(?:[^\\s\'"\\\\]|\\\\{8}|\\\\{1,7}(?:[^"\\\\t]|$)|\\\\{4,7}t)))))',
+        desc: 'sort invoked with an output file (-o / --output) or with --compress-program naming a non-compressor program - sort writes or executes it itself (CVE-2026-105789 primary primitive)',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '\\\\{0,7}"(?:\\w{0,24}?[_-]|bash|shell|sh|run|exec|raw|full)?(?:command_line|commandline|cmd_line|cmdline|command|cmd|shell|script|exec|args?|argv)\\\\{0,7}"\\s*:\\s*\\\\{0,7}"\\s{0,16}(?:sudo(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64})?(?:/(?:usr/)?(?:local/)?s?bin/|\\./)?sort(?:(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}[^\\s"\\\\|;&<>]{1,80}){0,8}?(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}(?:(?:-[bcdfghimnrsuvz]{0,8}o(?:\\s|\\\\(?:\\\\\\\\?)?t){0,64}|--o(?:u(?:t(?:p(?:u(?:t)?)?)?)?)?(?:=|(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}))(?:\\\\{1,7}"|\')?[^\\s"\\\\|;&<>{}\\[\\],-]|--co[a-z-]{0,16}(?:=|(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64})(?:\'(?:[^/bglpxz]|$)|\\\\{1,7}"[^\\s"\\\\|;&<>{}\\[\\],/bglpxz-]|[^\\s"\\\\|;&<>{}\\[\\],\'/bglpxz-]|(?:\'|\\\\{1,7}")?(?:/(?:usr/)?(?:local/)?s?bin/(?:[^bglpxz]|$|b(?:[^rz]|$|r(?:[^o]|$|o(?:[^t]|$|t(?:[^l]|$|l(?:[^i]|$))))|z(?:[^i]|$|i(?:[^p]|$|p(?:[^2]|$))))|g(?:[^z]|$|z(?:[^i]|$|i(?:[^p]|$)))|l(?:[^bz]|$|b(?:[^z]|$|z(?:[^i]|$|i(?:[^p]|$|p(?:[^2]|$))))|z(?:[^4imo]|$|i(?:[^p]|$)|m(?:[^a]|$)|o(?:[^p]|$)))|p(?:[^bilxz]|$|b(?:[^z]|$|z(?:[^i]|$|i(?:[^p]|$|p(?:[^2]|$))))|i(?:[^g]|$|g(?:[^z]|$))|l(?:[^z]|$|z(?:[^i]|$|i(?:[^p]|$)))|x(?:[^z]|$)|z(?:[^s]|$|s(?:[^t]|$|t(?:[^d]|$))))|x(?:[^z]|$)|z(?:[^s]|$|s(?:[^t]|$|t(?:[^d]|$)))|(?:gzip|pigz|bzip2|pbzip2|lbzip2|xz|pxz|lz4|lzop|zstd|pzstd|lzma|lzip|plzip|brotli)(?:[^\\s\'"\\\\]|\\\\{8}|\\\\{1,7}(?:[^"\\\\t]|$)|\\\\{4,7}t))|/(?:[^blsu]|$|b(?:[^i]|$|i(?:[^n]|$|n(?:[^/]|$)))|l(?:[^o]|$|o(?:[^c]|$|c(?:[^a]|$|a(?:[^l]|$|l(?:[^/]|$|/(?:[^bs]|$|b(?:[^i]|$|i(?:[^n]|$|n(?:[^/]|$)))|s(?:[^b]|$|b(?:[^i]|$|i(?:[^n]|$|n(?:[^/]|$))))))))))|s(?:[^b]|$|b(?:[^i]|$|i(?:[^n]|$|n(?:[^/]|$))))|u(?:[^s]|$|s(?:[^r]|$|r(?:[^/]|$|/(?:[^bls]|$|b(?:[^i]|$|i(?:[^n]|$|n(?:[^/]|$)))|l(?:[^o]|$|o(?:[^c]|$|c(?:[^a]|$|a(?:[^l]|$|l(?:[^/]|$|/(?:[^bs]|$|b(?:[^i]|$|i(?:[^n]|$|n(?:[^/]|$)))|s(?:[^b]|$|b(?:[^i]|$|i(?:[^n]|$|n(?:[^/]|$))))))))))|s(?:[^b]|$|b(?:[^i]|$|i(?:[^n]|$|n(?:[^/]|$)))))))))|(?:b(?:[^rz]|$|r(?:[^o]|$|o(?:[^t]|$|t(?:[^l]|$|l(?:[^i]|$))))|z(?:[^i]|$|i(?:[^p]|$|p(?:[^2]|$))))|g(?:[^z]|$|z(?:[^i]|$|i(?:[^p]|$)))|l(?:[^bz]|$|b(?:[^z]|$|z(?:[^i]|$|i(?:[^p]|$|p(?:[^2]|$))))|z(?:[^4imo]|$|i(?:[^p]|$)|m(?:[^a]|$)|o(?:[^p]|$)))|p(?:[^bilxz]|$|b(?:[^z]|$|z(?:[^i]|$|i(?:[^p]|$|p(?:[^2]|$))))|i(?:[^g]|$|g(?:[^z]|$))|l(?:[^z]|$|z(?:[^i]|$|i(?:[^p]|$)))|x(?:[^z]|$)|z(?:[^s]|$|s(?:[^t]|$|t(?:[^d]|$))))|x(?:[^z]|$)|z(?:[^s]|$|s(?:[^t]|$|t(?:[^d]|$)))|(?:gzip|pigz|bzip2|pbzip2|lbzip2|xz|pxz|lz4|lzop|zstd|pzstd|lzma|lzip|plzip|brotli)(?:[^\\s\'"\\\\]|\\\\{8}|\\\\{1,7}(?:[^"\\\\t]|$)|\\\\{4,7}t)))))',
+        desc: 'Same as Layer 1, in the JSON-encoded tool argument object',
+      },
+      {
+        field: 'content',
+        pattern:
+          '\\\\{0,7}"(?:\\w{0,24}?[_-]|bash|shell|sh|run|exec|raw|full)?(?:command_line|commandline|cmd_line|cmdline|command|cmd|shell|script|exec|args?|argv)\\\\{0,7}"\\s*:\\s*\\\\{0,7}"\\s{0,16}(?:sudo(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64})?(?:/(?:usr/)?(?:local/)?s?bin/|\\./)?diff(?:(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}[^\\s"\\\\|;&<>]{1,80}){0,8}?(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}(?:-[abcehnpqrtuvwyz]{0,6}o(?:\\s|\\\\(?:\\\\\\\\?)?t){0,64}|--out(?:p(?:u(?:t)?)?)?(?:=|(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}))(?:\\\\{1,7}"|\')?[^\\s"\\\\|;&<>{}\\[\\],-]',
+        desc: 'diff invoked with an output file (--output / --out / -o) - diff writes the destination itself',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '\\\\{0,7}"(?:\\w{0,24}?[_-]|bash|shell|sh|run|exec|raw|full)?(?:command_line|commandline|cmd_line|cmdline|command|cmd|shell|script|exec|args?|argv)\\\\{0,7}"\\s*:\\s*\\\\{0,7}"\\s{0,16}(?:sudo(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64})?(?:/(?:usr/)?(?:local/)?s?bin/|\\./)?diff(?:(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}[^\\s"\\\\|;&<>]{1,80}){0,8}?(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}(?:-[abcehnpqrtuvwyz]{0,6}o(?:\\s|\\\\(?:\\\\\\\\?)?t){0,64}|--out(?:p(?:u(?:t)?)?)?(?:=|(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}))(?:\\\\{1,7}"|\')?[^\\s"\\\\|;&<>{}\\[\\],-]',
+        desc: 'Same as Layer 2, in the JSON-encoded tool argument object',
+      },
+      {
+        field: 'content',
+        pattern:
+          '\\\\{0,7}"(?:\\w{0,24}?[_-]|bash|shell|sh|run|exec|raw|full)?(?:command_line|commandline|cmd_line|cmdline|command|cmd|shell|script|exec|args?|argv)\\\\{0,7}"\\s*:\\s*\\\\{0,7}"\\s{0,16}(?:sudo(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64})?(?:/(?:usr/)?(?:local/)?s?bin/|\\./)?uniq(?:(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}[^\\s"\\\\|;&<>{}\\[\\],-][^\\s"\\\\|;&<>]{0,200}|(?:(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}(?:--|-[a-z\\d]{1,6}(?:(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}\\d{1,6})?|--[a-z][a-z-]{1,20}(?:=[\\w-]{0,20}|(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}\\d{1,6})?)){0,5}(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}(?:(?:-[a-z\\d]{1,6}|--[a-z][a-z-]{1,20})(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}[^\\s"\\\\|;&<>{}\\[\\],\\d-][^\\s"\\\\|;&<>]{0,200}|(?:--|-[a-z\\d]{1,6}(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}\\d{1,6}|--[a-z][a-z-]{1,20}(?:=[\\w-]{0,20}|(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}\\d{1,6}))(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}[^\\s"\\\\|;&<>{}\\[\\],-][^\\s"\\\\|;&<>]{0,200}))(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}[^\\s"\\\\|;&<>{}\\[\\],-][^\\s"\\\\|;&<>]{0,200}(?:(?:\\s|\\\\(?:\\\\\\\\?)?t)|\\\\{0,7}"|$)',
+        desc: 'uniq given an input and an output operand - uniq creates or overwrites the second file itself',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '\\\\{0,7}"(?:\\w{0,24}?[_-]|bash|shell|sh|run|exec|raw|full)?(?:command_line|commandline|cmd_line|cmdline|command|cmd|shell|script|exec|args?|argv)\\\\{0,7}"\\s*:\\s*\\\\{0,7}"\\s{0,16}(?:sudo(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64})?(?:/(?:usr/)?(?:local/)?s?bin/|\\./)?uniq(?:(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}[^\\s"\\\\|;&<>{}\\[\\],-][^\\s"\\\\|;&<>]{0,200}|(?:(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}(?:--|-[a-z\\d]{1,6}(?:(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}\\d{1,6})?|--[a-z][a-z-]{1,20}(?:=[\\w-]{0,20}|(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}\\d{1,6})?)){0,5}(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}(?:(?:-[a-z\\d]{1,6}|--[a-z][a-z-]{1,20})(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}[^\\s"\\\\|;&<>{}\\[\\],\\d-][^\\s"\\\\|;&<>]{0,200}|(?:--|-[a-z\\d]{1,6}(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}\\d{1,6}|--[a-z][a-z-]{1,20}(?:=[\\w-]{0,20}|(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}\\d{1,6}))(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}[^\\s"\\\\|;&<>{}\\[\\],-][^\\s"\\\\|;&<>]{0,200}))(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}[^\\s"\\\\|;&<>{}\\[\\],-][^\\s"\\\\|;&<>]{0,200}(?:(?:\\s|\\\\(?:\\\\\\\\?)?t)|\\\\{0,7}"|$)',
+        desc: 'Same as Layer 3, in the JSON-encoded tool argument object',
+      },
+      {
+        field: 'content',
+        pattern:
+          '\\\\{0,7}"(?:\\w{0,24}?[_-]|bash|shell|sh|run|exec|raw|full)?(?:command_line|commandline|cmd_line|cmdline|command|cmd|shell|script|exec|args?|argv)\\\\{0,7}"\\s*:\\s*\\\\{0,7}"\\s{0,16}(?:sudo(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64})?(?:/(?:usr/)?(?:local/)?s?bin/|\\./)?date(?:(?:(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}[^\\s"\\\\|;&<>]{1,80}){0,8}?(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}(?:-u?s(?:\\s|\\\\(?:\\\\\\\\?)?t){0,64}|--s(?:et?)?(?:=|(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}))(?:\\\\{1,7}"|\')?[^\\s"\\\\|;&<>{}\\[\\],-]|(?:(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}(?:-u|--utc|--universal)){0,3}(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\\d|3[01])(?:[01]\\d|2[0-3])[0-5]\\d(?:\\d{2}){0,2}(?:\\.\\d{2})?(?:(?:\\s|\\\\(?:\\\\\\\\?)?t)|\\\\{0,7}"|$))',
+        desc: 'date invoked with -s / --set or a valid MMDDhhmm operand - both set the system clock',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '\\\\{0,7}"(?:\\w{0,24}?[_-]|bash|shell|sh|run|exec|raw|full)?(?:command_line|commandline|cmd_line|cmdline|command|cmd|shell|script|exec|args?|argv)\\\\{0,7}"\\s*:\\s*\\\\{0,7}"\\s{0,16}(?:sudo(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64})?(?:/(?:usr/)?(?:local/)?s?bin/|\\./)?date(?:(?:(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}[^\\s"\\\\|;&<>]{1,80}){0,8}?(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}(?:-u?s(?:\\s|\\\\(?:\\\\\\\\?)?t){0,64}|--s(?:et?)?(?:=|(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}))(?:\\\\{1,7}"|\')?[^\\s"\\\\|;&<>{}\\[\\],-]|(?:(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}(?:-u|--utc|--universal)){0,3}(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\\d|3[01])(?:[01]\\d|2[0-3])[0-5]\\d(?:\\d{2}){0,2}(?:\\.\\d{2})?(?:(?:\\s|\\\\(?:\\\\\\\\?)?t)|\\\\{0,7}"|$))',
+        desc: 'Same as Layer 4, in the JSON-encoded tool argument object',
+      },
+      {
+        field: 'content',
+        pattern:
+          '\\\\{0,7}"(?:\\w{0,24}?[_-]|bash|shell|sh|run|exec|raw|full)?(?:command_line|commandline|cmd_line|cmdline|command|cmd|shell|script|exec|args?|argv)\\\\{0,7}"\\s*:\\s*\\\\{0,7}"\\s{0,16}(?:sudo(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64})?(?:/(?:usr/)?(?:local/)?s?bin/|\\./)?hostname(?:(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}(?:-[bv]{1,2}|--boot|--verbose)){0,3}(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}(?:(?:-[bv]{0,2}f(?:\\s|\\\\(?:\\\\\\\\?)?t){0,64}|--fi(?:le?)?(?:=|(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}))(?:\\\\{1,7}"|\')?[^\\s"\\\\|;&<>{}\\[\\],-]|[a-z0-9][a-z0-9.-]{0,252}(?:\\s|\\\\(?:\\\\\\\\?)?t){0,16}(?:\\\\{0,7}"|$))',
+        desc: 'hostname given a new name or a name file - hostname changes the system hostname',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '\\\\{0,7}"(?:\\w{0,24}?[_-]|bash|shell|sh|run|exec|raw|full)?(?:command_line|commandline|cmd_line|cmdline|command|cmd|shell|script|exec|args?|argv)\\\\{0,7}"\\s*:\\s*\\\\{0,7}"\\s{0,16}(?:sudo(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64})?(?:/(?:usr/)?(?:local/)?s?bin/|\\./)?hostname(?:(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}(?:-[bv]{1,2}|--boot|--verbose)){0,3}(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}(?:(?:-[bv]{0,2}f(?:\\s|\\\\(?:\\\\\\\\?)?t){0,64}|--fi(?:le?)?(?:=|(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}))(?:\\\\{1,7}"|\')?[^\\s"\\\\|;&<>{}\\[\\],-]|[a-z0-9][a-z0-9.-]{0,252}(?:\\s|\\\\(?:\\\\\\\\?)?t){0,16}(?:\\\\{0,7}"|$))',
+        desc: 'Same as Layer 5, in the JSON-encoded tool argument object',
+      },
+      {
+        field: 'content',
+        pattern:
+          '\\\\{0,7}"(?:\\w{0,24}?[_-]|bash|shell|sh|run|exec|raw|full)?(?:command_line|commandline|cmd_line|cmdline|command|cmd|shell|script|exec|args?|argv)\\\\{0,7}"\\s*:\\s*\\\\{0,7}"\\s{0,16}(?:sudo(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64})?(?:/(?:usr/)?(?:local/)?s?bin/|\\./)?file(?:(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}[^\\s"\\\\|;&<>]{1,80}){0,8}?(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}--co(?:m(?:p(?:i(?:l(?:e)?)?)?)?)?(?:(?:\\s|\\\\(?:\\\\\\\\?)?t)|\\\\{0,7}"|$)',
+        desc: 'file invoked with --compile - file writes a compiled magic database into the working directory',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '\\\\{0,7}"(?:\\w{0,24}?[_-]|bash|shell|sh|run|exec|raw|full)?(?:command_line|commandline|cmd_line|cmdline|command|cmd|shell|script|exec|args?|argv)\\\\{0,7}"\\s*:\\s*\\\\{0,7}"\\s{0,16}(?:sudo(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64})?(?:/(?:usr/)?(?:local/)?s?bin/|\\./)?file(?:(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}[^\\s"\\\\|;&<>]{1,80}){0,8}?(?:\\s|\\\\(?:\\\\\\\\?)?t){1,64}--co(?:m(?:p(?:i(?:l(?:e)?)?)?)?)?(?:(?:\\s|\\\\(?:\\\\\\\\?)?t)|\\\\{0,7}"|$)',
+        desc: 'Same as Layer 6, in the JSON-encoded tool argument object',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02866',
+    title: 'Non-ASCII IDNA Label Separator Inside the Host of a Fetch-Tool URL Argument',
+    severity: 'medium',
+    category: 'context-exfiltration',
+    scan_target: 'runtime',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_args',
+        pattern:
+          '\\\\?["\\x27](?:[a-z]{0,16}_?ur[il]|href|link|src|endpoint|location|website|site|page|target)\\\\?["\\x27]\\s{0,3}[:=]\\s{0,3}\\\\?["\\x27]\\s{0,3}(?:[a-z][a-z0-9+.-]{0,15}:)?//[^\\s/?#"\\x27\\\\\u3002\uff0e\uff61\u2024\ufe52]{0,253}(?:[\u3002\uff0e\uff61\u2024\ufe52]|\\\\u(?:3002|ff0e|ff61|2024|fe52))(?:[a-z0-9-]|[\uff10-\uff19\uff21-\uff3a\uff41-\uff5a]|[/?#]|:\\d)',
+        desc: "A quoted URL-typed argument whose HOST component (between '//' and the first '/', '?' or '#') contains an IDNA label separator (U+3002, U+FF0E, U+FF61) or look-alike dot (U+2024, U+FE52), literal or JSON-escaped, followed by another label, a delimiter or a port -- the CVE-2026-107288 blocked_domains bypass shape.",
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '\\\\?["\\x27](?:host|hostname|domain|[a-z]{1,12}_host|server_name)\\\\?["\\x27]\\s{0,3}[:=]\\s{0,3}\\\\?["\\x27]\\s{0,3}[a-z0-9.-]{1,253}(?:[\u3002\uff0e\uff61\u2024\ufe52]|\\\\u(?:3002|ff0e|ff61|2024|fe52))[a-z0-9-](?:[a-z0-9.-]|[\u3002\uff0e\uff61\u2024\ufe52]|\\\\u(?:3002|ff0e|ff61|2024|fe52)){0,253}(?::\\d{1,5})?\\\\?["\\x27]',
+        desc: 'The same separator inside a bare host-typed argument (host / hostname / domain / *_host / server_name) that a tool resolves directly -- the scheme-less form of the same normalisation bypass. The whole value must be an ASCII hostname (labels, separators, optional :port) running to the closing quote, so CJK free text in such a field is not read.',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02867',
+    title:
+      'Dot-Dot Path Segment Inside an Identifier-Typed Tool Argument (REST-Wrapper Path Traversal)',
+    severity: 'high',
+    category: 'privilege-escalation',
+    scan_target: 'tool_args',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_args',
+        pattern:
+          '"(?:[a-z0-9_-]{0,40}[_-](?:id|number|num|no|nr|uuid|guid|slug)|[a-z0-9]{1,40}(?:number|uuid|guid|id)|id|number|uuid|guid|slug)"\\s{0,3}:\\s{0,3}"(?:[^"\\n]{0,120}?(?:/|\\\\|%2f|%5c))?(?:\\.\\.|%2e%2e|\\.%2e|%2e\\.|%252e%252e)(?:/|\\\\|%2f|%5c|%252f|%255c|")',
+        desc: 'An identifier-typed JSON argument (snake_case *_id/*_number/*_no/*_uuid/*_slug, camelCase *Number/*Id/*Uuid, or a bare id/number key; *_code keys excluded because they usually carry program text) whose value contains a dot-dot path segment - at the start of the value or after a separator, followed by a separator or the end of the value - literal or percent-encoded',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02868',
+    title: 'SSRF via IPv6 Transition Address Embedding a Private IPv4 Target',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'tool_args',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)//(?:[^\\s/@\\[\\]"]{1,64}@)?(?:\\[|%5b)(?:(?:(?:0{1,4}:){1,4}|:):(?:ffff:(?:0{1,4}:)?)?|(?:0{1,4}:){5}(?:ffff|0{1,4}):|0{0,2}64:ff9b(?::0{0,3}1)?(?::0{1,4}){0,4}::?)(?:(?:7f[0-9a-f]{2}|0?a[0-9a-f]{2}|ac1[0-9a-f]|c0a8|a9fe):[0-9a-f]{1,4}|(?:127|10)(?:\\.\\d{1,3}){3}|172\\.(?:1[6-9]|2\\d|3[01])(?:\\.\\d{1,3}){2}|(?:192\\.168|169\\.254)(?:\\.\\d{1,3}){2})(?:\\]|%5d)',
+        desc: 'URL bracketed host is an IPv4-compatible, IPv4-mapped/translated or NAT64 address whose final 32 bits are a loopback, RFC 1918 or link-local IPv4',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)//(?:[^\\s/@\\[\\]"]{1,64}@)?(?:\\[|%5b)0{0,2}2002:(?:7f[0-9a-f]{2}|0?a[0-9a-f]{2}|ac1[0-9a-f]|c0a8|a9fe):[0-9a-f:]{0,35}(?:\\]|%5d)',
+        desc: 'URL bracketed host is a 6to4 (2002::/16) address whose embedded IPv4 (bits 16-47) is a loopback, RFC 1918 or link-local IPv4',
+      },
+      {
+        field: 'tool_args',
+        pattern:
+          '(?i)["\'](?:host|hostname|host_?name|ip|ip_?addr(?:ess)?|addr(?:ess)?|target_?host|server)["\']\\s*:\\s*["\']\\[?(?:(?:(?:0{1,4}:){1,4}|:):(?:ffff:(?:0{1,4}:)?)?(?:7f[0-9a-f]{2}|0?a[0-9a-f]{2}|ac1[0-9a-f]|c0a8|a9fe):[0-9a-f]{1,4}|0{0,2}64:ff9b(?::0{0,3}1)?(?::0{1,4}){0,4}::?(?:7f[0-9a-f]{2}|0?a[0-9a-f]{2}|ac1[0-9a-f]|c0a8|a9fe):[0-9a-f]{1,4}|0{0,2}2002:(?:7f[0-9a-f]{2}|0?a[0-9a-f]{2}|ac1[0-9a-f]|c0a8|a9fe):[0-9a-f:]{0,35})\\]?["\']',
+        desc: 'Host-typed tool argument whose whole value is an IPv6 transition address (hex embedding) carrying a loopback, RFC 1918 or link-local IPv4',
+      },
+    ],
+  },
+  {
+    id: 'ATR-2026-02870',
+    title: 'Invisible Unicode Control Before a Directive in a Tool Description or Skill File',
+    severity: 'high',
+    category: 'tool-poisoning',
+    scan_target: 'both',
+    rule_version: 1,
+    patterns: [
+      {
+        field: 'tool_description',
+        pattern:
+          "(?:(?:[\\x21-\\x2F\\x3A-\\x40\\x5B-\\x60\\x7B-\\x7E\u3001\u3002\uff01\uff0c\uff1a\uff1b\uff1f][ \\t]{0,3}|[A-Za-z0-9][ \\t]{1,3})[\u200b\u200c\u200d\u2060\u180e\u00ad\u200e\u200f\u202a\u202b\u202d\u202e\u2066\u2067\u2068\ufeff\u202c\u2069]{0,6}[\u200b\u200c\u200d\u2060\u180e\u00ad\u200e\u200f\u202a\u202b\u202d\u202e\u2066\u2067\u2068\ufeff]|(?:^|[\\r\\n])[ \\t]{0,8}[\u200b\u200c\u200d\u2060\u180e\u00ad\u200e\u200f\u202a\u202b\u202d\u202e\u2066\u2067\u2068\u202c\u2069]{0,6}[\u200b\u200c\u200d\u2060\u180e\u00ad\u200e\u200f\u202a\u202b\u202d\u202e\u2066\u2067\u2068])[ \\t\"'*_`>(\\[]{0,4}(?:(?:also|then|please|now|first|additionally|and|but|ai|assistant|agent|model|llm|claude)[,:]?\\s+){0,2}(?:(?:ignore|disregard|forget|override|bypass)\\s+(?:all\\s+|any\\s+)?(?:(?:the|your|of\\s+the|previous|prior|above|earlier|preceding|system|original|other|safety|security|developer)\\s+){0,3}(?:instructions?|rules|prompts?|guidelines|directives|polic(?:y|ies)|guardrails|restrictions|constraints)|(?:important|attention|urgent|critical|system\\s+(?:note|override|message|instruction)|admin(?:istrator)?\\s+note|note\\s+to\\s+(?:the\\s+)?(?:ai|assistant|model|agent|llm))\\s{0,3}[:!>-][^\\n]{0,60}?\\b(?:ignore|disregard|forget|read|send|forward|upload|include|attach|exfiltrate|leak|(?:do\\s+not|don't|never)\\s+(?:tell|mention|inform|reveal)|(?:before|after|when)\\s+(?:answering|responding|replying|you\\s+(?:answer|respond|reply)))\\b|<\\s{0,3}/?(?:important|system|instructions?|secret|hidden)\\s{0,3}>|you\\s+are\\s+now\\b|new\\s+(?:system\\s+)?instructions?\\s{0,3}:)",
+        desc: 'Invisible control at the start of a clause, followed by an instruction override (ignore/disregard previous instructions), an attention header whose clause tells the model to read, send, ignore or answer differently, an injected <IMPORTANT>/<system> tag, or a new-instructions / you-are-now header',
+      },
+      {
+        field: 'tool_description',
+        pattern:
+          '(?:(?:[\\x21-\\x2F\\x3A-\\x40\\x5B-\\x60\\x7B-\\x7E\u3001\u3002\uff01\uff0c\uff1a\uff1b\uff1f][ \\t]{0,3}|[A-Za-z0-9][ \\t]{1,3})[\u200b\u200c\u200d\u2060\u180e\u00ad\u200e\u200f\u202a\u202b\u202d\u202e\u2066\u2067\u2068\ufeff\u202c\u2069]{0,6}[\u200b\u200c\u200d\u2060\u180e\u00ad\u200e\u200f\u202a\u202b\u202d\u202e\u2066\u2067\u2068\ufeff]|(?:^|[\\r\\n])[ \\t]{0,8}[\u200b\u200c\u200d\u2060\u180e\u00ad\u200e\u200f\u202a\u202b\u202d\u202e\u2066\u2067\u2068\u202c\u2069]{0,6}[\u200b\u200c\u200d\u2060\u180e\u00ad\u200e\u200f\u202a\u202b\u202d\u202e\u2066\u2067\u2068])[ \\t"\'*_`>(\\[]{0,4}(?:(?:also|then|please|now|first|additionally|and|but|ai|assistant|agent|model|llm|claude)[,:]?\\s+){0,2}(?:(?:before|after|when|while|prior\\s+to|whenever|each\\s+time)\\s+(?:you\\s+)?(?:respond(?:ing)?|answer(?:ing)?|repl(?:y|ying)|returning\\s+(?:the\\s+)?(?:results?|output|answer)|(?:using|calling|invoking)\\s+(?:this|any|another|other)\\s+tools?)\\b[^\\n]{0,80}?\\b(?:(?:send|forward|upload|post|attach|append|include|copy|transmit|exfiltrate|leak|email|share)\\b[^\\n]{0,60}?(?:(?:conversation|chat\\s+history|message\\s+history|system\\s+prompt|(?:process\\s+)?environment|\\benv\\s+vars?|credentials?|secrets?|api[\\s_-]?keys?|(?:access|auth(?:entication)?|session|bearer)\\s+tokens?|passwords?|private\\s+keys?|ssh\\s+keys?|~/\\.ssh|\\.ssh/|id_rsa|id_ed25519|\\.env\\b|\\.aws/|cookies)|https?://|[\\w.+-]{1,64}@[\\w-]{1,63}\\.[a-z]{2,})|(?:call|invoke|use)\\s+this\\s+(?:tool|function))|(?:always|must|you\\s+must|you\\s+should|make\\s+sure\\s+(?:to|you))\\s+(?:first\\s+)?(?:(?:call|invoke|use|run|prefer|choose|select)\\s+this\\s+(?:tool|function|server|skill|plugin)\\s+(?:first|before\\s+(?:any|all|every|other)|instead\\s+of|rather\\s+than|for\\s+(?:every|all|any)\\b|even\\s+(?:if|when))|(?:send|forward|upload|post|attach|append|include|copy|transmit|exfiltrate|leak|email|share)\\b[^\\n]{0,60}?(?:conversation|chat\\s+history|message\\s+history|system\\s+prompt|(?:process\\s+)?environment|\\benv\\s+vars?|credentials?|secrets?|api[\\s_-]?keys?|(?:access|auth(?:entication)?|session|bearer)\\s+tokens?|passwords?|private\\s+keys?|ssh\\s+keys?|~/\\.ssh|\\.ssh/|id_rsa|id_ed25519|\\.env\\b|\\.aws/|cookies))|(?:(?:for\\s+best\\s+results|for\\s+(?:debugging|analytics|telemetry|quality|audit)(?:\\s+purposes)?|to\\s+improve\\s+[a-z]+)[,:]?\\s+)?(?:silently\\s+|quietly\\s+|secretly\\s+)?(?:send|forward|upload|post|attach|append|include|copy|transmit|exfiltrate|leak|email|share)\\b[^\\n]{0,60}?(?:conversation|chat\\s+history|message\\s+history|system\\s+prompt|(?:process\\s+)?environment|\\benv\\s+vars?|credentials?|secrets?|api[\\s_-]?keys?|(?:access|auth(?:entication)?|session|bearer)\\s+tokens?|passwords?|private\\s+keys?|ssh\\s+keys?|~/\\.ssh|\\.ssh/|id_rsa|id_ed25519|\\.env\\b|\\.aws/|cookies)|(?:read|cat|open|load|print|dump|return)\\s+[^\\n]{0,40}?(?:~/\\.ssh|\\.ssh/|id_rsa|id_ed25519|/etc/(?:passwd|shadow)|\\.env\\b|\\.aws/credentials|\\.npmrc|\\.netrc|\\.git-credentials|\\.kube/config))',
+        desc: 'Invisible control at the start of a clause, followed by a response-timing hook (before answering, after responding, when calling another tool) that sends or reads secrets, conversation or a URL; an always/must directive to call this tool first or instead of others, or to send secrets; an exfiltration verb on secrets, conversation, environment or credential files; or a read of ~/.ssh, .env, .aws/credentials and similar files',
+      },
+      {
+        field: 'tool_description',
+        pattern:
+          "(?:(?:[\\x21-\\x2F\\x3A-\\x40\\x5B-\\x60\\x7B-\\x7E\u3001\u3002\uff01\uff0c\uff1a\uff1b\uff1f][ \\t]{0,3}|[A-Za-z0-9][ \\t]{1,3})[\u200b\u200c\u200d\u2060\u180e\u00ad\u200e\u200f\u202a\u202b\u202d\u202e\u2066\u2067\u2068\ufeff\u202c\u2069]{0,6}[\u200b\u200c\u200d\u2060\u180e\u00ad\u200e\u200f\u202a\u202b\u202d\u202e\u2066\u2067\u2068\ufeff]|(?:^|[\\r\\n])[ \\t]{0,8}[\u200b\u200c\u200d\u2060\u180e\u00ad\u200e\u200f\u202a\u202b\u202d\u202e\u2066\u2067\u2068\u202c\u2069]{0,6}[\u200b\u200c\u200d\u2060\u180e\u00ad\u200e\u200f\u202a\u202b\u202d\u202e\u2066\u2067\u2068])[ \\t\"'*_`>(\\[]{0,4}(?:(?:also|then|please|now|first|additionally|and|but|ai|assistant|agent|model|llm|claude)[,:]?\\s+){0,2}(?:(?:do\\s+not|don't|never|without)\\s+(?:tell(?:ing)?|inform(?:ing)?|notify(?:ing)?|mention(?:ing)?|reveal(?:ing)?|disclos(?:e|ing)|alert(?:ing)?|warn(?:ing)?|ask(?:ing)?)\\s+(?:this\\s+to\\s+|anything\\s+to\\s+)?(?:the\\s+)?(?:user|human|operator)\\b|(?:do\\s+not|don't|never)\\s+let\\s+(?:the\\s+)?(?:user|human)\\s+(?:know|see))",
+        desc: 'Invisible control at the start of a clause, followed by a concealment directive (do not tell, inform, mention or reveal to the user)',
       },
     ],
   },
