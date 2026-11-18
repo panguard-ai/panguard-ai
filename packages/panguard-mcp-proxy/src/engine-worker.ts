@@ -35,6 +35,27 @@ export class EngineWorkerError extends Error {
   }
 }
 
+/**
+ * A worker that stopped or failed after the evaluation request was sent to it.
+ * The content may have been mid-scan, so a caller that must not let unscanned
+ * content through treats this as it treats a deadline. A worker that could not
+ * be started is a plain EngineWorkerError: nothing was sent to it.
+ */
+export class EngineWorkerLostError extends EngineWorkerError {
+  constructor(message: string) {
+    super(message);
+    this.name = 'EngineWorkerLostError';
+  }
+}
+
+/** The worker did not finish starting within the time its caller allowed. */
+export class EngineWorkerStartTimeoutError extends EngineWorkerError {
+  constructor(readonly timeoutMs: number) {
+    super(`ATR worker did not start within ${timeoutMs} ms`);
+    this.name = 'EngineWorkerStartTimeoutError';
+  }
+}
+
 /** The fields of an ATR match the deny policy reads. Plain data, so it crosses the thread boundary. */
 export interface EngineMatch {
   readonly rule: {
@@ -63,6 +84,8 @@ export interface EngineWorkerOptions {
   readonly rulesDir: string;
   /** Called with the new state after every start, including restarts after a cut. */
   readonly onStart?: (state: EngineWorkerState) => void;
+  /** How long to wait for a (re)started worker to load its rules (default LOAD_TIMEOUT_MS). */
+  readonly startTimeoutMs?: number;
 }
 
 /** Loading rules is not cut by an evaluation deadline, but a worker that never answers must not hang its caller. */
@@ -131,6 +154,8 @@ async function serve(parentPort, workerData) {
 }
 `;
 
+const NO_SEND = (): void => undefined;
+
 type Reply = { readonly id?: number; readonly ready?: boolean; readonly error?: string } & Record<
   string,
   unknown
@@ -142,6 +167,8 @@ export class EngineWorker {
   private autoRuleLoads: ReadonlyArray<{ readonly dir: string; readonly adviseOnly: boolean }> = [];
   /** Bundled rules the first worker loaded; a restarted worker must load at least as many. */
   private firstRuleCount: number | undefined;
+  /** Set once a restarted worker was refused for loading fewer rules; every later call fails the same way. */
+  private rejection: EngineWorkerError | undefined;
   private nextId = 0;
   private tail: Promise<unknown> = Promise.resolve();
   /** Calls waiting on the worker right now. */
@@ -157,10 +184,18 @@ export class EngineWorker {
     });
   }
 
-  /** Evaluate events in the worker. Rejects with EvaluationDeadlineError if it runs past `deadlineMs`. */
-  evaluate(events: readonly AgentEvent[], deadlineMs: number): Promise<EngineMatch[]> {
+  /**
+   * Evaluate events in the worker. Rejects with EvaluationDeadlineError if it
+   * runs past the deadline. A function is called once the worker is ready, so
+   * the deadline can depend on the time spent getting there.
+   */
+  evaluate(
+    events: readonly AgentEvent[],
+    deadline: number | (() => number)
+  ): Promise<EngineMatch[]> {
     return this.serve(async () => {
       const worker = await this.ensureWorker();
+      const deadlineMs = typeof deadline === 'function' ? deadline() : deadline;
       const reply = await this.request(
         worker,
         { type: 'evaluate', events },
@@ -209,6 +244,10 @@ export class EngineWorker {
   }
 
   private async spawn(): Promise<Worker> {
+    // A restart that was refused stays refused: starting and loading the rules
+    // again on every call would only repeat the refusal.
+    if (this.rejection) throw this.rejection;
+    const startTimeoutMs = this.options.startTimeoutMs ?? LOAD_TIMEOUT_MS;
     let worker: Worker;
     try {
       worker = new Worker(WORKER_SOURCE, {
@@ -241,8 +280,8 @@ export class EngineWorker {
       const reply = await this.awaitMessage(
         worker,
         (msg) => msg.ready !== undefined,
-        LOAD_TIMEOUT_MS,
-        () => new EngineWorkerError('ATR worker did not start in time')
+        startTimeoutMs,
+        () => new EngineWorkerStartTimeoutError(startTimeoutMs)
       );
       if (!reply.ready) {
         throw new EngineWorkerError(
@@ -257,10 +296,11 @@ export class EngineWorker {
       // loaded means the package changed or went missing underneath this
       // process, and scanning on would quietly catch less.
       if (this.firstRuleCount !== undefined && state.ruleCount < this.firstRuleCount) {
-        throw new EngineWorkerError(
+        this.rejection = new EngineWorkerError(
           `ATR worker restarted with ${state.ruleCount} bundled rules, fewer than the ` +
             `${this.firstRuleCount} it first loaded; restart this process`
         );
+        throw this.rejection;
       }
       this.firstRuleCount ??= state.ruleCount;
       this.state = state;
@@ -301,9 +341,10 @@ export class EngineWorker {
     match: (msg: Reply) => boolean,
     timeoutMs: number,
     onTimeout: () => Error,
-    send: () => void = () => undefined
+    send: () => void = NO_SEND
   ): Promise<Reply> {
     this.active++;
+    let sent = false;
     return new Promise<Reply>((resolve, reject) => {
       const settle = (finish: () => void) => {
         clearTimeout(timer);
@@ -316,16 +357,16 @@ export class EngineWorker {
       const onMessage = (msg: Reply) => {
         if (match(msg)) settle(() => resolve(msg));
       };
-      const onFailure = (err?: unknown) =>
+      const onFailure = (err?: unknown) => {
+        const message =
+          err instanceof Error
+            ? `ATR worker failed: ${err.message}`
+            : `ATR worker exited (code ${String(err)})`;
+        // Once a request has gone out, the worker's loss is a lost evaluation.
         settle(() =>
-          reject(
-            new EngineWorkerError(
-              err instanceof Error
-                ? `ATR worker failed: ${err.message}`
-                : `ATR worker exited (code ${String(err)})`
-            )
-          )
+          reject(sent ? new EngineWorkerLostError(message) : new EngineWorkerError(message))
         );
+      };
       const timer = setTimeout(() => {
         settle(() => reject(onTimeout()));
         this.discard(worker);
@@ -335,6 +376,7 @@ export class EngineWorker {
       worker.on('exit', onFailure);
       try {
         send();
+        sent = send !== NO_SEND;
       } catch (err) {
         settle(() => reject(err));
       }
