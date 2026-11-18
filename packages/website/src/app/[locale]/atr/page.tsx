@@ -24,7 +24,7 @@ export default function ATRPage() {
         data={[
           definedTermSchema({
             name: 'Agent Threat Rules (ATR)',
-            description: `Open detection standard for AI agent security threats. ${STATS.atrRules} YAML-based rules across 10 threat categories, mapped to OWASP Agentic Top 10 (10/10 covered), MITRE ATLAS, and NIST AI RMF. MIT licensed. ATR rules merged upstream as maintainer-accepted contributions (not vendor endorsements): Cisco AI Defense skill-scanner rule packs, in production (PR #99); Microsoft AGT community-rules examples (PR #1277); MISP; and OWASP ASRH.`,
+            description: `Open detection standard for AI agent security threats. ${STATS.atrRules} YAML-based rules across 10 threat categories, mapped to OWASP Agentic Top 10 (10/10 covered), MITRE ATLAS, and NIST AI RMF. MIT licensed. ATR rules merged upstream as maintainer-accepted contributions (not vendor endorsements): the open-source Cisco AI Defense skill-scanner repository (PR #99); Microsoft AGT examples (PR #2308 + #3025); MISP; and OWASP ASRH.`,
             url: 'https://panguard.ai/atr',
             termCode: 'ATR',
           }),

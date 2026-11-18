@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ExternalLink, AlertTriangle, Shield } from 'lucide-react';
 import FadeInUp from '@/components/FadeInUp';
-import { useEcosystemStats } from '@/hooks/useEcosystemStats';
+import { STATS } from '@/lib/stats';
 
 type Severity = 'CRITICAL' | 'HIGH';
 
@@ -38,12 +38,7 @@ const SEVERITY_STYLES: Record<Severity, { text: string; bg: string; border: stri
 
 export default function Evidence() {
   const t = useTranslations('home.evidence');
-  const eco = useEcosystemStats();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-
-  const totalScanned = eco.skillsScanned;
-  const riskPercent =
-    totalScanned > 0 ? ((eco.threatsDetected / totalScanned) * 100).toFixed(1) : '13.4';
 
   function handleToggle(index: number) {
     setExpandedIndex((prev) => (prev === index ? null : index));
@@ -60,8 +55,10 @@ export default function Evidence() {
         <FadeInUp className="text-center mb-12">
           <h2 className="text-2xl sm:text-3xl font-bold text-text-primary">
             {t('title', {
-              count: totalScanned.toLocaleString(),
-              percent: riskPercent,
+              scanned: STATS.wildScan.skillsScanned.toLocaleString('en-US'),
+              flagged: STATS.wildScan.flagged.toLocaleString('en-US'),
+              engine: STATS.wildScan.engineVersion,
+              rules: STATS.wildScan.engineRules,
             })}
           </h2>
           <p className="text-base text-text-secondary mt-3">{t('subtitle')}</p>

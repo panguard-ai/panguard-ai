@@ -6,7 +6,7 @@ import SectionWrapper from '@/components/ui/SectionWrapper';
 import SectionTitle from '@/components/ui/SectionTitle';
 import { Link } from '@/navigation';
 import { ArrowRight } from 'lucide-react';
-import { ShieldIcon, ScanIcon } from '@/components/ui/BrandIcons';
+import { ShieldIcon } from '@/components/ui/BrandIcons';
 import { STATS } from '@/lib/stats';
 
 /* ─── OWASP data from stats.ts (single source of truth) ─── */
@@ -125,61 +125,45 @@ export default function ComplianceContent() {
         </FadeInUp>
       </SectionWrapper>
 
-      {/* -- Ecosystem Evidence -- */}
+      {/* -- Wild scan evidence (2026-04; cite with its scan engine) -- */}
       <SectionWrapper>
         <SectionTitle
           overline={t('evidence.overline')}
           title={t('evidence.title')}
-          subtitle={t('evidence.subtitle')}
+          subtitle={t('evidence.subtitle', {
+            engine: STATS.wildScan.engineVersion,
+            rules: STATS.wildScan.engineRules,
+          })}
         />
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-14">
-          {(['scanned', 'findings', 'critical', 'tripleThreat'] as const).map((key, i) => {
-            const values: Record<string, number> = {
-              scanned: STATS.ecosystem.skillsScanned,
-              findings: STATS.ecosystem.packagesWithFindings,
-              critical: STATS.ecosystem.findingsCritical,
-              tripleThreat: STATS.ecosystem.tripleThreat,
+          {(['scanned', 'flagged', 'sources', 'engine'] as const).map((key, i) => {
+            const values: Record<string, string> = {
+              scanned: STATS.wildScan.skillsScanned.toLocaleString('en-US'),
+              flagged: STATS.wildScan.flagged.toLocaleString('en-US'),
+              sources: String(STATS.wildScan.sources),
+              engine: STATS.wildScan.engineVersion,
             };
             return (
               <FadeInUp key={key} delay={i * 0.08}>
                 <div className="bg-surface-1 rounded-xl border border-border p-6 text-center">
-                  <p className="text-3xl font-extrabold text-text-primary">
-                    {values[key]?.toLocaleString()}
+                  <p className="text-3xl font-extrabold text-text-primary">{values[key]}</p>
+                  <p className="text-sm text-text-secondary mt-2">
+                    {t(`evidence.${key}`, { rules: STATS.wildScan.engineRules })}
                   </p>
-                  <p className="text-sm text-text-secondary mt-2">{t(`evidence.${key}`)}</p>
                 </div>
               </FadeInUp>
             );
           })}
         </div>
         <FadeInUp delay={0.4}>
-          <div className="mt-10 bg-surface-2 rounded-xl border border-border p-6 max-w-2xl mx-auto">
-            <div className="flex items-start gap-4">
-              <ScanIcon size={20} className="text-brand-sage shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-semibold text-text-primary">
-                  {t('evidence.breakdownTitle')}
-                </p>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-3">
-                  {(
-                    [
-                      ['critical', STATS.ecosystem.findingsCritical],
-                      ['high', STATS.ecosystem.findingsHigh],
-                      ['medium', STATS.ecosystem.findingsMedium],
-                      ['low', STATS.ecosystem.findingsLow],
-                    ] as const
-                  ).map(([severity, count]) => (
-                    <div key={severity}>
-                      <p className="text-lg font-bold text-text-primary">{count}</p>
-                      <p className="text-[11px] text-text-muted uppercase tracking-wider">
-                        {t(`evidence.severity.${severity}`)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+          <p className="text-center text-sm text-text-muted mt-8">
+            <Link
+              href="/research/96k-scan"
+              className="text-brand-sage underline underline-offset-2"
+            >
+              {t('evidence.reportLink')}
+            </Link>
+          </p>
         </FadeInUp>
       </SectionWrapper>
 

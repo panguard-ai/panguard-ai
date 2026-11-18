@@ -6,7 +6,6 @@ import { AnimatePresence, motion, useReducedMotion, type Variants } from 'framer
 import BrandLogo from '@/components/ui/BrandLogo';
 import { ShieldIcon, ScanIcon } from '@/components/ui/BrandIcons';
 import { useSkillScan } from '@/hooks/useSkillScan';
-import { useEcosystemStats } from '@/hooks/useEcosystemStats';
 import { STATS } from '@/lib/stats';
 import ScanAnimation from './ScanAnimation';
 import ScanResultCard from './ScanResultCard';
@@ -149,7 +148,6 @@ function PlatformTicker({ names }: { readonly names: readonly string[] }) {
 
 function ScannerHeroInner() {
   const t = useTranslations('home.scannerHero');
-  const eco = useEcosystemStats();
   const {
     url,
     setUrl,
@@ -238,7 +236,7 @@ function ScannerHeroInner() {
             variants={heroVariants.child}
             className="mt-5 text-base sm:text-lg text-text-secondary leading-relaxed max-w-xl mx-auto"
           >
-            {t('subtitle', { count: eco.skillsScanned.toLocaleString() })}
+            {t('subtitle')}
           </motion.p>
         </div>
 
@@ -418,8 +416,7 @@ function ScannerHeroInner() {
         <motion.div variants={heroVariants.childLast} className="mt-8">
           <div className="flex flex-wrap justify-center gap-2">
             {[
-              t('badgeRules', { count: eco.atrRules }),
-              t('badgeRecall'),
+              t('badgeRules', { count: STATS.totalRulesDisplay }),
               t('badgeCisco'),
               t('badgeLicense'),
             ].map((badge) => (
@@ -514,9 +511,6 @@ function ScannerHeroSkeleton() {
         <div className="flex flex-wrap justify-center gap-2 pt-4">
           <span className="rounded-full border border-border bg-surface-1 px-3 py-1 font-mono text-[10px] uppercase tracking-micro text-text-muted">
             {STATS.totalRulesDisplay} ATR rules
-          </span>
-          <span className="rounded-full border border-border bg-surface-1 px-3 py-1 font-mono text-[10px] uppercase tracking-micro text-text-muted">
-            Garak {STATS.benchmark.garak.recall}% recall
           </span>
           <span className="rounded-full border border-border bg-surface-1 px-3 py-1 font-mono text-[10px] uppercase tracking-micro text-text-muted">
             Rules merged upstream

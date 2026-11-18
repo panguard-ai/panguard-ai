@@ -17,9 +17,9 @@ export default function Measured() {
 
       <dl className="mt-12 grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
         <StatV2 value={`${b.hackaprompt.recall}%`} label={t('b1Label')} />
-        <StatV2 value={`${b.pint.precision}%`} label={t('b2Label')} />
+        <StatV2 value={`${b.pint.precision}%`} label={t('b2Label', { recall: b.pint.recall })} />
         <StatV2 value={`${b.garak.recall}%`} label={t('b3Label')} />
-        <StatV2 value={`${b.skill.recall}% / ${b.skill.fp}%`} label={t('b4Label')} />
+        <StatV2 value={`${b.skill.recall}%`} label={t('b4Label')} />
       </dl>
 
       <p className="mt-10 max-w-3xl text-sm leading-relaxed text-text-muted">{t('honesty')}</p>

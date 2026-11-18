@@ -67,6 +67,7 @@ function thousandsUnderscore(n) {
 }
 
 const ruleTotal = get(upstream, 'rules.total');
+const rulePatterns = get(upstream, 'rules.patterns');
 const pintBench = findBenchmark('pint');
 const skillBench = findBenchmark('skill-benchmark');
 
@@ -91,6 +92,12 @@ const candidates = [
     val: () => `totalRules: ${ruleTotal}`,
     needs: 'rules.total',
     have: typeof ruleTotal === 'number',
+  },
+  {
+    re: /atrPatterns:\s*[\d_]+/,
+    val: () => `atrPatterns: ${thousandsUnderscore(rulePatterns)}`,
+    needs: 'rules.patterns',
+    have: typeof rulePatterns === 'number',
   },
   {
     re: /totalRulesDisplay:\s*'[^']+'\s*as\s*const/,
@@ -194,9 +201,9 @@ const candidates = [
     have: !!pintBench,
   },
   {
-    re: /skill:\s*\{\s*recall:\s*[\d.]+,\s*precision:\s*[\d.]+,\s*fp:\s*[\d.]+,\s*samples:\s*[\d_]+\s*\}/,
-    val: () =>
-      `skill: { recall: ${pct(skillBench.recall)}, precision: ${pct(skillBench.precision)}, fp: ${pct(skillBench.fp_rate)}, samples: ${skillBench.samples} }`,
+    // SKILL.md precision and FP are in-sample, so stats.ts carries recall only.
+    re: /skill:\s*\{\s*recall:\s*[\d.]+,\s*samples:\s*[\d_]+\s*\}/,
+    val: () => `skill: { recall: ${pct(skillBench.recall)}, samples: ${skillBench.samples} }`,
     needs: 'benchmarks[source=skill-benchmark]',
     have: !!skillBench,
   },

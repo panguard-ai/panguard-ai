@@ -1,89 +1,79 @@
 #!/usr/bin/env tsx
 /**
- * Generate public/llms-full.txt — a long-form context file for AI coding tools
- * (Cursor, Claude Code, GitHub Copilot, Windsurf) that fetch llms-full.txt
- * to seed their understanding of a project.
+ * Generate public/llms.txt (compact index) and public/llms-full.txt (long-form
+ * context) for AI tools that fetch them to understand the project.
  *
- * Pulls from:
- *   - src/lib/stats.ts (single source of truth for product stats)
- *   - src/lib/atr-rules-compiled.ts (rule IDs + titles + categories)
- *   - src/data/blog-posts.ts (top blog excerpts)
+ * Every figure comes from src/lib/stats.ts, the site's single source of truth,
+ * so these files cannot drift from the pages. Blog excerpts that quote a figure
+ * ATR has since withdrawn or narrowed carry the same dated correction as the
+ * post page (src/lib/withdrawn-figures.ts).
  *
- * Output is structured markdown with stable headings so AI tools can extract
- * the section they need. Output is capped at ~100K tokens (≈ 400 KB) so it
- * stays within Vercel response limits and AI tool ingestion budgets.
- *
- * Run: `pnpm gen:llms` (added to postbuild).
+ * Run: `pnpm gen:llms` (also runs as prebuild).
  */
 
-import { writeFileSync, readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { STATS } from '../src/lib/stats.ts';
+import { CORRECTION_DATE, correctionsFor } from '../src/lib/withdrawn-figures.ts';
 
 const ROOT = join(import.meta.dirname, '..');
-const OUT = join(ROOT, 'public', 'llms-full.txt');
+const OUT_FULL = join(ROOT, 'public', 'llms-full.txt');
+const OUT_INDEX = join(ROOT, 'public', 'llms.txt');
 
-// Inline minimal stats — we cannot import from src/ at script time because
-// the rule file uses ESM with Next.js conventions. Keep this list manually
-// synced with src/lib/stats.ts (it is the single most-changed-together pair).
-const STATS = {
-  cliVersion: '1.5.6',
-  // NOTE: keep these values in sync with src/lib/stats.ts (single source of
-  // truth). atrRules is the standard total (data/stats.json); the compiled
-  // bundle is 651.
-  atrVersion: '3.4.0',
-  atrRules: 651,
-  atrPatterns: 2_949,
-  totalRulesDisplay: '650+',
-  promotionIntervalMinutes: 2,
-  testsPassing: 3528,
-  detectionLayers: 3,
-  responseActions: 11,
-  cliCommands: 23,
-  mcpTools: 12,
-  skillAuditChecks: 8,
-  benchmark: {
-    // PINT here is a self-built 850-sample corpus (deepset prompt-injections +
-    // Lakera Gandalf), NOT Lakera's official PINT benchmark or any third party.
-    pint: { recall: 63.2, precision: 99.65, samples: 850 },
-    skill: { recall: 100, precision: 97, fp: 0.2, samples: 498 },
-    garak: { recall: 98, samples: 650 },
-    hackaprompt: { recall: 66.2, samples: 4_780 },
-  },
-  ecosystem: {
-    skillsScanned: 67_799,
-    confirmedMalware: 751,
-    blacklistedSkills: 1_096,
-    suspiciousPlusConfirmed: 11_324,
-    packagesWithFindings: 2_322,
-    tripleThreat: 249,
-  },
-  adoption: {
-    ciscoRulesMerged: 651,
-    microsoftRulesMerged: 287,
-    externalPRMerges: 13,
-    externalOrgs: 6,
-    tier1Institutions: 7,
-  },
-  coverage: {
-    owaspAgentic: '10/10',
-    safeMcpDetail: '78/85',
-  },
-};
+const n = (value: number): string => value.toLocaleString('en-US');
+
+const B = STATS.benchmark;
+const WS = STATS.wildScan;
+const SCANNER = STATS.scanner;
+const ATR_REPO = 'https://github.com/Agent-Threat-Rule/agent-threat-rules';
+
+const WILD_SCAN_LINE = `${n(WS.skillsScanned)} published AI agent skills and MCP servers from five public sources, scanned ${WS.scannedOn} with scan engine ${WS.engineVersion} (${WS.engineRules} ATR rules, not today's rule set); ${n(WS.flagged)} flagged. A flag is a rule match, not a verdict, so no confirmed-malicious count is published.`;
+
+const BENCHMARK_LINES = [
+  `garak in-the-wild jailbreaks: ${B.garak.recall}% recall on ${n(B.garak.samples)} samples (hunt lane; partly closed-book, because some rules were written from this corpus).`,
+  `garak full probe corpus (${B.garakFull.families} families, ${n(B.garakFull.samples)} prompts): ${B.garakFull.recall}% recall (hunt lane, also partly closed-book). By family: latentinjection ${B.garakFull.perFamily.latentinjection}%, sysprompt_extraction ${B.garakFull.perFamily.sysprompt_extraction}%, dan ${B.garakFull.perFamily.dan}%.`,
+  `SKILL.md: ${B.skill.recall}% recall on ${n(B.skill.samples)} samples (hunt lane, in-sample: the benign samples are the set the rules are tuned against, so precision and false-positive figures are not cited).`,
+  `PINT-format corpus, self-built from deepset prompt-injections + Lakera Gandalf (NOT Lakera's official PINT benchmark): ${B.pint.recall}% recall, ${B.pint.precision}% precision on ${n(B.pint.samples)} samples. It is effectively a prompt-injection-family score.`,
+  `HackAPrompt (EMNLP 2023): ${B.hackaprompt.recall}% recall on ${n(B.hackaprompt.samples)} samples, measured on ATR v3.5.0. Closed-book: ATR mined rules from this corpus's misses, and ${B.hackaprompt.baselineRecall}% is ATR's own recall before them. The corpus is attack-only, so precision and false-positive rate are undefined on it.`,
+  'The benign-gate false-positive rates once quoted for a "65,000-sample" gate were withdrawn on 2026-09-19 pending re-measurement. There is no single engine-wide false-positive number.',
+  'Recall figures above are the hunt lane (all effective rules). The enforce lane, which is what runs when blocking is on, recalls far less.',
+];
+
+const ADOPTION_LINES = [
+  'Cisco AI Defense skill-scanner: ATR rule pack merged into the open-source cisco-ai-defense/skill-scanner repository (PR #99, after PoC #79). This describes that repository, not any Cisco product.',
+  'Microsoft Agent Governance Toolkit: ATR example adapters merged into the repository examples (examples/atr-import, PR #2308, and examples/acs-atr-annotator, PR #3025). The rule pack added by the earlier example PRs #908 and #1277 was removed upstream on 2026-07-30.',
+  'MISP / CIRCL: ATR rule-ID taxonomy and threat-intel galaxy merged (MISP/misp-taxonomies PR #323, MISP/misp-galaxy PR #1207).',
+  'Gen Digital Sage: ATR-derived agent-layer threat patterns contributed (gendigitalinc/sage PR #33).',
+];
+
+const MCP_TOOLS = [
+  'panguard_scan',
+  'panguard_scan_code',
+  'panguard_audit_skill',
+  'panguard_guard_start',
+  'panguard_guard_stop',
+  'panguard_status',
+  'panguard_alerts',
+  'panguard_block_ip',
+  'panguard_deploy',
+  'panguard_init',
+  'panguard_generate_report',
+];
+
+const bullets = (lines: readonly string[]): string => lines.map((line) => `- ${line}`).join('\n');
+
+/* ───────────────────────────── llms-full.txt ───────────────────────────── */
 
 const HEADER = `# PanGuard AI — full context for AI coding tools
 
-This file is a structured long-form context dump intended for AI coding tools
-(Cursor, Claude Code, GitHub Copilot, Windsurf, Anthropic agents) that fetch
-llms-full.txt to understand a project at depth. It is auto-generated from
-the canonical source files in the panguard-ai repository.
+This file is a structured long-form context dump for AI tools (Cursor, Claude
+Code, GitHub Copilot, Windsurf, Anthropic agents) that fetch llms-full.txt. It
+is generated on every site build from the panguard-ai repository:
+- src/lib/stats.ts (every figure below)
+- src/lib/atr-rules-compiled.ts (the rule index)
+- src/data/blog-posts.ts (recent writing)
 
 Last generated: ${new Date().toISOString()}
-Sources of truth:
-- src/lib/stats.ts (product stats)
-- src/lib/atr-rules-compiled.ts (ATR rule index)
-- src/data/blog-posts.ts (recent writing)
-- public/llms.txt (compact index)
-
 To regenerate: \`pnpm gen:llms\` in packages/website/.
 
 ---
@@ -93,10 +83,8 @@ To regenerate: \`pnpm gen:llms\` in packages/website/.
 const COMPANY_SECTION = `## Section 1 — Company and product positioning
 
 PanGuard AI is the commercial platform built on top of ATR (Agent Threat Rules),
-an open detection standard for AI agent security threats. The split mirrors
-Sigma/Splunk (open rule standard plus commercial SIEM) and YARA/VirusTotal
-(open signature standard plus commercial threat intel) — the standard is free
-and community-driven, the platform layer is where commercial value lives.
+an open detection standard for AI agent security threats. ATR is a separate,
+community-driven project under the MIT license; PanGuard uses it.
 
 ### Founder
 Adam Lin (林冠辛). Email: adam@agentthreatrule.org. GitHub: eeee2345.
@@ -105,99 +93,62 @@ marketing (Threads, 300M impressions), and culture (hip-hop festival, 5th year).
 Self-taught engineer. Based in Taiwan, shipping globally. Founded Panguard AI,
 Inc. (Delaware C-Corp) on 2026-05-12.
 
-### Product tiers (locked 2026-04-22)
-- Community: $0 forever, MIT licensed, ${STATS.totalRulesDisplay} ATR rules, unlimited self-host.
-- Pilot: $25K / 90 days. F500 procurement test drive. IT director can approve.
-  Full credit toward Y1 Enterprise.
-- Enterprise: $150K-500K / year. Migrator Pro, 5-framework signed compliance
-  evidence packs, airgap deployment, SLA, dedicated CSM.
-- Sovereign: $5M-20M / nation. Nation-scale airgap, multi-tenant, custom
-  compliance, Cisco/AMD/NVIDIA JV pre-integrated.
-
-There is deliberately no middle tier between Community and Pilot. The /pricing
-page explains why the middle tier is a trap (insufficient revenue for support
-cost, insufficient differentiation, vendor death spiral).
-
-### Strategic positioning
-- Layer 0 (open standard, free): ATR. Wins category vocabulary, becomes the
-  schema that ecosystem tools cite.
-- Layer 1 (commercial platform): PanGuard Migrator + Guard + Threat Cloud +
-  Compliance Evidence Module.
-- Goal: be the open standard plus the company that monetizes the platform
-  layer, with no peer competitor on either dimension.
+### Product tiers (see https://panguard.ai/pricing)
+- Community: $0, MIT licensed, self-hosted.
+- Founding Pilot: $25K one-time, self-serve via https://panguard.ai/scoping,
+  credited toward year-one Enterprise.
+- Enterprise and up: from $150K, sales-led (https://panguard.ai/enterprise).
+  Sovereign is nation-scale airgap deployment.
 
 ---
 
 `;
 
-const STATS_SECTION = `## Section 2 — Core stats (verified ${new Date().toISOString().split('T')[0]})
+const STATS_SECTION = `## Section 2 — Core stats
 
-### Rule corpus
-- ${STATS.totalRulesDisplay} ATR rules (${STATS.atrRules} exact) in v${STATS.atrVersion}
-- ${STATS.atrPatterns.toLocaleString()} compiled detection patterns across all rules
+### ATR, the open standard
+- ${STATS.totalRulesDisplay} effective rules in agent-threat-rules v${STATS.atrVersion} (draft and deprecated rules excluded)
 - 10 threat categories (prompt-injection, agent-manipulation, skill-compromise,
   context-exfiltration, tool-poisoning, privilege-escalation, model-abuse,
   excessive-autonomy, model-security, data-poisoning)
-- ${STATS.coverage.owaspAgentic} OWASP Agentic Top 10 coverage
-- ${STATS.coverage.safeMcpDetail} SAFE-MCP coverage (91.8%)
+- ${STATS.coverage.owaspAgentic} OWASP Agentic Top 10 categories mapped
+- ${STATS.coverage.safeMcpDetail} SAFE-MCP techniques mapped (${STATS.coverage.safeMcp}%)
 
-### Benchmarks
-- Garak (NVIDIA jailbreak corpus): ${STATS.benchmark.garak.recall}% recall on ${STATS.benchmark.garak.samples} samples
-- SKILL.md (real-world skill corpus): ${STATS.benchmark.skill.recall}% recall,
-  ${STATS.benchmark.skill.precision}% precision, ${STATS.benchmark.skill.fp}% false positive rate on ${STATS.benchmark.skill.samples} samples
-- PINT (self-built PINT-format corpus: deepset prompt-injections + Lakera Gandalf, NOT Lakera's official PINT benchmark): ${STATS.benchmark.pint.recall}% recall, ${STATS.benchmark.pint.precision}% precision on ${STATS.benchmark.pint.samples} samples
-- HackAPrompt (EMNLP 2023 competition corpus): ${STATS.benchmark.hackaprompt.recall}% recall on ${STATS.benchmark.hackaprompt.samples.toLocaleString()} samples
-- Wild scan: ${STATS.ecosystem.skillsScanned.toLocaleString()} AI agent skills scanned, ${STATS.ecosystem.confirmedMalware} confirmed malware (${STATS.ecosystem.suspiciousPlusConfirmed.toLocaleString()} suspicious + confirmed),
-  ${STATS.ecosystem.tripleThreat} triple-threat packages (shell + network + filesystem access)
+### What PanGuard runs
+- The panguard.ai web scanner runs ${n(SCANNER.rules)} rules (${n(SCANNER.patterns)} detection conditions)
+  from agent-threat-rules v${SCANNER.atrRelease}, which lags the latest ATR release.
+- The PanGuard CLI and Guard load whichever agent-threat-rules release is
+  installed with them (see the dependency ranges in packages/*/package.json).
 
-### Ecosystem adoption
-- ${STATS.adoption.externalPRMerges} external PRs merged across ${STATS.adoption.externalOrgs} external organizations
-- ${STATS.adoption.tier1Institutions} tier-1 institutions with active engagement: Microsoft, Cisco, Gen Digital (Sage), MISP, OWASP, NVIDIA, IBM
-- Microsoft AGT (agent-governance-toolkit): ${STATS.adoption.microsoftRulesMerged} rules merged via PR #1277 (weekly auto-sync workflow)
-- Cisco AI Defense (skill-scanner): ${STATS.adoption.ciscoRulesMerged} rules merged via PR #99 (full library in production)
-- MISP: 2 PRs merged (galaxy + taxonomies)
-- OWASP Agentic Top 10 (A-S-R-H): rule pack merged via PR #74
+### Benchmarks (ATR Layer 1 rules, ATR v${STATS.atrVersion} unless stated)
+${bullets(BENCHMARK_LINES)}
 
-### Implementation
-- CLI: ${STATS.cliCommands} top-level commands (panguard.cjs)
-- MCP server: ${STATS.mcpTools} tools exposed via Model Context Protocol
+### Wild scan (2026-04)
+- ${WILD_SCAN_LINE}
+- ${n(WS.fourRegistrySubset)} is the four SKILL.md registries without the MCP server crawl; cite it
+  only with that label. No confirmed-malicious count from this scan is supported,
+  and the counts PanGuard published earlier are withdrawn.
+
+### Implementation (PanGuard ${STATS.cliVersion})
+- CLI: ${STATS.cliCommands} top-level commands
 - Skill Auditor: ${STATS.skillAuditChecks} pre-install checks
-- Detection layers: ${STATS.detectionLayers} (regex, content fingerprinting, LLM-as-judge)
-- Response actions: ${STATS.responseActions} (block, quarantine, log, notify, etc.)
-- Tests: ${STATS.testsPassing.toLocaleString()} passing across 159 test files
-- Platform support: macOS, Linux, Windows (16 platforms in CI matrix)
-
-### Maturity
-- License: MIT (both ATR and PanGuard CLI)
-- ATR semantic version: ${STATS.atrVersion}
-- PanGuard CLI version: ${STATS.cliVersion}
-- Threat Cloud sync interval: every hour
-- Rule promotion interval: ${STATS.promotionIntervalMinutes} minutes (community-validated to production)
+- Detection layers: ${STATS.detectionLayers} (rules, content fingerprinting, LLM analysis)
+- Guard response actions: ${STATS.responseActions}
+- License: MIT (both ATR and the PanGuard CLI)
 
 ---
 
 `;
 
 const ATR_INDEX_SECTION = (() => {
-  // Read rule file as text, extract id + title pairs to keep this section bounded
-  const rulesText = readFileSync(join(ROOT, 'src/lib/atr-rules-compiled.ts'), 'utf-8');
-  const matches = Array.from(
-    rulesText.matchAll(
-      /id:\s*'(ATR-[\w-]+)'[\s\S]+?title:\s*'((?:[^'\\]|\\.)+)'[\s\S]+?category:\s*'([\w-]+)'/g
-    )
-  );
+  // Parse the bundle itself (not its .ts mirror) so every rule keeps its own id, title and category.
+  const rules = JSON.parse(
+    readFileSync(join(ROOT, 'src/lib/atr-rules-compiled.json'), 'utf-8')
+  ) as Array<{ id: string; title: string; category: string }>;
   const byCategory: Record<string, Array<{ id: string; title: string }>> = {};
-  for (const m of matches) {
-    const [, id, title, category] = m;
-    if (!byCategory[category]) byCategory[category] = [];
-    byCategory[category].push({ id, title });
+  for (const { id, title, category } of rules) {
+    byCategory[category] = [...(byCategory[category] ?? []), { id, title }];
   }
-
-  let out = '## Section 3 — ATR rule index (by category)\n\n';
-  out += 'Full rule bodies (patterns, OWASP mapping, test cases) are in the\n';
-  out += 'agent-threat-rules repository: github.com/Agent-Threat-Rule/agent-threat-rules.\n';
-  out += 'This index gives you titles per category so you can ask for specific\n';
-  out += 'rule bodies on demand.\n\n';
 
   const orderedCategories = [
     'prompt-injection',
@@ -212,83 +163,60 @@ const ATR_INDEX_SECTION = (() => {
     'data-poisoning',
   ];
 
+  let out = '## Section 3 — ATR rule index (the web scanner bundle, by category)\n\n';
+  out += `These are the ${n(rules.length)} rules the panguard.ai web scanner runs, from\n`;
+  out += `agent-threat-rules v${SCANNER.atrRelease}. The latest ATR release (v${STATS.atrVersion}) has more.\n`;
+  out += `Full rule bodies (patterns, mappings, test cases) are in ${ATR_REPO}.\n\n`;
   for (const cat of orderedCategories) {
-    const rules = byCategory[cat] || [];
+    const rules = byCategory[cat] ?? [];
     if (rules.length === 0) continue;
     out += `### ${cat} (${rules.length} rules)\n\n`;
-    for (const r of rules) {
-      // Unescape JS string literal escapes back to readable text
-      const titleClean = r.title.replace(/\\'/g, "'").replace(/\\\\/g, '\\');
-      out += `- ${r.id}: ${titleClean}\n`;
+    for (const r of byCategory[cat]) {
+      out += `- ${r.id}: ${r.title}\n`;
     }
     out += '\n';
   }
-
   return out + '---\n\n';
 })();
 
 const PRODUCTS_SECTION = `## Section 4 — Product surface (what each piece does)
 
 ### PanGuard Scan
-Static + dynamic analysis on AI agent skill packages before install. Pipeline:
-content fingerprint, regex match against ${STATS.totalRulesDisplay} ATR rules, optional LLM second
-opinion. Outputs SARIF 2.1.0 (industry-standard threat export) and signed
-JSON evidence packs. CLI: \`panguard scan <path>\`. 60 seconds end-to-end on
-a typical npm package.
+Pre-install analysis of AI agent skill packages and MCP configs: content
+fingerprinting, regex matching against ATR rules, optional LLM second opinion.
+Outputs SARIF 2.1.0. CLI: \`panguard scan <path>\`.
 
 ### PanGuard Guard
 Runtime enforcement engine. Subscribes to MCP and Skill events from a host
 agent (Claude Code, Cursor, OpenClaw, etc.), runs them through a 4-agent
-pipeline (Detect → Analyze → Respond → Report), enforces ATR rules in real
-time. Response actions: block_input, block_output, alert, snapshot, kill,
+pipeline (Detect → Analyze → Respond → Report) and enforces ATR rules.
+${STATS.responseActions} response actions: block_input, block_output, alert, snapshot, kill,
 quarantine, notify_telegram, notify_slack, block_ip, custom_script, escalate.
-Confidence-based: high-confidence threats are auto-blocked, medium-confidence
-are alerted, low-confidence are logged only.
 
 ### PanGuard Skill Auditor
-Pre-install gate. 8 checks: prompt injection in skill description, suspicious
-tool calls, hidden capabilities, supply-chain signals (typosquatting,
-postinstall scripts), excessive permissions declared, secret access patterns,
-exfiltration patterns, behavior-description mismatch. Designed to fit the
-\`npm install\` → \`pga audit\` → \`npm install\` pattern.
+Pre-install gate with ${STATS.skillAuditChecks} checks: prompt injection in the skill description,
+suspicious tool calls, hidden capabilities, supply-chain signals (typosquatting,
+postinstall scripts), excessive declared permissions, secret access patterns,
+exfiltration patterns, behavior-description mismatch.
 
 ### PanGuard Migrator (Community + Enterprise)
-Converts legacy Sigma + YARA detections into ATR YAML for the AI agent
-runtime. Community version on npm (\`@panguard-ai/migrator-community\`):
-parsers, IR transformer, ATR output, CLI. Enterprise version (proprietary):
-5-framework compliance auto-mapping (EU AI Act, OWASP Agentic Top 10:2026,
-OWASP LLM Top 10:2025, NIST AI RMF, ISO/IEC 42001), evidence packs with
-SHA-256 + Merkle root attestation, ATR upstream contribution pipeline.
+Converts legacy Sigma + YARA detections into ATR YAML. The Community version is
+on npm (\`@panguard-ai/migrator-community\`); compliance mapping and evidence
+packs are in the Enterprise version.
 
 ### PanGuard MCP Server
-Exposes 12 panguard_* tools over Model Context Protocol so any MCP-compatible
-agent (Claude Code, Cursor, OpenClaw, NemoClaw, Workbuddy) can use PanGuard
-as a security tool. Tools: panguard_scan, panguard_audit_skill,
-panguard_guard_start, panguard_guard_stop, panguard_status, panguard_alerts,
-panguard_block_ip, panguard_deploy, panguard_init, panguard_generate_report,
-panguard_scan_code, plus a discovery tool.
+Exposes panguard_* tools over the Model Context Protocol, so MCP-compatible
+agents can use PanGuard as a security tool: ${MCP_TOOLS.join(', ')}.
 
 ### Threat Cloud
-The flywheel. Every PanGuard install becomes a sensor. Novel attack patterns
-detected at one tenant are anonymized (hashes only, no payload bodies),
-aggregated, and crystallized into new ATR rules. New rules are promoted to
-production within minutes if they survive a multi-tenant validation step
-(zero false positives on a 432-skill clean corpus, 3+ tenants agreement).
+Designed as the shared intelligence service: PanGuard installs send anonymized
+detections (hashes, no payload bodies), from which candidate ATR rules are
+proposed. Candidates are reviewed before they ship in an ATR release.
 
-### PanGuard Trap (in development)
-Honeypot system. Plants decoy MCP skills, decoy credentials, decoy file paths
-in agent-accessible locations. Triggers on read/write/exec to surface
-exfiltration intent before damage. Currently in beta.
-
-### PanGuard Chat (in development)
-Conversational interface over Guard and Threat Cloud. Operator asks "did any
-agent try to read SSH keys this week" — Chat queries the event log and
-returns a structured answer plus drill-down.
-
-### PanGuard Report (in development)
-Auto-generated compliance reports for SOC 2 (Type 1 and Type 2 evidence),
-ISO 27001, Taiwan Cybersecurity Management Act (TCSA), EU AI Act Article 15,
-NIST AI RMF. Pulls from Guard event log and PanGuard's own audit trail.
+### PanGuard Trap, Chat, Report (in development)
+Trap plants decoy skills, credentials and paths to surface exfiltration intent.
+Chat is a conversational interface over Guard. Report generates compliance
+reports from Guard's event log.
 
 ---
 
@@ -296,92 +224,54 @@ NIST AI RMF. Pulls from Guard event log and PanGuard's own audit trail.
 
 const BENCHMARKS_SECTION = `## Section 5 — Benchmark methodology
 
-### Garak (NVIDIA jailbreak corpus)
-Source: github.com/NVIDIA/garak. ${STATS.benchmark.garak.samples} adversarial prompts spanning prompt
-injection, jailbreaking, encoding tricks, persona attacks. Result: ${STATS.benchmark.garak.recall}%
-recall. Methodology: ATR loaded with the full ${STATS.totalRulesDisplay}-rule bundle, prompts fed
-through detect-only mode (no LLM second opinion), recall = (true positives) /
-(true positives + false negatives). Reproducibility: agent-threat-rules
-repo, \`pnpm bench:garak\`.
+Each figure is a measurement of ATR's deterministic Layer 1 rules on one named
+corpus, never an engine-wide claim. ATR's measurement records live in
+${ATR_REPO}/tree/main/data/measurements.
 
-### SKILL.md (PanGuard wild skill corpus)
-Source: scraped from ClawHub, OpenClaw, Skills.sh registries. 498 samples
-manually labeled as malicious (252) or benign (246). Result: 100% recall,
-97% precision, 0.2% false positive rate. Methodology: ATR v2.1.2 detect-only
-mode, full pipeline (regex + fingerprint + content checks). The 0.2% FP rate
-is the 1 false positive out of 432 clean skills in the held-out test set.
+### garak in-the-wild jailbreaks
+${B.garak.samples} jailbreak prompts from NVIDIA garak. ${B.garak.recall}% recall in the hunt lane
+(all effective rules), detect-only, no LLM second opinion. Partly closed-book:
+some rules were written from this corpus, so it overstates out-of-sample recall.
 
-### PINT (self-built PINT-format corpus)
-Source: self-built ${STATS.benchmark.pint.samples}-sample corpus in PINT format,
-assembled from deepset/prompt-injections + Lakera Gandalf. This is NOT Lakera's
-official private PINT benchmark and is not attributable to any third party.
-Result: ${STATS.benchmark.pint.recall}% recall, ${STATS.benchmark.pint.precision}%
-precision. Methodology: ATR regex layer only (no LLM). The lower
-recall vs Garak/SKILL.md reflects the corpus being designed for SIEM
-detection patterns, not agent-context patterns — Sigma migration via Migrator
-is in active development to close the gap.
+### garak full probe corpus
+${n(B.garakFull.samples)} prompts across ${B.garakFull.families} garak probe families. ${B.garakFull.recall}% recall in the hunt lane.
+Per-family figures (latentinjection ${B.garakFull.perFamily.latentinjection}%, sysprompt_extraction ${B.garakFull.perFamily.sysprompt_extraction}%,
+dan ${B.garakFull.perFamily.dan}%) belong to this corpus, not to the in-the-wild set above.
 
-### Wild scan (live ecosystem audit)
-Crawled 96,096 AI agent skill entries from ClawHub (36,378), OpenClaw (56,503),
-Skills.sh (3,115), plus a small Hermes-protocol sample (100). Result:
-${STATS.ecosystem.confirmedMalware} confirmed malware skills. Separately, the cumulative
-Threat Cloud blacklist stands at ${STATS.ecosystem.blacklistedSkills.toLocaleString()} skills, and
-${STATS.ecosystem.suspiciousPlusConfirmed.toLocaleString()} skills carry at least one suspicious-or-confirmed
-threat signal (these are distinct metrics, not interchangeable). ${STATS.ecosystem.tripleThreat}
-triple-threat packages (combined shell + network + filesystem access), 122 packages with
-postinstall scripts.
+### SKILL.md
+${B.skill.samples} labeled skills. ${B.skill.recall}% recall in the hunt lane. In-sample: the benign
+samples are the set the rules are tuned against, so precision and
+false-positive figures on this corpus are not cited.
 
-### HackAPrompt cluster mining
-Source: HackAPrompt EMNLP 2023 competition corpus
-(${STATS.benchmark.hackaprompt.samples.toLocaleString()} deterministic samples). Clustered the miss space,
-wrote new rules covering dominant attack families, tightened to zero false
-positives on a benign corpus, re-ran. Result: HackAPrompt recall ${STATS.benchmark.hackaprompt.recall}%,
-PINT recall ${STATS.benchmark.pint.recall}%, zero new false positives. The number is
-honest and below closed-source ML detector claims. The number is not the
-point — the methodology is.
+### PINT-format (self-built)
+${B.pint.samples} samples assembled from deepset/prompt-injections + Lakera Gandalf. This is NOT
+Lakera's official PINT benchmark, whose corpus is private. ${B.pint.recall}% recall, ${B.pint.precision}%
+precision. It is effectively a prompt-injection-family score, not a measure of
+overall coverage.
+
+### HackAPrompt
+${n(B.hackaprompt.samples)} deterministic samples from the EMNLP 2023 competition corpus.
+${B.hackaprompt.recall}% recall, measured on ATR v3.5.0. Closed-book: ATR mined rules from
+this corpus's misses, and ${B.hackaprompt.baselineRecall}% is ATR's own recall before them. The corpus is
+attack-only, so precision and false-positive rate are undefined on it.
+
+### Wild scan (2026-04)
+${WILD_SCAN_LINE}
+It is not a labeled benchmark: there is no ground truth, so it has no recall
+or precision. The scan record (data/full-scan-v2-2026-04-14.json in the ATR
+repository) keeps file paths and rule ids but not content, so it cannot be
+re-run. ${n(WS.fourRegistrySubset)} is the four SKILL.md registries without the MCP server crawl.
 
 ---
 
 `;
 
-const ECOSYSTEM_SECTION = `## Section 6 — Ecosystem integrations (what is shipping where)
+const ECOSYSTEM_SECTION = `## Section 6 — Where ATR has been merged
 
-### Microsoft AGT (Agent Governance Toolkit)
-PR #908 (15 rules, initial) → PR #1277 (287 rules + weekly auto-sync workflow,
-merged 2026-04-26). On 2026-05-11, Microsoft Copilot SWE Agent opened
-agent-governance-toolkit issue #1981 with regression-test fixtures presuming
-ATR detection — a bidirectional integration loop is now operational.
+Maintainer-accepted contributions, not vendor endorsements. The evidence-linked
+list is ADOPTERS.md in ${ATR_REPO}. Selected entries:
 
-### Cisco AI Defense (skill-scanner)
-PR #79 (PoC, 34 rules) → PR #99 (full rule library merged in production with
-auto-sync to the latest ATR release, currently ${STATS.totalRulesDisplay} rules,
-2026-04-22). skill-scanner is Cisco's commercial scanner; ATR is the rule
-engine underneath.
-
-### MISP (taxonomies + galaxy)
-PR #323 on misp-taxonomies (rule-ID tagging vocabulary, merged 2026-04-12).
-PR #1207 on misp-galaxy (336-rule cluster, merged 2026-05-10). Now part
-of the MISP global threat-intel sharing layer.
-
-### OWASP Agentic Security Resource Hub (A-S-R-H)
-PR #74 merged 2026-05-11 with "Welcome to the team" greeting from project
-lead Mert Satilmaz. Note: this is the third-party A-S-R-H repo; the official
-OWASP Foundation repo PR is still pending. Cited as OWASP-affiliated, not
-OWASP-official.
-
-### Gen Digital Sage
-PR #33 (Norton / Avast / AVG parent company). 2026-04-18. Open and tracked.
-
-### Other open PRs
-NVIDIA garak #1676 (full ATR rule pack, 2 review rounds passed), safe-agentic-
-framework/safe-mcp #187, IBM mcp-context-forge #4109, meta-llama/PurpleLlama
-#206, promptfoo/promptfoo #8529, cisco-ai-defense/mcp-scanner #151,
-agentcontrol/agent-control #170.
-
-### npm + PyPI packages (October 2025 onwards)
-13 packages combined cross-ecosystem, 10K+ monthly downloads in aggregate.
-Notable: agent-threat-rules (npm, ${STATS.atrVersion}), @panguard-ai/migrator-community
-(npm, 0.1.0), panguard (npm, ${STATS.cliVersion}).
+${bullets(ADOPTION_LINES)}
 
 ---
 
@@ -390,7 +280,7 @@ Notable: agent-threat-rules (npm, ${STATS.atrVersion}), @panguard-ai/migrator-co
 const BLOG_SECTION = (() => {
   try {
     const blogText = readFileSync(join(ROOT, 'src/data/blog-posts.ts'), 'utf-8');
-    // Find slug + title + excerpt blocks, take the first 20 EN posts (skip -zh)
+    // Find slug + title + excerpt blocks; keep the 20 newest English posts (skip -zh)
     const matches = Array.from(
       blogText.matchAll(
         /slug:\s*'([^']+)',\s*title:\s*'((?:[^'\\]|\\.)+)',\s*excerpt:\s*'((?:[^'\\]|\\.)+)',[^}]*?date:\s*'([^']+)'/g
@@ -407,27 +297,34 @@ const BLOG_SECTION = (() => {
       .sort((a, b) => (a.date < b.date ? 1 : -1))
       .slice(0, 20);
 
-    let out = '## Section 7 — Recent writing (top 20 blog posts, English)\n\n';
+    let out = '## Section 7 — Recent writing (20 newest blog posts, English)\n\n';
     out += 'Full text at panguard.ai/blog/{slug}. Each post also has a zh-TW\n';
-    out += 'counterpart at panguard.ai/zh-TW/blog/{slug}-zh.\n\n';
+    out += 'counterpart at panguard.ai/zh-TW/blog/{slug}-zh. Posts keep their\n';
+    out += 'original text; a dated correction is noted where a post quotes a\n';
+    out += 'figure that has since been withdrawn or narrowed.\n\n';
     for (const p of enPosts) {
       out += `### ${p.title}\n`;
       out += `- URL: https://panguard.ai/blog/${p.slug}\n`;
       out += `- Date: ${p.date}\n`;
-      out += `- Excerpt: ${p.excerpt}\n\n`;
+      out += `- Excerpt: ${p.excerpt}\n`;
+      for (const correction of correctionsFor([p.title, p.excerpt])) {
+        out += `- Correction (${CORRECTION_DATE}): ${correction.en}\n`;
+      }
+      out += '\n';
     }
     return out + '---\n\n';
   } catch (err) {
+    console.error('generate-llms-full: could not read blog-posts.ts', err);
     return '## Section 7 — Recent writing\n\n(Generator failed to read blog-posts.ts. Re-run `pnpm gen:llms` after fixing.)\n\n---\n\n';
   }
 })();
 
 const FOOTER = `## Section 8 — Where to look next
 
-For source code: github.com/panguard-ai/panguard-ai (monorepo with 18 packages).
-For the open rule standard: github.com/Agent-Threat-Rule/agent-threat-rules.
+For source code: github.com/panguard-ai/panguard-ai (monorepo).
+For the open rule standard: ${ATR_REPO}.
 For docs: docs.panguard.ai (Mintlify, en + zh-Hant).
-For the marketing site: panguard.ai (Next.js 14, en + zh-TW).
+For the marketing site: panguard.ai (Next.js, en + zh-TW).
 For the sovereign brief: sovereign-ai-defense.vercel.app.
 For commercial enquiry: adam@agentthreatrule.org.
 
@@ -436,7 +333,80 @@ file an issue at github.com/panguard-ai/panguard-ai/issues with the tag
 \`llms-full\`.
 `;
 
-const content =
+/* ─────────────────────────────── llms.txt ─────────────────────────────── */
+
+const INDEX = `# PanGuard AI
+
+> PanGuard AI is the commercial platform for AI agent security built on ATR
+> (Agent Threat Rules), an open, MIT-licensed detection standard with
+> ${STATS.totalRulesDisplay} effective rules in v${STATS.atrVersion}. PanGuard adds runtime enforcement, pre-install
+> auditing, and migration and compliance tooling. Community is free; Founding
+> Pilot and Enterprise tiers add the platform layer.
+
+## Core stats
+
+- ATR: ${STATS.totalRulesDisplay} effective rules in v${STATS.atrVersion}, 10 threat categories, MIT
+- OWASP Agentic Top 10: ${STATS.coverage.owaspAgentic} categories mapped
+${bullets(BENCHMARK_LINES)}
+- Wild scan (2026-04): ${WILD_SCAN_LINE}
+- The panguard.ai web scanner runs ${n(SCANNER.rules)} rules from agent-threat-rules v${SCANNER.atrRelease}
+
+## Core products
+
+- [PanGuard product overview](https://panguard.ai/product)
+- [Skill Auditor](https://panguard.ai/product/skill-auditor): ${STATS.skillAuditChecks}-check pre-install gate for AI agent skills
+- [PanGuard Scan](https://panguard.ai/product/scan): pre-install audit with ATR, Sigma and YARA rule engines
+- [PanGuard Guard](https://panguard.ai/product/guard): 4-agent runtime pipeline (detect, analyze, respond, report)
+- [PanGuard Migrator](https://panguard.ai/migrator): converts legacy Sigma/YARA detections into ATR YAML
+- [PanGuard MCP Server](https://panguard.ai/product/mcp): panguard_* tools for Claude Code, Cursor, OpenClaw and other MCP clients
+- [ATR Standard](https://panguard.ai/atr): the open detection standard
+- [Threat Cloud](https://panguard.ai/threat-cloud): shared intelligence; candidate rules are reviewed before they ship
+
+## Pricing
+
+- [Pricing](https://panguard.ai/pricing): Community ($0, MIT, self-hosted), Founding Pilot ($25K one-time, self-serve), Enterprise and up (from $150K, sales-led)
+
+## Benchmarks and research
+
+- [Benchmark results](https://panguard.ai/research/benchmarks): each result with its corpus, lane, ATR version and caveats
+- [Wild scan report](https://panguard.ai/research/96k-scan): the April 2026 scan of published agent skills
+- [MCP ecosystem scan](https://panguard.ai/research/mcp-ecosystem-scan): the March 2026 scan of MCP server packages
+
+## Documentation
+
+- [Getting Started](https://docs.panguard.ai/getting-started)
+- [Installation](https://docs.panguard.ai/installation): macOS / Linux / Windows / npm
+- [Quickstart](https://docs.panguard.ai/quickstart)
+- [ATR concept page](https://docs.panguard.ai/atr)
+- [CLI Reference](https://docs.panguard.ai/cli): ${STATS.cliCommands} commands
+- [Skill Auditor docs](https://docs.panguard.ai/products/skill-auditor)
+- [Guard docs](https://docs.panguard.ai/products/guard): ${STATS.responseActions} response actions
+- [Scan docs](https://docs.panguard.ai/products/scan)
+- [Threat Cloud docs](https://docs.panguard.ai/products/threat-cloud)
+
+## ATR (Agent Threat Rules)
+
+- Repo: ${ATR_REPO}
+- npm: \`agent-threat-rules\` (v${STATS.atrVersion})
+- License: MIT
+- Where it has been merged, with evidence: ADOPTERS.md in the repository (maintainer-accepted contributions, not vendor endorsements)
+
+## Company
+
+- [About PanGuard](https://panguard.ai/about)
+- [Trust Center](https://panguard.ai/trust)
+- [Compliance](https://panguard.ai/compliance)
+- [Sovereign AI Defense brief](https://sovereign-ai-defense.vercel.app)
+- [Blog](https://panguard.ai/blog)
+- [GitHub](https://github.com/panguard-ai/panguard-ai)
+- [Full context for AI tools](https://panguard.ai/llms-full.txt)
+
+## Founder
+
+- Adam Lin (林冠辛), founder. Email: adam@agentthreatrule.org. GitHub: github.com/eeee2345. Self-taught engineer, based in Taiwan.
+`;
+
+const full =
   HEADER +
   COMPANY_SECTION +
   STATS_SECTION +
@@ -447,6 +417,7 @@ const content =
   BLOG_SECTION +
   FOOTER;
 
-writeFileSync(OUT, content, 'utf-8');
-const sizeKb = (content.length / 1024).toFixed(1);
-console.log(`wrote ${OUT} (${sizeKb} KB, ${content.length.toLocaleString()} chars)`);
+writeFileSync(OUT_FULL, full, 'utf-8');
+writeFileSync(OUT_INDEX, INDEX, 'utf-8');
+console.log(`wrote ${OUT_FULL} (${(full.length / 1024).toFixed(1)} KB)`);
+console.log(`wrote ${OUT_INDEX} (${(INDEX.length / 1024).toFixed(1)} KB)`);

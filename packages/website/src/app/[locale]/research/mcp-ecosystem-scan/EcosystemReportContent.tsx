@@ -119,8 +119,8 @@ export default function EcosystemReportContent() {
             {flaggedPercent}% flagged.
           </p>
           <p className="text-text-muted text-xs mt-4">
-            Published March 2026 | Methodology: {STATS.atrRules} ATR rules + secret detection +
-            permission analysis
+            Published March 2026 | Methodology: ATR rules of the release current at scan time +
+            secret detection + permission analysis
           </p>
         </FadeInUp>
       </section>
@@ -192,8 +192,8 @@ export default function EcosystemReportContent() {
               <p>Each skill was scanned using:</p>
               <ul className="list-disc list-inside space-y-1 ml-4">
                 <li>
-                  <strong className="text-text-primary">{STATS.atrRules} ATR rules</strong> with{' '}
-                  {STATS.atrPatterns}+ detection patterns across 10 threat categories
+                  <strong className="text-text-primary">ATR rules</strong> from the release current
+                  at scan time (March 2026), not today&apos;s rule set
                 </li>
                 <li>
                   <strong className="text-text-primary">Secret detection</strong>: AWS keys, GitHub

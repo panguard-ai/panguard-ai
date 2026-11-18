@@ -56,12 +56,12 @@ export default function ProofTerminal() {
 
       <div className="mt-12 grid grid-cols-2 gap-x-8 gap-y-10 border-t border-border-subtle pt-8 sm:grid-cols-4">
         <StatV2 value={`${STATS.benchmark.hackaprompt.recall}%`} label={t('b1Label')} />
-        <StatV2 value={`${STATS.benchmark.pint.precision}%`} label={t('b2Label')} />
-        <StatV2 value={`${STATS.benchmark.garak.recall}%`} label={t('b3Label')} />
         <StatV2
-          value={`${STATS.benchmark.skill.recall}% / ${STATS.benchmark.skill.fp}%`}
-          label={t('b4Label')}
+          value={`${STATS.benchmark.pint.precision}%`}
+          label={t('b2Label', { recall: STATS.benchmark.pint.recall })}
         />
+        <StatV2 value={`${STATS.benchmark.garak.recall}%`} label={t('b3Label')} />
+        <StatV2 value={`${STATS.benchmark.skill.recall}%`} label={t('b4Label')} />
       </div>
 
       <p className="mt-8 max-w-3xl text-sm leading-relaxed text-text-muted">{t('honesty')}</p>

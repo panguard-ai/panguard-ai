@@ -11,6 +11,7 @@ import JsonLdBreadcrumb from '@/components/seo/JsonLdBreadcrumb';
 import BilingualArticle from '@/components/blog/BilingualArticle';
 import { getAllPosts } from '@/lib/blog-store';
 import { notFound } from 'next/navigation';
+import { CORRECTION_DATE, correctionsFor } from '@/lib/withdrawn-figures';
 
 /* ─── All blog pages are SSR to support dynamic JSON posts ─── */
 export const dynamic = 'force-dynamic';
@@ -83,6 +84,11 @@ export default async function BlogPostPage(props: {
   }
 
   const zhPost = allPosts.find((p) => p.slug === `${post.slug}-zh`) ?? null;
+
+  const showZh = params.locale === 'zh-TW' || isZhSlug;
+  const corrections = correctionsFor(
+    [post.excerpt, ...(post.content ?? []), ...(zhPost?.content ?? [])].filter(Boolean)
+  );
 
   const nonce = await getNonce();
 
@@ -202,6 +208,27 @@ export default async function BlogPostPage(props: {
                 <p className="text-lg text-text-secondary leading-relaxed">{post.excerpt}</p>
               </div>
             </FadeInUp>
+
+            {corrections.length > 0 ? (
+              <FadeInUp delay={0.18}>
+                <aside className="mt-8 rounded-xl border border-border bg-surface-1 p-5 text-sm leading-relaxed text-text-secondary">
+                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-brand-sage">
+                    {showZh ? `更正 · ${CORRECTION_DATE}` : `Correction · ${CORRECTION_DATE}`}
+                  </p>
+                  {corrections.map((correction) => (
+                    <p key={correction.id} className="mb-2">
+                      {showZh ? correction.zh : correction.en}
+                    </p>
+                  ))}
+                  <p>
+                    {showZh ? '本文其餘內容保留原樣。' : 'The post is otherwise left as published.'}{' '}
+                    <Link href="/research/benchmarks" className="text-brand-sage underline">
+                      {showZh ? '現行數字與限制' : 'Current figures and caveats'}
+                    </Link>
+                  </p>
+                </aside>
+              </FadeInUp>
+            ) : null}
 
             {/* ───────────── Article Content or Coming Soon ───────────── */}
             {post.content ? (

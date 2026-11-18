@@ -546,8 +546,11 @@ export class MCPProxy {
       // text AND non-text (resource URIs, embedded resource.text/blob, image
       // data) — so a malicious server cannot smuggle an exfil/injection payload
       // through a resource/image block that a text-only extractor would silently
-      // drop. Cap is 256KB (not 10KB) so padding the payload past a tiny cap no
-      // longer evades the scan.
+      // drop. The scan covers the first 256KB (not 10KB, so padding past a tiny cap
+      // no longer evades it); the evaluator splits a response over 100,000 chars
+      // into windows because the engine skips any longer field. Content past
+      // 256KB is not scanned: the cap limits how much text one response can make
+      // the proxy scan.
       const responseText = (result.content as Array<Record<string, unknown>>)
         ?.map((c) => {
           if (typeof c['text'] === 'string') return c['text'];

@@ -133,16 +133,16 @@ export const LAYERS: readonly Layer[] = [
       zh: '一個惡意 skill 安裝 = agent 被劫持。postmark-mcp 事件安靜轉發 15,000 封 email/天數月才被發現。在 agent 執行那段程式碼前先掃過。',
     },
     how: {
-      en: 'Regex-first ATR engine with optional LLM semantic layer. Rules stored as YAML with versioned lifecycle (draft → experimental → stable). Web scanner at panguard.ai/ and CLI `pga scan <url-or-path>`. ATR rules merged upstream into Cisco AI Defense skill-scanner rule packs (PR #99, in production) and Microsoft AGT community-rules examples (PR #1277) — maintainer-accepted contributions, not vendor endorsements.',
-      zh: '以 regex 為主的 ATR 引擎，可選 LLM 語意層。規則以 YAML 儲存，有版本生命週期(draft → experimental → stable)。Web scanner 在 panguard.ai/,CLI `pga scan <url-or-path>`。ATR 規則已上游合併進 Cisco AI Defense skill-scanner 規則包(PR #99,生產環境)與 Microsoft AGT community-rules 範例(PR #1277)— 由維護者接受的貢獻,非廠商背書。',
+      en: 'Regex-first ATR engine with optional LLM semantic layer. Rules stored as YAML with versioned lifecycle (draft → experimental → stable). Web scanner at panguard.ai/ and CLI `pga scan <url-or-path>`. ATR rules merged upstream into the open-source cisco-ai-defense/skill-scanner repository (PR #99) and Microsoft AGT example directories (PR #2308 + #3025) — maintainer-accepted contributions, not vendor endorsements.',
+      zh: '以 regex 為主的 ATR 引擎，可選 LLM 語意層。規則以 YAML 儲存，有版本生命週期(draft → experimental → stable)。Web scanner 在 panguard.ai/,CLI `pga scan <url-or-path>`。ATR 規則已上游合併進開源 cisco-ai-defense/skill-scanner repo(PR #99)與 Microsoft AGT 範例目錄(PR #2308 + #3025)— 由維護者接受的貢獻,非廠商背書。',
     },
     proof: {
-      en: `${STATS.totalRulesDisplay} ATR rules (MIT licensed) · ${STATS.benchmark.garak.recall}% recall on NVIDIA Garak (${STATS.benchmark.garak.samples} adversarial prompts) · ${STATS.benchmark.skill.recall}% recall / ${STATS.benchmark.skill.precision}% precision on ${STATS.benchmark.skill.samples} real-world SKILL.md samples · 0.48% FP (enforce lane) on 3,115 wild Skills.sh packages, hunt lane higher · Merged upstream: full ATR pack into Cisco AI Defense skill-scanner rule packs, in production (PR #79 + #99); ${STATS.adoption.microsoftRulesMerged} rules into Microsoft AGT community-rules examples (PR #908 + #1277) — maintainer-accepted contributions, not vendor endorsements.`,
-      zh: `${STATS.totalRulesDisplay} 條 ATR 規則（MIT 授權）· NVIDIA Garak ${STATS.benchmark.garak.recall}% 召回（${STATS.benchmark.garak.samples} 個對抗 prompt）· ${STATS.benchmark.skill.samples} 個真實 SKILL.md 樣本 ${STATS.benchmark.skill.recall}% 召回 / ${STATS.benchmark.skill.precision}% 精度 · 3,115 個野外 Skills.sh 套件 0.48% FP（enforce lane，hunt lane 較高）· 上游合併:完整 ATR 規則包進入 Cisco AI Defense skill-scanner 規則包(生產環境,PR #79 + #99);${STATS.adoption.microsoftRulesMerged} 條進入 Microsoft AGT community-rules 範例(PR #908 + #1277)— 由維護者接受的貢獻,非廠商背書。`,
+      en: `${STATS.totalRulesDisplay} ATR rules (MIT licensed) · ${STATS.benchmark.garak.recall}% hunt-lane recall on NVIDIA garak's in-the-wild jailbreaks (${STATS.benchmark.garak.samples} prompts, partly closed-book) · ${STATS.benchmark.skill.recall}% hunt-lane recall on ${STATS.benchmark.skill.samples} labeled SKILL.md samples (in-sample) · Merged upstream: the ATR rule pack in the open-source cisco-ai-defense/skill-scanner repository (PR #79 + #99) and ATR example directories in Microsoft AGT (PR #2308 + #3025) — maintainer-accepted contributions, not vendor endorsements.`,
+      zh: `${STATS.totalRulesDisplay} 條 ATR 規則（MIT 授權）· NVIDIA garak 實戰越獄集 hunt lane 召回 ${STATS.benchmark.garak.recall}%（${STATS.benchmark.garak.samples} 個 prompt，部分 closed-book）· ${STATS.benchmark.skill.samples} 個已標註 SKILL.md 樣本 hunt lane 召回 ${STATS.benchmark.skill.recall}%（樣本內）· 上游合併：ATR 規則包進入開源 cisco-ai-defense/skill-scanner repo（PR #79 + #99），以及 Microsoft AGT 內的 ATR 範例目錄（PR #2308 + #3025）——由維護者接受的貢獻，非廠商背書。`,
     },
     proofShort: {
-      en: `${STATS.totalRulesDisplay} rules · ${STATS.benchmark.garak.recall}% Garak recall · 0.48% FP (enforce lane)`,
-      zh: `${STATS.totalRulesDisplay} 條規則 · Garak ${STATS.benchmark.garak.recall}% 召回 · 0.48% FP（enforce lane）`,
+      en: `${STATS.totalRulesDisplay} rules · ${STATS.benchmark.garak.recall}% garak recall (hunt lane)`,
+      zh: `${STATS.totalRulesDisplay} 條規則 · garak 召回 ${STATS.benchmark.garak.recall}%（hunt lane）`,
     },
     tryIt: {
       intro: {
@@ -179,27 +179,19 @@ export const LAYERS: readonly Layer[] = [
     ],
     ecosystem: [
       {
-        label: 'Microsoft Agent Governance Toolkit #908 + #1277',
-        href: 'https://github.com/microsoft/agent-governance-toolkit/pull/1277',
+        label: 'Microsoft Agent Governance Toolkit #2308 + #3025',
+        href: 'https://github.com/microsoft/agent-governance-toolkit/pull/3025',
         context: {
-          en: 'Merged: 287 ATR rules + weekly auto-sync workflow into AGT community-rules examples (examples/atr-community-rules/) — maintainer-accepted, not product core',
-          zh: '已合併：287 條 ATR 規則 + 每週自動同步 workflow 進入 AGT community-rules 範例(examples/atr-community-rules/)— 維護者接受,非產品核心',
+          en: 'Merged: ATR example directories; the earlier rule-pack YAML was removed upstream on 2026-07-30',
+          zh: '已合併：ATR 範例目錄；先前的規則包 YAML 已於 2026-07-30 被上游移除',
         },
       },
       {
         label: 'Cisco AI Defense skill-scanner #79 + #99',
         href: 'https://github.com/cisco-ai-defense/skill-scanner/pull/99',
         context: {
-          en: `Merged: full ${STATS.totalRulesDisplay}-rule ATR pack in skill-scanner production`,
-          zh: `已合併：完整 ${STATS.totalRulesDisplay} 條 ATR 規則進入 skill-scanner 生產環境`,
-        },
-      },
-      {
-        label: 'NVIDIA Garak #1676',
-        href: 'https://github.com/NVIDIA/garak/pull/1676',
-        context: {
-          en: 'PR open: ATR integrated as a first-class detector',
-          zh: 'PR 審查中：ATR 成為 first-class detector',
+          en: 'Merged: ATR rule pack in the open-source skill-scanner repository (the repository, not a Cisco product)',
+          zh: '已合併：ATR 規則包進入開源的 skill-scanner repo（指該 repo，不代表任何 Cisco 產品）',
         },
       },
     ],

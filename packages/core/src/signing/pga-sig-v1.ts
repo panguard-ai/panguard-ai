@@ -238,11 +238,17 @@ export function verifyAuditReport(
   }
 
   if (integrity.signature_scheme === 'issuer') {
-    const sig = integrity.issuer_signature;
-    if (sig === undefined) {
+    const block: unknown = integrity.issuer_signature;
+    if (
+      block === undefined ||
+      block === null ||
+      typeof block !== 'object' ||
+      Array.isArray(block)
+    ) {
       return { ok: false, reason: 'missing-issuer-signature', sha256: recomputed };
     }
-    const outcome = verifyIssuerSignature(recomputed, sig);
+    const sig = block as IssuerSignature;
+    const outcome = safeVerifyIssuerSignature(recomputed, sig);
     if (!outcome.valid) {
       return {
         ok: false,
@@ -300,6 +306,22 @@ export function verifyAuditReport(
     sha256: recomputed,
     ...(integrity.unsigned_reason !== undefined ? { detail: integrity.unsigned_reason } : {}),
   };
+}
+
+/**
+ * verifyIssuerSignature over a block read from an untrusted document: a field
+ * of the wrong type must yield a failed result, not an exception.
+ */
+function safeVerifyIssuerSignature(sha256: string, sig: IssuerSignature): IssuerSigVerifyResult {
+  try {
+    return verifyIssuerSignature(sha256, sig);
+  } catch (err) {
+    return {
+      valid: false,
+      reason: 'bad-signature',
+      detail: err instanceof Error ? err.message : String(err),
+    };
+  }
 }
 
 /** Structural read of the integrity block; null when this is not an audit report. */

@@ -19,7 +19,7 @@ import {
   formatDuration,
   setLogLevel,
 } from '@panguard-ai/core';
-import { runScan, runRemoteScan } from '@panguard-ai/panguard-scan';
+import { runScan, runRemoteScan, checkCompiledArtifacts } from '@panguard-ai/panguard-scan';
 import { PANGUARD_VERSION } from '../../index.js';
 import { computeGrade, buildScanOutput, saveResults } from '../scan-helpers.js';
 import type { ScanOutputSystem } from '../scan-helpers.js';
@@ -167,6 +167,21 @@ async function findLocalSkillDir(): Promise<string | null> {
     }
   }
   return null;
+}
+
+/** Print the compiled-bytecode findings for a `pga scan <path>` text run. */
+function printCompiledArtifacts(
+  findings: ReadonlyArray<{ title: string; description: string; severity: string }>
+): void {
+  if (findings.length === 0) return;
+  console.log(
+    `  ${c.critical('!!')} ${c.bold(`${findings.length} compiled Python file(s) that no rule can review`)}`
+  );
+  for (const f of findings) {
+    console.log(`     [${f.severity.toUpperCase()}] ${f.title}`);
+    console.log(`     ${c.dim(f.description)}`);
+  }
+  console.log('');
 }
 
 export function scanCommand(): Command {
@@ -335,6 +350,18 @@ export function scanCommand(): Command {
                 console.log(`  ${c.dim('?')} ${c.bold(skill.name)} — scan error`);
               }
             }
+
+            // ATR reads SKILL.md text only. Bytecode the skill ships is never
+            // reviewed by a rule, so its presence alone flags the skill.
+            const compiled = await checkCompiledArtifacts(skillPath);
+            if (compiled.length > 0 && !flaggedNames.includes(skill.name)) {
+              if (scannedOkNames.includes(skill.name)) clean--;
+              threats++;
+              flaggedNames.push(skill.name);
+              console.log(
+                `  ${c.critical('!!')} ${c.bold(skill.name)} — ships ${compiled.length} compiled Python file(s) no rule can review`
+              );
+            }
           }
 
           // Persist verdicts so `pga status` / `pga doctor` reflect this scan.
@@ -444,19 +471,38 @@ export function scanCommand(): Command {
               timeout: 60_000,
               env: scanEnv,
             });
-            process.stdout.write(result);
+            // ATR reads SKILL.md text only, so bytecode a skill ships is never
+            // reviewed by a rule. Report it alongside the ATR result.
+            const compiled = await checkCompiledArtifacts(resolvedPath);
             // `pga scan <path>` must exit non-zero when threats are found so it is
             // usable as a CI gate — the bundled ATR CLI itself always exits 0.
             // Matches `pga audit` (exit 2 on a confirmed threat).
             const out = result.toString();
             let threats = 0;
             if (options.json) {
+              let parsed: Record<string, unknown> | null = null;
               try {
-                threats = (JSON.parse(out) as { threats_detected?: number }).threats_detected ?? 0;
+                parsed = JSON.parse(out) as Record<string, unknown>;
               } catch {
-                /* unparseable JSON → leave 0 */
+                /* unparseable JSON → pass it through unchanged */
+              }
+              const atrThreats =
+                parsed && typeof parsed['threats_detected'] === 'number'
+                  ? (parsed['threats_detected'] as number)
+                  : 0;
+              threats = atrThreats + compiled.length;
+              if (parsed && compiled.length > 0) {
+                const merged = {
+                  ...parsed,
+                  threats_detected: threats,
+                  compiled_artifacts: compiled,
+                };
+                process.stdout.write(`${JSON.stringify(merged, null, 2)}\n`);
+              } else {
+                process.stdout.write(result);
               }
             } else if (options.sarif) {
+              process.stdout.write(result);
               try {
                 threats =
                   (JSON.parse(out) as { runs?: Array<{ results?: unknown[] }> }).runs?.[0]?.results
@@ -464,13 +510,22 @@ export function scanCommand(): Command {
               } catch {
                 /* unparseable SARIF → leave 0 */
               }
+              threats += compiled.length;
+              if (compiled.length > 0) {
+                process.stderr.write(
+                  `PanGuard: ${compiled.length} compiled Python file(s) in this skill cannot be reviewed by any rule. Run without --sarif for details.\n`
+                );
+              }
             } else {
+              process.stdout.write(result);
               // Strip ANSI color codes BEFORE reading the count: the colored number itself
               // contains ANSI digits (e.g. [32m) that would otherwise be misread as the count.
               // eslint-disable-next-line no-control-regex -- ESC byte is intentional for ANSI stripping
               const plain = out.replace(/\u001b\[[0-9;]*m/g, '');
               const m = plain.match(/Threats found:\s*(\d+)/i);
               if (m && m[1]) threats = parseInt(m[1], 10);
+              threats += compiled.length;
+              printCompiledArtifacts(compiled);
               // Scope note: scan = ATR rules only; audit = full multi-layer. Stated
               // so the two commands' counts never look like a bug when they differ.
               console.log(
@@ -483,6 +538,10 @@ export function scanCommand(): Command {
             // ATR exits 1 on findings with fail-on-finding — still show output
             if (e.stdout && e.stdout.length > 0) {
               process.stdout.write(e.stdout);
+            }
+            if (!options.json && !options.sarif) {
+              const { resolve: resolvePath } = await import('node:path');
+              printCompiledArtifacts(await checkCompiledArtifacts(resolvePath(path)));
             }
             process.exitCode = e.status ?? 1;
           }

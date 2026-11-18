@@ -7,7 +7,7 @@ import { sageRich, Eyebrow, SectionTitleV2, SectionV2, CardV2 } from './primitiv
 
 /**
  * Section 05 — Ecosystem wall. Deck p9: three honesty tiers.
- * Tier 1 ships ATR in production, tier 2 has merged public PRs,
+ * Tier 1 has ATR content merged into its open-source repositories, tier 2 has merged public PRs,
  * tier 3 is engagement only — labeled as such, never inflated.
  */
 

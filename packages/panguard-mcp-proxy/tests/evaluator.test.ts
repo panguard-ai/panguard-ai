@@ -106,4 +106,17 @@ describe('ProxyEvaluator — ATR rules 實際驗證', () => {
     });
     expect(r.outcome).toBe('deny');
   });
+
+  // ATR-2026-01980 (agent-threat-rules 4.2) flags a quoted MCP argument value
+  // followed by `;` and `$()`. In the agent's own shell that is ordinary
+  // grammar: the built-in-tool hook advises, the MCP proxy still blocks.
+  it('ASK, not DENY: quote + `;` + $() on the built-in shell surface (ATR-2026-01980)', async () => {
+    const command = 'git commit -m "fix: tidy" ; echo "done at $(date)"';
+    const hook = await evaluator.evaluateToolCall('command', { input: command }, 'tool_call', true);
+    expect(hook.matchedRules).toContain('ATR-2026-01980');
+    expect(hook.outcome).toBe('ask');
+    const proxy = await evaluator.evaluateToolCall('run_task', { input: command }, 'tool_call');
+    expect(proxy.matchedRules).toContain('ATR-2026-01980');
+    expect(proxy.outcome).toBe('deny');
+  });
 });

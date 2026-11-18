@@ -3,7 +3,8 @@
  *
  * Usage: Import STATS directly in components. RuleStatsContext wraps STATS
  * with live API data from /api/threat-intel/stats (rule counts only).
- * Ecosystem stats are static until P2 TC API integration.
+ * Study figures (wildScan, ecosystem) are static; live Threat Cloud registry
+ * counts are read by useEcosystemStats and never stored here.
  *
  * When adding new stats: update here first, then all components auto-update.
  *
@@ -14,7 +15,8 @@
  *   packages/panguard/src/cli/index.ts         -> 23 top-level commands
  *   packages/panguard-mcp/src/server.ts        -> 10 MCP tools shown on /product/mcp
  *   packages/panguard-skill-auditor/src/checks/ -> 8 audit checks
- *   agent-threat-rules/rules/                  -> 747 ATR rules (npm v3.5.8). The web-scanner bundle atr-rules-compiled.json ships the 650 production rules (draft/deprecated excluded, mirroring the runtime engine). Re-sync with the three-command flow above when bumping ATR.
+ *   agent-threat-rules (latest npm release)    -> atrRules/totalRules, written by the ATR Stats Sync Bot
+ *   agent-threat-rules (this workspace's)      -> scanner, written by scripts/compile-atr-rules.mjs
  *   packages/panguard-guard/src/playbook/      -> 3 playbook templates
  *   packages/panguard-guard/src/collectors/     -> 4 log parsers
  *
@@ -23,28 +25,38 @@
  */
 export const STATS = {
   /** Must match packages/panguard/package.json "version" */
-  cliVersion: '1.9.0',
+  cliVersion: '1.10.1',
   /**
-   * Synced from agent-threat-rules by: pnpm update agent-threat-rules ->
-   * node scripts/compile-atr-rules.mjs -> node scripts/apply-atr-stats.mjs.
-   * atrRules/totalRules below is the full ATR corpus (747). The web-scanner
-   * bundle (src/lib/atr-rules-compiled.json) ships the 650 production rules
-   * only — draft/deprecated are excluded to mirror the runtime engine.
+   * atrVersion/atrRules/totalRules are written by the ATR Stats Sync Bot
+   * (.github/workflows/sync-atr-stats.yml): EFFECTIVE rules in the latest
+   * agent-threat-rules npm release, draft and deprecated excluded to match ATR's
+   * outward count. They describe the ATR standard. The panguard.ai web scanner
+   * runs a separate, older bundle: see `scanner` below.
    */
-  atrVersion: '4.0.0',
+  atrVersion: '4.3.1',
   /**
-   * Full ATR corpus (agent-threat-rules v3.5.8 on npm = 747 YAML rules) —
-   * auditable by `npm i agent-threat-rules@3.5.8 && find rules -name '*.yaml' | wc -l`.
-   * The online scanner runs the 650 production subset (see atr-rules-compiled.json).
+   * Effective rules in the shipped npm package (v4.1.5: 829 rule files, of
+   * which 5 draft and 2 deprecated are not loaded by the engine, so 822).
+   * Written by the ATR Stats Sync Bot; do not hand-edit.
    */
-  atrRules: 785,
-  /** Total detection patterns across the full ATR corpus (747 rules, v3.5.8). */
-  atrPatterns: 3_200,
-  totalRules: 785,
+  atrRules: 836,
+  /**
+   * Detection conditions across the same effective rules (npm 4.1.5: 3,416).
+   * Written by the ATR Stats Sync Bot alongside atrRules; do not hand-edit.
+   */
+  atrPatterns: 3_455,
+  totalRules: 836,
   /** Use this for all user-facing display — avoids stale hardcoded counts. */
-  totalRulesDisplay: '785' as const,
+  totalRulesDisplay: '836' as const,
   /** Separate display for honest breakdown */
-  atrRulesDisplay: '785' as const,
+  atrRulesDisplay: '836' as const,
+  /**
+   * What the panguard.ai web scanner (/api/scan) runs: src/lib/atr-rules-compiled.json,
+   * the effective rules of the agent-threat-rules release this workspace resolves,
+   * which lags the ATR release above. Written by scripts/compile-atr-rules.mjs and
+   * checked by CI together with the bundle; do not hand-edit.
+   */
+  scanner: { atrRelease: '3.5.8', rules: 650, patterns: 2_903 },
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,
@@ -129,25 +141,25 @@ export const STATS = {
     syncInterval: '1h',
   },
   /**
-   * Ecosystem scanning stats (from crawl-mcp-registry + audit-npm-skills-v2 pipeline)
+   * The March 2026 MCP ecosystem scan behind /research/mcp-ecosystem-scan
+   * (crawl-mcp-registry + audit-npm-skills-v2). Its denominator is the classified
+   * total, the sum of the five findings* fields. It is a different population from
+   * the 2026-04 wild scan (`wildScan`): never cite one study's counts against the
+   * other's "scanned" total.
    *
-   * Pipeline: crawl-mcp-registry.ts → audit-npm-skills-v2.ts → push-to-threat-cloud.ts
-   * Source: npm registry, GitHub API, awesome-lists (8 queries, pagination)
-   * Updated: 2026-03-16
+   * Live Threat Cloud registry counts (scanned, blacklisted, whitelisted) are not
+   * stored here. useEcosystemStats reads them live and shows them as unavailable
+   * when Threat Cloud does not answer, instead of a stored snapshot.
    */
   ecosystem: {
     /** Total MCP/AI skill entries crawled from registries (ClawHub 37,394 + OpenClaw 50,283 + Skills.sh 3,115) */
     entriesCrawled: 90_792,
     /** npm packages found in crawl */
     npmPackages: 2_769,
-    /** Skills actually scanned — TC live data is authoritative; fallback synced 2026-04-16 */
-    skillsScanned: 67_799,
     /** Total MCP tool definitions extracted from scanned packages */
     toolsExtracted: 35_858,
     /** Packages with security findings (any severity) */
     packagesWithFindings: 2_322,
-    /** Threats detected (confirmed + suspicious) — synced from TC 2026-04-16 */
-    maliciousFound: 11_324,
     /** ATR rule candidates from scan findings */
     atrRulesGenerated: 225,
     /** Total ATR rule matches across all packages */
@@ -164,12 +176,6 @@ export const STATS = {
     findingsMedium: 1_016,
     findingsLow: 7_354,
     findingsClean: 26_718,
-    /** Skills verified safe by community + TC (live from /api/metrics) */
-    whitelistedSkills: 8_066,
-    /** Skills confirmed malicious and blocked (live from /api/metrics) */
-    blacklistedSkills: 1_096,
-    /** Total skill threat reports submitted to TC */
-    skillThreatsTotal: 21_669,
     registrySources: 3,
     lastCrawl: '2026-04-16',
   },
@@ -188,58 +194,73 @@ export const STATS = {
   // consistent unit across the site — call sites render `${value}%` directly.
   benchmark: {
     pint: { recall: 65.41, precision: 100, fp: 0, samples: 850 },
-    skill: { recall: 100, precision: 97, fp: 0.2, samples: 498 },
-    garak: {
-      recall: 97.2,
-      samples: 650,
-      perFamily: { latentinjection: 34.4, sysprompt_extraction: 67.9, dan: 90.2 },
-    },
-    hackaprompt: { recall: 69.6, precision: 100, samples: 4_780, baselineRecall: 28.6 },
     /**
-     * Lane-based false-positive rates on the 65K-sample benign gate (v3.5.0
-     * detection lanes). There is NO single engine-wide FP number — enforce lane
-     * (stable + confirm-gated rules) and hunt lane (all rules, the default)
-     * behave differently by design. Cite the lane, never a blended figure.
+     * SKILL.md recall is hunt-lane and IN-SAMPLE: the 466 benign samples are the
+     * set rules are tuned against (32 malicious). Precision and FP on this corpus
+     * are not cited for that reason.
      */
-    benignLanes: {
-      enforceFp: 0.24,
-      huntFp: 9,
-      samples: 65_000,
-      defaultLane: 'hunt' as const,
+    skill: { recall: 100, samples: 498 },
+    /**
+     * Hunt-lane recall on garak's in-the-wild jailbreak set, ATR 4.1.5. Partly
+     * closed-book: some rules were written from this corpus. Always cite the lane
+     * and that caveat; the enforce lane (used when blocking is on) recalls far less.
+     */
+    garak: { recall: 92.3, samples: 650 },
+    /**
+     * garak's full probe corpus (23 families, 3,475 prompts), hunt lane, ATR 4.1.5
+     * (agent-threat-rules data/measurements/garak-full/latest.json). The per-family
+     * figures belong to this corpus, not to the 650-sample in-the-wild set above.
+     * Also partly closed-book: rules were written from garak's probe corpus.
+     */
+    garakFull: {
+      recall: 57.2,
+      samples: 3_475,
+      families: 23,
+      perFamily: { latentinjection: 34.4, sysprompt_extraction: 96.4, dan: 92.5 },
     },
-    asOf: '2026-07-04',
+    /**
+     * Attack-only corpus: precision and FP are mathematically undefined, so not cited.
+     * Closed-book: ATR mined rules from this corpus's misses, and baselineRecall is
+     * ATR's own recall before those rules. Measured on ATR v3.5.0 (2026-06-16).
+     */
+    hackaprompt: { recall: 69.6, samples: 4_780, baselineRecall: 28.6 },
+    /**
+     * The lane-based benign-gate FP rates (enforce ~0.24% / hunt ~9%, "65K
+     * samples") were withdrawn by ATR on 2026-09-19 and must not be cited.
+     * Re-measurement is pending.
+     */
+    asOf: '2026-10-14',
   },
   /**
-   * 2026-04 wild scan of published agent skills.
+   * 2026-04 wild scan of published agent skills. FROZEN caliber, reconciled
+   * 2026-08-27 against the source file in agent-threat-rules
+   * (data/full-scan-v2-2026-04-14.json), whose per-registry subtotals add up.
    *
-   * CALIBER DISCIPLINE — these numbers have DIFFERENT denominators and must never
-   * be mixed. The scan report's own per-registry table is the arithmetic proof:
+   * Citable: 101,280 scanned / 1,434 flagged, always together with the scan
+   * engine (v2.0.0, 113 rules, run 2026-04-13). A flag is a rule match, not a
+   * verdict.
    *
-   *   OpenClaw          56,480 scanned →   751 flagged  (1.33%)
-   *   Other sources (4) 39,616 scanned →   551 flagged  (1.39%)
-   *   Total             96,096 scanned → 1,302 flagged  (1.35%)
+   * Not citable in any form, "hundreds" included: a confirmed-malicious count.
+   * None of 751, 703 or 552 is a per-skill verdict. 751 is a filtered flag count
+   * for one registry (OpenClaw), 703 adds up three accounts' listings, and 552 is
+   * two accounts' flagged files, marked malicious by account rather than file by
+   * file. 1,302 is the flag total of a separate 2026-04-14 report that does not
+   * reconcile with this record.
    *
-   * So 751 is the OpenClaw-ONLY flag count, and it is a FLAG count, not a
-   * confirmed-malware count. Pairing "751" with "96,096" — as the site and the
-   * launch copy did until 2026-07-19 — overstates by using one registry's
-   * numerator against every registry's denominator, and calls a flag a
-   * confirmation. `confirmedMalware` (552) is the post-manual-review figure and
-   * is the only one that belongs next to `skillsScanned`.
-   *
-   * KNOWN GAP: the curation from raw flags to these published counts
-   * (1,434 → 1,302; OpenClaw 1,376 → 751) has no recorded methodology. If asked
-   * how the filter worked, say it was not written down at the time — do not
-   * reconstruct a rationale.
+   * The five sources are OpenClaw, ClawHub, Skills.sh, Hermes Agent and an MCP
+   * server crawl (Glama, npm, GitHub, awesome-lists, mcp.so; "MCP Registry" in
+   * the record, 5,184 entries). 96,096 is the four SKILL.md registries without
+   * that crawl. Cite it only under that label.
    */
   wildScan: {
-    skillsScanned: 96_096,
-    registries: 4,
-    flagged: 1_302,
-    confirmedMalware: 552,
-    threatActors: 3,
-    /** Worst single registry, on its OWN denominator. Never pair with skillsScanned. */
-    openClaw: { scanned: 56_480, flagged: 751 },
-    asOf: '2026-04-16',
+    skillsScanned: 101_280,
+    flagged: 1_434,
+    sources: 5,
+    engineVersion: 'v2.0.0',
+    engineRules: 113,
+    scannedOn: '2026-04-13',
+    /** The four SKILL.md registries only, without the MCP server crawl (see above). */
+    fourRegistrySubset: 96_096,
   },
   /** Standards coverage */
   coverage: {
@@ -296,69 +317,11 @@ export const STATS = {
     layersComingSoon: [1, 7] as const,
     upstreamMerged: ['Microsoft AGT', 'Cisco AI Defense'] as const,
   },
-  /**
-   * NOTE: These fallback numbers are only used when TC live API is unreachable.
-   * Website components should always prefer fetchLiveMetrics() for real-time data.
-   * Update these periodically to keep fallbacks reasonable.
-   */
-  lastUpdated: '2026-06-16T11:05:13.632Z',
+  /** Written by the ATR Stats Sync Bot. */
+  lastUpdated: '2026-11-09T01:12:23.412Z',
 } as const;
 
 export type Stats = typeof STATS;
-
-/**
- * Live metrics from Threat Cloud API.
- * Used on the website to show real-time numbers from all scan sources.
- * Falls back to static STATS.ecosystem values if TC is unavailable.
- *
- * Usage:
- *   const metrics = await fetchLiveMetrics();
- *   // metrics.totalSkillsScanned -- from all sources (bulk + CLI + web)
- *   // metrics.totalAgentsProtected -- unique devices with panguard installed
- */
-export interface LiveMetrics {
-  totalSkillsScanned: number;
-  totalAgentsProtected: number;
-  totalThreatsDetected: number;
-  totalAtrRules: number;
-  sources: {
-    bulk: { skills: number; findings: number };
-    cli: { skills: number; findings: number; devices: number };
-    web: { skills: number; findings: number };
-  };
-  lastUpdated: string;
-}
-
-const TC_METRICS_URL = process.env['THREAT_CLOUD_URL']
-  ? `${process.env['THREAT_CLOUD_URL']}/api/metrics`
-  : 'https://tc.panguard.ai/api/metrics';
-
-/** Fetch live metrics from Threat Cloud, with static fallback */
-export async function fetchLiveMetrics(): Promise<LiveMetrics> {
-  try {
-    const resp = await fetch(TC_METRICS_URL, {
-      next: { revalidate: 60 },
-    } as RequestInit);
-    if (!resp.ok) throw new Error(`TC returned ${resp.status}`);
-    const json = (await resp.json()) as { ok: boolean; data: LiveMetrics };
-    if (json.ok && json.data) return json.data;
-  } catch {
-    // Fallback to static stats
-  }
-
-  return {
-    totalSkillsScanned: STATS.ecosystem.skillsScanned,
-    totalAgentsProtected: 0,
-    totalThreatsDetected: STATS.ecosystem.maliciousFound,
-    totalAtrRules: STATS.atrRules,
-    sources: {
-      bulk: { skills: STATS.ecosystem.skillsScanned, findings: STATS.ecosystem.maliciousFound },
-      cli: { skills: 0, findings: 0, devices: 0 },
-      web: { skills: 0, findings: 0 },
-    },
-    lastUpdated: STATS.lastUpdated,
-  };
-}
 
 /** Product maturity label */
 export type MaturityLevel = 'GA' | 'Beta' | 'ComingSoon';
