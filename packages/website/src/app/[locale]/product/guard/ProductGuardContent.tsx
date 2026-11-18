@@ -377,7 +377,7 @@ export default function ProductGuardContent() {
                 {t('cta.cta1')} <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href="/technology"
+                href="https://github.com/panguard-ai/panguard-ai/blob/main/ARCHITECTURE.md"
                 className="border border-border text-text-secondary hover:text-text-primary hover:border-brand-sage font-semibold rounded-full px-8 py-3.5 transition-all duration-200"
               >
                 {t('cta.cta2')}

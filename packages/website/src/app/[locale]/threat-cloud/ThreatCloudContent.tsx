@@ -58,6 +58,14 @@ export default function ThreatCloudContent() {
               {t('subtitle')}
             </p>
           </FadeInUp>
+          <FadeInUp delay={0.15}>
+            <p
+              role="status"
+              className="max-w-2xl mx-auto mt-8 rounded-xl border border-border bg-surface-2 px-5 py-4 text-sm text-text-secondary leading-relaxed"
+            >
+              {t('statusNotice')}
+            </p>
+          </FadeInUp>
         </div>
       </section>
 

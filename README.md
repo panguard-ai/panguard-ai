@@ -13,7 +13,7 @@
 [![npm](https://img.shields.io/npm/v/panguard?style=flat-square&color=cb3837&logo=npm&label=panguard)](https://www.npmjs.com/package/panguard)
 [![GitHub Stars](https://img.shields.io/github/stars/panguard-ai/panguard-ai?style=flat-square&color=DAA520)](https://github.com/panguard-ai/panguard-ai/stargazers)
 [![MIT License](https://img.shields.io/badge/License-MIT-brightgreen?style=flat-square)](LICENSE)
-[![ATR](https://img.shields.io/badge/built%20on-ATR%20747%20rules-8b5cf6.svg?style=flat-square)](https://github.com/Agent-Threat-Rule/agent-threat-rules)
+[![ATR](https://img.shields.io/badge/built%20on-ATR-8b5cf6.svg?style=flat-square)](https://github.com/Agent-Threat-Rule/agent-threat-rules)
 [![Made in Taiwan](https://img.shields.io/badge/Made%20in-Taiwan-e11d48.svg?style=flat-square)](https://panguard.ai)
 
 </div>
@@ -22,7 +22,7 @@
 
 Your AI agents now act on your behalf. They install skills from registries you've never read, and they run shell commands, edit files, and fetch URLs on their own. **Someone should check what they're about to do.**
 
-PanGuard is that check. One command scans every skill your agents installed against **747 open ATR rules**, drops a guard between your agents and the tools they call, and shows you the whole thing in a local dashboard. Nothing about your code leaves your machine.
+PanGuard is that check. One command scans every skill your agents installed against the open **ATR** rules, puts a check in front of the tools your agents call, and shows you the whole thing in a local dashboard. Nothing about your code leaves your machine.
 
 ```bash
 npm install -g panguard && pga up
@@ -36,14 +36,15 @@ I'm **Adam Lin (林冠辛)**, a solo founder in Taiwan. I'm not a career enginee
 
 So I built the thing that watches — and the open detection standard underneath it, **ATR**, the way Sigma standardized SIEM rules and YARA standardized malware signatures. ATR is independent and MIT-licensed; PanGuard is one runtime on top of it.
 
-Solo, from zero — and the rules behind it are already **merged into Microsoft's and Cisco's security tooling** (details below). I'm giving the whole runtime away free because this should exist for everyone, not sit behind a sales call.
+Solo, from zero — and ATR rules already ship inside Cisco's open-source skill-scanner, with an ATR example in Microsoft's Agent Governance Toolkit (details below). I'm giving the whole runtime away free because this should exist for everyone, not sit behind a sales call.
 
 ---
 
 ## What you get
 
-- **Pre-install scan** — `pga scan` audits a skill or MCP server against 747 ATR rules in seconds, and **exits non-zero on a real threat** so any CI can gate a malicious skill out.
-- **Runtime guard** — a local daemon inspects every agent tool call — both MCP servers and the agent's _own_ built-in tools (Bash / Edit / Write / WebFetch) — across **7 platforms** (Claude Code, Cursor, Codex, Continue, Gemini CLI, Cline, Windsurf), and blocks known attacks before they run.
+- **Pre-install scan** — `pga scan` audits a skill or MCP server against the ATR rules in seconds, and **exits non-zero on a real threat** so any CI can gate a malicious skill out.
+- **Tool-call hook** — before an agent runs one of its _own_ built-in tools (Bash / Edit / Write / WebFetch), a hook checks the command or content against ATR and answers allow, ask or deny. Supported hosts: Claude Code, Cursor, Codex, Continue, Gemini CLI, Cline, Windsurf. Each call is checked on its own; calls to MCP tools are not covered by the hook.
+- **MCP proxy** — checks the calls an agent makes to the MCP servers the proxy wraps.
 - **A local dashboard** — one glance answers "am I protected right now?"; one click quarantines a threat. Survives reboot like real antivirus.
 - **Deterministic + explainable** — the blocking is regex/AST + ATR rules, on-device, sub-50ms. An optional LLM "second opinion" (bring your own — free local Ollama or a cloud key) only flags for review; **it never auto-blocks**.
 - **100% free, MIT, on-device.** No account, no signup. Threat-sharing is **opt-in and off by default** — nothing leaves your machine unless you turn it on.
@@ -55,6 +56,8 @@ Solo, from zero — and the rules behind it are already **merged into Microsoft'
 ```bash
 npm install -g panguard && pga up
 ```
+
+The one-line installer on [panguard.ai](https://panguard.ai) (`curl -fsSL https://get.panguard.ai | bash`) is the other supported way to install.
 
 1. `pga up` — scans your installed skills, starts protection, opens the dashboard
 2. `pga audit skill ./some-skill` — vet a skill _before_ you install it (risk score + findings)
@@ -79,12 +82,12 @@ $ npm install -g panguard && pga up
   ▣ Looking at your setup...
     ✓ Claude Code found      ✓ Cursor found
     ✓ Codex CLI   found      ✓ Continue found
-  → Scanning installed skills against 747 ATR rules...
+  → Scanning installed skills against ATR rules...
     1 CRITICAL — prompt injection via tool description (blocked)
   ▣ Watching your agents...
     Built-in tools guarded across 7 platforms (restart the agent to activate)
   ──────────────────────────────────────────────
-  PROTECTED · 747 rules active
+  PROTECTED · ATR rules active
   Dashboard   http://127.0.0.1:3100/?token=…   (open to see live status)
   Threat Cloud  off (opt-in) — nothing leaves this machine
 ```
@@ -98,16 +101,16 @@ Quiet is the goal. A clean machine shows "all clear"; a real threat shows up und
 ```
   pga up
     └─> detect AI platforms → scan installed skills → inject the runtime guard
-          └─> every tool call → ATR evaluation (747 rules, 10 categories) → ALLOW / DENY
+          └─> built-in tool call (hook) / wrapped MCP call (proxy) → ATR evaluation → ALLOW / ASK / DENY
                 ├─> local dashboard (real-time status + evidence)
-                └─> Threat Cloud (opt-in): a confirmed threat → reviewed → a new ATR rule for everyone
+                └─> rule proposal kept on this machine → you submit it as a public ATR issue
 ```
 
 Deterministic by default. Layers A + B run on-device and do the blocking; Layer C is optional and advisory.
 
 | Layer | Engine                            | Latency | Cost    | Auto-blocks?               |
 | ----- | --------------------------------- | ------- | ------- | -------------------------- |
-| **A** | 747 ATR rules (regex + AST)       | < 50ms  | $0      | yes                        |
+| **A** | ATR rules (regex + AST)           | < 50ms  | $0      | yes                        |
 | **B** | On-device heuristics              | < 50ms  | $0      | yes                        |
 | **C** | _Your_ LLM (local Ollama / cloud) | ~2–5s   | $0 / ~¢ | no — flags for review only |
 
@@ -123,38 +126,29 @@ Internet down? A and B keep running. No model configured? You still get full det
 
 ---
 
-## Real adoption
+## Where ATR rules are used
 
-Not "stars" — merged code, in production.
+Merged code in other projects, checked on 2026-11-18.
 
-| Organization                              | What                              | Status                                                                               |
-| ----------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------ |
-| **Microsoft** Agent Governance Toolkit    | ATR rules + weekly auto-sync      | Merged · [PR #1277](https://github.com/microsoft/agent-governance-toolkit/pull/1277) |
-| **Cisco** AI Defense                      | ATR rule library in skill-scanner | Merged · [PR #99](https://github.com/cisco-ai-defense/skill-scanner/pull/99)         |
-| **MISP** (threat intel)                   | Galaxy + taxonomy entries         | Merged                                                                               |
-| **OWASP** Agentic Security Resource Hub\* | Listing                           | Merged                                                                               |
+| Project                                | What is merged                                                                         | Evidence                                                                                                       |
+| -------------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| **Cisco** AI Defense skill-scanner     | An ATR rule pack inside the scanner                                                    | [PR #99](https://github.com/cisco-ai-defense/skill-scanner/pull/99)                                            |
+| **Microsoft** Agent Governance Toolkit | An ATR rules example with a weekly sync workflow (an example, not a shipped rule pack) | [PR #1277](https://github.com/microsoft/agent-governance-toolkit/pull/1277)                                    |
+| **MISP** (threat intel)                | Galaxy and taxonomy entries                                                            | [misp-galaxy](https://github.com/MISP/misp-galaxy), [misp-taxonomies](https://github.com/MISP/misp-taxonomies) |
 
-\* third-party resource hub, not the OWASP Foundation main repo. Several more integrations are in review (NVIDIA garak, OpenSSF SAFE-MCP, IBM, Meta PurpleLlama, Gen Digital) — listed honestly on [panguard.ai](https://panguard.ai), not counted as adoption.
+ATR keeps the full, re-verified list in its [ADOPTERS.md](https://github.com/Agent-Threat-Rule/agent-threat-rules/blob/main/ADOPTERS.md).
 
 ---
 
 ## Benchmarks
 
-Public corpora, deterministic samples, fixed seeds. We quote precise numbers — we don't round up. Full methodology: [panguard.ai/research/benchmarks](https://panguard.ai/research/benchmarks).
-
-| Corpus                    | Recall   | Precision | Sample |
-| ------------------------- | -------- | --------- | ------ |
-| SKILL.md (real-world)     | **100%** | **97%**   | 498    |
-| garak (ATR-core families) | **~98%** | —         | 650    |
-| PINT (prompt-injection)   | 63.2%    | 99.7%     | 850    |
-
-garak is an approximate figure that drifts across rule versions; the authoritative live rule count is in [stats.json](https://raw.githubusercontent.com/Agent-Threat-Rule/agent-threat-rules/main/data/stats.json).
+Detection results depend on the ATR version, so they are published with the rules rather than copied here. See the measurements and methods in the [ATR repository](https://github.com/Agent-Threat-Rule/agent-threat-rules), and the live rule count in [stats.json](https://raw.githubusercontent.com/Agent-Threat-Rule/agent-threat-rules/main/data/stats.json).
 
 ---
 
 ## Honest about what leaves your machine
 
-PanGuard is on-device by default. The optional **Threat Cloud** (off until you opt in) shares only a **minimal threat signature** — the matched rule ID, attack category, MITRE technique, a coarse country region, and a truncated IP. **Never** your prompts, code, file contents, file paths, secrets, or hostname. Inbound community rules are **ed25519 signature-verified and fail-closed** — a rogue server can't inject detection logic.
+PanGuard is on-device by default. **The Threat Cloud service is currently offline**, so nothing is sent even if you opted in. When it runs, the optional Threat Cloud (off until you opt in) shares only a **minimal threat signature** — the matched rule ID, attack category, MITRE technique, a coarse country region, and a truncated IP. **Never** your prompts, code, file contents, file paths, secrets, or hostname. Inbound community rules are **ed25519 signature-verified and fail-closed** — a rogue server can't inject detection logic.
 
 > Sharing is pseudonymous (a stable random install ID), transport-encrypted (TLS). End-to-end encrypted contributions — where not even our server can read a payload — are on the roadmap for regulated fleets.
 
@@ -194,9 +188,9 @@ TypeScript (strict) · Node.js 20+ · pnpm workspaces. ATR is the open standard 
 
 ## License
 
-**MIT.** Community is free forever — the runtime engine, the ATR rules, the scanner, the MCP server, and the CLI. No telemetry by default, no vendor lock-in. The one paid add-on is signed compliance evidence reporting, part of the Enterprise editions (below).
+**MIT.** The open-source edition is free with no paywall — the runtime engine, the ATR rules, the scanner, the MCP server, and the CLI. No telemetry by default, no vendor lock-in.
 
-Enterprise and Sovereign tiers add separately-licensed commercial services for regulated orgs (signed multi-framework compliance evidence, end-to-end upload encryption, airgap, SLA, dedicated support). Detail at [panguard.ai/pricing](https://panguard.ai/pricing).
+Services for organizations (one policy across many machines, records signed for auditors and insurers, on-premises deployment) are in development with design partners and are not in this repo. They have no public price yet; see [panguard.ai/pricing](https://panguard.ai/pricing).
 
 ---
 

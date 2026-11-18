@@ -437,7 +437,7 @@ export default function MigratorDemo() {
                     href="/pricing"
                     className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-brand-sage text-surface-0 font-semibold text-xs hover:bg-brand-sage-light transition-colors whitespace-nowrap"
                   >
-                    {isZh ? '看 Migrator Pro' : 'See Migrator Pro'}
+                    {isZh ? '看定價' : 'See pricing'}
                     <ArrowRight className="w-3 h-3" />
                   </a>
                 </div>
@@ -501,10 +501,12 @@ export default function MigratorDemo() {
                 <p className="text-[11px] uppercase tracking-[0.15em] text-brand-sage font-semibold">
                   Migrator Pro
                 </p>
-                <span className="text-2xl font-extrabold text-text-primary">$500K&ndash;2M</span>
+                <span className="text-2xl font-extrabold text-text-primary">
+                  {isZh ? '聯絡我們' : 'Contact us'}
+                </span>
               </div>
               <p className="text-xs text-text-muted mb-4">
-                {isZh ? '年約 · 旗艦' : 'annual · flagship'}
+                {isZh ? '開發中 · 沒有公開價格' : 'in development · no public price'}
               </p>
               <ul className="space-y-2 text-sm text-text-secondary flex-1">
                 <ComparisonRow ok pilot zh={isZh}>
@@ -534,7 +536,7 @@ export default function MigratorDemo() {
                 href="/contact?tier=migrator"
                 className="mt-5 inline-flex items-center gap-1.5 text-xs text-brand-sage font-semibold hover:underline"
               >
-                {isZh ? '洽詢 Migrator Pro' : 'Contact sales'} <ArrowRight className="w-3 h-3" />
+                {isZh ? '寫信給我們' : 'Write to us'} <ArrowRight className="w-3 h-3" />
               </a>
             </div>
           </FadeInUp>
@@ -554,7 +556,7 @@ export default function MigratorDemo() {
               href="/pricing"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-border text-text-secondary text-sm hover:border-brand-sage hover:text-text-primary transition-colors"
             >
-              {isZh ? '查看完整定價' : 'See full pricing'}
+              {isZh ? '查看定價' : 'See pricing'}
               <ArrowRight className="w-4 h-4" />
             </a>
           </div>

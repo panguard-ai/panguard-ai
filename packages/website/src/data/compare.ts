@@ -540,8 +540,8 @@ export const COMPARE: ComparisonEntry[] = [
       {
         feature: 'Pricing',
         featureZh: '定價',
-        atr: 'Community $0, Enterprise $150-500K, Migrator Pro $500K-2M, Sovereign $5-20M',
-        atrZh: 'Community $0、Enterprise $150-500K、Migrator Pro $500K-2M、Sovereign $5-20M',
+        atr: 'Open-source edition free (MIT); services for organizations have no public price yet',
+        atrZh: '開源版免費（MIT）；組織層服務尚無公開價格',
         other: 'Enterprise contracts, custom pricing',
         otherZh: '企業合約、客製定價',
         winner: 'context',
@@ -558,9 +558,9 @@ export const COMPARE: ComparisonEntry[] = [
       {
         feature: 'Sovereign deployment',
         featureZh: 'Sovereign 部署',
-        atr: 'Sovereign tier explicit ($5-20M/nation, airgap; ATR merged into Cisco AI Defense skill-scanner PR #99)',
+        atr: 'Air-gapped deployment discussed case by case, no public price (ATR rule pack merged into Cisco AI Defense skill-scanner, PR #99)',
         atrZh:
-          '明確的 Sovereign tier（$5-20M/國、airgap；ATR 已合併進 Cisco AI Defense skill-scanner PR #99）',
+          '離網部署逐案討論，無公開價格（ATR 規則包已合併進 Cisco AI Defense skill-scanner，PR #99）',
         other: 'Custom enterprise engagements',
         otherZh: '客製企業合作',
         winner: 'context',
@@ -575,8 +575,8 @@ export const COMPARE: ComparisonEntry[] = [
       zh: '你是 Cisco 用戶。Cisco 在你的 DR、SD-WAN、XDR。DefenseClaw 接到既有的 Cisco 基礎設施，你的採購、支援、SLA 關係已經在 Cisco。企業整合成本近乎零。',
     },
     bottomLine: {
-      en: "At the rule layer ATR is open: an ATR rule pack was merged into the open-source Cisco AI Defense skill-scanner repository (PR #99), a maintainer-accepted upstream contribution rather than a vendor endorsement, and not a claim about DefenseClaw. The choice is between Cisco's commercial bundle (heavyweight, integrated, expensive) and PanGuard's open-plus-commercial model (lightweight, vendor-neutral, scales from $0 to $20M). If you are already a Cisco customer, the integration advantage probably wins. Everyone else benefits more from PanGuard's open posture.",
-      zh: '在規則層，ATR 是開放的：ATR 規則包已合併進開源的 Cisco AI Defense skill-scanner repo（PR #99），這是維護者接受的上游貢獻，不是廠商背書，也不代表 DefenseClaw 的任何情況。選擇在於 Cisco 的商業 bundle（重量級、整合、貴）vs PanGuard 的開放+商業模式（輕量、廠商中立、從 $0 規模到 $20M）。如果你已經是 Cisco 客戶，整合優勢大概會贏。其他人從 PanGuard 的開放姿態獲益更多。',
+      en: "At the rule layer ATR is open: an ATR rule pack was merged into the open-source Cisco AI Defense skill-scanner repository (PR #99), a maintainer-accepted upstream contribution rather than a vendor endorsement, and not a claim about DefenseClaw. The choice is between Cisco's commercial bundle (heavyweight, integrated, expensive) and PanGuard's open-source edition (lightweight, vendor-neutral, free under MIT). If you are already a Cisco customer, the integration advantage probably wins. Everyone else benefits more from PanGuard's open posture.",
+      zh: '在規則層，ATR 是開放的：ATR 規則包已合併進開源的 Cisco AI Defense skill-scanner repo（PR #99），這是維護者接受的上游貢獻，不是廠商背書，也不代表 DefenseClaw 的任何情況。選擇在於 Cisco 的商業 bundle（重量級、整合、貴）vs PanGuard 的開源版（輕量、廠商中立、MIT 免費）。如果你已經是 Cisco 客戶，整合優勢大概會贏。其他人從 PanGuard 的開放姿態獲益更多。',
     },
     references: [
       {
