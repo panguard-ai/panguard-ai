@@ -1,6 +1,6 @@
 # @panguard-ai/panguard-guard
 
-AI real-time endpoint monitoring and auto-response — the core daemon powering Panguard security.
+AI agent action interception engine — the core daemon powering Panguard security.
 
 Monitor and respond to threats:
 
