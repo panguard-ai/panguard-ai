@@ -4621,7 +4621,7 @@
         "badge": "Layer 2",
         "name": "Rules Engine",
         "desc": "ATR detection rules for AI agent security.",
-        "detail": "Catches 90% of known threats in under 50ms. No AI needed."
+        "detail": "Deterministic pattern matching on your machine. No AI needed."
       },
       "layer3": {
         "badge": "Layer 3",
