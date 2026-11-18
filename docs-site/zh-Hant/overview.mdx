@@ -10,15 +10,15 @@ Panguard AI 是專為 AI Agent 時代打造的開源資安平台。當 AI Agent�
 
 **三大支柱。一個目標：守護每一個 AI Agent。**
 
-1. **ATR (Agent Threat Rules)** -- AI Agent 威脅偵測的開放標準（768 條規則，10 大類別，OWASP 10/10）
+1. **ATR (Agent Threat Rules)** -- AI Agent 威脅偵測的開放標準（10 大類別，OWASP 10/10）
 2. **Threat Cloud** -- 每個安裝都讓所有人更安全的集體免疫網路（11 個情報來源，每小時同步）
-3. **Guard** -- 內建 Skill Auditor + 威脅阻斷 + 自動回應的執行引擎（768 條 ATR 規則）
+3. **Guard** -- 內建 Skill Auditor + 威脅阻斷 + 自動回應的執行引擎（ATR 規則）
 
 ## 三大支柱
 
 <CardGroup cols={3}>
   <Card title="ATR -- 標準" icon="file-code">
-    **768 條規則，10 大威脅類別。OWASP 10/10。** AI Agent 威脅偵測的第一個開放標準 -- 專門對付 prompt
+    **10 大威脅類別。OWASP 10/10。** AI Agent 威脅偵測的第一個開放標準 -- 專門對付 prompt
     injection、tool poisoning、skill compromise、agent manipulation。YAML
     格式，人看得懂，機器跑得動。
   </Card>
@@ -27,7 +27,7 @@ Panguard AI 是專為 AI Agent 時代打造的開源資安平台。當 AI Agent�
     審查，從真實攻擊自動產生 ATR 規則。11 個威脅情報來源、5,000+ 驗證過的 IoC 記錄，每小時同步。
   </Card>
   <Card title="Guard -- 引擎" icon="shield-halved">
-    **768 條 ATR 偵測規則。** 4-Agent AI 管線（Detect、Analyze、Respond、Report）用 ATR 規則處理 OS
+    **ATR 偵測規則。** 4-Agent AI 管線（Detect、Analyze、Respond、Report）用 ATR 規則處理 OS
     層級事件。內建 Skill Auditor 在安裝前把關每個 AI Skill。自動封鎖 IP、終止 process、隔離檔案。
   </Card>
 </CardGroup>
@@ -71,7 +71,7 @@ Panguard 用分層 AI 漏斗平衡速度、成本和準確度。每一層處理�
 | Runtime     | Node.js 20+                             |
 | Monorepo    | pnpm 10 workspaces                      |
 | 測試        | Vitest 3 (3,583 tests / 165 files)      |
-| 偵測規則    | ATR (768) -- OWASP Agentic Top 10: 10/10 |
+| 偵測規則    | ATR -- OWASP Agentic Top 10: 10/10       |
 | AI Provider | Ollama (本地) + Claude / OpenAI (雲端)  |
 | 多語系      | English + 繁體中文                      |
 | 加密        | AES-256-GCM                             |

