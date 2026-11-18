@@ -4,8 +4,9 @@
  * Collective-defense sharing is OPT-IN and defaults to OFF. On first interactive
  * run we explain BOTH the value (your blocked attacks become ATR rules that
  * protect everyone, and you get community rules back faster) and the privacy
- * guarantee (matched rule ID, a one-way payload hash, source type — never
- * prompts/code/file contents/keys, no IP, no hostname, a random install ID),
+ * guarantee (matched rule ID, attack category, a truncated IP, skill names and
+ * audit summaries — never prompts/code/file contents/keys/paths, no hostname,
+ * a random install ID),
  * then ask the user to turn it ON; pressing Enter declines. This is an informed
  * invitation, not a nag or a pre-checked default. Raw samples are never sent.
  * Non-interactive (CI) stays OFF until explicitly enabled. Nothing leaves the
@@ -51,7 +52,8 @@ export function markConsentAsked(): void {
  * (or are about to agree to) months later sees the exact same copy — not a
  * status-line summary that drops the privacy detail.
  *
- * The "END-TO-END ENCRYPT" line below is stated as unconditional fact
+ * The "END-TO-END ENCRYPT" line below covers the threat signatures only (the
+ * /api/threats upload) and is stated as unconditional fact
  * because it IS one: postThreats() (packages/panguard-guard/src/threat-cloud
  * /index.ts) throws and refuses to upload rather than falling back to
  * plaintext-over-TLS when sealing is unavailable, so whenever an upload
@@ -87,20 +89,36 @@ export function printCollectiveDefenseDisclosure(): void {
   );
   console.log(`  ${c.dim('     truncated IP (last two octets zeroed).')}`);
   console.log(
-    `  ${c.dim('  2. Anonymize it on your machine, then END-TO-END ENCRYPT it — sealed so')}`
+    `  ${c.dim('  2. Anonymize those signatures on your machine, then END-TO-END ENCRYPT')}`
   );
   console.log(
-    `  ${c.dim('     only the Threat Cloud backend can read it, not the network or a relay.')}`
+    `  ${c.dim('     them — sealed so only the Threat Cloud backend can read them, not the')}`
   );
-  console.log(`  ${c.dim('  3. Auto-update your detection rules from the community.')}`);
+  console.log(`  ${c.dim('     network or a relay.')}`);
+  console.log(
+    `  ${c.dim('  3. Send small summaries over HTTPS (not sealed): the name of a skill or')}`
+  );
+  console.log(
+    `  ${c.dim('     MCP server you audited (its manifest/config name, never its path),')}`
+  );
+  console.log(
+    `  ${c.dim('     its risk level and score, finding rule IDs and titles, scan counts,')}`
+  );
+  console.log(`  ${c.dim('     and your OS and CPU type.')}`);
+  console.log(`  ${c.dim('  4. Auto-update your detection rules from the community.')}`);
   console.log('');
   console.log(
     `  ${c.dim('NEVER shared: your prompts, code, file contents, secrets, file paths,')}`
   );
   console.log(
-    `  ${c.dim('hostname, or username. Raw samples are never sent. A stable random install')}`
+    `  ${c.dim('hostname, or username. Raw samples are never sent. Detection-rule proposals')}`
   );
-  console.log(`  ${c.dim('ID links your own submissions (pseudonymous, not fully anonymous).')}`);
+  console.log(
+    `  ${c.dim('drafted from what PanGuard finds stay on this machine (~/.panguard/proposals)')}`
+  );
+  console.log(`  ${c.dim('until you choose to submit one yourself with pga proposals submit.')}`);
+  console.log(`  ${c.dim('A stable random install ID links your own submissions (pseudonymous,')}`);
+  console.log(`  ${c.dim('not fully anonymous).')}`);
   console.log('');
   console.log(`  ${c.dim('Turn off anytime: pga config set telemetry false (upload) /')}`);
   console.log(`  ${c.dim('pga config set threat-cloud false (rule sync).')}`);
