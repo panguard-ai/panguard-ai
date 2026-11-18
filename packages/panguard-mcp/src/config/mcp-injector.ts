@@ -25,6 +25,7 @@ import { execFileSync } from 'node:child_process';
 import { createLogger } from '@panguard-ai/core';
 import type { PlatformId } from './platform-detector.js';
 import { getConfigPath } from './platform-detector.js';
+import { MCP_PACKAGE, PROXY_PACKAGE, isSpecOf, pinnedSpec } from './package-spec.js';
 
 const logger = createLogger('panguard-mcp:injector');
 
@@ -39,7 +40,7 @@ export interface InjectionResult {
 /** The MCP server entry Panguard adds to config files. */
 const PANGUARD_MCP_ENTRY = {
   command: 'npx',
-  args: ['-y', '@panguard-ai/panguard-mcp'],
+  args: ['-y', pinnedSpec(MCP_PACKAGE)],
 };
 
 /**
@@ -146,10 +147,30 @@ function injectClaudeDesktop(configPath: string): void {
  */
 function injectClaudeCode(_configPath: string): void {
   try {
+    // Drop any existing (possibly unpinned) entry so the add below writes the
+    // pinned form; a missing entry is not an error.
+    try {
+      execFileSync('claude', ['mcp', 'remove', '--scope', 'user', 'panguard'], {
+        timeout: 15_000,
+        stdio: 'pipe',
+      });
+    } catch {
+      /* no existing entry */
+    }
     // Try `claude mcp add` first (the correct way for Claude Code)
     execFileSync(
       'claude',
-      ['mcp', 'add', '--scope', 'user', 'panguard', '--', 'npx', '-y', '@panguard-ai/panguard-mcp'],
+      [
+        'mcp',
+        'add',
+        '--scope',
+        'user',
+        'panguard',
+        '--',
+        'npx',
+        '-y',
+        ...PANGUARD_MCP_ENTRY.args.slice(1),
+      ],
       {
         timeout: 15_000,
         stdio: 'pipe',
@@ -384,12 +405,10 @@ export function getInstallCommand(): string {
 
 // ── Proxy Injection ──────────────────────────────────────────
 
-const PROXY_PACKAGE = '@panguard-ai/panguard-mcp-proxy';
-
 /** Check if an MCP server entry is already wrapped with the proxy. */
 function isAlreadyProxied(server: Record<string, unknown>): boolean {
   const args = Array.isArray(server['args']) ? server['args'] : [];
-  return args.some((a: unknown) => typeof a === 'string' && a.includes(PROXY_PACKAGE));
+  return args.some((a: unknown) => isSpecOf(a, PROXY_PACKAGE));
 }
 
 /** Check if an MCP server entry belongs to PanGuard itself. */
@@ -399,7 +418,7 @@ function isPanguardEntry(name: string, server: Record<string, unknown>): boolean
   const command = typeof server['command'] === 'string' ? server['command'] : '';
   return (
     command.includes('panguard') ||
-    args.some((a: unknown) => typeof a === 'string' && a.includes('@panguard-ai/panguard-mcp'))
+    args.some((a: unknown) => typeof a === 'string' && a.includes(MCP_PACKAGE))
   );
 }
 
@@ -410,10 +429,22 @@ function wrapWithProxy(server: Record<string, unknown>): Record<string, unknown>
     ? (server['args'] as unknown[]).filter((a): a is string => typeof a === 'string')
     : [];
 
-  // New args: npx -y @panguard-ai/panguard-mcp-proxy -- <original command> <original args>
-  const proxyArgs = ['-y', PROXY_PACKAGE, '--', command, ...args];
+  // New args: npx -y @panguard-ai/panguard-mcp-proxy@<version> -- <original command> <original args>
+  const proxyArgs = ['-y', pinnedSpec(PROXY_PACKAGE), '--', command, ...args];
 
   return { ...server, command: 'npx', args: proxyArgs };
+}
+
+/**
+ * Upgrade an existing proxied entry written by an older release (unpinned or a
+ * different version) to the pinned spec. Returns the same object when current.
+ */
+function repinProxy(server: Record<string, unknown>): Record<string, unknown> {
+  const args = Array.isArray(server['args']) ? (server['args'] as unknown[]) : [];
+  const spec = pinnedSpec(PROXY_PACKAGE);
+  const idx = args.findIndex((a) => isSpecOf(a, PROXY_PACKAGE));
+  if (idx === -1 || args[idx] === spec) return server;
+  return { ...server, args: args.map((a, i) => (i === idx ? spec : a)) };
 }
 
 /** Unwrap a proxy-wrapped MCP server entry. Returns null if not proxied. */
@@ -491,15 +522,17 @@ function injectProxyForJsonPlatform(
       }
       const server = value as Record<string, unknown>;
 
-      // Skip panguard's own entries
-      if (isPanguardEntry(name, server)) {
-        updatedServers[name] = server;
+      // Already proxied: keep it, but upgrade an unpinned/older spec to the pinned one
+      if (isAlreadyProxied(server)) {
+        const repinned = repinProxy(server);
+        updatedServers[name] = repinned;
         result.serversSkipped++;
+        if (repinned !== server) changed = true;
         continue;
       }
 
-      // Skip already proxied
-      if (isAlreadyProxied(server)) {
+      // Skip panguard's own entries
+      if (isPanguardEntry(name, server)) {
         updatedServers[name] = server;
         result.serversSkipped++;
         continue;
