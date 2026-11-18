@@ -18,10 +18,20 @@ import { resolve, dirname, join } from 'node:path';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { EngineWorker, EngineWorkerError, EvaluationDeadlineError } from './engine-worker.js';
+import {
+  EngineWorker,
+  EngineWorkerError,
+  EngineWorkerStartTimeoutError,
+  EvaluationDeadlineError,
+} from './engine-worker.js';
 import type { EngineMatch, EngineWorkerOptions, EngineWorkerState } from './engine-worker.js';
 
-export { EngineWorkerError, EvaluationDeadlineError } from './engine-worker.js';
+export {
+  EngineWorkerError,
+  EngineWorkerLostError,
+  EngineWorkerStartTimeoutError,
+  EvaluationDeadlineError,
+} from './engine-worker.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -68,12 +78,22 @@ export interface ProxyEvaluatorOptions {
   readonly isolation?: EvaluationIsolation;
   /** Worker mode: how long one evaluation may run (default DEFAULT_EVAL_DEADLINE_MS). */
   readonly deadlineMs?: number;
+  /** Worker mode: how long to wait for the worker to start and load its rules (default 60 s). */
+  readonly startTimeoutMs?: number;
+  /**
+   * Worker mode: called as each evaluation starts; the evaluation is cut at the
+   * smaller of this and `deadlineMs`. For a caller with a time budget of its
+   * own that startup has already used part of.
+   */
+  readonly deadlineCapMs?: () => number;
+  /** Directory of the agent-threat-rules package to use instead of the installed one (tests). */
+  readonly atrPackageDir?: string;
 }
 
 /**
- * Large ordinary tool responses (bundled JavaScript, source maps) can take
- * several seconds to scan. A deadline close to that would cut them on a slower
- * machine, and under the proxy's fail-closed default that blocks them.
+ * Large ordinary tool responses take longer to scan than small ones. The default
+ * leaves them room on a slower machine, since a scan that is cut is blocked
+ * under the proxy's fail-closed default.
  */
 export const DEFAULT_EVAL_DEADLINE_MS = 15_000;
 
@@ -103,12 +123,19 @@ function inlineBackend(engine: ATREngine): EngineBackend {
   };
 }
 
-function workerBackend(options: EngineWorkerOptions, deadlineMs: number): EngineBackend {
+function workerBackend(
+  options: EngineWorkerOptions,
+  deadlineMs: number,
+  deadlineCapMs: (() => number) | undefined
+): EngineBackend {
   const worker = new EngineWorker(options);
   return {
     loadRules: async () => (await worker.start()).ruleCount,
     addAutoRules: (dir, adviseOnly) => worker.loadAutoRules(dir, adviseOnly),
-    evaluate: (events) => worker.evaluate(events, deadlineMs),
+    evaluate: (events) =>
+      worker.evaluate(events, () =>
+        deadlineCapMs ? Math.min(deadlineMs, Math.max(1, deadlineCapMs())) : deadlineMs
+      ),
     close: () => worker.close(),
   };
 }
@@ -328,7 +355,7 @@ export class ProxyEvaluator {
     }
     this.isolation = isolation;
     this.deadlineMs = deadlineMs;
-    const packageDir = findAtrPackageDir();
+    const packageDir = options.atrPackageDir ?? findAtrPackageDir();
     const rulesDir = join(packageDir, 'rules');
     // 'hunt' detection (every rule) so we never MISS an attack in a tool call —
     // incl. the broad workhorse rule ATR-2026-00001 (stable but confirm:embedding,
@@ -344,8 +371,10 @@ export class ProxyEvaluator {
             engineUrl: engineEntryUrl(packageDir),
             rulesDir,
             onStart: (state) => this.adoptWorkerState(state),
+            startTimeoutMs: options.startTimeoutMs,
           },
-          deadlineMs
+          deadlineMs,
+          options.deadlineCapMs
         );
     this.blocklistPath = join(homedir(), '.panguard-guard', 'blocked-tools.json');
     this.refreshBlocklist();
@@ -651,16 +680,21 @@ export class ProxyEvaluator {
  * Load the rules. When `evaluator` cannot start its worker here (a sandbox or
  * a process limit that refuses threads), fall back to an inline evaluator, so
  * the content is still scanned, only without the time limit. Resolves with the
- * evaluator that holds the rules.
+ * evaluator that holds the rules. A start that merely timed out falls back too,
+ * unless `inlineAfterStartTimeout` is false.
  */
 export async function loadRulesOrInline(
   evaluator: ProxyEvaluator,
-  warn: (message: string) => void
+  warn: (message: string) => void,
+  { inlineAfterStartTimeout = true }: { readonly inlineAfterStartTimeout?: boolean } = {}
 ): Promise<{ readonly evaluator: ProxyEvaluator; readonly ruleCount: number }> {
   try {
     return { evaluator, ruleCount: await evaluator.loadRules() };
   } catch (err) {
     if (!(err instanceof EngineWorkerError)) throw err;
+    // A worker that was too slow to start within the caller's time budget:
+    // loading the rules on this thread would only spend more of it.
+    if (err instanceof EngineWorkerStartTimeoutError && !inlineAfterStartTimeout) throw err;
     warn(`${err.message}; scanning on this thread instead, without the time limit`);
     const inline = new ProxyEvaluator();
     return { evaluator: inline, ruleCount: await inline.loadRules() };

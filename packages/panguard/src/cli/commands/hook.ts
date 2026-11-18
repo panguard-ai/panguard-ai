@@ -37,6 +37,8 @@ import {
   EVALUATION_ERROR_SENTINEL,
   EvaluationDeadlineError,
   EngineWorkerError,
+  EngineWorkerLostError,
+  EngineWorkerStartTimeoutError,
   loadRulesOrInline,
 } from '@panguard-ai/panguard-mcp-proxy/evaluator';
 import type { EvalResult, ProxyEvaluatorOptions } from '@panguard-ai/panguard-mcp-proxy/evaluator';
@@ -573,35 +575,60 @@ function resolvePosture(opts: { enforce?: boolean; advisory?: boolean }): HookPo
 
 /**
  * Tool-call content up to this many chars is scanned on the hook's own thread:
- * at this size the slowest content we have measured still scans far inside the
- * deadline, and most tool calls are this short, so they skip the cost of
- * starting a worker. Longer content is scanned in a worker cut at the deadline.
+ * most tool calls are this short, so they skip the cost of starting a worker.
+ * Longer content is scanned in a worker cut at the deadline.
  */
 export const HOOK_INLINE_MAX_CHARS = 2_048;
 
 /**
  * How long one scan of longer content may run (PANGUARD_HOOK_EVAL_DEADLINE_MS
- * overrides it). The time the hook takes to start and load its rules comes on
- * top; the limit leaves room for that under the shortest tool-hook timeout the
- * installer writes (Gemini's 10 s), so on an ordinary machine the hook answers
- * before the host stops waiting for it.
+ * overrides it).
  */
 export const HOOK_EVAL_DEADLINE_MS = 6_000;
+
+/**
+ * The whole run's time budget, counted from the start of the process: CLI
+ * start, reading stdin, starting the worker and loading rules all come out of
+ * it, and the scan gets what is left. It stays under the shortest tool-hook
+ * timeout the installer writes (Gemini's 10 s), because a host that times a
+ * hook out lets the tool call through. With PANGUARD_HOOK_EVAL_DEADLINE_MS set,
+ * the budget grows by the same amount.
+ */
+export const HOOK_TOTAL_BUDGET_MS = 8_000;
+
+/** Whatever the clock says, a worker and a scan are given at least this long. */
+const HOOK_MIN_BUDGET_MS = 500;
 
 /** The longest delay a Node timer honors; a longer one fires at once. */
 const MAX_TIMER_DELAY_MS = 2_147_483_647;
 
-/** Inline for short content; a worker with a deadline for longer content. Pure + exported for testing. */
+/** Time left of a run budget `totalMs` after `elapsedMs`, never less than the minimum. */
+export function hookRemainingBudgetMs(totalMs: number, elapsedMs: number): number {
+  return Math.max(HOOK_MIN_BUDGET_MS, Math.floor(totalMs - elapsedMs));
+}
+
+/**
+ * Inline for short content; a worker with a deadline for longer content. Waiting
+ * for the worker to start, and the scan itself, share what is left of the run's
+ * budget at the moment each begins. Pure + exported for testing.
+ */
 export function hookEvaluatorOptions(
   content: string,
-  env: NodeJS.ProcessEnv = process.env
+  env: NodeJS.ProcessEnv = process.env,
+  elapsedMs: () => number = () => process.uptime() * 1000
 ): ProxyEvaluatorOptions {
   if (content.length <= HOOK_INLINE_MAX_CHARS) return { isolation: 'inline' };
   const raw = env['PANGUARD_HOOK_EVAL_DEADLINE_MS'] ?? '';
   const override = /^\d+$/.test(raw) ? Number(raw) : 0;
+  const deadlineMs =
+    override > 0 && override <= MAX_TIMER_DELAY_MS ? override : HOOK_EVAL_DEADLINE_MS;
+  const totalMs = deadlineMs + (HOOK_TOTAL_BUDGET_MS - HOOK_EVAL_DEADLINE_MS);
+  const remaining = (): number => hookRemainingBudgetMs(totalMs, elapsedMs());
   return {
     isolation: 'worker',
-    deadlineMs: override > 0 && override <= MAX_TIMER_DELAY_MS ? override : HOOK_EVAL_DEADLINE_MS,
+    deadlineMs,
+    startTimeoutMs: remaining(),
+    deadlineCapMs: remaining,
   };
 }
 
@@ -622,17 +649,23 @@ function failOpenOnEngineError(platform: HookPlatform): never {
  * The scan ran past its deadline and was cut. Under a blocking posture content
  * that could not be scanned is not let through, the same as an oversized or
  * unparseable payload: otherwise content that is slow to scan would be a way
- * past the hook. Advisory blocks nothing, so it only warns. Either way the
+ * past the hook. The same goes for a worker that stopped after it was given the
+ * content (`workerLost`). Advisory blocks nothing, so it only warns. Either way the
  * status file records it for `pga doctor`.
  */
-function scanDeadlineEmission(platform: HookPlatform, posture: HookPosture): Emission {
+function scanDeadlineEmission(
+  platform: HookPlatform,
+  posture: HookPosture,
+  workerLost = false
+): Emission {
   if (posture === 'advisory') {
     writeContractMarker(platform, 'evaluation-deadline', 'allowed');
     return {
       exit: 0,
-      stderr:
-        '[panguard] advisory (not blocked): tool-call content could not be scanned within the time limit ' +
-        '(PANGUARD_HOOK_EVAL_DEADLINE_MS raises it)',
+      stderr: workerLost
+        ? '[panguard] advisory (not blocked): the scan of this tool call stopped before it finished'
+        : '[panguard] advisory (not blocked): tool-call content could not be scanned within the time limit ' +
+          '(PANGUARD_HOOK_EVAL_DEADLINE_MS raises it)',
     };
   }
   writeContractMarker(platform, 'evaluation-deadline', 'blocked');
@@ -640,8 +673,10 @@ function scanDeadlineEmission(platform: HookPlatform, posture: HookPosture): Emi
     return emitFor(
       platform,
       'deny',
-      'PanGuard: tool-call content could not be scanned within the time limit — blocked (fail-closed). ' +
-        'If this blocks ordinary work, raise PANGUARD_HOOK_EVAL_DEADLINE_MS (milliseconds).'
+      workerLost
+        ? 'PanGuard: the scan of this tool call stopped before it finished — blocked (fail-closed).'
+        : 'PanGuard: tool-call content could not be scanned within the time limit — blocked (fail-closed). ' +
+            'If this blocks ordinary work, raise PANGUARD_HOOK_EVAL_DEADLINE_MS (milliseconds).'
     );
   } catch (e) {
     if (e instanceof HookContractError) failClosed(platform, e.message);
@@ -707,10 +742,21 @@ export async function runHook(
     const norm = normalizeInput(platform, payload);
     if (!norm || !norm.content.trim()) process.exit(0);
 
-    const { evaluator, ruleCount } = await loadRulesOrInline(
-      new ProxyEvaluator(hookEvaluatorOptions(norm.content)),
-      (message) => process.stderr.write(`[panguard-hook] WARNING: ${message}\n`)
-    );
+    let loaded: Awaited<ReturnType<typeof loadRulesOrInline>>;
+    try {
+      loaded = await loadRulesOrInline(
+        new ProxyEvaluator(hookEvaluatorOptions(norm.content)),
+        (message) => process.stderr.write(`[panguard-hook] WARNING: ${message}\n`),
+        { inlineAfterStartTimeout: false }
+      );
+    } catch (err) {
+      // The worker was too slow to start within the run's time budget: the
+      // content was not scanned, so it is handled like a scan cut at its deadline.
+      if (err instanceof EngineWorkerStartTimeoutError)
+        return apply(scanDeadlineEmission(platform, posture));
+      throw err;
+    }
+    const { evaluator, ruleCount } = loaded;
     if (ruleCount <= 0) {
       // Fail-OPEN (correct: never brick the agent) but NOT silent — record the
       // degraded state + warn once on stderr so doctor/dashboard/user can see
@@ -759,8 +805,12 @@ export async function runHook(
     } catch (err) {
       if (err instanceof EvaluationDeadlineError)
         return apply(scanDeadlineEmission(platform, posture));
-      // The worker died mid-scan: an operational failure, handled like an
-      // engine crash below.
+      // The worker stopped after it had the content: it may have been mid-scan,
+      // so this is handled like a deadline, not like an engine crash.
+      if (err instanceof EngineWorkerLostError)
+        return apply(scanDeadlineEmission(platform, posture, true));
+      // Any other worker failure (it could not be restarted): an operational
+      // failure, handled like an engine crash below.
       if (err instanceof EngineWorkerError) failOpenOnEngineError(platform);
       throw err;
     }
