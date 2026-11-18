@@ -17,7 +17,7 @@ import { detectLang } from '../interactive/lang.js';
 import { ensureTelemetryConsent } from '../consent.js';
 import { installFor, toHookPlatform } from './hook.js';
 import { ensurePersistentService, type PersistResult } from './persist.js';
-import { buildSkillAuditProposal, keepSkillAuditProposalLocally } from './atr-proposal.js';
+import { keepSkillAuditProposalLocally } from './atr-proposal.js';
 import { isFirstRun, markInitialized } from '../first-run.js';
 import {
   readAuthenticatedDashboardUrl,
@@ -1167,8 +1167,7 @@ async function submitToTC(
       category: string;
       severity: string;
       title: string;
-      // Optional real-evidence fields — forwarded into the ATR proposal when the
-      // scan captured them (source snippet is the genuine attack pattern).
+      // Optional evidence fields; never uploaded.
       location?: string;
       explain?: { snippet?: string };
     }>;
@@ -1178,7 +1177,7 @@ async function submitToTC(
   // name. discoverAllSkills() yields registry/manifest names, but strip path
   // separators + cap length so a path-like name can't leak a local directory tree.
   skillName = skillName.replace(/[\\/]/g, '_').slice(0, 80);
-  const { ThreatCloudClient, withOutbox } = await import('@panguard-ai/panguard-guard');
+  const { ThreatCloudClient } = await import('@panguard-ai/panguard-guard');
   const { contentHash } = await import('@panguard-ai/scan-core');
   const { readFileSync: rf, existsSync: fe } = await import('node:fs');
 
@@ -1202,36 +1201,10 @@ async function submitToTC(
     })),
   });
 
-  // 2. Submit ATR proposal for HIGH/CRITICAL
-  if (
-    (report.riskLevel === 'HIGH' || report.riskLevel === 'CRITICAL') &&
-    report.findings.length > 0
-  ) {
-    // Emit a VALID draft-request proposal (real evidence + needsLLMDraft), never
-    // a rule fabricated from the finding-title keywords. See atr-proposal.ts for
-    // why the old title-keyword regex was scrapped (it detected our own report
-    // text and had no precision test). The server/Guard drafter turns this into a
-    // real, test-backed rule via the Rule Creation Standard.
-    const proposal = buildSkillAuditProposal({
-      skillName,
-      riskLevel: report.riskLevel === 'CRITICAL' ? 'CRITICAL' : 'HIGH',
-      source: 'pga-up',
-      skillDir,
-      findings: report.findings.map((f) => ({
-        id: f.id,
-        title: f.title,
-        severity: f.severity,
-        category: f.category,
-        location: f.location,
-        snippet: f.explain?.snippet,
-      })),
-    });
-    // Threat Cloud is an optional extra sink; the outbox record (already kept
-    // locally during the scan) is updated with whether TC accepted it.
-    if (proposal) await withOutbox((p) => tc.submitATRProposal(p))(proposal);
-  }
+  // ATR rule proposals are never uploaded; the scan keeps them in the local
+  // outbox (see keepSkillAuditProposalLocally).
 
-  // 3. Report scan event for metrics
+  // 2. Report scan event for metrics
   void tc.reportScanEvent({
     source: 'cli-user',
     skillsScanned: 1,

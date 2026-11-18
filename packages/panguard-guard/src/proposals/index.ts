@@ -30,7 +30,7 @@ export {
   listOutbox,
   readOutboxRecord,
   markOutboxOpened,
-  withOutbox,
+  proposalOutboxSink,
   defaultOutboxDir,
   outboxId,
 } from './outbox.js';

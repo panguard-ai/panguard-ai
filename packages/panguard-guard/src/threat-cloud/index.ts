@@ -18,6 +18,7 @@ import { request as httpRequest } from 'node:http';
 import { createLogger } from '@panguard-ai/core';
 import type { AnonymizedThreatData, ThreatCloudUpdate, ThreatCloudStatus } from '../types.js';
 import { getAnonymousClientId } from './client-id.js';
+import { sanitizeSkillLabel } from './skill-label.js';
 import {
   assertSafeOutboundUrl,
   checkOutboundUrl,
@@ -472,7 +473,7 @@ export class ThreatCloudClient {
 
     try {
       const url = `${this.endpoint}/api/skill-whitelist`;
-      const body = JSON.stringify({ skillName, fingerprintHash });
+      const body = JSON.stringify({ skillName: sanitizeSkillLabel(skillName), fingerprintHash });
       await this.httpPost(url, body);
       logger.info(`Reported safe skill: ${skillName}`);
     } catch (err: unknown) {
@@ -492,7 +493,9 @@ export class ThreatCloudClient {
 
     try {
       const url = `${this.endpoint}/api/skill-whitelist`;
-      const body = JSON.stringify({ skills });
+      const body = JSON.stringify({
+        skills: skills.map((s) => ({ ...s, skillName: sanitizeSkillLabel(s.skillName) })),
+      });
       await this.httpPost(url, body);
       logger.info(`Batch reported ${skills.length} safe skill(s)`);
     } catch (err: unknown) {
@@ -603,41 +606,8 @@ export class ThreatCloudClient {
     };
   }
 
-  // ---------------------------------------------------------------------------
-  // ATR Proposal Submission / ATR 提案提交
-  // ---------------------------------------------------------------------------
-
-  /**
-   * Submit a locally-drafted ATR rule proposal to Threat Cloud.
-   * The proposal will go through community consensus voting.
-   * 提交本地 LLM 產生的 ATR 規則提案至 Threat Cloud（經社群共識投票）
-   */
-  async submitATRProposal(proposal: {
-    patternHash: string;
-    ruleContent: string;
-    llmProvider: string;
-    llmModel: string;
-    selfReviewVerdict: string;
-  }): Promise<boolean> {
-    if (this.status === 'offline' || !this.endpoint) {
-      logger.info('Cannot submit ATR proposal in offline mode / 離線模式無法提交 ATR 提案');
-      return false;
-    }
-
-    try {
-      const url = `${this.endpoint}/api/atr-proposals`;
-      await this.httpPost(url, proposal);
-      logger.info(
-        `ATR proposal submitted for pattern ${proposal.patternHash} / ` +
-          `ATR 提案已提交 (pattern: ${proposal.patternHash})`
-      );
-      return true;
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      logger.warn(`ATR proposal submission failed: ${msg} / ATR 提案提交失敗: ${msg}`);
-      return false;
-    }
-  }
+  // ATR rule proposals are intentionally NOT uploaded: they carry attack text
+  // taken from skills. They stay in the local outbox (see proposals/outbox.ts).
 
   /**
    * Report ATR rule match feedback (true/false positive) to Threat Cloud.
@@ -682,7 +652,10 @@ export class ThreatCloudClient {
 
     try {
       const url = `${this.endpoint}/api/skill-threats`;
-      await this.httpPost(url, submission);
+      await this.httpPost(url, {
+        ...submission,
+        skillName: sanitizeSkillLabel(submission.skillName),
+      });
       logger.info(
         `Skill threat submitted: ${submission.skillName} (risk: ${submission.riskLevel})`
       );

@@ -242,13 +242,13 @@ export async function initEngines(
   });
   setFeedManager(feedManager);
 
-  // ATRDrafter's sole output is an OUTBOUND submission of drafted rule proposals
-  // to Threat Cloud. That is collective-defense sharing, so it only runs when the
-  // user has explicitly opted in (=== true, never !== false). No opt-in => no
-  // drafter is created, so nothing is drafted and nothing is uploaded.
+  // ATRDrafter sends detected-pattern text to the configured LLM to draft rule
+  // proposals. Drafts are kept ONLY in the local outbox (never uploaded). The
+  // drafter stays behind the same explicit opt-in (=== true, never !== false) as
+  // before, so without consent no pattern text is handed to any LLM.
   let atrDrafter: ATRDrafter | null = null;
   if (analyzeLLM && config.threatCloudUploadEnabled === true) {
-    atrDrafter = new ATRDrafter(analyzeLLM, threatCloud, {
+    atrDrafter = new ATRDrafter(analyzeLLM, {
       llmProvider: process.env['ANTHROPIC_API_KEY']
         ? 'claude'
         : process.env['OPENAI_API_KEY']

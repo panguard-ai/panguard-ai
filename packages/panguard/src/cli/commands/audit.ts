@@ -15,7 +15,7 @@ import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { c, banner, divider, box, symbols, setLogLevel } from '@panguard-ai/core';
 import { contentHash } from '@panguard-ai/scan-core';
-import { buildSkillAuditProposal, keepSkillAuditProposalLocally } from './atr-proposal.js';
+import { keepSkillAuditProposalLocally } from './atr-proposal.js';
 import {
   buildEventsFromAuditReport,
   getTcCorrelationHeaders,
@@ -601,7 +601,7 @@ export function auditCommand(): Command {
         // ── ATR rule proposal, kept LOCALLY (no consent needed) ──
         // Nothing leaves the machine here: the de-identified proposal waits in
         // ~/.panguard/proposals until the user submits it as a pre-filled public
-        // ATR issue (`pga proposals submit <id>`). Threat Cloud, below, is optional.
+        // ATR issue (`pga proposals submit <id>`). Proposals are never uploaded.
         if (
           (report.riskLevel === 'HIGH' || report.riskLevel === 'CRITICAL') &&
           report.findings.length > 0
@@ -624,66 +624,6 @@ export function auditCommand(): Command {
             console.log(
               `  ${c.dim(`${symbols.info} Detection rule proposal saved locally (${kept.id}). Review and send to ATR: pga proposals submit ${kept.id}`)}`
             );
-          }
-        }
-
-        // ── Flywheel: submit ATR proposal for HIGH/CRITICAL findings — OPT-IN ──
-        if (
-          cloudUploadAllowed &&
-          (report.riskLevel === 'HIGH' || report.riskLevel === 'CRITICAL') &&
-          report.findings.length > 0
-        ) {
-          try {
-            const { ThreatCloudClient } = await import('@panguard-ai/panguard-guard');
-            const dataDir = path.join(
-              process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.',
-              '.panguard-guard'
-            );
-            const tc = await ThreatCloudClient.create(options.tcEndpoint, dataDir);
-            const skillName = safeSkillName(report.manifest?.name, resolvedPath);
-
-            // Emit a VALID draft-request proposal (real evidence + needsLLMDraft),
-            // never a rule fabricated from finding-title keywords. See
-            // atr-proposal.ts for why the old title-keyword regex was scrapped (it
-            // detected our own report text and shipped no precision test). The
-            // server/Guard drafter builds the real, test-backed rule.
-            const proposal = buildSkillAuditProposal({
-              skillName,
-              riskLevel: report.riskLevel === 'CRITICAL' ? 'CRITICAL' : 'HIGH',
-              source: 'cli-auditor',
-              skillDir: resolvedPath,
-              findings: report.findings.map((f) => ({
-                id: f.id,
-                title: f.title,
-                severity: f.severity,
-                category: f.category,
-                location: f.location,
-                snippet: (f as { explain?: { snippet?: string } }).explain?.snippet,
-              })),
-            });
-            if (proposal) {
-              // Report the REAL result — submitATRProposal returns false when the
-              // backend rejects it (e.g. the evidence-only draft-request does not
-              // yet meet the rule quality bar). Never print "submitted" on a
-              // rejected/offline POST (that was a fake-green). The accepted
-              // contribution is the skill-threat shared above; the community rule
-              // is drafted from repeated reports.
-              const { withOutbox } = await import('@panguard-ai/panguard-guard');
-              const proposalAccepted = await withOutbox((p) => tc.submitATRProposal(p))(proposal);
-              if (!options.json) {
-                if (proposalAccepted) {
-                  console.log(
-                    `  ${c.green(symbols.pass)} ${c.dim('ATR rule proposal submitted to Threat Cloud')}`
-                  );
-                } else if (options.verbose) {
-                  console.log(
-                    `  ${c.dim(`${symbols.info} ATR proposal not accepted yet (needs community drafting); skill threat shared above`)}`
-                  );
-                }
-              }
-            }
-          } catch {
-            // ATR proposal submission is best-effort
           }
         }
 

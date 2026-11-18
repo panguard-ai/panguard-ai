@@ -35,7 +35,7 @@ import { DashboardRenderer } from './dashboard-renderer.js';
 import type { DashboardState } from './dashboard-renderer.js';
 import { removeDashboardToken } from '../dashboard/index.js';
 import { SkillWatcher } from '../engines/skill-watcher.js';
-import { withOutbox } from '../proposals/outbox.js';
+import { proposalOutboxSink } from '../proposals/outbox.js';
 import { commandScan } from './scan-command.js';
 import {
   classifyThreatResponse,
@@ -818,20 +818,19 @@ async function commandStart(
 
   // ── Skill Install Watcher ────────────────────────────────────────────
   // Local detection always runs (dashboard alerts, blacklist checks). The
-  // OUTBOUND flywheel submitters (skill threat + ATR proposal) carry a skill
-  // name and findings to Threat Cloud, so they are collective-defense sharing:
-  // wire them ONLY when the user has explicitly opted in (=== true, never
-  // !== false). Opted out => submitters stay undefined => SkillWatcher uploads
-  // nothing.
+  // OUTBOUND skill-threat submitter carries a skill name and findings to Threat
+  // Cloud, so it is collective-defense sharing: wire it ONLY when the user has
+  // explicitly opted in (=== true, never !== false). Opted out => undefined =>
+  // SkillWatcher uploads nothing.
   const sharingOptedIn = config.threatCloudUploadEnabled === true;
   // ATR proposals always land in the LOCAL outbox (~/.panguard/proposals), which
   // never leaves the machine on its own: the user reviews each one and submits it
-  // as a pre-filled public GitHub issue (`pga proposals submit <id>`). Threat
-  // Cloud stays an optional extra sink, used only when sharing is opted in.
+  // as a pre-filled public GitHub issue (`pga proposals submit <id>`). Proposals
+  // are never uploaded to Threat Cloud, whatever the sharing consent says.
   const skillWatcher = new SkillWatcher({
     pollInterval: 10_000,
     submitThreat: sharingOptedIn ? engine.getSkillThreatSubmitter() : undefined,
-    submitATRProposal: withOutbox(sharingOptedIn ? engine.getATRProposalSubmitter() : undefined),
+    submitATRProposal: proposalOutboxSink(),
   });
 
   skillWatcher.on('skill-added', (change: { name: string; platformId: string }) => {

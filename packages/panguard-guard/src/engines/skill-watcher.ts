@@ -54,7 +54,7 @@ export type SkillThreatSubmitter = (submission: {
   findingSummaries?: Array<{ id: string; category: string; severity: string; title: string }>;
 }) => Promise<boolean>;
 
-/** Callback for submitting ATR rule proposals to Threat Cloud */
+/** Callback that keeps an ATR rule proposal (local outbox only, never uploaded) */
 export type ATRProposalSubmitter = (proposal: {
   patternHash: string;
   ruleContent: string;
@@ -77,7 +77,7 @@ export interface SkillWatcherConfig {
   readonly autoBlock?: boolean;
   /** Optional callback to submit audit results to Threat Cloud */
   readonly submitThreat?: SkillThreatSubmitter;
-  /** Optional callback to submit ATR rule proposals to Threat Cloud (flywheel) */
+  /** Optional callback that stores ATR rule proposals locally (never uploaded) */
   readonly submitATRProposal?: ATRProposalSubmitter;
   /** Optional callback to check community blacklist before auditing */
   readonly checkBlacklist?: SkillBlacklistChecker;
@@ -715,11 +715,6 @@ export class SkillWatcher extends EventEmitter {
     const success = await this.config.submitATRProposal(proposal);
 
     if (success) {
-      logger.info(
-        `ATR proposal submitted from skill audit: ${skillName} (${proposal.patternHash}) / ` +
-          `技能審計 ATR 提案已提交: ${skillName}`
-      );
-    } else {
       logger.info(
         `ATR proposal from skill audit kept in the local outbox: ${skillName} ` +
           `(review and submit with \`pga proposals list\`) / ` +
