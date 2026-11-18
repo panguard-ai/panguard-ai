@@ -68,6 +68,8 @@ export interface ProcessListEntry {
 export class ProcessMonitor extends EventEmitter {
   /** Whether the monitor is currently running / 監控器是否正在執行 */
   private running = false;
+  /** True while a poll is in flight; a slow OS tool must not stack up child processes */
+  private polling = false;
   /** Polling timer / 輪詢計時器 */
   private timer?: ReturnType<typeof setInterval>;
   /** Previous process snapshot for diff detection / 用於差異偵測的先前程序快照 */
@@ -142,6 +144,8 @@ export class ProcessMonitor extends EventEmitter {
    * 輪詢程序列表並為變更發出事件
    */
   private async pollProcesses(): Promise<void> {
+    if (this.polling) return;
+    this.polling = true;
     try {
       const currentList = await this.getProcessList();
       const currentMap = new Map<number, ProcessInfo>();
@@ -189,6 +193,8 @@ export class ProcessMonitor extends EventEmitter {
     } catch (err) {
       logger.error('Failed to poll processes', { error: String(err) });
       this.emit('error', err instanceof Error ? err : new Error(String(err)));
+    } finally {
+      this.polling = false;
     }
   }
 
@@ -273,6 +279,7 @@ export class ProcessMonitor extends EventEmitter {
   private async parseTasklist(): Promise<ProcessListEntry[]> {
     const { stdout } = await execFileAsync('tasklist', ['/FO', 'CSV'], {
       timeout: 10000,
+      windowsHide: true,
     });
 
     const processes: ProcessListEntry[] = [];

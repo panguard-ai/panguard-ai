@@ -16,6 +16,7 @@ import { existsSync, statSync, openSync, readSync, closeSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { createLogger, MonitorEngine, setFeedManager } from '@panguard-ai/core';
+import { toMonitorEngineConfig } from './monitor-config.js';
 import type { SecurityEvent } from '@panguard-ai/core';
 import type {
   GuardConfig,
@@ -307,10 +308,7 @@ export class GuardEngine {
     void checkForRuleUpdates(syncDeps); // fire-and-forget initial check (no network block on startup)
 
     // Start monitor engine
-    this.monitorEngine = new MonitorEngine({
-      networkPollInterval: this.config.monitors.networkPollInterval,
-      processPollInterval: this.config.monitors.processPollInterval,
-    });
+    this.monitorEngine = new MonitorEngine(toMonitorEngineConfig(this.config.monitors));
 
     this.monitorEngine.on('event', (event: SecurityEvent) => {
       void this.processEvent(event);

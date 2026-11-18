@@ -149,10 +149,10 @@ if [ ! -f "$CONFIG_FILE" ]; then
   "dashboardEnabled": true,
   "verbose": false,
   "monitors": {
-    "logMonitor": true,
-    "networkMonitor": true,
-    "processMonitor": true,
-    "fileMonitor": true,
+    "logMonitor": false,
+    "networkMonitor": false,
+    "processMonitor": false,
+    "fileMonitor": false,
     "networkPollInterval": 5000,
     "processPollInterval": 10000
   },
@@ -242,10 +242,10 @@ if (-not (Test-Path $configFile)) {
         dashboardEnabled = $true
         verbose = $false
         monitors = @{
-            logMonitor = $true
-            networkMonitor = $true
-            processMonitor = $true
-            fileMonitor = $true
+            logMonitor = $false
+            networkMonitor = $false
+            processMonitor = $false
+            fileMonitor = $false
             networkPollInterval = 5000
             processPollInterval = 10000
         }

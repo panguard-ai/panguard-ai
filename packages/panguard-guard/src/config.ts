@@ -141,11 +141,17 @@ export const DEFAULT_GUARD_CONFIG: GuardConfig = {
   dashboardPort: 3100,
   dashboardEnabled: true,
   verbose: false,
+  // Host-level monitoring (OS logs, network sockets, process table) is OFF by
+  // default: the product's main line is AI-agent protection, and these pollers
+  // spawn OS tools (lsof/ps/log/netstat) on a timer. Opt in explicitly through
+  // the `monitors` block of the config file. fileMonitor stays false too: the
+  // engine-level file monitor is never given watch paths, and SkillWatcher runs
+  // its own independent file monitor.
   monitors: {
-    logMonitor: true,
-    networkMonitor: true,
-    processMonitor: true,
-    fileMonitor: true,
+    logMonitor: false,
+    networkMonitor: false,
+    processMonitor: false,
+    fileMonitor: false,
     networkPollInterval: 30000,
     processPollInterval: 15000,
   },
