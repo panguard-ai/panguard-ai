@@ -26,6 +26,7 @@ export type {
 
 // Sub-modules (for consumers that need individual pieces)
 export { contentHash, patternHash } from './hash-utils.js';
+export { directoryContentHash, mcpServerHash, stripLocalPath } from './local-hash.js';
 export {
   stripMarkdownNoise,
   extractCodeBlocks,

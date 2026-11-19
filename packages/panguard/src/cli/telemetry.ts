@@ -1,6 +1,7 @@
 /**
  * Telemetry client — fire-and-forget POST to TC /api/telemetry.
- * Only sends if telemetryEnabled is true (opt-in).
+ * Only sends when sharing is on (the single predicate isSharingEnabled; the callers
+ * pass the value ensureTelemetryConsent() returns).
  * Never blocks, never throws.
  *
  * All data is real — no mocks, no hardcoded values.

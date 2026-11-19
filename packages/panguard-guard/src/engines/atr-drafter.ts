@@ -22,8 +22,8 @@ import yaml from 'js-yaml';
 import { createLogger } from '@panguard-ai/core';
 import type { SecurityEvent } from '@panguard-ai/core';
 import type { AnalyzeLLM } from '../types.js';
-import type { ThreatCloudClient } from '../threat-cloud/index.js';
-import { withOutbox } from '../proposals/outbox.js';
+import { proposalOutboxSink } from '../proposals/outbox.js';
+import { proposalToIssueFields } from '../proposals/convert.js';
 
 const logger = createLogger('panguard-guard:atr-drafter');
 
@@ -70,6 +70,8 @@ export interface ATRDrafterConfig {
   llmProvider: string;
   /** LLM model name for metadata */
   llmModel: string;
+  /** Local outbox directory override (tests); default ~/.panguard/proposals */
+  outboxDir?: string;
 }
 
 const DEFAULT_CONFIG: ATRDrafterConfig = {
@@ -96,10 +98,10 @@ export class ATRDrafter {
   private readonly patterns = new Map<string, LocalPattern>();
   private readonly submittedPatterns = new Set<string>();
   private cycleTimer: ReturnType<typeof setInterval> | null = null;
+  private initialTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private readonly llm: AnalyzeLLM,
-    private readonly threatCloud: ThreatCloudClient,
     config?: Partial<ATRDrafterConfig>
   ) {
     this.config = { ...DEFAULT_CONFIG, ...config };
@@ -198,7 +200,7 @@ export class ATRDrafter {
     if (this.cycleTimer) return;
 
     // Run first cycle after a delay to accumulate some events
-    setTimeout(() => void this.runDraftCycle(), 30 * 60 * 1000); // 30 min initial delay
+    this.initialTimer = setTimeout(() => void this.runDraftCycle(), 30 * 60 * 1000); // 30 min initial delay
 
     this.cycleTimer = setInterval(() => void this.runDraftCycle(), this.config.windowMs);
 
@@ -213,6 +215,10 @@ export class ATRDrafter {
    * 停止草稿產生週期
    */
   stop(): void {
+    if (this.initialTimer) {
+      clearTimeout(this.initialTimer);
+      this.initialTimer = null;
+    }
     if (this.cycleTimer) {
       clearInterval(this.cycleTimer);
       this.cycleTimer = null;
@@ -260,30 +266,43 @@ export class ATRDrafter {
     for (const { hash, pattern } of toProcess) {
       try {
         const result = await this.draftAndReview(hash, pattern);
-        if (!result) continue;
+        if (!result) {
+          // The model returned no usable rule (invalid or short YAML, schema
+          // failure). Record the pattern as handled so it is not sent to the LLM
+          // again every cycle; a failed LLM call (thrown) is retried instead.
+          this.submittedPatterns.add(hash);
+          continue;
+        }
         drafted++;
 
         if (result.selfReviewApproved) {
-          // Every approved draft also lands in the local outbox, so a Threat Cloud
-          // outage no longer drops it: the user can submit it as a pre-filled ATR
-          // issue. A draft kept in the outbox counts as handled, so it is not
-          // re-drafted (and re-billed to the LLM) every cycle.
-          let savedLocally = false;
-          const submit = withOutbox((p) => this.threatCloud.submitATRProposal(p), {
-            onSaved: () => {
-              savedLocally = true;
-            },
-          });
-          const success = await submit({
+          // Approved drafts stay in the local outbox and are never uploaded: the
+          // user can submit one as a pre-filled public ATR issue. A draft kept in
+          // the outbox counts as handled, so it is not re-drafted (and re-billed
+          // to the LLM) every cycle.
+          const proposal = {
             patternHash: hash,
             ruleContent: result.ruleContent,
             llmProvider: this.config.llmProvider,
             llmModel: this.config.llmModel,
             selfReviewVerdict: result.selfReviewVerdict,
-          });
-
-          if (success) submitted++;
-          if (success || savedLocally) this.submittedPatterns.add(hash);
+          };
+          // A draft with no usable evidence (no true-positive input) can never be
+          // turned into an issue. Record it as handled (skipped) so the pattern is
+          // not sent to the LLM again every cycle.
+          if (!proposalToIssueFields(proposal)) {
+            this.submittedPatterns.add(hash);
+            logger.info(`ATR draft for pattern ${hash} has no usable evidence; skipped`);
+            continue;
+          }
+          const save = proposalOutboxSink({ dir: this.config.outboxDir });
+          if (await save(proposal)) {
+            submitted++;
+            this.submittedPatterns.add(hash);
+          }
+        } else {
+          // Rejected by the drafter's own self-review: handled, not retried every cycle.
+          this.submittedPatterns.add(hash);
         }
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
@@ -296,8 +315,8 @@ export class ATRDrafter {
 
     if (drafted > 0) {
       logger.info(
-        `ATR draft cycle: ${drafted} drafted, ${submitted} submitted / ` +
-          `ATR 草稿週期: ${drafted} 草稿, ${submitted} 已提交`
+        `ATR draft cycle: ${drafted} drafted, ${submitted} kept locally / ` +
+          `ATR 草稿週期: ${drafted} 草稿, ${submitted} 已存本機`
       );
     }
 

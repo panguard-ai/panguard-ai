@@ -5,7 +5,6 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { AnalyzeLLM } from '../src/types.js';
-import type { ThreatCloudClient } from '../src/threat-cloud/index.js';
 
 // Mock logger
 vi.mock('@panguard-ai/core', () => ({
@@ -37,21 +36,13 @@ function createMockLLM(): AnalyzeLLM {
   };
 }
 
-function createMockThreatCloud(): ThreatCloudClient {
-  return {
-    submitATRProposal: vi.fn().mockResolvedValue(true),
-  } as unknown as ThreatCloudClient;
-}
-
 describe('ATRDrafter', () => {
   let drafter: InstanceType<typeof ATRDrafter>;
   let mockLLM: AnalyzeLLM;
-  let mockCloud: ThreatCloudClient;
 
   beforeEach(() => {
     mockLLM = createMockLLM();
-    mockCloud = createMockThreatCloud();
-    drafter = new ATRDrafter(mockLLM, mockCloud);
+    drafter = new ATRDrafter(mockLLM);
   });
 
   // -----------------------------------------------------------------------
@@ -244,7 +235,6 @@ detection:
       const result = await drafter.runDraftCycle();
       expect(result).toEqual({ drafted: 0, submitted: 0 });
       expect(mockLLM.analyze).not.toHaveBeenCalled();
-      expect(mockCloud.submitATRProposal).not.toHaveBeenCalled();
     });
   });
 });

@@ -62,10 +62,12 @@ export function buildPanguardConfig(answers: WizardAnswers): PanguardConfig {
         notifyAndWait: guardPolicy.notifyAndWait,
       },
       monitors: {
-        logMonitor: true,
-        networkMonitor: true,
-        processMonitor: true,
-        fileMonitor: goals.includes('realtime'),
+        // Host-level monitors are opt-in (the product's main line is AI-agent
+        // protection); edit this block to turn them on.
+        logMonitor: false,
+        networkMonitor: false,
+        processMonitor: false,
+        fileMonitor: false,
       },
     },
     ai: {
@@ -228,10 +230,10 @@ export function buildQuickConfig(
         notifyAndWait: guardPolicy.notifyAndWait,
       },
       monitors: {
-        logMonitor: true,
-        networkMonitor: true,
-        processMonitor: true,
-        fileMonitor: true,
+        logMonitor: false,
+        networkMonitor: false,
+        processMonitor: false,
+        fileMonitor: false,
       },
     },
     ai: {

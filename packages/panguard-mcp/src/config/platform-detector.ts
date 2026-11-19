@@ -76,8 +76,10 @@ function hasClaudeCodePanguard(): boolean {
     }).toString();
     return output.includes('panguard');
   } catch {
-    // Fallback: check JSON config
-    return hasPanguardMCPEntry(getClaudeCodeConfigPath());
+    // The claude CLI is missing, slow or failed: the state is UNKNOWN, reported as
+    // not configured. ~/.claude/settings.local.json is not a place Claude Code is
+    // documented to load MCP servers from, so it is never read as evidence.
+    return false;
   }
 }
 

@@ -17,7 +17,8 @@ import { detectLang } from '../interactive/lang.js';
 import { ensureTelemetryConsent } from '../consent.js';
 import { installFor, toHookPlatform } from './hook.js';
 import { ensurePersistentService, type PersistResult } from './persist.js';
-import { buildSkillAuditProposal, keepSkillAuditProposalLocally } from './atr-proposal.js';
+import { computeSkillHash } from '../skill-hash.js';
+import { keepSkillAuditProposalLocally } from './atr-proposal.js';
 import { isFirstRun, markInitialized } from '../first-run.js';
 import {
   readAuthenticatedDashboardUrl,
@@ -324,29 +325,12 @@ export function upCommand(): Command {
         const telemetryConsented = await ensureTelemetryConsent();
 
         // Whether the scan flywheel may upload to Threat Cloud. OPT-IN, default
-        // OFF: requires an affirmative consent (telemetryConsented) AND that TC
-        // upload is EXPLICITLY enabled in config (threatCloudUploadEnabled ===
-        // true). Absent/unset config => OFF (gate is `=== true`, never `!== false`).
-        // Nothing leaves the machine unless the user opted in via the first-run
-        // prompt / `pga config set telemetry true` / the dashboard toggle.
-        const tcUploadAllowed = (() => {
-          if (!telemetryConsented) return false;
-          try {
-            const cfgPath = join(homedir(), '.panguard-guard', 'config.json');
-            if (existsSync(cfgPath)) {
-              const cfg = JSON.parse(readFileSync(cfgPath, 'utf-8')) as {
-                telemetryEnabled?: boolean;
-                threatCloudUploadEnabled?: boolean;
-              };
-              return cfg.threatCloudUploadEnabled === true;
-            }
-          } catch {
-            // On any read error, fail closed — do not upload.
-            return false;
-          }
-          // No config on disk yet => not opted in => OFF.
-          return false;
-        })();
+        // OFF. ensureTelemetryConsent() returns the single sharing predicate
+        // (isSharingEnabled: threatCloudUploadEnabled === true), the same value every
+        // other upload gate and status line reads. Nothing leaves the machine unless
+        // the user opted in via the first-run prompt / `pga config set threat-cloud
+        // true` / the dashboard toggle.
+        const tcUploadAllowed = telemetryConsented;
 
         // ── Step 1: Detect AI platforms (we SCAN before deploying) ──
         let platformCount = 0;
@@ -361,6 +345,7 @@ export function upCommand(): Command {
         // Captured during detection, used to inject AFTER the scan completes.
         let detectedPlatforms: Array<{ id: string; name: string; detected: boolean }> = [];
         let injectProxyFn: InjectFn | null = null;
+        let repinFn: ((ids: readonly string[]) => string[]) | null = null;
         try {
           let detectPlatforms: DetectFn;
           try {
@@ -368,9 +353,11 @@ export function upCommand(): Command {
             const mcp = (await import('@panguard-ai/panguard-mcp/config' as string)) as {
               detectPlatforms: DetectFn;
               injectProxy: InjectFn;
+              repinPanguardConfig?: (ids: readonly string[]) => string[];
             };
             detectPlatforms = mcp.detectPlatforms;
             injectProxyFn = mcp.injectProxy;
+            repinFn = mcp.repinPanguardConfig ?? null;
           } catch {
             // Monorepo fallback: resolve from cwd
             const { resolve } = await import('node:path');
@@ -379,9 +366,11 @@ export function upCommand(): Command {
             const mcp = (await import(pathToFileURL(mcpDist).href)) as {
               detectPlatforms: DetectFn;
               injectProxy: InjectFn;
+              repinPanguardConfig?: (ids: readonly string[]) => string[];
             };
             detectPlatforms = mcp.detectPlatforms;
             injectProxyFn = mcp.injectProxy;
+            repinFn = mcp.repinPanguardConfig ?? null;
           }
 
           console.log(
@@ -713,6 +702,8 @@ export function upCommand(): Command {
             );
           } else {
             console.log(`\n  ${shield()} ${c.bold('Watching your agents...')}\n`);
+            // Bring an older / unpinned panguard MCP entry to this version's pinned spec.
+            repinFn?.(detectedPlatforms.map((p) => p.id));
             const proxySummary = injectProxyFn(detectedPlatforms.map((p) => p.id));
             platformCount = proxySummary.totalPlatforms;
             serverCount = proxySummary.totalServersProxied;
@@ -788,7 +779,7 @@ export function upCommand(): Command {
           console.log();
         }
 
-        // ── Activation tracking (one-time, OPT-IN) ──
+        // ── Activation tracking (until accepted once, OPT-IN) ──
         // The activation ping is non-essential collective telemetry, so it only
         // fires when the user has EXPLICITLY opted in (threatCloudUploadEnabled
         // === true). Default OFF: absent/unset config or any read error => no ping.
@@ -1073,7 +1064,7 @@ export function upCommand(): Command {
             `  ${c.dim(t(lang, `This machine contributes anonymous detections to the community defense network.`, `這台機器正在為社群防禦網路貢獻匿名偵測。`))}`
           );
           console.log(
-            `  ${c.dim(t(lang, `Check status: pga sensor status · Opt out: pga config set telemetry false`, `查看狀態:pga sensor status · 停用:pga config set telemetry false`))}`
+            `  ${c.dim(t(lang, `Check status: pga sensor status · Opt out: pga config set threat-cloud false`, `查看狀態:pga sensor status · 停用:pga config set threat-cloud false`))}`
           );
           console.log('');
         }
@@ -1113,35 +1104,22 @@ export function upCommand(): Command {
         );
         if (tcUploadAllowed) {
           console.log(
-            `  ${c.dim(t(lang, 'Collective defense ON: when an attack is blocked, only the matched rule ID,', '集體防禦已開啟：擋下攻擊時，只分享命中的規則 ID、'))}`
+            `  ${c.dim(t(lang, 'Collective defense ON. See exactly what is shared: pga config show --verbose', '集體防禦已開啟。完整分享內容請見：pga config show --verbose'))}`
           );
           console.log(
-            `  ${c.dim(t(lang, 'a one-way payload hash, and the source type are shared — never your prompts,', 'payload 的單向雜湊、來源類型 — 絕不含你的 prompt、'))}`
-          );
-          console.log(
-            `  ${c.dim(t(lang, 'code, file contents, keys, hostname, or IP. Thank you for defending the commons.', '程式碼、檔案內容、金鑰、主機名或 IP。謝謝你一起守護社群。'))}`
-          );
-          console.log(
-            `  ${c.dim(t(lang, 'Turn off anytime: pga config set telemetry false', '隨時可關閉：pga config set telemetry false'))}`
+            `  ${c.dim(t(lang, 'Turn off anytime (stops all uploads and downloads): pga config set threat-cloud false', '隨時可關閉（停止所有上傳與下載）：pga config set threat-cloud false'))}`
           );
         } else {
-          // OPT-IN guidance (NOT a default, NOT a nag): explain the value + the
-          // privacy guarantee + the one command, so the user can make an
-          // informed choice. Collective defense stays OFF until they opt in.
+          // OPT-IN guidance (NOT a default, NOT a nag). Collective defense stays
+          // OFF until the user opts in.
           console.log(
-            `  ${c.dim(t(lang, 'Collective defense is OFF — nothing leaves this machine.', '集體防禦目前關閉 — 沒有任何資料離開這台機器。'))}`
+            `  ${c.dim(t(lang, 'Collective defense is OFF — nothing is uploaded or downloaded.', '集體防禦目前關閉 — 不會上傳或下載任何資料。'))}`
           );
           console.log(
-            `  ${c.dim(t(lang, 'Want to help? The attacks you block feed the community threat pool that protects', '想幫忙嗎？你擋下的攻擊會匯入保護所有人的社群威脅池，'))}`
+            `  ${c.dim(t(lang, 'Want to help? Read exactly what joining shares: pga config show --verbose', '想幫忙嗎？加入前請先看完整分享內容：pga config show --verbose'))}`
           );
           console.log(
-            `  ${c.dim(t(lang, 'everyone — and you get community rules back faster. Shared: only the matched', '而你也能更快收到社群回流的規則。分享的只有命中的規則 ID、'))}`
-          );
-          console.log(
-            `  ${c.dim(t(lang, 'rule ID, a one-way hash, and the source type. Never your prompts, code,', 'payload 的單向雜湊、來源類型。絕不含你的 prompt、程式碼、'))}`
-          );
-          console.log(
-            `  ${c.dim(t(lang, 'file contents, keys, hostname, or IP. Opt in: pga config set telemetry true', '檔案內容、金鑰、主機名或 IP。開啟：pga config set telemetry true'))}`
+            `  ${c.dim(t(lang, 'Opt in: pga config set threat-cloud true', '開啟：pga config set threat-cloud true'))}`
           );
         }
         console.log('');
@@ -1167,8 +1145,7 @@ async function submitToTC(
       category: string;
       severity: string;
       title: string;
-      // Optional real-evidence fields — forwarded into the ATR proposal when the
-      // scan captured them (source snippet is the genuine attack pattern).
+      // Optional evidence fields; never uploaded.
       location?: string;
       explain?: { snippet?: string };
     }>;
@@ -1178,16 +1155,13 @@ async function submitToTC(
   // name. discoverAllSkills() yields registry/manifest names, but strip path
   // separators + cap length so a path-like name can't leak a local directory tree.
   skillName = skillName.replace(/[\\/]/g, '_').slice(0, 80);
-  const { ThreatCloudClient, withOutbox } = await import('@panguard-ai/panguard-guard');
-  const { contentHash } = await import('@panguard-ai/scan-core');
-  const { readFileSync: rf, existsSync: fe } = await import('node:fs');
+  const { ThreatCloudClient } = await import('@panguard-ai/panguard-guard');
 
   const dataDir = join(homedir(), '.panguard-guard');
   const tc = await ThreatCloudClient.create(TC_ENDPOINT, dataDir);
 
   // 1. Submit skill threat
-  const skillMdPath = join(skillDir, 'SKILL.md');
-  const skillHash = fe(skillMdPath) ? contentHash(rf(skillMdPath, 'utf-8')) : contentHash(skillDir);
+  const skillHash = computeSkillHash(skillDir);
 
   await tc.submitSkillThreat({
     skillHash,
@@ -1202,36 +1176,10 @@ async function submitToTC(
     })),
   });
 
-  // 2. Submit ATR proposal for HIGH/CRITICAL
-  if (
-    (report.riskLevel === 'HIGH' || report.riskLevel === 'CRITICAL') &&
-    report.findings.length > 0
-  ) {
-    // Emit a VALID draft-request proposal (real evidence + needsLLMDraft), never
-    // a rule fabricated from the finding-title keywords. See atr-proposal.ts for
-    // why the old title-keyword regex was scrapped (it detected our own report
-    // text and had no precision test). The server/Guard drafter turns this into a
-    // real, test-backed rule via the Rule Creation Standard.
-    const proposal = buildSkillAuditProposal({
-      skillName,
-      riskLevel: report.riskLevel === 'CRITICAL' ? 'CRITICAL' : 'HIGH',
-      source: 'pga-up',
-      skillDir,
-      findings: report.findings.map((f) => ({
-        id: f.id,
-        title: f.title,
-        severity: f.severity,
-        category: f.category,
-        location: f.location,
-        snippet: f.explain?.snippet,
-      })),
-    });
-    // Threat Cloud is an optional extra sink; the outbox record (already kept
-    // locally during the scan) is updated with whether TC accepted it.
-    if (proposal) await withOutbox((p) => tc.submitATRProposal(p))(proposal);
-  }
+  // ATR rule proposals are never uploaded; the scan keeps them in the local
+  // outbox (see keepSkillAuditProposalLocally).
 
-  // 3. Report scan event for metrics
+  // 2. Report scan event for metrics
   void tc.reportScanEvent({
     source: 'cli-user',
     skillsScanned: 1,
@@ -1242,7 +1190,7 @@ async function submitToTC(
   });
 }
 
-/** One-time activation report — only fires on first pga up */
+/** Activation report: resent on each pga up (while sharing is on) until the server accepts it once */
 async function reportActivation(): Promise<void> {
   const {
     existsSync: fe,

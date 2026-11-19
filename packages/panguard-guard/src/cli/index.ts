@@ -35,7 +35,7 @@ import { DashboardRenderer } from './dashboard-renderer.js';
 import type { DashboardState } from './dashboard-renderer.js';
 import { removeDashboardToken } from '../dashboard/index.js';
 import { SkillWatcher } from '../engines/skill-watcher.js';
-import { withOutbox } from '../proposals/outbox.js';
+import { proposalOutboxSink } from '../proposals/outbox.js';
 import { commandScan } from './scan-command.js';
 import {
   classifyThreatResponse,
@@ -561,6 +561,9 @@ async function commandStart(
   process.on('SIGHUP', () => {
     void (async () => {
       try {
+        // Re-read config.json too, so a consent change made with `pga config set`
+        // reaches this running daemon (turning sharing off stops it at once).
+        engine.applyConfig(loadConfig(join(dataDir, 'config.json')));
         const result = await engine.reloadRules();
         console.log(
           `  ${symbols.pass} Rules reloaded: ${result.total} (${result.bundled} bundled + ${result.custom} custom)`
@@ -743,6 +746,8 @@ async function commandStart(
     if (telemetryBatch.length === 0) return;
     const batch = [...telemetryBatch];
     telemetryBatch.length = 0;
+    // Consent may have been withdrawn while events were queued: send nothing.
+    if (engine.getConfig().threatCloudUploadEnabled !== true) return;
     const telemetryUrl = `${TC_ENDPOINT}/api/telemetry`;
     // SSRF guard: reject non-https / private / metadata endpoints, and refuse
     // to follow redirects (a redirect could point telemetry at an internal host).
@@ -776,7 +781,7 @@ async function commandStart(
 
   function pushTelemetryEvent(event: string, findingCount: number, severity: string): void {
     // Opt-in, default OFF: only queue telemetry when explicitly enabled.
-    if (config.threatCloudUploadEnabled !== true) return;
+    if (engine.getConfig().threatCloudUploadEnabled !== true) return;
     telemetryBatch.push({
       event,
       platform: `${process.platform}-${process.arch}`,
@@ -818,20 +823,23 @@ async function commandStart(
 
   // ── Skill Install Watcher ────────────────────────────────────────────
   // Local detection always runs (dashboard alerts, blacklist checks). The
-  // OUTBOUND flywheel submitters (skill threat + ATR proposal) carry a skill
-  // name and findings to Threat Cloud, so they are collective-defense sharing:
-  // wire them ONLY when the user has explicitly opted in (=== true, never
-  // !== false). Opted out => submitters stay undefined => SkillWatcher uploads
-  // nothing.
-  const sharingOptedIn = config.threatCloudUploadEnabled === true;
+  // OUTBOUND skill-threat submitter carries a skill name and findings to Threat
+  // Cloud, so it is collective-defense sharing: it only submits while the user has
+  // explicitly opted in (=== true, never !== false). Opted out => nothing uploaded.
+  const skillThreatSubmitter = engine.getSkillThreatSubmitter();
   // ATR proposals always land in the LOCAL outbox (~/.panguard/proposals), which
   // never leaves the machine on its own: the user reviews each one and submits it
-  // as a pre-filled public GitHub issue (`pga proposals submit <id>`). Threat
-  // Cloud stays an optional extra sink, used only when sharing is opted in.
+  // as a pre-filled public GitHub issue (`pga proposals submit <id>`). Proposals
+  // are never uploaded to Threat Cloud, whatever the sharing consent says.
   const skillWatcher = new SkillWatcher({
     pollInterval: 10_000,
-    submitThreat: sharingOptedIn ? engine.getSkillThreatSubmitter() : undefined,
-    submitATRProposal: withOutbox(sharingOptedIn ? engine.getATRProposalSubmitter() : undefined),
+    // Consent is checked on every call against the live config, so withdrawing it
+    // stops skill-threat uploads without a restart.
+    submitThreat: async (submission) =>
+      engine.getConfig().threatCloudUploadEnabled === true
+        ? skillThreatSubmitter(submission)
+        : false,
+    submitATRProposal: proposalOutboxSink(),
   });
 
   skillWatcher.on('skill-added', (change: { name: string; platformId: string }) => {
@@ -1098,7 +1106,9 @@ async function showFirstRunWelcome(dashboardPort: number, atrRuleCount: number):
   // from the engine, so the banner tells the truth about what's enforcing.
   console.log(`    ${symbols.pass} Auto-audits skills with ${atrRuleCount} ATR threat rules`);
   console.log(`    ${symbols.pass} Blocks critical threats, alerts on suspicious ones`);
-  console.log(`    ${symbols.pass} Syncs community threat intelligence via Threat Cloud`);
+  console.log(
+    `    ${c.dim('-')} Collective defense (Threat Cloud): off until you opt in ${c.dim('(pga config show --verbose)')}`
+  );
   console.log('');
   console.log(divider());
   console.log('');

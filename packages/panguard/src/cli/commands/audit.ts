@@ -9,13 +9,14 @@
  */
 
 import { Command } from 'commander';
-import { readFileSync, existsSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { createPublicKey, verify as edVerify } from 'node:crypto';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { c, banner, divider, box, symbols, setLogLevel } from '@panguard-ai/core';
-import { contentHash } from '@panguard-ai/scan-core';
-import { buildSkillAuditProposal, keepSkillAuditProposalLocally } from './atr-proposal.js';
+import { computeSkillHash } from '../skill-hash.js';
+import { isThreatCloudUploadEnabled } from '../consent.js';
+import { keepSkillAuditProposalLocally } from './atr-proposal.js';
 import {
   buildEventsFromAuditReport,
   getTcCorrelationHeaders,
@@ -180,26 +181,16 @@ function writeToTempDir(content: string, skillName: string): string {
 // ---------------------------------------------------------------------------
 
 /**
- * Compute a content hash of a skill's SKILL.md using scan-core's canonical hash.
- * Identical to what the website produces — critical for TC dedup.
+ * Skill name for uploads and local proposals. A manifest name is one the skill
+ * author chose to publish, so it is safe to share. Without one a constant label
+ * is used: the on-disk basename (or any hash of it) can identify a repo, client or
+ * user, so nothing derived from the local path is ever sent.
  */
-function computeSkillHash(skillDir: string): string {
-  const skillMdPath = path.join(skillDir, 'SKILL.md');
-  if (!existsSync(skillMdPath)) return contentHash(skillDir);
-  const content = readFileSync(skillMdPath, 'utf-8');
-  return contentHash(content);
-}
+const UNNAMED_SKILL = 'unnamed-skill';
 
-/**
- * Privacy-safe skill name for Threat Cloud submission. A manifest name is one the
- * skill author chose to publish, so it is safe to share. The on-disk basename can
- * embed a repo / client / project / username, so when there is no manifest name we
- * send a short non-reversible label instead of leaking the local path.
- */
-function safeSkillName(manifestName: string | undefined, resolvedPath: string): string {
+function safeSkillName(manifestName: string | undefined, _resolvedPath: string): string {
   const trimmed = manifestName?.trim();
-  if (trimmed) return trimmed.slice(0, 64);
-  return `skill-${contentHash(path.basename(resolvedPath)).slice(0, 12)}`;
+  return trimmed ? trimmed.slice(0, 64) : UNNAMED_SKILL;
 }
 
 export function auditCommand(): Command {
@@ -236,26 +227,10 @@ export function auditCommand(): Command {
 
         // Collective-defense upload is OPT-IN, default OFF. `--no-cloud` is a hard
         // off-switch, but even with cloud not disabled we only upload when the user
-        // has EXPLICITLY opted in (threatCloudUploadEnabled === true in the guard
-        // config). Absent/unset config or any read error => OFF (no upload).
-        const cloudUploadAllowed = await (async (): Promise<boolean> => {
-          if (!options.cloud) return false;
-          try {
-            const { existsSync, readFileSync } = await import('node:fs');
-            const cfgPath = path.join(
-              process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.',
-              '.panguard-guard',
-              'config.json'
-            );
-            if (!existsSync(cfgPath)) return false;
-            const cfg = JSON.parse(readFileSync(cfgPath, 'utf-8')) as {
-              threatCloudUploadEnabled?: boolean;
-            };
-            return cfg.threatCloudUploadEnabled === true;
-          } catch {
-            return false;
-          }
-        })();
+        // has EXPLICITLY opted in (the single sharing predicate). Absent/unset
+        // config or any read error => OFF. Without it this command makes NO network
+        // call to Threat Cloud at all (no registration, no blacklist or rule download).
+        const cloudUploadAllowed = options.cloud && isThreatCloudUploadEnabled();
 
         // ── Detect URL vs local path ──
         let resolvedPath: string;
@@ -346,7 +321,7 @@ export function auditCommand(): Command {
           [key: string]: unknown;
         };
         const cloudRules: CloudATRRule[] = [];
-        if (options.cloud) {
+        if (cloudUploadAllowed) {
           try {
             const { ThreatCloudClient } = await import('@panguard-ai/panguard-guard');
             const dataDir = path.join(
@@ -601,7 +576,7 @@ export function auditCommand(): Command {
         // ── ATR rule proposal, kept LOCALLY (no consent needed) ──
         // Nothing leaves the machine here: the de-identified proposal waits in
         // ~/.panguard/proposals until the user submits it as a pre-filled public
-        // ATR issue (`pga proposals submit <id>`). Threat Cloud, below, is optional.
+        // ATR issue (`pga proposals submit <id>`). Proposals are never uploaded.
         if (
           (report.riskLevel === 'HIGH' || report.riskLevel === 'CRITICAL') &&
           report.findings.length > 0
@@ -624,66 +599,6 @@ export function auditCommand(): Command {
             console.log(
               `  ${c.dim(`${symbols.info} Detection rule proposal saved locally (${kept.id}). Review and send to ATR: pga proposals submit ${kept.id}`)}`
             );
-          }
-        }
-
-        // ── Flywheel: submit ATR proposal for HIGH/CRITICAL findings — OPT-IN ──
-        if (
-          cloudUploadAllowed &&
-          (report.riskLevel === 'HIGH' || report.riskLevel === 'CRITICAL') &&
-          report.findings.length > 0
-        ) {
-          try {
-            const { ThreatCloudClient } = await import('@panguard-ai/panguard-guard');
-            const dataDir = path.join(
-              process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.',
-              '.panguard-guard'
-            );
-            const tc = await ThreatCloudClient.create(options.tcEndpoint, dataDir);
-            const skillName = safeSkillName(report.manifest?.name, resolvedPath);
-
-            // Emit a VALID draft-request proposal (real evidence + needsLLMDraft),
-            // never a rule fabricated from finding-title keywords. See
-            // atr-proposal.ts for why the old title-keyword regex was scrapped (it
-            // detected our own report text and shipped no precision test). The
-            // server/Guard drafter builds the real, test-backed rule.
-            const proposal = buildSkillAuditProposal({
-              skillName,
-              riskLevel: report.riskLevel === 'CRITICAL' ? 'CRITICAL' : 'HIGH',
-              source: 'cli-auditor',
-              skillDir: resolvedPath,
-              findings: report.findings.map((f) => ({
-                id: f.id,
-                title: f.title,
-                severity: f.severity,
-                category: f.category,
-                location: f.location,
-                snippet: (f as { explain?: { snippet?: string } }).explain?.snippet,
-              })),
-            });
-            if (proposal) {
-              // Report the REAL result — submitATRProposal returns false when the
-              // backend rejects it (e.g. the evidence-only draft-request does not
-              // yet meet the rule quality bar). Never print "submitted" on a
-              // rejected/offline POST (that was a fake-green). The accepted
-              // contribution is the skill-threat shared above; the community rule
-              // is drafted from repeated reports.
-              const { withOutbox } = await import('@panguard-ai/panguard-guard');
-              const proposalAccepted = await withOutbox((p) => tc.submitATRProposal(p))(proposal);
-              if (!options.json) {
-                if (proposalAccepted) {
-                  console.log(
-                    `  ${c.green(symbols.pass)} ${c.dim('ATR rule proposal submitted to Threat Cloud')}`
-                  );
-                } else if (options.verbose) {
-                  console.log(
-                    `  ${c.dim(`${symbols.info} ATR proposal not accepted yet (needs community drafting); skill threat shared above`)}`
-                  );
-                }
-              }
-            }
-          } catch {
-            // ATR proposal submission is best-effort
           }
         }
 

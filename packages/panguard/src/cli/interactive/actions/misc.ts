@@ -193,7 +193,7 @@ export async function actionThreat(lang: Lang): Promise<void> {
     ThreatCloudServer = tc.ThreatCloudServer;
   } catch {
     console.log(c.red('  Threat Cloud server package is not available.'));
-    console.log(c.dim('  Your Guard client connects to Threat Cloud automatically.'));
+    console.log(c.dim('  Your Guard client connects to Threat Cloud only if you opt in.'));
     return;
   }
   const sp = spinner(

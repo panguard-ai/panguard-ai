@@ -57,12 +57,10 @@ export interface CloudSyncDeps {
 export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
   const { atrEngine, threatCloud, feedManager, config } = deps;
 
-  // Outbound collective-defense sharing is opt-in: it is allowed ONLY when the
-  // user has explicitly enabled it. Absent/unset config is treated as OFF (the
-  // gate is `=== true`, never `!== false`). This governs every OUTBOUND post in
-  // this function; the INBOUND indicator pulls below run regardless because they
-  // download community blocklists/lists and never reveal anything about this host.
-  const sharingOptedIn = config.threatCloudUploadEnabled === true;
+  // Every Threat Cloud request, downloads included, is gated on the explicit
+  // sharing opt-in (=== true, never !== false): defense in depth next to the
+  // caller and the offline client.
+  if (config.threatCloudUploadEnabled !== true) return;
 
   try {
     // NOTE: Detection RULES are intentionally NOT pulled from Threat Cloud here.
@@ -94,25 +92,9 @@ export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
       );
     }
 
-    // Report locally whitelisted skills to Threat Cloud (batch) — OUTBOUND
-    // collective-defense sharing, so only when the user has opted in.
-    if (sharingOptedIn) {
-      try {
-        const localSkills = atrEngine
-          .getWhitelistManager()
-          .getAll()
-          .filter((s) => s.source === 'fingerprint' || s.source === 'manual');
-        if (localSkills.length > 0) {
-          await threatCloud.reportSafeSkillsBatch(
-            localSkills.map((s) => ({ skillName: s.name, fingerprintHash: s.fingerprintHash }))
-          );
-        }
-      } catch (err: unknown) {
-        logger.warn(
-          `Skill whitelist upload failed: ${err instanceof Error ? err.message : String(err)}`
-        );
-      }
-    }
+    // Locally whitelisted tool names are NOT uploaded: runtime entries are the
+    // names of tools this agent calls (they can be internal names), so they stay
+    // on this machine.
 
     // Sync community skill whitelist (incremental after first sync)
     let importedSkills = 0;
@@ -219,22 +201,6 @@ export function getSkillThreatSubmitter(
 }
 
 /**
- * Get an ATR proposal submitter function for SkillWatcher flywheel integration.
- * Bridges skill audit findings into the ATR rule generation pipeline.
- */
-export function getATRProposalSubmitter(
-  threatCloud: ThreatCloudClient
-): (proposal: {
-  patternHash: string;
-  ruleContent: string;
-  llmProvider: string;
-  llmModel: string;
-  selfReviewVerdict: string;
-}) => Promise<boolean> {
-  return (proposal) => threatCloud.submitATRProposal(proposal);
-}
-
-/**
  * Get a skill blacklist checker function for SkillWatcher integration.
  * Checks if a skill name appears in the community blacklist from Threat Cloud.
  * Uses a 5-minute in-memory cache to avoid hitting TC on every check.
@@ -287,6 +253,22 @@ export interface RuleUpdateStatus {
   readonly currentVersion: string | null;
   readonly latestVersion: string | null;
   readonly checkedAt: string;
+}
+
+/**
+ * The daily rule-update check is a network call PanGuard makes whether or not the
+ * user joined Threat Cloud (a plain version lookup on the npm registry). It is
+ * off when the environment variable PANGUARD_NO_UPDATE_CHECK is 1, true or yes
+ * (an override that always wins), or when the config key `updateCheck` is false.
+ * Pure + exported for tests.
+ */
+export function ruleUpdateCheckEnabled(
+  env: NodeJS.ProcessEnv = process.env,
+  config: { readonly updateCheck?: boolean } = {}
+): boolean {
+  if (config.updateCheck === false) return false;
+  const v = (env['PANGUARD_NO_UPDATE_CHECK'] ?? '').trim().toLowerCase();
+  return !(v === '1' || v === 'true' || v === 'yes');
 }
 
 /**

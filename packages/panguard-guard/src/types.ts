@@ -581,6 +581,8 @@ export interface GuardConfig {
   threatCloudUploadEnabled?: boolean;
   /** Receive new ATR rules from Threat Cloud. ON by default; false pins to bundled rules. */
   threatCloudRuleSyncEnabled?: boolean;
+  /** Daily npm version lookups (the rules'). false turns them off; default on. */
+  updateCheck?: boolean;
   /**
    * Gap A: auto-pull the latest integrity-verified agent-threat-rules bundle
    * from npm and hot-reload it. Opt-in (default false). Auto-pulled rules

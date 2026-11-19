@@ -82,6 +82,7 @@ vi.mock('@panguard-ai/panguard-mcp/config', () => ({
   detectPlatforms: vi.fn().mockResolvedValue([]),
   injectMCPConfig: vi.fn(),
   removeMCPConfig: vi.fn(),
+  repinPanguardConfig: vi.fn().mockReturnValue([]),
   discoverAllSkills: vi.fn().mockResolvedValue([]),
   removeServer: vi.fn().mockReturnValue(true),
 }));

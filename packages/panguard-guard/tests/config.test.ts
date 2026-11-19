@@ -82,22 +82,30 @@ describe('loadConfig', () => {
     expect(config.actionPolicy.logOnly).toBe(0); // default
   });
 
+  it('turns host-level monitors off by default', () => {
+    expect(DEFAULT_GUARD_CONFIG.monitors.logMonitor).toBe(false);
+    expect(DEFAULT_GUARD_CONFIG.monitors.networkMonitor).toBe(false);
+    expect(DEFAULT_GUARD_CONFIG.monitors.processMonitor).toBe(false);
+    expect(DEFAULT_GUARD_CONFIG.monitors.fileMonitor).toBe(false);
+  });
+
   it('should merge nested monitors config', () => {
     const configPath = join(testDir, 'config.json');
     writeFileSync(
       configPath,
       JSON.stringify({
-        monitors: { logMonitor: false, networkMonitor: false },
+        monitors: { networkMonitor: true },
       })
     );
 
     const config = loadConfig(configPath);
 
+    // An explicit opt-in is honoured
+    expect(config.monitors.networkMonitor).toBe(true);
+    // Unspecified monitors keep the (off) defaults
     expect(config.monitors.logMonitor).toBe(false);
-    expect(config.monitors.networkMonitor).toBe(false);
-    // Unspecified monitors should keep defaults
-    expect(config.monitors.processMonitor).toBe(true);
-    expect(config.monitors.fileMonitor).toBe(true);
+    expect(config.monitors.processMonitor).toBe(false);
+    expect(config.monitors.fileMonitor).toBe(false);
   });
 
   it('should merge notifications config', () => {

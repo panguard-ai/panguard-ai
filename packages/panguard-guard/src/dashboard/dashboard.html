@@ -1547,10 +1547,10 @@
                 <div class="welcome-step-h">Join collective defense</div>
                 <div class="welcome-step-b">
                   Optionally let the attacks Guard blocks here help draft new open rules for
-                  everyone — and get the community's new rules back sooner. Shares only the matched
-                  rule ID(s), attack category, a coarse region, and a truncated IP;
-                  <strong>never your prompts, code, files, secrets, paths, or hostname</strong>. Off
-                  until you turn it on.
+                  everyone. Shares threat signatures and audit summaries and downloads community
+                  lists;
+                  <strong>never your prompts, code, files, secrets, paths, or hostname</strong>. The
+                  full list is in <code>pga config show --verbose</code>. Off until you turn it on.
                 </div>
                 <button type="button" class="btn btn-secondary btn-sm" data-goto="tcloud">
                   Open Threat Cloud &rarr;
@@ -2124,8 +2124,8 @@
         <div class="pd" data-i18n="d_tc">
           Threat Cloud is PanGuard's anonymous threat-intelligence network. It is
           <strong
-            >off by default — until you turn on Collective Defense below, nothing leaves this
-            machine.</strong
+            >off by default — until you turn on Collective Defense below, nothing is sent to
+            Threat Cloud.</strong
           >
           When you do enable it, your endpoint uploads anonymized threat signatures (no code, no
           file contents). New detection rules ship in the open ATR package — Guard checks once a day
@@ -2189,9 +2189,9 @@
           <div class="fs" style="margin-top: 20px">
             <h3>Collective defense</h3>
             <div class="desc">
-              Off by default. When you turn it on, every attack Guard blocks on this machine can
-              become a new ATR rule that protects everyone — and you get the community's new rules
-              back faster. More sensors means quicker detection for all of us.
+              Off by default. When you turn it on, an attack Guard blocks on this machine can help
+              draft a new ATR rule that protects everyone. Detection rules on this machine still
+              change only when you run <strong>pga upgrade</strong>.
             </div>
 
             <div class="cd-grid">
@@ -2199,7 +2199,10 @@
                 <div class="cd-box-title cd-good">What turning it on does for you</div>
                 <ul class="cd-list">
                   <li>Your blocked patterns help draft new open ATR rules.</li>
-                  <li>You receive community rule updates sooner.</li>
+                  <li>
+                    Guard downloads community block and allow lists every 5 minutes, plus public
+                    threat-intel feeds. Those servers see your IP address.
+                  </li>
                   <li>You can turn it off again at any time.</li>
                 </ul>
               </div>
@@ -2210,14 +2213,22 @@
                     <strong>Threat signatures &mdash; end-to-end sealed:</strong> the matched rule
                     ID(s), attack category + MITRE technique, a coarse country region, and a
                     truncated IP (last two octets zeroed). Sealed before it leaves this machine
-                    &mdash; only the Threat Cloud backend can open these, not the network or a relay.
+                    &mdash; only the Threat Cloud backend can open these, not the network or a
+                    relay.
                   </li>
                   <li>
-                    <strong>Flagged-skill contributions &mdash; over encrypted HTTPS (not E2E):</strong>
-                    when a skill is flagged, its name, the matched finding titles, and draft rule
-                    content, plus a stable pseudonymous install ID, are sent over TLS to help draft
-                    new community rules. These are readable by the Threat Cloud service (treat them
-                    as visible to the backend, not sealed end-to-end).
+                    <strong
+                      >Audit and scan summaries &mdash; over HTTPS (not end-to-end sealed):</strong
+                    >
+                    skill or MCP server names (never paths), hashes of their content, risk level and
+                    score, the rule ID, category, severity and title of each finding, scan counts,
+                    your OS and CPU type and the PanGuard version, with a stable pseudonymous
+                    install ID. The Threat Cloud service can read these.
+                  </li>
+                  <li>
+                    <strong>Rule-proposal drafter:</strong> sends short event descriptions to the AI
+                    model you configured (a cloud provider if you set an API key). Drafted rule
+                    proposals stay on this machine until you submit one yourself.
                   </li>
                   <li>
                     <strong>Never shared:</strong> your prompts, code, file contents, secrets, file
@@ -4344,11 +4355,13 @@
             'Turn on collective defense?\n\n' +
               'When Guard blocks an attack, it shares a minimal signature (matched rule ID + ' +
               'attack category + coarse region + truncated IP), sealed end-to-end — only the ' +
-              'Threat Cloud backend can open it.\n\nWhen a skill is flagged, its name + finding ' +
-              'titles + draft rule content (plus a pseudonymous install ID) are also sent, over ' +
-              'encrypted HTTPS — readable by the Threat Cloud service, not sealed end-to-end.\n\n' +
-              'Never shared: your prompts, code, file contents, secrets, file paths, hostname, or ' +
-              'username.\n\nYou can turn this off anytime.'
+              'Threat Cloud backend can open it.\n\nAudit and scan summaries (skill names, ' +
+              'content hashes, risk scores, finding IDs and titles; never paths) are sent over ' +
+              'HTTPS. Guard also downloads community block lists and public threat-intel feeds ' +
+              'every 5 minutes, and the rule drafter sends short event descriptions to the AI ' +
+              'model you configured.\n\nNever shared: your prompts, code, file contents, ' +
+              'secrets, file paths, hostname, or username.\n\nFull list: pga config show ' +
+              '--verbose. You can turn this off anytime.'
           );
           if (!ok) return;
         }
@@ -4365,7 +4378,7 @@
               toast(
                 !isOn
                   ? 'Collective defense ON — anonymized signatures will be shared.'
-                  : 'Collective defense OFF — nothing leaves this machine.'
+                  : 'Collective defense OFF — nothing is sent to Threat Cloud.'
               );
               loadTCloud();
             } else {

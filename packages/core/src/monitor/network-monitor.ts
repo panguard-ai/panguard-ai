@@ -353,6 +353,7 @@ export class NetworkMonitor extends EventEmitter {
   private async parseNetstat(): Promise<ActiveConnection[]> {
     const { stdout } = await execFileAsync('netstat', ['-an'], {
       timeout: 10000,
+      windowsHide: true,
     });
 
     const connections: ActiveConnection[] = [];

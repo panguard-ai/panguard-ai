@@ -12,8 +12,11 @@
  *
  * Privacy:
  *   - Raw adversarial payloads are NEVER uploaded. Only: rule_id, severity,
- *     target (path/URL), target_hash (sha256 of content), and a 1-line summary
- *     produced by the CLI.
+ *     target, target_hash (sha256 of content), and a 1-line summary produced
+ *     by the CLI.
+ *   - `target` never carries a local file path: a path is reduced to its
+ *     basename; a URL keeps scheme + host + pathname and drops userinfo,
+ *     query and fragment (see workspace-target.ts).
  *   - Endpoint identification: a stable hash of machine-id + logged-in user.
  *     Not the hostname itself, not the user's email.
  *
@@ -29,6 +32,7 @@ import { readFileSync, unlinkSync } from 'node:fs';
 import { homedir, hostname, platform } from 'node:os';
 import { join } from 'node:path';
 import { c, symbols } from '@panguard-ai/core';
+import { sanitizeSyncTarget } from './workspace-target.js';
 
 const DEFAULT_APP_URL = 'https://app.panguard.ai';
 const AUTH_JSON_RELATIVE = '.panguard/auth.json';
@@ -273,6 +277,7 @@ export function buildEventsFromAuditReport(args: {
   skillName?: string;
 }): WorkspaceEvent[] {
   const out: WorkspaceEvent[] = [];
+  const target = sanitizeSyncTarget(args.target);
 
   // One event per rule match — this is the unit of compliance evidence.
   for (const f of args.findings) {
@@ -281,7 +286,7 @@ export function buildEventsFromAuditReport(args: {
       event_type: 'scan.rule_match',
       severity: normalizeSeverity(typeof f.severity === 'string' ? f.severity : undefined),
       rule_id: f.ruleId,
-      target: args.target,
+      target,
       ...(args.targetHash ? { target_hash: args.targetHash } : {}),
       payload_summary: (typeof f.title === 'string' ? f.title : `${f.ruleId} match`).slice(0, 200),
       metadata: {
@@ -295,7 +300,7 @@ export function buildEventsFromAuditReport(args: {
   out.push({
     event_type: 'scan.completed',
     severity: 'info',
-    target: args.target,
+    target,
     ...(args.targetHash ? { target_hash: args.targetHash } : {}),
     payload_summary: `Scan completed — risk=${args.riskLevel}, score=${args.riskScore}, findings=${args.findings.length}`,
     metadata: {
