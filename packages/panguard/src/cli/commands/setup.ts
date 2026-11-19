@@ -230,10 +230,14 @@ export function setupCommand(): Command {
         // A platform that already has Panguard configured is skipped below, so an
         // entry written by an older release (unpinned or another version) is
         // brought to this version's pinned spec here, keeping env and other fields.
-        if (!options.remove && mcpConfig.repinPanguardConfig) {
-          mcpConfig.repinPanguardConfig(
-            allPlatforms.filter((p) => p.detected && p.alreadyConfigured).map((p) => p.id)
-          );
+        if (!options.remove) {
+          try {
+            mcpConfig.repinPanguardConfig?.(
+              allPlatforms.filter((p) => p.detected && p.alreadyConfigured).map((p) => p.id)
+            );
+          } catch {
+            // Re-pinning is best effort; it must never break setup.
+          }
         }
 
         // Filter to target platform if specified
