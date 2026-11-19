@@ -35,4 +35,16 @@ describe('computeSkillHash', () => {
     writeFileSync(join(b, 'src', 'index.js'), 'run2()');
     expect(computeSkillHash(a)).not.toBe(computeSkillHash(b));
   });
+
+  it('hashes a single file by its content', () => {
+    const f1 = join(a, 'one.md');
+    const f2 = join(a, 'two.md');
+    const f3 = join(b, 'one.md');
+    writeFileSync(f1, '# one');
+    writeFileSync(f2, '# two');
+    writeFileSync(f3, '# one');
+    expect(computeSkillHash(f1)).toBe(contentHash('# one'));
+    expect(computeSkillHash(f1)).not.toBe(computeSkillHash(f2));
+    expect(computeSkillHash(f1)).toBe(computeSkillHash(f3));
+  });
 });

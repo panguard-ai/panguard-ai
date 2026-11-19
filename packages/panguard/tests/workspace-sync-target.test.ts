@@ -20,6 +20,13 @@ describe('sanitizeSyncTarget', () => {
     ).toBe('https://github.com/acme/skill/tree/main');
   });
 
+  it('keeps prefixed remote identifiers (they are not local paths)', () => {
+    expect(sanitizeSyncTarget('github:owner/repo/SKILL.md')).toBe('github:owner/repo/SKILL.md');
+    expect(sanitizeSyncTarget('clawhub:owner/skill')).toBe('clawhub:owner/skill');
+    // a Windows drive path is still a local path
+    expect(sanitizeSyncTarget('C:\\Users\\alice\\skill')).toBe('skill');
+  });
+
   it('never leaks a path or credentials and has a fallback', () => {
     expect(sanitizeSyncTarget('')).toBe('unknown');
     expect(sanitizeSyncTarget('/')).toBe('unknown');
