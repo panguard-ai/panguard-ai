@@ -1106,7 +1106,9 @@ async function showFirstRunWelcome(dashboardPort: number, atrRuleCount: number):
   // from the engine, so the banner tells the truth about what's enforcing.
   console.log(`    ${symbols.pass} Auto-audits skills with ${atrRuleCount} ATR threat rules`);
   console.log(`    ${symbols.pass} Blocks critical threats, alerts on suspicious ones`);
-  console.log(`    ${symbols.pass} Syncs community threat intelligence via Threat Cloud`);
+  console.log(
+    `    ${c.dim('-')} Collective defense (Threat Cloud): off until you opt in ${c.dim('(pga config show --verbose)')}`
+  );
   console.log('');
   console.log(divider());
   console.log('');
