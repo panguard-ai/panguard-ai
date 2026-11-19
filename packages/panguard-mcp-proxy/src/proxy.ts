@@ -34,6 +34,7 @@ import {
   EvaluationDeadlineError,
   EVALUATION_ERROR_SENTINEL,
   DEFAULT_EVAL_DEADLINE_MS,
+  MAX_TOOL_INPUT_SCAN_CHARS,
   loadRulesOrInline,
 } from './evaluator.js';
 import type { EvalResult, EvaluationIsolation } from './evaluator.js';
@@ -390,7 +391,13 @@ export class MCPProxy {
     outcome: string;
     confidence: number;
     matchedRules: readonly string[];
+    segmented?: boolean;
   }): void {
+    // A verdict from a windowed scan of long input never escalates the session:
+    // broad rules fire on large ordinary files, and max-confidence across many
+    // windows makes a high-confidence match likely, so one big write could lock
+    // every later call out through the inline gate.
+    if (verdict.segmented) return;
     // Normalize confidence to a 0-100 scale before the threshold check: the ATR
     // engine reports match confidence on a 0-1 scale, so comparing it raw to a
     // 0-100 threshold (95) made this escalation NEVER fire for a real deny.
@@ -567,8 +574,9 @@ export class MCPProxy {
       // exception this is a superset of the mcp_exchange rules, so nothing that
       // 'mcp_exchange' caught is lost. (The old default silently skipped ~44
       // tool_call rules on every MCP call.) Arguments over 100,000 chars are
-      // scanned in windows, like a long response; the evaluator's deadline
-      // bounds how long that takes.
+      // scanned in windows, like a long response (only stable rules deny,
+      // and such a verdict never escalates the session); only the first 256KB
+      // are scanned, as for a response; the evaluator's deadline bounds the time.
       let preResult: EvalResult;
       const preStart = Date.now();
       try {
@@ -584,10 +592,17 @@ export class MCPProxy {
         phase: 'pre',
         tool: name,
         outcome: preResult.outcome,
-        reason: preResult.reason,
+        reason: preResult.inputCapped
+          ? `${preResult.reason} [input capped: only the first ${MAX_TOOL_INPUT_SCAN_CHARS} chars scanned]`
+          : preResult.reason,
         rules: preResult.matchedRules,
         ms: preResult.durationMs,
       });
+      if (preResult.inputCapped) {
+        process.stderr.write(
+          `[panguard-proxy] NOTE: ${name} arguments over ${MAX_TOOL_INPUT_SCAN_CHARS} chars; only the first ${MAX_TOOL_INPUT_SCAN_CHARS} were scanned.\n`
+        );
+      }
 
       // Close the dual-path loop: a high-confidence deny escalates the session.
       this.recordEvalVerdict(preResult);
