@@ -150,6 +150,8 @@ Detection results depend on the ATR version, so they are published with the rule
 
 PanGuard is on-device by default. Joining Collective Defense (Threat Cloud) is **off until you opt in**, and one switch controls it: `pga config set threat-cloud true|false` (`telemetry` is the same switch). The full text you agree to is `pga config show --verbose`; it is the single source this section follows.
 
+**Status, checked 2026-11-18:** the Threat Cloud service is offline, so uploads to it and its community lists do not go through even if you opt in. Third-party feeds and the drafter's model calls do not depend on Threat Cloud.
+
 **If you opt in**, PanGuard:
 
 1. Shares **minimal threat signatures**: the matched rule ID, attack category, MITRE technique, a coarse country region and a truncated IP (last two octets zeroed). These are **end-to-end encrypted** on your machine to the Threat Cloud ingest key; only the backend can read them. This is the only traffic that is sealed today.
