@@ -52,7 +52,7 @@ interface CacheData {
  * 集體情報分享的威脅雲客戶端
  */
 export class ThreatCloudClient {
-  private readonly endpoint: string | undefined;
+  private endpoint: string | undefined;
   private readonly apiKey: string | undefined;
   private readonly dataDir: string;
   private readonly clientId: string;
@@ -246,6 +246,19 @@ export class ThreatCloudClient {
       this.status = 'disconnected';
       return false;
     }
+  }
+
+  /**
+   * Switch this client to offline mode for good: no further request is made, the
+   * flush timer is stopped and anything still buffered for upload is dropped.
+   * Used when the user withdraws consent while the daemon is running.
+   */
+  goOffline(): void {
+    this.stopFlushTimer();
+    this.endpoint = undefined;
+    this.status = 'offline';
+    this.uploadBuffer = [];
+    logger.info('Threat Cloud switched to offline mode (sharing turned off)');
   }
 
   /**

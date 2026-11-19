@@ -21,6 +21,7 @@ import { loadGuardConfig, updateGuardConfig } from '../guard-config.js';
 import { saveLang } from '../interactive/lang.js';
 import { printCollectiveDefenseDisclosure } from '../consent.js';
 import { sharingPatch } from '../sharing-switch.js';
+import { applySharingToRunningGuard, describeOutcome } from '../apply-sharing.js';
 import type { SharingKey } from '../sharing-switch.js';
 
 /**
@@ -82,6 +83,11 @@ export function configCommand(): Command {
       await updateGuardConfig({ ...config, ...patch });
       for (const [flag, flagValue] of Object.entries(patch)) {
         console.log(`  ${c.safe(flag)} set to ${c.bold(String(flagValue))}`);
+      }
+      const outcome = await applySharingToRunningGuard(boolValue);
+      console.log(`  ${c.dim(describeOutcome(outcome))}`);
+      if (boolValue) {
+        console.log(`  ${c.dim('What sharing sends: pga config show --verbose')}`);
       }
     });
 

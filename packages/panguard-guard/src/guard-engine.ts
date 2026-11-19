@@ -288,11 +288,16 @@ export class GuardEngine {
     // Every Threat Cloud request, downloads included, is part of collective
     // defense and runs ONLY when the user has opted in (=== true). Without
     // consent no timer is created and no request is made.
+    const currentConfig = (): GuardConfig => this.config;
     const syncDeps = {
       atrEngine: this.engines.atrEngine,
       threatCloud: this.engines.threatCloud,
       feedManager: this.engines.feedManager,
-      config: this.config,
+      // Read the CURRENT config on every sync, so a consent change applied to this
+      // live instance reaches the timer without a restart.
+      get config(): GuardConfig {
+        return currentConfig();
+      },
     };
     if (this.config.threatCloudUploadEnabled === true) {
       this.cloudSyncTimer = setupCloudSyncTimer(syncDeps);
@@ -955,7 +960,11 @@ export class GuardEngine {
    * snapping the control back.
    */
   applyConfig(newConfig: GuardConfig): void {
+    const wasSharing = this.config.threatCloudUploadEnabled === true;
     this.config = newConfig;
+    if (wasSharing && newConfig.threatCloudUploadEnabled !== true) {
+      this.stopSharing();
+    }
     const nextMode = newConfig.mode;
     if (nextMode && nextMode !== this.mode) {
       this.mode = nextMode;
@@ -970,6 +979,28 @@ export class GuardEngine {
     if (this.dashboard) {
       this.updateDashboardStatus();
     }
+  }
+
+  /**
+   * Withdraw consent on a running instance: stop the Threat Cloud sync timer, the
+   * public feed downloads and the rule-proposal drafter, and make the Threat Cloud
+   * client offline. Turning sharing back ON needs a restart (the client is created
+   * offline when sharing is off).
+   */
+  private stopSharing(): void {
+    if (this.cloudSyncTimer) {
+      clearInterval(this.cloudSyncTimer);
+      this.cloudSyncTimer = null;
+    }
+    this.engines.feedManager.stop();
+    this.engines.atrDrafter?.stop();
+    this.engines.threatCloud.goOffline();
+    logger.info('Sharing turned off: sync, feed downloads and drafter stopped');
+  }
+
+  /** The config this instance is currently running with. */
+  getConfig(): GuardConfig {
+    return this.config;
   }
 
   /**

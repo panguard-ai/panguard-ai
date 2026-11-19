@@ -98,6 +98,7 @@ export class ATRDrafter {
   private readonly patterns = new Map<string, LocalPattern>();
   private readonly submittedPatterns = new Set<string>();
   private cycleTimer: ReturnType<typeof setInterval> | null = null;
+  private initialTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private readonly llm: AnalyzeLLM,
@@ -199,7 +200,7 @@ export class ATRDrafter {
     if (this.cycleTimer) return;
 
     // Run first cycle after a delay to accumulate some events
-    setTimeout(() => void this.runDraftCycle(), 30 * 60 * 1000); // 30 min initial delay
+    this.initialTimer = setTimeout(() => void this.runDraftCycle(), 30 * 60 * 1000); // 30 min initial delay
 
     this.cycleTimer = setInterval(() => void this.runDraftCycle(), this.config.windowMs);
 
@@ -214,6 +215,10 @@ export class ATRDrafter {
    * 停止草稿產生週期
    */
   stop(): void {
+    if (this.initialTimer) {
+      clearTimeout(this.initialTimer);
+      this.initialTimer = null;
+    }
     if (this.cycleTimer) {
       clearInterval(this.cycleTimer);
       this.cycleTimer = null;

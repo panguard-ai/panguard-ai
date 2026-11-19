@@ -12,19 +12,29 @@ import type { EnvironmentBaseline, GuardConfig } from '../src/types.js';
 // Mocks - must be set up before importing the module under test
 // ---------------------------------------------------------------------------
 
-const { monitorEngineCtor, feedStart, processWatcherStart, processWatcherCtor, syncSpy, timerSpy } =
-  vi.hoisted(() => ({
-    monitorEngineCtor: vi.fn().mockImplementation(() => ({
-      on: vi.fn(),
-      start: vi.fn(),
-      stop: vi.fn(),
-    })),
-    feedStart: vi.fn().mockResolvedValue(undefined),
-    processWatcherStart: vi.fn().mockResolvedValue(undefined),
-    processWatcherCtor: vi.fn(),
-    syncSpy: vi.fn().mockResolvedValue(undefined),
-    timerSpy: vi.fn().mockReturnValue(setTimeout(() => undefined, 0)),
-  }));
+const {
+  monitorEngineCtor,
+  feedStart,
+  feedStop,
+  goOffline,
+  processWatcherStart,
+  processWatcherCtor,
+  syncSpy,
+  timerSpy,
+} = vi.hoisted(() => ({
+  monitorEngineCtor: vi.fn().mockImplementation(() => ({
+    on: vi.fn(),
+    start: vi.fn(),
+    stop: vi.fn(),
+  })),
+  feedStart: vi.fn().mockResolvedValue(undefined),
+  feedStop: vi.fn(),
+  goOffline: vi.fn(),
+  processWatcherStart: vi.fn().mockResolvedValue(undefined),
+  processWatcherCtor: vi.fn(),
+  syncSpy: vi.fn().mockResolvedValue(undefined),
+  timerSpy: vi.fn().mockReturnValue(setTimeout(() => undefined, 0)),
+}));
 
 vi.mock('../src/watchers/process-watcher.js', () => ({
   ProcessWatcher: vi.fn().mockImplementation(() => {
@@ -57,7 +67,7 @@ vi.mock('@panguard-ai/core', async () => {
     MonitorEngine: monitorEngineCtor,
     ThreatIntelFeedManager: vi.fn().mockImplementation(() => ({
       start: feedStart,
-      stop: vi.fn(),
+      stop: feedStop,
       getIoCCount: vi.fn().mockReturnValue(0),
       getIPCount: vi.fn().mockReturnValue(0),
       addExternalIPs: vi.fn().mockReturnValue(0),
@@ -210,6 +220,7 @@ vi.mock('../src/threat-cloud/index.js', () => {
     flushQueue: mockFlushQueue,
     getStatus: vi.fn().mockReturnValue('connected'),
     stopFlushTimer: vi.fn(),
+    goOffline,
   };
   const MockedClient = vi.fn().mockImplementation(() => mockInstance);
   // Static async factory used by initEngines() for auto-provisioning TC sensor keys
@@ -366,5 +377,26 @@ describe('GuardEngine.start() follows the config', () => {
     expect(timerSpy).toHaveBeenCalledTimes(1);
     expect(syncSpy).toHaveBeenCalledTimes(1);
     expect(feedStart).toHaveBeenCalledTimes(1);
+  });
+
+  it('withdrawing consent on a running instance stops sync, feeds and the client', async () => {
+    engine = await startEngine({ threatCloudUploadEnabled: true });
+    feedStop.mockClear();
+    goOffline.mockClear();
+
+    engine.applyConfig({ ...engine.getConfig(), threatCloudUploadEnabled: false });
+
+    expect(feedStop).toHaveBeenCalledTimes(1);
+    expect(goOffline).toHaveBeenCalledTimes(1);
+    expect(engine.getConfig().threatCloudUploadEnabled).toBe(false);
+  });
+
+  it('applying a config that keeps sharing on changes nothing', async () => {
+    engine = await startEngine({ threatCloudUploadEnabled: true });
+    feedStop.mockClear();
+    goOffline.mockClear();
+    engine.applyConfig({ ...engine.getConfig(), mode: 'learning' });
+    expect(feedStop).not.toHaveBeenCalled();
+    expect(goOffline).not.toHaveBeenCalled();
   });
 });
