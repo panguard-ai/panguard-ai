@@ -21,11 +21,15 @@ import {
 } from 'node:fs';
 import { dirname, join, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execFileSync } from 'node:child_process';
 import { createLogger } from '@panguard-ai/core';
 import type { PlatformId } from './platform-detector.js';
 import { getConfigPath } from './platform-detector.js';
 import { MCP_PACKAGE, PROXY_PACKAGE, isSpecOf, pinnedSpec } from './package-spec.js';
+import {
+  installClaudeCodeEntry,
+  removeClaudeCodeEntry,
+  repinClaudeCodeEntry,
+} from './claude-code-mcp.js';
 
 const logger = createLogger('panguard-mcp:injector');
 
@@ -141,55 +145,6 @@ function injectClaudeDesktop(configPath: string): void {
 }
 
 /**
- * Inject Panguard MCP config for Claude Code.
- * Claude Code uses `claude mcp add` CLI (not JSON file).
- * Falls back to writing settings.local.json if CLI not available.
- */
-function injectClaudeCode(_configPath: string): void {
-  try {
-    // Drop any existing (possibly unpinned) entry so the add below writes the
-    // pinned form; a missing entry is not an error.
-    try {
-      execFileSync('claude', ['mcp', 'remove', '--scope', 'user', 'panguard'], {
-        timeout: 15_000,
-        stdio: 'pipe',
-      });
-    } catch {
-      /* no existing entry */
-    }
-    // Try `claude mcp add` first (the correct way for Claude Code)
-    execFileSync(
-      'claude',
-      [
-        'mcp',
-        'add',
-        '--scope',
-        'user',
-        'panguard',
-        '--',
-        'npx',
-        '-y',
-        ...PANGUARD_MCP_ENTRY.args.slice(1),
-      ],
-      {
-        timeout: 15_000,
-        stdio: 'pipe',
-        windowsHide: true,
-      }
-    );
-    logger.info('Added Panguard MCP via `claude mcp add --scope user`');
-  } catch {
-    // Fallback: write JSON directly (older Claude Code versions)
-    logger.warn('`claude mcp add` failed, falling back to JSON config');
-    const config = readJsonSafe(_configPath);
-    const servers = (config['mcpServers'] as Record<string, unknown>) ?? {};
-    servers['panguard'] = { ...PANGUARD_MCP_ENTRY };
-    config['mcpServers'] = servers;
-    atomicWriteJson(_configPath, config);
-  }
-}
-
-/**
  * Inject Panguard MCP config for Cursor.
  * Cursor uses: { "mcpServers": { "panguard": { "command": "...", "args": [...] } } }
  * in ~/.cursor/mcp.json
@@ -266,15 +221,18 @@ export function injectMCPConfig(platformId: PlatformId): InjectionResult {
   const result: InjectionResult = { platformId, success: false, configPath };
 
   try {
-    ensureDir(configPath);
-    result.backupPath = backupFile(configPath);
+    // Claude Code is managed through its own CLI, not through a file we write.
+    if (platformId !== 'claude-code') {
+      ensureDir(configPath);
+      result.backupPath = backupFile(configPath);
+    }
 
     switch (platformId) {
       case 'claude-desktop':
         injectClaudeDesktop(configPath);
         break;
       case 'claude-code':
-        injectClaudeCode(configPath);
+        installClaudeCodeEntry();
         break;
       case 'cursor':
         injectCursor(configPath);
@@ -297,25 +255,10 @@ export function injectMCPConfig(platformId: PlatformId): InjectionResult {
 
     // Verify the write succeeded
     if (platformId === 'claude-code') {
-      // Claude Code: verify via `claude mcp list`
-      try {
-        const output = execFileSync('claude', ['mcp', 'list'], {
-          timeout: 10_000,
-          stdio: 'pipe',
-          windowsHide: true,
-        }).toString();
-        if (output.includes('panguard')) {
-          result.success = true;
-          logger.info('Verified Panguard MCP in Claude Code via `claude mcp list`');
-        } else {
-          // Might take a moment to register, assume success if inject didn't throw
-          result.success = true;
-          logger.info('Panguard MCP added to Claude Code (pending verification)');
-        }
-      } catch {
-        result.success = true; // inject didn't throw, assume OK
-        logger.info('Panguard MCP injected into Claude Code');
-      }
+      // installClaudeCodeEntry() threw if the add failed; reaching here means
+      // `claude mcp add` (or an existing entry of ours / a custom one) is in place.
+      result.success = true;
+      logger.info('Panguard MCP configured in Claude Code via the claude CLI');
     } else if (platformId === 'openclaw') {
       // OpenClaw uses SKILL.md, not JSON
       if (existsSync(join(configPath, 'SKILL.md'))) {
@@ -364,6 +307,12 @@ export function removeMCPConfig(platformId: PlatformId): InjectionResult {
       return result;
     }
 
+    if (platformId === 'claude-code') {
+      removeClaudeCodeEntryAndLegacyFile(configPath);
+      result.success = true;
+      return result;
+    }
+
     if (!existsSync(configPath)) {
       result.success = true;
       return result;
@@ -388,6 +337,28 @@ export function removeMCPConfig(platformId: PlatformId): InjectionResult {
 }
 
 /**
+ * Claude Code removal: only via `claude mcp remove`, and only for an entry that
+ * is one of our npx specs. A panguard key that an older release wrote into
+ * ~/.claude/settings.local.json (which Claude Code does not load) is cleaned up.
+ */
+function removeClaudeCodeEntryAndLegacyFile(legacyPath: string): void {
+  try {
+    removeClaudeCodeEntry();
+  } catch (err) {
+    logger.warn(`claude mcp remove failed: ${err instanceof Error ? err.message : String(err)}`);
+    throw err;
+  }
+  if (!existsSync(legacyPath)) return;
+  const config = readJsonSafe(legacyPath);
+  const servers = config['mcpServers'] as Record<string, unknown> | undefined;
+  if (servers && 'panguard' in servers) {
+    backupFile(legacyPath);
+    const { panguard: _removed, ...rest } = servers;
+    atomicWriteJson(legacyPath, { ...config, mcpServers: rest });
+  }
+}
+
+/**
  * Inject Panguard MCP config into all detected platforms.
  * 將 Panguard MCP 設定注入所有偵測到的平台。
  */
@@ -401,6 +372,58 @@ export async function injectAll(platformIds: PlatformId[]): Promise<InjectionRes
  */
 export function getInstallCommand(): string {
   return 'npx panguard setup';
+}
+
+// ── Re-pinning an existing panguard entry ────────────────────
+
+/**
+ * Rewrite panguard's own MCP entry to the pinned spec when it is one of our
+ * npx specs at another version (or unpinned). Other fields (env, ...) are kept.
+ * Returns the same object when nothing needs to change.
+ */
+function repinPanguardEntry(server: Record<string, unknown>): Record<string, unknown> {
+  const args = Array.isArray(server['args']) ? (server['args'] as unknown[]) : [];
+  const spec = pinnedSpec(MCP_PACKAGE);
+  const idx = args.findIndex((a) => isSpecOf(a, MCP_PACKAGE));
+  if (idx === -1 || args[idx] === spec) return server;
+  return { ...server, args: args.map((a, i) => (i === idx ? spec : a)) };
+}
+
+function repinJsonPlatform(configPath: string): boolean {
+  if (!existsSync(configPath)) return false;
+  const config = readJsonSafe(configPath);
+  const servers = config['mcpServers'] as Record<string, unknown> | undefined;
+  const entry = servers?.['panguard'];
+  if (!servers || !entry || typeof entry !== 'object') return false;
+  const repinned = repinPanguardEntry(entry as Record<string, unknown>);
+  if (repinned === entry) return false;
+  backupFile(configPath);
+  atomicWriteJson(configPath, { ...config, mcpServers: { ...servers, panguard: repinned } });
+  return true;
+}
+
+/**
+ * Bring an already-configured panguard entry on each platform to the pinned
+ * spec. Platforms without our entry, and customised entries, are not touched.
+ * Returns the ids of the platforms that were rewritten.
+ */
+export function repinPanguardConfig(platformIds: readonly PlatformId[]): PlatformId[] {
+  const changed: PlatformId[] = [];
+  for (const platformId of platformIds) {
+    if (platformId === 'openclaw') continue;
+    try {
+      const didChange =
+        platformId === 'claude-code'
+          ? repinClaudeCodeEntry() === 'repinned'
+          : repinJsonPlatform(getConfigPath(platformId));
+      if (didChange) changed.push(platformId);
+    } catch (err) {
+      logger.warn(
+        `Could not re-pin Panguard MCP on ${platformId}: ${err instanceof Error ? err.message : String(err)}`
+      );
+    }
+  }
+  return changed;
 }
 
 // ── Proxy Injection ──────────────────────────────────────────
@@ -531,10 +554,13 @@ function injectProxyForJsonPlatform(
         continue;
       }
 
-      // Skip panguard's own entries
+      // Panguard's own entries are never proxied, but an older/unpinned spec is
+      // upgraded in place
       if (isPanguardEntry(name, server)) {
-        updatedServers[name] = server;
+        const repinned = name === 'panguard' ? repinPanguardEntry(server) : server;
+        updatedServers[name] = repinned;
         result.serversSkipped++;
+        if (repinned !== server) changed = true;
         continue;
       }
 

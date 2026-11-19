@@ -18,7 +18,12 @@ vi.mock('../src/config/platform-detector.js', async () => {
   return { ...actual, getConfigPath: () => state.configPath };
 });
 
-import { injectMCPConfig, injectProxy, removeProxy } from '../src/config/mcp-injector.js';
+import {
+  injectMCPConfig,
+  injectProxy,
+  removeProxy,
+  repinPanguardConfig,
+} from '../src/config/mcp-injector.js';
 import { SELF_VERSION, isSpecOf } from '../src/config/package-spec.js';
 
 const readServers = (p: string): Record<string, { command: string; args: string[] }> =>
@@ -108,14 +113,64 @@ describe('pinned npx specs', () => {
       'node',
       'server.js',
     ]);
-    // panguard's own entry is not wrapped
-    expect(servers['panguard']!.args).toEqual(['-y', '@panguard-ai/panguard-mcp']);
+    // panguard's own entry is not wrapped, but is upgraded to the pinned spec
+    expect(servers['panguard']!.args).toEqual(['-y', `@panguard-ai/panguard-mcp@${SELF_VERSION}`]);
 
     removeProxy(['cursor']);
     expect(readServers(state.configPath)['fs']).toEqual({
       command: 'node',
       args: ['server.js'],
     });
+  });
+
+  it('repinPanguardConfig upgrades an older entry in place and keeps env and other fields', () => {
+    writeFileSync(
+      state.configPath,
+      JSON.stringify({
+        mcpServers: {
+          panguard: {
+            command: 'npx',
+            args: ['-y', '@panguard-ai/panguard-mcp@0.0.1'],
+            env: { FOO: 'bar' },
+            disabled: false,
+          },
+          other: { command: 'node', args: ['x.js'] },
+        },
+      })
+    );
+    expect(repinPanguardConfig(['cursor'])).toEqual(['cursor']);
+    const servers = readServers(state.configPath) as Record<string, Record<string, unknown>>;
+    expect(servers['panguard']).toEqual({
+      command: 'npx',
+      args: ['-y', `@panguard-ai/panguard-mcp@${SELF_VERSION}`],
+      env: { FOO: 'bar' },
+      disabled: false,
+    });
+    expect(servers['other']).toEqual({ command: 'node', args: ['x.js'] });
+    // already pinned: nothing to do
+    expect(repinPanguardConfig(['cursor'])).toEqual([]);
+  });
+
+  it('repinPanguardConfig leaves a customised entry alone', () => {
+    const custom = { command: 'node', args: ['/opt/panguard/server.js'] };
+    writeFileSync(state.configPath, JSON.stringify({ mcpServers: { panguard: custom } }));
+    expect(repinPanguardConfig(['cursor'])).toEqual([]);
+    expect(readServers(state.configPath)['panguard']).toEqual(custom);
+  });
+
+  it('injectProxy (the pga up path) upgrades the panguard entry but does not proxy it', () => {
+    writeFileSync(
+      state.configPath,
+      JSON.stringify({
+        mcpServers: { panguard: { command: 'npx', args: ['-y', '@panguard-ai/panguard-mcp'] } },
+      })
+    );
+    const summary = injectProxy(['cursor']);
+    expect(summary.totalServersProxied).toBe(0);
+    expect(readServers(state.configPath)['panguard']!.args).toEqual([
+      '-y',
+      `@panguard-ai/panguard-mcp@${SELF_VERSION}`,
+    ]);
   });
 
   it('isSpecOf matches pinned and unpinned forms only for the exact package name', () => {

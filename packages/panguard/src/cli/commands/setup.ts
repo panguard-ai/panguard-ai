@@ -201,6 +201,7 @@ export function setupCommand(): Command {
             configPath?: string;
             error?: string;
           };
+          repinPanguardConfig?: (platformIds: readonly string[]) => string[];
         }>);
         const { detectPlatforms, injectMCPConfig, removeMCPConfig } = mcpConfig;
 
@@ -225,6 +226,15 @@ export function setupCommand(): Command {
         }
 
         const allPlatforms = await detectPlatforms();
+
+        // A platform that already has Panguard configured is skipped below, so an
+        // entry written by an older release (unpinned or another version) is
+        // brought to this version's pinned spec here, keeping env and other fields.
+        if (!options.remove && mcpConfig.repinPanguardConfig) {
+          mcpConfig.repinPanguardConfig(
+            allPlatforms.filter((p) => p.detected && p.alreadyConfigured).map((p) => p.id)
+          );
+        }
 
         // Filter to target platform if specified
         const validIds = [

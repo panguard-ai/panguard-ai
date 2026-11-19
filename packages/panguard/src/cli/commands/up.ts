@@ -362,6 +362,7 @@ export function upCommand(): Command {
         // Captured during detection, used to inject AFTER the scan completes.
         let detectedPlatforms: Array<{ id: string; name: string; detected: boolean }> = [];
         let injectProxyFn: InjectFn | null = null;
+        let repinFn: ((ids: readonly string[]) => string[]) | null = null;
         try {
           let detectPlatforms: DetectFn;
           try {
@@ -369,9 +370,11 @@ export function upCommand(): Command {
             const mcp = (await import('@panguard-ai/panguard-mcp/config' as string)) as {
               detectPlatforms: DetectFn;
               injectProxy: InjectFn;
+              repinPanguardConfig?: (ids: readonly string[]) => string[];
             };
             detectPlatforms = mcp.detectPlatforms;
             injectProxyFn = mcp.injectProxy;
+            repinFn = mcp.repinPanguardConfig ?? null;
           } catch {
             // Monorepo fallback: resolve from cwd
             const { resolve } = await import('node:path');
@@ -380,9 +383,11 @@ export function upCommand(): Command {
             const mcp = (await import(pathToFileURL(mcpDist).href)) as {
               detectPlatforms: DetectFn;
               injectProxy: InjectFn;
+              repinPanguardConfig?: (ids: readonly string[]) => string[];
             };
             detectPlatforms = mcp.detectPlatforms;
             injectProxyFn = mcp.injectProxy;
+            repinFn = mcp.repinPanguardConfig ?? null;
           }
 
           console.log(
@@ -714,6 +719,8 @@ export function upCommand(): Command {
             );
           } else {
             console.log(`\n  ${shield()} ${c.bold('Watching your agents...')}\n`);
+            // Bring an older / unpinned panguard MCP entry to this version's pinned spec.
+            repinFn?.(detectedPlatforms.map((p) => p.id));
             const proxySummary = injectProxyFn(detectedPlatforms.map((p) => p.id));
             platformCount = proxySummary.totalPlatforms;
             serverCount = proxySummary.totalServersProxied;

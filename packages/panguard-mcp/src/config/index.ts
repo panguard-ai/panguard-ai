@@ -14,6 +14,7 @@ export {
   getInstallCommand,
   injectProxy,
   removeProxy,
+  repinPanguardConfig,
 } from './mcp-injector.js';
 export type {
   InjectionResult,
