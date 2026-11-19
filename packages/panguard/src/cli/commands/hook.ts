@@ -800,7 +800,11 @@ export async function runHook(
         'command',
         { input: norm.content },
         'tool_call',
-        true
+        true,
+        // No scan cap here: stdin is capped by the reader above and the scan by
+        // the time limit. Long content is scanned in windows (only stable rules
+        // block) — see ProxyEvaluator.evaluateToolCall for the known limits.
+        Number.POSITIVE_INFINITY
       );
     } catch (err) {
       if (err instanceof EvaluationDeadlineError)
