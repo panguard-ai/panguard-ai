@@ -46,7 +46,7 @@ graph TB
 
     subgraph Cloud["Cloud Layer"]
         TC["Threat Cloud"]
-        TI["Threat Intel Feeds<br/>ThreatFox | URLhaus<br/>Feodo | GreyNoise<br/>AbuseIPDB"]
+        TI["Threat Intel Feeds<br/>ThreatFox | URLhaus<br/>Feodo | GreyNoise<br/>NetAPI | AbuseIPDB"]
         LLM["AI Providers<br/>Ollama | Claude | OpenAI"]
     end
 
