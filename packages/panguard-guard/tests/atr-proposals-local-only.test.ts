@@ -114,4 +114,38 @@ describe('ATR proposals stay local', () => {
     expect(result).toEqual({ drafted: 1, submitted: 1 });
     expect(listOutbox(dir)).toHaveLength(1);
   });
+
+  it('a draft with no usable evidence is recorded as handled and not re-sent to the LLM', async () => {
+    const llm = { isAvailable: vi.fn().mockResolvedValue(true) } as unknown as AnalyzeLLM;
+    const drafter = new ATRDrafter(llm, { outboxDir: dir, llmProvider: 'test', llmModel: 'm' });
+    const internals = drafter as unknown as {
+      draftAndReview: (h: string, p: unknown) => Promise<unknown>;
+      patterns: Map<string, unknown>;
+    };
+    const draft = vi.fn().mockResolvedValue({
+      ruleContent: '{}',
+      selfReviewApproved: true,
+      selfReviewVerdict: '{}',
+    });
+    internals.draftAndReview = draft;
+    internals.patterns.set('p2', {
+      attackType: 'command_injection',
+      mitreTechniques: [],
+      occurrences: 9,
+      distinctIPs: new Set(['a', 'b', 'c']),
+      severities: { high: 9 },
+      sampleDescriptions: [],
+      atrRulesMatched: [],
+      analyzeReasons: [],
+      evidenceDescriptions: [],
+      firstSeen: new Date().toISOString(),
+      lastSeen: new Date().toISOString(),
+    });
+
+    await drafter.runDraftCycle();
+    await drafter.runDraftCycle();
+
+    expect(draft).toHaveBeenCalledTimes(1);
+    expect(listOutbox(dir)).toHaveLength(0);
+  });
 });

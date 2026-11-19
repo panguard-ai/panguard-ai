@@ -57,12 +57,10 @@ export interface CloudSyncDeps {
 export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
   const { atrEngine, threatCloud, feedManager, config } = deps;
 
-  // Outbound collective-defense sharing is opt-in: it is allowed ONLY when the
-  // user has explicitly enabled it. Absent/unset config is treated as OFF (the
-  // gate is `=== true`, never `!== false`). This governs every OUTBOUND post in
-  // this function; the INBOUND indicator pulls below run regardless because they
-  // download community blocklists/lists and never reveal anything about this host.
-  const sharingOptedIn = config.threatCloudUploadEnabled === true;
+  // Every Threat Cloud request, downloads included, is gated on the explicit
+  // sharing opt-in (=== true, never !== false): defense in depth next to the
+  // caller and the offline client.
+  if (config.threatCloudUploadEnabled !== true) return;
 
   try {
     // NOTE: Detection RULES are intentionally NOT pulled from Threat Cloud here.
@@ -94,25 +92,9 @@ export async function syncThreatCloud(deps: CloudSyncDeps): Promise<void> {
       );
     }
 
-    // Report locally whitelisted skills to Threat Cloud (batch) — OUTBOUND
-    // collective-defense sharing, so only when the user has opted in.
-    if (sharingOptedIn) {
-      try {
-        const localSkills = atrEngine
-          .getWhitelistManager()
-          .getAll()
-          .filter((s) => s.source === 'fingerprint' || s.source === 'manual');
-        if (localSkills.length > 0) {
-          await threatCloud.reportSafeSkillsBatch(
-            localSkills.map((s) => ({ skillName: s.name, fingerprintHash: s.fingerprintHash }))
-          );
-        }
-      } catch (err: unknown) {
-        logger.warn(
-          `Skill whitelist upload failed: ${err instanceof Error ? err.message : String(err)}`
-        );
-      }
-    }
+    // Locally whitelisted tool names are NOT uploaded: runtime entries are the
+    // names of tools this agent calls (they can be internal names), so they stay
+    // on this machine.
 
     // Sync community skill whitelist (incremental after first sync)
     let importedSkills = 0;

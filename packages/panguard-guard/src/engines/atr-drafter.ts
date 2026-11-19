@@ -23,6 +23,7 @@ import { createLogger } from '@panguard-ai/core';
 import type { SecurityEvent } from '@panguard-ai/core';
 import type { AnalyzeLLM } from '../types.js';
 import { proposalOutboxSink } from '../proposals/outbox.js';
+import { proposalToIssueFields } from '../proposals/convert.js';
 
 const logger = createLogger('panguard-guard:atr-drafter');
 
@@ -268,16 +269,23 @@ export class ATRDrafter {
           // user can submit one as a pre-filled public ATR issue. A draft kept in
           // the outbox counts as handled, so it is not re-drafted (and re-billed
           // to the LLM) every cycle.
-          const save = proposalOutboxSink({ dir: this.config.outboxDir });
-          const success = await save({
+          const proposal = {
             patternHash: hash,
             ruleContent: result.ruleContent,
             llmProvider: this.config.llmProvider,
             llmModel: this.config.llmModel,
             selfReviewVerdict: result.selfReviewVerdict,
-          });
-
-          if (success) {
+          };
+          // A draft with no usable evidence (no true-positive input) can never be
+          // turned into an issue. Record it as handled (skipped) so the pattern is
+          // not sent to the LLM again every cycle.
+          if (!proposalToIssueFields(proposal)) {
+            this.submittedPatterns.add(hash);
+            logger.info(`ATR draft for pattern ${hash} has no usable evidence; skipped`);
+            continue;
+          }
+          const save = proposalOutboxSink({ dir: this.config.outboxDir });
+          if (await save(proposal)) {
             submitted++;
             this.submittedPatterns.add(hash);
           }

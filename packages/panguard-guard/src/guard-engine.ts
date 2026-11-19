@@ -283,23 +283,25 @@ export class GuardEngine {
     // Periodic Threat Cloud INDICATOR sync — INBOUND pull only: IP/domain
     // blocklists + community skill whitelist/blacklist. It does NOT pull
     // detection rules (those are bundled, updated only via `pga upgrade`) and it
-    // does NOT phone home — there is no device heartbeat / hostname beacon. The
-    // only outbound traffic is the opt-in, event-driven anonymized threat upload
-    // (see event-processor.reportAndNotify) and the opt-in whitelist batch.
+    // does NOT phone home — there is no device heartbeat / hostname beacon.
+    // Every Threat Cloud request, downloads included, is part of collective
+    // defense and runs ONLY when the user has opted in (=== true). Without
+    // consent no timer is created and no request is made.
     const syncDeps = {
       atrEngine: this.engines.atrEngine,
       threatCloud: this.engines.threatCloud,
       feedManager: this.engines.feedManager,
       config: this.config,
     };
-    this.cloudSyncTimer = setupCloudSyncTimer(syncDeps);
-    // Initial indicator sync — FIRE-AND-FORGET (do NOT await). Awaiting it here
-    // blocked the daemon — and therefore the dashboard bind — on a Threat Cloud
-    // network call; a slow / firewalled / dead-IPv6 route to tc.panguard.ai hung
-    // startup for ~75s (the request idle-timeout doesn't cover TCP/TLS connect).
-    // The periodic timer above keeps blocklists fresh; the first pull just lands
-    // a moment after the daemon is already up. Mirrors checkForRuleUpdates below.
-    void syncThreatCloud(syncDeps);
+    if (this.config.threatCloudUploadEnabled === true) {
+      this.cloudSyncTimer = setupCloudSyncTimer(syncDeps);
+      // Initial indicator sync — FIRE-AND-FORGET (do NOT await). Awaiting it here
+      // blocked the daemon — and therefore the dashboard bind — on a Threat Cloud
+      // network call; a slow / firewalled / dead-IPv6 route hung startup. The
+      // periodic timer keeps blocklists fresh; the first pull lands a moment
+      // after the daemon is already up.
+      void syncThreatCloud(syncDeps);
+    }
 
     // Daily rule-update CHECK (notify-only): compares the bundled ruleset against
     // the latest published npm version and surfaces "update available" — it never
@@ -342,13 +344,17 @@ export class GuardEngine {
       logger.info('Git repository watcher active');
     }
 
-    // Start process watcher (optional, graceful degradation)
-    this.processWatcher = new ProcessWatcher();
-    const processWatcherAvailable = await this.processWatcher.checkAvailability();
-    if (processWatcherAvailable) {
-      this.processWatcher.on('event', (event) => void this.processEvent(event));
-      await this.processWatcher.start();
-      logger.info('Process command-line watcher active');
+    // Start process watcher (optional, graceful degradation). It polls the full
+    // process table with command lines, so it is host monitoring: it follows the
+    // same `monitors.processMonitor` switch as the core process monitor.
+    if (this.config.monitors.processMonitor) {
+      this.processWatcher = new ProcessWatcher();
+      const processWatcherAvailable = await this.processWatcher.checkAvailability();
+      if (processWatcherAvailable) {
+        this.processWatcher.on('event', (event) => void this.processEvent(event));
+        await this.processWatcher.start();
+        logger.info('Process command-line watcher active');
+      }
     }
 
     // Start log collector if configured

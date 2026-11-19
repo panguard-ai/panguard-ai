@@ -3,7 +3,7 @@
  * ProcessWatcher 單元測試
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import * as os from 'node:os';
 import {
   ProcessWatcher,
@@ -301,5 +301,30 @@ describe('ProcessWatcher', () => {
       // No new processes appeared between polls, so count shouldn't increase
       expect(events.length).toBe(firstCount);
     });
+  });
+});
+
+describe('ProcessWatcher poll overlap', () => {
+  it('does not start a new poll while the previous one is still running', async () => {
+    const watcher = new ProcessWatcher(60_000);
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const listSpy = vi.fn().mockImplementation(async () => {
+      await gate;
+      return [];
+    });
+    (watcher as unknown as { getProcessList: typeof listSpy }).getProcessList = listSpy;
+
+    const first = watcher.pollOnce();
+    const second = watcher.pollOnce();
+    release();
+    await Promise.all([first, second]);
+
+    expect(listSpy).toHaveBeenCalledTimes(1);
+    // and a later poll runs again
+    await watcher.pollOnce();
+    expect(listSpy).toHaveBeenCalledTimes(2);
   });
 });

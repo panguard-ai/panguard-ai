@@ -316,18 +316,24 @@ export async function loadAllRules(
   feedManager: ThreatIntelFeedManager,
   config: GuardConfig
 ): Promise<void> {
-  feedManager
-    .start()
-    .then(() => {
-      logger.info(
-        `Threat intel feeds loaded: ${feedManager.getIoCCount()} IoCs, ${feedManager.getIPCount()} IPs indexed`
-      );
-    })
-    .catch((err: unknown) => {
-      logger.warn(
-        `Threat intel feed start failed (using hardcoded list): ${err instanceof Error ? err.message : String(err)}`
-      );
-    });
+  // Public threat-intel feeds are downloaded from third-party hosts (the request
+  // reveals this machine's IP), so they follow the same explicit Threat Cloud
+  // consent as every other network call. Without consent only the hardcoded
+  // indicator list is used.
+  if (config.threatCloudUploadEnabled === true) {
+    feedManager
+      .start()
+      .then(() => {
+        logger.info(
+          `Threat intel feeds loaded: ${feedManager.getIoCCount()} IoCs, ${feedManager.getIPCount()} IPs indexed`
+        );
+      })
+      .catch((err: unknown) => {
+        logger.warn(
+          `Threat intel feed start failed (using hardcoded list): ${err instanceof Error ? err.message : String(err)}`
+        );
+      });
+  }
 
   // Load bundled rules FIRST, then fetch cloud rules.
   // This ensures bundledRuleIds is populated before addCloudRule dedup checks.
