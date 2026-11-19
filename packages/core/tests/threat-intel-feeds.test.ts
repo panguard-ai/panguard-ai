@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ThreatIntelFeedManager, type IoC } from '../src/monitor/threat-intel-feeds.js';
 
 describe('ThreatIntelFeedManager', () => {
@@ -186,5 +186,58 @@ describe('ThreatIntelFeedManager', () => {
     expect(health[0].degraded).toBe(true);
 
     mgr.stop();
+  });
+
+  // -------------------------------------------------------------------------
+  // NetAPI feed and HTTP error handling / NetAPI 情報源與 HTTP 錯誤處理
+  // -------------------------------------------------------------------------
+
+  describe('with a mocked fetch', () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it('should load the NetAPI list and skip lines that are not IPv4 addresses', async () => {
+      const body = '198.51.100.7\n203.0.113.42\n\n# comment\n2001:db8::1\n999.1.1.1\n01.2.3.4\n';
+      const fetchMock = vi.fn().mockResolvedValue(new Response(body, { status: 200 }));
+      vi.stubGlobal('fetch', fetchMock);
+
+      const mgr = new ThreatIntelFeedManager({ enabledFeeds: ['netapi'], requestTimeoutMs: 5000 });
+      const [result] = await mgr.updateAll();
+
+      expect(fetchMock.mock.calls[0]?.[0]).toBe(
+        'https://netapi.com/api2/?method=compromised&dataset_type=ip&header=0'
+      );
+      expect(result).toMatchObject({ source: 'netapi', success: true, iocCount: 2 });
+      expect(mgr.getIPCount()).toBe(2);
+      expect(mgr.checkIP('203.0.113.42')).toMatchObject({ source: 'netapi', type: 'ip' });
+      expect(mgr.checkIP('999.1.1.1')).toBeUndefined();
+      expect(mgr.getConfidenceMultiplier('netapi')).toBe(1.0);
+      mgr.stop();
+    });
+
+    it('should report a feed that answers 401 as failed, not as an empty success', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue(new Response('{"error": "Unauthorized"}', { status: 401 }))
+      );
+
+      const mgr = new ThreatIntelFeedManager({
+        enabledFeeds: ['threatfox', 'urlhaus'],
+        requestTimeoutMs: 5000,
+      });
+      const results = await mgr.updateAll();
+
+      expect(results.map((r) => r.success)).toEqual([false, false]);
+      expect(results[0]?.error).toContain('HTTP 401');
+      expect(mgr.getFeedHealth().every((h) => h.stale)).toBe(true);
+      mgr.stop();
+    });
+
+    it('should include the NetAPI feed in the default feeds', () => {
+      const mgr = new ThreatIntelFeedManager();
+      expect(mgr.getFeedHealth().map((h) => h.source)).toContain('netapi');
+      mgr.stop();
+    });
   });
 });

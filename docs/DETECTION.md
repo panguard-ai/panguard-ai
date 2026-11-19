@@ -348,7 +348,7 @@ Panguard runs 10 monitors across two layers: 4 built-in monitors from `@panguard
 
 ## Threat Intelligence Sources / 威脅情報來源
 
-The `ThreatIntelFeedManager` (`packages/core/src/monitor/threat-intel-feeds.ts`) integrates with 5 threat intelligence feeds plus the Panguard Threat Cloud.
+The `ThreatIntelFeedManager` (`packages/core/src/monitor/threat-intel-feeds.ts`) integrates with 6 threat intelligence feeds plus the Panguard Threat Cloud.
 
 ### Feed Sources
 
@@ -360,7 +360,7 @@ The `ThreatIntelFeedManager` (`packages/core/src/monitor/threat-intel-feeds.ts`)
 | Method    | POST (query: `get_iocs`, days: 1)        |
 | IoC Types | IP, URL, domain, hash                    |
 | Data      | Recent malware indicators of compromise  |
-| Auth      | None required (free API)                 |
+| Auth      | abuse.ch Auth-Key (401 without one)      |
 | Update    | Bulk fetch on startup, then hourly       |
 
 #### 2. URLhaus (abuse.ch)
@@ -371,7 +371,7 @@ The `ThreatIntelFeedManager` (`packages/core/src/monitor/threat-intel-feeds.ts`)
 | Method     | GET                                                      |
 | IoC Types  | URL, IP (extracted from host)                            |
 | Data       | Recent malicious URLs used for malware distribution      |
-| Auth       | None required (free API)                                 |
+| Auth       | abuse.ch Auth-Key (401 without one)                      |
 | Confidence | Online URLs: 90, Offline URLs: 50                        |
 
 #### 3. Feodo Tracker (abuse.ch)
@@ -397,7 +397,19 @@ The `ThreatIntelFeedManager` (`packages/core/src/monitor/threat-intel-feeds.ts`)
 | Mode       | Per-IP lookup (not bulk), checked on demand for network events       |
 | Confidence | Malicious classification: 85, Other noise: 50                        |
 
-#### 5. AbuseIPDB (Optional)
+#### 5. NetAPI honeypot attackers
+
+| Property   | Value                                                                  |
+| ---------- | ---------------------------------------------------------------------- |
+| API        | `https://netapi.com/api2/?method=compromised&dataset_type=ip&header=0` |
+| Method     | GET (plain text, one IPv4 address per line)                            |
+| IoC Types  | IP                                                                     |
+| Data       | IPs that attacked NetAPI's honeypot sensors in the last 48 hours       |
+| Auth       | None required (free, CC BY 4.0)                                        |
+| Update     | Regenerated hourly upstream, fetched with the other feeds              |
+| Confidence | 80                                                                     |
+
+#### 6. AbuseIPDB (Optional)
 
 | Property  | Value                                                |
 | --------- | ---------------------------------------------------- |
@@ -416,14 +428,14 @@ The `ThreatIntelFeedManager` (`packages/core/src/monitor/threat-intel-feeds.ts`)
 {
   updateIntervalMs: 3_600_000,  // 1 hour
   maxIoCs: 50_000,              // Max IoCs in memory
-  enabledFeeds: ['threatfox', 'urlhaus', 'feodotracker', 'greynoise'],
+  enabledFeeds: ['threatfox', 'urlhaus', 'feodotracker', 'greynoise', 'netapi'],
   requestTimeoutMs: 30_000,     // 30 seconds per request
 }
 ```
 
 ### Threat Cloud Integration
 
-In addition to the 5 external feeds, the Guard also integrates with Panguard's Threat Cloud:
+In addition to the 6 external feeds, the Guard also integrates with Panguard's Threat Cloud:
 
 - **Blocklist Download**: Fetches known-bad IP addresses and injects them into the feed manager with confidence score 85
 - **Rule Distribution**: Downloads community ATR rules
