@@ -18,7 +18,7 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { createInterface } from 'node:readline';
 import { c, symbols } from '@panguard-ai/core';
-import { loadGuardConfig, updateGuardConfig } from './guard-config.js';
+import { isSharingEnabled, loadGuardConfig, updateGuardConfig } from './guard-config.js';
 
 const GUARD_CONFIG_DIR = join(homedir(), '.panguard-guard');
 const CONSENT_MARKER = join(GUARD_CONFIG_DIR, '.telemetry-prompted');
@@ -196,7 +196,7 @@ function promptYesNo(question: string, defaultYes = false): Promise<boolean> {
  */
 export function isThreatCloudUploadEnabled(): boolean {
   try {
-    return loadGuardConfig().threatCloudUploadEnabled === true;
+    return isSharingEnabled(loadGuardConfig());
   } catch {
     return false;
   }
@@ -205,13 +205,12 @@ export function isThreatCloudUploadEnabled(): boolean {
 /**
  * Check and ask for telemetry consent if not yet asked.
  * Call this at the start of scan/setup commands.
- * Returns the current telemetryEnabled value.
+ * Returns whether sharing is on (the single predicate, isSharingEnabled).
  */
 export async function ensureTelemetryConsent(): Promise<boolean> {
   if (!hasConsentBeenAsked()) {
     return askTelemetryConsent();
   }
   // Already asked — return current setting
-  const config = loadGuardConfig();
-  return config.telemetryEnabled === true;
+  return isSharingEnabled(loadGuardConfig());
 }

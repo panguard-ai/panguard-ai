@@ -26,6 +26,8 @@ const mockUpdateGuardConfig = vi.fn();
 
 vi.mock('../src/cli/guard-config.js', () => ({
   loadGuardConfig: () => mockLoadGuardConfig(),
+  isSharingEnabled: (c: { threatCloudUploadEnabled?: boolean }) =>
+    c.threatCloudUploadEnabled === true,
   updateGuardConfig: (...args: unknown[]) => mockUpdateGuardConfig(...args),
 }));
 
@@ -84,13 +86,13 @@ describe('ensureTelemetryConsent', () => {
   it('returns current config value when already asked', async () => {
     // hasConsentBeenAsked returns true
     mockExistsSync.mockReturnValue(true);
-    mockLoadGuardConfig.mockReturnValue({ telemetryEnabled: true });
+    mockLoadGuardConfig.mockReturnValue({ threatCloudUploadEnabled: true });
 
     const result = await ensureTelemetryConsent();
     expect(result).toBe(true);
   });
 
-  it('returns false when already asked and telemetryEnabled is undefined', async () => {
+  it('returns false when already asked and sharing is not enabled', async () => {
     mockExistsSync.mockReturnValue(true);
     mockLoadGuardConfig.mockReturnValue({});
 
@@ -213,7 +215,7 @@ describe('ensureTelemetryConsent does not re-prompt once marked (BUG2 regression
     // The trailing ensureTelemetryConsent() must NOT prompt again (which used to
     // default-NO and silently overwrite the opt-in) — it just reads the value back.
     mockExistsSync.mockReturnValue(true); // hasConsentBeenAsked() === true
-    mockLoadGuardConfig.mockReturnValue({ telemetryEnabled: true });
+    mockLoadGuardConfig.mockReturnValue({ threatCloudUploadEnabled: true });
 
     const result = await ensureTelemetryConsent();
 

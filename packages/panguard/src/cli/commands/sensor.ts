@@ -19,6 +19,7 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { c, symbols } from '@panguard-ai/core';
 import { detectLang } from '../interactive/lang.js';
+import { isSharingEnabled } from '../guard-config.js';
 
 type Lang = 'en' | 'zh-TW';
 const t = (lang: Lang, en: string, zh: string): string => (lang === 'zh-TW' ? zh : en);
@@ -63,10 +64,10 @@ function collectSensorStatus(): SensorStatus {
   const keyProvisioned = existsSync(keyPath);
 
   // Telemetry opt-out config
-  const guardConfig = readJson<{ telemetryEnabled?: boolean }>(
+  const guardConfig = readJson<{ threatCloudUploadEnabled?: boolean }>(
     join(home, '.panguard-guard', 'config.json')
   );
-  const telemetryDisabled = guardConfig?.telemetryEnabled === false;
+  const telemetryDisabled = !isSharingEnabled(guardConfig ?? {});
 
   // TC sync cache
   const cache = readJson<{

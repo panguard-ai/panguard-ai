@@ -284,13 +284,17 @@ describe('pga config set — boolean validation (no silent reverse-set)', () => 
   };
 
   it.runIf(existsSync(bin))(
-    'telemetry: on / enabled / true all persist telemetryEnabled=TRUE (never inverted)',
+    'telemetry: on / enabled / true all turn sharing ON like the consent prompt (never inverted)',
     () => {
       for (const word of ['on', 'enabled', 'true']) {
         const h = sandbox();
         const { status, config } = run(h, ['telemetry', word]);
         expect(status).toBe(0);
-        expect(config).toEqual({ telemetryEnabled: true });
+        expect(config).toEqual({
+          telemetryEnabled: true,
+          threatCloudUploadEnabled: true,
+          threatCloudRuleSyncEnabled: true,
+        });
         rmSync(h, { recursive: true, force: true });
         home = undefined;
       }
@@ -305,7 +309,11 @@ describe('pga config set — boolean validation (no silent reverse-set)', () => 
         const h = sandbox();
         const { status, config } = run(h, ['telemetry', word]);
         expect(status).toBe(0);
-        expect(config).toEqual({ telemetryEnabled: false, threatCloudUploadEnabled: false });
+        expect(config).toEqual({
+          telemetryEnabled: false,
+          threatCloudUploadEnabled: false,
+          threatCloudRuleSyncEnabled: false,
+        });
         rmSync(h, { recursive: true, force: true });
         home = undefined;
       }
@@ -314,12 +322,16 @@ describe('pga config set — boolean validation (no silent reverse-set)', () => 
   );
 
   it.runIf(existsSync(bin))(
-    'threat-cloud on persists threatCloudUploadEnabled=TRUE',
+    'threat-cloud on turns sharing ON like the consent prompt',
     () => {
       const h = sandbox();
       const { status, config } = run(h, ['threat-cloud', 'on']);
       expect(status).toBe(0);
-      expect(config).toEqual({ threatCloudUploadEnabled: true });
+      expect(config).toEqual({
+        telemetryEnabled: true,
+        threatCloudUploadEnabled: true,
+        threatCloudRuleSyncEnabled: true,
+      });
     },
     30000
   );
@@ -342,7 +354,7 @@ describe('pga config set — boolean validation (no silent reverse-set)', () => 
     () => {
       const h = sandbox();
       // First, legitimately enable telemetry.
-      expect(run(h, ['telemetry', 'true']).config).toEqual({ telemetryEnabled: true });
+      expect(run(h, ['telemetry', 'true']).config).toMatchObject({ telemetryEnabled: true });
       const before = readFileSync(configPath(h), 'utf-8');
 
       // Now a typo'd value must be rejected AND leave the config byte-for-byte intact

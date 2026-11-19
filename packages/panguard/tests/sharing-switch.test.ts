@@ -1,24 +1,30 @@
 import { describe, it, expect } from 'vitest';
 import { sharingPatch } from '../src/cli/sharing-switch.js';
+import { isSharingEnabled } from '../src/cli/guard-config.js';
 
 describe('sharingPatch', () => {
-  it('telemetry false turns off the usage ping and every upload', () => {
-    expect(sharingPatch('telemetry', false)).toEqual({
+  it('both keys are the same switch and behave like the consent prompt', () => {
+    const on = {
+      telemetryEnabled: true,
+      threatCloudUploadEnabled: true,
+      threatCloudRuleSyncEnabled: true,
+    };
+    const off = {
       telemetryEnabled: false,
       threatCloudUploadEnabled: false,
-    });
-  });
-
-  it('threat-cloud false stops all uploads, the usage ping and rule sync', () => {
-    expect(sharingPatch('threat-cloud', false)).toEqual({
-      threatCloudUploadEnabled: false,
-      telemetryEnabled: false,
       threatCloudRuleSyncEnabled: false,
-    });
+    };
+    expect(sharingPatch('telemetry', true)).toEqual(on);
+    expect(sharingPatch('threat-cloud', true)).toEqual(on);
+    expect(sharingPatch('telemetry', false)).toEqual(off);
+    expect(sharingPatch('threat-cloud', false)).toEqual(off);
   });
 
-  it('turning a switch on only sets its own flag', () => {
-    expect(sharingPatch('telemetry', true)).toEqual({ telemetryEnabled: true });
-    expect(sharingPatch('threat-cloud', true)).toEqual({ threatCloudUploadEnabled: true });
+  it('every status line reads the same predicate as the switch writes', () => {
+    expect(isSharingEnabled({ ...sharingPatch('threat-cloud', true) })).toBe(true);
+    expect(isSharingEnabled({ ...sharingPatch('telemetry', true) })).toBe(true);
+    expect(isSharingEnabled({ ...sharingPatch('telemetry', false) })).toBe(false);
+    expect(isSharingEnabled({ telemetryEnabled: true })).toBe(false);
+    expect(isSharingEnabled({})).toBe(false);
   });
 });

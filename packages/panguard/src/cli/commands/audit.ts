@@ -14,8 +14,8 @@ import { createPublicKey, verify as edVerify } from 'node:crypto';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { c, banner, divider, box, symbols, setLogLevel } from '@panguard-ai/core';
-import { contentHash } from '@panguard-ai/scan-core';
 import { computeSkillHash } from '../skill-hash.js';
+import { isThreatCloudUploadEnabled } from '../consent.js';
 import { keepSkillAuditProposalLocally } from './atr-proposal.js';
 import {
   buildEventsFromAuditReport,
@@ -181,15 +181,16 @@ function writeToTempDir(content: string, skillName: string): string {
 // ---------------------------------------------------------------------------
 
 /**
- * Privacy-safe skill name for Threat Cloud submission. A manifest name is one the
- * skill author chose to publish, so it is safe to share. The on-disk basename can
- * embed a repo / client / project / username, so when there is no manifest name we
- * send a short non-reversible label instead of leaking the local path.
+ * Skill name for uploads and local proposals. A manifest name is one the skill
+ * author chose to publish, so it is safe to share. Without one a constant label
+ * is used: the on-disk basename (or any hash of it) can identify a repo, client or
+ * user, so nothing derived from the local path is ever sent.
  */
-function safeSkillName(manifestName: string | undefined, resolvedPath: string): string {
+const UNNAMED_SKILL = 'unnamed-skill';
+
+function safeSkillName(manifestName: string | undefined, _resolvedPath: string): string {
   const trimmed = manifestName?.trim();
-  if (trimmed) return trimmed.slice(0, 64);
-  return `skill-${contentHash(path.basename(resolvedPath)).slice(0, 12)}`;
+  return trimmed ? trimmed.slice(0, 64) : UNNAMED_SKILL;
 }
 
 export function auditCommand(): Command {
@@ -226,26 +227,10 @@ export function auditCommand(): Command {
 
         // Collective-defense upload is OPT-IN, default OFF. `--no-cloud` is a hard
         // off-switch, but even with cloud not disabled we only upload when the user
-        // has EXPLICITLY opted in (threatCloudUploadEnabled === true in the guard
-        // config). Absent/unset config or any read error => OFF (no upload).
-        const cloudUploadAllowed = await (async (): Promise<boolean> => {
-          if (!options.cloud) return false;
-          try {
-            const { existsSync, readFileSync } = await import('node:fs');
-            const cfgPath = path.join(
-              process.env['HOME'] ?? process.env['USERPROFILE'] ?? '.',
-              '.panguard-guard',
-              'config.json'
-            );
-            if (!existsSync(cfgPath)) return false;
-            const cfg = JSON.parse(readFileSync(cfgPath, 'utf-8')) as {
-              threatCloudUploadEnabled?: boolean;
-            };
-            return cfg.threatCloudUploadEnabled === true;
-          } catch {
-            return false;
-          }
-        })();
+        // has EXPLICITLY opted in (the single sharing predicate). Absent/unset
+        // config or any read error => OFF. Without it this command makes NO network
+        // call to Threat Cloud at all (no registration, no blacklist or rule download).
+        const cloudUploadAllowed = options.cloud && isThreatCloudUploadEnabled();
 
         // ── Detect URL vs local path ──
         let resolvedPath: string;
@@ -336,7 +321,7 @@ export function auditCommand(): Command {
           [key: string]: unknown;
         };
         const cloudRules: CloudATRRule[] = [];
-        if (options.cloud) {
+        if (cloudUploadAllowed) {
           try {
             const { ThreatCloudClient } = await import('@panguard-ai/panguard-guard');
             const dataDir = path.join(

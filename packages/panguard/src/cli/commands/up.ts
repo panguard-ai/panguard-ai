@@ -325,29 +325,12 @@ export function upCommand(): Command {
         const telemetryConsented = await ensureTelemetryConsent();
 
         // Whether the scan flywheel may upload to Threat Cloud. OPT-IN, default
-        // OFF: requires an affirmative consent (telemetryConsented) AND that TC
-        // upload is EXPLICITLY enabled in config (threatCloudUploadEnabled ===
-        // true). Absent/unset config => OFF (gate is `=== true`, never `!== false`).
-        // Nothing leaves the machine unless the user opted in via the first-run
-        // prompt / `pga config set telemetry true` / the dashboard toggle.
-        const tcUploadAllowed = (() => {
-          if (!telemetryConsented) return false;
-          try {
-            const cfgPath = join(homedir(), '.panguard-guard', 'config.json');
-            if (existsSync(cfgPath)) {
-              const cfg = JSON.parse(readFileSync(cfgPath, 'utf-8')) as {
-                telemetryEnabled?: boolean;
-                threatCloudUploadEnabled?: boolean;
-              };
-              return cfg.threatCloudUploadEnabled === true;
-            }
-          } catch {
-            // On any read error, fail closed — do not upload.
-            return false;
-          }
-          // No config on disk yet => not opted in => OFF.
-          return false;
-        })();
+        // OFF. ensureTelemetryConsent() returns the single sharing predicate
+        // (isSharingEnabled: threatCloudUploadEnabled === true), the same value every
+        // other upload gate and status line reads. Nothing leaves the machine unless
+        // the user opted in via the first-run prompt / `pga config set threat-cloud
+        // true` / the dashboard toggle.
+        const tcUploadAllowed = telemetryConsented;
 
         // ── Step 1: Detect AI platforms (we SCAN before deploying) ──
         let platformCount = 0;
