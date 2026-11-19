@@ -635,8 +635,13 @@ export class SkillWatcher extends EventEmitter {
 
       // Submit audit result to Threat Cloud (anonymized)
       if (this.config.submitThreat && audit.riskScore > 0) {
-        const { contentHash } = await import('@panguard-ai/scan-core');
-        const skillHash = contentHash(`${change.name}:${change.command}`);
+        const { mcpServerHash } = await import('@panguard-ai/scan-core');
+        // Name + command shape; absolute path components are reduced to basenames.
+        const skillHash = mcpServerHash({
+          name: change.name,
+          command: change.command,
+          args: change.args,
+        });
         this.config
           .submitThreat({
             skillHash,

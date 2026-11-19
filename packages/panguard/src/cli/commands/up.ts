@@ -17,6 +17,7 @@ import { detectLang } from '../interactive/lang.js';
 import { ensureTelemetryConsent } from '../consent.js';
 import { installFor, toHookPlatform } from './hook.js';
 import { ensurePersistentService, type PersistResult } from './persist.js';
+import { computeSkillHash } from '../skill-hash.js';
 import { keepSkillAuditProposalLocally } from './atr-proposal.js';
 import { isFirstRun, markInitialized } from '../first-run.js';
 import {
@@ -1178,15 +1179,12 @@ async function submitToTC(
   // separators + cap length so a path-like name can't leak a local directory tree.
   skillName = skillName.replace(/[\\/]/g, '_').slice(0, 80);
   const { ThreatCloudClient } = await import('@panguard-ai/panguard-guard');
-  const { contentHash } = await import('@panguard-ai/scan-core');
-  const { readFileSync: rf, existsSync: fe } = await import('node:fs');
 
   const dataDir = join(homedir(), '.panguard-guard');
   const tc = await ThreatCloudClient.create(TC_ENDPOINT, dataDir);
 
   // 1. Submit skill threat
-  const skillMdPath = join(skillDir, 'SKILL.md');
-  const skillHash = fe(skillMdPath) ? contentHash(rf(skillMdPath, 'utf-8')) : contentHash(skillDir);
+  const skillHash = computeSkillHash(skillDir);
 
   await tc.submitSkillThreat({
     skillHash,

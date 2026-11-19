@@ -15,6 +15,7 @@ import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { c, banner, divider, box, symbols, setLogLevel } from '@panguard-ai/core';
 import { contentHash } from '@panguard-ai/scan-core';
+import { computeSkillHash } from '../skill-hash.js';
 import { keepSkillAuditProposalLocally } from './atr-proposal.js';
 import {
   buildEventsFromAuditReport,
@@ -178,17 +179,6 @@ function writeToTempDir(content: string, skillName: string): string {
 // ---------------------------------------------------------------------------
 // Hash utility
 // ---------------------------------------------------------------------------
-
-/**
- * Compute a content hash of a skill's SKILL.md using scan-core's canonical hash.
- * Identical to what the website produces — critical for TC dedup.
- */
-function computeSkillHash(skillDir: string): string {
-  const skillMdPath = path.join(skillDir, 'SKILL.md');
-  if (!existsSync(skillMdPath)) return contentHash(skillDir);
-  const content = readFileSync(skillMdPath, 'utf-8');
-  return contentHash(content);
-}
 
 /**
  * Privacy-safe skill name for Threat Cloud submission. A manifest name is one the
