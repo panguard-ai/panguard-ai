@@ -150,6 +150,8 @@ Detection results depend on the ATR version, so they are published with the rule
 
 PanGuard is on-device by default. **The Threat Cloud service is currently offline**, so nothing is sent even if you opted in. When it runs, the optional Threat Cloud (off until you opt in) shares only a **minimal threat signature** — the matched rule ID, attack category, MITRE technique, a coarse country region, and a truncated IP. **Never** your prompts, code, file contents, file paths, secrets, or hostname. Inbound community rules are **ed25519 signature-verified and fail-closed** — a rogue server can't inject detection logic.
 
+One check runs whether or not you opt in: once a day PanGuard asks the npm registry whether a newer `agent-threat-rules` release exists, so it can tell you to run `pga upgrade`. It downloads nothing, and npm sees only your IP address. Set `PANGUARD_NO_UPDATE_CHECK=1` to turn it off.
+
 > Sharing is pseudonymous (a stable random install ID), transport-encrypted (TLS). End-to-end encrypted contributions — where not even our server can read a payload — are on the roadmap for regulated fleets.
 
 ### Send what you catch to ATR (no Threat Cloud needed)

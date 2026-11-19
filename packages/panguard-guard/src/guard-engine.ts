@@ -54,6 +54,7 @@ import {
   syncThreatCloud,
   setupCloudSyncTimer,
   checkForRuleUpdates,
+  ruleUpdateCheckEnabled,
   setupRuleUpdateCheckTimer,
   getSkillThreatSubmitter as _getSkillThreatSubmitter,
   getSkillBlacklistChecker as _getSkillBlacklistChecker,
@@ -306,8 +307,12 @@ export class GuardEngine {
     // Daily rule-update CHECK (notify-only): compares the bundled ruleset against
     // the latest published npm version and surfaces "update available" — it never
     // downloads or live-applies rules (that is the supply-chain hole we avoid).
-    this.ruleUpdateTimer = setupRuleUpdateCheckTimer(syncDeps);
-    void checkForRuleUpdates(syncDeps); // fire-and-forget initial check (no network block on startup)
+    // PANGUARD_NO_UPDATE_CHECK=1 turns this off (it runs whether or not the
+    // user joined Threat Cloud, and the disclosure says so).
+    if (ruleUpdateCheckEnabled()) {
+      this.ruleUpdateTimer = setupRuleUpdateCheckTimer(syncDeps);
+      void checkForRuleUpdates(syncDeps); // fire-and-forget initial check (no network block on startup)
+    }
 
     // Start monitor engine
     this.monitorEngine = new MonitorEngine(toMonitorEngineConfig(this.config.monitors));

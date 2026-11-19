@@ -256,6 +256,16 @@ export interface RuleUpdateStatus {
 }
 
 /**
+ * The daily rule-update check is the one network call PanGuard makes whether or
+ * not the user joined Threat Cloud (a plain version lookup on the npm registry).
+ * PANGUARD_NO_UPDATE_CHECK=1 (or "true") turns it off. Pure + exported for tests.
+ */
+export function ruleUpdateCheckEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
+  const v = (env['PANGUARD_NO_UPDATE_CHECK'] ?? '').trim().toLowerCase();
+  return !(v === '1' || v === 'true' || v === 'yes');
+}
+
+/**
  * Daily rule-update CHECK — notify-only. Queries the public npm registry for the
  * latest published agent-threat-rules version and compares it to the version
  * bundled with this install. It does NOT download or apply anything: detection
