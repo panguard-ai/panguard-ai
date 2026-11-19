@@ -20,6 +20,8 @@ import { saveLlmConfig, loadLlmConfig, deleteLlmConfig } from '../credentials.js
 import { loadGuardConfig, updateGuardConfig } from '../guard-config.js';
 import { saveLang } from '../interactive/lang.js';
 import { printCollectiveDefenseDisclosure } from '../consent.js';
+import { sharingPatch } from '../sharing-switch.js';
+import type { SharingKey } from '../sharing-switch.js';
 
 /**
  * Print how to provide a cloud key without persisting it: via the environment
@@ -76,12 +78,10 @@ export function configCommand(): Command {
         process.exit(1);
       }
       const boolValue = truthy.includes(v);
-      if (key === 'telemetry') {
-        await updateGuardConfig({ ...config, telemetryEnabled: boolValue });
-        console.log(`  ${c.safe('telemetryEnabled')} set to ${c.bold(String(boolValue))}`);
-      } else if (key === 'threat-cloud') {
-        await updateGuardConfig({ ...config, threatCloudUploadEnabled: boolValue });
-        console.log(`  ${c.safe('threatCloudUploadEnabled')} set to ${c.bold(String(boolValue))}`);
+      const patch = sharingPatch(key as SharingKey, boolValue);
+      await updateGuardConfig({ ...config, ...patch });
+      for (const [flag, flagValue] of Object.entries(patch)) {
+        console.log(`  ${c.safe(flag)} set to ${c.bold(String(flagValue))}`);
       }
     });
 

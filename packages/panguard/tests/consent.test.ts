@@ -259,3 +259,30 @@ describe('markConsentAsked (via askTelemetryConsent)', () => {
     expect(result).toBe(false);
   });
 });
+
+describe('collective defense disclosure text', async () => {
+  const { COLLECTIVE_DEFENSE_LINES } = await import('../src/cli/consent.js');
+  const text = COLLECTIVE_DEFENSE_LINES.join('\n');
+
+  it('does not promise automatic community rules or rule updates', () => {
+    expect(text).not.toMatch(/get every community rule back/i);
+    expect(text).not.toMatch(/auto-?update your detection rules/i);
+    expect(text).toContain('pga upgrade');
+  });
+
+  it('names the command that stops every upload and download', () => {
+    expect(text).toContain('pga config set threat-cloud false');
+  });
+
+  it('discloses the downloads, the drafter LLM call and the logged-in workspace link', () => {
+    expect(text).toMatch(/every 5 minutes/);
+    expect(text).toMatch(/200 characters/);
+    expect(text).toMatch(/pga login/);
+    expect(text).toMatch(/TERM|terminal program name/i);
+  });
+
+  it('says proposals and runtime tool names stay on this machine', () => {
+    expect(text).toMatch(/proposals[\s\S]*stay on this machine/);
+    expect(text).toMatch(/names of tools your agents call at\s*runtime are never uploaded/);
+  });
+});

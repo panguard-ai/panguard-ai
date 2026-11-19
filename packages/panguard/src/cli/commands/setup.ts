@@ -820,48 +820,19 @@ export function setupCommand(): Command {
         let tcUploadOptedIn = false;
         if (!options.remove && !options.skipGuard) {
           const dataDir = join(homedir(), '.panguard-guard');
-          // Honest agreement shown before the opt-in. States exactly what joining
-          // does (contribute anonymized signatures incl. UNKNOWN threats + auto-
-          // receive community rules), and is precise about encryption: anonymized
-          // on-device, then end-to-end sealed (JWE to the ingest key) so only the
-          // Threat Cloud backend can read it — verified live 2026-07-07.
+          // Honest agreement shown before the opt-in: the shared disclosure text,
+          // identical to the first-run prompt and `pga config show --verbose`.
           if (!options.yes && !options.json) {
-            console.log();
-            console.log(`  ${c.bold('Join Collective Defense (your choice, reversible anytime)')}`);
-            console.log(c.dim('    If you agree, PanGuard connects to Threat Cloud and will:'));
-            console.log(
-              c.dim('    · share minimal ANONYMIZED threat signatures (matched rule ID, attack')
-            );
-            console.log(c.dim('      category + MITRE, coarse region, truncated IP),'));
-            console.log(
-              c.dim('    · with the local AI layer on (free — pga guard setup-ai), ALSO report')
-            );
-            console.log(
-              c.dim('      UNKNOWN suspicious behavior it can’t yet match to a rule, so the')
-            );
-            console.log(c.dim('      community can turn a novel attack into a new rule,'));
-            console.log(
-              c.dim('    · anonymize it on your machine, then END-TO-END SEAL the threat')
-            );
-            console.log(
-              c.dim('      signatures (only the Threat Cloud backend can read them, not the')
-            );
-            console.log(
-              c.dim('      network); skill-audit findings & rule proposals go over TLS,')
-            );
-            console.log(c.dim('    · auto-update your detection rules from the community.'));
-            console.log(
-              c.dim('    NEVER shared: prompts, code, file contents, secrets, paths, hostname.')
-            );
-            console.log();
+            const { printCollectiveDefenseDisclosure } = await import('../consent.js');
+            printCollectiveDefenseDisclosure();
           }
           const enableTC =
             !options.yes &&
             !options.json &&
             (await promptConfirm({
               message: {
-                en: 'Agree and join Collective Defense? (auto-connect + auto-update rules)',
-                'zh-TW': '同意並加入集體防禦？（自動連線 + 規則自動更新）',
+                en: 'Agree and join Collective Defense?',
+                'zh-TW': '同意並加入集體防禦？',
               },
               defaultValue: false,
               lang: L,
@@ -874,11 +845,11 @@ export function setupCommand(): Command {
             const guardConfig = loadConfig(tcConfigPath);
             const updatedConfig = {
               ...guardConfig,
-              // One consent answer wires the whole collective-defense loop:
-              // contribute (upload + telemetry) AND receive (rule sync auto-updates).
-              // The upload gate checks threatCloudUploadEnabled; telemetryEnabled is
-              // what ensureTelemetryConsent() reads back; threatCloudRuleSyncEnabled
-              // turns on automatic community rule updates. All follow the one answer.
+              // One consent answer drives all three flags. The upload gate checks
+              // threatCloudUploadEnabled; telemetryEnabled is what
+              // ensureTelemetryConsent() reads back; threatCloudRuleSyncEnabled is
+              // the opt-in for signed community rules (none load without a
+              // publisher key, so rules still change only via `pga upgrade`).
               threatCloudUploadEnabled: enableTC,
               telemetryEnabled: enableTC,
               threatCloudRuleSyncEnabled: enableTC,
@@ -901,11 +872,7 @@ export function setupCommand(): Command {
                     `  ${symbols.pass} Connected to Threat Cloud: ${updatedConfig.threatCloudEndpoint ?? 'https://tc.panguard.ai/api'}`
                   )
                 );
-                console.log(
-                  c.dim(
-                    '    Sharing anonymized signatures (incl. unknown threats); rules auto-update.'
-                  )
-                );
+                console.log(c.dim('    Sharing anonymized signatures (incl. unknown threats).'));
               } else {
                 console.log(
                   c.dim(

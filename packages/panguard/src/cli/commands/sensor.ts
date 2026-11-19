@@ -214,7 +214,7 @@ function renderHuman(status: SensorStatus, lang: Lang): void {
     );
   } else {
     console.log(
-      `  ${c.dim(t(lang, 'Opt out:', '停用:'))}            ${c.sage('pga config set telemetry false')}`
+      `  ${c.dim(t(lang, 'Opt out:', '停用:'))}            ${c.sage('pga config set threat-cloud false')}`
     );
   }
   console.log(`  ${c.dim(t(lang, 'Privacy policy:', '隱私政策:'))}      panguard.ai/privacy`);

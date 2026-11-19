@@ -299,13 +299,13 @@ describe('pga config set — boolean validation (no silent reverse-set)', () => 
   );
 
   it.runIf(existsSync(bin))(
-    'telemetry: false / off / disabled all persist telemetryEnabled=FALSE',
+    'telemetry: false / off / disabled persist telemetryEnabled=FALSE and stop uploads too',
     () => {
       for (const word of ['false', 'off', 'disabled']) {
         const h = sandbox();
         const { status, config } = run(h, ['telemetry', word]);
         expect(status).toBe(0);
-        expect(config).toEqual({ telemetryEnabled: false });
+        expect(config).toEqual({ telemetryEnabled: false, threatCloudUploadEnabled: false });
         rmSync(h, { recursive: true, force: true });
         home = undefined;
       }

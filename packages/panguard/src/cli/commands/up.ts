@@ -1074,7 +1074,7 @@ export function upCommand(): Command {
             `  ${c.dim(t(lang, `This machine contributes anonymous detections to the community defense network.`, `這台機器正在為社群防禦網路貢獻匿名偵測。`))}`
           );
           console.log(
-            `  ${c.dim(t(lang, `Check status: pga sensor status · Opt out: pga config set telemetry false`, `查看狀態:pga sensor status · 停用:pga config set telemetry false`))}`
+            `  ${c.dim(t(lang, `Check status: pga sensor status · Opt out: pga config set threat-cloud false`, `查看狀態:pga sensor status · 停用:pga config set threat-cloud false`))}`
           );
           console.log('');
         }
@@ -1114,35 +1114,22 @@ export function upCommand(): Command {
         );
         if (tcUploadAllowed) {
           console.log(
-            `  ${c.dim(t(lang, 'Collective defense ON: when an attack is blocked, only the matched rule ID,', '集體防禦已開啟：擋下攻擊時，只分享命中的規則 ID、'))}`
+            `  ${c.dim(t(lang, 'Collective defense ON. See exactly what is shared: pga config show --verbose', '集體防禦已開啟。完整分享內容請見：pga config show --verbose'))}`
           );
           console.log(
-            `  ${c.dim(t(lang, 'a one-way payload hash, and the source type are shared — never your prompts,', 'payload 的單向雜湊、來源類型 — 絕不含你的 prompt、'))}`
-          );
-          console.log(
-            `  ${c.dim(t(lang, 'code, file contents, keys, hostname, or IP. Thank you for defending the commons.', '程式碼、檔案內容、金鑰、主機名或 IP。謝謝你一起守護社群。'))}`
-          );
-          console.log(
-            `  ${c.dim(t(lang, 'Turn off anytime: pga config set telemetry false', '隨時可關閉：pga config set telemetry false'))}`
+            `  ${c.dim(t(lang, 'Turn off anytime (stops all uploads and downloads): pga config set threat-cloud false', '隨時可關閉（停止所有上傳與下載）：pga config set threat-cloud false'))}`
           );
         } else {
-          // OPT-IN guidance (NOT a default, NOT a nag): explain the value + the
-          // privacy guarantee + the one command, so the user can make an
-          // informed choice. Collective defense stays OFF until they opt in.
+          // OPT-IN guidance (NOT a default, NOT a nag). Collective defense stays
+          // OFF until the user opts in.
           console.log(
-            `  ${c.dim(t(lang, 'Collective defense is OFF — nothing leaves this machine.', '集體防禦目前關閉 — 沒有任何資料離開這台機器。'))}`
+            `  ${c.dim(t(lang, 'Collective defense is OFF — nothing is uploaded or downloaded.', '集體防禦目前關閉 — 不會上傳或下載任何資料。'))}`
           );
           console.log(
-            `  ${c.dim(t(lang, 'Want to help? The attacks you block feed the community threat pool that protects', '想幫忙嗎？你擋下的攻擊會匯入保護所有人的社群威脅池，'))}`
+            `  ${c.dim(t(lang, 'Want to help? Read exactly what joining shares: pga config show --verbose', '想幫忙嗎？加入前請先看完整分享內容：pga config show --verbose'))}`
           );
           console.log(
-            `  ${c.dim(t(lang, 'everyone — and you get community rules back faster. Shared: only the matched', '而你也能更快收到社群回流的規則。分享的只有命中的規則 ID、'))}`
-          );
-          console.log(
-            `  ${c.dim(t(lang, 'rule ID, a one-way hash, and the source type. Never your prompts, code,', 'payload 的單向雜湊、來源類型。絕不含你的 prompt、程式碼、'))}`
-          );
-          console.log(
-            `  ${c.dim(t(lang, 'file contents, keys, hostname, or IP. Opt in: pga config set telemetry true', '檔案內容、金鑰、主機名或 IP。開啟：pga config set telemetry true'))}`
+            `  ${c.dim(t(lang, 'Opt in: pga config set threat-cloud true', '開啟：pga config set threat-cloud true'))}`
           );
         }
         console.log('');
