@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
+  ClaudeCliUnavailableError,
   installClaudeCodeEntry,
   readClaudeEntry,
   removeClaudeCodeEntry,
@@ -10,8 +11,18 @@ import { SELF_VERSION } from '../src/config/package-spec.js';
 
 const PINNED = `@panguard-ai/panguard-mcp@${SELF_VERSION}`;
 
-const getOutput = (command: string, args: string): string =>
-  `panguard:\n  Scope: User config\n  Status: Connected\n  Type: stdio\n  Command: ${command}\n  Args: ${args}\n`;
+const SCOPE_LABEL = {
+  user: 'User config (available in all your projects)',
+  local: 'Local config (private to you in this project)',
+  project: 'Project config (shared via .mcp.json)',
+};
+
+const getOutput = (
+  command: string,
+  args: string,
+  opts: { scope?: keyof typeof SCOPE_LABEL; env?: string[] } = {}
+): string =>
+  `panguard:\n  Scope: ${SCOPE_LABEL[opts.scope ?? 'user']}\n  Status: Connected\n  Type: stdio\n  Command: ${command}\n  Args: ${args}\n  Environment:\n${(opts.env ?? []).map((e) => `    ${e}\n`).join('')}`;
 
 /** Fake `claude` CLI: records calls, serves `mcp get` from `entry`, can fail adds. */
 function fakeClaude(opts: { entry?: string; failAddAt?: number[] }): {
@@ -102,5 +113,48 @@ describe('Claude Code panguard entry', () => {
     expect(removeClaudeCodeEntry(ours.exec)).toBe('removed');
     expect(ours.calls.at(-1)).toEqual(['mcp', 'remove', '--scope', 'user', 'panguard']);
     expect(removeClaudeCodeEntry(fakeClaude({}).exec)).toBe('absent');
+  });
+
+  it('treats an entry with environment variables or extra args as custom', () => {
+    const withEnv = fakeClaude({
+      entry: getOutput('npx', '-y @panguard-ai/panguard-mcp', { env: ['API_KEY=abc'] }),
+    });
+    expect(installClaudeCodeEntry(withEnv.exec)).toBe('kept-custom');
+    expect(repinClaudeCodeEntry(withEnv.exec)).toBe('kept-custom');
+    expect(removeClaudeCodeEntry(withEnv.exec)).toBe('kept-custom');
+    expect(verbs(withEnv.calls)).not.toContain('remove');
+    expect(verbs(withEnv.calls)).not.toContain('add');
+
+    const extraArgs = fakeClaude({
+      entry: getOutput('npx', '-y @panguard-ai/panguard-mcp --flag value'),
+    });
+    expect(installClaudeCodeEntry(extraArgs.exec)).toBe('kept-custom');
+    expect(verbs(extraArgs.calls)).toEqual(['get']);
+  });
+
+  it('removes and re-adds in the scope it read, not in user scope', () => {
+    const { exec, calls } = fakeClaude({
+      entry: getOutput('npx', '-y @panguard-ai/panguard-mcp', { scope: 'project' }),
+    });
+    expect(installClaudeCodeEntry(exec)).toBe('repinned');
+    expect(calls[1]).toEqual(['mcp', 'remove', '--scope', 'project', 'panguard']);
+    expect(calls[2]).toContain('project');
+    expect(calls[2]).not.toContain('user');
+  });
+
+  it('an entry whose scope cannot be read is left alone', () => {
+    const entry = getOutput('npx', '-y @panguard-ai/panguard-mcp').replace(/Scope:.*\n/, '');
+    const { exec, calls } = fakeClaude({ entry });
+    expect(installClaudeCodeEntry(exec)).toBe('kept-custom');
+    expect(verbs(calls)).toEqual(['get']);
+  });
+
+  it('reports an unavailable CLI as an error instead of an absent entry', () => {
+    const missing: ClaudeExec = () => {
+      throw Object.assign(new Error('spawn claude ENOENT'), { code: 'ENOENT' });
+    };
+    expect(() => readClaudeEntry(missing)).toThrow(ClaudeCliUnavailableError);
+    expect(() => installClaudeCodeEntry(missing)).toThrow(ClaudeCliUnavailableError);
+    expect(() => removeClaudeCodeEntry(missing)).toThrow(ClaudeCliUnavailableError);
   });
 });

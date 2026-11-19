@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -21,6 +21,7 @@ vi.mock('../src/config/platform-detector.js', async () => {
 import {
   injectMCPConfig,
   injectProxy,
+  removeMCPConfig,
   removeProxy,
   repinPanguardConfig,
 } from '../src/config/mcp-injector.js';
@@ -171,6 +172,31 @@ describe('pinned npx specs', () => {
       '-y',
       `@panguard-ai/panguard-mcp@${SELF_VERSION}`,
     ]);
+  });
+
+  it('does not write a settings file for Claude Code (injectProxy leaves it alone)', () => {
+    const original = JSON.stringify({
+      mcpServers: {
+        fs: { command: 'npx', args: ['-y', '@modelcontextprotocol/server-filesystem'] },
+      },
+    });
+    writeFileSync(state.configPath, original);
+    const summary = injectProxy(['claude-code']);
+    expect(summary.results).toEqual([]);
+    expect(readFileSync(state.configPath, 'utf-8')).toBe(original);
+  });
+
+  it('reports failure, not success, when the claude CLI cannot be run', () => {
+    const savedPath = process.env['PATH'];
+    process.env['PATH'] = join(dir, 'no-such-bin');
+    try {
+      expect(injectMCPConfig('claude-code').success).toBe(false);
+      expect(removeMCPConfig('claude-code').success).toBe(false);
+    } finally {
+      process.env['PATH'] = savedPath;
+    }
+    // and nothing was written to the legacy settings path
+    expect(existsSync(state.configPath)).toBe(false);
   });
 
   it('isSpecOf matches pinned and unpinned forms only for the exact package name', () => {

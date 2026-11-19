@@ -25,42 +25,91 @@ export const defaultClaudeExec: ClaudeExec = (args) =>
     windowsHide: true,
   }).toString();
 
+export type ClaudeScope = 'user' | 'local' | 'project';
+
 export interface ClaudeEntry {
   readonly present: boolean;
-  /** True when the entry is `npx ... @panguard-ai/panguard-mcp[@version]`. */
+  /**
+   * True only for exactly `npx -y @panguard-ai/panguard-mcp[@version]` with no
+   * environment variables, no extra args, and a scope we can name. Anything else
+   * is the user's own configuration and is never removed or rewritten.
+   */
   readonly ours: boolean;
   /** The package spec argument (`@panguard-ai/panguard-mcp` or with `@version`). */
   readonly spec?: string;
+  /** The scope the entry was read from; remove and add use this same scope. */
+  readonly scope?: ClaudeScope;
+}
+
+/** The `claude` CLI could not be run (missing, timed out): nothing is known. */
+export class ClaudeCliUnavailableError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ClaudeCliUnavailableError';
+  }
 }
 
 const NPX = /^npx(?:\.cmd)?$/i;
 
-/** Parse `claude mcp get panguard`; an error (no such server) means absent. */
+function parseScope(output: string): ClaudeScope | undefined {
+  const label = /^\s*Scope:\s*(\w+)/m.exec(output)?.[1]?.toLowerCase();
+  return label === 'user' || label === 'local' || label === 'project' ? label : undefined;
+}
+
+/** `Environment:` followed by inline text or by more-indented lines. */
+function hasEnvironment(output: string): boolean {
+  const m = /^([ \t]*)Environment:[ \t]*(.*)\n?((?:\1[ \t]+\S.*\n?)*)/m.exec(output);
+  return m !== null && (m[2]!.trim() !== '' || m[3]!.trim() !== '');
+}
+
+function isUnavailable(err: unknown): boolean {
+  const e = err as { code?: unknown; killed?: unknown; signal?: unknown };
+  return e?.code === 'ENOENT' || e?.killed === true || e?.code === 'ETIMEDOUT';
+}
+
+/**
+ * Parse `claude mcp get panguard`. A non-zero exit (no such server) means absent;
+ * a CLI that cannot be run at all throws ClaudeCliUnavailableError.
+ */
 export function readClaudeEntry(exec: ClaudeExec): ClaudeEntry {
   let output: string;
   try {
     output = exec(['mcp', 'get', 'panguard']);
-  } catch {
+  } catch (err) {
+    if (isUnavailable(err)) {
+      throw new ClaudeCliUnavailableError('The claude CLI is not available');
+    }
     return { present: false, ours: false };
   }
   const command = /^\s*Command:\s*(\S+)/m.exec(output)?.[1] ?? '';
-  const args = (/^\s*Args:\s*(.*)$/m.exec(output)?.[1] ?? '').trim().split(/\s+/);
-  const spec = args.find((a) => isSpecOf(a, MCP_PACKAGE));
-  return { present: true, ours: NPX.test(command) && spec !== undefined, spec };
+  const args = (/^\s*Args:\s*(.*)$/m.exec(output)?.[1] ?? '').trim().split(/\s+/).filter(Boolean);
+  const spec = args[1];
+  const scope = parseScope(output);
+  const exactArgs =
+    args.length === 2 && args[0] === '-y' && spec !== undefined && isSpecOf(spec, MCP_PACKAGE);
+  const ours = NPX.test(command) && exactArgs && !hasEnvironment(output) && scope !== undefined;
+  return { present: true, ours, spec: exactArgs ? spec : undefined, scope };
 }
 
-function addArgs(spec: string): string[] {
-  return ['mcp', 'add', '--scope', 'user', 'panguard', '--', 'npx', '-y', spec];
+function addArgs(spec: string, scope: ClaudeScope): string[] {
+  return ['mcp', 'add', '--scope', scope, 'panguard', '--', 'npx', '-y', spec];
 }
 
-const removeArgs = ['mcp', 'remove', '--scope', 'user', 'panguard'];
+const removeArgs = (scope: ClaudeScope): string[] => [
+  'mcp',
+  'remove',
+  '--scope',
+  scope,
+  'panguard',
+];
 
 export type ClaudeInstallOutcome = 'added' | 'repinned' | 'unchanged' | 'kept-custom';
 
 /**
  * Make Claude Code's panguard entry the pinned spec.
  * Throws when the entry could not be added; an entry that was replaced is
- * restored first.
+ * restored first (same scope). Throws ClaudeCliUnavailableError when the CLI
+ * cannot be run.
  */
 export function installClaudeCodeEntry(exec: ClaudeExec = defaultClaudeExec): ClaudeInstallOutcome {
   const pinned = pinnedSpec(MCP_PACKAGE);
@@ -70,18 +119,20 @@ export function installClaudeCodeEntry(exec: ClaudeExec = defaultClaudeExec): Cl
   if (existing.present && existing.spec === pinned) return 'unchanged';
 
   if (!existing.present) {
-    exec(addArgs(pinned));
+    exec(addArgs(pinned, 'user'));
     return 'added';
   }
 
-  // Older / unpinned entry of ours: replace it, restoring the original on failure.
-  exec(removeArgs);
+  // Older / unpinned entry of ours: replace it in the scope it was read from,
+  // restoring the original on failure.
+  const scope = existing.scope as ClaudeScope;
+  exec(removeArgs(scope));
   try {
-    exec(addArgs(pinned));
+    exec(addArgs(pinned, scope));
     return 'repinned';
   } catch (err) {
     try {
-      exec(addArgs(existing.spec ?? MCP_PACKAGE));
+      exec(addArgs(existing.spec ?? MCP_PACKAGE, scope));
     } catch {
       /* the original could not be restored either; surface the add error below */
     }
@@ -92,9 +143,9 @@ export function installClaudeCodeEntry(exec: ClaudeExec = defaultClaudeExec): Cl
 /** Re-pin only: touches nothing unless an older/unpinned entry of ours exists. */
 export function repinClaudeCodeEntry(exec: ClaudeExec = defaultClaudeExec): ClaudeInstallOutcome {
   const existing = readClaudeEntry(exec);
-  if (!existing.present || !existing.ours || existing.spec === pinnedSpec(MCP_PACKAGE)) {
-    return existing.present && !existing.ours ? 'kept-custom' : 'unchanged';
-  }
+  if (!existing.present) return 'unchanged';
+  if (!existing.ours) return 'kept-custom';
+  if (existing.spec === pinnedSpec(MCP_PACKAGE)) return 'unchanged';
   return installClaudeCodeEntry(exec);
 }
 
@@ -105,6 +156,6 @@ export function removeClaudeCodeEntry(
   const existing = readClaudeEntry(exec);
   if (!existing.present) return 'absent';
   if (!existing.ours) return 'kept-custom';
-  exec(removeArgs);
+  exec(removeArgs(existing.scope as ClaudeScope));
   return 'removed';
 }

@@ -597,8 +597,9 @@ export function injectProxy(platformIds: readonly PlatformId[]): ProxyInjectionS
   const results: ProxyInjectionResult[] = [];
 
   for (const platformId of platformIds) {
-    // OpenClaw uses SKILL.md, not MCP protocol — skip
-    if (platformId === 'openclaw') continue;
+    // OpenClaw uses SKILL.md, not MCP protocol — skip. Claude Code's MCP servers
+    // live in its own store (~/.claude.json), not in a file we may write.
+    if (platformId === 'openclaw' || platformId === 'claude-code') continue;
 
     const configPath = getConfigPath(platformId);
     const result = injectProxyForJsonPlatform(platformId, configPath);
