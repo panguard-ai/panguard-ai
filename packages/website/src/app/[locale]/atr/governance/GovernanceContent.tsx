@@ -194,7 +194,7 @@ export default function GovernanceContent() {
           <div className="mb-3 flex items-center gap-2">
             <Users className="h-5 w-5 text-text-secondary" aria-hidden />
             <h3 className="text-base font-semibold text-text-primary">
-              {isZh ? 'Enterprise Member（$10,000 / 年）' : 'Enterprise Member ($10,000 / year)'}
+              {isZh ? 'Enterprise Member（會費尚未定案）' : 'Enterprise Member (fees not yet set)'}
             </h3>
           </div>
           <p className="text-sm leading-relaxed text-text-secondary">

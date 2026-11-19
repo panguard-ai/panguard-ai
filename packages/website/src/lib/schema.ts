@@ -116,6 +116,7 @@ export function softwareApplicationSchema(opts: {
   description: string;
   url: string;
   category?: string;
+  /** Kept for callers; ignored since 2026-11-18 (only the free offer is published). */
   pricing?: 'free' | 'commercial' | 'mixed';
   version?: string;
   applicationSubCategory?: string;
@@ -125,53 +126,15 @@ export function softwareApplicationSchema(opts: {
     description,
     url,
     category = 'SecurityApplication',
-    pricing = 'mixed',
     version = STATS.cliVersion,
     applicationSubCategory,
   } = opts;
 
-  const offers =
-    pricing === 'free'
-      ? [{ '@type': 'Offer', price: '0', priceCurrency: 'USD', name: 'Community (Open Source)' }]
-      : pricing === 'commercial'
-        ? [
-            {
-              '@type': 'Offer',
-              priceSpecification: {
-                '@type': 'PriceSpecification',
-                priceCurrency: 'USD',
-                minPrice: '150000',
-                maxPrice: '500000',
-              },
-              name: 'Enterprise (annual)',
-              url: 'https://panguard.ai/contact?tier=enterprise',
-            },
-            {
-              '@type': 'Offer',
-              priceSpecification: {
-                '@type': 'PriceSpecification',
-                priceCurrency: 'USD',
-                minPrice: '500000',
-                maxPrice: '2000000',
-              },
-              name: 'Migrator Pro (annual)',
-              url: 'https://panguard.ai/contact?tier=migrator',
-            },
-          ]
-        : [
-            { '@type': 'Offer', price: '0', priceCurrency: 'USD', name: 'Community (Open Source)' },
-            {
-              '@type': 'Offer',
-              priceSpecification: {
-                '@type': 'PriceSpecification',
-                priceCurrency: 'USD',
-                minPrice: '150000',
-                maxPrice: '500000',
-              },
-              name: 'Enterprise (annual)',
-              url: 'https://panguard.ai/contact?tier=enterprise',
-            },
-          ];
+  // 2026-11-18: no paid tier carries a public price (nothing paid is deliverable
+  // yet), so every page advertises only the free open-source offer.
+  const offers = [
+    { '@type': 'Offer', price: '0', priceCurrency: 'USD', name: 'Community (Open Source)' },
+  ];
 
   return {
     '@context': 'https://schema.org',
@@ -184,7 +147,7 @@ export function softwareApplicationSchema(opts: {
     operatingSystem: 'macOS, Linux, Windows',
     softwareVersion: version,
     license: 'https://opensource.org/licenses/MIT',
-    isAccessibleForFree: pricing !== 'commercial',
+    isAccessibleForFree: true,
     offers,
     publisher: { '@id': ORG_ID },
     author: { '@id': PERSON_ADAM_ID },
@@ -195,11 +158,9 @@ export function softwareApplicationSchema(opts: {
 }
 
 /**
- * Pricing-page schema. Emits a SoftwareApplication whose offers mirror the
- * four canonical tiers on /pricing (Community $0, Enterprise $150K-500K/yr,
- * Migrator Pro $500K-2M/yr, Sovereign $5-20M). Google treats SoftwareApplication offers as a
- * pricing-eligible product, so this is what makes the pricing rich result
- * eligible.
+ * Pricing-page schema. Emits a SoftwareApplication whose only offer is the free
+ * open-source edition, mirroring /pricing (2026-11-18: paid services have no
+ * public price until they can be delivered).
  *
  * NOTE: aggregateRating is intentionally omitted. We have no real, verifiable
  * review/rating data, and Google penalizes fabricated ratings. Add an
@@ -212,7 +173,7 @@ export function pricingApplicationSchema() {
     '@id': 'https://panguard.ai/pricing#software',
     name: 'PanGuard AI',
     description:
-      'AI agent security platform built on the open ATR detection standard. Community tier is free and open source; Enterprise, Migrator Pro and Sovereign add hosted compliance, evidence packs, and managed runtime guard.',
+      'AI agent security built on the open ATR detection standard. The open-source edition is free under the MIT license; services for organizations and insurers are in development with design partners and have no public price.',
     url: 'https://panguard.ai/pricing',
     applicationCategory: 'SecurityApplication',
     applicationSubCategory: 'AI Agent Security',
@@ -229,52 +190,11 @@ export function pricingApplicationSchema() {
       {
         '@type': 'Offer',
         name: 'Community',
-        description: 'Unlimited open-source scanning and detection. MIT licensed.',
+        description: 'Open-source scanning and tool-call checks for AI agents. MIT licensed.',
         price: '0',
         priceCurrency: 'USD',
         availability: 'https://schema.org/InStock',
         url: 'https://panguard.ai/pricing',
-      },
-      {
-        '@type': 'Offer',
-        name: 'Enterprise (annual)',
-        description:
-          'Annual platform license: managed runtime guard, compliance reporting, and evidence packs.',
-        priceSpecification: {
-          '@type': 'PriceSpecification',
-          priceCurrency: 'USD',
-          minPrice: '150000',
-          maxPrice: '500000',
-        },
-        availability: 'https://schema.org/InStock',
-        url: 'https://panguard.ai/contact?tier=enterprise',
-      },
-      {
-        '@type': 'Offer',
-        name: 'Migrator Pro (annual)',
-        description:
-          'Signed, continuously re-scanned compliance evidence — the flagship migration + evidence engine.',
-        priceSpecification: {
-          '@type': 'PriceSpecification',
-          priceCurrency: 'USD',
-          minPrice: '500000',
-          maxPrice: '2000000',
-        },
-        availability: 'https://schema.org/InStock',
-        url: 'https://panguard.ai/contact?tier=migrator',
-      },
-      {
-        '@type': 'Offer',
-        name: 'Sovereign / OEM',
-        description: 'On-prem, air-gapped, per-nation deployment. The ceiling beyond Sigma.',
-        priceSpecification: {
-          '@type': 'PriceSpecification',
-          priceCurrency: 'USD',
-          minPrice: '5000000',
-          maxPrice: '20000000',
-        },
-        availability: 'https://schema.org/InStock',
-        url: 'https://panguard.ai/contact?tier=sovereign',
       },
     ],
   } as Record<string, unknown>;

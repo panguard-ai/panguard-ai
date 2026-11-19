@@ -1072,7 +1072,7 @@
     "layers": {
       "overline": "五階段偵測",
       "title": "五階段偵測，攔截別人漏掉的",
-      "subtitle": "從靜態分析到上下文記憶，每一階段都增加智慧——這是 PanGuard 七層架構中今日已上線的五層。",
+      "subtitle": "Guard 引擎從環境探索到回應的各個階段。主機監控（網路與程序）是選用功能；對 AI agent 的檢查走工具呼叫 hook 與 MCP proxy。",
       "layer1": {
         "badge": "第一層",
         "name": "環境探索",
@@ -1083,7 +1083,7 @@
         "badge": "第二層",
         "name": "規則引擎",
         "desc": "ATR 偵測規則，專為 AI Agent 安全設計。",
-        "detail": "50 毫秒內攔截 90% 已知威脅。不需要 AI。"
+        "detail": "在你的機器上做確定性的規則比對，不需要 AI。"
       },
       "layer3": {
         "badge": "第三層",
@@ -1095,7 +1095,7 @@
         "badge": "第四層",
         "name": "AI 分析",
         "desc": "當規則無法解釋一個行為時，AI 介入。先用本地指紋比對 & 啟發式分析（零設定，完全離線）。只在必要時用雲端 LLM。",
-        "detail": "三層漏斗：90% 規則 / 7% 本地啟發式 / 3% 雲端 AI。雲端分析由 Threat Cloud 伺服器端執行——所有用戶完全免費。"
+        "detail": "先用規則，再用本機啟發式，必要時才用模型。Threat Cloud 目前停止服務，雲端分析無法使用；本機分析與你自己的模型金鑰（本機 Ollama 或雲端 API）照常可用。"
       },
       "layer5": {
         "badge": "第五層",
@@ -1262,6 +1262,7 @@
     "title": "資安是一個網路問題。",
     "titleHighlight": "我們用網路解決它。",
     "subtitle": "傳統的威脅情報由研究團隊產出。Threat Cloud 由每一個 Panguard 部署自動產出。",
+    "statusNotice": "狀態（2026-11-18）：Threat Cloud 服務目前停止。PanGuard 在你的機器上照常完整運作，不會送出任何資料。下方內容是設計說明，服務恢復時會更新這一頁。",
     "vision": {
       "overline": "集體智慧",
       "title": "用戶越多，防護越強",
@@ -1753,7 +1754,7 @@
     },
     "howItWorks": {
       "title": "運作原理——Panguard AI",
-      "description": "五層防禦、三級 AI 分析、一行指令部署。了解 Panguard 如何從偵測到自動回應保護你的基礎設施。"
+      "description": "PanGuard 如何檢查 AI agent：skill 與 MCP server 的安裝前掃描、工具呼叫 hook、MCP proxy 與 Guard 引擎。一行指令安裝。"
     },
     "threatCloud": {
       "title": "威脅雲端——Panguard AI",
@@ -3368,17 +3369,7 @@
       "inquiryType": "選擇類型",
       "message": "我們能如何幫助你？"
     },
-    "inquiryTypes": [
-      "一般詢問",
-      "Migrator Pro ($500K–2M)",
-      "Enterprise ($150K–$500K)",
-      "Founding F500 （$100K × 2 年）",
-      "Sovereign AI ($5–20M)",
-      "OEM 授權 ($2–10M)",
-      "ATR Foundation Member （$10K/年）",
-      "技術支援",
-      "其他"
-    ],
+    "inquiryTypes": ["一般詢問", "企業與保險", "政府與主權部署", "ATR 會員", "技術支援", "其他"],
     "submit": "發送訊息",
     "submitting": "發送中…",
     "successTitle": "訊息已發送。",

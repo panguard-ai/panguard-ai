@@ -8,13 +8,15 @@ import { Check } from 'lucide-react';
 const inputStyles =
   'w-full bg-surface-1 border border-border rounded-full px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand-sage transition-colors';
 
+// 2026-11-18: no tier carries a price any more (nothing paid is deliverable yet).
+// Old tier links (migrator, founding-f500, oem) fold into "Organizations & insurers".
 const TIER_TO_INQUIRY_INDEX: Record<string, number> = {
+  enterprise: 1,
   migrator: 1,
-  enterprise: 2,
-  'founding-f500': 3,
-  sovereign: 4,
-  oem: 5,
-  'atr-member': 6,
+  'founding-f500': 1,
+  oem: 1,
+  sovereign: 2,
+  'atr-member': 3,
 };
 
 export default function ContactForm() {
@@ -40,12 +42,12 @@ export default function ContactForm() {
     const prefilledType =
       idx !== undefined && inquiryTypes[idx] !== undefined ? inquiryTypes[idx] : '';
     const tierLabel: Record<string, string> = {
-      migrator: 'Migrator Pro ($500K-2M/year)',
-      enterprise: 'Enterprise ($150K-$500K)',
-      'founding-f500': 'Founding F500 program ($100K/year × 2)',
-      sovereign: 'Sovereign AI ($5-20M)',
-      oem: 'Vendor OEM License ($2-10M/year)',
-      'atr-member': 'ATR Foundation Member ($10K/year)',
+      enterprise: 'Organizations & insurers',
+      migrator: 'Organizations & insurers (Sigma / YARA rule migration)',
+      'founding-f500': 'Organizations & insurers',
+      oem: 'Organizations & insurers',
+      sovereign: 'Government / sovereign deployment',
+      'atr-member': 'ATR membership (fees not yet set)',
     };
     const label = tierLabel[tier];
     const sovereignPath = tier === 'sovereign' ? searchParams?.get('path') : null;
