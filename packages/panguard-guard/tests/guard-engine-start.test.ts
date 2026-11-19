@@ -6,9 +6,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { SecurityEvent } from '@panguard-ai/core';
-import type { DetectionResult, EnvironmentBaseline, GuardConfig } from '../src/types.js';
-import { DEFAULT_ACTION_POLICY } from '../src/types.js';
+import type { EnvironmentBaseline, GuardConfig } from '../src/types.js';
 
 // ---------------------------------------------------------------------------
 // Mocks - must be set up before importing the module under test

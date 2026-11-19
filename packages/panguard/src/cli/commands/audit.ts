@@ -9,7 +9,7 @@
  */
 
 import { Command } from 'commander';
-import { readFileSync, existsSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { createPublicKey, verify as edVerify } from 'node:crypto';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
