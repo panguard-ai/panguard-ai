@@ -29,7 +29,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // platform / marketing
     '/integrations',
     '/security',
-    '/technology',
     '/how-it-works',
     '/threat-cloud',
     '/about',
@@ -39,15 +38,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/solutions/developers',
     '/migrator',
     '/pricing',
-    '/enterprise',
     // NOTE: /customers, /partners, /solutions/{enterprise,smb}, /careers,
     // /product/manager, /legal/sla all redirect to '/' (see next.config.mjs)
     // and are deliberately absent.
-    '/layers',
     '/community',
-    '/evidence-pack',
     '/demo',
-    '/early-access',
     '/scan',
     '/blacklist',
     '/whitelist',
@@ -94,8 +89,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/legal/security',
     '/legal/dpa',
     '/legal/msa',
-    '/legal/refund',
-    '/legal/sow',
   ];
 
   const getFrequency = (path: string): 'weekly' | 'monthly' => {

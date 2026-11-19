@@ -91,10 +91,33 @@ const nextConfig = {
       { source: '/zh-TW/docs/api', destination: '/zh-TW/docs/getting-started', permanent: false },
     ];
 
+    // 2026-11-18 price-list takedown: no paid service can be delivered yet, so
+    // nothing is sold or priced on the site. The self-serve pilot order flow,
+    // the priced enterprise spec and the pilot's terms are hidden (files kept,
+    // temporary redirects) and point to the two-column /pricing page instead.
+    const pricingTakedown = [
+      ['/scoping', '/contact?tier=enterprise'],
+      ['/pilot', '/pricing'],
+      ['/pilot/:path*', '/pricing'],
+      ['/enterprise', '/pricing'],
+      ['/evidence-pack', '/pricing'],
+      ['/legal/sow', '/pricing'],
+      ['/legal/refund', '/pricing'],
+      // "Five layers of real-time defense" pages describe the host-monitoring
+      // stack that is frozen and moving to off-by-default; hidden until rewritten.
+      ['/technology', '/how-it-works'],
+      ['/layers', '/how-it-works'],
+      ['/layers/:slug*', '/how-it-works'],
+    ];
+
     return [
       ...hiddenRoutes.flatMap((source) => [
         { source, destination: '/', permanent: false },
         { source: `/zh-TW${source}`, destination: '/', permanent: false },
+      ]),
+      ...pricingTakedown.flatMap(([source, destination]) => [
+        { source, destination, permanent: false },
+        { source: `/zh-TW${source}`, destination: `/zh-TW${destination}`, permanent: false },
       ]),
       ...consoleRedirects,
       ...productRedirects,
