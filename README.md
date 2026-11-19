@@ -148,11 +148,26 @@ Detection results depend on the ATR version, so they are published with the rule
 
 ## Honest about what leaves your machine
 
-PanGuard is on-device by default. **The Threat Cloud service is currently offline**, so nothing is sent even if you opted in. When it runs, the optional Threat Cloud (off until you opt in) shares only a **minimal threat signature** — the matched rule ID, attack category, MITRE technique, a coarse country region, and a truncated IP. **Never** your prompts, code, file contents, file paths, secrets, or hostname. Inbound community rules are **ed25519 signature-verified and fail-closed** — a rogue server can't inject detection logic.
+PanGuard is on-device by default. Joining Collective Defense (Threat Cloud) is **off until you opt in**, and one switch controls it: `pga config set threat-cloud true|false` (`telemetry` is the same switch). The full text you agree to is `pga config show --verbose`; it is the single source this section follows.
 
-One check runs whether or not you opt in: once a day PanGuard asks the npm registry whether a newer `agent-threat-rules` release exists, so it can tell you to run `pga upgrade`. It downloads nothing, and npm sees only your IP address. Set `PANGUARD_NO_UPDATE_CHECK=1` to turn it off.
+**If you opt in**, PanGuard:
 
-> Sharing is pseudonymous (a stable random install ID), transport-encrypted (TLS). End-to-end encrypted contributions — where not even our server can read a payload — are on the roadmap for regulated fleets.
+1. Shares **minimal threat signatures**: the matched rule ID, attack category, MITRE technique, a coarse country region and a truncated IP (last two octets zeroed). These are **end-to-end encrypted** on your machine to the Threat Cloud ingest key; only the backend can read them. This is the only traffic that is sealed today.
+2. Sends **summaries over HTTPS (not sealed)** when you audit skills or scan: the manifest or config name of a skill or MCP server (never a path), a hash of it (its `SKILL.md`, its files, or the server name and command shape; never its path), the risk level and score, the rule ID, category, severity and title of each finding, scan counts, your OS and CPU type, the PanGuard version, the list of agent platforms PanGuard set up, and, on `pga up` until the server accepts it once, your terminal program name and Node version.
+3. **Downloads** community lists every 5 minutes (IP and domain blocklists, community skill allow/block lists) from Threat Cloud, plus public threat-intel feeds from third parties (abuse.ch, and GreyNoise or AbuseIPDB if you set their keys). Those servers see your IP address.
+4. Turns on the **rule-proposal drafter**. In two calls (draft, then review) it sends the AI model you configured (a cloud provider if you set an API key, otherwise a local model) up to five event descriptions of up to 200 characters each, the analysis and evidence text built from them (capped), event counts, the time range, and then the rule it drafted.
+
+**Never**: your prompts, code, file contents, file paths, secrets, hostname or username. The names of tools your agents call at runtime are never uploaded. Detection-rule proposals stay on your machine until you submit one yourself (below). Inbound community rules are **ed25519 signature-verified and fail-closed**: a rogue server can't inject detection logic.
+
+**Whether or not you opt in:**
+
+- Two daily version checks, the CLI's own and the rules', both plain lookups on the npm registry. They download nothing, and npm sees your IP address. `pga config set update-check false` turns both off; `PANGUARD_NO_UPDATE_CHECK=1` overrides it.
+- `pga scan` in full mode looks up the names (and versions, when detected) of services listening on this machine on the NIST NVD vulnerability database.
+- If you have run `pga login`, every `pga audit` also sends the findings to your workspace at app.panguard.ai: rule ID, severity and title of each finding, risk level and score, the skill name, the target's base name (or remote identifier), a hash of the target, a one-way hashed machine ID, your OS and the PanGuard version. The events are tied to your workspace. `pga logout` stops it.
+
+Turning sharing off stops everything in the opt-in list. It restarts an installed always-on Guard service and stops a Guard that is running now; turning sharing on in a Guard you started by hand needs `pga guard restart`.
+
+> Sharing is pseudonymous (a stable random install ID). Signatures are end-to-end encrypted as described above; the other uploads are transport-encrypted (TLS) only. Extending end-to-end encryption to them is on the roadmap for regulated fleets.
 
 ### Send what you catch to ATR (no Threat Cloud needed)
 

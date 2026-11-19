@@ -278,9 +278,13 @@ describe('collective defense disclosure text', async () => {
 
   it('discloses the downloads, the drafter LLM call and the logged-in workspace link', () => {
     expect(text).toMatch(/every 5 minutes/);
-    expect(text).toMatch(/200 characters/);
-    expect(text).toMatch(/pga login/);
-    expect(text).toMatch(/TERM|terminal program name/i);
+    expect(text).toMatch(/five event descriptions of up to 200/);
+    expect(text).toMatch(/pga login[\s\S]*whether or not you joined/);
+    expect(text).toMatch(/pga logout stops it/);
+    expect(text).toMatch(/terminal\s+program name/i);
+    expect(text).toMatch(/services\.nvd\.nist\.gov/);
+    expect(text).toMatch(/pga config set update-check false/);
+    expect(text).toMatch(/two daily version checks/);
   });
 
   it('says proposals and runtime tool names stay on this machine', () => {

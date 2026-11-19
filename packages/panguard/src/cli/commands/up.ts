@@ -779,7 +779,7 @@ export function upCommand(): Command {
           console.log();
         }
 
-        // ── Activation tracking (one-time, OPT-IN) ──
+        // ── Activation tracking (until accepted once, OPT-IN) ──
         // The activation ping is non-essential collective telemetry, so it only
         // fires when the user has EXPLICITLY opted in (threatCloudUploadEnabled
         // === true). Default OFF: absent/unset config or any read error => no ping.
@@ -1190,7 +1190,7 @@ async function submitToTC(
   });
 }
 
-/** One-time activation report — only fires on first pga up */
+/** Activation report: resent on each pga up (while sharing is on) until the server accepts it once */
 async function reportActivation(): Promise<void> {
   const {
     existsSync: fe,
