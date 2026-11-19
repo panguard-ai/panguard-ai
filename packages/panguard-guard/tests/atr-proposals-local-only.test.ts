@@ -148,4 +148,68 @@ describe('ATR proposals stay local', () => {
     expect(draft).toHaveBeenCalledTimes(1);
     expect(listOutbox(dir)).toHaveLength(0);
   });
+
+  it.each([
+    ['no usable rule from the model', null],
+    [
+      'a rejected self-review',
+      { ruleContent: PROPOSAL.ruleContent, selfReviewApproved: false, selfReviewVerdict: '{}' },
+    ],
+  ])('%s is recorded as handled and not re-sent to the LLM', async (_label, outcome) => {
+    const llm = { isAvailable: vi.fn().mockResolvedValue(true) } as unknown as AnalyzeLLM;
+    const drafter = new ATRDrafter(llm, { outboxDir: dir, llmProvider: 'test', llmModel: 'm' });
+    const internals = drafter as unknown as {
+      draftAndReview: (h: string, p: unknown) => Promise<unknown>;
+      patterns: Map<string, unknown>;
+    };
+    const draft = vi.fn().mockResolvedValue(outcome);
+    internals.draftAndReview = draft;
+    internals.patterns.set('p3', {
+      attackType: 'command_injection',
+      mitreTechniques: [],
+      occurrences: 9,
+      distinctIPs: new Set(['a', 'b', 'c']),
+      severities: { high: 9 },
+      sampleDescriptions: [],
+      atrRulesMatched: [],
+      analyzeReasons: [],
+      evidenceDescriptions: [],
+      firstSeen: new Date().toISOString(),
+      lastSeen: new Date().toISOString(),
+    });
+
+    await drafter.runDraftCycle();
+    await drafter.runDraftCycle();
+
+    expect(draft).toHaveBeenCalledTimes(1);
+  });
+
+  it('a failed LLM call is retried on the next cycle', async () => {
+    const llm = { isAvailable: vi.fn().mockResolvedValue(true) } as unknown as AnalyzeLLM;
+    const drafter = new ATRDrafter(llm, { outboxDir: dir, llmProvider: 'test', llmModel: 'm' });
+    const internals = drafter as unknown as {
+      draftAndReview: (h: string, p: unknown) => Promise<unknown>;
+      patterns: Map<string, unknown>;
+    };
+    const draft = vi.fn().mockRejectedValue(new Error('LLM call timed out'));
+    internals.draftAndReview = draft;
+    internals.patterns.set('p4', {
+      attackType: 'command_injection',
+      mitreTechniques: [],
+      occurrences: 9,
+      distinctIPs: new Set(['a', 'b', 'c']),
+      severities: { high: 9 },
+      sampleDescriptions: [],
+      atrRulesMatched: [],
+      analyzeReasons: [],
+      evidenceDescriptions: [],
+      firstSeen: new Date().toISOString(),
+      lastSeen: new Date().toISOString(),
+    });
+
+    await drafter.runDraftCycle();
+    await drafter.runDraftCycle();
+
+    expect(draft).toHaveBeenCalledTimes(2);
+  });
 });

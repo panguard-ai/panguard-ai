@@ -266,7 +266,13 @@ export class ATRDrafter {
     for (const { hash, pattern } of toProcess) {
       try {
         const result = await this.draftAndReview(hash, pattern);
-        if (!result) continue;
+        if (!result) {
+          // The model returned no usable rule (invalid or short YAML, schema
+          // failure). Record the pattern as handled so it is not sent to the LLM
+          // again every cycle; a failed LLM call (thrown) is retried instead.
+          this.submittedPatterns.add(hash);
+          continue;
+        }
         drafted++;
 
         if (result.selfReviewApproved) {
@@ -294,6 +300,9 @@ export class ATRDrafter {
             submitted++;
             this.submittedPatterns.add(hash);
           }
+        } else {
+          // Rejected by the drafter's own self-review: handled, not retried every cycle.
+          this.submittedPatterns.add(hash);
         }
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
