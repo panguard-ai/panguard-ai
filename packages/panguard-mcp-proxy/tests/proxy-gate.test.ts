@@ -104,6 +104,17 @@ describe('MCPProxy dual-path loop (brain verdict feeds the gate)', () => {
     expect(p.gateCheck('echo', { text: 'hi' }).allow).toBe(true); // still allowed
   });
 
+  it('a high-confidence deny from a windowed long-input scan does NOT escalate the session', () => {
+    const p = resolvedProxy(['echo']);
+    p.recordEvalVerdict({
+      outcome: 'deny',
+      confidence: 98,
+      matchedRules: ['ATR-X'],
+      segmented: true,
+    });
+    expect(p.gateCheck('echo', { text: 'hi' }).allow).toBe(true);
+  });
+
   it('an allow verdict never escalates', () => {
     const p = resolvedProxy(['echo']);
     p.recordEvalVerdict({ outcome: 'allow', confidence: 99, matchedRules: [] });

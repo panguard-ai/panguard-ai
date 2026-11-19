@@ -76,7 +76,11 @@ export interface ProxyEvaluatorOptions {
    * an unfinished scan means.
    */
   readonly isolation?: EvaluationIsolation;
-  /** Worker mode: how long one evaluation may run (default DEFAULT_EVAL_DEADLINE_MS). */
+  /**
+   * How long one evaluation may run (default DEFAULT_EVAL_DEADLINE_MS). In
+   * worker mode it is a hard limit; inline, a long input scanned in windows
+   * stops between windows once past it.
+   */
   readonly deadlineMs?: number;
   /** Worker mode: how long to wait for the worker to start and load its rules (default 60 s). */
   readonly startTimeoutMs?: number;
@@ -106,7 +110,7 @@ interface EngineBackend {
   close(): Promise<void>;
 }
 
-function inlineBackend(engine: ATREngine): EngineBackend {
+function inlineBackend(engine: ATREngine, deadlineMs: number): EngineBackend {
   return {
     loadRules: () => engine.loadRules(),
     async addAutoRules(dir) {
@@ -118,7 +122,19 @@ function inlineBackend(engine: ATREngine): EngineBackend {
       for (const rule of fresh) engine.addRule(rule);
       return fresh.map((rule) => rule.id);
     },
-    evaluate: async (events) => events.flatMap((event) => engine.evaluate(event)),
+    async evaluate(events) {
+      if (events.length === 1) return engine.evaluate(events[0]!);
+      // A long input's windows run one at a time, yielding between them, and
+      // stop once past the deadline. Only a worker can cut a window midway.
+      const started = Date.now();
+      const matches: EngineMatch[] = [];
+      for (const event of events) {
+        if (Date.now() - started > deadlineMs) throw new EvaluationDeadlineError(deadlineMs);
+        matches.push(...engine.evaluate(event));
+        await new Promise((resolve) => setImmediate(resolve));
+      }
+      return matches;
+    },
     close: async () => undefined,
   };
 }
@@ -155,6 +171,15 @@ export interface EvalResult {
    * rule) and for 'allow'.
    */
   readonly adviseOnly: boolean;
+  /**
+   * True when the input was longer than ENGINE_MAX_EVAL_LENGTH and was scanned
+   * in windows. Such a verdict is weaker evidence than one on a whole input (see
+   * LONG_INPUT_SCAN_NOTE), so a caller MUST NOT let it escalate a session or
+   * lock a gate (the proxy's recordEvalVerdict ignores it).
+   */
+  readonly segmented?: boolean;
+  /** True when the input was longer than the scan cap and only a prefix was scanned. */
+  readonly inputCapped?: boolean;
 }
 
 /**
@@ -253,13 +278,14 @@ export function shouldHardDeny(rule: RuleLike, builtinToolSurface = false): bool
  * field (safeRegexTest() returns false), so every condition on that field
  * silently misses. A tool response past this length used to be not scanned at
  * all, and padding a poisoned response past it evaded the indirect-injection scan.
+ * Longer tool input is scanned in windows too (see evaluateToolCall).
  */
 export const ENGINE_MAX_EVAL_LENGTH = 100_000;
 
 /**
- * A response longer than ENGINE_MAX_EVAL_LENGTH is scanned in overlapping
- * windows. A response the engine can take whole stays one event, exactly as
- * before, so windowing adds no seams there.
+ * A response (or tool input) longer than ENGINE_MAX_EVAL_LENGTH is scanned in
+ * overlapping windows. Text the engine can take whole stays one event, exactly
+ * as before, so windowing adds no seams there.
  *
  * Windows are kept small to bound the cost of one evaluate(). The small window
  * also leaves the Unicode-normalised text, which the engine tests too, plenty
@@ -271,9 +297,29 @@ export const ENGINE_MAX_EVAL_LENGTH = 100_000;
 export const RESPONSE_WINDOW_CHARS = 30_000;
 export const RESPONSE_WINDOW_OVERLAP_CHARS = 6_000;
 
-/** Appended to the reason when a long response's hard-deny match was held back to an advisory. */
+/**
+ * How much of one tool call's flattened input is scanned. Same bound as the
+ * proxy puts on a tool response: the cap limits how much text one call can make
+ * the process scan. Content past it is NOT scanned (the verdict says so).
+ */
+export const MAX_TOOL_INPUT_SCAN_CHARS = 262_144;
+
+/** Appended to the reason when a long input's hard-deny match was held back to an advisory. */
 export const LONG_RESPONSE_ADVISORY =
-  ' [advisory: response over 100,000 chars, only stable rules block]';
+  ' [advisory: input over 100,000 chars, only stable rules block]';
+
+/** Appended to the reason when only a prefix of an over-long input was scanned. */
+export const INPUT_CAPPED_NOTE = ' [input over the scan cap: only the first 262,144 chars scanned]';
+
+/**
+ * Known limit of windowed scanning. Input over ENGINE_MAX_EVAL_LENGTH is scanned
+ * one overlapping window at a time, so a rule that needs two parts of the text
+ * that are far apart (more than the overlap) to appear together can match in a
+ * single event under the limit and not once the text is split. Long input is
+ * therefore not scanned as thoroughly as short input.
+ */
+export const LONG_INPUT_SCAN_NOTE =
+  'Windowed scans can miss a match whose parts lie farther apart than the window overlap.';
 
 /** Overlapping windows covering `text`, each at most `size` chars (the text itself when it fits). */
 export function responseWindows(
@@ -322,7 +368,7 @@ function mergeMatches<T extends MatchLike>(matches: readonly T[]): T[] {
 export class ProxyEvaluator {
   /** Where the engine runs (see ProxyEvaluatorOptions). */
   readonly isolation: EvaluationIsolation;
-  /** Worker mode: how long one evaluation may run before it is cut. */
+  /** How long one evaluation may run before it is cut (see ProxyEvaluatorOptions). */
   readonly deadlineMs: number;
   /** The engine itself in inline mode; in worker mode it lives in the worker. */
   private readonly engine: ATREngine | null;
@@ -365,7 +411,7 @@ export class ProxyEvaluator {
     // unproven matches degrade to 'ask' rather than breaking the agent.
     this.engine = isolation === 'inline' ? new ATREngine({ rulesDir }) : null;
     this.backend = this.engine
-      ? inlineBackend(this.engine)
+      ? inlineBackend(this.engine, deadlineMs)
       : workerBackend(
           {
             engineUrl: engineEntryUrl(packageDir),
@@ -487,6 +533,14 @@ export class ProxyEvaluator {
    * multi_agent_comm and llm_io rules that never apply to a shell command.
    * The old hardcoded 'mcp_exchange' both missed the tool_call attack rules
    * and false-fired multi_agent_comm rules on ordinary commands.
+   *
+   * Flattened tool input the engine can take whole (ENGINE_MAX_EVAL_LENGTH)
+   * is one event. Longer input, such as a large Write, is one event per window
+   * (see responseWindows). In that range only a proven (maturity: stable) rule
+   * hard-denies; the broad test-maturity rules fire on large ordinary files
+   * (compiled JS, lockfiles, JSON), so there they surface as an 'ask' advisory,
+   * and the verdict never escalates a session (EvalResult.segmented). Only the
+   * first MAX_TOOL_INPUT_SCAN_CHARS are scanned. Windowed scanning also has a known limit: a rule whose parts lie farther apart than the window overlap can match in one short event and not across windows.
    */
   async evaluateToolCall(
     toolName: string,
@@ -497,7 +551,10 @@ export class ProxyEvaluator {
     // metacharacter rule) advises instead of hard-blocking a real shell command.
     // The MCP proxy leaves it false (default) — on a genuine MCP argument those
     // rules correctly deny.
-    builtinToolSurface = false
+    builtinToolSurface = false,
+    // How much flattened input is scanned. The hook passes Infinity (its own
+    // stdin and time limits bound it); the proxy takes the default.
+    maxScanChars = MAX_TOOL_INPUT_SCAN_CHARS
   ): Promise<EvalResult> {
     const start = Date.now();
 
@@ -515,18 +572,30 @@ export class ProxyEvaluator {
     }
 
     // Flatten args into natural text so ATR regexes can match content like paths and commands
-    const flatContent = `${toolName} ${this.flattenArgs(args)}`;
-    const event: AgentEvent = {
-      type: eventType,
-      timestamp: new Date().toISOString(),
-      content: flatContent,
-      fields: {
-        tool_name: toolName,
-        tool_input: flatContent,
-      },
-    };
+    const fullContent = `${toolName} ${this.flattenArgs(args)}`;
+    const inputCapped = fullContent.length > maxScanChars;
+    const flatContent = inputCapped ? fullContent.slice(0, maxScanChars) : fullContent;
+    const windowed = flatContent.length > ENGINE_MAX_EVAL_LENGTH;
+    const timestamp = new Date().toISOString();
+    const texts = windowed ? responseWindows(flatContent) : [flatContent];
+    const events = texts.map(
+      (text): AgentEvent => ({
+        type: eventType,
+        timestamp,
+        content: text,
+        fields: {
+          tool_name: toolName,
+          tool_input: text,
+        },
+      })
+    );
 
-    return this.evaluate([event], start, { builtinToolSurface });
+    return this.evaluate(events, start, {
+      builtinToolSurface,
+      stableOnlyDeny: windowed,
+      segmented: windowed,
+      inputCapped,
+    });
   }
 
   /**
@@ -572,7 +641,7 @@ export class ProxyEvaluator {
       })
     );
 
-    return this.evaluate(events, start, { stableOnlyDeny: windowed });
+    return this.evaluate(events, start, { stableOnlyDeny: windowed, segmented: windowed });
   }
 
   private async evaluate(
@@ -581,7 +650,14 @@ export class ProxyEvaluator {
     {
       builtinToolSurface = false,
       stableOnlyDeny = false,
-    }: { readonly builtinToolSurface?: boolean; readonly stableOnlyDeny?: boolean } = {}
+      segmented = false,
+      inputCapped = false,
+    }: {
+      readonly builtinToolSurface?: boolean;
+      readonly stableOnlyDeny?: boolean;
+      readonly segmented?: boolean;
+      readonly inputCapped?: boolean;
+    } = {}
   ): Promise<EvalResult> {
     try {
       const matches = mergeMatches(await this.backend.evaluate(events));
@@ -595,6 +671,8 @@ export class ProxyEvaluator {
           confidence: 0,
           durationMs,
           adviseOnly: false,
+          ...(segmented ? { segmented: true } : {}),
+          ...(inputCapped ? { inputCapped: true } : {}),
         };
       }
 
@@ -649,11 +727,13 @@ export class ProxyEvaluator {
         reason:
           outcome === 'allow'
             ? `No actionable threat (low-severity match suppressed: ${topMatch.rule.title}, ${topMatch.rule.severity})`
-            : `${topMatch.rule.title} (${topMatch.rule.severity})${heldBack ? LONG_RESPONSE_ADVISORY : ''}`,
+            : `${topMatch.rule.title} (${topMatch.rule.severity})${heldBack ? LONG_RESPONSE_ADVISORY : ''}${inputCapped ? INPUT_CAPPED_NOTE : ''}`,
         matchedRules: matches.map((m) => m.rule.id),
         confidence: outcome === 'allow' ? 0 : topMatch.confidence,
         durationMs,
         adviseOnly,
+        ...(segmented ? { segmented: true } : {}),
+        ...(inputCapped ? { inputCapped: true } : {}),
       };
     } catch (err: unknown) {
       // A scan cut at its deadline, or one a worker failure kept from running,
@@ -696,7 +776,7 @@ export async function loadRulesOrInline(
     // loading the rules on this thread would only spend more of it.
     if (err instanceof EngineWorkerStartTimeoutError && !inlineAfterStartTimeout) throw err;
     warn(`${err.message}; scanning on this thread instead, without the time limit`);
-    const inline = new ProxyEvaluator();
+    const inline = new ProxyEvaluator({ deadlineMs: evaluator.deadlineMs });
     return { evaluator: inline, ruleCount: await inline.loadRules() };
   }
 }

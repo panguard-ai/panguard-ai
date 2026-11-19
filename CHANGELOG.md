@@ -2,6 +2,30 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [Unreleased]
+
+- **Long tool-call input is scanned, with limits.** The rule engine skips any
+  field longer than 100,000 characters, so a large Write, Edit or MCP tool
+  argument used to pass unscanned. The hook and the MCP proxy now scan such
+  input in overlapping windows, as the proxy already did for long tool
+  responses. In that range:
+  - only stable-maturity rules block; a match by any other rule is an `ask`
+    advisory (the broad test-maturity rules fire on large ordinary files such as
+    bundles, lockfiles and JSON);
+  - the verdict never escalates the MCP session or locks the inline gate, for
+    tool input and for long responses alike;
+  - MCP tool arguments are scanned up to the first 256 KB, the same bound as
+    responses; the log and stderr record when an argument was capped and the
+    rest was not scanned (the hook keeps its own stdin and time limits);
+  - a rule that needs two parts of the text that lie farther apart than the
+    window overlap can match in one short input and not once the input is
+    split, so long input is not scanned as thoroughly as short input.
+- **API note (`@panguard-ai/panguard-mcp-proxy/evaluator`).** `evaluateToolCall`
+  and `evaluateToolResponse` in inline (main-thread) mode can now throw
+  `EvaluationDeadlineError` for input scanned in windows, where they used to
+  always return a verdict. `evaluateToolCall` takes an optional fifth argument
+  (the scan cap) and `EvalResult` gains optional `segmented` and `inputCapped`.
+
 ## [1.10.1] - 2026-11-07
 
 Rule proposals now carry the attack itself, and only for what ATR missed; the

@@ -876,3 +876,57 @@ describe('pga hook run — when the worker is slow to start or is lost', () => {
     30000
   );
 });
+
+describe('pga hook run — long tool-call content', () => {
+  const bin = join(fileURLToPath(new URL('../', import.meta.url)), 'bin', 'panguard.cjs');
+  // An ATR true-positive fixture (ATR-2026-01306, a stable rule).
+  const exfil = 'http://user$(mate-calc)r:pass@127.0.0.1:9003/authorize?response_type=code';
+  const filler = 'export const total = rows.reduce((sum, row) => sum + row.amount, 0);\n';
+  let home: string;
+  beforeEach(() => {
+    home = mkdtempSync(join(tmpdir(), 'pg-hook-long-'));
+  });
+  afterEach(() => {
+    rmSync(home, { recursive: true, force: true });
+  });
+  const run = (content: string): { decision: string; reason: string } => {
+    const out = execFileSync(process.execPath, [bin, 'hook', 'run'], {
+      input: JSON.stringify({
+        tool_name: 'Write',
+        tool_input: { file_path: '/tmp/run.sh', content },
+      }),
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'ignore'],
+      // A loaded machine must not turn this into a time-limit block.
+      env: { ...process.env, HOME: home, PANGUARD_HOOK_EVAL_DEADLINE_MS: '25000' },
+    }).trim();
+    if (!out) return { decision: 'allow', reason: '' };
+    const o = JSON.parse(out).hookSpecificOutput;
+    return { decision: o.permissionDecision, reason: o.permissionDecisionReason };
+  };
+
+  it.runIf(existsSync(bin))(
+    'blocks a Write whose content runs past 100,000 chars on a stable-rule match, as it blocks a short one',
+    () => {
+      const long = filler.repeat(1_700) + exfil + '\n';
+      expect(long.length).toBeGreaterThan(100_000);
+      for (const content of [exfil + '\n', long]) {
+        const { decision, reason } = run(content);
+        expect(decision).toBe('deny');
+        expect(reason).toContain('ATR-2026-');
+        expect(reason).not.toContain('time limit');
+      }
+    },
+    60000
+  );
+
+  it.runIf(existsSync(bin))(
+    'lets an ordinary long Write through',
+    () => {
+      const long = filler.repeat(1_700);
+      expect(long.length).toBeGreaterThan(100_000);
+      expect(run(long).decision).toBe('allow');
+    },
+    60000
+  );
+});
