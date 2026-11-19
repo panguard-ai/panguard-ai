@@ -69,7 +69,12 @@ export interface ProxyConfig {
    * failMode.
    */
   readonly evalTimeout?: number;
-  /** Fail mode: 'closed' blocks on error (safer), 'open' allows on error (default for availability) */
+  /**
+   * Fail mode. The default is 'closed': an error, or a scan that does not finish
+   * within the time limit (evalTimeout), blocks the call or response. 'open'
+   * allows it instead, so with 'open' content whose scan was cut at the limit
+   * is forwarded unscanned. Also set by PANGUARD_PROXY_FAIL_MODE.
+   */
   readonly failMode?: 'open' | 'closed';
   /** Stable session id for this proxy run (default: per-process unique). */
   readonly sessionId?: string;
@@ -561,9 +566,7 @@ export class MCPProxy {
       // exactly those payloads in its args. Via the engine's mcp-over-tool
       // exception this is a superset of the mcp_exchange rules, so nothing that
       // 'mcp_exchange' caught is lost. (The old default silently skipped ~44
-      // tool_call rules on every MCP call.) Arguments over 100,000 chars are
-      // scanned in windows, like a long response; the evaluator's deadline
-      // bounds how long that takes.
+      // tool_call rules on every MCP call.)
       let preResult: EvalResult;
       const preStart = Date.now();
       try {

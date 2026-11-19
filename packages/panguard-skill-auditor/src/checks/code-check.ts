@@ -43,6 +43,17 @@ export async function checkCode(skillDirOrFile: string): Promise<CheckResult> {
         }>
       >)
     | null = null;
+  let checkCompiledArtifacts:
+    | ((dir: string) => Promise<
+        Array<{
+          id: string;
+          title: string;
+          description: string;
+          severity: Severity;
+          details?: string;
+        }>
+      >)
+    | null = null;
 
   try {
     const scan = await import('@panguard-ai/panguard-scan');
@@ -51,6 +62,9 @@ export async function checkCode(skillDirOrFile: string): Promise<CheckResult> {
     }
     if (typeof scan.checkHardcodedSecrets === 'function') {
       checkHardcodedSecrets = scan.checkHardcodedSecrets;
+    }
+    if (typeof scan.checkCompiledArtifacts === 'function') {
+      checkCompiledArtifacts = scan.checkCompiledArtifacts;
     }
   } catch {
     return {
@@ -69,12 +83,13 @@ export async function checkCode(skillDirOrFile: string): Promise<CheckResult> {
     };
   }
 
-  const [codeResults, secretResults] = await Promise.all([
+  const [codeResults, secretResults, compiledResults] = await Promise.all([
     checkSourceCode ? checkSourceCode(skillDir) : Promise.resolve([]),
     checkHardcodedSecrets ? checkHardcodedSecrets(skillDir) : Promise.resolve([]),
+    checkCompiledArtifacts ? checkCompiledArtifacts(skillDir) : Promise.resolve([]),
   ]);
 
-  for (const finding of codeResults) {
+  for (const finding of [...codeResults, ...compiledResults]) {
     findings.push({
       id: `code-${finding.id}`,
       title: finding.title,

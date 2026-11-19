@@ -11,7 +11,13 @@ import { existsSync, mkdirSync, mkdtempSync, writeFileSync, rmSync } from 'node:
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { EngineWorker, EngineWorkerError, EvaluationDeadlineError } from '../src/engine-worker.js';
+import {
+  EngineWorker,
+  EngineWorkerError,
+  EngineWorkerLostError,
+  EngineWorkerStartTimeoutError,
+  EvaluationDeadlineError,
+} from '../src/engine-worker.js';
 import type { EngineWorkerState } from '../src/engine-worker.js';
 import type { AgentEvent } from 'agent-threat-rules';
 
@@ -139,20 +145,23 @@ describe('EngineWorker', () => {
     expect(Date.now() - begin).toBeLessThan(3_000);
   });
 
-  it('fails a call whose worker exits mid-scan with EngineWorkerError, then recovers', async () => {
+  it('fails a call whose worker exits mid-scan with EngineWorkerLostError, then recovers', async () => {
     const w = engineWorker();
     await w.start();
-    await expect(w.evaluate([event('exit-now')], 5_000)).rejects.toBeInstanceOf(EngineWorkerError);
+    const lost = w.evaluate([event('exit-now')], 5_000);
+    await expect(lost).rejects.toBeInstanceOf(EngineWorkerLostError);
+    await expect(lost).rejects.toBeInstanceOf(EngineWorkerError);
     expect((await w.evaluate([event('has FAKE-1')], 5_000)).map((m) => m.rule.id)).toEqual([
       'FAKE-1',
     ]);
   });
 
-  it('refuses a restarted worker that loads fewer rules than the first one', async () => {
+  it('refuses a restarted worker that loads fewer rules than the first one, and keeps refusing without starting another', async () => {
     const dir = join(root, 'shrinking');
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, 'count'), '3');
-    const w = new EngineWorker({ engineUrl, rulesDir: dir });
+    const starts: EngineWorkerState[] = [];
+    const w = new EngineWorker({ engineUrl, rulesDir: dir, onStart: (s) => starts.push(s) });
     open.push(w);
     expect((await w.start()).ruleCount).toBe(3);
     writeFileSync(join(dir, 'count'), '0');
@@ -160,9 +169,40 @@ describe('EngineWorker', () => {
     const after = w.evaluate([event('FAKE-1')], 5_000);
     await expect(after).rejects.toBeInstanceOf(EngineWorkerError);
     await expect(after).rejects.toThrow('fewer than the 3 it first loaded');
-    // Once the rules are back, the next call starts a worker that has them.
+    // The refusal is remembered until the process restarts: even with the rules
+    // back, later calls fail at once, without starting and loading again.
     writeFileSync(join(dir, 'count'), '3');
-    expect((await w.evaluate([event('FAKE-1')], 5_000)).map((m) => m.rule.id)).toEqual(['FAKE-1']);
+    const begin = Date.now();
+    for (let i = 0; i < 3; i++) {
+      await expect(w.evaluate([event('FAKE-1')], 5_000)).rejects.toThrow(
+        'fewer than the 3 it first loaded'
+      );
+    }
+    await expect(w.start()).rejects.toThrow('fewer than the 3 it first loaded');
+    expect(Date.now() - begin).toBeLessThan(500);
+    expect(starts).toEqual([{ ruleCount: 3, autoRules: [] }]);
+  });
+
+  it('rejects with EngineWorkerStartTimeoutError when the worker starts slower than startTimeoutMs, and treats a worker that never started as not lost', async () => {
+    const w = new EngineWorker({ engineUrl, rulesDir: join(root, 'bundled'), startTimeoutMs: 1 });
+    open.push(w);
+    const start = w.start();
+    await expect(start).rejects.toBeInstanceOf(EngineWorkerStartTimeoutError);
+    await expect(start).rejects.not.toBeInstanceOf(EngineWorkerLostError);
+  });
+
+  it('takes the deadline from a function once the worker is ready', async () => {
+    const w = engineWorker();
+    let asked = 0;
+    const matches = await w.evaluate([event('has FAKE-1')], () => {
+      asked++;
+      return 5_000;
+    });
+    expect(matches.map((m) => m.rule.id)).toEqual(['FAKE-1']);
+    expect(asked).toBe(1);
+    await expect(w.evaluate([event('spin')], () => 250)).rejects.toMatchObject({
+      deadlineMs: 250,
+    });
   });
 
   it('fails only the call whose evaluation threw', async () => {

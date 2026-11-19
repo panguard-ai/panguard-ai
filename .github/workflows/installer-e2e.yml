@@ -38,7 +38,7 @@ jobs:
   # -- macOS arm64 (Apple Silicon) -----------------------------
   macos-arm64:
     name: macOS arm64 (source build)
-    runs-on: macos-14
+    runs-on: macos-15
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4

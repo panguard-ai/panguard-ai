@@ -2,6 +2,73 @@
 
 All notable changes to Panguard AI will be documented in this file.
 
+## [1.10.1] - 2026-11-07
+
+Rule proposals now carry the attack itself, and only for what ATR missed; the
+skill audit reads build output and report verification is hardened.
+
+- **Proposals skip threats ATR already catches.** In 1.10.0 a proposal could
+  be made entirely of findings from ATR rules that had already fired, with
+  those rules' regexes as the "payload", so it asked ATR for a rule it had.
+  `pga audit`, `pga up` and the Guard skill watcher now share one builder:
+  findings made by ATR, and any other finding in a file an ATR rule matched,
+  are left out, as are leaked credentials and audit bookkeeping (manifest,
+  dependency and permission notes). What remains is proposed with the lines
+  around each finding, read from inside the skill and capped at 600
+  characters, or the readable strings of a compiled file. A finding whose
+  source cannot be read is dropped rather than replaced by its title. No
+  remaining finding means no proposal and no message. The Guard rule drafter
+  skips patterns an ATR rule already matched.
+- **De-identification keeps file names.** An absolute path was masked whole as
+  a token, turning `scripts/run.py` into `[token].py`. A path now keeps its
+  segments; only a segment that looks like a token is masked.
+- **`pga audit skill` reads scripts under `dist/`, `build/` and `target/`.**
+  The script scan skipped these directories without counting them, so a skill
+  whose SKILL.md runs `node dist/index.js` had its payload unread and could
+  still score LOW. They are now read, after every other top-level directory so
+  a committed bundle cannot push hand-written scripts past the file cap.
+  `.min.js` files are still not read but are now counted as skipped, which
+  reports the scan as incomplete; `.pyw` files are read as Python.
+- **`pga report sign verify` output hardening.** Strings taken from the report
+  or the command line (file name, issuer, key_id, jurisdiction, hash, failure
+  detail) are printed with non-printable characters shown as `\uXXXX`
+  escapes. `--json` output and exit codes are unchanged.
+- **`verifyAuditReport` no longer throws on a malformed `issuer_signature`.**
+  A `null`, non-object or wrongly typed signature block now returns a failed
+  result (`missing-issuer-signature` or `bad-signature`).
+
+## [1.10.0] - 2026-11-06
+
+Skill scans now read the code a skill ships, and rule proposals have a way out
+that does not depend on Threat Cloud.
+
+- **`pga proposals` sends rule proposals to ATR as a pre-filled GitHub issue.**
+  Every proposal PanGuard produces (`pga up`, `pga audit`, the skill watcher,
+  the Guard rule drafter) used to have one exit, Threat Cloud; with it
+  unreachable, proposals were dropped. They now land in `~/.panguard/proposals`
+  (0600), de-identified on the machine: secrets and token-shaped strings, home
+  paths, user and host names, emails and IPs are masked, and the skill name is
+  left out. `pga proposals list|show|submit` reviews them; `submit` only opens a
+  pre-filled ATR "New Rule Proposal" issue that you read and submit from your
+  own GitHub account. The CLI posts nothing and needs no token. Threat Cloud
+  stays an optional extra destination.
+- **Python bytecode in a skill is flagged.** A skill could keep its `.py`
+  sources clean and ship the code that runs in `__pycache__/*.pyc`, and every
+  text-based check reported it clean. `.pyc`/`.pyo` files are now reported:
+  high by default, critical when the file's readable strings name a call that
+  runs commands or code. `pga scan` counts them in the threat total and exit
+  code; JSON output gains `compiled_artifacts`. Fixes #60, reported by @nedlir.
+- **`pga audit skill` runs ATR rules on the scripts a skill ships**, not only
+  SKILL.md, and moves to agent-threat-rules 4.3. Script files are read breadth
+  first within a per-skill size and time budget; anything skipped is counted,
+  and a skill whose scripts were not fully read cannot score LOW.
+- **The MCP proxy scans tool responses longer than 100,000 characters.** The
+  rule engine skips longer fields, so a poisoned response padded past that
+  length was not scanned. Longer responses are now scanned in overlapping
+  windows; in that newly covered range only stable rules hard-deny, and
+  test-maturity matches surface as an `ask` advisory. Moves to
+  agent-threat-rules 4.2.
+
 ## [1.9.0] - 2026-08-19
 
 The trust-page promise becomes runnable, and one Threat Cloud answer means one

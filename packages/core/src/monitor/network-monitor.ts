@@ -58,6 +58,10 @@ export class NetworkMonitor extends EventEmitter {
   private previousConnections: Map<string, ActiveConnection> = new Map();
   /** Polling interval in milliseconds / 輪詢間隔（毫秒） */
   private pollInterval: number;
+  /** Whether a poll is still in flight / 是否仍有輪詢在進行中 */
+  private polling = false;
+  /** Whether a skipped poll has been logged since the last completed one / 自上次完成後是否已記錄略過的輪詢 */
+  private skipLogged = false;
 
   /**
    * Create a new NetworkMonitor instance
@@ -126,6 +130,19 @@ export class NetworkMonitor extends EventEmitter {
    * 輪詢目前連線並為變更發出事件
    */
   private async pollConnections(): Promise<void> {
+    // Never overlap polls. The OS tool can block indefinitely (e.g. lsof on an
+    // unresponsive network mount sits in an uninterruptible wait that neither the
+    // execFile timeout nor SIGKILL ends), and starting a new one every interval
+    // would pile up processes until the user's process limit is reached.
+    // 輪詢不重疊：系統工具可能無限期阻塞，每次都啟動新程序會耗盡程序上限。
+    if (this.polling) {
+      if (!this.skipLogged) {
+        this.skipLogged = true;
+        logger.warn('Previous network poll has not finished; skipping until it does');
+      }
+      return;
+    }
+    this.polling = true;
     try {
       const currentList = await this.getCurrentConnections();
       const currentMap = new Map<string, ActiveConnection>();
@@ -169,6 +186,9 @@ export class NetworkMonitor extends EventEmitter {
     } catch (err) {
       logger.error('Failed to poll connections', { error: String(err) });
       this.emit('error', err instanceof Error ? err : new Error(String(err)));
+    } finally {
+      this.polling = false;
+      this.skipLogged = false;
     }
   }
 
