@@ -312,9 +312,9 @@ export class GuardEngine {
     // Daily rule-update CHECK (notify-only): compares the bundled ruleset against
     // the latest published npm version and surfaces "update available" — it never
     // downloads or live-applies rules (that is the supply-chain hole we avoid).
-    // PANGUARD_NO_UPDATE_CHECK=1 turns this off (it runs whether or not the
-    // user joined Threat Cloud, and the disclosure says so).
-    if (ruleUpdateCheckEnabled()) {
+    // PANGUARD_NO_UPDATE_CHECK=1 or config `updateCheck: false` turns this off (it
+    // runs whether or not the user joined Threat Cloud, and the disclosure says so).
+    if (ruleUpdateCheckEnabled(process.env, this.config)) {
       this.ruleUpdateTimer = setupRuleUpdateCheckTimer(syncDeps);
       void checkForRuleUpdates(syncDeps); // fire-and-forget initial check (no network block on startup)
     }

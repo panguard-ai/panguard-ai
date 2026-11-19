@@ -13,4 +13,12 @@ describe('ruleUpdateCheckEnabled', () => {
       expect(ruleUpdateCheckEnabled({ PANGUARD_NO_UPDATE_CHECK: v })).toBe(false);
     }
   });
+
+  it('is off when the config key updateCheck is false, and the env var still overrides', () => {
+    expect(ruleUpdateCheckEnabled({}, { updateCheck: false })).toBe(false);
+    expect(ruleUpdateCheckEnabled({}, { updateCheck: true })).toBe(true);
+    expect(ruleUpdateCheckEnabled({ PANGUARD_NO_UPDATE_CHECK: '1' }, { updateCheck: true })).toBe(
+      false
+    );
+  });
 });

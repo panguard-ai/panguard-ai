@@ -112,6 +112,7 @@ const GuardConfigFileSchema = z
     // infrastructure is available. Leaving it off keeps detection pinned to the
     // bundled rules without disabling IP/domain blocklist feeds.
     threatCloudRuleSyncEnabled: z.boolean().optional(),
+    updateCheck: z.boolean().optional(),
     // Gap A: auto-pull the latest agent-threat-rules bundle from npm (integrity-
     // verified) and hot-reload it, so detection stays fresh with no user action.
     // Opt-in. Auto-pulled rules DETECT (advise) only — they never gain BLOCK

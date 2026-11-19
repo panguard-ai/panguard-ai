@@ -256,11 +256,17 @@ export interface RuleUpdateStatus {
 }
 
 /**
- * The daily rule-update check is the one network call PanGuard makes whether or
- * not the user joined Threat Cloud (a plain version lookup on the npm registry).
- * PANGUARD_NO_UPDATE_CHECK=1 (or "true") turns it off. Pure + exported for tests.
+ * The daily rule-update check is a network call PanGuard makes whether or not the
+ * user joined Threat Cloud (a plain version lookup on the npm registry). It is
+ * off when the environment variable PANGUARD_NO_UPDATE_CHECK is 1, true or yes
+ * (an override that always wins), or when the config key `updateCheck` is false.
+ * Pure + exported for tests.
  */
-export function ruleUpdateCheckEnabled(env: NodeJS.ProcessEnv = process.env): boolean {
+export function ruleUpdateCheckEnabled(
+  env: NodeJS.ProcessEnv = process.env,
+  config: { readonly updateCheck?: boolean } = {}
+): boolean {
+  if (config.updateCheck === false) return false;
   const v = (env['PANGUARD_NO_UPDATE_CHECK'] ?? '').trim().toLowerCase();
   return !(v === '1' || v === 'true' || v === 'yes');
 }

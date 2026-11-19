@@ -14,6 +14,7 @@ const GUARD_CONFIG_PATH = join(GUARD_CONFIG_DIR, 'config.json');
 export interface GuardConfigSubset {
   telemetryEnabled?: boolean;
   threatCloudUploadEnabled?: boolean;
+  updateCheck?: boolean;
   mode?: string;
   dashboardEnabled?: boolean;
   dashboardPort?: number;

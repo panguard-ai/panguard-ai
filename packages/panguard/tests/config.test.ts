@@ -337,6 +337,17 @@ describe('pga config set — boolean validation (no silent reverse-set)', () => 
   );
 
   it.runIf(existsSync(bin))(
+    'update-check false persists updateCheck=false and touches nothing else',
+    () => {
+      const h = sandbox();
+      const { status, config } = run(h, ['update-check', 'false']);
+      expect(status).toBe(0);
+      expect(config).toEqual({ updateCheck: false });
+    },
+    30000
+  );
+
+  it.runIf(existsSync(bin))(
     'REGRESSION: an unknown value exits 1 and writes NOTHING (no silent false)',
     () => {
       const h = sandbox();
