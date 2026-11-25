@@ -7,8 +7,10 @@
  * - abuse.ch URLhaus (malicious URLs)
  * - abuse.ch Feodo Tracker (banking trojan C2)
  * - GreyNoise Community API (internet scanners)
+ * - NetAPI honeypot attackers (IPs seen attacking honeypot sensors, last 48h)
  *
- * All feeds are free and require no registration (except AbuseIPDB which is optional).
+ * All feeds are free. ThreatFox and URLhaus need an abuse.ch Auth-Key (they answer
+ * 401 without one), AbuseIPDB needs an API key and is optional.
  *
  * @module @panguard-ai/core/monitor/threat-intel-feeds
  */
@@ -19,7 +21,13 @@ import type { ThreatIntelEntry } from './types.js';
 const logger = createLogger('threat-intel-feeds');
 
 /** Feed source identifier / 情報源識別 */
-export type FeedSource = 'threatfox' | 'urlhaus' | 'feodotracker' | 'greynoise' | 'abuseipdb';
+export type FeedSource =
+  | 'threatfox'
+  | 'urlhaus'
+  | 'feodotracker'
+  | 'greynoise'
+  | 'abuseipdb'
+  | 'netapi';
 
 /** Individual IoC (Indicator of Compromise) / 入侵指標 */
 export interface IoC {
@@ -73,7 +81,7 @@ export interface FeedManagerConfig {
 const DEFAULT_CONFIG: FeedManagerConfig = {
   updateIntervalMs: 60 * 60 * 1000, // 1 hour
   maxIoCs: 50000,
-  enabledFeeds: ['threatfox', 'urlhaus', 'feodotracker', 'greynoise'],
+  enabledFeeds: ['threatfox', 'urlhaus', 'feodotracker', 'greynoise', 'netapi'],
   requestTimeoutMs: 30000,
   staleThresholdMultiplier: 2,
   degradedThresholdMultiplier: 6,
@@ -340,6 +348,9 @@ export class ThreatIntelFeedManager {
         case 'abuseipdb':
           count = await this.fetchAbuseIPDB();
           break;
+        case 'netapi':
+          count = await this.fetchNetAPI();
+          break;
       }
       const now = Date.now();
       this.lastUpdate.set(source, new Date(now).toISOString());
@@ -382,6 +393,7 @@ export class ThreatIntelFeedManager {
       },
       this.config.requestTimeoutMs
     );
+    ensureOk(res, 'threatfox');
 
     const data = (await res.json()) as {
       query_status: string;
@@ -441,6 +453,7 @@ export class ThreatIntelFeedManager {
       },
       this.config.requestTimeoutMs
     );
+    ensureOk(res, 'urlhaus');
 
     const data = (await res.json()) as {
       urls?: Array<{
@@ -497,6 +510,7 @@ export class ThreatIntelFeedManager {
       },
       this.config.requestTimeoutMs
     );
+    ensureOk(res, 'feodotracker');
 
     const data = (await res.json()) as Array<{
       ip_address: string;
@@ -597,6 +611,42 @@ export class ThreatIntelFeedManager {
   }
 
   /**
+   * NetAPI honeypot attackers - IPv4 addresses that attacked NetAPI's own
+   * honeypot sensors in the last 48 hours (password guessing, exploit attempts,
+   * malware delivery). Plain list, one address per line, regenerated hourly,
+   * no key required, CC BY 4.0.
+   * https://netapi.com/compromised-ips/
+   */
+  private async fetchNetAPI(): Promise<number> {
+    const res = await fetchWithTimeout(
+      'https://netapi.com/api2/?method=compromised&dataset_type=ip&header=0',
+      {
+        method: 'GET',
+      },
+      this.config.requestTimeoutMs
+    );
+    ensureOk(res, 'netapi');
+
+    const now = new Date().toISOString();
+    let count = 0;
+    for (const line of (await res.text()).split('\n')) {
+      const ip = line.trim();
+      if (!isIPv4(ip)) continue;
+      this.addIoC({
+        type: 'ip',
+        value: ip,
+        threatType: 'attacker:honeypot',
+        source: 'netapi',
+        confidence: 80,
+        lastSeen: now,
+        tags: ['honeypot'],
+      });
+      count++;
+    }
+    return count;
+  }
+
+  /**
    * AbuseIPDB check (requires API key, optional)
    */
   private async fetchAbuseIPDB(): Promise<number> {
@@ -679,6 +729,26 @@ export class ThreatIntelFeedManager {
       }
     }
   }
+}
+
+/**
+ * Treat a non-2xx answer as a failed update, so that a feed which stopped
+ * serving data (e.g. 401 without an API key) is reported as stale/degraded
+ * instead of a successful update with zero IoCs.
+ */
+function ensureOk(res: Response, source: FeedSource): void {
+  if (!res.ok) {
+    throw new Error(`${source} answered HTTP ${res.status}`);
+  }
+}
+
+/** Strict dotted-quad IPv4 check / 嚴格 IPv4 格式檢查 */
+function isIPv4(value: string): boolean {
+  const parts = value.split('.');
+  return (
+    parts.length === 4 &&
+    parts.every((p) => /^\d{1,3}$/.test(p) && Number(p) <= 255 && String(Number(p)) === p)
+  );
 }
 
 /** Fetch with timeout / 含逾時的 fetch */
