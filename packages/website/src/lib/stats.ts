@@ -56,7 +56,7 @@ export const STATS = {
    * which lags the ATR release above. Written by scripts/compile-atr-rules.mjs and
    * checked by CI together with the bundle; do not hand-edit.
    */
-  scanner: { atrRelease: '3.5.8', rules: 650, patterns: 2_903 },
+  scanner: { atrRelease: '4.3.1', rules: 836, patterns: 3_455 },
   /** Promotion interval in Threat Cloud */
   promotionIntervalMinutes: 2,
   testsPassing: 3_528,

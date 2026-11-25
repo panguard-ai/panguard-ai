@@ -112,6 +112,7 @@ const GuardConfigFileSchema = z
     // infrastructure is available. Leaving it off keeps detection pinned to the
     // bundled rules without disabling IP/domain blocklist feeds.
     threatCloudRuleSyncEnabled: z.boolean().optional(),
+    updateCheck: z.boolean().optional(),
     // Gap A: auto-pull the latest agent-threat-rules bundle from npm (integrity-
     // verified) and hot-reload it, so detection stays fresh with no user action.
     // Opt-in. Auto-pulled rules DETECT (advise) only — they never gain BLOCK
@@ -141,11 +142,17 @@ export const DEFAULT_GUARD_CONFIG: GuardConfig = {
   dashboardPort: 3100,
   dashboardEnabled: true,
   verbose: false,
+  // Host-level monitoring (OS logs, network sockets, process table) is OFF by
+  // default: the product's main line is AI-agent protection, and these pollers
+  // spawn OS tools (lsof/ps/log/netstat) on a timer. Opt in explicitly through
+  // the `monitors` block of the config file. fileMonitor stays false too: the
+  // engine-level file monitor is never given watch paths, and SkillWatcher runs
+  // its own independent file monitor.
   monitors: {
-    logMonitor: true,
-    networkMonitor: true,
-    processMonitor: true,
-    fileMonitor: true,
+    logMonitor: false,
+    networkMonitor: false,
+    processMonitor: false,
+    fileMonitor: false,
     networkPollInterval: 30000,
     processPollInterval: 15000,
   },

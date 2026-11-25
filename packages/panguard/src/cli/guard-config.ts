@@ -14,10 +14,20 @@ const GUARD_CONFIG_PATH = join(GUARD_CONFIG_DIR, 'config.json');
 export interface GuardConfigSubset {
   telemetryEnabled?: boolean;
   threatCloudUploadEnabled?: boolean;
+  updateCheck?: boolean;
   mode?: string;
   dashboardEnabled?: boolean;
   dashboardPort?: number;
   [key: string]: unknown;
+}
+
+/**
+ * THE sharing predicate. Every upload, download and status line reads this one
+ * value: sharing is ON only when threatCloudUploadEnabled is exactly true
+ * (absent, false or unreadable config means OFF).
+ */
+export function isSharingEnabled(cfg: GuardConfigSubset): boolean {
+  return cfg.threatCloudUploadEnabled === true;
 }
 
 /** Load guard config from ~/.panguard-guard/config.json */

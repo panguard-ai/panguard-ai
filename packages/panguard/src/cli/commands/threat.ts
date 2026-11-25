@@ -18,7 +18,7 @@ async function loadThreatCloud(): Promise<any> {
     console.error(
       `\n  ${c.red('Threat Cloud server package is not available.')}\n` +
         `  This command is for Panguard operators only.\n` +
-        `  Your Guard client connects to Threat Cloud automatically — no action needed.\n`
+        `  Your Guard client connects to Threat Cloud only if you opt in (pga config show --verbose).\n`
     );
     process.exitCode = 1;
     return null;

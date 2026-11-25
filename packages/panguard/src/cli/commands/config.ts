@@ -17,9 +17,13 @@ import { Command } from 'commander';
 import { c, banner } from '@panguard-ai/core';
 import { PANGUARD_VERSION } from '../../index.js';
 import { saveLlmConfig, loadLlmConfig, deleteLlmConfig } from '../credentials.js';
-import { loadGuardConfig, updateGuardConfig } from '../guard-config.js';
+import { isSharingEnabled, loadGuardConfig, updateGuardConfig } from '../guard-config.js';
+import { isUpdateCheckEnabled } from '../update-check.js';
 import { saveLang } from '../interactive/lang.js';
 import { printCollectiveDefenseDisclosure } from '../consent.js';
+import { sharingPatch } from '../sharing-switch.js';
+import { applySharingToRunningGuard, describeOutcome } from '../apply-sharing.js';
+import type { SharingKey } from '../sharing-switch.js';
 
 /**
  * Print how to provide a cloud key without persisting it: via the environment
@@ -39,10 +43,10 @@ export function configCommand(): Command {
   cmd
     .command('set')
     .description('Set a guard config value')
-    .argument('<key>', 'Config key: telemetry, threat-cloud, lang')
+    .argument('<key>', 'Config key: telemetry, threat-cloud, update-check, lang')
     .argument('<value>', 'Config value (true/false, or en/zh-TW for lang)')
     .action(async (key: string, value: string) => {
-      const validKeys = ['telemetry', 'threat-cloud', 'lang'];
+      const validKeys = ['telemetry', 'threat-cloud', 'update-check', 'lang'];
       if (!validKeys.includes(key)) {
         console.log(
           `  ${c.caution(`Invalid key: ${key}. Must be one of: ${validKeys.join(', ')}`)}`
@@ -76,12 +80,23 @@ export function configCommand(): Command {
         process.exit(1);
       }
       const boolValue = truthy.includes(v);
-      if (key === 'telemetry') {
-        await updateGuardConfig({ ...config, telemetryEnabled: boolValue });
-        console.log(`  ${c.safe('telemetryEnabled')} set to ${c.bold(String(boolValue))}`);
-      } else if (key === 'threat-cloud') {
-        await updateGuardConfig({ ...config, threatCloudUploadEnabled: boolValue });
-        console.log(`  ${c.safe('threatCloudUploadEnabled')} set to ${c.bold(String(boolValue))}`);
+      if (key === 'update-check') {
+        await updateGuardConfig({ ...config, updateCheck: boolValue });
+        console.log(`  ${c.safe('updateCheck')} set to ${c.bold(String(boolValue))}`);
+        console.log(
+          `  ${c.dim('Covers the CLI and the Guard rule-version lookups (npm registry). PANGUARD_NO_UPDATE_CHECK=1 overrides it.')}`
+        );
+        return;
+      }
+      const patch = sharingPatch(key as SharingKey, boolValue);
+      await updateGuardConfig({ ...config, ...patch });
+      for (const [flag, flagValue] of Object.entries(patch)) {
+        console.log(`  ${c.safe(flag)} set to ${c.bold(String(flagValue))}`);
+      }
+      const outcome = await applySharingToRunningGuard(boolValue);
+      console.log(`  ${c.dim(describeOutcome(outcome))}`);
+      if (boolValue) {
+        console.log(`  ${c.dim('What sharing sends: pga config show --verbose')}`);
       }
     });
 
@@ -96,11 +111,12 @@ export function configCommand(): Command {
       console.log(banner(PANGUARD_VERSION));
       console.log(`  ${c.sage('Guard Configuration')}`);
       const guardConfig = loadGuardConfig();
+      // Both lines read the single sharing predicate.
+      const sharing = isSharingEnabled(guardConfig);
+      console.log(`  Telemetry:     ${sharing ? c.safe('enabled') : c.dim('disabled')}`);
+      console.log(`  Threat Cloud:  ${sharing ? c.safe('enabled') : c.dim('disabled')}`);
       console.log(
-        `  Telemetry:     ${guardConfig.telemetryEnabled === true ? c.safe('enabled') : c.dim('disabled')}`
-      );
-      console.log(
-        `  Threat Cloud:  ${guardConfig.threatCloudUploadEnabled === true ? c.safe('enabled') : c.dim('disabled')}`
+        `  Update check:  ${isUpdateCheckEnabled(process.env, guardConfig) ? c.safe('on (npm registry, daily)') : c.dim('off')}`
       );
       console.log(
         `  Mode:          ${guardConfig.mode ? c.bold(guardConfig.mode) : c.dim('default')}`

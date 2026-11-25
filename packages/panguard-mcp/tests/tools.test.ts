@@ -365,9 +365,9 @@ describe('panguard_init', () => {
     const config = JSON.parse(content) as Record<string, unknown>;
     const monitors = config['monitors'] as Record<string, unknown>;
 
-    expect(monitors['logMonitor']).toBe(true);
-    expect(monitors['networkMonitor']).toBe(true);
-    expect(monitors['processMonitor']).toBe(true);
+    expect(monitors['logMonitor']).toBe(false);
+    expect(monitors['networkMonitor']).toBe(false);
+    expect(monitors['processMonitor']).toBe(false);
     expect(monitors['fileMonitor']).toBe(false);
   });
 

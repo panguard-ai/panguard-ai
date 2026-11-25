@@ -257,6 +257,10 @@ async function showWhatsNewIfUpgraded(): Promise<void> {
  * Non-blocking, max once per 24 hours, best-effort.
  */
 async function checkForUpdates(): Promise<void> {
+  // PANGUARD_NO_UPDATE_CHECK=1 or `pga config set update-check false` turns this off.
+  const { loadGuardConfig } = await import('./guard-config.js');
+  const { isUpdateCheckEnabled } = await import('./update-check.js');
+  if (!isUpdateCheckEnabled(process.env, loadGuardConfig())) return;
   const { existsSync, readFileSync, writeFileSync, mkdirSync } = await import('node:fs');
   const { join } = await import('node:path');
 

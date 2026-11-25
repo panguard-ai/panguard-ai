@@ -8,7 +8,7 @@
   },
   "homepage": "https://panguard.ai",
   "type": "module",
-  "description": "AI real-time endpoint monitoring and auto-response / AI 即時端點監控與自動回應",
+  "description": "AI agent action interception engine / AI agent 動作攔截引擎",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -60,7 +60,7 @@
     "@panguard-ai/panguard-trap": "workspace:*",
     "@panguard-ai/scan-core": "workspace:*",
     "@panguard-ai/security-hardening": "workspace:*",
-    "agent-threat-rules": "^3.5.10",
+    "agent-threat-rules": "^4.3.1",
     "jose": "^5.9.0",
     "js-yaml": "^4.1.0",
     "ws": "^8.21.0",

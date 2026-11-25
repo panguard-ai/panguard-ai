@@ -289,6 +289,8 @@ export function createProcessEvent(opts: {
  */
 export class ProcessWatcher extends EventEmitter {
   private running = false;
+  /** True while a poll is in flight; a slow ps/tasklist must not stack up child processes */
+  private polling = false;
   private pollTimer: ReturnType<typeof setInterval> | null = null;
   private readonly pollIntervalMs: number;
   /** Track alerted PIDs to avoid duplicate alerts for the same process */
@@ -375,6 +377,8 @@ export class ProcessWatcher extends EventEmitter {
    * Poll the process list and analyze new processes.
    */
   private async pollAndAnalyze(): Promise<void> {
+    if (this.polling) return;
+    this.polling = true;
     try {
       const processes = await this.getProcessList();
       const currentPids = new Set(processes.map((p) => p.pid));
@@ -398,6 +402,8 @@ export class ProcessWatcher extends EventEmitter {
       this.previousPids = currentPids;
     } catch (err) {
       logger.warn(`Process poll failed: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      this.polling = false;
     }
   }
 

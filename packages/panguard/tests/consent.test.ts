@@ -26,6 +26,8 @@ const mockUpdateGuardConfig = vi.fn();
 
 vi.mock('../src/cli/guard-config.js', () => ({
   loadGuardConfig: () => mockLoadGuardConfig(),
+  isSharingEnabled: (c: { threatCloudUploadEnabled?: boolean }) =>
+    c.threatCloudUploadEnabled === true,
   updateGuardConfig: (...args: unknown[]) => mockUpdateGuardConfig(...args),
 }));
 
@@ -84,13 +86,13 @@ describe('ensureTelemetryConsent', () => {
   it('returns current config value when already asked', async () => {
     // hasConsentBeenAsked returns true
     mockExistsSync.mockReturnValue(true);
-    mockLoadGuardConfig.mockReturnValue({ telemetryEnabled: true });
+    mockLoadGuardConfig.mockReturnValue({ threatCloudUploadEnabled: true });
 
     const result = await ensureTelemetryConsent();
     expect(result).toBe(true);
   });
 
-  it('returns false when already asked and telemetryEnabled is undefined', async () => {
+  it('returns false when already asked and sharing is not enabled', async () => {
     mockExistsSync.mockReturnValue(true);
     mockLoadGuardConfig.mockReturnValue({});
 
@@ -213,7 +215,7 @@ describe('ensureTelemetryConsent does not re-prompt once marked (BUG2 regression
     // The trailing ensureTelemetryConsent() must NOT prompt again (which used to
     // default-NO and silently overwrite the opt-in) — it just reads the value back.
     mockExistsSync.mockReturnValue(true); // hasConsentBeenAsked() === true
-    mockLoadGuardConfig.mockReturnValue({ telemetryEnabled: true });
+    mockLoadGuardConfig.mockReturnValue({ threatCloudUploadEnabled: true });
 
     const result = await ensureTelemetryConsent();
 
@@ -257,5 +259,36 @@ describe('markConsentAsked (via askTelemetryConsent)', () => {
     // Should not throw
     const result = await askTelemetryConsent();
     expect(result).toBe(false);
+  });
+});
+
+describe('collective defense disclosure text', async () => {
+  const { COLLECTIVE_DEFENSE_LINES } = await import('../src/cli/consent.js');
+  const text = COLLECTIVE_DEFENSE_LINES.join('\n');
+
+  it('does not promise automatic community rules or rule updates', () => {
+    expect(text).not.toMatch(/get every community rule back/i);
+    expect(text).not.toMatch(/auto-?update your detection rules/i);
+    expect(text).toContain('pga upgrade');
+  });
+
+  it('names the command that stops every upload and download', () => {
+    expect(text).toContain('pga config set threat-cloud false');
+  });
+
+  it('discloses the downloads, the drafter LLM call and the logged-in workspace link', () => {
+    expect(text).toMatch(/every 5 minutes/);
+    expect(text).toMatch(/five event descriptions of up to 200/);
+    expect(text).toMatch(/pga login[\s\S]*whether or not you joined/);
+    expect(text).toMatch(/pga logout stops it/);
+    expect(text).toMatch(/terminal\s+program name/i);
+    expect(text).toMatch(/services\.nvd\.nist\.gov/);
+    expect(text).toMatch(/pga config set update-check false/);
+    expect(text).toMatch(/two daily version checks/);
+  });
+
+  it('says proposals and runtime tool names stay on this machine', () => {
+    expect(text).toMatch(/proposals[\s\S]*stay on this machine/);
+    expect(text).toMatch(/names of tools your agents call at\s*runtime are never uploaded/);
   });
 });

@@ -16,6 +16,7 @@ import { existsSync, statSync, openSync, readSync, closeSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { createLogger, MonitorEngine, setFeedManager } from '@panguard-ai/core';
+import { toMonitorEngineConfig } from './monitor-config.js';
 import type { SecurityEvent } from '@panguard-ai/core';
 import type {
   GuardConfig,
@@ -53,9 +54,9 @@ import {
   syncThreatCloud,
   setupCloudSyncTimer,
   checkForRuleUpdates,
+  ruleUpdateCheckEnabled,
   setupRuleUpdateCheckTimer,
   getSkillThreatSubmitter as _getSkillThreatSubmitter,
-  getATRProposalSubmitter as _getATRProposalSubmitter,
   getSkillBlacklistChecker as _getSkillBlacklistChecker,
 } from './rule-sync.js';
 import { processEvent as _processEvent } from './event-processor.js';
@@ -283,35 +284,43 @@ export class GuardEngine {
     // Periodic Threat Cloud INDICATOR sync — INBOUND pull only: IP/domain
     // blocklists + community skill whitelist/blacklist. It does NOT pull
     // detection rules (those are bundled, updated only via `pga upgrade`) and it
-    // does NOT phone home — there is no device heartbeat / hostname beacon. The
-    // only outbound traffic is the opt-in, event-driven anonymized threat upload
-    // (see event-processor.reportAndNotify) and the opt-in whitelist batch.
+    // does NOT phone home — there is no device heartbeat / hostname beacon.
+    // Every Threat Cloud request, downloads included, is part of collective
+    // defense and runs ONLY when the user has opted in (=== true). Without
+    // consent no timer is created and no request is made.
+    const currentConfig = (): GuardConfig => this.config;
     const syncDeps = {
       atrEngine: this.engines.atrEngine,
       threatCloud: this.engines.threatCloud,
       feedManager: this.engines.feedManager,
-      config: this.config,
+      // Read the CURRENT config on every sync, so a consent change applied to this
+      // live instance reaches the timer without a restart.
+      get config(): GuardConfig {
+        return currentConfig();
+      },
     };
-    this.cloudSyncTimer = setupCloudSyncTimer(syncDeps);
-    // Initial indicator sync — FIRE-AND-FORGET (do NOT await). Awaiting it here
-    // blocked the daemon — and therefore the dashboard bind — on a Threat Cloud
-    // network call; a slow / firewalled / dead-IPv6 route to tc.panguard.ai hung
-    // startup for ~75s (the request idle-timeout doesn't cover TCP/TLS connect).
-    // The periodic timer above keeps blocklists fresh; the first pull just lands
-    // a moment after the daemon is already up. Mirrors checkForRuleUpdates below.
-    void syncThreatCloud(syncDeps);
+    if (this.config.threatCloudUploadEnabled === true) {
+      this.cloudSyncTimer = setupCloudSyncTimer(syncDeps);
+      // Initial indicator sync — FIRE-AND-FORGET (do NOT await). Awaiting it here
+      // blocked the daemon — and therefore the dashboard bind — on a Threat Cloud
+      // network call; a slow / firewalled / dead-IPv6 route hung startup. The
+      // periodic timer keeps blocklists fresh; the first pull lands a moment
+      // after the daemon is already up.
+      void syncThreatCloud(syncDeps);
+    }
 
     // Daily rule-update CHECK (notify-only): compares the bundled ruleset against
     // the latest published npm version and surfaces "update available" — it never
     // downloads or live-applies rules (that is the supply-chain hole we avoid).
-    this.ruleUpdateTimer = setupRuleUpdateCheckTimer(syncDeps);
-    void checkForRuleUpdates(syncDeps); // fire-and-forget initial check (no network block on startup)
+    // PANGUARD_NO_UPDATE_CHECK=1 or config `updateCheck: false` turns this off (it
+    // runs whether or not the user joined Threat Cloud, and the disclosure says so).
+    if (ruleUpdateCheckEnabled(process.env, this.config)) {
+      this.ruleUpdateTimer = setupRuleUpdateCheckTimer(syncDeps);
+      void checkForRuleUpdates(syncDeps); // fire-and-forget initial check (no network block on startup)
+    }
 
     // Start monitor engine
-    this.monitorEngine = new MonitorEngine({
-      networkPollInterval: this.config.monitors.networkPollInterval,
-      processPollInterval: this.config.monitors.processPollInterval,
-    });
+    this.monitorEngine = new MonitorEngine(toMonitorEngineConfig(this.config.monitors));
 
     this.monitorEngine.on('event', (event: SecurityEvent) => {
       void this.processEvent(event);
@@ -345,13 +354,17 @@ export class GuardEngine {
       logger.info('Git repository watcher active');
     }
 
-    // Start process watcher (optional, graceful degradation)
-    this.processWatcher = new ProcessWatcher();
-    const processWatcherAvailable = await this.processWatcher.checkAvailability();
-    if (processWatcherAvailable) {
-      this.processWatcher.on('event', (event) => void this.processEvent(event));
-      await this.processWatcher.start();
-      logger.info('Process command-line watcher active');
+    // Start process watcher (optional, graceful degradation). It polls the full
+    // process table with command lines, so it is host monitoring: it follows the
+    // same `monitors.processMonitor` switch as the core process monitor.
+    if (this.config.monitors.processMonitor) {
+      this.processWatcher = new ProcessWatcher();
+      const processWatcherAvailable = await this.processWatcher.checkAvailability();
+      if (processWatcherAvailable) {
+        this.processWatcher.on('event', (event) => void this.processEvent(event));
+        await this.processWatcher.start();
+        logger.info('Process command-line watcher active');
+      }
     }
 
     // Start log collector if configured
@@ -839,19 +852,6 @@ export class GuardEngine {
   }
 
   /**
-   * Get an ATR proposal submitter function for SkillWatcher flywheel integration.
-   */
-  getATRProposalSubmitter(): (proposal: {
-    patternHash: string;
-    ruleContent: string;
-    llmProvider: string;
-    llmModel: string;
-    selfReviewVerdict: string;
-  }) => Promise<boolean> {
-    return _getATRProposalSubmitter(this.engines.threatCloud);
-  }
-
-  /**
    * Get a skill blacklist checker function for SkillWatcher integration.
    */
   getSkillBlacklistChecker(): (skillName: string) => Promise<boolean> {
@@ -960,7 +960,11 @@ export class GuardEngine {
    * snapping the control back.
    */
   applyConfig(newConfig: GuardConfig): void {
+    const wasSharing = this.config.threatCloudUploadEnabled === true;
     this.config = newConfig;
+    if (wasSharing && newConfig.threatCloudUploadEnabled !== true) {
+      this.stopSharing();
+    }
     const nextMode = newConfig.mode;
     if (nextMode && nextMode !== this.mode) {
       this.mode = nextMode;
@@ -975,6 +979,28 @@ export class GuardEngine {
     if (this.dashboard) {
       this.updateDashboardStatus();
     }
+  }
+
+  /**
+   * Withdraw consent on a running instance: stop the Threat Cloud sync timer, the
+   * public feed downloads and the rule-proposal drafter, and make the Threat Cloud
+   * client offline. Turning sharing back ON needs a restart (the client is created
+   * offline when sharing is off).
+   */
+  private stopSharing(): void {
+    if (this.cloudSyncTimer) {
+      clearInterval(this.cloudSyncTimer);
+      this.cloudSyncTimer = null;
+    }
+    this.engines.feedManager.stop();
+    this.engines.atrDrafter?.stop();
+    this.engines.threatCloud.goOffline();
+    logger.info('Sharing turned off: sync, feed downloads and drafter stopped');
+  }
+
+  /** The config this instance is currently running with. */
+  getConfig(): GuardConfig {
+    return this.config;
   }
 
   /**

@@ -17,7 +17,7 @@ import {
   listOutbox,
   readOutboxRecord,
   markOutboxOpened,
-  withOutbox,
+  proposalOutboxSink,
 } from '../src/proposals/index.js';
 import type { AtrProposal, DeidentifyContext } from '../src/proposals/index.js';
 
@@ -255,33 +255,20 @@ describe('outbox', () => {
     expect(readdirSync(dir)).toHaveLength(1);
   });
 
-  it('keeps a proposal when Threat Cloud rejects, fails or is absent', async () => {
+  it('keeps a proposal locally and reports true', async () => {
     const saved: string[] = [];
-    const onSaved = (r: { id: string }) => saved.push(r.id);
+    const sink = proposalOutboxSink({ dir, onSaved: (r) => saved.push(r.id) });
 
-    expect(
-      await withOutbox(async () => false, { dir, onSaved })(skillAuditProposal('a', 'h-reject'))
-    ).toBe(false);
-    expect(
-      await withOutbox(
-        async () => {
-          throw new Error('TC API error: 404 Not Found');
-        },
-        { dir, onSaved }
-      )(skillAuditProposal('b', 'h-throw'))
-    ).toBe(false);
-    expect(await withOutbox(undefined, { dir, onSaved })(skillAuditProposal('c', 'h-none'))).toBe(
-      false
-    );
-
-    expect(saved.sort()).toEqual(['h-none', 'h-reject', 'h-throw']);
-    expect(listOutbox(dir).every((r) => r.status === 'pending' && !r.threatCloudAccepted)).toBe(
-      true
-    );
+    expect(await sink(skillAuditProposal('a', 'h-one'))).toBe(true);
+    expect(saved).toEqual(['h-one']);
+    const record = readOutboxRecord('h-one', dir)!;
+    expect(record.status).toBe('pending');
+    expect(record.threatCloudAccepted).toBe(false);
   });
 
-  it('records Threat Cloud acceptance and passes its result through', async () => {
-    expect(await withOutbox(async () => true, { dir })(skillAuditProposal('d', 'h-ok'))).toBe(true);
-    expect(readOutboxRecord('h-ok', dir)!.threatCloudAccepted).toBe(true);
+  it('reports false and writes nothing when the proposal has no usable evidence', async () => {
+    const empty: AtrProposal = { ...skillAuditProposal('a', 'h-empty'), ruleContent: '{}' };
+    expect(await proposalOutboxSink({ dir })(empty)).toBe(false);
+    expect(listOutbox(dir)).toHaveLength(0);
   });
 });

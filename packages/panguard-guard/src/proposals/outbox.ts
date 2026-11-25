@@ -35,7 +35,10 @@ export interface OutboxRecord {
   /** Producer tag, e.g. 'skill-audit' or the drafter's LLM provider. */
   readonly source: string;
   readonly status: OutboxStatus;
-  /** Whether Threat Cloud accepted the same proposal (optional sink). */
+  /**
+   * Legacy field. Proposals are never uploaded to Threat Cloud any more, so
+   * new records always carry false; old records may still say true.
+   */
   readonly threatCloudAccepted: boolean;
   /** De-identified ATR issue-form fields. */
   readonly issue: AtrIssueFields;
@@ -94,7 +97,7 @@ export function readOutboxRecord(
  */
 export function saveProposalToOutbox(
   proposal: AtrProposal,
-  opts: { dir?: string; threatCloudAccepted?: boolean; ctx?: DeidentifyContext; now?: Date } = {}
+  opts: { dir?: string; ctx?: DeidentifyContext; now?: Date } = {}
 ): OutboxRecord | null {
   const fields = proposalToIssueFields(proposal);
   if (!fields) return null;
@@ -109,8 +112,7 @@ export function saveProposalToOutbox(
     updatedAt: now,
     source: proposal.llmProvider,
     status: existing?.status ?? 'pending',
-    threatCloudAccepted:
-      (existing?.threatCloudAccepted ?? false) || opts.threatCloudAccepted === true,
+    threatCloudAccepted: existing?.threatCloudAccepted ?? false,
     issue: deidentifyIssue(fields, opts.ctx ?? localContext()),
   };
   writeAtomic(recordPath(dir, id), record);
@@ -142,33 +144,24 @@ export function markOutboxOpened(
 }
 
 /**
- * Wrap a Threat Cloud submitter so every proposal also lands in the outbox.
- * Threat Cloud stays optional: when it is unreachable or rejects the proposal
- * the record is kept as `pending` instead of being silently dropped. The
- * wrapper reports Threat Cloud's own result so callers keep their retry logic.
+ * The only sink for ATR rule proposals: the local outbox. A proposal carries
+ * attack text taken from a skill, so it is never uploaded anywhere. The user
+ * reviews it and may submit it as a pre-filled public GitHub issue with
+ * `pga proposals submit <id>`. Resolves true when the proposal was kept
+ * locally, false when it carried no usable evidence or the write failed.
  */
-export function withOutbox(
-  submit: ((p: AtrProposal) => Promise<boolean>) | undefined,
+export function proposalOutboxSink(
   opts: { dir?: string; onSaved?: (record: OutboxRecord) => void } = {}
 ): (p: AtrProposal) => Promise<boolean> {
   return async (proposal) => {
-    let accepted = false;
-    if (submit) {
-      try {
-        accepted = await submit(proposal);
-      } catch {
-        accepted = false;
-      }
-    }
     try {
-      const record = saveProposalToOutbox(proposal, {
-        dir: opts.dir,
-        threatCloudAccepted: accepted,
-      });
-      if (record) opts.onSaved?.(record);
+      const record = saveProposalToOutbox(proposal, { dir: opts.dir });
+      if (!record) return false;
+      opts.onSaved?.(record);
+      return true;
     } catch {
       // A full disk or unwritable home must not break detection.
+      return false;
     }
-    return accepted;
   };
 }
